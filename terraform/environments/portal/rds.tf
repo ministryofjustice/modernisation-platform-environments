@@ -106,7 +106,6 @@ resource "aws_db_option_group" "PortalIGDB19OptionGroup" {
 }
 
 resource "aws_security_group" "igdb" {
-  # name        = "${local.application_name}-${local.environment}-secgroup"
   name        = "${local.application_name}-${local.environment}-secgroup-DB"
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
@@ -229,7 +228,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
   secret_id = aws_secretsmanager_secret.rds_password_secret.id
   secret_string = jsonencode(
     {
-      username = local.username
+      username = local.igdb_username
       password = random_password.rds_password.result
     }
   )
@@ -238,35 +237,34 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 
 
 resource "aws_db_instance" "appdb1" {
-  allocated_storage               = local.storage_size
+  allocated_storage               = local.igdb_storage_size
   db_name                         = local.igdb_dbname
-  # identifier                      = local.application_name
   identifier                      = lower(local.igdb_dbname)
-  engine                          = local.engine
-  engine_version                  = local.engine_version
+  engine                          = local.igdb_engine
+  engine_version                  = local.igdb_engine_version
   enabled_cloudwatch_logs_exports = ["alert", "audit", "listener", "trace"]
   performance_insights_enabled    = true
-  instance_class                  = local.instance_class
-  auto_minor_version_upgrade      = local.auto_minor_version_upgrade
-  storage_type                    = local.storage_type
-  backup_retention_period         = local.backup_retention_period
-  backup_window                   = local.backup_window
-  character_set_name              = local.character_set_name
-  #?max_allocated_storage           = local.max_allocated_storage
-  username               = local.username
+  instance_class                  = local.igdb_instance_class
+  auto_minor_version_upgrade      = local.igdb_auto_minor_version_upgrade
+  storage_type                    = local.igdb_storage_type
+  backup_retention_period         = local.igdb_backup_retention_period
+  backup_window                   = local.igdb_backup_window
+  character_set_name              = local.igdb_character_set_name
+  #max_allocated_storage           = local.max_allocated_storage
+  username               = local.igdb_username
   password               = random_password.rds_password.result
   vpc_security_group_ids = [aws_security_group.igdb.id]
-  # skip_final_snapshot             = false
+  #skip_final_snapshot             = false
   final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name  = aws_db_parameter_group.igdb-parametergroup-19c.name
   db_subnet_group_name  = aws_db_subnet_group.igdb.name
-  maintenance_window    = local.maintenance_window
+  maintenance_window    = local.igdb_maintenance_window
   license_model         = "bring-your-own-license"
   #TODO deletion_protection   = true
   copy_tags_to_snapshot = true
   storage_encrypted     = true
-  # apply_immediately           = true
-  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.rds_snapshot_name)
+  #apply_immediately           = true
+  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.igdb_rds_snapshot_name)
   kms_key_id                  = data.aws_kms_key.rds_shared.arn
   publicly_accessible         = false
   allow_major_version_upgrade = true
@@ -284,7 +282,6 @@ resource "aws_db_instance" "appdb1" {
 
   tags = merge(
     local.tags,
-    # { "Name" = "${local.application_name}" },
     { "Name" = "${local.igdb_dbname}" },
     { "Keep" = "true" },
     { "scheduler:ebs-snapshot" = "True" }
