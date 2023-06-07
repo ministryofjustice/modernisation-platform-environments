@@ -75,7 +75,7 @@ locals {
       #     }
       #   }
       # }
-      
+
       private = {
         internal_lb              = true
         enable_delete_protection = false
@@ -124,8 +124,6 @@ locals {
         lb_target_groups = {
           https-443 = {
             port                 = 443
-            protocol             = "TCP"
-            target_type          = "alb"
             deregistration_delay = 30
             health_check = {
               enabled             = true

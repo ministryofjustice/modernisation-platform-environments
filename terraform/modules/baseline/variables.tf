@@ -457,8 +457,6 @@ variable "lbs" {
     tags                     = optional(map(string), {})
     lb_target_groups = optional(map(object({
       port                 = optional(number)
-      protocol             = optional(string)
-      target_type          = string
       deregistration_delay = optional(number)
       health_check = optional(object({
         enabled             = optional(bool)
