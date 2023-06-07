@@ -3,17 +3,21 @@ resource "random_password" "new_password" {
   special = false 
 }
 
+data "aws_db_instance" "database" {
+  db_instance_identifier = var.db_instance_identifier
+}
+
 resource "null_resource" "setup_db" {
-  depends_on = [aws_db_instance.rdsdb] #wait for the db to be ready
+  depends_on = [data.aws_db_instance.database] #wait for the db to be ready
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
 
     environment = {
-      DB_URL = aws_db_instance.rdsdb.address      
-      USER_NAME = nonsensitive(jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"])
-      PASSWORD = nonsensitive(jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"])
+      DB_URL = data.aws_db_instance.database.address
+      USER_NAME = var.rds_user
+      PASSWORD = var.rds_password
       NEW_DB_NAME = "lands"
       NEW_USER_NAME = "lands_admin"
       NEW_PASSWORD = random_password.new_password.result
