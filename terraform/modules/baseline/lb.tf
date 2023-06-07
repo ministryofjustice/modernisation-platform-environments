@@ -30,7 +30,7 @@ module "lb" {
   idle_timeout               = each.value.idle_timeout
   internal_lb                = each.value.internal_lb
   load_balancer_type         = each.value.load_balancer_type
-  #lb_target_groups           = each.value.lb_target_groups
+  lb_target_groups           = each.value.lb_target_groups
 
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
