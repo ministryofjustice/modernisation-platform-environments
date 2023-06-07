@@ -974,7 +974,7 @@
     "TCP_161-162": {
       "from_port": 161,
       "to_port": 162,
-      "protocol": "TCP"
+      "protocol": "UDP"
     },
     "ICMP_ALL": {
       "from_port": -1,
