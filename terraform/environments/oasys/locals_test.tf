@@ -91,8 +91,12 @@ locals {
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["t2_${local.application_name}_cert"]
             default_action = {
-              type = "forward"
-              target_group_name = "t2-${local.application_name}-web-a-http-8080"
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
             }
             rules = {
               t2-web-http-8080 = {
