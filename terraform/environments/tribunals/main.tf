@@ -1,7 +1,7 @@
-# module "transport" {
-#   source                 = "./modules/transport"
-#   application_name       = "tribs-transport-${local.environment}"
-#   environment            = local.environment
-#   db_instance_identifier = local.application_data.accounts[local.environment].db_identifier
-#   rds_secret_arn          = "arn:aws:secretsmanager:eu-west-2:263310006819:secret:tribunals-db-dev-credentials-WIKA7c"
-# }
+module "lands_chamber" {
+  source                 = "./modules/lands_chamber"
+  application_name       = "lands_chamber"
+  environment            = local.environment
+  db_instance_identifier = local.application_data.accounts[local.environment].db_identifier
+ 
+}
