@@ -971,7 +971,7 @@
       "to_port": 65535,
       "protocol": "UDP"
     },
-    "TCP_161-162": {
+    "UDP_161-162": {
       "from_port": 161,
       "to_port": 162,
       "protocol": "UDP"
