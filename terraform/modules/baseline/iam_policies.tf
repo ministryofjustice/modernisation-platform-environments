@@ -1,5 +1,5 @@
 locals {
-  iam_policies = merge(local.s3_buckets_iam_policies, local.route53_iam_policies, var.iam_policies)
+  iam_policies = merge(local.s3_buckets_iam_policies, var.iam_policies)
 }
 
 data "aws_iam_policy_document" "this" {

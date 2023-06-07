@@ -10,27 +10,6 @@ locals {
     for key, value in aws_route53_zone.this : key => merge(value, { provider = "self" })
   })
 
-  # create route53 policy for query logs
-  route53_iam_policies = length(local.route53_zones_to_create) != 0 ? {
-    CloudWatchRoute53Policy = {
-      path        = "/"
-      description = "Allow Route53 to write CloudWatch logs"
-      statements = [{
-        effect = "Allow"
-        actions = [
-          "logs:PutLogEvents",
-          "logs:CreateLogStream",
-        ]
-        resources = ["arn:aws:logs:*:*:log-group:/route53/*"]
-        principals = {
-          identifiers = ["route53.amazonaws.com"]
-          type        = "Service"
-        }
-        conditions = []
-      }]
-    }
-  } : {}
-
   route53_records_list = flatten([
     for zone_name, zone_value in var.route53_zones : [
       for record in zone_value.records : [{
@@ -174,12 +153,34 @@ resource "aws_route53_zone" "this" {
   })
 }
 
+data "aws_iam_policy_document" "route53_query_logging_policy" {
+  statement {
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+
+    resources = ["arn:aws:logs:*:*:log-group:/route53/*"]
+
+    principals {
+      identifiers = ["route53.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_resource_policy" "route53_query_logging_policy" {
+  provider = aws.us-east-1
+
+  policy_document = data.aws_iam_policy_document.route53_query_logging_policy.json
+  policy_name     = "CloudWatchRoute53QueryLoggingPolicy"
+}
+
 resource "aws_cloudwatch_log_group" "route53" {
   for_each = local.route53_zones_to_create
 
   provider = aws.us-east-1
 
-  # the name matches iam policy defined in locals above
   name              = "route53/${each.key}"
   retention_in_days = 30
 
@@ -195,7 +196,7 @@ resource "aws_route53_query_log" "this" {
   zone_id                  = aws_route53_zone.this[each.key].zone_id
 
   depends_on = [
-    aws_iam_policy.this,
+    aws_cloudwatch_log_resource_policy.route53_query_logging_policy,
   ]
 }
 
