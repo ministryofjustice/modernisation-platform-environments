@@ -85,7 +85,7 @@ locals {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 1
         })
-        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description          = "For testing XTAG image"
           ami                  = "base_rhel_7_9"
@@ -353,6 +353,7 @@ locals {
         }
       }
     }
+
     baseline_route53_zones = {
       "test.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
@@ -401,6 +402,7 @@ locals {
         ]
       }
     }
+
     baseline_s3_buckets = {
       # use this bucket for storing artefacts for use across all accounts
       ec2-image-builder-nomis = {
