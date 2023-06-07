@@ -131,4 +131,8 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_sns_topics", {})
   )
 
+  ssm_parameters = merge(
+    local.baseline_ssm_parameters,
+    lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
+  )
 }

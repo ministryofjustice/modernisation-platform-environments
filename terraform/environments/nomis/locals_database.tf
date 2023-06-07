@@ -6,6 +6,20 @@
 
 locals {
 
+  database_ssm_parameters = {
+    prefix = "/database/"
+    names = {
+      az_sas_token = {}
+    }
+  }
+
+  database_instance_ssm_parameters = {
+    prefix = "/database/"
+    names = {
+      syspassword = {}
+    }
+  }
+
   database_cloudwatch_metric_alarms = {
     oracle-db-disconnected = {
       comparison_operator = "GreaterThanOrEqualToThreshold"

@@ -4,6 +4,7 @@ locals {
   # baseline config
   test_config = {
 
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -21,6 +22,26 @@ locals {
           description = "wildcard cert for nomis ${local.environment} domains"
         }
       }
+    }
+
+    baseline_ssm_parameters = {
+      # add into code once for_each issue resolved
+      #      "t1-nomis-db-1-b"         = local.database_ssm_parameters
+      #      "t1-nomis-db-1-b/CNOMT1"  = local.database_instance_ssm_parameters
+      #      "t1-nomis-db-1-b/NDHT1"   = local.database_instance_ssm_parameters
+      #      "t1-nomis-db-1-b/TRDATT1" = local.database_instance_ssm_parameters
+      #      "t2-nomis-db-1-b"         = local.database_ssm_parameters
+      #      "t2-nomis-db-1-b/CNOMT2"  = local.database_instance_ssm_parameters
+      #      "t2-nomis-db-1-b/NDHT2"   = local.database_instance_ssm_parameters
+      #      "t2-nomis-db-1-b/TRDATT2" = local.database_instance_ssm_parameters
+      #      "t3-nomis-db-1"           = local.database_ssm_parameters
+
+      #      "t1-nomis-web-a" = local.weblogic_ssm_parameters
+      #      "t1-nomis-web-b" = local.weblogic_ssm_parameters
+      #      "t2-nomis-web-a" = local.weblogic_ssm_parameters
+      #      "t2-nomis-web-b" = local.weblogic_ssm_parameters
+
+      #      "t1-nomis-xtag-a" = local.xtag_ssm_parameters
     }
 
     baseline_ec2_autoscaling_groups = {
