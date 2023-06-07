@@ -222,10 +222,10 @@ resource "aws_security_group" "ecs_service" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    description     = "Allow all traffic from load balancer"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    description     = "Allow traffic on port 80 from load balancer"
     security_groups = [aws_security_group.tipstaff_lb_sc.id]
   }
 
