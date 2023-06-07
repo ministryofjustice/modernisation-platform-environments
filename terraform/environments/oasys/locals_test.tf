@@ -75,6 +75,7 @@ locals {
       #     }
       #   }
       # }
+      
       private = {
         internal_lb              = true
         enable_delete_protection = false
