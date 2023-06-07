@@ -209,3 +209,9 @@ resource "aws_iam_role_policy" "ecs_exec" {
   policy = data.aws_iam_policy_document.ecs_exec.json
   role   = aws_iam_role.ecs_exec.id
 }
+
+# temp log group for testinng ldap
+resource "aws_cloudwatch_log_group" "ldap_test" {
+  name              = "/ecs/ldap_test"
+  retention_in_days = 7
+}
