@@ -173,7 +173,7 @@ data "aws_iam_policy_document" "route53_query_logging_policy" {
       "logs:PutLogEvents",
     ]
 
-    resources = ["arn:aws:logs:*:*:log-group:/route53/*"]
+    resources = ["arn:aws:logs:us-east-1:*:log-group:*"]
 
     principals {
       identifiers = ["route53.amazonaws.com"]
