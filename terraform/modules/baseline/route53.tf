@@ -25,6 +25,7 @@ locals {
           identifiers = ["route53.amazonaws.com"]
           type        = "Service"
         }
+        conditions = []
       }]
     }
   } : {}
