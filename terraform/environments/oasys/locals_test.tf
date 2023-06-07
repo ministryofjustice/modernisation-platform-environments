@@ -124,7 +124,6 @@ locals {
         lb_target_groups = {
           https-443 = {
             port                 = 443
-            deregistration_delay = 30
             health_check = {
               enabled             = true
               interval            = 30
@@ -134,10 +133,6 @@ locals {
               port                = 443
               timeout             = 5
               unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
             }
           }
         }
