@@ -90,6 +90,11 @@ output "cluster_encrypted" {
   value       = module.datamart.cluster_encrypted
 }
 
+output "cluster_master_password" {
+  description = "Cluster Password"
+  value       = module.datamart.redshift_master_password
+}
+
 output "cluster_vpc_security_group_ids" {
   description = "The VPC security group ids associated with the cluster"
   value       = module.datamart.cluster_vpc_security_group_ids
