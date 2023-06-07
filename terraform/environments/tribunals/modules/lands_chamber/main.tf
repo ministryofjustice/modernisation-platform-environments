@@ -3,19 +3,14 @@ resource "random_password" "new_password" {
   special = false 
 }
 
-data "aws_db_instance" "database" {
-  db_instance_identifier = var.db_instance_identifier
-}
-
 resource "null_resource" "setup_db" {
-  depends_on = [data.aws_db_instance.database] #wait for the db to be ready
-
+ 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
 
     environment = {
-      DB_URL = data.aws_db_instance.database.address
+      DB_URL = var.rds_url   
       USER_NAME = var.rds_user
       PASSWORD = var.rds_password
       NEW_DB_NAME = "lands"

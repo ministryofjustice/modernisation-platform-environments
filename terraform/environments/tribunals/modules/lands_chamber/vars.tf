@@ -15,11 +15,17 @@ variable app_db_login_name {
   default = "lands-app"
 }  
 
-variable "db_instance_identifier" {  
+#variable "db_instance_identifier" {  
+#}
+
+variable "rds_url" {  
+  type = string
 }
 
 variable "rds_user" {  
+  type = string
 }
 
 variable "rds_password" {  
+  type = string
 }
