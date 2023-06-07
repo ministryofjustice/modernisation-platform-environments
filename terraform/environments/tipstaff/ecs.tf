@@ -88,7 +88,6 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
 
 resource "aws_ecs_service" "tipstaff_ecs_service" {
   depends_on = [
-    aws_lb_listener.tipstaff_lb_1,
     aws_lb_listener.tipstaff_lb_2
   ]
 
