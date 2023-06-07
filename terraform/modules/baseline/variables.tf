@@ -734,7 +734,7 @@ variable "ssm_parameters" {
         length  = number
         special = optional(bool)
       }))
-      value = optional(string, "placeholder, overwrite me outside of terraform")
+      value = optional(string)
     }))
   }))
   default = {}
