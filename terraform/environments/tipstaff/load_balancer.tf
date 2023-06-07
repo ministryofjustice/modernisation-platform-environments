@@ -3,13 +3,13 @@ resource "aws_security_group" "tipstaff_lb_sc" {
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    description = "allow access on HTTP for the MOJ VPN"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
-  }
+  # ingress {
+  #   description = "allow access on HTTP for the MOJ VPN"
+  #   from_port   = 80
+  #   to_port     = 80
+  #   protocol    = "tcp"
+  #   cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
+  # }
 
   ingress {
     description = "allow access on HTTPS for the MOJ VPN"
@@ -105,17 +105,17 @@ resource "aws_lb_target_group" "tipstaff_target_group" {
 
 }
 
-resource "aws_lb_listener" "tipstaff_lb_1" {
-  load_balancer_arn = aws_lb.tipstaff_lb.arn
-  port              = local.application_data.accounts[local.environment].server_port_1
-  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_1
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_1 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+# resource "aws_lb_listener" "tipstaff_lb_1" {
+#   load_balancer_arn = aws_lb.tipstaff_lb.arn
+#   port              = local.application_data.accounts[local.environment].server_port_1
+#   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_1
+#   ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_1 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tipstaff_target_group.arn
-  }
-}
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.tipstaff_target_group.arn
+#   }
+# }
 
 resource "aws_lb_listener" "tipstaff_lb_2" {
   depends_on = [
