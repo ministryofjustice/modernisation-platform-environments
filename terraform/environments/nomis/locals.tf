@@ -107,43 +107,19 @@ locals {
   baseline_sns_topics = {}
 
   baseline_ssm_parameters = {
-    "" = {
-      prefix  = ""
-      postfix = ""
-      names = {
-        test-cloud-watch-config-linux = {
-          description = "cloud watch agent config for linux"
-          # file        = "./templates/cloud_watch_linux.json"
-          file = "./templates/cloud_watch_windows.json"
-          type = "String"
-        }
-        test-cloud-watch-config-windows = {
-          description = "cloud watch agent config for windows"
-          # file        = "./templates/cloud_watch_windows.json"
-          file = "./templates/cloud_watch_linux.json"
-          type = "String"
-        }
-        test-ec2-user_pem       = {}
-        test-github-ci-user-pat = {}
-        test-random = {
-          random = {
-            length  = 24
-            special = false
-          }
-        }
-        test-random2 = {
-          random = {
-            length  = 24
-            special = false
-          }
-        }
-        test-value = {
-          value = "test3"
-        }
-        test-value2 = {
-          value = "test24"
-        }
-      }
-    }
+    # Add these into code once for_each issue fixed
+    #    "" = {
+    #      prefix  = ""
+    #      postfix = ""
+    #      names = {
+    #        cloud-watch-config-windows = {
+    #          description = "cloud watch agent config for windows"
+    #          file        = "./templates/cloud_watch_windows.json"
+    #          type = "String"
+    #        }
+    #        ec2-user_pem       = {}
+    #        github-ci-user-pat = {}
+    #      }
+    #    }
   }
 }
