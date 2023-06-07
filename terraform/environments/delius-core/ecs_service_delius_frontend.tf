@@ -261,10 +261,6 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
             valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_port.arn
           },
           {
-            name      = "LDAP_HOST"
-            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_host.arn
-          },
-          {
             name      = "LDAP_PRINCIPAL"
             valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_principal.arn
           },
@@ -278,6 +274,12 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
           {
             name      = "EIS_USER_CONTEXT"
             valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_eis_user_context.arn
+          }
+        ]
+        environment = [
+          {
+            name  = "LDAP_HOST"
+            value = aws_lb.ldap.dns_name
           }
         ]
       }
