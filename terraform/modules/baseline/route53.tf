@@ -10,6 +10,25 @@ locals {
     for key, value in aws_route53_zone.this : key => merge(value, { provider = "self" })
   })
 
+  # create route53 policy for query logs
+  route53_iam_policies = length(route53_zones_to_create) != 0 ? {
+    CloudWatchRoute53Policy = {
+      description = "Allow Route53 to write CloudWatch logs"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "logs:PutLogEvents",
+          "logs:CreateLogStream",
+        ]
+        resources = ["arn:aws:logs:*:*:log-group:/route53/*"]
+        principals = {
+          identifiers = ["route53.amazonaws.com"]
+          type        = "Service"
+        }
+      }]
+    }
+  } : {}
+
   route53_records_list = flatten([
     for zone_name, zone_value in var.route53_zones : [
       for record in zone_value.records : [{
@@ -158,6 +177,7 @@ resource "aws_cloudwatch_log_group" "route53" {
 
   provider = aws.us-east-1
 
+  # the name matches iam policy defined in locals above
   name              = "route53/${each.key}"
   retention_in_days = 30
 
