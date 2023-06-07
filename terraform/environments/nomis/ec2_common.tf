@@ -51,21 +51,6 @@ resource "aws_ssm_document" "cloud_watch_agent" {
   )
 }
 
-resource "aws_ssm_parameter" "cloud_watch_config_windows" {
-  #checkov:skip=CKV2_AWS_34:there should not be anything secret in this config
-  description = "cloud watch agent config for windows"
-  name        = "cloud-watch-config-windows"
-  type        = "String"
-  value       = file("./templates/cloud_watch_windows.json")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "cloud-watch-config-windows"
-    },
-  )
-}
-
 #------------------------------------------------------------------------------
 # SSM Agent - update Systems Manager Agent
 #------------------------------------------------------------------------------
