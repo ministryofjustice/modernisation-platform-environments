@@ -11,7 +11,7 @@ locals {
   })
 
   # create route53 policy for query logs
-  route53_iam_policies = length(route53_zones_to_create) != 0 ? {
+  route53_iam_policies = length(local.route53_zones_to_create) != 0 ? {
     CloudWatchRoute53Policy = {
       description = "Allow Route53 to write CloudWatch logs"
       statements = [{
