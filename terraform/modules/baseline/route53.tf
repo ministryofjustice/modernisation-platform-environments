@@ -153,6 +153,19 @@ resource "aws_route53_zone" "this" {
   })
 }
 
+resource "aws_cloudwatch_log_group" "route53" {
+  for_each = local.route53_zones_to_create
+
+  provider = aws.us-east-1
+
+  name              = "aws/route53/${each.key}"
+  retention_in_days = 30
+
+  tags = merge(local.tags, {
+    Name = "aws/route53/${each.key}"
+  })
+}
+
 data "aws_iam_policy_document" "route53_query_logging_policy" {
   statement {
     actions = [
@@ -160,7 +173,7 @@ data "aws_iam_policy_document" "route53_query_logging_policy" {
       "logs:PutLogEvents",
     ]
 
-    resources = ["arn:aws:logs:*:*:log-group:/route53/*"]
+    resources = ["arn:aws:logs:*:*:log-group:/aws/route53/*"]
 
     principals {
       identifiers = ["route53.amazonaws.com"]
@@ -176,18 +189,6 @@ resource "aws_cloudwatch_log_resource_policy" "route53_query_logging_policy" {
   policy_name     = "CloudWatchRoute53QueryLoggingPolicy"
 }
 
-resource "aws_cloudwatch_log_group" "route53" {
-  for_each = local.route53_zones_to_create
-
-  provider = aws.us-east-1
-
-  name              = "route53/${each.key}"
-  retention_in_days = 30
-
-  tags = merge(local.tags, {
-    Name = "route53/${each.key}"
-  })
-}
 
 resource "aws_route53_query_log" "this" {
   for_each = local.route53_zones_to_create
