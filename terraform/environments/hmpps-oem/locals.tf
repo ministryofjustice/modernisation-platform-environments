@@ -25,7 +25,7 @@ locals {
       dba_high_priority_pagerduty = ["dba_high_priority_pagerduty"]
     }
     route53_resolver_rules = {
-      outbound-data-and-private-subnets = ["azure-fixngo-domain"]
+      # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
