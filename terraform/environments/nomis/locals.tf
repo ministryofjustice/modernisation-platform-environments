@@ -111,7 +111,7 @@ locals {
     #    "" = {
     #      prefix  = ""
     #      postfix = ""
-    #      names = {
+    #      parameters = {
     #        cloud-watch-config-windows = {
     #          description = "cloud watch agent config for windows"
     #          file        = "./templates/cloud_watch_windows.json"
