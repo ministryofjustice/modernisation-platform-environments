@@ -411,40 +411,40 @@ resource "random_password" "rds_password_iadb" {
   special = false
 }
 
-resource "aws_secretsmanager_secret" "rds_password_secret" {
-  name        = "${local.application_name}/app/db-master-password"
+resource "aws_secretsmanager_secret" "rds_password_secret_igdb" {
+  name        = "${local.application_name}/app/db-master-password-igdb"
   description = "This secret has a dynamically generated password."
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}/app/db-master-password" },
+    { "Name" = "${local.application_name}/app/db-master-password-igdb" },
   )
 }
 
 resource "aws_secretsmanager_secret" "rds_password_secret_iadb" {
-  name        = "${local.application_name}/app/db-master-password"
+  name        = "${local.application_name}/app/db-master-password-iadb"
   description = "This secret has a dynamically generated password."
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}/app/db-master-password" },
+    { "Name" = "${local.application_name}/app/db-master-password-iadb" },
   )
 }
 
 resource "aws_secretsmanager_secret_version" "rds_password_secret_version_igdb" {
-  secret_id = aws_secretsmanager_secret.rds_password_secret.id
+  secret_id = aws_secretsmanager_secret.rds_password_secret_igdb.id
   secret_string = jsonencode(
     {
       username = local.igdb_username
-      password = random_password.rds_password.result
+      password = random_password.rds_password_igdb.result
     }
   )
 }
 
 resource "aws_secretsmanager_secret_version" "rds_password_secret_version_iadb" {
-  secret_id = aws_secretsmanager_secret.rds_password_secret.id
+  secret_id = aws_secretsmanager_secret.rds_password_secret_iadb.id
   secret_string = jsonencode(
     {
-      username = local.igdb_username
-      password = random_password.rds_password.result
+      username = local.iadb_username
+      password = random_password.rds_password_iadb.result
     }
   )
 }
