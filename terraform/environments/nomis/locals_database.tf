@@ -8,14 +8,14 @@ locals {
 
   database_ssm_parameters = {
     prefix = "/database/"
-    names = {
+    parameters = {
       az_sas_token = {}
     }
   }
 
   database_instance_ssm_parameters = {
     prefix = "/database/"
-    names = {
+    parameters = {
       syspassword = {}
     }
   }

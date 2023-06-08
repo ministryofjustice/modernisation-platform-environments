@@ -2,7 +2,7 @@ locals {
 
   ssm_parameters_list = flatten([
     for sp_key, sp_value in var.ssm_parameters : [
-      for param_name, param_value in sp_value.names : {
+      for param_name, param_value in sp_value.parameters : {
         key   = "${sp_value.prefix}${sp_key}${sp_value.postfix}${param_name}"
         value = param_value
       }
