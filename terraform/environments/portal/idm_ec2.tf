@@ -15,8 +15,14 @@ echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
 echo "/dev/xvdc /IDAM/product/runtime/Domain/aserver ext4 defaults 0 0" >> /etc/fstab
 echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/fstab
 echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
+echo "/dev/xvdf /IDAM/product/runtime/instances ext4 defaults 0 0" >> /etc/fstab
 mount -a
 hostnamectl set-hostname ${local.application_name}-idm1-ms.${local.portal_hosted_zone}
+EOF
+
+  idm_2_userdata = <<EOF
+#!/bin/bash
+hostnamectl set-hostname ${local.application_name}-idm2-ms.${local.portal_hosted_zone}
 EOF
 }
 
@@ -247,98 +253,52 @@ resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to_idm" {
 ######################################
 
 resource "aws_instance" "idm_instance_1" {
-  ami                         = local.application_data.accounts[local.environment].oam_ami_id
+  ami                         = local.application_data.accounts[local.environment].idm_ami_id
   availability_zone           = "eu-west-2a"
-  instance_type               = local.application_data.accounts[local.environment].oam_instance_type
-  vpc_security_group_ids      = [aws_security_group.oam_instance.id]
+  instance_type               = local.application_data.accounts[local.environment].idm_instance_type
+  vpc_security_group_ids      = [aws_security_group.idm_instance.id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
-  user_data_base64            = base64encode(local.oam_1_userdata)
+  user_data_base64            = base64encode(local.idm_1_userdata)
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name} OAM Instance 1" },
+    { "Name" = "${local.application_name} IDM Instance 1" },
     { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
   )
 }
 
-resource "aws_instance" "oam_instance_2" {
+resource "aws_instance" "idm_instance_2" {
   count = local.environment == "production" ? 1 : 0
-  ami                         = local.application_data.accounts[local.environment].oam_ami_id
+  ami                         = local.application_data.accounts[local.environment].idm_ami_id
   availability_zone           = "eu-west-2b"
-  instance_type               = local.application_data.accounts[local.environment].oam_instance_type
-  vpc_security_group_ids      = [aws_security_group.oam_instance.id]
+  instance_type               = local.application_data.accounts[local.environment].idm_instance_type
+  vpc_security_group_ids      = [aws_security_group.idm_instance.id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_b.id
-  # iam_instance_profile        = aws_iam_instance_profile.portal_instance_profile.id # TODO to be updated once merging with OHS work
+  iam_instance_profile        = aws_iam_instance_profile.portal.id # TODO to be updated once merging with OHS work
   user_data_base64            = base64encode(local.oam_2_userdata)
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name} OAM Instance 2" },
+    { "Name" = "${local.application_name} IDM Instance 2" },
     { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
   )
 }
 
 
 ###############################
-# OAM EBS Volumes
+# IDM EBS Volumes
 ###############################
 
-resource "aws_ebs_volume" "oam_repo_home" {
-  availability_zone = "eu-west-2a"
-  size              = 150
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_repo_home_snapshot
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OAM-repo-home" },
-  )
-}
-resource "aws_volume_attachment" "oam_repo_home" {
-  device_name = "/dev/sdf"
-  volume_id   = aws_ebs_volume.oam_repo_home.id
-  instance_id = aws_instance.oam_instance_1.id
-}
-
-resource "aws_ebs_volume" "oam_config" {
-  availability_zone = "eu-west-2a"
-  size              = 15
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id  # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
-  snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OAM-config" },
-  )
-}
-resource "aws_volume_attachment" "oam_onfig" {
-  device_name = "/dev/xvdd"
-  volume_id   = aws_ebs_volume.oam_config.id
-  instance_id = aws_instance.oam_instance_1.id
-}
-
-resource "aws_ebs_volume" "oam_fmw" {
+resource "aws_ebs_volume" "idm_fmw" {
   availability_zone = "eu-west-2a"
   size              = 30
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_fmw_snapshot
+  snapshot_id       = local.application_data.accounts[local.environment].idm_fmw_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -346,22 +306,22 @@ resource "aws_ebs_volume" "oam_fmw" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-OAM-fmw" },
+    { "Name" = "${local.application_name}-IDM-fmw" },
   )
 }
-resource "aws_volume_attachment" "oam_fmw" {
+resource "aws_volume_attachment" "idm_fmw" {
   device_name = "/dev/xvdb"
-  volume_id   = aws_ebs_volume.oam_fmw.id
-  instance_id = aws_instance.oam_instance_1.id
+  volume_id   = aws_ebs_volume.idm_fmw.id
+  instance_id = aws_instance.idm_instance_1.id
 }
 
-resource "aws_ebs_volume" "oam_aserver" {
+resource "aws_ebs_volume" "idm_aserver" {
   availability_zone = "eu-west-2a"
   size              = 15
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_aserver_snapshot
+  snapshot_id       = local.application_data.accounts[local.environment].idm_aserver_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -369,22 +329,45 @@ resource "aws_ebs_volume" "oam_aserver" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-OAM-aserver" },
+    { "Name" = "${local.application_name}-IDM-aserver" },
   )
 }
-resource "aws_volume_attachment" "oam_aserver" {
+resource "aws_volume_attachment" "idm_aserver" {
   device_name = "/dev/xvdc"
-  volume_id   = aws_ebs_volume.oam_aserver.id
-  instance_id = aws_instance.oam_instance_1.id
+  volume_id   = aws_ebs_volume.idm_aserver.id
+  instance_id = aws_instance.idm_instance_1.id
 }
 
-resource "aws_ebs_volume" "oam_mserver" {
+resource "aws_ebs_volume" "idm_config" {
   availability_zone = "eu-west-2a"
-  size              = 40
+  size              = 15
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id  
+  snapshot_id       = local.application_data.accounts[local.environment].idm_config_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-IDM-config" },
+  )
+}
+resource "aws_volume_attachment" "idm_config" {
+  device_name = "/dev/xvdd"
+  volume_id   = aws_ebs_volume.idm_config.id
+  instance_id = aws_instance.idm_instance_1.id
+}
+
+resource "aws_ebs_volume" "idm_mserver" {
+  availability_zone = "eu-west-2a"
+  size              = 20
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_mserver_snapshot
+  snapshot_id       = local.application_data.accounts[local.environment].idm_mserver_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -392,165 +375,34 @@ resource "aws_ebs_volume" "oam_mserver" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-OAM-mserver" },
+    { "Name" = "${local.application_name}-IDM-mserver" },
   )
 }
 resource "aws_volume_attachment" "oam_mserver" {
   device_name = "/dev/xvde"
-  volume_id   = aws_ebs_volume.oam_mserver.id
-  instance_id = aws_instance.oam_instance_1.id
+  volume_id   = aws_ebs_volume.idm_mserver.id
+  instance_id = aws_instance.idm_instance_1.id
 }
 
-###############################
-# EC2 Instance Profile
-###############################
+resource "aws_ebs_volume" "idm_instances" {
+  availability_zone = "eu-west-2a"
+  size              = 20
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].idm_instances_snapshot
 
-# IAM Role, policy and instance profile (to attach the role to the EC2)
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
 
-resource "aws_iam_instance_profile" "portal" {
-  name = "${local.application_name}-ec2-instance-profile"
-  role = aws_iam_role.portal.name
   tags = merge(
     local.tags,
-    {
-      Name = "${local.application_name}-ec2-instance-profile"
-    }
+    { "Name" = "${local.application_name}-IDM-instances" },
   )
 }
-
-resource "aws_iam_role" "portal" {
-  name = "${local.application_name}-ec2-instance-role"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-ec2-instance-role"
-    }
-  )
-  assume_role_policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "sts:AssumeRole",
-            "Principal": {
-               "Service": "ec2.amazonaws.com"
-            },
-            "Effect": "Allow",
-            "Sid": ""
-        }
-    ]
+resource "aws_volume_attachment" "idm_instances" {
+  device_name = "/dev/xvdf"
+  volume_id   = aws_ebs_volume.idm_instances.id
+  instance_id = aws_instance.idm_instance_1.id
 }
-EOF
-}
-
-# TODO What exactly do the instance role require kms:Decrypt for?
-
-resource "aws_iam_policy" "portal" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name = "${local.application_name}-ec2-instance-policy"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-ec2-instance-policy"
-    }
-  )
-  policy = <<EOF
-{
-    "Version" : "2012-10-17",
-    "Statement": [
-        {
-            "Action": [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-                "logs:DescribeLogStreams",
-                "logs:DescribeLogGroups",
-                "cloudwatch:PutMetricData",
-                "cloudwatch:GetMetricStatistics",
-                "cloudwatch:ListMetrics",
-                "ec2:*",
-                "ec2messages:*",
-                "s3:*",
-                "ssm:*"
-            ],
-            "Resource": "*",
-            "Effect": "Allow"
-        },
-        {
-            "Action": "kms:Decrypt",
-            "Resource": [
-                "arn:aws:kms:eu-west-2:${data.aws_caller_identity.current.account_id}:alias/aws/ssm"
-            ],
-            "Effect": "Allow"
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "ssm" {
-  role       = aws_iam_role.portal.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_role_policy_attachment" "portal" {
-  role       = aws_iam_role.portal.name
-  policy_arn = aws_iam_policy.portal.arn
-}
-
-#####################################
-# OAM Route 53 records
-#####################################
-
-resource "aws_route53_record" "oam1_nonprod" {
-  count    = local.environment != "production" ? 1 : 0
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}" # Correspond to portal-oam1-ms.aws.dev.legalservices.gov.uk
-  type     = "A"
-  ttl      = 60
-  records  = [aws_instance.oam_instance_1.private_ip]
-}
-
-# resource "aws_route53_record" "oam1_prod" {
-#   count    = local.environment == "production" ? 1 : 0
-#   provider = aws.core-network-services
-#   zone_id  = data.aws_route53_zone.portal-oam.zone_id # TODO This hosted zone name to be determined
-#   name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
-#   type     = "A"
-#   ttl      = 60
-#   records  = [aws_instance.oam_instance_1.private_ip]
-# }
-
-# resource "aws_route53_record" "oam2_prod" {
-#   count    = local.environment == "production" ? 1 : 0
-#   provider = aws.core-vpc
-#   zone_id  = data.aws_route53_zone.portal-oam.zone_id # TODO This hosted zone name to be determined
-#   name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
-#   type     = "A"
-#   ttl      = 60
-#   records  = [aws_instance.oam_instance_2.private_ip]
-# }
-#
-#
-# ## TODO Optionally, OAM Admin Records can be looped with the other records...
-# resource "aws_route53_record" "oam_admin_nonprod" {
-#   count    = local.environment != "production" ? 1 : 0
-#   provider = aws.core-vpc
-#   zone_id  = data.aws_route53_zone.external.zone_id
-#   name     = "${local.application_name}.${data.aws_route53_zone.external.name}"
-#   type     = "A"
-#   ttl      = 60
-#   records  = [aws_instance.oam_instance_1.private_ip]
-# }
-#
-# resource "aws_route53_record" "oam_admin_prod" {
-#   count    = local.environment == "production" ? 1 : 0
-#   provider = aws.core-network-services
-#   zone_id  = data.aws_route53_zone.portal-oam.zone_id # TODO This hosted zone name to be determined
-#   name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
-#   type     = "A"
-#   ttl      = 60
-#   records  = [aws_instance.oam_instance_1.private_ip]
-# }
-#
-# ###############
