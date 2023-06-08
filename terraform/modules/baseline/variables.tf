@@ -721,11 +721,30 @@ variable "sns_topics" {
 }
 
 variable "ssm_parameters" {
-  description = "map of ssm parameters to create.  Designed to be used in conjunction with ec2 modules.  SSM parameter is {prefix}{mapkey}{postfix}{name} where mapkey is name of EC2/ASG and names is a list of parameters.  By default creates a placeholder value but you can set a specific value, read a value from a file, or assign a random value"
+  # Example usage:
+  # my_ec2_params = {
+  #   prefix = "/ec2"
+  #   postfix = "/"
+  #   parameters = {
+  #     username = { value = "myusername" }
+  #     password = { description = "placeholder for password" }
+  #   }
+  # }
+  # ssm_parameters = {
+  #   my_ec2_1 = local.my_ec2_params
+  #   my_ec2_2 = local.my_ec2_params
+  # }
+  # Will create SSM params as follows
+  # /ec2/my_ec2_1/username
+  # /ec2/my_ec2_1/password
+  # /ec2/my_ec2_2/username
+  # /ec2/my_ec2_2/password
+  #
+  description = "Create a placeholder SSM parameter, or a SSM parameter with a given value (randomly generated, from file, or value set directly).  The top-level key is used as a prefix for the SSM parameters, e.g. /ec2/myec2name.  Then define a map of parameters to create underneath that prefix.  SSM parameter name is {prefix}{top-level-map-key}{postfix}{parameters-map-key}"
   type = map(object({
     prefix  = optional(string, "")
     postfix = optional(string, "/")
-    names = map(object({
+    parameters = map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
       key_id      = optional(string, null)

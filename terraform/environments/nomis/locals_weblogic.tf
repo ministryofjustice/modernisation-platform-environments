@@ -2,7 +2,7 @@ locals {
 
   weblogic_ssm_parameters = {
     prefix = "/weblogic/"
-    names = {
+    parameters = {
       admin_username     = {}
       admin_password     = {}
       db_username        = {}
