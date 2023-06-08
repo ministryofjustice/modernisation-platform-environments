@@ -63,7 +63,7 @@ locals {
     "" = {
       prefix  = ""
       postfix = ""
-      names = {
+      parameters = {
         ec2-user_pem = {}
       }
     }
