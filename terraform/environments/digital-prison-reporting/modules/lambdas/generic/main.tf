@@ -14,7 +14,7 @@ resource "aws_lambda_function" "this" {
   filename      = var.filename
   s3_bucket     = var.s3_bucket
   s3_key        = var.s3_key
-  role          = aws_iam_role.this.arn
+  role          = aws_iam_role.this[0].arn
   runtime       = var.runtime
   handler       = var.handler
   memory_size   = var.memory_size
