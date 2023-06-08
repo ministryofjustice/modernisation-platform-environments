@@ -33,7 +33,7 @@ resource "aws_secretsmanager_secret_version" "db_credentials_version" {
 {
   "username": "${var.app_db_login_name}",
   "password": "${random_password.new_password.result}",  
-  "host": "${data.aws_db_instance.database.address}",  
+  "host": "${var.rds_url}",  
   "database_name": "${var.app_db_name}"
 }
 EOF
