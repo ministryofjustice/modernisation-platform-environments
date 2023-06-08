@@ -13,6 +13,7 @@ module "domain_builder_backend_Lambda" {
   handler       = "io.micronaut.function.aws.proxy.MicronautLambdaHandler"
   runtime       = "java11"
   policies      = [aws_iam_policy.s3_read_access_policy.arn, ]
+  tracing       = "Active"
   env_vars = {
     "POSTGRES_DB_NAME" = "domain_builder"
   }

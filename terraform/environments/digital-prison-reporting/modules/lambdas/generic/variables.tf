@@ -8,6 +8,12 @@ variable "account" {
   default     = ""
 }
 
+variable "enable_lambda" {
+  type        = bool
+  default     = false
+  description = "(Optional) Create Lambda, If Set to Yes"  
+}
+
 variable "s3_bucket" {
   description = <<EOF
   The S3 bucket location containing the function's deployment package. Conflicts with filename and image_uri. 

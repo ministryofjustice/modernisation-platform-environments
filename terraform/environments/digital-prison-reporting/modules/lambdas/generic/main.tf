@@ -22,7 +22,7 @@ resource "aws_lambda_function" "this" {
   timeout       = var.timeout
 
   tracing_config {
-    mode = var.tracing # "Active"
+    mode = var.tracing
   }
 
   environment {
