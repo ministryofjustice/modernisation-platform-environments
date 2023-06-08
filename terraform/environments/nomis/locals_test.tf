@@ -79,7 +79,7 @@ locals {
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "nomis/xtag_weblogic_setup"
+            branch = "main"
           })
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
