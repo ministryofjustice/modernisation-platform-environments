@@ -74,7 +74,7 @@ resource "aws_iam_role_policy_attachment" "lambda_execution" {
 }
 
 resource "aws_iam_role_policy_attachment" "this" {
-  for_each = var.enable_lambda == true ? toset(var.policies): toset([])
+  for_each = var.enable_lambda ? toset(var.policies): toset([])
 
   role       = aws_iam_role.this[0].id
   policy_arn = each.value
