@@ -245,6 +245,41 @@ locals {
     "${local.application_name}-environment" = local.environment
     environment-name                        = terraform.workspace # used in provisioning script to select group vars
   }
+
+  bip_a = {
+    config = merge(module.baseline_presets.ec2_instance.config.default, {
+      ami_name                  = "oasys_bip_release_*"
+      ssm_parameters_prefix     = "ec2-web/"
+      iam_resource_names_prefix = "ec2-web"
+      availability_zone         = "${local.region}a"
+    })
+    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      monitoring = true
+    })
+    cloudwatch_metric_alarms = {}
+    user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
+    autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+    autoscaling_group        = module.baseline_presets.ec2_autoscaling_group.default
+    lb_target_groups         = local.lb_target_groups # This won't be correct for bip, will correct later
+    tags = {
+      component         = "bip"
+      description       = "${local.environment} ${local.application_name} bip"
+      os-type           = "Linux"
+      os-major-version  = 7
+      os-version        = "RHEL 7.9"
+      "Patch Group"     = "RHEL"
+      server-type       = "${local.application_name}-bip"
+      description       = "${local.application_name} bip"
+      monitored         = true
+      oasys-environment = local.environment
+      environment-name  = terraform.workspace
+    }
+  }
+  bip_b = merge(local.bip_a, {
+    config = merge(local.bip_a.config, {
+      availability_zone = "${local.region}b"
+    })
+  })
   
 
   # lb_listener_defaults = {
