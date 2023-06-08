@@ -41,12 +41,12 @@ locals {
  }
 
 resource "aws_db_subnet_group" "igdb" {
-  name       = "${local.application_name}-${local.environment}-subnetgrp"
+  name       = "${local.application_name}-${local.environment}-subnetgrp-${local.igdb_dbname}"
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-subnetgrp" },
+    { "Name" = "${local.application_name}-${local.environment}-subnetgrp-${local.igdb_dbname}" },
     { "Keep" = "true" }
 
   )
@@ -54,12 +54,12 @@ resource "aws_db_subnet_group" "igdb" {
 }
 
 resource "aws_db_subnet_group" "iadb" {
-  name       = "${local.application_name}-${local.environment}-subnetgrp"
+  name       = "${local.application_name}-${local.environment}-subnetgrp-${local.iadb_dbname}"
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-subnetgrp" },
+    { "Name" = "${local.application_name}-${local.environment}-subnetgrp-${local.iadb_dbname}" },
     { "Keep" = "true" }
 
   )
@@ -67,9 +67,9 @@ resource "aws_db_subnet_group" "iadb" {
 }
 
 resource "aws_db_parameter_group" "igdb-parametergroup-19c" {
-  name        = "${local.application_name}-${local.environment}-parametergroup"
+  name        = "${local.application_name}-${local.environment}-parametergroup-${local.igdb_dbname}"
   family      = "oracle-ee-19"
-  description = "${local.application_name}-${local.environment}-parametergroup"
+  description = "${local.application_name}-${local.environment}-parametergroup-${local.igdb_dbname}"
 
 
   parameter {
@@ -110,15 +110,15 @@ resource "aws_db_parameter_group" "igdb-parametergroup-19c" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-parametergroup" },
+    { "Name" = "${local.application_name}-${local.environment}-parametergroup-${local.igdb_dbname}" },
     { "Keep" = "true" }
   )
 }
 
 resource "aws_db_parameter_group" "iadb-parametergroup-19c" {
-  name        = "${local.application_name}-${local.environment}-parametergroup"
+  name        = "${local.application_name}-${local.environment}-parametergroup-${local.iadb_dbname}"
   family      = "oracle-ee-19"
-  description = "${local.application_name}-${local.environment}-parametergroup"
+  description = "${local.application_name}-${local.environment}-parametergroup-${local.iadb_dbname}"
 
 
   parameter {
@@ -159,13 +159,13 @@ resource "aws_db_parameter_group" "iadb-parametergroup-19c" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-parametergroup" },
+    { "Name" = "${local.application_name}-${local.environment}-parametergroup-${local.iadb_dbname}" },
     { "Keep" = "true" }
   )
 }
 
 resource "aws_db_option_group" "PortalIGDB19OptionGroup" {
-  name                     = "${local.application_name}-${local.environment}-optiongroup"
+  name                     = "${local.application_name}-${local.environment}-optiongroup-${local.igdb_dbname}"
   option_group_description = "Portal IGDB DB 19- enables STATSPACK"
   engine_name              = "oracle-ee"
   major_engine_version     = "19"
@@ -176,13 +176,13 @@ resource "aws_db_option_group" "PortalIGDB19OptionGroup" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-optiongroup" },
+    { "Name" = "${local.application_name}-${local.environment}-optiongroup-${local.igdb_dbname}" },
     { "Keep" = "true" }
   )
 }
 
 resource "aws_db_option_group" "PortalIADB19OptionGroup" {
-  name                     = "${local.application_name}-${local.environment}-optiongroup"
+  name                     = "${local.application_name}-${local.environment}-optiongroup-${local.iadb_dbname}"
   option_group_description = "Portal IADB DB 19- enables STATSPACK"
   engine_name              = "oracle-ee"
   major_engine_version     = "19"
@@ -193,13 +193,13 @@ resource "aws_db_option_group" "PortalIADB19OptionGroup" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-optiongroup" },
+    { "Name" = "${local.application_name}-${local.environment}-optiongroup-${local.iadb_dbname}" },
     { "Keep" = "true" }
   )
 }
 
 resource "aws_security_group" "igdb" {
-  name        = "${local.application_name}-${local.environment}-secgroup-DB"
+  name        = "${local.application_name}-${local.environment}-secgroup-DB-${local.igdb_dbname}"
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -295,12 +295,12 @@ resource "aws_security_group" "igdb" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-igdb" }
+    { "Name" = "${local.application_name}-${local.environment}-${local.igdb_dbname}" }
   )
 }
 
 resource "aws_security_group" "iadb" {
-  name        = "${local.application_name}-${local.environment}-secgroup-DB"
+  name        = "${local.application_name}-${local.environment}-secgroup-DB-${local.iadb_dbname}"
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -396,7 +396,7 @@ resource "aws_security_group" "iadb" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-iadb" }
+    { "Name" = "${local.application_name}-${local.environment}-${local.iadb_dbname}" }
   )
 }
 
@@ -484,10 +484,6 @@ resource "aws_db_instance" "appdb1" {
   multi_az                    = false
   option_group_name           = aws_db_option_group.PortalIGDB19OptionGroup.name
 
-
-
-
-
   timeouts {
     create = "60m"
     delete = "2h"
@@ -544,7 +540,7 @@ resource "aws_db_instance" "appdb2" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.igdb_dbname}" },
+    { "Name" = "${local.iadb_dbname}" },
     { "Keep" = "true" },
     { "scheduler:ebs-snapshot" = "True" }
   )
