@@ -106,7 +106,7 @@ locals {
   }
 
   weblogic_cloudwatch_metric_alarms = {
-    weblogic-node-manager-service = {
+    weblogic-healthcheck-service = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
       namespace           = "CWAgent"
@@ -114,9 +114,9 @@ locals {
       period              = "60"
       statistic           = "Average"
       threshold           = "1"
-      alarm_description   = "weblogic-node-manager service has stopped"
+      alarm_description   = "weblogic-healthcheck service has stopped"
       dimensions = {
-        instance = "weblogic_node_manager"
+        instance = "weblogic_healthcheck"
       }
     }
   }
