@@ -1,14 +1,5 @@
 locals {
-  nonprod_workspaces_cidr         = "10.200.0.0/20"
-  prod_workspaces_cidr            = "10.200.16.0/20"
-  redc_cidr                       = "172.16.0.0/20"
-  atos_cidr                       = "10.0.0.0/8"
-  portal_hosted_zone              = data.aws_route53_zone.external.name # TODO This needs a logic for a TBC Hosted Zone for production
-
-
   # EC2 User data
-  # TODO The hostname is too long as the domain itself is 62 characters long... If this hostname is required, a new domain is required
-
   idm_1_userdata = <<EOF
 #!/bin/bash
 echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
@@ -36,7 +27,7 @@ resource "aws_security_group" "idm_instance" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "outbound" {
+resource "aws_vpc_security_group_egress_rule" "idm_sg_outbound" {
   security_group_id = aws_security_group.idm_instance.id
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "-1"
@@ -378,7 +369,7 @@ resource "aws_ebs_volume" "idm_mserver" {
     { "Name" = "${local.application_name}-IDM-mserver" },
   )
 }
-resource "aws_volume_attachment" "oam_mserver" {
+resource "aws_volume_attachment" "idm_mserver" {
   device_name = "/dev/xvde"
   volume_id   = aws_ebs_volume.idm_mserver.id
   instance_id = aws_instance.idm_instance_1.id
