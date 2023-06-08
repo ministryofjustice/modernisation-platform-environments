@@ -92,8 +92,7 @@ output "cluster_encrypted" {
 
 output "cluster_master_password" {
   description = "Cluster Password"
-  value       = module.datamart.redshift_master_password
-  sensitive   = true
+  value       = nonsensitive(module.datamart.redshift_master_password)
 }
 
 output "cluster_vpc_security_group_ids" {
