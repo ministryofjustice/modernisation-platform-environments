@@ -25,7 +25,7 @@ Assumes you have correct aws config profiles setup
 app=nomis
 for env in development test preproduction production; do
   pem=$(cat $app-$env/ec2-user)
-  aws ssm put-parameter --name "ec2-user_pem" --type "SecureString" --data-type "text" --value "$pem" --profile "$app-$env"
+  aws ssm put-parameter --name "ec2-user_pem" --type "SecureString" --data-type "text" --value "$pem" --overwrite --profile "$app-$env"
 done
 ```
 
@@ -41,3 +41,15 @@ Run [get-keys.sh](get-keys.sh) from this directory to download all of the keys (
 
 Example ssh config found [here](https://github.com/ministryofjustice/dso-useful-stuff/blob/main/.ssh/config)
 This assumes keys are stored under your .ssh directory, e.g. `~/.ssh/nomis-development/ec2-user`
+
+Setup soft links in your own .ssh directory like this
+```
+  dir=$(pwd)
+  (
+    cd ~/.ssh
+    app=nomis
+    for env in development test preproduction production; do
+      ln -sf $dir/$app-$env $app-$env
+    done
+  )
+```
