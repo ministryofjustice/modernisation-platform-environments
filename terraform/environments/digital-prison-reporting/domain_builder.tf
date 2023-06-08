@@ -3,14 +3,18 @@
 ##########################
 
 # Domain Builder Backend Lambda function
-module "domain_builder_backend_api_Lambda" {
-  name      = "${local.project}-domain-builder-backend-api"
-  s3_bucket = module.s3_curated_bucket.bucket_id
-  s3_key    = "build-artifacts/domain-builder/jars/domain-builder-backend-api-vLatest-all.jar"
-  handler   = "io.micronaut.function.aws.proxy.MicronautLambdaHandler"
-  runtime   = "java11"
-  variables = {
-    "POSTGRES_DB_NAME": "domain_builder"
+module "domain_builder_backend_Lambda" {
+  source    = "./modules/lambdas/generic"
+
+  enable_lambda = local.enable_domain_builder_lambda
+  name          = "${local.project}-domain-builder-backend-api"
+  s3_bucket     = module.s3_curated_bucket.bucket_id
+  s3_key        = "build-artifacts/domain-builder/jars/domain-builder-backend-api-vLatest-all.jar"
+  handler       = "io.micronaut.function.aws.proxy.MicronautLambdaHandler"
+  runtime       = "java11"
+  policies      = [aws_iam_policy.s3_read_access_policy.arn, ]
+  env_vars = {
+    "POSTGRES_DB_NAME" = "domain_builder"
   }
 
   tags = merge(
