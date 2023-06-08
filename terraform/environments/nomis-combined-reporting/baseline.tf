@@ -5,6 +5,7 @@ module "baseline" {
     aws                       = aws
     aws.core-network-services = aws.core-network-services
     aws.core-vpc              = aws.core-vpc
+    aws.us-east-1             = aws.us-east-1
   }
 
   environment = module.environment
