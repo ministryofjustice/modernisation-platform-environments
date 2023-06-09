@@ -9,7 +9,7 @@ module "domain_builder_backend_Lambda" {
   enable_lambda = local.enable_domain_builder_lambda
   name          = "${local.project}-domain-builder-backend-api"
   s3_bucket     = module.s3_artifacts_store.bucket_id
-  s3_key        = "/build-artifacts/domain-builder/jars/domain-builder-backend-api-vLatest-all.jar"
+  s3_key        = "build-artifacts/domain-builder/jars/domain-builder-backend-api-vLatest-all.jar"
   handler       = "io.micronaut.function.aws.proxy.MicronautLambdaHandler"
   runtime       = "java11"
   policies      = [aws_iam_policy.s3_read_access_policy.arn, ]
