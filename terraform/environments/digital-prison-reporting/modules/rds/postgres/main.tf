@@ -28,7 +28,7 @@ resource "aws_db_subnet_group" "subnets" {
     var.tags,
     {
       Resource_Type = "subnet"
-      Name = ""${var.name}-subnet""
+      Name = "${var.name}-subnet"
     }
   )  
 }
@@ -57,7 +57,7 @@ resource "aws_db_instance" "default" {
     var.tags,
     {
       Resource_Type = "rds"
-      Name = ""${var.name}-rds""
+      Name = "${var.name}-rds"
     }
   )  
 }

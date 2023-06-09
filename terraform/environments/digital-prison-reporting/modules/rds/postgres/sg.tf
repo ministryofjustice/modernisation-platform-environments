@@ -18,7 +18,7 @@ resource "aws_security_group" "rds" {
     var.tags,
     {
       Resource_Type = "sg_group"
-      Name = ""${var.name}-sg""
+      Name = "${var.name}-sg"
     }
   ) 
 }
