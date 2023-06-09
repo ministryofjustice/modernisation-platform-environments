@@ -26,6 +26,8 @@ unzip awscliv2.zip
 systemctl stop amazon-ssm-agent
 systemctl start amazon-ssm-agent
 timedatectl set-timezone Europe/London
+echo -e "NETWORKING=yes\nHOSTNAME=${local.vision_host}" > /etc/sysconfig/network
+
 EOF
   metadata_options {
     http_endpoint = "enabled"
