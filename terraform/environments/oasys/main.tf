@@ -88,6 +88,6 @@ module "baseline" {
 }
 
 data "aws_lb_target_group" "private_lb" {
-  count = local.environment == "test" ? 1 : 0
+  # count = local.environment == "test" ? 1 : 0
   name = "private-lb-https-443"
 }
