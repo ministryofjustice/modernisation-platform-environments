@@ -6,7 +6,7 @@ locals {
    dpr_subnets = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
    rds_kms_arn = aws_kms_key.rds.arn    
    enable_domain_builder_rds = local.application_data.accounts[local.environment].enable_domain_builder_rds
-   rds_dbuilder_name = "${local.project}-backend-rds"
+   rds_dbuilder_name = "${local.project}_backend_rds"
    rds_dbuilder_db_identifier = "${local.project}-domain-builder"
    rds_dbuilder_inst_class = "db.t3.small"
    rds_dbuilder_store_type = "gp2"

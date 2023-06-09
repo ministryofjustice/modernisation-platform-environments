@@ -29,12 +29,12 @@ resource "aws_db_subnet_group" "subnets" {
 
 resource "aws_db_instance" "default" {
   count                   = var.enable_rds ? 1 : 0
-  db_name                 = var.name
+  identifier              = var.name
+  db_name                 = var.db_name
   engine                  = "postgres"
   instance_class          = var.db_instance_class
   username                = var.master_user
   password                = data.aws_secretsmanager_secret_version.password.secret_string
-  identifier              = var.db_name
   storage_type            = var.storage_type
   db_subnet_group_name    = aws_db_subnet_group.subnets[0].name
   maintenance_window      = var.maintenance_window
