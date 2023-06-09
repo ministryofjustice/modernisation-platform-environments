@@ -47,7 +47,20 @@ locals {
         load_balancer_type       = "network"
         internal_lb              = false
         enable_delete_protection = false
-        existing_target_groups   = {"t2-${local.application_name}-web-a-http-8080"}
+        existing_target_groups   = { "private-lb-https-443" = {
+            port                 = 443
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 443
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+          }
+        }
         idle_timeout             = 60 # 60 is default
         security_groups          = ["public"]
         public_subnets           = module.environment.subnets["public"].ids
