@@ -57,26 +57,26 @@ locals {
         public_subnets           = module.environment.subnets["public"].ids
         tags                     = local.tags
         listeners = {
-          # https = {
-          #   port                      = 443
-          #   protocol                  = "HTTPS"
-          #   ssl_policy                = "ELBSecurityPolicy-2016-08"
-          #   certificate_names_or_arns = ["application_environment_wildcard_cert"]
-          #   default_action = {
-          #     type              = "forward"
-          #     target_group_name = "private-lb-https-443"
-          #   }
-          #   rules = {
-          #     "private-lb-443" = {
-          #       priority = 100
-          #       actions = [{
-          #         type              = "forward"
-          #         target_group_name = "private-lb-https-443"
-          #       }]
-          #       conditions = []
-          #     }
-          #   }
-          # }
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            default_action = {
+              type              = "forward"
+              target_group_name = "private-lb-https-443"
+            }
+            rules = {
+              "private-lb-443" = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "private-lb-https-443"
+                }]
+                conditions = []
+              }
+            }
+          }
         }
       }
 
