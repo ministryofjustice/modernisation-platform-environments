@@ -9,4 +9,5 @@ module "lands_chamber" {
   source_db_url         = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
   source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
+  replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
 }

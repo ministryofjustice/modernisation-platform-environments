@@ -1,7 +1,7 @@
 module "dms" {
   source                      = "../dms"
   replication_instance_arn    = var.replication_instance_arn
-  replication_task_id         = var.replication_task_id
+  replication_task_id         = "lands_migration_task"
   #target_db_instance          = 0
   target_endpoint_id          = "lands-target"
   target_database_name        = "lands"

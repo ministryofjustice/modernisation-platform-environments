@@ -41,3 +41,6 @@ variable "source_db_user" {
 variable "source_db_password" {  
   type = string
 }
+
+variable "replication_instance_arn" {
+}
