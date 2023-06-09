@@ -8,7 +8,7 @@ locals {
       test-oem = merge(local.oem_ec2_default, {
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
           args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "nomis/DSOS-1933/prepare-oem"
+            branch = "main"
           })
         })
       })
