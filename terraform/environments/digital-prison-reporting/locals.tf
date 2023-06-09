@@ -13,7 +13,6 @@ locals {
     s3_kms_arn                 = aws_kms_key.s3.arn
     kinesis_kms_arn            = aws_kms_key.kinesis-kms-key.arn
     kinesis_kms_id             = data.aws_kms_key.kinesis_kms_key.key_id
-    rds_kms_arn                = aws_kms_key.rds.arn
     create_bucket              = local.application_data.accounts[local.environment].setup_buckets
     account_id                 = data.aws_caller_identity.current.account_id
     account_region             = data.aws_region.current.name
@@ -28,7 +27,7 @@ locals {
     kinesis_stream_ingestor    = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-ingestor-${local.environment}"
     kinesis_endpoint           = "https://kinesis.eu-west-2.amazonaws.com"
     cloud_platform_cidr        = "172.20.0.0/16"
-    
+
     all_tags = merge(
     local.tags,
         {
