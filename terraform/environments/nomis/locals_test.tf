@@ -118,6 +118,7 @@ locals {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0 # set to 0 while testing
         })
+        cloudwatch_metric_alarms = {} # not included while testing
       })
 
       test-oem = {
