@@ -49,7 +49,7 @@ locals {
         enable_delete_protection = false
         existing_target_groups   = {
           "private-lb-https-443" = {
-            arn = "arn:aws:elasticloadbalancing:${local.region}:${module.environment.account_id}:targetgroup/private-lb-https-443/fa33abacc49eaa9c"
+            arn = data.aws_lb_target_group.private_lb[0].arn
           }
         }
         idle_timeout             = 60 # 60 is default
