@@ -47,20 +47,7 @@ locals {
         load_balancer_type       = "network"
         internal_lb              = false
         enable_delete_protection = false
-        existing_target_groups   = { "private-lb-https-443" = {
-            port                 = 443
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 443
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-          }
-        }
+        existing_target_groups   = { data.aws_lb_target_group.private_lb }
         idle_timeout             = 60 # 60 is default
         security_groups          = ["public"]
         public_subnets           = module.environment.subnets["public"].ids
