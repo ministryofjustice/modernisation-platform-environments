@@ -66,16 +66,6 @@ locals {
               type              = "forward"
               target_group_name = "private-lb-https-443"
             }
-            rules = {
-              "private-lb-443" = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "private-lb-https-443"
-                }]
-                conditions = []
-              }
-            }
           }
         }
       }
