@@ -453,33 +453,7 @@ variable "lbs" {
     load_balancer_type       = optional(string, "application")
     security_groups          = list(string)
     public_subnets           = list(string)
-    existing_target_groups   = optional(map(object({
-      port                 = optional(number)
-      protocol             = optional(string)
-      target_type          = optional(string)
-      deregistration_delay = optional(number)
-      health_check = optional(object({
-        enabled             = optional(bool)
-        interval            = optional(number)
-        healthy_threshold   = optional(number)
-        matcher             = optional(string)
-        path                = optional(string)
-        port                = optional(number)
-        timeout             = optional(number)
-        unhealthy_threshold = optional(number)
-      }))
-      stickiness = optional(object({
-        enabled         = optional(bool)
-        type            = string
-        cookie_duration = optional(number)
-        cookie_name     = optional(string)
-      }))
-      attachments = optional(list(object({
-        target_id         = string
-        port              = optional(number)
-        availability_zone = optional(string)
-      })), [])
-    })), {})
+    existing_target_groups   = optional(map(any), {})
     tags                     = optional(map(string), {})
     lb_target_groups = optional(map(object({
       port                 = optional(number)
