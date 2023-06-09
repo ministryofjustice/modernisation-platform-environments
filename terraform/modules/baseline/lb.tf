@@ -11,6 +11,16 @@ locals {
     ]
   ]
   lb_listeners = { for item in flatten(local.lb_listener_list) : item.key => item.value }
+
+  lb_target_groups_list = [
+    for lb_key, lb_value in module.lb : [
+      for tg_key, tg_value in lb_value.lb_target_groups : {
+        key   = "${asg_key}-${tg_key}"
+        value = tg_value
+      }
+    ]
+  ]
+  lb_target_groups = { for item in flatten(local.asg_target_groups_list) : item.key => item.value }
 }
 
 # following AWS terraform naming convention here aws_lb, aws_lb_listener, so lbs.tf and lb_listeners.tf.
@@ -57,6 +67,7 @@ module "lb_listener" {
   load_balancer             = module.lb[each.value.lb_application_name].load_balancer
   existing_target_groups    = merge(
                                 local.asg_target_groups,
+                                local.lb_target_groups,
                                 var.lbs[each.value.lb_application_name].existing_target_groups
                               )
   port                      = each.value.port
