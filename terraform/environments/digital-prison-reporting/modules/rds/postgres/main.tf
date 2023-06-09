@@ -29,7 +29,6 @@ resource "aws_db_subnet_group" "subnets" {
 
 resource "aws_db_instance" "default" {
   count                   = var.enable_rds ? 1 : 0
-  allocated_storage       = var.allocated_storage
   db_name                 = var.name
   engine                  = "postgres"
   instance_class          = var.db_instance_class
