@@ -41,7 +41,8 @@ locals {
  }
 
 resource "aws_db_subnet_group" "igdb" {
-  name       = "${local.application_name}-${local.environment}-subnetgrp-igdb"
+  # name       = "${local.application_name}-${local.environment}-subnetgrp-igdb"
+  name       = "${local.application_name}-${local.environment}-subnetgrp-${lower(local.igdb_dbname)}"
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
   tags = merge(
