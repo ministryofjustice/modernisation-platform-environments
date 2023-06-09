@@ -179,8 +179,3 @@ output "domain_builder_rds_endpoint" {
   description = "Domain Builder RDS Endpoint"
   value       = module.domain_builder_backend_db.rds_host
 }
-
-output "domain_builder_rds_db_secret" {
-  description = "Domain Builder RDS Secret"
-  value       = nonsensitive(module.domain_builder_backend_db.master_password)
-}
