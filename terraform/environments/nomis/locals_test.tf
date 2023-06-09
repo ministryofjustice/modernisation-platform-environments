@@ -108,6 +108,18 @@ locals {
         })
       })
 
+      t3-nomis-web-b = merge(local.weblogic_ec2_b, {
+        tags = merge(local.weblogic_ec2_b.tags, {
+          nomis-environment    = "t3"
+          oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T3CNOM"
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0 # set to 0 while testing
+        })
+      })
+
       test-oem = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "base_ol_8_5_*"
@@ -344,6 +356,24 @@ locals {
                       "c-t2.test.nomis.az.justice.gov.uk",
                       "c-t2.test.nomis.service.justice.gov.uk",
                       "t2-cn.hmpp-azdt.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t3-nomis-web-b-http-7777 = {
+                priority = 600
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t3-nomis-web-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t3-nomis-web-b.test.nomis.az.justice.gov.uk",
+                      "t3-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t3.test.nomis.az.justice.gov.uk",
+                      "c-t3.test.nomis.service.justice.gov.uk",
+                      "t3-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
