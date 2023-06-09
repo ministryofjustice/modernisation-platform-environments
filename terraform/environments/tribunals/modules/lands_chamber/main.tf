@@ -1,5 +1,5 @@
 module "dms" {
-  source                      = "./dms"
+  source                      = "../dms"
   replication_instance_arn    = var.replication_instance_arn
   replication_task_id         = var.replication_task_id
   #target_db_instance          = 0
