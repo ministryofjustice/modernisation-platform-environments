@@ -58,7 +58,7 @@ module "domain_builder_backend_db" {
   subnets               = local.dpr_subnets
   vpc_id                = local.dpr_vpc
   kms                   = local.rds_kms_arn
-  name                  = local.rds_dbuilder_name
+  name                  = "some"
   db_name               = local.rds_dbuilder_db_identifier
   db_instance_class     = local.rds_dbuilder_inst_class
   storage_type          = local.rds_dbuilder_store_type
