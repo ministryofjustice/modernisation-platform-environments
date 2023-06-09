@@ -12,7 +12,9 @@ locals {
    rds_dbuilder_store_type = "gp2"
    rds_dbuilder_init_size = 10
    rds_dbuilder_max_size = 50
-   rds_parameter_group = "postgres14"
+   rds_dbuilder_parameter_group = "postgres14"
+   rds_dbuilder_port = 5432
+   rds_dbuilder_user = "domain_builder"
    enable_dbuilder_lambda = local.application_data.accounts[local.environment].enable_domain_builder_lambda
    lambda_dbuilder_name = "${local.project}-domain-builder-backend-api"
    lambda_dbuilder_runtime = "java11"
@@ -36,7 +38,12 @@ module "domain_builder_backend_Lambda" {
   policies      = local.lambda_dbuilder_policies
   tracing       = local.lambda_dbuilder_tracing
   env_vars = {
-    "POSTGRES_DB_NAME" = "domain_builder"
+    "JAVA_TOOL_OPTIONS" = "-XX:MetaspaceSize=32m"
+    "POSTGRES_HOST" = module.domain_builder_backend_db.rds_host
+    "POSTGRES_DB_NAME" = local.rds_dbuilder_db_identifier
+    "POSTGRES_USERNAME" = local.rds_dbuilder_user
+    "POSTGRES_PASSWORD" = module.domain_builder_backend_db.master_password
+    "POSTGRES_PORT" = local.rds_dbuilder_port
   }
 
   tags = merge(
@@ -61,9 +68,10 @@ module "domain_builder_backend_db" {
   name                  = local.rds_dbuilder_name
   db_name               = local.rds_dbuilder_db_identifier
   db_instance_class     = local.rds_dbuilder_inst_class
+  master_user           = local.rds_dbuilder_user
   storage_type          = local.rds_dbuilder_store_type
-  parameter_group       = local.rds_parameter_group     
-
+  parameter_group       = local.rds_dbuilder_parameter_group     
+  
   tags = merge(
     local.all_tags,
     {
