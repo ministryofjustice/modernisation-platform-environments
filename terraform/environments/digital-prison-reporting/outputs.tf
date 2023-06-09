@@ -168,3 +168,14 @@ output "dynamodb_table_stream_label" {
   description = "A timestamp, in ISO 8601 format of the Table Stream. Only available when var.stream_enabled is true"
   value       = module.dynamo_tab_domain_registry.dynamodb_table_stream_label
 }
+
+## Domain Builder
+output "domain_builder_lambda" {
+  description = "Domain Builder Lambda Function"
+  value       = module.domain_builder_backend_Lambda.lambda_function
+}
+
+output "domain_builder_rds_endpoint" {
+  description = "Domain Builder RDS Endpoint"
+  value       = module.domain_builder_backend_db.rds_host
+}
