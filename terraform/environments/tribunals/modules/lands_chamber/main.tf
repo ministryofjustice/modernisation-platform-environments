@@ -1,3 +1,22 @@
+module "dms" {
+  source                      = "./dms"
+  replication_instance_arn    = var.replication_instance_arn
+  replication_task_id         = var.replication_task_id
+  #target_db_instance          = 0
+  target_endpoint_id          = "lands-target"
+  target_database_name        = "lands"
+  target_server_name          = var.rds_url
+  target_username             = var.rds_user
+  target_password             = var.rds_password
+  source_endpoint_id          = "lands_source"
+  source_database_name        = "Lands"
+  source_server_name          = var.source_db_url
+  source_username             = var.source_db_user
+  source_password             = var.source_db_password
+ 
+}
+
+
 resource "random_password" "new_password" {
   length  = 16
   special = false 
