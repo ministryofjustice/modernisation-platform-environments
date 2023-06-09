@@ -161,6 +161,25 @@ data "aws_iam_policy_document" "ecs_ssm_exec" {
   }
 }
 
+
+data "aws_iam_policy_document" "ecs_s3" {
+  statement {
+    effect    = "Allow"
+    resources = ["*"]
+
+    actions = [
+      "s3:*"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "ecs_s3" {
+  name   = format("hmpps-%s-%s-openldap-service-s3", local.environment, local.application_name)
+  policy = data.aws_iam_policy_document.ecs_s3.json
+  role   = aws_iam_role.ecs_task.id
+}
+
+
 resource "aws_iam_role_policy" "ecs_ssm_exec" {
   name   = format("hmpps-%s-%s-openldap-service-ssm-exec", local.environment, local.application_name)
   policy = data.aws_iam_policy_document.ecs_ssm_exec.json
