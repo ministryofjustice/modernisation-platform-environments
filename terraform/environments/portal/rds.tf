@@ -465,7 +465,7 @@ resource "aws_db_instance" "appdb1" {
   character_set_name              = local.igdb_character_set_name
   #max_allocated_storage           = local.max_allocated_storage
   username               = local.igdb_username
-  password               = random_password.rds_password.result
+  password               = random_password.rds_password_igdb.result
   vpc_security_group_ids = [aws_security_group.igdb.id]
   #skip_final_snapshot             = false
   final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
@@ -514,7 +514,7 @@ resource "aws_db_instance" "appdb2" {
   character_set_name              = local.iadb_character_set_name
   #max_allocated_storage           = local.max_allocated_storage
   username               = local.iadb_username
-  password               = random_password.rds_password.result
+  password               = random_password.rds_password_iadb.result
   vpc_security_group_ids = [aws_security_group.iadb.id]
   #skip_final_snapshot             = false
   final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
