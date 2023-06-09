@@ -29,7 +29,7 @@ module "domain_builder_backend_Lambda" {
 
   enable_lambda = local.enable_dbuilder_lambda
   name          = local.lambda_dbuilder_name
-  s3_bucket     = local.lambda_dbuilder_code_bucket
+  s3_bucket     = local.lambda_dbuilder_code_s3_bucket
   s3_key        = local.lambda_dbuilder_code_s3_key
   handler       = local.lambda_dbuilder_handler
   runtime       = local.lambda_dbuilder_runtime
