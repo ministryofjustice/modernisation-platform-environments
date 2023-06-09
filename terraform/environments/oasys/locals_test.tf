@@ -49,6 +49,7 @@ locals {
         enable_delete_protection = false
         existing_target_groups   = { "private-lb-https-443" = {
             port                 = 443
+            target_type          = "alb"
             health_check = {
               enabled             = true
               interval            = 30
