@@ -21,7 +21,7 @@ data "aws_secretsmanager_secret_version" "password" {
 
 resource "aws_db_subnet_group" "subnets" {
   count      = var.enable_rds ? 1 : 0
-  name       = var.subnet-name
+  name       = "${var.name}-subnet"
   subnet_ids = var.subnets
 
   tags = var.tags
@@ -42,7 +42,7 @@ resource "aws_db_instance" "default" {
   backup_retention_period = var.back_up_period
   vpc_security_group_ids  = [aws_security_group.rds[0].id, ]
   skip_final_snapshot     = true
-  kms_key_id              = var.kms_key
+  kms_key_id              = var.kms
   storage_encrypted       = true
   apply_immediately       = true
   allocated_storage       = var.allocated_size

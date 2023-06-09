@@ -12,6 +12,7 @@ locals {
    rds_dbuilder_store_type = "gp2"
    rds_dbuilder_init_size = 10
    rds_dbuilder_max_size = 50
+   rds_parameter_group = "postgres14"
    enable_domain_builder_lambda = local.application_data.accounts[local.environment].enable_domain_builder_lambda
    lambda_dbuilder_name = "${local.project}-domain-builder-backend-api"
    lambda_dbuilder_runtime = "java11"
@@ -56,11 +57,12 @@ module "domain_builder_backend_db" {
   max_allocated_size    = local.rds_dbuilder_max_size
   subnets               = local.dpr_subnets
   vpc_id                = local.dpr_vpc
-  kms_key_id            = local.rds_kms_arn
+  kms                   = local.rds_kms_arn
   name                  = local.rds_dbuilder_name
   db_name               = local.rds_dbuilder_db_identifier
   db_instance_class     = local.rds_dbuilder_inst_class
   storage_type          = local.rds_dbuilder_store_type
+  parameter_group       = local.rds_parameter_group     
 
   tags = merge(
     local.all_tags,

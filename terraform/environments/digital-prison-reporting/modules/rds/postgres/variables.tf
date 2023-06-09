@@ -7,10 +7,6 @@ variable "subnets" {
   type = list(string)
 }
 
-variable "subnet-name" {
-  type = string
-}
-
 variable "vpc_id" {
   type = string
 }
@@ -59,10 +55,6 @@ variable "name" {
   default     = "dpr-postgres-rds"
 }
 
-variable "allocated_storage" {
-  type        = number
-  description = "Allocated Storage"
-}
 
 variable "kms" {
   type    = string
