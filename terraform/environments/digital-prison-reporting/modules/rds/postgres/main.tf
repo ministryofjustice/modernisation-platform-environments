@@ -24,7 +24,13 @@ resource "aws_db_subnet_group" "subnets" {
   name       = "${var.name}-subnet"
   subnet_ids = var.subnets
 
-  tags = var.tags
+  tags = merge(
+    var.tags,
+    {
+      Resource_Type = "subnet"
+      Name = ""${var.name}-subnet""
+    }
+  )  
 }
 
 resource "aws_db_instance" "default" {
@@ -47,7 +53,13 @@ resource "aws_db_instance" "default" {
   apply_immediately       = true
   allocated_storage       = var.allocated_size
   max_allocated_storage   = var.max_allocated_size 
-  tags                    = var.tags
+  tags = merge(
+    var.tags,
+    {
+      Resource_Type = "rds"
+      Name = ""${var.name}-rds""
+    }
+  )  
 }
 
 resource "random_password" "password" {

@@ -14,10 +14,13 @@ resource "aws_security_group" "rds" {
     create_before_destroy = true
   }
 
-  tags = merge(tomap({
-    "Component" = "Security Group" }),
+  tags = merge(
     var.tags,
-  )
+    {
+      Resource_Type = "sg_group"
+      Name = ""${var.name}-sg""
+    }
+  ) 
 }
 
 resource "aws_security_group_rule" "rule" {
