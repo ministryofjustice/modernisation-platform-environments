@@ -1,5 +1,19 @@
 locals {
 
+  weblogic_ssm_parameters = {
+    prefix = "/weblogic/"
+    parameters = {
+      admin_username     = {}
+      admin_password     = {}
+      db_username        = {}
+      db_password        = {}
+      db_tagsar_username = {}
+      db_tagsar_password = {}
+      rms_hosts          = {}
+      rms_key            = {}
+    }
+  }
+
   weblogic_target_group_http_7001 = {
     port                 = 7001
     protocol             = "HTTP"
