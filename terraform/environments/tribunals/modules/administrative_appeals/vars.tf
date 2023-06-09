@@ -1,5 +1,5 @@
 variable "application_name" { 
-  default = "transport"
+  default = "ossc"
 }
 
 variable "environment" {
@@ -8,11 +8,11 @@ variable "environment" {
 }
 
 variable app_db_name {
-  default = "transport"
+  default = "ossc"
 }  
 
 variable app_db_login_name {
-  default = "transport-app"
+  default = "ossc-app"
 }  
 
 #variable "db_instance_identifier" {  

@@ -1,15 +1,15 @@
 module "dms" {
   source                      = "../dms"
   replication_instance_arn    = var.replication_instance_arn
-  replication_task_id         = "transport-migration-task"
+  replication_task_id         = "carestandards-migration-task"
   #target_db_instance          = 0
-  target_endpoint_id          = "transport-target"
-  target_database_name        = "transport"
+  target_endpoint_id          = "carestandards-target"
+  target_database_name        = "carestandards"
   target_server_name          = var.rds_url
   target_username             = var.rds_user
   target_password             = var.rds_password
-  source_endpoint_id          = "transport-source"
-  source_database_name        = "Transport"
+  source_endpoint_id          = "carestandards-source"
+  source_database_name        = "CARESTANDARDS"
   source_server_name          = var.source_db_url
   source_username             = var.source_db_user
   source_password             = var.source_db_password
@@ -32,8 +32,8 @@ resource "null_resource" "setup_db" {
       DB_URL = var.rds_url   
       USER_NAME = var.rds_user
       PASSWORD = var.rds_password
-      NEW_DB_NAME = "transport"
-      NEW_USER_NAME = "transport_admin"
+      NEW_DB_NAME = "carestandards"
+      NEW_USER_NAME = "carestandards_admin"
       NEW_PASSWORD = random_password.new_password.result
     }
   }
