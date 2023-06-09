@@ -15,7 +15,7 @@ locals {
   lb_target_groups_list = [
     for lb_key, lb_value in module.lb : [
       for tg_key, tg_value in lb_value.lb_target_groups : {
-        key   = "${asg_key}-${tg_key}"
+        key   = "${lb_key}-${tg_key}"
         value = tg_value
       }
     ]
