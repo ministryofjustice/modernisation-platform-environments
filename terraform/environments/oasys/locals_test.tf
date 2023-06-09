@@ -47,7 +47,7 @@ locals {
         load_balancer_type       = "network"
         internal_lb              = false
         enable_delete_protection = false
-        existing_target_groups   = {}
+        existing_target_groups   = {"t2-${local.application_name}-web-a-http-8080"}
         idle_timeout             = 60 # 60 is default
         security_groups          = ["public"]
         public_subnets           = module.environment.subnets["public"].ids
