@@ -16,7 +16,7 @@ locals {
   igdb_backup_window              = "22:00-01:00"
   igdb_maintenance_window         = "Mon:01:15-Mon:06:00"
   igdb_storage_type               = "gp2"
-  igdb_rds_snapshot_name          = "portal-igdb-spike-manual-mp-31052023"
+  igdb_snapshot_name              = "portal-igdb-spike-manual-mp-31052023"
   igdb_snapshot_arn               = "arn:aws:rds:eu-west-2:${data.aws_caller_identity.current.account_id}:snapshot:${local.application_data.accounts[local.environment].igdb_snapshot_name}"
   iadb_dbname                     = "IADB"
   iadb_storage_size               = "200"
@@ -31,7 +31,7 @@ locals {
   iadb_backup_window              = "22:00-01:00"
   iadb_maintenance_window         = "Mon:01:15-Mon:06:00"
   iadb_storage_type               = "gp2"
-  iadb_rds_snapshot_name          = "portal-iadb-spike-manual-mp-07062023"
+  iadb_snapshot_name          = "portal-iadb-spike-manual-mp-07062023"
   iadb_snapshot_arn               = "arn:aws:rds:eu-west-2:${data.aws_caller_identity.current.account_id}:snapshot:${local.application_data.accounts[local.environment].iadb_snapshot_name}"
   appstream_cidr                  = "10.200.32.0/19"
   cidr_ire_workspace              = "10.200.96.0/19"
@@ -41,7 +41,7 @@ locals {
  }
 
 resource "aws_db_subnet_group" "igdb" {
-  name       = "${local.application_name}-${local.environment}-subnetgrp-${local.igdb_dbname}"
+  name       = "${local.application_name}-${local.environment}-subnetgrp-lower(${local.igdb_dbname})"
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
   tags = merge(
