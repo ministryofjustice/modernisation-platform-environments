@@ -19,11 +19,7 @@ locals {
     enable_oracle_secure_web                     = true
     cloudwatch_metric_alarms                     = {}
     cloudwatch_metric_alarms_lists               = {}
-    cloudwatch_metric_alarms_lists_with_actions = {
-      dso_pagerduty               = ["dso_pagerduty"]
-      dba_pagerduty               = ["dba_pagerduty"]
-      dba_high_priority_pagerduty = ["dba_high_priority_pagerduty"]
-    }
+    cloudwatch_metric_alarms_lists_with_actions  = {}
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }

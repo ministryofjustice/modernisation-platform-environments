@@ -6,7 +6,7 @@ The private key is uploaded as a SSM parameter in each environment under `ec2-us
 1. Generate keys (don't set password)
 
 ```
-app=hmpps-oem
+app=corporate-staff-rostering
 for env in development test preproduction production; do
   mkdir -p $app-$env
   cd $app-$env
@@ -22,7 +22,7 @@ done
 Assumes you have correct aws config profiles setup
 
 ```
-app=hmpps-oem
+app=corporate-staff-rostering
 for env in development test preproduction production; do
   pem=$(cat $app-$env/ec2-user)
   aws ssm put-parameter --name "ec2-user_pem" --type "SecureString" --data-type "text" --value "$pem" --overwrite --profile "$app-$env"
@@ -40,14 +40,14 @@ rm */ec2-user
 Run [get-keys.sh](get-keys.sh) from this directory to download all of the keys (set a password you can remember).
 
 Example ssh config found [here](https://github.com/ministryofjustice/dso-useful-stuff/blob/main/.ssh/config)
-This assumes keys are stored under your .ssh directory, e.g. `~/.ssh/hmpps-oem-development/ec2-user`
+This assumes keys are stored under your .ssh directory, e.g. `~/.ssh/corporate-staff-rostering-development/ec2-user`
 
 Setup soft links in your own .ssh directory like this
 ```
   dir=$(pwd)
   (
     cd ~/.ssh
-    app=hmpps-oem
+    app=corporate-staff-rostering
     for env in development test preproduction production; do
       ln -sf $dir/$app-$env $app-$env
     done
