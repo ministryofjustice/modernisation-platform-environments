@@ -97,6 +97,7 @@ resource "aws_instance" "onprem_gateway" {
   associate_public_ip_address = false
   monitoring                  = false
   ebs_optimized               = false
+  user_data                   = "onprem_gateway_userdata.ps1"
 
   metadata_options {
     http_endpoint = "enabled"
