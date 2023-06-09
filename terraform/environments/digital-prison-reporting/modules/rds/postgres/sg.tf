@@ -4,7 +4,7 @@ data "aws_vpc" "dpr" {
 
 ## RDS SG
 resource "aws_security_group" "rds" {
-  count = var.enabled ? 1 : 0
+  count = var.enable_rds ? 1 : 0
 
   name_prefix = "${var.name}-sg"
   description = "RDS VPC Endpoint Security Group"

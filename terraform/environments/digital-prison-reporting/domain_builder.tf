@@ -13,7 +13,7 @@ locals {
    rds_dbuilder_init_size = 10
    rds_dbuilder_max_size = 50
    rds_parameter_group = "postgres14"
-   enable_domain_builder_lambda = local.application_data.accounts[local.environment].enable_domain_builder_lambda
+   enable_dbuilder_lambda = local.application_data.accounts[local.environment].enable_domain_builder_lambda
    lambda_dbuilder_name = "${local.project}-domain-builder-backend-api"
    lambda_dbuilder_runtime = "java11"
    lambda_dbuilder_tracing = "Active"
