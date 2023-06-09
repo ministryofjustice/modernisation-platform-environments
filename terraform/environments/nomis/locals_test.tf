@@ -431,7 +431,8 @@ locals {
           { name = "t3ndh-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t3or-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
           { name = "t3or-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # NOTE: No reporting in this environment
+          { name = "t3trdat-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
+          { name = "t3trdat-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           # T1
