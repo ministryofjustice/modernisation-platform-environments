@@ -6,7 +6,6 @@
       "ohssnapshot1" : "snap-09be6356ad9f3ae14",
       "ohssnapshot2" : "snap-08c74940e74f5403d",
       "pagerduty_integration_key_name": "laa_portal_nonprod_alarms",
-      "pagerduty_integration_key_name_ga": "get_access_improvement_alarms",
       "management_cidr": "",
       "oam_ami_id": "ami-04220eb9ced81987f",
       "oam_instance_type": "t3a.large",
@@ -16,9 +15,15 @@
       "oam_mserver_snapshot": "snap-0db8a2c01be9128e8",
       "oam_repo_home_snapshot": "snap-04ed65da750df338c",
       "ohs_instance_type": "t3a.medium",
+      "igdb_snapshot_name": "portal-igdb-spike-manual-mp-31052023",
       "oim_instance_type": "t3a.xlarge",
-      "pagerduty_integration_key_name": "laa_portal_nonprod_alarms"
-
+      "idm_ami_id": "ami-0ebbabd8056dea136",
+      "idm_instance_type": "t3a.large",
+      "idm_fmw_snapshot": "snap-0a3213ba856e69d1b",
+      "idm_aserver_snapshot": "snap-0d1122b9e4fb2d8b9",
+      "idm_config_snapshot": "snap-0ec8e0fb2421b8b8f",
+      "idm_mserver_snapshot": "snap-0f196a2f2f8bc532f",
+      "idm_instances_snapshot": "snap-058ee73f8e4a01b75"
     },
     "test": {
       "example_var": "test-data"

@@ -14,7 +14,9 @@
       "create_glue_connections": false,
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
-      "setup_redshift": true
+      "setup_redshift": true,
+      "enable_domain_builder_lambda": true,
+      "enable_domain_builder_rds": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -30,10 +32,27 @@
       "create_glue_connections": false,
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
-      "setup_redshift": true
+      "setup_redshift": true,
+      "enable_domain_builder_lambda": false,
+      "enable_domain_builder_rds": false
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "project_short_id": "dpr",
+      "create_database": true,
+      "db_description": "DPR Data Catalog",
+      "create_job": true,
+      "glue_job_name": "glue-job-ingester",
+      "create_security_conf": true,
+      "setup_buckets": true,
+      "create_kinesis_streams": true,
+      "create_glue_registries": false,
+      "setup_s3_buckets": true,
+      "create_glue_connections": false,
+      "ec2_instance_type": "t3.small",
+      "ami_image_id": "ami-00cc4c3fee6bb6c22",
+      "setup_redshift": true,
+      "enable_domain_builder_lambda": false,
+      "enable_domain_builder_rds": false
     },
     "production": {
       "example_var": "production-data"

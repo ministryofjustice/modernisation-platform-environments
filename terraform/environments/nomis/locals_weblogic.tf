@@ -1,5 +1,19 @@
 locals {
 
+  weblogic_ssm_parameters = {
+    prefix = "/weblogic/"
+    parameters = {
+      admin_username     = {}
+      admin_password     = {}
+      db_username        = {}
+      db_password        = {}
+      db_tagsar_username = {}
+      db_tagsar_password = {}
+      rms_hosts          = {}
+      rms_key            = {}
+    }
+  }
+
   weblogic_target_group_http_7001 = {
     port                 = 7001
     protocol             = "HTTP"
@@ -171,11 +185,11 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "nomis/DSOS-1820/weblogic-init-tweak-v2"
+        branch = "main"
       })
     })
     # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
-    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
+    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
       desired_capacity = 0
     })
     cloudwatch_metric_alarms = {}

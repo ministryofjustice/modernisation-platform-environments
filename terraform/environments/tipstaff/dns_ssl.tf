@@ -1,3 +1,5 @@
+// DEV + PRE-PRODUCTION DNS CONFIGURATION
+
 // ACM Public Certificate
 resource "aws_acm_certificate" "external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
@@ -16,12 +18,9 @@ resource "aws_acm_certificate" "external" {
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
-  timeouts {
-    create = "10m"
-  }
 }
 
-// Route53 DNS record for certificate validation
+// Route53 DNS records for certificate validation
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 
@@ -44,7 +43,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-// Route53 DNS record for directing traffic to the service 
+// Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 

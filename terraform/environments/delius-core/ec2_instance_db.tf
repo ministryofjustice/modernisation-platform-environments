@@ -123,13 +123,13 @@ resource "aws_iam_instance_profile" "base_ami_test_instance_profile" {
 data "aws_ami" "aws_ami_base_ol" {
   most_recent = true
   owners      = [local.environment_management.account_ids["core-shared-services-production"]]
-  name_regex  = "^delius_oracle_db_"
+  name_regex  = "^delius_core_ol_8_5_oracle_db_19c_"
 }
 
 resource "aws_instance" "base_ami_test_instance" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
-  # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type = "t2.small"
+  # Specify the instance type and ami to be used
+  instance_type = "t3.small" # Built on AWS Nitro - required - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html#ec2-nitro-instances
   ami           = data.aws_ami.aws_ami_base_ol.id
   # ami = "ami-0e3dd4f4b84ef84f5" # AL2 amzn2-ami-hvm-2.0.20230418.0-x86_64-gp2
   vpc_security_group_ids      = [aws_security_group.base_ami_test_instance_sg.id]
@@ -137,7 +137,7 @@ resource "aws_instance" "base_ami_test_instance" {
   iam_instance_profile        = aws_iam_instance_profile.base_ami_test_instance_profile.name
   associate_public_ip_address = false
   monitoring                  = false
-  ebs_optimized               = false
+  ebs_optimized               = true
 
   metadata_options {
     http_endpoint = "enabled"

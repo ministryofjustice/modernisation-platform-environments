@@ -51,50 +51,6 @@ resource "aws_ssm_document" "cloud_watch_agent" {
   )
 }
 
-/* resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
-  name             = aws_ssm_document.cloud_watch_agent.name
-  association_name = "manage-cloud-watch-agent"
-  parameters = { # name of ssm parameter containing cloud watch agent config file
-    optionalConfigurationLocation = aws_ssm_parameter.cloud_watch_config_linux.name
-  }
-  targets {
-    key    = "tag:os_type"
-    values = ["Linux"]
-  }
-  apply_only_at_cron_interval = false
-  schedule_expression         = "cron(45 7 ? * TUE *)"
-} */
-
-resource "aws_ssm_parameter" "cloud_watch_config_linux" {
-  #checkov:skip=CKV2_AWS_34:there should not be anything secret in this config
-  description = "cloud watch agent config for linux"
-  name        = "cloud-watch-config-linux"
-  type        = "String"
-  value       = file("./templates/cloud_watch_linux.json")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "cloud-watch-config-linux"
-    },
-  )
-}
-
-resource "aws_ssm_parameter" "cloud_watch_config_windows" {
-  #checkov:skip=CKV2_AWS_34:there should not be anything secret in this config
-  description = "cloud watch agent config for windows"
-  name        = "cloud-watch-config-windows"
-  type        = "String"
-  value       = file("./templates/cloud_watch_windows.json")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "cloud-watch-config-windows"
-    },
-  )
-}
-
 #------------------------------------------------------------------------------
 # SSM Agent - update Systems Manager Agent
 #------------------------------------------------------------------------------

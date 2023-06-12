@@ -677,6 +677,16 @@
       "from_port": 4119,
       "to_port": 4119,
       "protocol": "TCP"
+    },
+    "TCP_5721": {
+      "from_port": 5721,
+      "to_port": 5721,
+      "protocol": "TCP"
+    },
+    "TCP_8530-8531": {
+      "from_port": 8530,
+      "to_port": 8531,
+      "protocol": "TCP"
     }
   },
   "equip_internal_rules": {
@@ -960,6 +970,16 @@
       "from_port": 4952,
       "to_port": 65535,
       "protocol": "UDP"
+    },
+    "UDP_161-162": {
+      "from_port": 161,
+      "to_port": 162,
+      "protocol": "UDP"
+    },
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
     }
   },
   "dns_endpoint_rules": {

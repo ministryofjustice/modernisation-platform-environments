@@ -37,6 +37,7 @@ module "baseline" {
     aws                       = aws
     aws.core-network-services = aws.core-network-services
     aws.core-vpc              = aws.core-vpc
+    aws.us-east-1             = aws.us-east-1
   }
 
   environment = module.environment
@@ -131,4 +132,8 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_sns_topics", {})
   )
 
+  ssm_parameters = merge(
+    local.baseline_ssm_parameters,
+    lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
+  )
 }
