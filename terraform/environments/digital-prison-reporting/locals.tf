@@ -58,9 +58,6 @@ locals {
       db_name = "nomis"
     }
 
-    type = map(string)
-  }
-
     all_tags = merge(
     local.tags,
         {
