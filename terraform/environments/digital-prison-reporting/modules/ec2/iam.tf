@@ -155,11 +155,22 @@ resource "aws_iam_policy" "glue-full-access" {
 data "aws_iam_policy_document" "glue-access" {
   statement {
     actions = [
-      "glue:*",
-      "secretsmanager:GetSecretValue",
+      "glue:*"
     ]
     resources = [
       "*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "secretsmanager:CreateSecret",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:List*"
+    ]
+    resources = [
+      "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:*"
     ]
   }
 
