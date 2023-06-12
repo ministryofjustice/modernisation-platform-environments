@@ -43,9 +43,9 @@ resource "aws_dms_replication_task" "dms-replication" {
   table_mappings            = data.template_file.table-mappings.rendered
   replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings.json")
 
-#  lifecycle {
-#    ignore_changes = [replication_task_settings]
-#  }
+  #  lifecycle {
+  #    ignore_changes = [replication_task_settings]
+  #  }
 }
 
 # Create an endpoint for the source database
@@ -91,7 +91,7 @@ resource "aws_dms_endpoint" "target" {
       service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
       stream_arn                     = lookup(var.kinesis_settings, "kinesis_target_stream", null)
     }
-  }  
+  }
 
   tags = var.tags
 }

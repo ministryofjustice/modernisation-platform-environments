@@ -123,7 +123,7 @@ locals {
         }
         lb_target_groups = {
           https-443 = {
-            port                 = 443
+            port = 443
             health_check = {
               enabled             = true
               interval            = 30

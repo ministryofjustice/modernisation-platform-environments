@@ -125,7 +125,7 @@ locals {
 
   database_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name = "oasys_oracle_db_*"
+      ami_name          = "oasys_oracle_db_*"
       availability_zone = "${local.region}a"
     })
     instance              = module.baseline_presets.ec2_instance.instance.default_db
@@ -245,7 +245,7 @@ locals {
     "${local.application_name}-environment" = local.environment
     environment-name                        = terraform.workspace # used in provisioning script to select group vars
   }
-  
+
 
   # lb_listener_defaults = {
 

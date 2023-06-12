@@ -17,13 +17,13 @@ locals {
   igdb_maintenance_window         = "Mon:01:15-Mon:06:00"
   igdb_storage_type               = "gp2"
   igdb_rds_snapshot_name          = "portal-igdb-spike-manual-mp-31052023"
-  igdb_snapshot_arn          = "arn:aws:rds:eu-west-2:${data.aws_caller_identity.current.account_id}:snapshot:${local.application_data.accounts[local.environment].igdb_snapshot_name}"
-  appstream_cidr             = "10.200.32.0/19"
-  cidr_ire_workspace         = "10.200.96.0/19"
-  workspaces_cidr            = "10.200.16.0/20"
-  cp_vpc_cidr                = "172.20.0.0/20"
-  lzprd-vpc                  = "10.205.0.0/20"
- }
+  igdb_snapshot_arn               = "arn:aws:rds:eu-west-2:${data.aws_caller_identity.current.account_id}:snapshot:${local.application_data.accounts[local.environment].igdb_snapshot_name}"
+  appstream_cidr                  = "10.200.32.0/19"
+  cidr_ire_workspace              = "10.200.96.0/19"
+  workspaces_cidr                 = "10.200.16.0/20"
+  cp_vpc_cidr                     = "172.20.0.0/20"
+  lzprd-vpc                       = "10.205.0.0/20"
+}
 
 resource "aws_db_subnet_group" "igdb" {
   name       = "${local.application_name}-${local.environment}-subnetgrp"
@@ -45,38 +45,38 @@ resource "aws_db_parameter_group" "igdb-parametergroup-19c" {
 
 
   parameter {
-    name  = "open_cursors"
-    value = "1000"
+    name         = "open_cursors"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "processes"
-    value = "1000"
+    name         = "processes"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "query_rewrite_enabled"
-    value = "TRUE"
+    name         = "query_rewrite_enabled"
+    value        = "TRUE"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "query_rewrite_integrity"
-    value = "TRUSTED"
+    name         = "query_rewrite_integrity"
+    value        = "TRUSTED"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "sessions"
-    value = "1000"
+    name         = "sessions"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "sqlnetora.sqlnet.allowed_logon_version_server"
-    value = "11"
+    name         = "sqlnetora.sqlnet.allowed_logon_version_server"
+    value        = "11"
     apply_method = "pending-reboot"
   }
 
@@ -254,11 +254,11 @@ resource "aws_db_instance" "appdb1" {
   password               = random_password.rds_password.result
   vpc_security_group_ids = [aws_security_group.igdb.id]
   #skip_final_snapshot             = false
-  final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
-  parameter_group_name  = aws_db_parameter_group.igdb-parametergroup-19c.name
-  db_subnet_group_name  = aws_db_subnet_group.igdb.name
-  maintenance_window    = local.igdb_maintenance_window
-  license_model         = "bring-your-own-license"
+  final_snapshot_identifier = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  parameter_group_name      = aws_db_parameter_group.igdb-parametergroup-19c.name
+  db_subnet_group_name      = aws_db_subnet_group.igdb.name
+  maintenance_window        = local.igdb_maintenance_window
+  license_model             = "bring-your-own-license"
   #TODO deletion_protection   = true
   copy_tags_to_snapshot = true
   storage_encrypted     = true

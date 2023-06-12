@@ -1,16 +1,16 @@
 locals {
-  dashboard_name                 = "${local.application_name}-${local.environment}-application-Dashboard"
+  dashboard_name = "${local.application_name}-${local.environment}-application-Dashboard"
 
   cpu_alarms_1 = {
     oam_instance_1 = {
-      service_name          = "oam_1"
+      service_name        = "oam_1"
       cpu_alarm_threshold = 85
       dimensions = {
         InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
-      service_name          = "ohs_1"
+      service_name        = "ohs_1"
       cpu_alarm_threshold = 85
       dimensions = {
         InstanceId = aws_instance.ohs1.id
@@ -19,7 +19,7 @@ locals {
   }
   cpu_alarms_2 = {
     oam_instance_2 = {
-      service_name          = "oam_2"
+      service_name        = "oam_2"
       cpu_alarm_threshold = 85
       dimensions = {
         InstanceId = "alice"
@@ -27,7 +27,7 @@ locals {
       }
     },
     ohs_instance_2 = {
-      service_name          = "oim_2"
+      service_name        = "oim_2"
       cpu_alarm_threshold = 85
       dimensions = {
         InstanceId = "bob"
@@ -37,14 +37,14 @@ locals {
   }
   status_alarms_1 = {
     oam_instance_1 = {
-      service_name          = "oam_1"
+      service_name           = "oam_1"
       status_alarm_threshold = 1
       dimensions = {
         InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
-      service_name          = "ohs_1"
+      service_name           = "ohs_1"
       status_alarm_threshold = 1
       dimensions = {
         InstanceId = aws_instance.ohs1.id
@@ -53,7 +53,7 @@ locals {
   }
   status_alarms_2 = {
     oam_instance_2 = {
-      service_name          = "oam_2"
+      service_name           = "oam_2"
       status_alarm_threshold = 1
       dimensions = {
         InstanceId = "alice"
@@ -63,14 +63,14 @@ locals {
   }
   memory_alarms_1 = {
     oam_instance_1 = {
-      service_name          = "oam_1"
+      service_name           = "oam_1"
       memory_alarm_threshold = 80
       dimensions = {
         InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
-      service_name          = "ohs_1"
+      service_name           = "ohs_1"
       memory_alarm_threshold = 80
       dimensions = {
         InstanceId = aws_instance.ohs1.id
@@ -79,7 +79,7 @@ locals {
   }
   memory_alarms_2 = {
     oam_instance_2 = {
-      service_name          = "oam_2"
+      service_name           = "oam_2"
       memory_alarm_threshold = 80
       dimensions = {
         InstanceId = "alice"
@@ -87,7 +87,7 @@ locals {
       }
     },
     ohs_instance_2 = {
-      service_name          = "ohs_2"
+      service_name           = "ohs_2"
       memory_alarm_threshold = 80
       dimensions = {
         InstanceId = "bob"
@@ -97,14 +97,14 @@ locals {
   }
   swapspace_alarms_1 = {
     oam_instance_1 = {
-      service_name          = "oam_1"
+      service_name              = "oam_1"
       swapspace_alarm_threshold = 50
       dimensions = {
         InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     },
     ohs_instance_1 = {
-      service_name          = "ohs_1"
+      service_name              = "ohs_1"
       swapspace_alarm_threshold = 50
       dimensions = {
         InstanceId = aws_instance.ohs1.id # TODO This needs updating when the OAM EC2 instance is built
@@ -113,7 +113,7 @@ locals {
   }
   swapspace_alarms_2 = {
     oam_instance_2 = {
-      service_name          = "oam_2"
+      service_name              = "oam_2"
       swapspace_alarm_threshold = 50
       dimensions = {
         InstanceId = "alice"
@@ -121,7 +121,7 @@ locals {
       }
     },
     ohs_instance_2 = {
-      service_name          = "ohs_2"
+      service_name              = "ohs_2"
       swapspace_alarm_threshold = 50
       dimensions = {
         InstanceId = "bob"
@@ -131,19 +131,19 @@ locals {
   }
   diskspace_alarms_1 = {
     oam_instance_1 = {
-      service_name          = "oam_1"
+      service_name              = "oam_1"
       diskspace_alarm_threshold = 80
       dimensions = {
-        MountPath = "/"
+        MountPath  = "/"
         Filesystem = "/dev/nvme0n1p2"
         InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
-      service_name          = "ohs_1"
+      service_name              = "ohs_1"
       diskspace_alarm_threshold = 80
       dimensions = {
-        MountPath = "/"
+        MountPath  = "/"
         Filesystem = "/dev/nvme0n1p2"
         InstanceId = aws_instance.ohs1.id
       }
@@ -151,21 +151,21 @@ locals {
   }
   diskspace_alarms_2 = {
     oam_instance_2 = {
-      service_name          = "oam_2"
+      service_name              = "oam_2"
       diskspace_alarm_threshold = 80
       dimensions = {
         InstanceId = "alice"
-        MountPath = "/"
+        MountPath  = "/"
         Filesystem = "/dev/nvme0n1p2"
         # InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     },
     ohs_instance_2 = {
-      service_name          = "ohs_2"
+      service_name              = "ohs_2"
       diskspace_alarm_threshold = 80
       dimensions = {
         InstanceId = "alice"
-        MountPath = "/"
+        MountPath  = "/"
         Filesystem = "/dev/nvme0n1p2"
         # InstanceId = aws_instance.ohs2.id # TODO This needs updating when the OAM EC2 instance is built
       }
@@ -173,7 +173,7 @@ locals {
   }
   mserver_alarms_1 = {
     oam_instance_1 = {
-      service_name          = "oam_1"
+      service_name            = "oam_1"
       mserver_alarm_threshold = 80
       dimensions = {
         MountPath = "/IDAM/product/runtime/Domain/mserver"
@@ -182,7 +182,7 @@ locals {
       }
     },
     ohs_instance_1 = {
-      service_name          = "ohs_1"
+      service_name            = "ohs_1"
       mserver_alarm_threshold = 80
       dimensions = {
         MountPath = "/IDAM/product/runtime/Domain/mserver"
@@ -193,21 +193,21 @@ locals {
   }
   mserver_alarms_2 = {
     oam_instance_2 = {
-      service_name          = "oam_2"
+      service_name            = "oam_2"
       mserver_alarm_threshold = 80
       dimensions = {
         InstanceId = "alice"
-        MountPath = "/IDAM/product/runtime/Domain/mserver"
+        MountPath  = "/IDAM/product/runtime/Domain/mserver"
         Filesystem = "/dev/nvme1n1"
         # InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     },
     ohs_instance_2 = {
-      service_name          = "ohs_2"
+      service_name            = "ohs_2"
       mserver_alarm_threshold = 80
       dimensions = {
         InstanceId = "alice"
-        MountPath = "/IDAM/product/runtime/Domain/mserver"
+        MountPath  = "/IDAM/product/runtime/Domain/mserver"
         Filesystem = "/dev/nvme1n1"
         # InstanceId = aws_instance.ohs2.id # TODO This needs updating when the OAM EC2 instance is built
       }
@@ -215,22 +215,22 @@ locals {
   }
   aserver_alarms_1 = {
     oam_instance_1 = {
-      service_name          = "oam_1"
+      service_name            = "oam_1"
       aserver_alarm_threshold = 80
       dimensions = {
-        MountPath = "/IDAM/product/runtime/Domain/aserver"
+        MountPath  = "/IDAM/product/runtime/Domain/aserver"
         Filesystem = "/dev/nvme1n1"
         InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     }
   }
 
-  cpu_alarms_list = local.environment == "production" ? merge(local.cpu_alarms_1, local.cpu_alarms_2) : local.cpu_alarms_1
-  status_alarms_list = local.environment == "production" ? merge(local.status_alarms_1, local.status_alarms_2) : local.status_alarms_1
-  memory_alarms_list = local.environment == "production" ? merge(local.memory_alarms_1, local.memory_alarms_2) : local.memory_alarms_1
+  cpu_alarms_list       = local.environment == "production" ? merge(local.cpu_alarms_1, local.cpu_alarms_2) : local.cpu_alarms_1
+  status_alarms_list    = local.environment == "production" ? merge(local.status_alarms_1, local.status_alarms_2) : local.status_alarms_1
+  memory_alarms_list    = local.environment == "production" ? merge(local.memory_alarms_1, local.memory_alarms_2) : local.memory_alarms_1
   swapspace_alarms_list = local.environment == "production" ? merge(local.swapspace_alarms_1, local.swapspace_alarms_2) : local.swapspace_alarms_1
   diskspace_alarms_list = local.environment == "production" ? merge(local.diskspace_alarms_1, local.diskspace_alarms_2) : local.diskspace_alarms_1
-  mserver_alarms_list = local.environment == "production" ? merge(local.mserver_alarms_1, local.mserver_alarms_2) : local.mserver_alarms_1
+  mserver_alarms_list   = local.environment == "production" ? merge(local.mserver_alarms_1, local.mserver_alarms_2) : local.mserver_alarms_1
 
 }
 
@@ -421,12 +421,12 @@ resource "aws_cloudwatch_metric_alarm" "aserver_alarm" {
 
 
 data "template_file" "dashboard_prod" {
-  count = local.environment == "production" ? 1 : 0
+  count    = local.environment == "production" ? 1 : 0
   template = file("${path.module}/dashboard_prod.tpl")
 
   # TODO Update the local variables to reference the correct alarms once they are created
   vars = {
-    aws_region                      = local.aws_region
+    aws_region = local.aws_region
     # elb_5xx_alarm_arn               = aws_cloudwatch_metric_alarm.ApplicationELB5xxError.arn
     # elb_4xx_alarm_arn               = aws_cloudwatch_metric_alarm.ApplicationELB4xxError.arn
     # elb_response_time_alarm_arn     = aws_cloudwatch_metric_alarm.TargetResponseTime.arn
@@ -451,12 +451,12 @@ data "template_file" "dashboard_prod" {
 }
 
 data "template_file" "dashboard_nonprod" {
-  count = local.environment != "production" ? 1 : 0
+  count    = local.environment != "production" ? 1 : 0
   template = file("${path.module}/dashboard_nonprod_temp.tpl") # TODO Update this to dashboard_nonprod.tpl once all relevant resources are created
 
   # TODO Update the local variables to reference the correct alarms once they are created
   vars = {
-    aws_region                      = local.aws_region
+    aws_region = local.aws_region
     # elb_5xx_alarm_arn               = aws_cloudwatch_metric_alarm.ApplicationELB5xxError.arn
     # elb_4xx_alarm_arn               = aws_cloudwatch_metric_alarm.ApplicationELB4xxError.arn
     # elb_response_time_alarm_arn     = aws_cloudwatch_metric_alarm.TargetResponseTime.arn
@@ -468,9 +468,9 @@ data "template_file" "dashboard_nonprod" {
     # igdb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.RDS2WriteLataencyOverThreshold.arn
     # oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim_instance_1"].arn
     # oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_1"].arn
-    oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
+    oam1_memory_alarm_arn = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
     # idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_1"].arn
-    ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
+    ohs1_memory_alarm_arn = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
   }
 }
 

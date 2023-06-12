@@ -3,8 +3,8 @@
     "development": {
       "example_var": "dev-data",
       "existing_archive_bucket_name": "",
-      "ohssnapshot1" : "snap-09be6356ad9f3ae14",
-      "ohssnapshot2" : "snap-08c74940e74f5403d",
+      "ohssnapshot1": "snap-09be6356ad9f3ae14",
+      "ohssnapshot2": "snap-08c74940e74f5403d",
       "pagerduty_integration_key_name": "laa_portal_nonprod_alarms",
       "management_cidr": "",
       "oam_ami_id": "ami-04220eb9ced81987f",

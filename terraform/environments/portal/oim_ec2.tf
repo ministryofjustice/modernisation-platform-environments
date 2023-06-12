@@ -7,7 +7,7 @@ resource "aws_security_group" "oim_instance" {
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
-ingress {
+  ingress {
     description = "Nodemanager port"
     from_port   = 5556
     to_port     = 5556
@@ -16,8 +16,8 @@ ingress {
 
   }
 
-  
-ingress {
+
+  ingress {
     description = "OIM Admin Console from Shared Svs"
     from_port   = 7101
     to_port     = 7101
@@ -26,7 +26,7 @@ ingress {
 
   }
 
-ingress {
+  ingress {
     description = "OIM Admin Console"
     from_port   = 7101
     to_port     = 7101
@@ -43,7 +43,7 @@ ingress {
     cidr_blocks = [local.first-cidr]
 
   }
-  
+
   ingress {
     description = "OIM Inbound on 14000"
     from_port   = 14000
@@ -89,7 +89,7 @@ ingress {
 
   }
 
- 
+
   # ingress {
   #   description = "SSH access from VPC"
   #   from_port   = 22
@@ -98,7 +98,7 @@ ingress {
   #   cidr_blocks = [local.first-cidr]
 
   # }
- 
+
   #   ingress {
   #   description = "SSH access from prod bastion"
   #   from_port   = 22
@@ -135,12 +135,12 @@ ingress {
 # TODO Depending on outcome of how EBS/EFS is used, this resource may depend on aws_instance.oam_instance_1
 
 resource "aws_instance" "oim1" {
-  ami                         = local.oim_ami-id
-  instance_type               = local.application_data.accounts[local.environment].oim_instance_type
-  monitoring                  = true
-  vpc_security_group_ids      = [aws_security_group.oim_instance.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.portal.id
+  ami                    = local.oim_ami-id
+  instance_type          = local.application_data.accounts[local.environment].oim_instance_type
+  monitoring             = true
+  vpc_security_group_ids = [aws_security_group.oim_instance.id]
+  subnet_id              = data.aws_subnet.data_subnets_a.id
+  iam_instance_profile   = aws_iam_instance_profile.portal.id
 
   # root_block_device {
   #   delete_on_termination      = false
@@ -156,18 +156,18 @@ resource "aws_instance" "oim1" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OIM Instance 1" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    { "snapshot-with-daily-35-day-retention" = "yes" } # TODO the Backup rule needs setting up first
   )
 }
 
 
 resource "aws_instance" "oim2" {
-  count = local.environment == "production" ? 1 : 0
-  ami                            = local.oim_ami-id
-  instance_type                  = local.application_data.accounts[local.environment].oim_instance_type
-  vpc_security_group_ids         = [aws_security_group.oim_instance.id]
-  subnet_id                      = data.aws_subnet.data_subnets_b.id
-  iam_instance_profile           = aws_iam_instance_profile.portal.id
+  count                  = local.environment == "production" ? 1 : 0
+  ami                    = local.oim_ami-id
+  instance_type          = local.application_data.accounts[local.environment].oim_instance_type
+  vpc_security_group_ids = [aws_security_group.oim_instance.id]
+  subnet_id              = data.aws_subnet.data_subnets_b.id
+  iam_instance_profile   = aws_iam_instance_profile.portal.id
 
   #   # root_block_device {
   #   # delete_on_termination     = false
@@ -184,7 +184,7 @@ resource "aws_instance" "oim2" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OIM Instance 2" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    { "snapshot-with-daily-35-day-retention" = "yes" } # TODO the Backup rule needs setting up first
   )
 }
 
