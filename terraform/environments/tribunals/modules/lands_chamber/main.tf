@@ -35,6 +35,7 @@ resource "null_resource" "setup_db" {
       NEW_DB_NAME = "lands"
       NEW_USER_NAME = "lands_admin"
       NEW_PASSWORD = random_password.new_password.result
+      APP_FOLDER = "lands_chamber"
     }
   }
   triggers = {

@@ -35,6 +35,7 @@ resource "null_resource" "setup_db" {
       NEW_DB_NAME = "transport"
       NEW_USER_NAME = "transport_admin"
       NEW_PASSWORD = random_password.new_password.result
+      APP_FOLDER = "transport"
     }
   }
   triggers = {

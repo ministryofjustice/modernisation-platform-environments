@@ -35,6 +35,7 @@ resource "null_resource" "setup_db" {
       NEW_DB_NAME = "carestandards"
       NEW_USER_NAME = "carestandards_admin"
       NEW_PASSWORD = random_password.new_password.result
+      APP_FOLDER = "care_standards"
     }
   }
   triggers = {

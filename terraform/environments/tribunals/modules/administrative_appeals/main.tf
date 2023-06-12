@@ -35,6 +35,7 @@ resource "null_resource" "setup_db" {
       NEW_DB_NAME = "ossc"
       NEW_USER_NAME = "ossc_admin"
       NEW_PASSWORD = random_password.new_password.result
+      APP_FOLDER = "administrative_appeals"
     }
   }
   triggers = {
