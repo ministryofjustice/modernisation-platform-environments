@@ -7,7 +7,7 @@ data "aws_kms_key" "kinesis_kms_key" {
 data "aws_secretsmanager_secret" "nomis" {
   name = aws_secretsmanager_secret.nomis.id
 
-  depends_on = [aws_secretsmanager_aws_secretsmanager_secret_version.nomis]
+  depends_on = [aws_secretsmanager_secret_version.nomis]
 }
 
 data "aws_secretsmanager_secret_version" "nomis" {
