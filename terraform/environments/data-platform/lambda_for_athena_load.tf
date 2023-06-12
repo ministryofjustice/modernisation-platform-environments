@@ -127,8 +127,11 @@ data "aws_iam_policy_document" "athena-load-lambda-function-policy" {
       "athena:StartQueryExecution",
       "athena:GetQueryExecution"
     ]
+    # fails the plan using the ar of the terraform resource because of a count
+    # in the lamdba module used and the are not being known until apply
     resources = [
-      aws_athena_workgroup.data_product_athena_workgroup.arn
+      # aws_athena_workgroup.data_product_athena_workgroup.arn
+      "arn:aws:athena:*:${data.aws_caller_identity.current.account_id}:workgroup/data_product_workgroup"
     ]
   }
 }
