@@ -52,10 +52,11 @@ locals {
     lambda_dbuilder_policies        = [aws_iam_policy.s3_read_access_policy.arn, ]     
 
     nomis_secrets_placeholder = {
+      db_name = "nomis"
       password = "placeholder"
       user = "placeholder"
       endpoint = "0.0.0.0"
-      db_name = "nomis"
+      port = "1521"
     }
 
     all_tags = merge(
