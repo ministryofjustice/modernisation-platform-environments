@@ -7,10 +7,7 @@
 data "aws_acm_certificate" "equip_cert" {
   domain   = "equip.service.justice.gov.uk"
   statuses = ["ISSUED"]
- 
-  lifecycle {
-    create_before_destroy = true
-  }
+  most_recent = true
 }
 
 #Load balancer needs to be publically accessible
