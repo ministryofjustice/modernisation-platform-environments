@@ -550,11 +550,11 @@ module "dms_nomis_ingestor" {
   name                  = "${local.project}-dms-nomis-ingestor-${local.env}"
   vpc_cidr              = [data.aws_vpc.shared.cidr_block]
   source_engine_name    = "oracle"
-  source_db_name        = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["db_name"]
-  source_app_username   = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["user"]
-  source_app_password   = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["password"]
-  source_address        = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["endpoint"]
-  source_db_port        = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["port"]
+  source_db_name        = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
+  source_app_username   = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["user"]
+  source_app_password   = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["password"]
+  source_address        = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
+  source_db_port        = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
   vpc                   = data.aws_vpc.shared.id
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   project_id            = local.project
