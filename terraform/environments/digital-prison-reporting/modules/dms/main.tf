@@ -56,7 +56,7 @@ resource "aws_dms_endpoint" "source" {
   engine_name   = var.source_engine_name
   password      = var.source_app_password
   port          = var.source_db_port
-  server_name   = var.source_address // TBC
+  server_name   = var.source_address
   ssl_mode      = "none"
   username      = var.source_app_username
 
