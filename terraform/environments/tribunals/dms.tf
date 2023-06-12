@@ -81,120 +81,58 @@ resource "aws_iam_role_policy" "dms_vpc_management_policy" {
   })
 }
 
-//transport
-# resource "aws_dms_endpoint" "target" {
-#   depends_on    = [aws_db_instance.rdsdb]
-#   database_name = ""
-#   endpoint_id   = "tribunals-target"
-#   endpoint_type = "target"
-#   engine_name   = "sqlserver"
-#   username      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-#   password      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-#   port          = 1433
-#   server_name   = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["host"]
-#   ssl_mode      = "none"
-# }
+resource "aws_dms_endpoint" "source" {
+  database_name               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dbname"]
+  endpoint_id                 = "tribunals-source"
+  endpoint_type               = "source"
+  engine_name                 = "sqlserver"
+  password                    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
+  port                        = 1433
+  server_name                 = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
+  ssl_mode                    = "none"
 
-# resource "aws_dms_endpoint" "source" {
-#   database_name               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dbname"]
-#   endpoint_id                 = "tribunals-source"
-#   endpoint_type               = "source"
-#   engine_name                 = "sqlserver"
-#   password                    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
-#   port                        = 1433
-#   server_name                 = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
-#   ssl_mode                    = "none"
+  username = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
+}
 
-#   username = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
-# }
+resource "aws_security_group" "modernisation_dms_access" {
+  provider    = aws.mojdsd
+  name        = "modernisation_dms_access"
+  description = "allow dms access to the database for the modernisation platform"
 
-# resource "aws_security_group" "modernisation_dms_access" {
-#   provider    = aws.mojdsd
-#   name        = "modernisation_dms_access"
-#   description = "allow dms access to the database for the modernisation platform"
+  ingress {
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
+    description = "Allow DMS to connect to source database"
+    cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips[0]}/32"]
+  }
 
-#   ingress {
-#     from_port   = 1433
-#     to_port     = 1433
-#     protocol    = "tcp"
-#     description = "Allow DMS to connect to source database"
-#     cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips[0]}/32"]
-#   }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
+// executes a local script to set up the security group for the target RDS instance in the source db aws account
+resource "null_resource" "setup_target_rds_security_group" {
+  depends_on = [aws_dms_replication_instance.tribunals_replication_instance]
 
-# // executes a local script to set up the security group for the target RDS instance in the source db aws account
-# resource "null_resource" "setup_target_rds_security_group" {
-#   depends_on = [aws_dms_replication_instance.tribunals_replication_instance]
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"   
 
-#   provisioner "local-exec" {
-#     interpreter = ["bash", "-c"]
-#     command = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"   
+    environment = {
+      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
+      EC2_INSTANCE_ID               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["ec2-instance-id"]
+      DMS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_access_key"]
+      DMS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_secret_key"]
+      AWS_REGION                    = "eu-west-1"
 
-#     environment = {
-#       DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
-#       EC2_INSTANCE_ID               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["ec2-instance-id"]
-#       DMS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_access_key"]
-#       DMS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_secret_key"]
-#       AWS_REGION                    = "eu-west-1"
-
-#     }
-#   }
-#   triggers = {
-#     always_run = "${timestamp()}"
-#   }
-# }
-
-# resource "aws_dms_replication_task" "migration-task" {
-#  # depends_on = [null_resource.setup_target_rds_security_group, aws_db_instance.rdsdb, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tribunals_replication_instance]
-
-#   migration_type            = "full-load"
-#   replication_instance_arn  = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
-#   replication_task_id       = "tf-tribunals-migration-task"
-#   source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
-#   target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
-#   start_replication_task   = false
- 
-#   replication_task_settings = jsonencode({
-#     TargetMetadata = {
-#       FullLobMode  = true,
-#       LobChunkSize = 64
-#     },
-#     FullLoadSettings = {
-#       TargetTablePrepMode = "DO_NOTHING"
-#     },
-#     ControlTablesSettings = {
-#       historyTimeslotInMinutes = 5
-#     },
-#     ErrorBehavior = {
-#       DataErrorPolicy            = "LOG_ERROR"
-#       ApplyErrorDeletePolicy     = "LOG_ERROR"
-#       ApplyErrorInsertPolicy     = "LOG_ERROR"
-#       ApplyErrorUpdatePolicy     = "LOG_ERROR"
-#       ApplyErrorEscalationCount  = 0
-#       ApplyErrorEscalationPolicy = "LOG_ERROR"
-#     }
-#   })
-
-#    table_mappings = jsonencode({
-#     rules = [
-#       {
-#         "rule-type" = "selection"
-#         "rule-id"   = "1"
-#         "rule-name" = "1"
-#         "object-locator" = {
-#           "schema-name" = "dbo"
-#           "table-name"  = "%"
-#         }
-#         "rule-action" = "include"
-#       }
-#     ]
-#   })
- 
-# }
+    }
+  }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}

@@ -1,15 +1,17 @@
+#Criminal Injuries Compensation Tribunal
+
 module "dms" {
   source                      = "../dms"
   replication_instance_arn    = var.replication_instance_arn
-  replication_task_id         = "transport-migration-task"
+  replication_task_id         = "cicap-migration-task"
   #target_db_instance          = 0
-  target_endpoint_id          = "transport-target"
-  target_database_name        = "transport"
+  target_endpoint_id          = "cicap-target"
+  target_database_name        = "cicap"
   target_server_name          = var.rds_url
   target_username             = var.rds_user
   target_password             = var.rds_password
-  source_endpoint_id          = "transport-source"
-  source_database_name        = "Transport"
+  source_endpoint_id          = "cicap-source"
+  source_database_name        = "cicap"
   source_server_name          = var.source_db_url
   source_username             = var.source_db_user
   source_password             = var.source_db_password
@@ -35,7 +37,7 @@ resource "null_resource" "setup_db" {
       NEW_DB_NAME = var.app_db_name
       NEW_USER_NAME = var.app_db_login_name
       NEW_PASSWORD = random_password.new_password.result
-      APP_FOLDER = "transport"
+      APP_FOLDER = "cicap"
     }
   }
   triggers = {
