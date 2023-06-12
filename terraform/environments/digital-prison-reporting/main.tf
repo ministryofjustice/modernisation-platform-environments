@@ -473,7 +473,9 @@ module "ec2_kinesis_agent" {
   ebs_delete_on_termination   = false
   # s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn # TBC
   region                      = local.account_region
-  account                     = local.account_id  
+  account                     = local.account_id
+  env                         = local.env
+
 
   tags = merge(
     local.all_tags,
@@ -548,11 +550,11 @@ module "dms_nomis_ingestor" {
   name                  = "${local.project}-dms-nomis-ingestor-${local.env}"
   vpc_cidr              = [data.aws_vpc.shared.cidr_block]
   source_engine_name    = "oracle"
-  source_db_name        = "CNOMT3"
-  source_app_username   = "digital_prison_reporting"
-  source_app_password   = "DSkpo4n7GhnmIV" ## Needs to pull from Secrets Manager, #TD
-  source_address        = "10.101.63.135"
-  source_db_port        = 1521
+  source_db_name        = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["db_name"]
+  source_app_username   = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["user"]
+  source_app_password   = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["password"]
+  source_address        = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["endpoint"]
+  source_db_port        = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["port"]
   vpc                   = data.aws_vpc.shared.id
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   project_id            = local.project
