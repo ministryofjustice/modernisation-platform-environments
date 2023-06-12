@@ -60,7 +60,6 @@ locals {
           https = {
             port                      = 443
             protocol                  = "TCP"
-            certificate_names_or_arns = ["application_environment_wildcard_cert"]
             default_action = {
               type              = "forward"
               target_group_name = "private-lb-https-443"
