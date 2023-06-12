@@ -51,6 +51,16 @@ locals {
     lambda_dbuilder_code_s3_key     = "build-artifacts/domain-builder/jars/domain-builder-backend-api-vLatest-all.jar"
     lambda_dbuilder_policies        = [aws_iam_policy.s3_read_access_policy.arn, ]     
 
+    nomis_secrets_placeholder = {
+      password = "placeholder"
+      user = "placeholder"
+      endpoint = "0.0.0.0"
+      db_name = "nomis"
+    }
+
+    type = map(string)
+  }
+
     all_tags = merge(
     local.tags,
         {
