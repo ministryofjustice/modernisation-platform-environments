@@ -12,7 +12,7 @@ module "administrative_appeals" {
   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
 }
 
-module "care_standards" {
+module "ahmlr" {
   source                = "./modules/ahmlr"
   application_name      = "hmlands"
   environment           = local.environment
@@ -40,7 +40,7 @@ module "care_standards" {
   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
 }
 
-module "administrative_appeals" {
+module "cicap" {
   source                = "./modules/cicap"
   application_name      = "cicap"
   environment           = local.environment
@@ -54,7 +54,7 @@ module "administrative_appeals" {
   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
 }
 
-module "administrative_appeals" {
+module "employment_appeals" {
   source                = "./modules/employment_appeals"
   application_name      = "eat"
   environment           = local.environment
@@ -68,7 +68,7 @@ module "administrative_appeals" {
   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
 }
 
-module "care_standards" {
+module "finance_and_tax" {
   source                = "./modules/finance_and_tax"
   application_name      = "ftt"
   environment           = local.environment
@@ -82,7 +82,7 @@ module "care_standards" {
   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
 }
 
-module "administrative_appeals" {
+module "immigartion_services" {
   source                = "./modules/immigartion_services"
   application_name      = "imset"
   environment           = local.environment
@@ -96,7 +96,7 @@ module "administrative_appeals" {
   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
 }
 
-module "care_standards" {
+module "information_tribunal" {
   source                = "./modules/information_tribunal"
   application_name      = "it"
   environment           = local.environment
