@@ -557,11 +557,11 @@ resource "aws_db_instance" "appdb2" {
 #   records  = [aws_db_instance.appdb1.address]
 # }
 
-resource "aws_route53_record" "iadb_rds" {
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
-  type     = "CNAME"
-  ttl      = 60
-  records  = [aws_db_instance.appdb2.address]
-}
+# resource "aws_route53_record" "iadb_rds" {
+#   provider = aws.core-vpc
+#   zone_id  = data.aws_route53_zone.external.zone_id
+#   name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
+#   type     = "CNAME"
+#   ttl      = 60
+#   records  = [aws_db_instance.appdb2.address]
+# }
