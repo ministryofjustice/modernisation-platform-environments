@@ -12,6 +12,13 @@ locals {
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
+      nomis-combined-reporting-bip-packages = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsReadOnlyAccessBucketPolicy
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
     }
 
     baseline_ec2_autoscaling_groups = {
