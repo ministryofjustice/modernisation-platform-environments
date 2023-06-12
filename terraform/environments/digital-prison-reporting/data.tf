@@ -5,7 +5,7 @@ data "aws_kms_key" "kinesis_kms_key" {
 
 # Source Nomis Secrets
 data "aws_secretsmanager_secret" "nomis" {
-  name = resource.aws_secretsmanager_secret.nomis.name
+  name = resource.aws_secretsmanager_secret.nomis.id
 }
 
 data "aws_secretsmanager_secret_version" "nomis" {
