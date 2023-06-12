@@ -108,6 +108,19 @@ locals {
         })
       })
 
+      t3-nomis-web-b = merge(local.weblogic_ec2_b, {
+        tags = merge(local.weblogic_ec2_b.tags, {
+          nomis-environment    = "t3"
+          oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T3CNOM"
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0 # set to 0 while testing
+        })
+        cloudwatch_metric_alarms = {} # not included while testing
+      })
+
       test-oem = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "base_ol_8_5_*"
@@ -348,6 +361,24 @@ locals {
                   }
                 }]
               }
+              t3-nomis-web-b-http-7777 = {
+                priority = 600
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t3-nomis-web-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t3-nomis-web-b.test.nomis.az.justice.gov.uk",
+                      "t3-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t3.test.nomis.az.justice.gov.uk",
+                      "c-t3.test.nomis.service.justice.gov.uk",
+                      "t3-cn.hmpp-azdt.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }
@@ -365,6 +396,10 @@ locals {
           { name = "t2-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "t2-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-t2", type = "A", lbs_map_key = "private" },
+          # T3
+          { name = "t3-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "t3-nomis-web-b", type = "A", lbs_map_key = "private" },
+          { name = "c-t3", type = "A", lbs_map_key = "private" },
         ]
       }
       "test.nomis.service.justice.gov.uk" = {
@@ -389,6 +424,16 @@ locals {
           { name = "t2or-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t2trdat-a", type = "A", ttl = "3600", records = ["10.101.33.132"] },
           { name = "t2trdat-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          # T3
+          { name = "t3nomis-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
+          { name = "t3nomis-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3-nomis-db-1-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3ndh-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
+          { name = "t3ndh-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3or-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
+          { name = "t3or-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3trdat-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
+          { name = "t3trdat-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           # T1
@@ -399,6 +444,10 @@ locals {
           { name = "t2-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "t2-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-t2", type = "A", lbs_map_key = "private" },
+          # T3
+          { name = "t3-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "t3-nomis-web-b", type = "A", lbs_map_key = "private" },
+          { name = "c-t3", type = "A", lbs_map_key = "private" },
         ]
       }
     }
