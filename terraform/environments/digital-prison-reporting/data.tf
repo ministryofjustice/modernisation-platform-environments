@@ -5,7 +5,7 @@ data "aws_kms_key" "kinesis_kms_key" {
 
 # Source Nomis Secrets
 data "aws_secretsmanager_secret" "nomis" {
-  name = "dpr/${local.project}-nomis-source-secrets"
+  name = resource.aws_secretsmanager_secret.nomis.name
 }
 
 data "aws_secretsmanager_secret_version" "nomis" {
