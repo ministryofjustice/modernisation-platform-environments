@@ -13,19 +13,6 @@ Invoke-Expression "& { $(Invoke-RestMethod 'https://aka.ms/install-powershell.ps
 # use Powershell 7 from this point
 pwsh
 
-## install onprem gateway
-Install-Module -Name DataGateway -Force
-
-Install-DataGateway -AcceptConditions
-
-### auth with cert
-
-# grab cert parameters from ssm
-$Cert = $(aws ssm get-parameter --name MANUAL-OPDGW-HMPPS-Jitbit-Dev-Cert)
-$Key = $(aws ssm get-parameter --name MANUAL-OPDGW-HMPPS-Jitbit-Dev-Key)
-$Passphrase = ConvertTo-SecureString -String $(aws ssm get-parameter --name MANUAL-OPDGW-HMPPS-Jitbit-Dev-Passphrase) -Force -AsPlainText
-$RecoveryKey = $(aws ssm get-parameter --name MANUAL-OPDGW-HMPPS-Jitbit-Dev-Recovery)
-
 # create pfx and import to local cert store
 openssl pkcs12 -export -out C:\Scripts\new.pfx -inkey C:\Scripts\key.pem -in C:\Scripts\cert.pem -passin pass:$Passphrase -passout pass:$Passphrase
 Import-PfxCertificate -FilePath C:\Scripts\new.pfx -CertStoreLocation Cert:\LocalMachine\My -Password $Passphrase
@@ -35,6 +22,19 @@ $ApplicationId = "dc03769e-5d0c-41bf-b5bf-a1f846743b31"
 $Tenant = "c6874728-71e6-41fe-a9e1-2e8c36776ad8"
 
 Connect-DataGatewayServiceAccount -ApplicationId $ApplicationId -CertificateThumbprint $CertificateThumbprint -Tenant $Tenant
+
+## install onprem gateway
+Import-Module DataGateway
+Install-Module -Name DataGateway -Force
+Install-DataGateway -AcceptConditions
+
+### auth with cert
+
+# grab cert parameters from ssm
+$Cert = $(aws ssm get-parameter --name MANUAL-OPDGW-HMPPS-Jitbit-Dev-Cert)
+$Key = $(aws ssm get-parameter --name MANUAL-OPDGW-HMPPS-Jitbit-Dev-Key)
+$Passphrase = ConvertTo-SecureString -String $(aws ssm get-parameter --name MANUAL-OPDGW-HMPPS-Jitbit-Dev-Passphrase) -Force -AsPlainText
+$RecoveryKey = $(aws ssm get-parameter --name MANUAL-OPDGW-HMPPS-Jitbit-Dev-Recovery)
 
 Add-DataGatewayCluster
    -RecoveryKey $RecoveryKey
