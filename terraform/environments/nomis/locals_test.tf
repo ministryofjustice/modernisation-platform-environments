@@ -47,9 +47,6 @@ locals {
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       t1-nomis-web-a = merge(local.weblogic_ec2_a, {
-        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 1
-        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
@@ -99,6 +96,17 @@ locals {
         }
       }
 
+      # blue deployment
+      t2-nomis-web-a = merge(local.weblogic_ec2_a, {
+        tags = merge(local.weblogic_ec2_a.tags, {
+          nomis-environment    = "t2"
+          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T2CNOM"
+        })
+      })
+
+      # green deployment
       t2-nomis-web-b = merge(local.weblogic_ec2_b, {
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t2"
@@ -108,6 +116,17 @@ locals {
         })
       })
 
+      # blue deployment
+      t3-nomis-web-a = merge(local.weblogic_ec2_a, {
+        tags = merge(local.weblogic_ec2_a.tags, {
+          nomis-environment    = "t3"
+          oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T3CNOM"
+        })
+      })
+
+      # green deployment
       t3-nomis-web-b = merge(local.weblogic_ec2_b, {
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t3"
