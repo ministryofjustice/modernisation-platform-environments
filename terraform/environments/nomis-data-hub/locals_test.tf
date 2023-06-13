@@ -168,6 +168,31 @@ locals {
           monitored   = false
         }
       }
+      t1_ndh_jumpserver = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
+          availability_zone             = null
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-jumpserver"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 1 # set to 0 while testing
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description = "Windows Server 2022 for ndh managment"
+          os-type     = "Windows"
+          component   = "jumpserver"
+          server-type = "nomis-jumpserver"
+        }
+      }
 
       lb_target_groups = {
         http-7777 = {
