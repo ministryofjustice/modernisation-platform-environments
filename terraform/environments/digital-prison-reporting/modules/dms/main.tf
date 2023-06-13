@@ -43,9 +43,9 @@ resource "aws_dms_replication_task" "dms-replication" {
   table_mappings            = data.template_file.table-mappings.rendered
   replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings.json")
 
-#  lifecycle {
-#    ignore_changes = [replication_task_settings]
-#  }
+  lifecycle {
+    ignore_changes = [replication_task_settings]
+  }
 }
 
 # Create an endpoint for the source database
@@ -56,7 +56,7 @@ resource "aws_dms_endpoint" "source" {
   engine_name   = var.source_engine_name
   password      = var.source_app_password
   port          = var.source_db_port
-  server_name   = var.source_address // TBC
+  server_name   = var.source_address
   ssl_mode      = "none"
   username      = var.source_app_username
 
