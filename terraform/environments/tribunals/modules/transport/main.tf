@@ -44,7 +44,7 @@ resource "null_resource" "setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "db_credentials" {
-  name = "${var.application_name}-${var.environment}-credentials"
+  name = "${var.application_name}-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "db_credentials_version" {
