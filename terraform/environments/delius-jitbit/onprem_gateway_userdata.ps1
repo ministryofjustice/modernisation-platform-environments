@@ -1,3 +1,4 @@
+<powershell>
 ### Powershell script for OnPrem Gateway
 
 ## pre-req
@@ -48,4 +49,4 @@ $GatewayUsers =  @{
 
 # change this to iterate through user hash
 Add-DataGatewayClusterUser -GatewayClusterId $GatewayClusterId -PrincipalObjectId 9cb0d2d9-9fd8-4da2-b2f6-79d400bb3803 -Role Admin
-
+</powershell>
