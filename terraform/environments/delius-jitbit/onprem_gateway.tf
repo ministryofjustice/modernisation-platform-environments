@@ -86,6 +86,13 @@ data "aws_ami" "onprem_gateway_windows" {
   }
 }
 
+data "template_file" "userdata" {
+  template = file("${path.module}/onprem_gateway_userdata.tftpl")
+
+  vars = {
+  }
+}
+
 resource "aws_instance" "onprem_gateway" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
@@ -97,7 +104,7 @@ resource "aws_instance" "onprem_gateway" {
   associate_public_ip_address = false
   monitoring                  = false
   ebs_optimized               = false
-  user_data                   = "onprem_gateway_userdata.ps1"
+  user_data                   = data.template_file.userdata.rendered
 
   metadata_options {
     http_endpoint = "enabled"
