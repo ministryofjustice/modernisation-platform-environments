@@ -16,6 +16,7 @@
       "oam_repo_home_snapshot": "snap-04ed65da750df338c",
       "ohs_instance_type": "t3a.medium",
       "igdb_snapshot_name": "portal-igdb-spike-manual-mp-31052023",
+      "iadb_snapshot_name": "portal-iadb-spike-manual-mp-07062023",
       "oim_instance_type": "t3a.xlarge",
       "idm_ami_id": "ami-0ebbabd8056dea136",
       "idm_instance_type": "t3a.large",
