@@ -450,6 +450,7 @@ variable "lbs" {
     force_destroy_bucket     = optional(bool, false)
     idle_timeout             = string
     internal_lb              = optional(bool, false)
+    access_logs              = optional(bool, true)
     load_balancer_type       = optional(string, "application")
     security_groups          = list(string)
     public_subnets           = list(string)
