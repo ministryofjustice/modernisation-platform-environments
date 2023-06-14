@@ -31,14 +31,9 @@ locals {
       #   tags                  = local.database_tags
       # })
 
-      "${local.application_name}-web-a" = merge(local.webserver_a, {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "oasys_webserver_release_*"
-        })
-        tags = merge(local.webserver_a.tags, {
-          description = "${local.application_name} web"
-        })
-      })
+      "dev-${local.application_name}-web-a" = local.webserver_a
+
+      "dev-${local.application_name}-bip-a" = local.bip_a
     }
 
     baseline_acm_certificates = {
