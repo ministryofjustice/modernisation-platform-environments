@@ -56,3 +56,38 @@ module "domain_builder_backend_db" {
     }
   )
 }
+
+# Ec2
+module "domain_builder_cli_agent" {
+  source                      = "./modules/compute_node"
+
+  enable_compute_node         = local.enable_domain_builder_agent
+  name                        = "${local.project}-domain-builder-agent-${local.env}"
+  description                 = "Domain Builder CLI Agent"
+  vpc                         = data.aws_vpc.shared.id
+  cidr                        = [data.aws_vpc.shared.cidr_block]
+  subnet_ids                  = data.aws_subnet.private_subnets_a.id
+  ec2_instance_type           = local.instance_type
+  ami_image_id                = local.image_id
+  aws_region                  = local.account_region
+  ec2_terminate_behavior      = "terminate"
+  associate_public_ip_address = false
+  ebs_optimized               = true
+  monitoring                  = true
+  ebs_size                    = 20
+  ebs_encrypted               = true
+  ebs_delete_on_termination   = false
+  policies                    = [aws_iam_policy.s3_read_access_policy.arn, ]
+  region                      = local.account_region
+  account                     = local.account_id
+  env                         = local.env
+  app_key                     = "domain-builder"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-ec2-kinesis-agent-${local.env}"
+      Resource_Type = "EC2 Instance"
+    }
+  )
+}
