@@ -5,10 +5,10 @@ data "archive_file" "docs_zip" {
 }
 
 resource "aws_lambda_function" "api_docs" {
-  function_name = "ServerlessExample"
+  function_name = "API docs"
 
   filename = "${path.module}/src/docs_${local.environment}/docs_lambda.zip"
-
+  source_code_hash = data.archive_file.docs_zip.output_base64sha256
   handler = "main.handler"
   runtime = "nodejs14.x"
 
