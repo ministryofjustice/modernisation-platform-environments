@@ -34,7 +34,7 @@ resource "aws_api_gateway_resource" "docs" {
 resource "aws_api_gateway_method" "docs_root" {
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
   resource_id   = aws_api_gateway_resource.docs.id
-  http_method   = "ANY"
+  http_method   = "GET"
   authorization = "NONE"
 }
 
@@ -57,7 +57,7 @@ resource "aws_api_gateway_resource" "proxy" {
 resource "aws_api_gateway_method" "proxy" {
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
   resource_id   = aws_api_gateway_resource.proxy.id
-  http_method   = "ANY"
+  http_method   = "GET"
   authorization = "NONE"
 }
 
@@ -74,7 +74,7 @@ resource "aws_api_gateway_integration" "lambda" {
 resource "aws_api_gateway_method" "proxy_root" {
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
   resource_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
-  http_method   = "ANY"
+  http_method   = "GET"
   authorization = "NONE"
 }
 
