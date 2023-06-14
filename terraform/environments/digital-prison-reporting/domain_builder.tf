@@ -77,7 +77,7 @@ module "domain_builder_cli_agent" {
   ebs_size                    = 20
   ebs_encrypted               = true
   ebs_delete_on_termination   = false
-  policies                    = [aws_iam_policy.s3_read_access_policy.arn, ]
+  policies                    = [aws_iam_policy.s3_read_access_policy.arn, aws_iam_policy.kms_read_access_policy.arn, ]
   region                      = local.account_region
   account                     = local.account_id
   env                         = local.env

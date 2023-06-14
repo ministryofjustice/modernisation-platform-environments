@@ -22,6 +22,6 @@ unzip awscliv2.zip
 ./aws/install
 
 # Sync S3 Domain Builder Artifacts
-mkdir -p ~/domain-builder/jars
-echo "export PATH=$PATH:~/domain-builder/jars" >> .bash_profile
+mkdir -p /home/ssm-user/domain-builder/jars
+echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" >> /home/ssm-user/.bash_profile
 aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar ~/domain-builder/jars
