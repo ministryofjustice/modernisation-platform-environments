@@ -1,29 +1,3 @@
-module "data_product_athena_load_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v1.1.0"
-  application_name               = "data_product_athena_load"
-  tags                           = local.tags
-  description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
-  role_name                      = "athena_load_lambda_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.athena-load-lambda-function-policy.json
-  function_name                  = "data_product_athena_load_${local.environment}"
-  create_role                    = true
-  reserved_concurrent_executions = 1
-
-  image_uri    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:latest"
-  timeout      = 600
-  tracing_mode = "Active"
-  memory_size  = 512
-
-  allowed_triggers = {
-
-    AllowStartExecutionFromCloudWatch = {
-      principal  = "events.amazonaws.com"
-      source_arn = aws_cloudwatch_event_rule.put_to_data_directory.arn
-    }
-  }
-
-}
-
 resource "aws_athena_workgroup" "data_product_athena_workgroup" {
   name = "data_product_workgroup"
 
@@ -43,7 +17,7 @@ resource "aws_athena_workgroup" "data_product_athena_workgroup" {
   }
 }
 
-data "aws_iam_policy_document" "athena-load-lambda-function-policy" {
+data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
   statement {
     sid    = "AllowLambdaToCreateLogGroup"
     effect = "Allow"
@@ -127,11 +101,63 @@ data "aws_iam_policy_document" "athena-load-lambda-function-policy" {
       "athena:StartQueryExecution",
       "athena:GetQueryExecution"
     ]
-    # fails the plan using the ar of the terraform resource because of a count
-    # in the lamdba module used and the are not being known until apply
     resources = [
-      # aws_athena_workgroup.data_product_athena_workgroup.arn
-      "arn:aws:athena:*:${data.aws_caller_identity.current.account_id}:workgroup/data_product_workgroup"
+      aws_athena_workgroup.data_product_athena_workgroup.arn
     ]
   }
+}
+
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "this" {
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  name               = "athena_load_lambda_role_${local.environment}"
+  tags               = local.tags
+}
+
+resource "aws_iam_policy" "athena_load_lambda_function_policy" {
+  name   = "athena_load_lambda_function_policy"
+  policy = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
+  tags   = local.tags
+}
+
+
+resource "aws_iam_role_policy_attachment" "policy_from_json" {
+  role       = aws_iam_role.this.name
+  policy_arn = aws_iam_policy.athena_load_lambda_function_policy.arn
+}
+
+resource "aws_lambda_function" "this" {
+  function_name                  = "data_product_athena_load_${local.environment}"
+  description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
+  reserved_concurrent_executions = 10
+  image_uri                      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:latest"
+  package_type                   = "Image"
+  role                           = aws_iam_role.this.arn
+  timeout                        = 600
+  memory_size                    = 512
+
+  environment {
+    variables = {
+      ENVIRONMENT   = local.environment
+    }
+  }
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_athena_load_lambda" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.this.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.put_to_data_directory.arn
 }
