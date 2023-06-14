@@ -23,8 +23,8 @@ unzip awscliv2.zip
 # Set Env Configuration
 sudo groupadd ssm-user; sudo useradd -m ssm-user; sudo usermod -a -G ssm-user ssm-user
 
-sudo mkdir -p /home/ssm-user/domain-builder/jars; chown -R ssm-user:ssm-user /home/ssm-user/domain-builder/
-touch /home/ssm-user/.bash_profile; chown ssm-user:ssm-user /home/ssm-user/.bash_profile; chmod +x /home/ssm-user/.bash_profile
+sudo mkdir -p /home/ssm-user/domain-builder/jars; sudo chown -R ssm-user:ssm-user /home/ssm-user/domain-builder/
+sudo touch /home/ssm-user/.bash_profile; sudo chown ssm-user:ssm-user /home/ssm-user/.bash_profile; sudo chmod +x /home/ssm-user/.bash_profile
 sudo echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" >> /home/ssm-user/.bash_profile
 # sudo source /etc/profile
 
