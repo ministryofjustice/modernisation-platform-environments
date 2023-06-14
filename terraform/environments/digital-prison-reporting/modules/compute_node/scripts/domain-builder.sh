@@ -20,9 +20,11 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 ./aws/install
 
-# Sync S3 Domain Builder Artifacts
+# Set Env Configuration
 sudo mkdir -p /home/ssm-user/domain-builder/jars
-sudo echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" >> /etc/bashrc
+sudo echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" >> /etc/profile
+
+# Sync S3 Domain Builder Artifacts
 aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
 
 echo "Bootstrap Complete"
