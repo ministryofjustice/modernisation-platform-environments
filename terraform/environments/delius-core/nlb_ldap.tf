@@ -18,12 +18,6 @@ resource "aws_lb" "ldap" {
   drop_invalid_header_fields = true
   enable_deletion_protection = false
 
-  access_logs {
-    bucket  = module.s3_bucket_nlb_logs.bucket.id
-    prefix  = format("%s/%s", local.application_name, local.openldap_name)
-    enabled = true
-  }
-
   tags = local.openldap_nlb_tags
 }
 
