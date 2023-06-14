@@ -16,7 +16,7 @@ ingress {
 
   }
 
-  
+
 ingress {
     description = "OIM Admin Console from Shared Svs"
     from_port   = 7101
@@ -43,7 +43,7 @@ ingress {
     cidr_blocks = [local.first-cidr]
 
   }
-  
+
   ingress {
     description = "OIM Inbound on 14000"
     from_port   = 14000
@@ -89,7 +89,7 @@ ingress {
 
   }
 
- 
+
   # ingress {
   #   description = "SSH access from VPC"
   #   from_port   = 22
@@ -98,7 +98,7 @@ ingress {
   #   cidr_blocks = [local.first-cidr]
 
   # }
- 
+
   #   ingress {
   #   description = "SSH access from prod bastion"
   #   from_port   = 22
@@ -156,7 +156,7 @@ resource "aws_instance" "oim1" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OIM Instance 1" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
 
@@ -184,10 +184,6 @@ resource "aws_instance" "oim2" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OIM Instance 2" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
-
-
-
-
