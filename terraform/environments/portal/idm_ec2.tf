@@ -274,7 +274,8 @@ resource "aws_instance" "idm_instance_2" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} IDM Instance 2" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }\
+  )
 }
 
 
