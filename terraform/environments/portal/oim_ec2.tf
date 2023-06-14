@@ -94,8 +94,8 @@ ingress {
     from_port   = 2049
     to_port     = 2049
     protocol    = "TCP"
+    type        = "ingress"
     source_security_group_id = aws_security_group.oim_instance.id
-
   }
 
   # ingress {
