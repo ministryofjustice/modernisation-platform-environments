@@ -41,7 +41,7 @@ resource "aws_vpc_security_group_ingress_rule" "weblogic_admin_port_from_shared_
   count = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.idm_instance.id
   description = "Weblogic Admin Server port from Shared Svs"
-  cidr_ipv4   = local.nonprod_workspaces_cidr 
+  cidr_ipv4   = local.nonprod_workspaces_cidr
   from_port   = 7001
   ip_protocol = "tcp"
   to_port     = 7001
@@ -61,7 +61,7 @@ resource "aws_vpc_security_group_ingress_rule" "idm_odsm_from_workspaces" {
   count = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.idm_instance.id
   description = "IDM ODSM access from Workspaces"
-  cidr_ipv4   = local.nonprod_workspaces_cidr 
+  cidr_ipv4   = local.nonprod_workspaces_cidr
   from_port   = 14200
   ip_protocol = "tcp"
   to_port     = 14200
@@ -70,7 +70,7 @@ resource "aws_vpc_security_group_ingress_rule" "idm_odsm_from_workspaces" {
 resource "aws_vpc_security_group_ingress_rule" "weblogic_admin_port_from_prod_shared_svs" {
   security_group_id = aws_security_group.idm_instance.id
   description = "Weblogic Admin Server port from Prod Shared Svs"
-  cidr_ipv4   = local.prod_workspaces_cidr 
+  cidr_ipv4   = local.prod_workspaces_cidr
   from_port   = 7001
   ip_protocol = "tcp"
   to_port     = 7001
@@ -79,7 +79,7 @@ resource "aws_vpc_security_group_ingress_rule" "weblogic_admin_port_from_prod_sh
 resource "aws_vpc_security_group_ingress_rule" "idm_odsm_from_prod_workspaces" {
   security_group_id = aws_security_group.idm_instance.id
   description = "IDM ODSM access from Prod Workspaces"
-  cidr_ipv4   = local.prod_workspaces_cidr 
+  cidr_ipv4   = local.prod_workspaces_cidr
   from_port   = 14200
   ip_protocol = "tcp"
   to_port     = 14200
@@ -88,7 +88,7 @@ resource "aws_vpc_security_group_ingress_rule" "idm_odsm_from_prod_workspaces" {
 resource "aws_vpc_security_group_ingress_rule" "weblogic_server_port" {
   security_group_id = aws_security_group.idm_instance.id
   description = "Weblogic Managed Server port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block 
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block
   from_port   = 4444
   ip_protocol = "tcp"
   to_port     = 4444
@@ -97,7 +97,7 @@ resource "aws_vpc_security_group_ingress_rule" "weblogic_server_port" {
 resource "aws_vpc_security_group_ingress_rule" "opmn_idm1_to_idm2" {
   security_group_id = aws_security_group.idm_instance.id
   description = "Allow Adminserver to communicate to OPMN from IDM1 to IDM2"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block 
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block
   from_port   = 6800
   ip_protocol = "tcp"
   to_port     = 6801
@@ -106,7 +106,7 @@ resource "aws_vpc_security_group_ingress_rule" "opmn_idm1_to_idm2" {
 resource "aws_vpc_security_group_ingress_rule" "idm_nodemanager" {
   security_group_id = aws_security_group.idm_instance.id
   description = "IDM NodeManager Port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block 
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block
   from_port   = 5556
   ip_protocol = "tcp"
   to_port     = 5556
@@ -115,7 +115,7 @@ resource "aws_vpc_security_group_ingress_rule" "idm_nodemanager" {
 resource "aws_vpc_security_group_ingress_rule" "idm_server_ods" {
   security_group_id = aws_security_group.idm_instance.id
   description = "IDM Managed Server(ods)"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block 
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block
   from_port   = 14200
   ip_protocol = "tcp"
   to_port     = 14200
@@ -124,27 +124,27 @@ resource "aws_vpc_security_group_ingress_rule" "idm_server_ods" {
 resource "aws_vpc_security_group_ingress_rule" "idm_ingress_1636_tls" {
   security_group_id = aws_security_group.idm_instance.id
   description = "IDM Inbound on 1636 TLS"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block 
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block
   from_port   = 1636
-  ip_protocol = "tcp" 
+  ip_protocol = "tcp"
   to_port     = 1636
 }
 
 resource "aws_vpc_security_group_ingress_rule" "weblogic_admin_server_port" {
   security_group_id = aws_security_group.idm_instance.id
   description = "Weblogic Admin Server port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block 
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block
   from_port   = 7001
-  ip_protocol = "tcp" 
+  ip_protocol = "tcp"
   to_port     = 7001
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ping_echo" {
   security_group_id = aws_security_group.idm_instance.id
   description = "Ping Echo"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block 
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block
   from_port   = 6200
-  ip_protocol = "tcp" 
+  ip_protocol = "tcp"
   to_port     = 6200
 }
 
@@ -160,9 +160,9 @@ resource "aws_vpc_security_group_ingress_rule" "ping_allow" {
 resource "aws_vpc_security_group_ingress_rule" "weblogic_admin_server_port2" {
   security_group_id = aws_security_group.idm_instance.id
   description = "Weblogic Admin Server port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block 
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block
   from_port   = 7201
-  ip_protocol = "tcp" 
+  ip_protocol = "tcp"
   to_port     = 7201
 }
 
@@ -256,7 +256,7 @@ resource "aws_instance" "idm_instance_1" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} IDM Instance 1" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
 
@@ -274,8 +274,7 @@ resource "aws_instance" "idm_instance_2" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} IDM Instance 2" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
-  )
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
 }
 
 
@@ -334,7 +333,7 @@ resource "aws_ebs_volume" "idm_config" {
   size              = 15
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id  
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].idm_config_snapshot
 
   lifecycle {

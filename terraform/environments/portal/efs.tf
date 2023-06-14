@@ -89,14 +89,3 @@ resource "aws_vpc_security_group_ingress_rule" "efs_product_inbound" {
   ip_protocol = "tcp"
   to_port     = 2049
 }
-
-resource "aws_efs_backup_policy" "policy" {
-  for_each = {
-    for k, v in local.efs : k => v
-  }
-  file_system_id = aws_efs_file_system.product[each.key].id
-
-  backup_policy {
-    status = "ENABLED"
-  }
-}
