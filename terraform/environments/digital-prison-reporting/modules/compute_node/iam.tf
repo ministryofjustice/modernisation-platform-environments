@@ -29,7 +29,7 @@ resource "aws_iam_role" "instance-role" {
 EOF
 }
 
-resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
+resource "aws_iam_instance_profile" "profile" {
   count = var.enable_compute_node ? 1 : 0
 
   name = "${var.name}-profile"

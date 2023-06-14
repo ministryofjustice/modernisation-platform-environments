@@ -86,7 +86,7 @@ module "domain_builder_cli_agent" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-ec2-kinesis-agent-${local.env}"
+      Name          = "${local.project}-domain-builder-agent-${local.env}"
       Resource_Type = "EC2 Instance"
     }
   )
