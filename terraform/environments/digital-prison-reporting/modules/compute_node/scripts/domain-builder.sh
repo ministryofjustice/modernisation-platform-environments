@@ -21,8 +21,10 @@ unzip awscliv2.zip
 ./aws/install
 
 # Set Env Configuration
-sudo groupadd ssm-user || true ; sudo useradd -m ssm-user || true; sudo usermod -a -G ssm-user ssm-user || true
-sudo mkdir -p /home/ssm-user/domain-builder/jars; sudo chown -R ssm-user:ssm-user /home/ssm-user/domain-builder
+sudo useradd -m ssm-user || true; 
+sudo mkdir -p /home/ssm-user/domain-builder/jars; chmod -R 0777 /home/ssm-user/domain-builder
+cd /home/ssm-user
+sudo chown -R ssm-user domain-builder
 
 #sudo touch /home/ssm-user/.bash_profile; sudo chown ssm-user:ssm-user /home/ssm-user/.bash_profile; sudo chmod +x /home/ssm-user/.bash_profile
 #sudo echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" >> /home/ssm-user/.bash_profile
