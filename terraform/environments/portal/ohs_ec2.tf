@@ -193,4 +193,3 @@ resource "aws_volume_attachment" "ohs_EC2ServerVolume02" {
   volume_id   = aws_ebs_volume.ohsvolume2.id
   instance_id = aws_instance.ohs1.id
 }
-oam_instance_1_v1
