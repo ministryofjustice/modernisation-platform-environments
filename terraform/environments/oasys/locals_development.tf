@@ -33,7 +33,7 @@ locals {
 
       # "dev-${local.application_name}-web-a" = local.webserver_a
 
-      "dev-${local.application_name}-bip-a" = local.bip_a
+      # "dev-${local.application_name}-bip-a" = local.bip_a
     }
 
     baseline_acm_certificates = {
