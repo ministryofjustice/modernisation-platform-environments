@@ -57,53 +57,54 @@ locals {
 
     baseline_lbs = {
 
-      private = {
-        internal_lb              = true
-        enable_delete_protection = false
-        existing_target_groups   = {}
-        idle_timeout             = 60 # 60 is default
-        security_groups          = ["private"]
-        public_subnets           = module.environment.subnets["private"].ids
-        tags                     = local.tags
+      # private = {
+      #   internal_lb              = true
+      #   enable_delete_protection = false
+      #   access_logs              = false
+      #   existing_target_groups   = {}
+      #   idle_timeout             = 60 # 60 is default
+      #   security_groups          = ["private"]
+      #   public_subnets           = module.environment.subnets["private"].ids
+      #   tags                     = local.tags
 
-        listeners = {
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["${local.application_name}_wildcard_cert_02"]
-            # cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].lb_default
+      #   listeners = {
+      #     https = {
+      #       port                      = 443
+      #       protocol                  = "HTTPS"
+      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
+      #       certificate_names_or_arns = ["${local.application_name}_wildcard_cert_02"]
+      #       # cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].lb_default
 
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
-            rules = {
-              # web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "dev-${local.application_name}-web-a-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           # web-oasys.hmpps-development.modernisation-platform.service.justice.gov.uk
-              #           "web-${module.environment.domains.public.application_environment}",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
-            }
-          }
-        }
-      }
+      #       default_action = {
+      #         type = "fixed-response"
+      #         fixed_response = {
+      #           content_type = "text/plain"
+      #           message_body = "Not implemented"
+      #           status_code  = "501"
+      #         }
+      #       }
+      #       rules = {
+      #         # web-http-8080 = {
+      #         #   priority = 100
+      #         #   actions = [{
+      #         #     type              = "forward"
+      #         #     target_group_name = "dev-${local.application_name}-web-a-http-8080"
+      #         #   }]
+      #         #   conditions = [
+      #         #     {
+      #         #       host_header = {
+      #         #         values = [
+      #         #           # web-oasys.hmpps-development.modernisation-platform.service.justice.gov.uk
+      #         #           "web-${module.environment.domains.public.application_environment}",
+      #         #         ]
+      #         #       }
+      #         #     }
+      #         #   ]
+      #         # }
+      #       }
+      #     }
+      #   }
+      # }
     }
 
     baseline_route53_zones = {
