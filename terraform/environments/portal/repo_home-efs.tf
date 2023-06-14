@@ -46,13 +46,13 @@ resource "aws_efs_mount_target" "target_a" {
 resource "aws_efs_mount_target" "target_b" {
  
   file_system_id = aws_efs_file_system.efs.id
-  subnet_id      = data.aws_subnet.private_subnets_b
+  subnet_id      = data.aws_subnet.private_subnets_b.id
   security_groups = [aws_security_group.efs_sg.id]
 }
 
 resource "aws_efs_mount_target" "target_c" {
  
   file_system_id = aws_efs_file_system.efs.id
-  subnet_id      = data.aws_subnet.private_subnets_c
+  subnet_id      = data.aws_subnet.private_subnets_c.id
   security_groups = [aws_security_group.efs_sg.id]
 }
