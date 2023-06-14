@@ -36,26 +36,18 @@ resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
   role = aws_iam_role.instance-role[0].name
 }
 
-resource "aws_iam_policy_attachment" "this" {
+resource "aws_iam_policy_attachment" "ec2-ssm-core" {
   count = var.enable_compute_node ? 1 : 0
 
-  name       = "ssm_managed_instance_core"
+  name       = "${var.name}-core"
   roles      = [aws_iam_role.instance-role[0].name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_policy_attachment" "ec2-role-for-ssm" {
+resource "aws_iam_policy_attachment" "ec2-ssm" {
   count = var.enable_compute_node ? 1 : 0
 
-  name       = "ssm_managed_instance_ec2_role"
-  roles      = [aws_iam_role.instance-role[0].name]
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
-}
-
-resource "aws_iam_policy_attachment" "ec2-role-for-ssm" {
-  count = var.enable_compute_node ? 1 : 0
-
-  name       = "ssm_managed_instance_ec2_role"
+  name       = "${var.name}-ssm"
   roles      = [aws_iam_role.instance-role[0].name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }
