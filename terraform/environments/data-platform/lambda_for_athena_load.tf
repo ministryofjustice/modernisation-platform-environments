@@ -149,7 +149,7 @@ resource "aws_lambda_function" "this" {
 
   environment {
     variables = {
-      ENVIRONMENT   = local.environment
+      ENVIRONMENT = local.environment
     }
   }
 }
