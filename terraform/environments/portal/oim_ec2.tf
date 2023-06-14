@@ -132,7 +132,7 @@ ingress {
 }
 
 
-# TODO Depending on outcome of how EBS/EFS is used, this resource may depend on aws_instance.oam_instance_1
+# TODO Depending on outcome of how EBS/EFS is used, this resource may depend on aws_instance.oam_instance_1_v1
 
 resource "aws_instance" "oim1" {
   ami                         = local.oim_ami-id

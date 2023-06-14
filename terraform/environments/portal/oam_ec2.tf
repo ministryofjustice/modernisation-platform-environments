@@ -199,7 +199,7 @@ resource "aws_vpc_security_group_ingress_rule" "atos" {
 # OAM Instance
 ######################################
 
-resource "aws_instance" "oam_instance_1" {
+resource "aws_instance" "oam_instance_1_v1" {
   ami                         = local.application_data.accounts[local.environment].oam_ami_id
   availability_zone           = "eu-west-2a"
   instance_type               = local.application_data.accounts[local.environment].oam_instance_type
@@ -212,15 +212,9 @@ resource "aws_instance" "oam_instance_1" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OAM Instance 1" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" },
-    { "Replacement" = "true" }
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 
-  lifecycle {
-    replace_triggered_by = [
-      aws_instance.oam_instance_1.tags
-    ]
-  }
 }
 
 resource "aws_instance" "oam_instance_2" {
@@ -266,7 +260,7 @@ resource "aws_ebs_volume" "oam_repo_home" {
 resource "aws_volume_attachment" "oam_repo_home" {
   device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.oam_repo_home.id
-  instance_id = aws_instance.oam_instance_1.id
+  instance_id = aws_instance.oam_instance_1_v1.id
 }
 
 resource "aws_ebs_volume" "oam_config" {
@@ -289,7 +283,7 @@ resource "aws_ebs_volume" "oam_config" {
 resource "aws_volume_attachment" "oam_onfig" {
   device_name = "/dev/xvdd"
   volume_id   = aws_ebs_volume.oam_config.id
-  instance_id = aws_instance.oam_instance_1.id
+  instance_id = aws_instance.oam_instance_1_v1.id
 }
 
 resource "aws_ebs_volume" "oam_fmw" {
@@ -312,7 +306,7 @@ resource "aws_ebs_volume" "oam_fmw" {
 resource "aws_volume_attachment" "oam_fmw" {
   device_name = "/dev/xvdb"
   volume_id   = aws_ebs_volume.oam_fmw.id
-  instance_id = aws_instance.oam_instance_1.id
+  instance_id = aws_instance.oam_instance_1_v1.id
 }
 
 resource "aws_ebs_volume" "oam_aserver" {
@@ -335,7 +329,7 @@ resource "aws_ebs_volume" "oam_aserver" {
 resource "aws_volume_attachment" "oam_aserver" {
   device_name = "/dev/xvdc"
   volume_id   = aws_ebs_volume.oam_aserver.id
-  instance_id = aws_instance.oam_instance_1.id
+  instance_id = aws_instance.oam_instance_1_v1.id
 }
 
 resource "aws_ebs_volume" "oam_mserver" {
@@ -358,7 +352,7 @@ resource "aws_ebs_volume" "oam_mserver" {
 resource "aws_volume_attachment" "oam_mserver" {
   device_name = "/dev/xvde"
   volume_id   = aws_ebs_volume.oam_mserver.id
-  instance_id = aws_instance.oam_instance_1.id
+  instance_id = aws_instance.oam_instance_1_v1.id
 }
 
 ###############################
@@ -468,7 +462,7 @@ resource "aws_route53_record" "oam1_nonprod" {
   name     = "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}" # Correspond to portal-oam1-ms.aws.dev.legalservices.gov.uk
   type     = "A"
   ttl      = 60
-  records  = [aws_instance.oam_instance_1.private_ip]
+  records  = [aws_instance.oam_instance_1_v1.private_ip]
 }
 
 # resource "aws_route53_record" "oam1_prod" {
@@ -478,7 +472,7 @@ resource "aws_route53_record" "oam1_nonprod" {
 #   name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
 #   type     = "A"
 #   ttl      = 60
-#   records  = [aws_instance.oam_instance_1.private_ip]
+#   records  = [aws_instance.oam_instance_1_v1.private_ip]
 # }
 
 # resource "aws_route53_record" "oam2_prod" {
@@ -500,7 +494,7 @@ resource "aws_route53_record" "oam1_nonprod" {
 #   name     = "${local.application_name}.${data.aws_route53_zone.external.name}"
 #   type     = "A"
 #   ttl      = 60
-#   records  = [aws_instance.oam_instance_1.private_ip]
+#   records  = [aws_instance.oam_instance_1_v1.private_ip]
 # }
 #
 # resource "aws_route53_record" "oam_admin_prod" {
@@ -510,7 +504,7 @@ resource "aws_route53_record" "oam1_nonprod" {
 #   name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
 #   type     = "A"
 #   ttl      = 60
-#   records  = [aws_instance.oam_instance_1.private_ip]
+#   records  = [aws_instance.oam_instance_1_v1.private_ip]
 # }
 #
 # ###############
