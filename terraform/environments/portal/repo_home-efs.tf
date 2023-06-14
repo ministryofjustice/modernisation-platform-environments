@@ -2,7 +2,7 @@
 resource "aws_security_group" "efs_sg" {
   
   name        = "${local.application_name}-${local.environment}-repo_home-efs-security-group"
-  description = "Portal ${upper(repo_home)} Product EFS Security Group"
+  description = "Portal repo_home Product EFS Security Group"
   vpc_id      = data.aws_vpc.shared.id
 }
 
