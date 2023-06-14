@@ -152,7 +152,7 @@ locals {
 
 # Load balancer build using the module
 module "ecs_lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.4.0"
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
