@@ -22,7 +22,7 @@ unzip awscliv2.zip
 
 # Set Env Configuration
 sudo mkdir -p /home/ssm-user/domain-builder/jars
-sudo echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" > /etc/profile; sudo source /etc/profile
+sudo echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" >> /etc/profile; sudo source /etc/profile
 
 # Sync S3 Domain Builder Artifacts
 aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
