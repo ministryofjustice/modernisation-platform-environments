@@ -148,6 +148,8 @@ resource "aws_autoscaling_group" "bastion_linux_daily" {
 }
 
 resource "aws_autoscaling_schedule" "bastion_linux_scale_down" {
+  count = var.enable_compute_node ? 1 : 0
+
   scheduled_action_name  = "${var.name}_scaledown"
   min_size               = 0
   max_size               = 0
@@ -157,6 +159,8 @@ resource "aws_autoscaling_schedule" "bastion_linux_scale_down" {
 }
 
 resource "aws_autoscaling_schedule" "bastion_linux_scale_up" {
+  count = var.enable_compute_node ? 1 : 0
+
   scheduled_action_name  = "${var.name}_scaleup"
   min_size               = 1
   max_size               = 1
