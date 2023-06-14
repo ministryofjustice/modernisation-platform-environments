@@ -97,7 +97,7 @@ resource "aws_launch_template" "ec2_template" {
   network_interfaces {
     associate_public_ip_address = var.associate_public_ip_address
     device_index                = 0
-    security_groups             = [aws_security_group.ec2_sec_group.id]
+    security_groups             = [aws_security_group.ec2_sec_group[0].id]
     subnet_id                   = var.subnet_ids
     delete_on_termination       = true
   }
