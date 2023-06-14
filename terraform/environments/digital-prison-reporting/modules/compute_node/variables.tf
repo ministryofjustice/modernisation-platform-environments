@@ -84,6 +84,12 @@ variable "associate_public_ip_address" {
   default     = false
 }
 
+variable "enable_compute_node" {
+  description = "Whether to Enable Compute Node, Setup EC2?"
+  type        = bool
+  default     = false
+}
+
 variable "ebs_optimized" {
   description = "If true, the launched EC2 instance will be EBS-optimized"
   type        = bool
