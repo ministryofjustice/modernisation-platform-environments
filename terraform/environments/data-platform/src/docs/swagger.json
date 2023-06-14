@@ -11,13 +11,10 @@
   },
   "servers": [
     {
-      "url": "https://our-cloudfront-mask-for-the-api/"
-    }
-  ],
-  "tags": [
+      "url": "https://our-cloudfront-mask-for-the-api/sandbox"
+    },
     {
-      "name": "upload_data",
-      "description": "Data upload operations."
+      "url": "https://our-cloudfront-mask-for-the-api/dev"
     }
   ],
   "paths": {
@@ -25,7 +22,7 @@
       "get": {
         "tags": ["upload_data"],
         "summary": "Get a presigned url to upload some data to an existing data product.",
-        "description": "Returns a presigned url to upload data to",
+        "description": "Returns a presigned url to post data to.",
         "operationId": "uploadData",
         "parameters": [
           {
@@ -68,7 +65,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadDataRequest"
+                  "$ref": "#/components/schemas/UploadDataResponse"
                 }
               }
             }
@@ -90,85 +87,6 @@
   },
   "components": {
     "schemas": {
-      "Category": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Dogs"
-          }
-        },
-        "xml": {
-          "name": "category"
-        }
-      },
-      "Tag": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "xml": {
-          "name": "tag"
-        }
-      },
-      "Pet": {
-        "required": ["name", "photoUrls"],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "example": 10
-          },
-          "name": {
-            "type": "string",
-            "example": "doggie"
-          },
-          "category": {
-            "$ref": "#/components/schemas/Category"
-          },
-          "photoUrls": {
-            "type": "array",
-            "xml": {
-              "wrapped": true
-            },
-            "items": {
-              "type": "string",
-              "xml": {
-                "name": "photoUrl"
-              }
-            }
-          },
-          "tags": {
-            "type": "array",
-            "xml": {
-              "wrapped": true
-            },
-            "items": {
-              "$ref": "#/components/schemas/Tag"
-            }
-          },
-          "status": {
-            "type": "string",
-            "description": "pet status in the store",
-            "enum": ["available", "pending", "sold"]
-          }
-        },
-        "xml": {
-          "name": "pet"
-        }
-      },
       "UploadDataRequest": {
         "required": ["database", "table", "contentMD5"],
         "type": "object",
@@ -184,6 +102,77 @@
           "contentMD5": {
             "type": "string",
             "example": "YojAHEZqfNk6B8zNmmLQhw=="
+          }
+        }
+      },
+      "URL": {
+        "type": "object",
+        "required": ["url", "fields"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "example": "https://data-platform-products.s3.amazonaws.com/"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/fields"
+          }
+        }
+      },
+      "UploadDataResponse": {
+        "type": "object",
+        "required": ["URL"],
+        "properties": {
+          "URL": {
+            "$ref": "#/components/schemas/URL"
+          }
+        }
+      },
+      "fields": {
+        "type": "object",
+        "properties": {
+          "x-amz-server-side-encryption": {
+            "type": "string",
+            "example": "AES256"
+          },
+          "x-amz-acl": {
+            "type": "string",
+            "example": "bucket-owner-full-control"
+          },
+          "x-amz-date": {
+            "type": "string",
+            "example": "20230609T130209Z"
+          },
+          "Content-MD5": {
+            "type": "string",
+            "example": "YojAHEZqfNk6B8zNmmLQhw=="
+          },
+          "Content-Type": {
+            "type": "string",
+            "example": "binary/octet-stream"
+          },
+          "key": {
+            "type": "string",
+            "example": "curated_data/test/test/extraction_timestamp=20230609T130209Z/452b1aef-ca12-46ff-9dbf-42cbc80412f0"
+          },
+          "x-amz-algorithm": {
+            "type": "string",
+            "example": "AWS4-HMAC-SHA256"
+          },
+          "x-amz-credential": {
+            "type": "string",
+            "example": "ASIAQGIFY4DVKJW2ZNKM/20230609/eu-west-2/s3/aws4_request"
+          },
+          "x-amz-security-token": {
+            "type": "string",
+            "example": "IQo..."
+          },
+          "x-amz-signature": {
+            "type": "string",
+            "example": "54a..."
+          },
+          "policy": {
+            "type": "string",
+            "example": "eyJ..."
           }
         }
       }
