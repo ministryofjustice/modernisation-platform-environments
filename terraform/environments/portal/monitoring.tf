@@ -2,11 +2,11 @@ locals {
   dashboard_name                 = "${local.application_name}-${local.environment}-application-Dashboard"
 
   cpu_alarms_1 = {
-    oam_instance_1_v1 = {
+    oam_instance_1 = {
       service_name          = "oam_1"
       cpu_alarm_threshold = 85
       dimensions = {
-        InstanceId = aws_instance.oam_instance_1_v1.id
+        InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
@@ -36,11 +36,11 @@ locals {
     }
   }
   status_alarms_1 = {
-    oam_instance_1_v1 = {
+    oam_instance_1 = {
       service_name          = "oam_1"
       status_alarm_threshold = 1
       dimensions = {
-        InstanceId = aws_instance.oam_instance_1_v1.id
+        InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
@@ -62,11 +62,11 @@ locals {
     }
   }
   memory_alarms_1 = {
-    oam_instance_1_v1 = {
+    oam_instance_1 = {
       service_name          = "oam_1"
       memory_alarm_threshold = 80
       dimensions = {
-        InstanceId = aws_instance.oam_instance_1_v1.id
+        InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
@@ -96,11 +96,11 @@ locals {
     }
   }
   swapspace_alarms_1 = {
-    oam_instance_1_v1 = {
+    oam_instance_1 = {
       service_name          = "oam_1"
       swapspace_alarm_threshold = 50
       dimensions = {
-        InstanceId = aws_instance.oam_instance_1_v1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     },
     ohs_instance_1 = {
@@ -130,13 +130,13 @@ locals {
     }
   }
   diskspace_alarms_1 = {
-    oam_instance_1_v1 = {
+    oam_instance_1 = {
       service_name          = "oam_1"
       diskspace_alarm_threshold = 80
       dimensions = {
         MountPath = "/"
         Filesystem = "/dev/nvme0n1p2"
-        InstanceId = aws_instance.oam_instance_1_v1.id
+        InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
@@ -157,7 +157,7 @@ locals {
         InstanceId = "alice"
         MountPath = "/"
         Filesystem = "/dev/nvme0n1p2"
-        # InstanceId = aws_instance.oam_instance_1_v1.id # TODO This needs updating when the OAM EC2 instance is built
+        # InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     },
     ohs_instance_2 = {
@@ -172,13 +172,13 @@ locals {
     }
   }
   mserver_alarms_1 = {
-    oam_instance_1_v1 = {
+    oam_instance_1 = {
       service_name          = "oam_1"
       mserver_alarm_threshold = 80
       dimensions = {
         MountPath = "/IDAM/product/runtime/Domain/mserver"
         # Filesystem = "/dev/nvme4n1"
-        InstanceId = aws_instance.oam_instance_1_v1.id
+        InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
@@ -199,7 +199,7 @@ locals {
         InstanceId = "alice"
         MountPath = "/IDAM/product/runtime/Domain/mserver"
         Filesystem = "/dev/nvme1n1"
-        # InstanceId = aws_instance.oam_instance_1_v1.id # TODO This needs updating when the OAM EC2 instance is built
+        # InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     },
     ohs_instance_2 = {
@@ -214,13 +214,13 @@ locals {
     }
   }
   aserver_alarms_1 = {
-    oam_instance_1_v1 = {
+    oam_instance_1 = {
       service_name          = "oam_1"
       aserver_alarm_threshold = 80
       dimensions = {
         MountPath = "/IDAM/product/runtime/Domain/aserver"
         Filesystem = "/dev/nvme1n1"
-        InstanceId = aws_instance.oam_instance_1_v1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     }
   }
@@ -439,7 +439,7 @@ data "template_file" "dashboard_prod" {
     # oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim_instance_1"].arn
     # oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_1"].arn
     # oim2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_2"].arn
-    # oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1_v1"].arn
+    # oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
     # oam2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_2"].arn
     # idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_1"].arn
     # idm2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_2"].arn
@@ -468,7 +468,7 @@ data "template_file" "dashboard_nonprod" {
     # igdb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.RDS2WriteLataencyOverThreshold.arn
     # oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim_instance_1"].arn
     # oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_1"].arn
-    oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1_v1"].arn
+    oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
     # idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_1"].arn
     ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
   }
