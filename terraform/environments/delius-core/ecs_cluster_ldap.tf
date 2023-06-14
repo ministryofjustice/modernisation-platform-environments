@@ -165,7 +165,7 @@ data "aws_iam_policy_document" "ecs_ssm_exec" {
 data "aws_iam_policy_document" "ecs_s3" {
   statement {
     effect    = "Allow"
-    resources = []
+    resources = [module.s3_bucket_migration.bucket.arn]
 
     actions = [
       "s3:*"

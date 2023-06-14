@@ -1,4 +1,4 @@
-module "s3_bucket" {
+module "s3_bucket_migration" {
   count = local.environment == "development" ? 1 : 0
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
@@ -29,30 +29,30 @@ module "s3_bucket" {
       type = "AWS"
       identifiers = [
         "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/ldap-data-migration-lambda-role"
+      ]
+    }
+    },
+    {
+      effect  = "Allow"
+      actions = ["s3:ListBucket"]
+      principals = {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/terraform"
         ]
       }
     },
     {
-        effect  = "Allow"
-        actions = ["s3:ListBucket"]
-        principals = {
-            type = "AWS"
-            identifiers = [
-                "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/terraform"
-            ]
-        }
-    },
-    {
-        effect  = "Allow"
-        actions = ["s3:ListBucket"]
-        principals = {
-            type = "AWS"
-            identifiers = [
-                "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
-            ]
-        }
+      effect  = "Allow"
+      actions = ["s3:ListBucket"]
+      principals = {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
+        ]
+      }
     }
-]
+  ]
 
   ownership_controls = "BucketOwnerEnforced" # Disable all S3 bucket ACL
 
