@@ -135,7 +135,7 @@ resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
 }
 
 
-resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to+oam" {
+resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to_oam" {
   security_group_id = aws_security_group.oam_instance.id
   description = "Inbound NFS from IDM Instances"
   referenced_security_group_id = aws_security_group.idm_instance.id
