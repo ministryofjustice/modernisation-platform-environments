@@ -17,7 +17,7 @@ locals {
 module "lb" {
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.3.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.4.1"
 
   providers = {
     aws.bucket-replication = aws
@@ -31,6 +31,7 @@ module "lb" {
   internal_lb                = each.value.internal_lb
   load_balancer_type         = each.value.load_balancer_type
   lb_target_groups           = each.value.lb_target_groups
+  access_logs                = lookup(each.value, "access_logs", true)
 
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
@@ -55,7 +56,10 @@ module "lb_listener" {
   business_unit             = var.environment.business_unit
   environment               = var.environment.environment
   load_balancer             = module.lb[each.value.lb_application_name].load_balancer
-  existing_target_groups    = merge(local.asg_target_groups, var.lbs[each.value.lb_application_name].existing_target_groups)
+  existing_target_groups    = merge(
+                                local.asg_target_groups,
+                                var.lbs[each.value.lb_application_name].existing_target_groups
+                              )
   port                      = each.value.port
   protocol                  = each.value.protocol
   ssl_policy                = each.value.ssl_policy

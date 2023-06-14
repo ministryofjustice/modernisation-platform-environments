@@ -43,38 +43,31 @@ locals {
     }
 
     baseline_lbs = {
-      # public = {
-      #   load_balancer_type       = "network"
-      #   internal_lb              = false
-      #   enable_delete_protection = false
-      #   existing_target_groups   = {}
-      #   idle_timeout             = 60 # 60 is default
-      #   security_groups          = ["public"]
-      #   public_subnets           = module.environment.subnets["public"].ids
-      #   tags                     = local.tags
-      #   listeners = {
-      #     https = {
-      #       port                      = 443
-      #       protocol                  = "HTTPS"
-      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
-      #       certificate_names_or_arns = ["application_environment_wildcard_cert"]
-      #       default_action = {
-      #         type = "forward"
-      #         target_group_name = "private-lb-web-https-443"
-      #       }
-      #       rules = {
-      #         t2-web-http-8080 = {
-      #           priority = 100
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "private-lb-web-https-443"
-      #           }]
-      #           conditions = []
-      #         }
-      #       }
-      #     }
-      #   }
-      # }
+      public = {
+        load_balancer_type       = "network"
+        internal_lb              = false
+        access_logs              = false
+        enable_delete_protection = false
+        existing_target_groups   = {
+          "private-lb-https-443" = {
+            arn = length(data.aws_lb_target_group.private_lb) > 0 ? data.aws_lb_target_group.private_lb[0].arn : ""
+          }
+        }
+        idle_timeout             = 60 # 60 is default
+        security_groups          = [] # no security groups for network load balancers
+        public_subnets           = module.environment.subnets["public"].ids
+        tags                     = local.tags
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "private-lb-https-443"
+            }
+          }
+        }
+      }
 
       private = {
         internal_lb              = true
