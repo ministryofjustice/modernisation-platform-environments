@@ -134,18 +134,16 @@ resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
   to_port     = 2049
 }
 
-# TODO enable when IDM resources are created
 
-# resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to+oam" {
-#   security_group_id = aws_security_group.oam_instance.id
-#   description = "Inbound NFS from IDM Instances"
-#   referenced_security_group_id = aws_security_group.idm_instance.id
-#   from_port   = 2049
-#   ip_protocol = "tcp"
-#   to_port     = 2049
-# }
+resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to+oam" {
+  security_group_id = aws_security_group.oam_instance.id
+  description = "Inbound NFS from IDM Instances"
+  referenced_security_group_id = aws_security_group.idm_instance.id
+  from_port   = 2049
+  ip_protocol = "tcp"
+  to_port     = 2049
+}
 
-# TODO enable when OHS resources are created
 
 resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
   security_group_id = aws_security_group.oam_instance.id
@@ -156,16 +154,15 @@ resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
   to_port     = 2049
 }
 
-# TODO enable when OIM resources are created
 
-# resource "aws_vpc_security_group_ingress_rule" "nfs_oim_to_oam" {
-#   security_group_id = aws_security_group.oam_instance.id
-#   description = "Inbound NFS from OIM Instances"
-#   referenced_security_group_id = aws_security_group.oim_instance.id
-#   from_port   = 2049
-#   ip_protocol = "tcp"
-#   to_port     = 2049
-# }
+resource "aws_vpc_security_group_ingress_rule" "nfs_oim_to_oam" {
+  security_group_id = aws_security_group.oam_instance.id
+  description = "Inbound NFS from OIM Instances"
+  referenced_security_group_id = aws_security_group.oim_instance.id
+  from_port   = 2049
+  ip_protocol = "tcp"
+  to_port     = 2049
+}
 
 resource "aws_vpc_security_group_ingress_rule" "nonprod_workspaces" {
   count = contains(["development", "testing"], local.environment) ? 1 : 0
