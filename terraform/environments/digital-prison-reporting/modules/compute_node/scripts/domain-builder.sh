@@ -22,11 +22,10 @@ unzip awscliv2.zip
 
 # Set Env Configuration
 sudo groupadd ssm-user; sudo useradd -m ssm-user; sudo usermod -a -G ssm-user ssm-user
-
 sudo mkdir -p /home/ssm-user/domain-builder/jars; sudo chown -R ssm-user:ssm-user /home/ssm-user/domain-builder/
-sudo touch /home/ssm-user/.bash_profile; sudo chown ssm-user:ssm-user /home/ssm-user/.bash_profile; sudo chmod +x /home/ssm-user/.bash_profile
-sudo echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" >> /home/ssm-user/.bash_profile
-# sudo source /etc/profile
+
+#sudo touch /home/ssm-user/.bash_profile; sudo chown ssm-user:ssm-user /home/ssm-user/.bash_profile; sudo chmod +x /home/ssm-user/.bash_profile
+#sudo echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" >> /home/ssm-user/.bash_profile
 
 # Sync S3 Domain Builder Artifacts
 aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
