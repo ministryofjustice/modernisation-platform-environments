@@ -2,7 +2,17 @@ variable "name" {
   description = "The EC2 Sec name."
 }
 
-variable "aws_region" {}
+variable "env" {
+  type        = string
+  default     = ""  
+  description = "Current Environment"
+}
+
+variable "aws_region" {
+  type        = string
+  default     = ""  
+  description = "AWS Region" 
+}
 
 variable "ec2_terminate_behavior" {}
 

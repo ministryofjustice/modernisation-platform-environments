@@ -17,7 +17,7 @@ locals {
 module "lb" {
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.3"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.4.1"
 
   providers = {
     aws.bucket-replication = aws
@@ -29,6 +29,9 @@ module "lb" {
   force_destroy_bucket       = each.value.force_destroy_bucket
   idle_timeout               = each.value.idle_timeout
   internal_lb                = each.value.internal_lb
+  load_balancer_type         = each.value.load_balancer_type
+  lb_target_groups           = each.value.lb_target_groups
+  access_logs                = lookup(each.value, "access_logs", true)
 
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
@@ -53,7 +56,10 @@ module "lb_listener" {
   business_unit             = var.environment.business_unit
   environment               = var.environment.environment
   load_balancer             = module.lb[each.value.lb_application_name].load_balancer
-  existing_target_groups    = merge(local.asg_target_groups, var.lbs[each.value.lb_application_name].existing_target_groups)
+  existing_target_groups    = merge(
+                                local.asg_target_groups,
+                                var.lbs[each.value.lb_application_name].existing_target_groups
+                              )
   port                      = each.value.port
   protocol                  = each.value.protocol
   ssl_policy                = each.value.ssl_policy
@@ -61,6 +67,7 @@ module "lb_listener" {
   certificate_names_or_arns = each.value.certificate_names_or_arns
   default_action            = each.value.default_action
   rules                     = each.value.rules
+  alarm_target_group_names  = each.value.alarm_target_group_names
 
   cloudwatch_metric_alarms = {
     for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
@@ -70,11 +77,8 @@ module "lb_listener" {
     })
   }
 
-  tags = merge(local.tags, each.value.tags)
-
   depends_on = [
     module.acm_certificate, # ensure certs are created first
   ]
-
-  alarm_target_group_names = each.value.alarm_target_group_names
+  tags = merge(local.tags, each.value.tags)
 }

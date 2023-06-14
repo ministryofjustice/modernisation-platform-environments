@@ -79,3 +79,11 @@ output "security_groups" {
   description = "map of security groups corresponding to var.security_groups"
   value       = aws_security_group.this
 }
+
+output "ssm_parameters" {
+  description = "map of security groups corresponding to var.ssm_parameters"
+  value = merge(
+    aws_ssm_parameter.fixed,
+    aws_ssm_parameter.placeholder
+  )
+}

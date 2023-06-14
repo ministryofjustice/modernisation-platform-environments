@@ -54,4 +54,9 @@ module "ec2_instance" {
   }
 
   tags = merge(local.tags, each.value.tags)
+
+  depends_on = [
+    aws_ssm_parameter.fixed,
+    aws_ssm_parameter.placeholder,
+  ]
 }

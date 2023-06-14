@@ -1,11 +1,4 @@
 locals {
-  nonprod_workspaces_cidr         = "10.200.0.0/20"
-  prod_workspaces_cidr            = "10.200.16.0/20"
-  redc_cidr                       = "172.16.0.0/20"
-  atos_cidr                       = "10.0.0.0/8"
-  portal_hosted_zone              = data.aws_route53_zone.external.name # TODO This needs a logic for a TBC Hosted Zone for production
-
-
   # EC2 User data
   # TODO The hostname is too long as the domain itself is 62 characters long... If this hostname is required, a new domain is required
 
@@ -219,7 +212,7 @@ resource "aws_instance" "oam_instance_1" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OAM Instance 1" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
 
@@ -237,7 +230,7 @@ resource "aws_instance" "oam_instance_2" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OAM Instance 2" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
 
