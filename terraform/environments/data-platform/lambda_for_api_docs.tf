@@ -5,7 +5,7 @@ data "archive_file" "docs_zip" {
 }
 
 resource "aws_lambda_function" "api_docs" {
-  function_name = "API docs"
+  function_name = "api_docs"
 
   filename = "${path.module}/src/docs_${local.environment}/docs_lambda.zip"
   source_code_hash = data.archive_file.docs_zip.output_base64sha256
