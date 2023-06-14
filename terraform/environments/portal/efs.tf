@@ -7,7 +7,16 @@ locals {
     oam = {
       sec_group_id          = aws_security_group.oam_instance.id
 
+    },
+    oim = {
+      sec_group_id          = aws_security_group.oim_instance.id
+
+    },
+    idm = {
+      sec_group_id          = aws_security_group.idm_instance.id
+
     }
+
   }
 }
 
@@ -19,7 +28,8 @@ resource "aws_efs_file_system" "product" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${each.key}-product" }
+    { "Name" = "${local.application_name}-${each.key}-product" },
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
 
@@ -78,4 +88,15 @@ resource "aws_vpc_security_group_ingress_rule" "efs_product_inbound" {
   from_port   = 2049
   ip_protocol = "tcp"
   to_port     = 2049
+}
+
+resource "aws_efs_backup_policy" "policy" {
+  for_each = {
+    for k, v in local.efs : k => v
+  }
+  file_system_id = aws_efs_file_system.product[each.key].id
+
+  backup_policy {
+    status = "ENABLED"
+  }
 }
