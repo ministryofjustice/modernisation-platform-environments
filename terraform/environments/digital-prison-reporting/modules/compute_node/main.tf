@@ -35,7 +35,7 @@ resource "aws_security_group" "ec2_sec_group" {
 }
 
 resource "aws_security_group_rule" "ingress_traffic" {
-  for_each = var.enable_compute_node ? toset(var.ec2_sec_rules): toset([])
+  for_each = var.enable_compute_node ? toset(var.ec2_sec_rules): toset({})
 
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
