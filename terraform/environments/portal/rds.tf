@@ -547,7 +547,7 @@ resource "aws_db_instance" "appdb2" {
 
 }
 
-#TODO add correct DNS record
+#TODO add correct entry for DNS
 # resource "aws_route53_record" "igdb_rds" {
 #   provider = aws.core-vpc
 #   zone_id  = data.aws_route53_zone.external.zone_id
@@ -557,7 +557,7 @@ resource "aws_db_instance" "appdb2" {
 #   records  = [aws_db_instance.appdb1.address]
 # }
 
-#TODO add correct DNS record
+#TODO add correct entry for DNS
 # resource "aws_route53_record" "iadb_rds" {
 #   provider = aws.core-vpc
 #   zone_id  = data.aws_route53_zone.external.zone_id
