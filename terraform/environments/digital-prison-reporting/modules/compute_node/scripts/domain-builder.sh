@@ -1,8 +1,7 @@
 #!/bin/bash -xe
 # send script output to /tmp so we can debug boot failures
-exec > /tmp/userdata.log 2>&1
-
-echo test of user_data | sudo tee /tmp/user_data.log
+# Ouput all log
+exec > >(tee /tmp/userdata.log|logger -t user-data-extra -s 2>/dev/console) 2>&1
 
 echo "assumeyes=1" >> /etc/yum.conf
 
@@ -22,6 +21,6 @@ unzip awscliv2.zip
 ./aws/install
 
 # Sync S3 Domain Builder Artifacts
-mkdir -p /home/ssm-user/domain-builder/jars
-echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" >> /home/ssm-user/.bash_profile
-aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar ~/domain-builder/jars
+#mkdir -p /home/ssm-user/domain-builder/jars
+#echo "export PATH=$PATH:/home/ssm-user/domain-builder/jars" >> /home/ssm-user/.bash_profile
+#aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar ~/domain-builder/jars
