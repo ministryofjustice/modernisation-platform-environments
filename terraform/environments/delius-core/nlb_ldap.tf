@@ -21,7 +21,6 @@ resource "aws_lb" "ldap" {
   tags = local.openldap_nlb_tags
 }
 
-
 resource "aws_lb_listener" "ldap" {
   load_balancer_arn = aws_lb.ldap.arn
   port              = local.openldap_port
