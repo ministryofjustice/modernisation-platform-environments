@@ -79,7 +79,7 @@ resource "aws_cloudwatch_event_rule" "put_to_data_directory" {
     "detail-type" : ["AWS API Call via CloudTrail"],
     "detail" : {
       "eventSource" : ["s3.amazonaws.com"],
-      "eventName" : ["PutObject"],
+      "eventName" : ["PutObject", "CompleteMultipartUpload"],
       "requestParameters" : {
         "bucketName" : [module.s3-bucket.bucket.id],
         "key" : [{ "prefix" : "raw_data/" }]
