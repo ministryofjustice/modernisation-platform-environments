@@ -60,7 +60,7 @@ locals {
         listeners = {
           https = {
             port                      = 443
-            protocol                  = "TLS"
+            protocol                  = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "private-lb-https-443"
