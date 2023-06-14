@@ -43,9 +43,9 @@ data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
     sid    = "s3Access"
     effect = "Allow"
     actions = [
-      "s3:GetObject*",
-      "s3:PutObject*",
-      "s3:ListBucket*",
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
     resources = [
