@@ -16,6 +16,7 @@ resource "aws_vpc_security_group_egress_rule" "efs_repo_home_outbound" {
 resource "aws_vpc_security_group_ingress_rule" "efs_repo_home_inbound" {
  
   security_group_id = aws_security_group.efs_sg.id
+  referenced_security_group_id = aws_security_group.efs_sg.id
   description = "EFS Rule inbound for repo_home"
   from_port   = 2049
   ip_protocol = "tcp"
