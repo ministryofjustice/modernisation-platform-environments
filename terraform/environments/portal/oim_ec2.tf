@@ -89,6 +89,14 @@ ingress {
 
   }
 
+ingress {
+    description = "Inbound NFS from other OIM Instances"
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "TCP"
+    source_security_group_id = aws_security_group.oim_instance.id
+
+  }
 
   # ingress {
   #   description = "SSH access from VPC"

@@ -249,40 +249,40 @@ resource "aws_security_group" "igdb" {
   }
 
 
-  # ingress {
-  #   description = "Connectivity from Portal IDM VPC"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_IDM]
-  # }
+  ingress {
+    description = "Inbound TNS access from Portal IDM Instances"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    source_security_group_id = aws_security_group.idm_instance.id
+  }
 
 
-  # ingress {
-  #   description = "Connectivity from Portal OAM VPC"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_OAM]
-  # }
+  ingress {
+    description = "Inbound TNS access from Portal OAM Instances"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    source_security_group_id = aws_security_group.oam_instance.id
+  }
 
 
-  # ingress {
-  #   description = "Connectivity from Portal OIM VPC"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_OIM]
-  # }
+  ingress {
+    description = "Inbound TNS access from Portal OIM Instances"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    source_security_group_id = aws_security_group.oim_instance.id
+  }
 
 
-  # ingress {
-  #   description = "Connectivity from Portal OHS VPC"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_OHS]
-  # }
+  ingress {
+    description = "Inbound TNS access from Portal OHS Instances"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    source_security_group_id = aws_security_group.ohs_instance.id
+  }
 
 
   egress {
@@ -350,40 +350,40 @@ resource "aws_security_group" "iadb" {
   }
 
 
-  # ingress {
-  #   description = "Connectivity from Portal IDM VPC"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_IDM]
-  # }
+  ingress {
+    description = "Inbound TNS access from Portal IDM Instances"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    source_security_group_id = aws_security_group.idm_instance.id
+  }
 
 
-  # ingress {
-  #   description = "Connectivity from Portal OAM VPC"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_OAM]
-  # }
+  ingress {
+    description = "Inbound TNS access from Portal OAM Instances"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    source_security_group_id = aws_security_group.oam_instance.id
+  }
 
 
-  # ingress {
-  #   description = "Connectivity from Portal OIM VPC"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_OIM]
-  # }
+  ingress {
+    description = "Inbound TNS access from Portal OIM Instances"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    source_security_group_id = aws_security_group.oim_instance.id
+  }
 
 
-  # ingress {
-  #   description = "Connectivity from Portal OHS VPC"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_OHS]
-  # }
+  ingress {
+    description = "Inbound TNS access from Portal OHS Instances"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    source_security_group_id = aws_security_group.ohs_instance.id
+  }
 
 
   egress {
