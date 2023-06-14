@@ -20,3 +20,8 @@ echo "Seup AWSCLI V2....."
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
+
+# Sync S3 Domain Builder Artifacts
+mkdir -p ~/domain-builder/jars
+echo "export PATH=$PATH:~/domain-builder/jars" >> .bash_profile
+aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar ~/domain-builder/jars
