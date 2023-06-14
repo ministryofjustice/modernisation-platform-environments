@@ -67,6 +67,7 @@ resource "aws_security_group_rule" "allow_all_egress" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.ldap.id
 }
+
 resource "aws_security_group_rule" "ldap_nlb" {
   description       = "Allow inbound traffic from VPC"
   type              = "ingress"
@@ -164,7 +165,7 @@ data "aws_iam_policy_document" "ecs_ssm_exec" {
 data "aws_iam_policy_document" "ecs_s3" {
   statement {
     effect    = "Allow"
-    resources = ["*"]
+    resources = []
 
     actions = [
       "s3:*"
