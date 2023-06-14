@@ -21,7 +21,7 @@ unzip awscliv2.zip
 ./aws/install
 
 # Set Env Configuration
-sudo usermod -a -G ssm-user
+sudo groupadd ssm-user; sudo useradd -m ssm-user; sudo usermod -a -G ssm-user ssm-user
 
 sudo mkdir -p /home/ssm-user/domain-builder/jars; chown -R ssm-user:ssm-user /home/ssm-user/domain-builder/
 touch /home/ssm-user/.bash_profile; chown ssm-user:ssm-user /home/ssm-user/.bash_profile; chmod +x /home/ssm-user/.bash_profile
