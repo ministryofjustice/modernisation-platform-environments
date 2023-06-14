@@ -212,8 +212,15 @@ resource "aws_instance" "oam_instance_1" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OAM Instance 1" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" },
+    { "Replacement" = "true" }
   )
+
+  lifecycle {
+    replace_triggered_by = [
+      aws_instance.oam_instance_1.tags
+    ]
+  }
 }
 
 resource "aws_instance" "oam_instance_2" {
