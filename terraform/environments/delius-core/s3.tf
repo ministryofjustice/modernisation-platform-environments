@@ -26,14 +26,11 @@ module "s3_bucket" {
       "s3:PutObjectTagging"
     ]
     principals = {
-        effect  = "Allow"
-        actions = ["s3:ListBucket"]
-        principals = {
-            type = "AWS"
-            identifiers = [
-                "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/ldap-data-migration-lambda-role"
-            ]
-        }
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/ldap-data-migration-lambda-role"
+        ]
+      }
     },
     {
         effect  = "Allow"
