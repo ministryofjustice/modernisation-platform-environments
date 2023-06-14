@@ -119,7 +119,7 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-resource "aws_iam_role" "this" {
+resource "aws_iam_role" "athena_load_lambda_role" {
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
   name               = "athena_load_lambda_role_${local.environment}"
   tags               = local.tags
@@ -133,17 +133,17 @@ resource "aws_iam_policy" "athena_load_lambda_function_policy" {
 
 
 resource "aws_iam_role_policy_attachment" "policy_from_json" {
-  role       = aws_iam_role.this.name
+  role       = aws_iam_role.athena_load_lambda_role.name
   policy_arn = aws_iam_policy.athena_load_lambda_function_policy.arn
 }
 
-resource "aws_lambda_function" "this" {
+resource "aws_lambda_function" "athena_load" {
   function_name                  = "data_product_athena_load_${local.environment}"
   description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
   reserved_concurrent_executions = 10
   image_uri                      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:latest"
   package_type                   = "Image"
-  role                           = aws_iam_role.this.arn
+  role                           = aws_iam_role.athena_load_lambda_role.arn
   timeout                        = 600
   memory_size                    = 512
 
@@ -157,7 +157,7 @@ resource "aws_lambda_function" "this" {
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_athena_load_lambda" {
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.this.function_name
+  function_name = aws_lambda_function.athena_load.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.put_to_data_directory.arn
 }
