@@ -227,7 +227,7 @@ locals {
         })
         ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 200 }
-          flash = { total_size = 2 }
+          flash = { total_size = 50 }
         })
       })
 
