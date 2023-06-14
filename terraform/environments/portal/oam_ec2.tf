@@ -9,7 +9,7 @@ echo "/dev/xvdc /IDAM/product/runtime/Domain/aserver ext4 defaults 0 0" >> /etc/
 echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/fstab
 echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
-mount -a
+# mount -a
 hostnamectl set-hostname ${local.application_name}-oam1-ms.${local.portal_hosted_zone}
 EOF
   oam_2_userdata = <<EOF
