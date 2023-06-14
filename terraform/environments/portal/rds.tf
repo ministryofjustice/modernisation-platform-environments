@@ -254,7 +254,7 @@ resource "aws_security_group" "igdb" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    source_security_group_id = aws_security_group.idm_instance.id
+    security_groups = aws_security_group.idm_instance.id
   }
 
 
@@ -263,7 +263,7 @@ resource "aws_security_group" "igdb" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    source_security_group_id = aws_security_group.oam_instance.id
+    security_groups = aws_security_group.oam_instance.id
   }
 
 
@@ -272,7 +272,7 @@ resource "aws_security_group" "igdb" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    source_security_group_id = aws_security_group.oim_instance.id
+    security_groups = aws_security_group.oim_instance.id
   }
 
 
@@ -281,7 +281,7 @@ resource "aws_security_group" "igdb" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    source_security_group_id = aws_security_group.ohs_instance.id
+    security_groups = aws_security_group.ohs_instance.id
   }
 
 
@@ -355,7 +355,7 @@ resource "aws_security_group" "iadb" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    source_security_group_id = aws_security_group.idm_instance.id
+    security_groups = aws_security_group.idm_instance.id
   }
 
 
@@ -364,7 +364,7 @@ resource "aws_security_group" "iadb" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    source_security_group_id = aws_security_group.oam_instance.id
+    security_groups = aws_security_group.oam_instance.id
   }
 
 
@@ -373,7 +373,7 @@ resource "aws_security_group" "iadb" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    source_security_group_id = aws_security_group.oim_instance.id
+    security_groups = aws_security_group.oim_instance.id
   }
 
 
@@ -382,7 +382,7 @@ resource "aws_security_group" "iadb" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    source_security_group_id = aws_security_group.ohs_instance.id
+    security_groups = aws_security_group.ohs_instance.id
   }
 
 
