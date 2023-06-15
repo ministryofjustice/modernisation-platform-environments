@@ -187,3 +187,104 @@ resource "aws_instance" "oim2" {
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
+
+
+resource "aws_ebs_volume" "oimvolume1" {
+  availability_zone = "eu-west-2a"
+  size              = "30"
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot1  
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OIMVolume1" },
+  )
+}
+
+resource "aws_volume_attachment" "oim_EC2ServerVolume01" {
+  device_name = "/dev/xvdb"
+  volume_id   = aws_ebs_volume.oimvolume1.id
+  instance_id = aws_instance.oim1.id
+}
+
+
+resource "aws_ebs_volume" "oimvolume2" {
+  availability_zone = "eu-west-2a"
+  size              = "15"
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot2  
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OIMVolume2" },
+  )
+}
+
+resource "aws_volume_attachment" "oim_EC2ServerVolume02" {
+  device_name = "/dev/xvdc"
+  volume_id   = aws_ebs_volume.oimvolume2.id
+  instance_id = aws_instance.oim1.id
+}
+
+
+
+resource "aws_ebs_volume" "oimvolume3" {
+  availability_zone = "eu-west-2a"
+  size              = "15"
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot3  
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OIMVolume3" },
+  )
+}
+
+resource "aws_volume_attachment" "oim_EC2ServerVolume03" {
+  device_name = "/dev/xvdd"
+  volume_id   = aws_ebs_volume.oimvolume3.id
+  instance_id = aws_instance.oim1.id
+}
+
+
+resource "aws_ebs_volume" "oimvolume4" {
+  availability_zone = "eu-west-2a"
+  size              = "20"
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot4  
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OIMVolume4" },
+  )
+}
+
+resource "aws_volume_attachment" "oim_EC2ServerVolume04" {
+  device_name = "/dev/xvde"
+  volume_id   = aws_ebs_volume.oimvolume4.id
+  instance_id = aws_instance.oim1.id
+}
