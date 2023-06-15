@@ -1,114 +1,100 @@
+locals {
+  # EC2 User data
+  # TODO The hostname is too long as the domain itself is 62 characters long... If this hostname is required, a new domain is required
 
+  ohs_1_userdata = <<EOF
+#!/bin/bash
+echo "${aws_efs_file_system.product["ohs"].dns_name}:/fmw /IDAM/product/fmw nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "/dev/xvdc /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+mount -a
+hostnamectl set-hostname ${local.application_name}-ohs1-ms.${local.portal_hosted_zone}
+EOF
+  ohs_2_userdata = <<EOF
+#!/bin/bash
+EOF
+}
 
-
+#################################
+# OHS Security Group Rules
+#################################
 
 resource "aws_security_group" "ohs_instance" {
   name        = "${local.application_name}-${local.environment}-ohs-security-group"
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    description = "Allow ping response"
-    from_port   = 8
-    to_port     = 1
-    protocol    = "ICMP"
-    cidr_blocks = [local.first-cidr]
-
-  }
-  ingress {
-    description = "OHS Inbound from Local account VPC"
-    from_port   = 7777
-    to_port     = 7777
-    protocol    = "TCP"
-    cidr_blocks = [local.first-cidr]
-
-  }
-  ingress {
-    description = "ONS Port"
-    from_port   = 6200
-    to_port     = 6200
-    protocol    = "TCP"
-    cidr_blocks = [local.first-cidr]
-
-  }
-
-  # ingress {
-  #   description = "SSH access from bastion"
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "TCP"
-  #   cidr_blocks = [local.second-cidr]
-
-  # }
-  # ingress {
-  #   description = "SSH access from VPC"
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "TCP"
-  #   cidr_blocks = [local.first-cidr]
-
-  # }
-   ingress {
-    description = "OHS Inbound from Shared Svs VPC"
-    from_port   = 7777
-    to_port     = 7777
-    protocol    = "TCP"
-    cidr_blocks = [local.second-cidr]
-
-  }
-  #   ingress {
-  #   description = "SSH access from prod bastion"
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "TCP"
-  #   cidr_blocks = [local.prd-cidr]
-
-  # }
-  #   ingress {
-  #   description = "OHS Inbound from Prod Shared Svs VPC"
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "7777"
-  #   cidr_blocks = [local.prd-cidr]
-
-  # }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-
-
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-portal" }
+    { "Name" = "${local.application_name}-${local.environment}-ohs-security-group" }
   )
 }
 
+resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
+  security_group_id = aws_security_group.ohs_instance.id
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "-1"
+}
 
-# TODO Depending on outcome of how EBS/EFS is used, this resource may depend on aws_instance.oam_instance_1
+resource "aws_vpc_security_group_ingress_rule" "ohs_local_vpc" {
+  security_group_id = aws_security_group.ohs_instance.id
+  description = "OHS Inbound from Local account VPC"
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port   = 7777
+  ip_protocol = "tcp"
+  to_port     = 7777
+}
 
-resource "aws_instance" "ohs1" {
-  ami                         = local.ami-id
+resource "aws_vpc_security_group_ingress_rule" "ohs_nonprod_workspaces" {
+  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  security_group_id = aws_security_group.ohs_instance.id
+  description = "OHS Inbound from Shared Svs VPC"
+  cidr_ipv4   = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
+  from_port   = 7777
+  ip_protocol = "tcp"
+  to_port     = 7777
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ohs_prod_workspaces" {
+  security_group_id = aws_security_group.ohs_instance.id
+  description = "OHS Inbound from Prod Shared Svs VPC"
+  cidr_ipv4   = local.prod_workspaces_cidr
+  from_port   = 7777
+  ip_protocol = "tcp"
+  to_port     = 7777
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ohs_ons" {
+  security_group_id = aws_security_group.ohs_instance.id
+  description = "ONS Port"
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port   = 6200
+  ip_protocol = "tcp"
+  to_port     = 6200
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ohs_ping" {
+  security_group_id = aws_security_group.ohs_instance.id
+  description = "Allow ping response"
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port   = 8
+  ip_protocol = "icmp"
+  to_port     = -1
+}
+
+######################################
+# OHS Instance
+######################################
+
+resource "aws_instance" "ohs_instance_1" {
+  ami                         = local.application_data.accounts[local.environment].ohs_ami_id
+  availability_zone           = "eu-west-2a"
   instance_type               = local.application_data.accounts[local.environment].ohs_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.ohs_instance.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
-
-  # root_block_device {
-  #   delete_on_termination      = false
-  #   encrypted                  = true
-  #   volume_size                = 60
-  #   volume_type                = "gp2"
-  #   tags = merge(
-  #     local.tags,
-  #     { "Name" = "${local.application_name}-root-volume" },
-  #   )
-  # }
+  user_data_base64            = base64encode(local.ohs_1_userdata)
 
   tags = merge(
     local.tags,
@@ -120,11 +106,12 @@ resource "aws_instance" "ohs1" {
 
 resource "aws_instance" "ohs2" {
   count = local.environment == "production" ? 1 : 0
-  ami                            = local.ami-id
+  ami                            = local.application_data.accounts[local.environment].ohs_ami_id
   instance_type                  = local.application_data.accounts[local.environment].ohs_instance_type
   vpc_security_group_ids         = [aws_security_group.ohs_instance.id]
   subnet_id                      = data.aws_subnet.data_subnets_b.id
   iam_instance_profile           = aws_iam_instance_profile.portal.id
+  user_data_base64               = base64encode(local.ohs_2_userdata)
 
   #   # root_block_device {
   #   # delete_on_termination     = false
@@ -145,14 +132,41 @@ resource "aws_instance" "ohs2" {
   )
 }
 
+###############################
+# OHS EBS Volumes
+###############################
 
-resource "aws_ebs_volume" "ohsvolume1" {
+# resource "aws_ebs_volume" "ohsvolume1" {
+#   availability_zone = "eu-west-2a"
+#   size              = "30"
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].ohssnapshot1
+#
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OHSVolume1" },
+#   )
+# }
+#
+# resource "aws_volume_attachment" "ohs_EC2ServerVolume01" {
+#   device_name = "/dev/xvdb"
+#   volume_id   = aws_ebs_volume.ohsvolume1.id
+#   instance_id = aws_instance.ohs_instance_1.id
+# }
+
+resource "aws_ebs_volume" "ohs_mserver" {
   availability_zone = "eu-west-2a"
   size              = "30"
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].ohssnapshot1
+  snapshot_id       = local.application_data.accounts[local.environment].ohs_mserver_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -160,36 +174,18 @@ resource "aws_ebs_volume" "ohsvolume1" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-OHSVolume1" },
+    { "Name" = "${local.application_name}-OHS-mserver" },
   )
 }
 
-resource "aws_volume_attachment" "ohs_EC2ServerVolume01" {
-  device_name = "/dev/xvdb"
-  volume_id   = aws_ebs_volume.ohsvolume1.id
-  instance_id = aws_instance.ohs1.id
-}
-
-resource "aws_ebs_volume" "ohsvolume2" {
-  availability_zone = "eu-west-2a"
-  size              = "30"
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].ohssnapshot2
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OHSVolume2" },
-  )
-}
-
-resource "aws_volume_attachment" "ohs_EC2ServerVolume02" {
+resource "aws_volume_attachment" "ohs_mserver" {
   device_name = "/dev/xvdc"
-  volume_id   = aws_ebs_volume.ohsvolume2.id
-  instance_id = aws_instance.ohs1.id
+  volume_id   = aws_ebs_volume.ohs_mserver.id
+  instance_id = aws_instance.ohs_instance_1.id
 }
+
+#####################################
+# OHS Route 53 records
+#####################################
+
+# TODO TBC once as part of Route53 ticket

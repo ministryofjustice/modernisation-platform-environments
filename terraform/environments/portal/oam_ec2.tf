@@ -8,8 +8,7 @@ echo "${aws_efs_file_system.product["oam"].dns_name}:/fmw /IDAM/product/fmw nfs4
 echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
-echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
-# echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 mount -a
 hostnamectl set-hostname ${local.application_name}-oam1-ms.${local.portal_hosted_zone}
 EOF
@@ -35,7 +34,7 @@ resource "aws_security_group" "oam_instance" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "outbound" {
+resource "aws_vpc_security_group_egress_rule" "oam_outbound" {
   security_group_id = aws_security_group.oam_instance.id
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "-1"
@@ -99,7 +98,7 @@ resource "aws_vpc_security_group_ingress_rule" "oracle_admin_prod" {
   to_port     = 7001
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ping" {
+resource "aws_vpc_security_group_ingress_rule" "oam_ping" {
   security_group_id = aws_security_group.oam_instance.id
   description = "Allow ping response"
   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
@@ -356,9 +355,9 @@ resource "aws_volume_attachment" "oam_mserver" {
   instance_id = aws_instance.oam_instance_1.id
 }
 
-###############################
-# EC2 Instance Profile
-###############################
+#####################################################################
+# EC2 Instance Profile - used for all of OAM, OIM, OHS and IDM
+#####################################################################
 
 # IAM Role, policy and instance profile (to attach the role to the EC2)
 
