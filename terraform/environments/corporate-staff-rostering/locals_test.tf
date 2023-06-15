@@ -8,10 +8,12 @@ locals {
       mrj-dev-base-ol85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "base_ol_8_5_*"
-          availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["data-db"]
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
         })
         tags = {
           description = "For testing our base OL8.5 base image"
