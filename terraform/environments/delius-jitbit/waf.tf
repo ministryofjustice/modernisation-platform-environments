@@ -106,4 +106,24 @@ data "aws_iam_policy_document" "waf" {
       variable = "aws:SourceAccount"
     }
   }
+  statement {
+    effect = "Allow"
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "AWS"
+    }
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    resources = [
+      data.aws_kms_key.general_shared.arn
+    ]
+  }
 }
