@@ -24,9 +24,9 @@ resource "aws_wafv2_web_acl" "this" {
     }
 
     visibility_config {
-      cloudwatch_metrics_enabled = false
+      cloudwatch_metrics_enabled = true
       metric_name                = "${local.application_name}-common-ruleset"
-      sampled_requests_enabled   = false
+      sampled_requests_enabled   = true
     }
   }
 
@@ -47,22 +47,63 @@ resource "aws_wafv2_web_acl" "this" {
     }
 
     visibility_config {
-      cloudwatch_metrics_enabled = false
+      cloudwatch_metrics_enabled = true
       metric_name                = "${local.application_name}-SQLi-ruleset"
-      sampled_requests_enabled   = false
+      sampled_requests_enabled   = true
     }
   }
 
   tags = local.tags
 
   visibility_config {
-    cloudwatch_metrics_enabled = false
+    cloudwatch_metrics_enabled = true
     metric_name                = "${local.application_name}-waf-metrics"
-    sampled_requests_enabled   = false
+    sampled_requests_enabled   = true
   }
 }
 
-resource "aws_wafv2_web_acl_association" "example" {
+resource "aws_wafv2_web_acl_association" "this" {
   resource_arn = aws_lb.external.arn
   web_acl_arn  = aws_wafv2_web_acl.this.arn
+}
+
+resource "aws_cloudwatch_log_group" "waf" {
+  name_prefix       = "${local.application_name}-waf"
+  retention_in_days = 14
+  kms_key_id        = data.aws_kms_key.general_shared.id
+
+  tags = local.tags
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "this" {
+  log_destination_configs = [aws_cloudwatch_log_group.waf.arn]
+  resource_arn            = aws_wafv2_web_acl.this.arn
+}
+
+resource "aws_cloudwatch_log_resource_policy" "waf" {
+  policy_document = data.aws_iam_policy_document.waf.json
+  policy_name     = "webacl-policy-uniq-name"
+}
+
+data "aws_iam_policy_document" "waf" {
+  version = "2012-10-17"
+  statement {
+    effect = "Allow"
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "AWS"
+    }
+    actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["${aws_cloudwatch_log_group.waf.arn}:*"]
+    condition {
+      test     = "ArnLike"
+      values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
+      variable = "aws:SourceArn"
+    }
+    condition {
+      test     = "StringEquals"
+      values   = [tostring(data.aws_caller_identity.current.account_id)]
+      variable = "aws:SourceAccount"
+    }
+  }
 }
