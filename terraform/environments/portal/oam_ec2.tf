@@ -4,11 +4,12 @@ locals {
 
   oam_1_userdata = <<EOF
 #!/bin/bash
-echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
-echo "/dev/xvdc /IDAM/product/runtime/Domain/aserver ext4 defaults 0 0" >> /etc/fstab
-echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.product["oam"].dns_name}:/fmw /IDAM/product/fmw nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
+# echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 mount -a
 hostnamectl set-hostname ${local.application_name}-oam1-ms.${local.portal_hosted_zone}
 EOF
@@ -125,18 +126,18 @@ resource "aws_vpc_security_group_ingress_rule" "oam_coherence_icmp" {
   to_port     = -1
 }
 
-resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "Inbound NFS from other OAM instances"
-  referenced_security_group_id = aws_security_group.oam_instance.id
-  from_port   = 2049
-  ip_protocol = "tcp"
-  to_port     = 2049
-}
+# nfs to be replaced with efs so these 4 ingress rules are no longer required
+# resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "Inbound NFS from other OAM instances"
+#   referenced_security_group_id = aws_security_group.oam_instance.id
+#   from_port   = 2049
+#   ip_protocol = "tcp"
+#   to_port     = 2049
+# }
 
-# TODO enable when IDM resources are created
 
-# resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to+oam" {
+# resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to_oam" {
 #   security_group_id = aws_security_group.oam_instance.id
 #   description = "Inbound NFS from IDM Instances"
 #   referenced_security_group_id = aws_security_group.idm_instance.id
@@ -145,18 +146,16 @@ resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
 #   to_port     = 2049
 # }
 
-# TODO enable when OHS resources are created
 
-resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "Inbound NFS from OHS Instances"
-  referenced_security_group_id = aws_security_group.ohs_instance.id
-  from_port   = 2049
-  ip_protocol = "tcp"
-  to_port     = 2049
-}
+# resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "Inbound NFS from OHS Instances"
+#   referenced_security_group_id = aws_security_group.ohs_instance.id
+#   from_port   = 2049
+#   ip_protocol = "tcp"
+#   to_port     = 2049
+# }
 
-# TODO enable when OIM resources are created
 
 # resource "aws_vpc_security_group_ingress_rule" "nfs_oim_to_oam" {
 #   security_group_id = aws_security_group.oam_instance.id
@@ -214,6 +213,7 @@ resource "aws_instance" "oam_instance_1" {
     { "Name" = "${local.application_name} OAM Instance 1" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
+
 }
 
 resource "aws_instance" "oam_instance_2" {
@@ -262,74 +262,74 @@ resource "aws_volume_attachment" "oam_repo_home" {
   instance_id = aws_instance.oam_instance_1.id
 }
 
-resource "aws_ebs_volume" "oam_config" {
-  availability_zone = "eu-west-2a"
-  size              = 15
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id  # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
-  snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
+# resource "aws_ebs_volume" "oam_config" {
+#   availability_zone = "eu-west-2a"
+#   size              = 15
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id  # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
+#   snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
+#
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OAM-config" },
+#   )
+# }
+# resource "aws_volume_attachment" "oam_onfig" {
+#   device_name = "/dev/xvdd"
+#   volume_id   = aws_ebs_volume.oam_config.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
 
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+# resource "aws_ebs_volume" "oam_fmw" {
+#   availability_zone = "eu-west-2a"
+#   size              = 30
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].oam_fmw_snapshot
+#
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OAM-fmw" },
+#   )
+# }
+# resource "aws_volume_attachment" "oam_fmw" {
+#   device_name = "/dev/xvdb"
+#   volume_id   = aws_ebs_volume.oam_fmw.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
 
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OAM-config" },
-  )
-}
-resource "aws_volume_attachment" "oam_onfig" {
-  device_name = "/dev/xvdd"
-  volume_id   = aws_ebs_volume.oam_config.id
-  instance_id = aws_instance.oam_instance_1.id
-}
-
-resource "aws_ebs_volume" "oam_fmw" {
-  availability_zone = "eu-west-2a"
-  size              = 30
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_fmw_snapshot
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OAM-fmw" },
-  )
-}
-resource "aws_volume_attachment" "oam_fmw" {
-  device_name = "/dev/xvdb"
-  volume_id   = aws_ebs_volume.oam_fmw.id
-  instance_id = aws_instance.oam_instance_1.id
-}
-
-resource "aws_ebs_volume" "oam_aserver" {
-  availability_zone = "eu-west-2a"
-  size              = 15
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_aserver_snapshot
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OAM-aserver" },
-  )
-}
-resource "aws_volume_attachment" "oam_aserver" {
-  device_name = "/dev/xvdc"
-  volume_id   = aws_ebs_volume.oam_aserver.id
-  instance_id = aws_instance.oam_instance_1.id
-}
+# resource "aws_ebs_volume" "oam_aserver" {
+#   availability_zone = "eu-west-2a"
+#   size              = 15
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].oam_aserver_snapshot
+#
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OAM-aserver" },
+#   )
+# }
+# resource "aws_volume_attachment" "oam_aserver" {
+#   device_name = "/dev/xvdc"
+#   volume_id   = aws_ebs_volume.oam_aserver.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
 
 resource "aws_ebs_volume" "oam_mserver" {
   availability_zone = "eu-west-2a"

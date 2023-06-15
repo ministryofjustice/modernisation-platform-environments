@@ -230,14 +230,15 @@ resource "aws_vpc_security_group_ingress_rule" "atos_1389_tls" {
   to_port     = 1389
 }
 
-resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to_idm" {
-  security_group_id = aws_security_group.idm_instance.id
-  description = "Inbound NFS from other IDM instances"
-  referenced_security_group_id = aws_security_group.idm_instance.id
-  from_port   = 2049
-  ip_protocol = "tcp"
-  to_port     = 2049
-}
+# nfs to be replaced with efs so this ingress rule is no longer required
+# resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to_idm" {
+#   security_group_id = aws_security_group.idm_instance.id
+#   description = "Inbound NFS from other IDM instances"
+#   referenced_security_group_id = aws_security_group.idm_instance.id
+#   from_port   = 2049
+#   ip_protocol = "tcp"
+#   to_port     = 2049
+# }
 
 ######################################
 # IDM Instance
