@@ -50,6 +50,13 @@ resource "aws_wafv2_web_acl" "this" {
       managed_rule_group_statement {
         name        = "AWSManagedRulesSQLiRuleSet"
         vendor_name = "AWS"
+
+        rule_action_override {
+          name = "*"
+          action_to_use {
+            count {}
+          }
+        }
       }
     }
 
