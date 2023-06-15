@@ -68,16 +68,16 @@ resource "aws_wafv2_web_acl_association" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "waf" {
-  name              = "${local.application_name}-waf"
+  name              = "aws-waf-logs-${local.application_name}"
   retention_in_days = 14
 
   tags = local.tags
 }
 
-# resource "aws_wafv2_web_acl_logging_configuration" "this" {
-#   log_destination_configs = ["${aws_cloudwatch_log_group.waf.arn}:*"]
-#   resource_arn            = aws_wafv2_web_acl.this.arn
-# }
+resource "aws_wafv2_web_acl_logging_configuration" "this" {
+  log_destination_configs = ["${aws_cloudwatch_log_group.waf.arn}:*"]
+  resource_arn            = aws_wafv2_web_acl.this.arn
+}
 
 resource "aws_cloudwatch_log_resource_policy" "waf" {
   policy_document = data.aws_iam_policy_document.waf.json
