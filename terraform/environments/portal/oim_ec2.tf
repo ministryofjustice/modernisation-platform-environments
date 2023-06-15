@@ -89,13 +89,14 @@ ingress {
 
   }
 
-ingress {
-    description = "Inbound NFS from other OIM Instances"
-    from_port   = 2049
-    to_port     = 2049
-    protocol    = "TCP"
-    self        = true
-  }
+# nfs to be replaced with efs so this ingress rule is no longer required
+# ingress {
+#     description = "Inbound NFS from other OIM Instances"
+#     from_port   = 2049
+#     to_port     = 2049
+#     protocol    = "TCP"
+#     self        = true
+#   }
 
   # ingress {
   #   description = "SSH access from VPC"
