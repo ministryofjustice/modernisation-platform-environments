@@ -75,7 +75,7 @@ resource "aws_cloudwatch_log_group" "waf" {
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "this" {
-  log_destination_configs = [aws_cloudwatch_log_group.waf.arn]
+  log_destination_configs = ["${aws_cloudwatch_log_group.waf.arn}:*"]
   resource_arn            = aws_wafv2_web_acl.this.arn
 }
 
@@ -93,7 +93,7 @@ data "aws_iam_policy_document" "waf" {
       type        = "AWS"
     }
     actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["${aws_cloudwatch_log_group.waf.arn}"]
+    resources = ["${aws_cloudwatch_log_group.waf.arn}:*"]
     condition {
       test     = "ArnLike"
       values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
