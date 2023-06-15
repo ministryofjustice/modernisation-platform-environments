@@ -227,7 +227,7 @@ locals {
         })
         ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 200 }
-          flash = { total_size = 2 }
+          flash = { total_size = 50 }
         })
       })
 
@@ -301,6 +301,9 @@ locals {
                     values = [
                       "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.az.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -316,9 +319,6 @@ locals {
                     values = [
                       "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
-                      "c-t1.test.nomis.az.justice.gov.uk",
-                      "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -327,7 +327,7 @@ locals {
           })
 
           https = merge(local.weblogic_lb_listeners.https, {
-            alarm_target_group_names = ["t1-nomis-web-b-http-7777"]
+            alarm_target_group_names = ["t1-nomis-web-a-http-7777"]
             rules = {
               t1-nomis-web-a-http-7777 = {
                 priority = 300
@@ -340,12 +340,15 @@ locals {
                     values = [
                       "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.az.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
               }
               t1-nomis-web-b-http-7777 = {
-                priority = 400
+                priority = 450
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-nomis-web-b-http-7777"
@@ -355,15 +358,30 @@ locals {
                     values = [
                       "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
-                      "c-t1.test.nomis.az.justice.gov.uk",
-                      "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t2-nomis-web-a-http-7777 = {
+                priority = 550
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t2-nomis-web-a.test.nomis.az.justice.gov.uk",
+                      "t2-nomis-web-a.test.nomis.service.justice.gov.uk",
+                      "c-t2.test.nomis.az.justice.gov.uk",
+                      "c-t2.test.nomis.service.justice.gov.uk",
+                      "t2-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
               }
               t2-nomis-web-b-http-7777 = {
-                priority = 500
+                priority = 600
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-nomis-web-b-http-7777"
@@ -373,15 +391,30 @@ locals {
                     values = [
                       "t2-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t2-nomis-web-b.test.nomis.service.justice.gov.uk",
-                      "c-t2.test.nomis.az.justice.gov.uk",
-                      "c-t2.test.nomis.service.justice.gov.uk",
-                      "t2-cn.hmpp-azdt.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t3-nomis-web-a-http-7777 = {
+                priority = 700
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t3-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t3-nomis-web-a.test.nomis.az.justice.gov.uk",
+                      "t3-nomis-web-a.test.nomis.service.justice.gov.uk",
+                      "c-t3.test.nomis.az.justice.gov.uk",
+                      "c-t3.test.nomis.service.justice.gov.uk",
+                      "t3-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
               }
               t3-nomis-web-b-http-7777 = {
-                priority = 600
+                priority = 800
                 actions = [{
                   type              = "forward"
                   target_group_name = "t3-nomis-web-b-http-7777"
@@ -391,9 +424,6 @@ locals {
                     values = [
                       "t3-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t3-nomis-web-b.test.nomis.service.justice.gov.uk",
-                      "c-t3.test.nomis.az.justice.gov.uk",
-                      "c-t3.test.nomis.service.justice.gov.uk",
-                      "t3-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]

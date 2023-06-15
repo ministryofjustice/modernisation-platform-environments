@@ -106,7 +106,7 @@ locals {
   }
 
   weblogic_cloudwatch_metric_alarms = {
-    weblogic-node-manager-service = {
+    weblogic-healthcheck-service = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
       namespace           = "CWAgent"
@@ -114,9 +114,9 @@ locals {
       period              = "60"
       statistic           = "Average"
       threshold           = "1"
-      alarm_description   = "weblogic-node-manager service has stopped"
+      alarm_description   = "weblogic-healthcheck service has stopped"
       dimensions = {
-        instance = "weblogic_node_manager"
+        instance = "weblogic_healthcheck"
       }
     }
   }
@@ -129,7 +129,7 @@ locals {
         "ec2_linux_with_collectd_default"
       ]
       alarms_list = [
-        { key = "weblogic", name = "weblogic-node-manager-service" }
+        { key = "weblogic", name = "weblogic-healthcheck-service" }
       ]
     }
   }
@@ -192,7 +192,7 @@ locals {
     # autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
     #  desired_capacity = 0
     # })
-    cloudwatch_metric_alarms = {}
+    # cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
       deployment = "blue"
     })
@@ -211,7 +211,7 @@ locals {
     # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
     #   desired_capacity = 0
     # })
-    # cloudwatch_metric_alarms = {}
+    cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
       deployment = "green"
     })

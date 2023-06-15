@@ -41,7 +41,9 @@ def get_database_name() -> str:
     returns database name from the key of the raw data product
     """
     # database name is the data product name pulled from the key
-    m = re.match("^(raw_data)\/(.*)\/(.*)\/(extraction_timestamp=[0-9]{1,14})\/(.*)$", raw_key)
+    m = re.match(
+        "^(raw_data)\/(.*)\/(.*)\/(extraction_timestamp=[0-9TZ]{1,16})\/(.*)$", raw_key
+    )
     if m:
         return m.group(2)
     else:
@@ -52,7 +54,7 @@ def get_extraction_timestamp() -> str:
     """
     uses regex pattern to pull and return extraction_timestamp from filepath
     """
-    pattern = "^(.*)\/(extraction_timestamp=)([0-9]{1,14})\/(.*)$"
+    pattern = "^(.*)\/(extraction_timestamp=)([0-9TZ]{1,16})\/(.*)$"
     m = re.match(pattern, raw_key)
     if m:
         return m.group(3)
@@ -71,7 +73,7 @@ def get_curated_path(db_name, table_name) -> str:
         bucket,
         "curated_data",
         f"database_name={db_name}",
-        f"table_name={table_name}"
+        f"table_name={table_name}",
     )
     return out_path
 
@@ -87,8 +89,7 @@ def does_extraction_timestamp_exist(db_name, table_name, timestamp) -> bool:
     client = boto3.client("s3")
     paginator = client.get_paginator("list_objects_v2")
     page_iterator = paginator.paginate(
-        Bucket=bucket,
-        Prefix=os.path.join("curated_data", db_path, table_path)
+        Bucket=bucket, Prefix=os.path.join("curated_data", db_path, table_path)
     )
     response = []
     try:
@@ -123,9 +124,7 @@ def does_database_exist(client, database_name) -> bool:
         return False
 
 
-def create_table_if_curated_data_exists(
-    database_name, table_name, glue_client
-) -> None:
+def create_table_if_curated_data_exists(database_name, table_name, glue_client) -> None:
     """
     creates a glue catalog table using boto3 for when curated data
     already exists but table does not.
@@ -134,9 +133,8 @@ def create_table_if_curated_data_exists(
 
     # get dynamic frame from s3 and get schema
     ddf = glue_context.create_dynamic_frame_from_options(
-        "s3",
-        {"paths": [table_path]},
-        format="parquet")
+        "s3", {"paths": [table_path]}, format="parquet"
+    )
 
     schema = ddf.schema()
 
@@ -158,9 +156,9 @@ def create_table_if_curated_data_exists(
                 "InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
                 "OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
                 "SerdeInfo": {
-                "SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
-                "Parameters": {"classification": "parquet"}
-                }
+                    "SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+                    "Parameters": {"classification": "parquet"},
+                },
             },
             "PartitionKeys": [
                 {
@@ -169,8 +167,8 @@ def create_table_if_curated_data_exists(
                 },
             ],
             "TableType": "EXTERNAL_TABLE",
-            "Parameters": {"classification": "parquet"}
-        }
+            "Parameters": {"classification": "parquet"},
+        },
     )
     sts_client = boto3.client("sts")
     account_id = sts_client.get_caller_identity()["Account"]
@@ -181,13 +179,15 @@ def create_table_if_curated_data_exists(
         QueryString=f"MSCK REPAIR TABLE {database_name}.{table_name}",
         ResultConfiguration={
             "OutputLocation": f"s3://athena-data-product-query-results-{account_id}"
-        }
+        },
     )
 
 
 database_name = get_database_name()
+logging.info(f"database name: {database_name}")
 # get table names produced for this source data
 source_data = Path(raw_key).parts[2]
+logging.info(f"source data: {source_data}")
 table_names = get_tables(bucket, raw_key, source_data)[database_name]
 
 logging.info(f"table names: {table_names}")
@@ -226,28 +226,29 @@ glue_client = boto3.client("glue")
 
 for database_name, table_name in tables_to_check_exist:
     try:
-        glue_client.get_table(
-            DatabaseName=database_name,
-            Name=table_name
-        )
+        glue_client.get_table(DatabaseName=database_name, Name=table_name)
     except ClientError as e:
         if e.response["Error"]["Code"] == "EntityNotFoundException":
             if e.response["Message"].startswith("Database"):
                 glue_client.create_database(
                     DatabaseInput={
                         "Name": database_name,
-                        "Description": "just a test for now"
+                        "Description": "just a test for now",
                     }
                 )
                 create_table_if_curated_data_exists(
                     database_name, table_name, glue_client
                 )
-                logging.info(f"database and table {database_name}.{table_name} didn't exist where curated did and have been created")
+                logging.info(
+                    f"database and table {database_name}.{table_name} didn't exist where curated did and have been created"
+                )
             elif e.response["Message"].startswith("Table"):
                 create_table_if_curated_data_exists(
                     database_name, table_name, glue_client
                 )
-                logging.info(f"table {database_name}.{table_name} didn't exist where curated did and has been created")
+                logging.info(
+                    f"table {database_name}.{table_name} didn't exist where curated did and has been created"
+                )
 
 for database_name, table_name in tables_to_process:
     # convert dataframe into pyspark create_dynamic_frame.
@@ -268,10 +269,7 @@ for database_name, table_name in tables_to_process:
     if not does_database_exist(glue_client, database_name):
         logging.info("creating database")
         glue_client.create_database(
-            DatabaseInput={
-                "Name": database_name,
-                "Description": "just a test for now"
-            }
+            DatabaseInput={"Name": database_name, "Description": "just a test for now"}
         )
 
     output_path = get_curated_path(database_name, table_name)

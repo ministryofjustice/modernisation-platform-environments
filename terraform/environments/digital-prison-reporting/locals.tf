@@ -49,7 +49,8 @@ locals {
     lambda_dbuilder_handler         = "io.micronaut.function.aws.proxy.MicronautLambdaHandler"
     lambda_dbuilder_code_s3_bucket  = module.s3_artifacts_store.bucket_id
     lambda_dbuilder_code_s3_key     = "build-artifacts/domain-builder/jars/domain-builder-backend-api-vLatest-all.jar"
-    lambda_dbuilder_policies        = [aws_iam_policy.s3_read_access_policy.arn, ]     
+    lambda_dbuilder_policies        = [aws_iam_policy.s3_read_access_policy.arn, ]
+    enable_domain_builder_agent     = local.application_data.accounts[local.environment].enable_domain_builder_agent
 
     nomis_secrets_placeholder = {
       db_name = "nomis"

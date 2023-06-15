@@ -113,7 +113,7 @@ resource "aws_instance" "ohs1" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OHS Instance 1" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
 
@@ -141,7 +141,7 @@ resource "aws_instance" "ohs2" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OHS Instance 2" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
 

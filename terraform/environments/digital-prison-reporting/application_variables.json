@@ -16,7 +16,8 @@
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
       "enable_domain_builder_lambda": true,
-      "enable_domain_builder_rds": true
+      "enable_domain_builder_rds": true,
+      "enable_domain_builder_agent": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -34,7 +35,8 @@
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
       "enable_domain_builder_lambda": false,
-      "enable_domain_builder_rds": false
+      "enable_domain_builder_rds": false,
+      "enable_domain_builder_agent": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -52,7 +54,8 @@
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
       "enable_domain_builder_lambda": false,
-      "enable_domain_builder_rds": false
+      "enable_domain_builder_rds": false,
+      "enable_domain_builder_agent": false
     },
     "production": {
       "example_var": "production-data"

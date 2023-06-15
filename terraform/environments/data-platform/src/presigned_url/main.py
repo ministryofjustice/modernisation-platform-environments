@@ -18,9 +18,9 @@ def handler(event, context):
     md5 = str(event["queryStringParameters"]["contentMD5"])
     uuid_string = str(uuid.uuid4())
     file_name = os.path.join(
-        "curated_data",
-        f"database_name={database}",
-        f"table_name={table}",
+        "raw_data",
+        database,
+        table,
         f"extraction_timestamp={amz_date}",
         uuid_string,
     )
