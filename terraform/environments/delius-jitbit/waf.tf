@@ -93,7 +93,7 @@ data "aws_iam_policy_document" "waf" {
       type        = "AWS"
     }
     actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["${aws_cloudwatch_log_group.waf.arn}:*"]
+    resources = ["${aws_cloudwatch_log_group.waf.arn}"]
     condition {
       test     = "ArnLike"
       values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
