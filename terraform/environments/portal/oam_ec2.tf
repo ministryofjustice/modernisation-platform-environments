@@ -126,18 +126,18 @@ resource "aws_vpc_security_group_ingress_rule" "oam_coherence_icmp" {
   to_port     = -1
 }
 
-resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "Inbound NFS from other OAM instances"
-  referenced_security_group_id = aws_security_group.oam_instance.id
-  from_port   = 2049
-  ip_protocol = "tcp"
-  to_port     = 2049
-}
+# nfs to be replaced with efs so these 4 ingress rules are no longer required
+# resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "Inbound NFS from other OAM instances"
+#   referenced_security_group_id = aws_security_group.oam_instance.id
+#   from_port   = 2049
+#   ip_protocol = "tcp"
+#   to_port     = 2049
+# }
 
-# TODO enable when IDM resources are created
 
-# resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to+oam" {
+# resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to_oam" {
 #   security_group_id = aws_security_group.oam_instance.id
 #   description = "Inbound NFS from IDM Instances"
 #   referenced_security_group_id = aws_security_group.idm_instance.id
@@ -146,18 +146,16 @@ resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
 #   to_port     = 2049
 # }
 
-# TODO enable when OHS resources are created
 
-resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "Inbound NFS from OHS Instances"
-  referenced_security_group_id = aws_security_group.ohs_instance.id
-  from_port   = 2049
-  ip_protocol = "tcp"
-  to_port     = 2049
-}
+# resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "Inbound NFS from OHS Instances"
+#   referenced_security_group_id = aws_security_group.ohs_instance.id
+#   from_port   = 2049
+#   ip_protocol = "tcp"
+#   to_port     = 2049
+# }
 
-# TODO enable when OIM resources are created
 
 # resource "aws_vpc_security_group_ingress_rule" "nfs_oim_to_oam" {
 #   security_group_id = aws_security_group.oam_instance.id
