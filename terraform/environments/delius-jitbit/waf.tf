@@ -32,7 +32,7 @@ resource "aws_wafv2_web_acl" "this" {
 
   rule {
     name     = "AWSManagedRulesSQLiRuleSet"
-    priority = 1
+    priority = 2
 
     override_action {
       # Dont do anything but count requests that match the rules in the ruleset
