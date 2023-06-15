@@ -13,7 +13,7 @@ locals {
           vpc_security_group_ids = ["data-db"]
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         tags = {
           description = "For testing our base OL8.5 base image"
