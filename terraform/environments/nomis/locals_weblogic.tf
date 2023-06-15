@@ -129,7 +129,7 @@ locals {
         "ec2_linux_with_collectd_default"
       ]
       alarms_list = [
-        { key = "weblogic", name = "weblogic-node-manager-service" }
+        { key = "weblogic", name = "weblogic-healthcheck-service" }
       ]
     }
   }
