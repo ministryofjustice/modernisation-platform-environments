@@ -1,5 +1,4 @@
 module "s3_bucket_migration" {
-  count = local.environment == "development" ? 1 : 0
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
@@ -87,7 +86,7 @@ module "s3_bucket_migration" {
 }
 
 resource "aws_s3_bucket_intelligent_tiering_configuration" "ldap_bucket_tiering" {
-  bucket = module.s3_bucket[0].bucket.id
+  bucket = module.s3_bucket_migration.bucket.id
   name   = "LDAPBucketTiering"
 
   status = "Enabled"
