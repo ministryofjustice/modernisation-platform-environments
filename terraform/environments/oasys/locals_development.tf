@@ -12,7 +12,6 @@ locals {
       # tags            = local.tags
     }
 
-
     baseline_s3_buckets = {
 
     }
