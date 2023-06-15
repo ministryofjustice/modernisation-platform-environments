@@ -70,7 +70,6 @@ resource "aws_wafv2_web_acl_association" "this" {
 resource "aws_cloudwatch_log_group" "waf" {
   name_prefix       = "${local.application_name}-waf-"
   retention_in_days = 14
-  kms_key_id        = data.aws_kms_key.general_shared.arn
 
   tags = local.tags
 }
