@@ -68,16 +68,16 @@ module "s3_bucket_migration" {
 
       noncurrent_version_transition = [
         {
-          days          = 90
+          days          = 120
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = 180
           storage_class = "GLACIER"
         }
       ]
 
       noncurrent_version_expiration = {
-        days = 730
+        days = 365
       }
     }
   ]
