@@ -64,7 +64,7 @@ resource "aws_security_group_rule" "allow_all_egress" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   security_group_id = aws_security_group.ldap.id
 }
 
@@ -161,6 +161,25 @@ data "aws_iam_policy_document" "ecs_ssm_exec" {
   }
 }
 
+
+data "aws_iam_policy_document" "ecs_s3" {
+  statement {
+    effect    = "Allow"
+    resources = [module.s3_bucket_migration.bucket.arn]
+
+    actions = [
+      "s3:*"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "ecs_s3" {
+  name   = format("hmpps-%s-%s-openldap-service-s3", local.environment, local.application_name)
+  policy = data.aws_iam_policy_document.ecs_s3.json
+  role   = aws_iam_role.ecs_task.id
+}
+
+
 resource "aws_iam_role_policy" "ecs_ssm_exec" {
   name   = format("hmpps-%s-%s-openldap-service-ssm-exec", local.environment, local.application_name)
   policy = data.aws_iam_policy_document.ecs_ssm_exec.json
@@ -208,4 +227,10 @@ resource "aws_iam_role_policy" "ecs_exec" {
   name   = format("hmpps-%s-%s-openldap-task-exec", local.environment, local.application_name)
   policy = data.aws_iam_policy_document.ecs_exec.json
   role   = aws_iam_role.ecs_exec.id
+}
+
+# temp log group for testinng ldap
+resource "aws_cloudwatch_log_group" "ldap_test" {
+  name              = "/ecs/ldap_test"
+  retention_in_days = 7
 }
