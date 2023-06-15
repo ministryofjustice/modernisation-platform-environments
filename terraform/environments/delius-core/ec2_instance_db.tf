@@ -127,7 +127,7 @@ data "aws_ami" "aws_ami_base_ol" {
 }
 
 data "template_file" "userdata" {
-  template = file("${path.module}/templates/userdata.tftpl")
+  template = file("${path.module}/templates/userdata.sh.tftpl")
 
   vars = {
     branch               = "main"
