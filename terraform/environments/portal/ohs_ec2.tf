@@ -21,107 +21,69 @@ EOF
 # OHS Security Group Rules
 #################################
 
-# resource "aws_security_group" "ohs_instance" {
-#   name        = "${local.application_name}-${local.environment}-ohs-security-group"
-#   description = "RDS access with the LAA Landing Zone"
-#   vpc_id      = data.aws_vpc.shared.id
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-${local.environment}-ohs-security-group" }
-#   )
-#
-#   # ingress {
-#   #   description = "Allow ping response"
-#   #   from_port   = 8
-#   #   to_port     = 1
-#   #   protocol    = "ICMP"
-#   #   cidr_blocks = [local.first-cidr]
-#   # }
-#   # ingress {
-#   #   description = "OHS Inbound from Local account VPC"
-#   #   from_port   = 7777
-#   #   to_port     = 7777
-#   #   protocol    = "TCP"
-#   #   cidr_blocks = [local.first-cidr]
-#   #
-#   # }
-#   # ingress {
-#   #   description = "ONS Port"
-#   #   from_port   = 6200
-#   #   to_port     = 6200
-#   #   protocol    = "TCP"
-#   #   cidr_blocks = [local.first-cidr]
-#   #
-#   # }
-#   #
-#   # ingress {
-#   #   description = "OHS Inbound from Shared Svs VPC"
-#   #   from_port   = 7777
-#   #   to_port     = 7777
-#   #   protocol    = "TCP"
-#   #   cidr_blocks = [local.second-cidr]
-#   #
-#   # }
-#   # egress {
-#   #   from_port   = 0
-#   #   to_port     = 0
-#   #   protocol    = "-1"
-#   #   cidr_blocks = ["0.0.0.0/0"]
-#   # }
-# }
+resource "aws_security_group" "ohs_instance" {
+  name        = "${local.application_name}-${local.environment}-ohs-security-group"
+  description = "RDS access with the LAA Landing Zone"
+  vpc_id      = data.aws_vpc.shared.id
 
-# resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
-#   security_group_id = aws_security_group.ohs_instance.id
-#   cidr_ipv4   = "0.0.0.0/0"
-#   ip_protocol = "-1"
-# }
-#
-# resource "aws_vpc_security_group_ingress_rule" "ohs_local_vpc" {
-#   security_group_id = aws_security_group.ohs_instance.id
-#   description = "OHS Inbound from Local account VPC"
-#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-#   from_port   = 7777
-#   ip_protocol = "tcp"
-#   to_port     = 7777
-# }
-#
-# resource "aws_vpc_security_group_ingress_rule" "ohs_nonprod_workspaces" {
-#   count = contains(["development", "testing"], local.environment) ? 1 : 0
-#   security_group_id = aws_security_group.ohs_instance.id
-#   description = "OHS Inbound from Shared Svs VPC"
-#   cidr_ipv4   = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
-#   from_port   = 7777
-#   ip_protocol = "tcp"
-#   to_port     = 7777
-# }
-#
-# resource "aws_vpc_security_group_ingress_rule" "ohs_prod_workspaces" {
-#   security_group_id = aws_security_group.ohs_instance.id
-#   description = "OHS Inbound from Prod Shared Svs VPC"
-#   cidr_ipv4   = local.prod_workspaces_cidr
-#   from_port   = 7777
-#   ip_protocol = "tcp"
-#   to_port     = 7777
-# }
-#
-# resource "aws_vpc_security_group_ingress_rule" "ohs_ons" {
-#   security_group_id = aws_security_group.ohs_instance.id
-#   description = "ONS Port"
-#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-#   from_port   = 6200
-#   ip_protocol = "tcp"
-#   to_port     = 6200
-# }
-#
-# resource "aws_vpc_security_group_ingress_rule" "ohs_ping" {
-#   security_group_id = aws_security_group.ohs_instance.id
-#   description = "Allow ping response"
-#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-#   from_port   = 8
-#   ip_protocol = "icmp"
-#   to_port     = -1
-# }
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-ohs-security-group" }
+  )
+
+}
+
+resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
+  security_group_id = aws_security_group.ohs_instance.id
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "-1"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ohs_local_vpc" {
+  security_group_id = aws_security_group.ohs_instance.id
+  description = "OHS Inbound from Local account VPC"
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port   = 7777
+  ip_protocol = "tcp"
+  to_port     = 7777
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ohs_nonprod_workspaces" {
+  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  security_group_id = aws_security_group.ohs_instance.id
+  description = "OHS Inbound from Shared Svs VPC"
+  cidr_ipv4   = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
+  from_port   = 7777
+  ip_protocol = "tcp"
+  to_port     = 7777
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ohs_prod_workspaces" {
+  security_group_id = aws_security_group.ohs_instance.id
+  description = "OHS Inbound from Prod Shared Svs VPC"
+  cidr_ipv4   = local.prod_workspaces_cidr
+  from_port   = 7777
+  ip_protocol = "tcp"
+  to_port     = 7777
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ohs_ons" {
+  security_group_id = aws_security_group.ohs_instance.id
+  description = "ONS Port"
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port   = 6200
+  ip_protocol = "tcp"
+  to_port     = 6200
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ohs_ping" {
+  security_group_id = aws_security_group.ohs_instance.id
+  description = "Allow ping response"
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port   = 8
+  ip_protocol = "icmp"
+  to_port     = -1
+}
 
 ######################################
 # OHS Instance
@@ -132,7 +94,7 @@ resource "aws_instance" "ohs_instance_1" {
   availability_zone           = "eu-west-2a"
   instance_type               = local.application_data.accounts[local.environment].ohs_instance_type
   monitoring                  = true
-  # vpc_security_group_ids      = [aws_security_group.ohs_instance.id]
+  vpc_security_group_ids      = [aws_security_group.oim_instance.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.ohs_1_userdata)
