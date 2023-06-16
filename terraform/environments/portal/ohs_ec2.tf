@@ -31,13 +31,28 @@ resource "aws_security_group" "ohs_instance" {
     { "Name" = "${local.application_name}-${local.environment}-ohs-security-group" }
   )
 
+
+  ingress {
+    description = "OHS Inbound from Shared Svs VPC"
+    from_port   = 7777
+    to_port     = 7777
+    protocol    = "TCP"
+    cidr_blocks = [local.second-cidr]
+
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
-resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
-  security_group_id = aws_security_group.ohs_instance.id
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "-1"
-}
+# resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
+#   security_group_id = aws_security_group.ohs_instance.id
+#   cidr_ipv4   = "0.0.0.0/0"
+#   ip_protocol = "-1"
+# }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_local_vpc" {
   security_group_id = aws_security_group.ohs_instance.id
@@ -48,15 +63,15 @@ resource "aws_vpc_security_group_ingress_rule" "ohs_local_vpc" {
   to_port     = 7777
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ohs_nonprod_workspaces" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
-  security_group_id = aws_security_group.ohs_instance.id
-  description = "OHS Inbound from Shared Svs VPC"
-  cidr_ipv4   = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
-  from_port   = 7777
-  ip_protocol = "tcp"
-  to_port     = 7777
-}
+# resource "aws_vpc_security_group_ingress_rule" "ohs_nonprod_workspaces" {
+#   count = contains(["development", "testing"], local.environment) ? 1 : 0
+#   security_group_id = aws_security_group.ohs_instance.id
+#   description = "OHS Inbound from Shared Svs VPC"
+#   cidr_ipv4   = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
+#   from_port   = 7777
+#   ip_protocol = "tcp"
+#   to_port     = 7777
+# }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_prod_workspaces" {
   security_group_id = aws_security_group.ohs_instance.id
