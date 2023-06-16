@@ -113,10 +113,10 @@ locals {
         { key = "ec2", name = "instance-status-check-failed-in-last-hour" },
         { key = "ec2", name = "system-status-check-failed-in-last-hour" },
         { key = "ec2_cwagent_linux", name = "free-disk-space-low-1hour" },
-        { key = "ec2_cwagent_collectd", name = "chronyd-stopped" },
-        { key = "ec2_cwagent_collectd", name = "sshd-stopped" },
-        { key = "ec2_cwagent_collectd", name = "cloudwatch-agent-stopped" },
-        { key = "ec2_cwagent_collectd", name = "ssm-agent-stopped" },
+        { key = "ec2_instance_cwagent_collectd", name = "chronyd-stopped" },
+        { key = "ec2_instance_cwagent_collectd", name = "sshd-stopped" },
+        { key = "ec2_instance_cwagent_collectd", name = "cloudwatch-agent-stopped" },
+        { key = "ec2_instance_cwagent_collectd", name = "ssm-agent-stopped" },
       ]
     }
     database_dba = {

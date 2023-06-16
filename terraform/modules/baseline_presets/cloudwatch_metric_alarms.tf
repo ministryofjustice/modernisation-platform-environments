@@ -154,7 +154,7 @@ locals {
       }
     }
 
-    ec2_cwagent_collectd = {
+    ec2_instance_cwagent_collectd = {
       chronyd-stopped = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
