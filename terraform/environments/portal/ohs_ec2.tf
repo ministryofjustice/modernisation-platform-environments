@@ -139,29 +139,29 @@ resource "aws_instance" "ohs2" {
 # OHS EBS Volumes
 ###############################
 
-resource "aws_ebs_volume" "ohsvolume1" {
-  availability_zone = "eu-west-2a"
-  size              = "30"
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].ohssnapshot1
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OHSVolume1" },
-  )
-}
-
-resource "aws_volume_attachment" "ohs_EC2ServerVolume01" {
-  device_name = "/dev/xvdb"
-  volume_id   = aws_ebs_volume.ohsvolume1.id
-  instance_id = aws_instance.ohs_instance_1.id
-}
+# resource "aws_ebs_volume" "ohsvolume1" {
+#   availability_zone = "eu-west-2a"
+#   size              = "30"
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].ohssnapshot1
+#
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OHSVolume1" },
+#   )
+# }
+#
+# resource "aws_volume_attachment" "ohs_EC2ServerVolume01" {
+#   device_name = "/dev/xvdb"
+#   volume_id   = aws_ebs_volume.ohsvolume1.id
+#   instance_id = aws_instance.ohs_instance_1.id
+# }
 
 resource "aws_ebs_volume" "ohs_mserver" {
   availability_zone = "eu-west-2a"
