@@ -121,9 +121,9 @@ resource "aws_s3_bucket_policy" "cloud-trail" {
     {
       "Sid": "Access",
       "Effect": "Allow",
-      "Principal": [
-        "Service" = "cloudtrail.amazonaws.com"
-      ],
+      "Principal": {
+        "Service": "cloudtrail.amazonaws.com"
+      },
       "Action": "s3:*",
       "Resource" : [
         "arn:aws:s3:::${var.project_id}-*/*",
