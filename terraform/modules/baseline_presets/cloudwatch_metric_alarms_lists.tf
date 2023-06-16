@@ -78,6 +78,12 @@ locals {
         { key = "ec2_instance_cwagent_collectd", name = "ssm-agent-stopped" },
       ]
     }
+    ec2_asg_linux_with_collectd_default = {
+      parent_keys = ["ec2_default", "ec2_linux_default"]
+      alarms_list = [
+        { key = "ec2_asg_cwagent_collectd", name = "asg-collectd-services" },
+      ]
+    }
     ec2_windows_default = {
       parent_keys = ["ec2_default"]
       alarms_list = [
