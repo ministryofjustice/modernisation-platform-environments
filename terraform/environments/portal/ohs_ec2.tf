@@ -114,7 +114,7 @@ resource "aws_instance" "ohs2" {
   # vpc_security_group_ids         = [aws_security_group.ohs_instance.id]
   subnet_id                      = data.aws_subnet.data_subnets_b.id
   iam_instance_profile           = aws_iam_instance_profile.portal.id
-  user_data_base64               = base64encode(local.ohs_2_userdata)
+  # user_data_base64               = base64encode(local.ohs_2_userdata)
 
   #   # root_block_device {
   #   # delete_on_termination     = false
