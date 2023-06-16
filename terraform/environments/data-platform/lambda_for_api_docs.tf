@@ -12,16 +12,16 @@ resource "aws_lambda_function" "api_docs" {
   handler = "main.handler"
   runtime = "nodejs14.x"
 
-  role = aws_iam_role.lambda_exec.arn
+  role = aws_iam_role.api_docs_lambda_role.arn
 }
 
-resource "aws_iam_role" "lambda_exec" {
+resource "aws_iam_role" "api_docs_lambda_role" {
   name               = "serverless_example_lambda"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
 }
 
-resource "aws_iam_role_policy_attachment" "example_basic_policy" {
-  role       = aws_iam_role.lambda_exec.name
+resource "aws_iam_role_policy_attachment" "attach_policy_to_lambda_role" {
+  role       = aws_iam_role.api_docs_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
@@ -61,7 +61,7 @@ resource "aws_api_gateway_method" "proxy" {
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_integration" "lambda" {
+resource "aws_api_gateway_integration" "docs_lambda" {
   rest_api_id = aws_api_gateway_rest_api.data_platform.id
   resource_id = aws_api_gateway_method.proxy.resource_id
   http_method = aws_api_gateway_method.proxy.http_method
@@ -78,7 +78,7 @@ resource "aws_api_gateway_method" "proxy_root" {
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_integration" "lambda_root" {
+resource "aws_api_gateway_integration" "docs_lambda_root" {
   rest_api_id = aws_api_gateway_rest_api.data_platform.id
   resource_id = aws_api_gateway_method.proxy_root.resource_id
   http_method = aws_api_gateway_method.proxy_root.http_method
@@ -92,7 +92,7 @@ resource "aws_api_gateway_integration" "lambda_root" {
   }
 }
 
-resource "aws_lambda_permission" "apigw" {
+resource "aws_lambda_permission" "allow_apigw_to_invoke_docs_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.api_docs.function_name
