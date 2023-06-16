@@ -37,8 +37,10 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:PutObjectTagging",
         "s3:ListBucket"
       ]
       principals = {
@@ -53,6 +55,7 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket"
       ]
       principals = {
@@ -68,9 +71,11 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:PutObjectTagging",
       ]
       principals = {
         type = "AWS"
@@ -84,9 +89,11 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:PutObjectTagging",
       ]
       principals = {
         type = "AWS"
@@ -100,9 +107,11 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:PutObjectTagging",
         "s3:DeleteObject",
       ]
       principals = {
@@ -117,9 +126,11 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:PutObjectTagging",
         "s3:DeleteObject",
         "s3:DeleteObjectVersion",
       ]
@@ -138,6 +149,7 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging",
           "s3:ListBucket",
         ]
       }
@@ -147,9 +159,11 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
+          "s3:PutObjectTagging",
         ]
       }
     ]
@@ -158,9 +172,11 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
+          "s3:PutObjectTagging",
           "s3:DeleteObject",
         ]
       }

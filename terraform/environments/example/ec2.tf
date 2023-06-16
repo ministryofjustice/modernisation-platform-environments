@@ -68,6 +68,16 @@ resource "aws_security_group_rule" "egress_traffic" {
   source_security_group_id = aws_security_group.example_ec2_sg.id
 }
 
+resource "aws_security_group_rule" "ingress_traffic_icmp_from_cp" {
+  description       = "Allowing ping from CP"
+  from_port         = 8 //Echo Request
+  protocol          = "ICMP"
+  security_group_id = aws_security_group.example_ec2_sg.id
+  to_port           = 0
+  type              = "ingress"
+  cidr_blocks       = ["172.20.0.0/16"] //Cloud Platform
+}
+
 #  Build EC2 "example-ec2"
 resource "aws_instance" "develop" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
