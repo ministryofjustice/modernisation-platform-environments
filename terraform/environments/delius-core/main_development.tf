@@ -1,18 +1,4 @@
 ##
-# Single module driven for all data
-##
-# module "account_all_components" {
-#   source = "./modules/account_all_components?"
-
-#   ec2_instances           = lookup(local.account_config, "ec2_instances", {})
-#   account_config_baseline = local.account_config_baseline
-
-#   account = {
-#     vpc_id = data.aws_vpc.shared.id
-#   }
-# }
-
-##
 # Modules for each environment 
 # Separate per environment to allow different versions
 ##
@@ -23,7 +9,8 @@ module "environment_dev1" {
 
   name = "dev1"
 
-  ldap = {}
+  ldap_config = local.ldap_config_dev1
+  db_config   = local.db_config_dev1
 
   account = {
     vpc_id = data.aws_vpc.shared.id
@@ -35,7 +22,9 @@ module "environment_dev2" {
   source = "./modules/environment_all_components"
   count  = local.environment == "development" ? 1 : 0
 
-  name = "dev2"
+  name        = "dev2"
+  ldap_config = local.ldap_config_dev2
+  db_config   = local.db_config_dev2
 
   account = {
     vpc_id = data.aws_vpc.shared.id
