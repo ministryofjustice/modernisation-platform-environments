@@ -281,7 +281,7 @@ resource "aws_security_group" "igdb" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    security_groups = [aws_security_group.ohs_instance.id]
+    security_groups = [aws_security_group.ohs_instance_rebuild.id]
   }
 
 
@@ -382,7 +382,7 @@ resource "aws_security_group" "iadb" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    security_groups = [aws_security_group.ohs_instance.id]
+    security_groups = [aws_security_group.ohs_instance_rebuild.id]
   }
 
 

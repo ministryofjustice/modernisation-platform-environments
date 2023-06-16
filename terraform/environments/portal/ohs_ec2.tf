@@ -8,6 +8,8 @@ echo "${aws_efs_file_system.product["ohs"].dns_name}:/fmw /IDAM/product/fmw nfs4
 echo "/dev/xvdc /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 mount -a
+
+# hostname TBD
 hostnamectl set-hostname ${local.application_name}-ohs1-ms.${local.portal_hosted_zone}
 EOF
   ohs_2_userdata = <<EOF
@@ -19,7 +21,7 @@ EOF
 # OHS Security Group Rules
 #################################
 
-resource "aws_security_group" "ohs_instance" {
+resource "aws_security_group" "ohs_instance_rebuild" {
   name        = "${local.application_name}-${local.environment}-ohs-security-group"
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
@@ -28,16 +30,17 @@ resource "aws_security_group" "ohs_instance" {
     local.tags,
     { "Name" = "${local.application_name}-${local.environment}-ohs-security-group" }
   )
+
 }
 
 resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
-  security_group_id = aws_security_group.ohs_instance.id
+  security_group_id = aws_security_group.ohs_instance_rebuild.id
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "-1"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_local_vpc" {
-  security_group_id = aws_security_group.ohs_instance.id
+  security_group_id = aws_security_group.ohs_instance_rebuild.id
   description = "OHS Inbound from Local account VPC"
   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
   from_port   = 7777
@@ -47,7 +50,7 @@ resource "aws_vpc_security_group_ingress_rule" "ohs_local_vpc" {
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_nonprod_workspaces" {
   count = contains(["development", "testing"], local.environment) ? 1 : 0
-  security_group_id = aws_security_group.ohs_instance.id
+  security_group_id = aws_security_group.ohs_instance_rebuild.id
   description = "OHS Inbound from Shared Svs VPC"
   cidr_ipv4   = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
   from_port   = 7777
@@ -56,7 +59,7 @@ resource "aws_vpc_security_group_ingress_rule" "ohs_nonprod_workspaces" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_prod_workspaces" {
-  security_group_id = aws_security_group.ohs_instance.id
+  security_group_id = aws_security_group.ohs_instance_rebuild.id
   description = "OHS Inbound from Prod Shared Svs VPC"
   cidr_ipv4   = local.prod_workspaces_cidr
   from_port   = 7777
@@ -65,7 +68,7 @@ resource "aws_vpc_security_group_ingress_rule" "ohs_prod_workspaces" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_ons" {
-  security_group_id = aws_security_group.ohs_instance.id
+  security_group_id = aws_security_group.ohs_instance_rebuild.id
   description = "ONS Port"
   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
   from_port   = 6200
@@ -74,7 +77,7 @@ resource "aws_vpc_security_group_ingress_rule" "ohs_ons" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_ping" {
-  security_group_id = aws_security_group.ohs_instance.id
+  security_group_id = aws_security_group.ohs_instance_rebuild.id
   description = "Allow ping response"
   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
   from_port   = 8
@@ -91,7 +94,7 @@ resource "aws_instance" "ohs_instance_1" {
   availability_zone           = "eu-west-2a"
   instance_type               = local.application_data.accounts[local.environment].ohs_instance_type
   monitoring                  = true
-  vpc_security_group_ids      = [aws_security_group.ohs_instance.id]
+  vpc_security_group_ids      = [aws_security_group.ohs_instance_rebuild.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.ohs_1_userdata)
@@ -109,7 +112,7 @@ resource "aws_instance" "ohs2" {
   count = local.environment == "production" ? 1 : 0
   ami                            = local.application_data.accounts[local.environment].ohs_ami_id
   instance_type                  = local.application_data.accounts[local.environment].ohs_instance_type
-  vpc_security_group_ids         = [aws_security_group.ohs_instance.id]
+  vpc_security_group_ids         = [aws_security_group.ohs_instance_rebuild.id]
   subnet_id                      = data.aws_subnet.data_subnets_b.id
   iam_instance_profile           = aws_iam_instance_profile.portal.id
   user_data_base64               = base64encode(local.ohs_2_userdata)
