@@ -220,7 +220,7 @@ locals {
       }
     }
     # Example target group setup below
-    lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
+    lb_target_groups = {}
     tags = {
       component                               = "data"
       oracle-sids                             = "OASPROD BIPINFRA"
