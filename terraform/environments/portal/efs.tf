@@ -1,7 +1,7 @@
 locals {
   efs = {
     ohs = {
-      sec_group_id          = aws_security_group.ohs_instance_rebuild.id
+      sec_group_id          = aws_security_group.ohs_instance.id
 
     },
     oam = {
