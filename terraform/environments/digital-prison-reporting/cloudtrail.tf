@@ -1,5 +1,7 @@
 resource "aws_cloudtrail" "trail" {
     name                          = "${local.project}-cloud-trail-${local.environment}"
+    s3_bucket_name                = module.s3_audit_logging_bucket.bucket_id
+    s3_key_prefix                 = "cloud_trail"
     include_global_service_events = true
 
     event_selector {
