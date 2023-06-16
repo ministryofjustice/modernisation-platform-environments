@@ -4,13 +4,13 @@ locals {
 
   oam_1_userdata = <<EOF
 #!/bin/bash
-# echo "${aws_efs_file_system.product["oam"].dns_name}:/fmw /IDAM/product/fmw nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-# echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-# echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-# echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.product["oam"].dns_name}:/fmw /IDAM/product/fmw nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 # echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
-# # echo ":/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-# mount -a
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+mount -a
 hostnamectl set-hostname ${local.application_name}-oam1-ms.${local.portal_hosted_zone}
 EOF
   oam_2_userdata = <<EOF
@@ -241,97 +241,97 @@ resource "aws_instance" "oam_instance_2" {
 # OAM EBS Volumes
 ###############################
 
-resource "aws_ebs_volume" "oam_repo_home" {
-  availability_zone = "eu-west-2a"
-  size              = 150
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_repo_home_snapshot
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OAM-repo-home" },
-  )
-}
-resource "aws_volume_attachment" "oam_repo_home" {
-  device_name = "/dev/sdf"
-  volume_id   = aws_ebs_volume.oam_repo_home.id
-  instance_id = aws_instance.oam_instance_1.id
-}
-
-resource "aws_ebs_volume" "oam_config" {
-  availability_zone = "eu-west-2a"
-  size              = 15
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id  # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
-  snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OAM-config" },
-  )
-}
-resource "aws_volume_attachment" "oam_onfig" {
-  device_name = "/dev/xvdd"
-  volume_id   = aws_ebs_volume.oam_config.id
-  instance_id = aws_instance.oam_instance_1.id
-}
-
-resource "aws_ebs_volume" "oam_fmw" {
-  availability_zone = "eu-west-2a"
-  size              = 30
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_fmw_snapshot
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OAM-fmw" },
-  )
-}
-resource "aws_volume_attachment" "oam_fmw" {
-  device_name = "/dev/xvdb"
-  volume_id   = aws_ebs_volume.oam_fmw.id
-  instance_id = aws_instance.oam_instance_1.id
-}
-
-resource "aws_ebs_volume" "oam_aserver" {
-  availability_zone = "eu-west-2a"
-  size              = 15
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_aserver_snapshot
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OAM-aserver" },
-  )
-}
-resource "aws_volume_attachment" "oam_aserver" {
-  device_name = "/dev/xvdc"
-  volume_id   = aws_ebs_volume.oam_aserver.id
-  instance_id = aws_instance.oam_instance_1.id
-}
+# resource "aws_ebs_volume" "oam_repo_home" {
+#   availability_zone = "eu-west-2a"
+#   size              = 150
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].oam_repo_home_snapshot
+#
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OAM-repo-home" },
+#   )
+# }
+# resource "aws_volume_attachment" "oam_repo_home" {
+#   device_name = "/dev/sdf"
+#   volume_id   = aws_ebs_volume.oam_repo_home.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
+#
+# resource "aws_ebs_volume" "oam_config" {
+#   availability_zone = "eu-west-2a"
+#   size              = 15
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id  # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
+#   snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
+#
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OAM-config" },
+#   )
+# }
+# resource "aws_volume_attachment" "oam_onfig" {
+#   device_name = "/dev/xvdd"
+#   volume_id   = aws_ebs_volume.oam_config.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
+#
+# resource "aws_ebs_volume" "oam_fmw" {
+#   availability_zone = "eu-west-2a"
+#   size              = 30
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].oam_fmw_snapshot
+#
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OAM-fmw" },
+#   )
+# }
+# resource "aws_volume_attachment" "oam_fmw" {
+#   device_name = "/dev/xvdb"
+#   volume_id   = aws_ebs_volume.oam_fmw.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
+#
+# resource "aws_ebs_volume" "oam_aserver" {
+#   availability_zone = "eu-west-2a"
+#   size              = 15
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].oam_aserver_snapshot
+#
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OAM-aserver" },
+#   )
+# }
+# resource "aws_volume_attachment" "oam_aserver" {
+#   device_name = "/dev/xvdc"
+#   volume_id   = aws_ebs_volume.oam_aserver.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
 
 resource "aws_ebs_volume" "oam_mserver" {
   availability_zone = "eu-west-2a"
