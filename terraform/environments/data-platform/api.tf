@@ -53,8 +53,8 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.upload_data.id,
       aws_api_gateway_method.upload_data_get.id,
       aws_api_gateway_integration.integration.id,
-      aws_api_gateway_integration.lambda,
-      aws_api_gateway_integration.lambda_root,
+      aws_api_gateway_integration.docs_to_lambda,
+      aws_api_gateway_integration.proxy_to_lambda,
     ]))
   }
 
