@@ -4,6 +4,13 @@ variable "name" {
   default     = ""
 }
 
+variable project_id {
+  type        = string
+  description = "Project ID"
+  default     = "dpr"
+}
+
+
 variable "tags" {
   description = "A mapping of tags to assign to the resource."
   type        = map(any)
