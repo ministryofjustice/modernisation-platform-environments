@@ -35,7 +35,7 @@ resource "aws_security_group" "oam_instance" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "outbound" {
+resource "aws_vpc_security_group_egress_rule" "oam_outbound" {
   security_group_id = aws_security_group.oam_instance.id
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "-1"
@@ -99,7 +99,7 @@ resource "aws_vpc_security_group_ingress_rule" "oracle_admin_prod" {
   to_port     = 7001
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ping" {
+resource "aws_vpc_security_group_ingress_rule" "oam_ping" {
   security_group_id = aws_security_group.oam_instance.id
   description = "Allow ping response"
   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
@@ -356,9 +356,9 @@ resource "aws_volume_attachment" "oam_mserver" {
   instance_id = aws_instance.oam_instance_1.id
 }
 
-###############################
-# EC2 Instance Profile
-###############################
+########################################################################
+# EC2 Instance Profile - used for all of OAM, OIM, OHS and IDM
+########################################################################
 
 # IAM Role, policy and instance profile (to attach the role to the EC2)
 
