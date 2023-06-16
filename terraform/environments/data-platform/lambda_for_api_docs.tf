@@ -16,7 +16,7 @@ resource "aws_lambda_function" "api_docs" {
 }
 
 resource "aws_iam_role" "api_docs_lambda_role" {
-  name               = "serverless_example_lambda"
+  name               = "api_docs_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
 }
 
