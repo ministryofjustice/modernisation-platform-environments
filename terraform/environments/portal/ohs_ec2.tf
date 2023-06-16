@@ -21,7 +21,7 @@ EOF
 # OHS Security Group Rules
 #################################
 
-resource "aws_security_group" "ohs_instance_rebuild" {
+resource "aws_security_group" "ohs_instance" {
   name        = "${local.application_name}-${local.environment}-ohs-security-group"
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
