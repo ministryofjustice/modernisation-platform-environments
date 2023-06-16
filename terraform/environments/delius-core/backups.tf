@@ -43,7 +43,7 @@ resource "aws_backup_selection" "efs_backup" {
 }
 
 ##
-# IAM role and policy creation for EFS Backups
+# IAM role and policy for EFS Backups implementation
 ##
 data "aws_iam_policy_document" "delius_core_backup" {
     statement {
