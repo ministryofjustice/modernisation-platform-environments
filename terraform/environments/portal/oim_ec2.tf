@@ -1,4 +1,22 @@
+locals {
+  # EC2 User data
+  # TODO The hostname is too long as the domain itself is 62 characters long... If this hostname is required, a new domain is required
 
+  oim_1_userdata = <<EOF
+#!/bin/bash
+echo "${aws_efs_file_system.product["oim"].dns_name}:/fmw /IDAM/product/fmw nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.product["oim"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.product["oim"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
+# echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+mount -a
+hostnamectl set-hostname ${local.application_name}-oim1-ms.${local.portal_hosted_zone}
+EOF
+  oim_2_userdata = <<EOF
+#!/bin/bash
+EOF
+}
 
 
 
@@ -149,6 +167,8 @@ resource "aws_instance" "oim1" {
   vpc_security_group_ids      = [aws_security_group.oim_instance.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
+  user_data_base64            = base64encode(local.oim_1_userdata)
+  user_data_replace_on_change = true
 
   # root_block_device {
   #   delete_on_termination      = false
@@ -176,6 +196,8 @@ resource "aws_instance" "oim2" {
   vpc_security_group_ids         = [aws_security_group.oim_instance.id]
   subnet_id                      = data.aws_subnet.data_subnets_b.id
   iam_instance_profile           = aws_iam_instance_profile.portal.id
+  user_data_base64               = base64encode(local.oim_2_userdata)
+  user_data_replace_on_change     = true
 
   #   # root_block_device {
   #   # delete_on_termination     = false
@@ -203,7 +225,7 @@ resource "aws_ebs_volume" "oimvolume1" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot1  
+  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot1
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -228,7 +250,7 @@ resource "aws_ebs_volume" "oimvolume2" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot2  
+  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot2
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -254,7 +276,7 @@ resource "aws_ebs_volume" "oimvolume3" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot3  
+  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot3
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -279,7 +301,7 @@ resource "aws_ebs_volume" "oimvolume4" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot4  
+  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot4
 
   lifecycle {
     ignore_changes = [kms_key_id]
