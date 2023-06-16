@@ -6,7 +6,7 @@ module "s3_audit_logging_bucket" {
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
-  cloudtrail_access_policy  = true
+  cloudtrail_access_policy  = true 
 
   tags = merge(
     local.all_tags,
