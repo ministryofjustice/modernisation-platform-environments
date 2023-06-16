@@ -8,8 +8,8 @@ echo "${aws_efs_file_system.product["oam"].dns_name}:/fmw /IDAM/product/fmw nfs4
 echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
-echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
-# echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+# echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 mount -a
 hostnamectl set-hostname ${local.application_name}-oam1-ms.${local.portal_hosted_zone}
 EOF
@@ -35,7 +35,7 @@ resource "aws_security_group" "oam_instance" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "outbound" {
+resource "aws_vpc_security_group_egress_rule" "oam_outbound" {
   security_group_id = aws_security_group.oam_instance.id
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "-1"
@@ -99,7 +99,7 @@ resource "aws_vpc_security_group_ingress_rule" "oracle_admin_prod" {
   to_port     = 7001
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ping" {
+resource "aws_vpc_security_group_ingress_rule" "oam_ping" {
   security_group_id = aws_security_group.oam_instance.id
   description = "Allow ping response"
   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
@@ -207,12 +207,14 @@ resource "aws_instance" "oam_instance_1" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.oam_1_userdata)
+  user_data_replace_on_change = true
 
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OAM Instance 1" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
+
 
 }
 
@@ -239,29 +241,29 @@ resource "aws_instance" "oam_instance_2" {
 # OAM EBS Volumes
 ###############################
 
-resource "aws_ebs_volume" "oam_repo_home" {
-  availability_zone = "eu-west-2a"
-  size              = 150
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_repo_home_snapshot
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OAM-repo-home" },
-  )
-}
-resource "aws_volume_attachment" "oam_repo_home" {
-  device_name = "/dev/sdf"
-  volume_id   = aws_ebs_volume.oam_repo_home.id
-  instance_id = aws_instance.oam_instance_1.id
-}
-
+# resource "aws_ebs_volume" "oam_repo_home" {
+#   availability_zone = "eu-west-2a"
+#   size              = 150
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].oam_repo_home_snapshot
+#
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OAM-repo-home" },
+#   )
+# }
+# resource "aws_volume_attachment" "oam_repo_home" {
+#   device_name = "/dev/sdf"
+#   volume_id   = aws_ebs_volume.oam_repo_home.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
+#
 # resource "aws_ebs_volume" "oam_config" {
 #   availability_zone = "eu-west-2a"
 #   size              = 15
@@ -284,7 +286,7 @@ resource "aws_volume_attachment" "oam_repo_home" {
 #   volume_id   = aws_ebs_volume.oam_config.id
 #   instance_id = aws_instance.oam_instance_1.id
 # }
-
+#
 # resource "aws_ebs_volume" "oam_fmw" {
 #   availability_zone = "eu-west-2a"
 #   size              = 30
@@ -307,7 +309,7 @@ resource "aws_volume_attachment" "oam_repo_home" {
 #   volume_id   = aws_ebs_volume.oam_fmw.id
 #   instance_id = aws_instance.oam_instance_1.id
 # }
-
+#
 # resource "aws_ebs_volume" "oam_aserver" {
 #   availability_zone = "eu-west-2a"
 #   size              = 15
@@ -354,9 +356,9 @@ resource "aws_volume_attachment" "oam_mserver" {
   instance_id = aws_instance.oam_instance_1.id
 }
 
-###############################
-# EC2 Instance Profile
-###############################
+########################################################################
+# EC2 Instance Profile - used for all of OAM, OIM, OHS and IDM
+########################################################################
 
 # IAM Role, policy and instance profile (to attach the role to the EC2)
 
