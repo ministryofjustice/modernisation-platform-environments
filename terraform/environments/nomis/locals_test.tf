@@ -297,6 +297,7 @@ locals {
           data  = { total_size = 200 }
           flash = { total_size = 50 }
         })
+        cloudwatch_metric_alarms = {} # disabled until commissioned
       })
 
       t2-nomis-db-1-b = merge(local.database_ec2_b, {
