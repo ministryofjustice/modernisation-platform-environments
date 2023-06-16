@@ -27,37 +27,4 @@ locals {
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
-  ##
-  # New target IaC
-  ##
-
-  ##
-  # Option 2 - Module call for each environment
-  ##
-  environments = {
-    dev = {
-      dev1 = {
-        db_config = {
-          name = "name for db1 in dev1"
-        }
-      },
-      dev2 = {
-        db_config = {
-          name = "name for db1 in dev2"
-        }
-      }
-    },
-    test = {
-      test1 = {
-        db_config = {
-          name = "name for db1 in test1"
-        }
-      },
-      test2 = {
-        db_config = {
-          name = "name for db1 in test2"
-        }
-      }
-    }
-  }
 }
