@@ -1,83 +1,66 @@
-resource "aws_backup_vault" "default_openldap" {
-  name = format("%s-openldap", local.application_name)
-  tags = {
-    Name = format("%s-openldap", local.application_name)
-  }
+resource "aws_backup_vault" "default_backup_vault" {
+    name = format("%s-backup-vault", local.application_name)
+    tags = {
+        Name = format("%s-backup-vault", local.application_name)
+    }
 }
 
-# Non production backup plan
-#resource "aws_backup_plan" "efs_backup_plan" {
-#
-#  name = "${local.application_name}-efs-backup-plan"
-#
-#  rule {
-#    rule_name         = "${local.application_name}-backup-daily-retain-7-days"
-#    target_vault_name = aws_backup_vault.default_oas.name
-#
-#    # Backup every day at 12:00am
-#    schedule = "cron(0 0 * * ? *)"
-#
-#    # The amount of time in minutes to start and finish a backup
-#    ## Start the backup within 1 hour of the schedule
-#    start_window = (1 * 60)
-#    ## Complete the backup within 6 hours of starting
-#    completion_window = (6 * 60)
-#
-#    lifecycle {
-#      delete_after = 7
-#    }
-#  }
-#
-#  advanced_backup_setting {
-#    backup_options = {
-#      WindowsVSS = "enabled"
-#    }
-#    resource_type = "EC2"
-#  }
-#
-#  tags = merge(
-#    local.tags,
-#    { "Name" = "${local.application_name}-backup-plan" },
-#  )
-#}
-#
-#resource "aws_backup_selection" "non_production_oas" {
-#  name         = "${local.application_name}-non-production-backup"
-#  iam_role_arn = local.application_data.accounts[local.environment].iam_role_arn
-#  plan_id      = aws_backup_plan.non_production_oas.id
-#  resources    = ["*"]
-#
-#  condition {
-#    string_equals {
-#      key   = "aws:ResourceTag/snapshot-with-daily-7-day-retention"
-#      value = "yes"
-#    }
-#    string_not_equals {
-#      key   = "aws:ResourceTag/is-production"
-#      value = "true"
-#    }
-#  }
-#}
+resource "aws_backup_plan" "ldap_backup_plan" {
+    name = format("%s-openldap", local.application_name)
+
+    rule {
+        rule_name         = "${local.application_name}-backup-retain-${local.application_data.accounts[local.environment].backup_retention_period}-days"
+        target_vault_name = aws_backup_vault.default_backup_vault.name
+        
+        schedule = local.application_data.accounts[local.environment].backup_schedule
+
+        # The amount of time in minutes to start and finish a backup
+        ## Start the backup within 1 hour of the schedule
+        start_window = (1 * 60)
+        ## Complete the backup within 6 hours of starting
+        #completion_window = (6 * 60)
+        
+        lifecycle {
+            delete_after = local.application_data.accounts[local.environment].backup_retention_period
+        }
+    }
+    
+    tags = merge(
+        local.tags,
+        {
+            Name = format("%s-backup-plan", local.application_name)
+        },
+    )
+}
+
+resource "aws_backup_selection" "efs_backup" {
+    name         = format("%s-openldap", local.application_name)
+    iam_role_arn = aws_iam_role.efs_backup_role.arn
+    plan_id      = aws_backup_plan.ldap_backup_plan.id
+    resources    = [
+        aws_efs_file_system.openldap.arn
+    ]
+}
 
 ##
 # IAM role and policy creation for EFS Backups
 ##
 data "aws_iam_policy_document" "delius_core_backup" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["backup.amazonaws.com"]
+    statement {
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
+        
+        principals {
+            type        = "Service"
+            identifiers = ["backup.amazonaws.com"]
+        }
     }
-  }
 }
 
 resource "aws_iam_role" "efs_backup_role" {
-  name = format("%s-efs-backup-role", local.application_name)
-  assume_role_policy = data.aws_iam_policy_document.delius_core_backup.json
-  tags               = local.tags
+    name = format("%s-efs-backup-role", local.application_name)
+    assume_role_policy = data.aws_iam_policy_document.delius_core_backup.json
+    tags               = local.tags
 }
 
 data "aws_iam_policy_document" "delius_core_backup_policy" {
