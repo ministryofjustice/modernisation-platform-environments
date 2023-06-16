@@ -9,7 +9,6 @@ echo "/dev/xvdc /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/
 echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 mount -a
 
-# hostname TBD
 hostnamectl set-hostname ${local.application_name}-ohs1-ms.${local.portal_hosted_zone}
 EOF
   ohs_2_userdata = <<EOF
