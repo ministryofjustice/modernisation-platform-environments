@@ -37,7 +37,6 @@ resource "aws_security_group" "ohs_instance_rebuild" {
   #   to_port     = 1
   #   protocol    = "ICMP"
   #   cidr_blocks = [local.first-cidr]
-  #
   # }
   # ingress {
   #   description = "OHS Inbound from Local account VPC"
