@@ -7,7 +7,7 @@ module "airflow_security_group" {
   version = "5.0.0"
 
   name   = "data-platform-mwaa"
-  vpc_id = data.data_platform_apps_and_tools.shared.id
+  vpc_id = data.aws_vpc.data_platform_apps_and_tools.id
 
   egress_cidr_blocks = ["0.0.0.0/0"]
   egress_rules       = ["all-all"]
