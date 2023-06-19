@@ -57,22 +57,22 @@ variable "name" {
 
 
 variable "kms" {
-  type    = string
+  type        = string
   description = "KMS Key ID for RDS Postgres"
-  default = ""
+  default     = ""
 }
 
 variable "allocated_size" {
-  type          = string
-  description   = "Allocated Storage"
-  default       = "10"
+  type        = string
+  description = "Allocated Storage"
+  default     = "10"
 }
 
 
 variable "max_allocated_size" {
-  type          = string
-  description   = "Max Allocated Storage"
-  default       = "50"
+  type        = string
+  description = "Max Allocated Storage"
+  default     = "50"
 }
 
 variable "enable_rds" {

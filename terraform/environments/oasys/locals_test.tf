@@ -52,19 +52,19 @@ locals {
         internal_lb              = false
         access_logs              = false
         enable_delete_protection = false
-        existing_target_groups   = {
+        existing_target_groups = {
           "private-lb-https-443" = {
             arn = length(data.aws_lb_target_group.private_lb) > 0 ? data.aws_lb_target_group.private_lb[0].arn : ""
           }
         }
-        idle_timeout             = 60 # 60 is default
-        security_groups          = [] # no security groups for network load balancers
-        public_subnets           = module.environment.subnets["public"].ids
-        tags                     = local.tags
+        idle_timeout    = 60 # 60 is default
+        security_groups = [] # no security groups for network load balancers
+        public_subnets  = module.environment.subnets["public"].ids
+        tags            = local.tags
         listeners = {
           https = {
-            port                      = 443
-            protocol                  = "TCP"
+            port     = 443
+            protocol = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "private-lb-https-443"
@@ -120,7 +120,7 @@ locals {
         }
         lb_target_groups = {
           https-443 = {
-            port                 = 443
+            port = 443
             health_check = {
               enabled             = true
               interval            = 30

@@ -11,9 +11,9 @@ mount -a
 
 hostnamectl set-hostname ${local.application_name}-ohs1-ms.${local.portal_hosted_zone}
 EOF
-#   ohs_2_userdata = <<EOF
-# #!/bin/bash
-# EOF
+  #   ohs_2_userdata = <<EOF
+  # #!/bin/bash
+  # EOF
 }
 
 #################################
@@ -34,54 +34,54 @@ resource "aws_security_group" "ohs_instance" {
 
 resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
   security_group_id = aws_security_group.ohs_instance.id
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_local_vpc" {
   security_group_id = aws_security_group.ohs_instance.id
-  description = "OHS Inbound from Local account VPC"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 7777
-  ip_protocol = "tcp"
-  to_port     = 7777
+  description       = "OHS Inbound from Local account VPC"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 7777
+  ip_protocol       = "tcp"
+  to_port           = 7777
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_nonprod_workspaces" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  count             = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.ohs_instance.id
-  description = "OHS Inbound from Shared Svs VPC"
-  cidr_ipv4   = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
-  from_port   = 7777
-  ip_protocol = "tcp"
-  to_port     = 7777
+  description       = "OHS Inbound from Shared Svs VPC"
+  cidr_ipv4         = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
+  from_port         = 7777
+  ip_protocol       = "tcp"
+  to_port           = 7777
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_prod_workspaces" {
   security_group_id = aws_security_group.ohs_instance.id
-  description = "OHS Inbound from Prod Shared Svs VPC"
-  cidr_ipv4   = local.prod_workspaces_cidr
-  from_port   = 7777
-  ip_protocol = "tcp"
-  to_port     = 7777
+  description       = "OHS Inbound from Prod Shared Svs VPC"
+  cidr_ipv4         = local.prod_workspaces_cidr
+  from_port         = 7777
+  ip_protocol       = "tcp"
+  to_port           = 7777
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_ons" {
   security_group_id = aws_security_group.ohs_instance.id
-  description = "ONS Port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 6200
-  ip_protocol = "tcp"
-  to_port     = 6200
+  description       = "ONS Port"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 6200
+  ip_protocol       = "tcp"
+  to_port           = 6200
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_ping" {
   security_group_id = aws_security_group.ohs_instance.id
-  description = "Allow ping response"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 8
-  ip_protocol = "icmp"
-  to_port     = -1
+  description       = "Allow ping response"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 8
+  ip_protocol       = "icmp"
+  to_port           = -1
 }
 
 ######################################
@@ -108,12 +108,12 @@ resource "aws_instance" "ohs_instance_1" {
 
 
 resource "aws_instance" "ohs2" {
-  count = local.environment == "production" ? 1 : 0
-  ami                            = local.application_data.accounts[local.environment].ohs_ami_id
-  instance_type                  = local.application_data.accounts[local.environment].ohs_instance_type
+  count         = local.environment == "production" ? 1 : 0
+  ami           = local.application_data.accounts[local.environment].ohs_ami_id
+  instance_type = local.application_data.accounts[local.environment].ohs_instance_type
   # vpc_security_group_ids         = [aws_security_group.ohs_instance.id]
-  subnet_id                      = data.aws_subnet.data_subnets_b.id
-  iam_instance_profile           = aws_iam_instance_profile.portal.id
+  subnet_id            = data.aws_subnet.data_subnets_b.id
+  iam_instance_profile = aws_iam_instance_profile.portal.id
   # user_data_base64               = base64encode(local.ohs_2_userdata)
 
   #   # root_block_device {

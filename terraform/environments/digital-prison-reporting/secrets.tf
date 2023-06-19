@@ -12,5 +12,5 @@ resource "aws_secretsmanager_secret_version" "nomis" {
 
   lifecycle {
     ignore_changes = [secret_string, ]
-  }  
+  }
 }
