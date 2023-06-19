@@ -35,42 +35,42 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   baseline_security_groups = {
-    public = {
-      description = "Security group for public subnet"
-      ingress = {
-        all-within-subnet = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        https = {
-          description = "Allow https ingress"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "tcp"
-          cidr_blocks = local.security_group_cidrs.https
-        }
-        http8080 = {
-          description = "Allow http8080 ingress"
-          from_port   = 8080
-          to_port     = 8080
-          protocol    = "tcp"
-          cidr_blocks = local.security_group_cidrs.https
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
+    # public = {
+    #   description = "Security group for public subnet"
+    #   ingress = {
+    #     all-within-subnet = {
+    #       description = "Allow all ingress to self"
+    #       from_port   = 0
+    #       to_port     = 0
+    #       protocol    = -1
+    #       self        = true
+    #     }
+    #     https = {
+    #       description = "Allow https ingress"
+    #       from_port   = 443
+    #       to_port     = 443
+    #       protocol    = "tcp"
+    #       cidr_blocks = local.security_group_cidrs.https
+    #     }
+    #     http8080 = {
+    #       description = "Allow http8080 ingress"
+    #       from_port   = 8080
+    #       to_port     = 8080
+    #       protocol    = "tcp"
+    #       cidr_blocks = local.security_group_cidrs.https
+    #     }
+    #   }
+    #   egress = {
+    #     all = {
+    #       description     = "Allow all egress"
+    #       from_port       = 0
+    #       to_port         = 0
+    #       protocol        = "-1"
+    #       cidr_blocks     = ["0.0.0.0/0"]
+    #       security_groups = []
+    #     }
+    #   }
+    # }
     private = {
       description = "Security group for private subnet"
       ingress = {
