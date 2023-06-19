@@ -13,7 +13,7 @@ locals {
       service_name          = "ohs_1"
       cpu_alarm_threshold = 85
       dimensions = {
-        InstanceId = aws_instance.ohs1.id
+        InstanceId = aws_instance.ohs_instance_1.id
       }
     }
   }
@@ -31,7 +31,7 @@ locals {
       cpu_alarm_threshold = 85
       dimensions = {
         InstanceId = "bob"
-        # InstanceId = aws_instance.ohs1.id # TODO This needs updating when the OAM EC2 instance is built
+        # InstanceId = aws_instance.ohs_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     }
   }
@@ -47,7 +47,7 @@ locals {
       service_name          = "ohs_1"
       status_alarm_threshold = 1
       dimensions = {
-        InstanceId = aws_instance.ohs1.id
+        InstanceId = aws_instance.ohs_instance_1.id
       }
     }
   }
@@ -73,7 +73,7 @@ locals {
       service_name          = "ohs_1"
       memory_alarm_threshold = 80
       dimensions = {
-        InstanceId = aws_instance.ohs1.id
+        InstanceId = aws_instance.ohs_instance_1.id
       }
     }
   }
@@ -107,7 +107,7 @@ locals {
       service_name          = "ohs_1"
       swapspace_alarm_threshold = 50
       dimensions = {
-        InstanceId = aws_instance.ohs1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = aws_instance.ohs_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     }
   }
@@ -145,7 +145,7 @@ locals {
       dimensions = {
         MountPath = "/"
         Filesystem = "/dev/nvme0n1p2"
-        InstanceId = aws_instance.ohs1.id
+        InstanceId = aws_instance.ohs_instance_1.id
       }
     }
   }
@@ -188,7 +188,7 @@ locals {
     #   dimensions = {
     #     MountPath = "/IDAM/product/runtime/Domain/mserver"
     #     # Filesystem = "/dev/nvme4n1"
-    #     InstanceId = aws_instance.ohs1.id
+    #     InstanceId = aws_instance.ohs_instance_1.id
     #   }
     # }
   }
