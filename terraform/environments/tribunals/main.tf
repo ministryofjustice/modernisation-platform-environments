@@ -136,4 +136,10 @@ module "transport" {
   source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
+  curserver                   = local.application_data.accounts[local.environment].curserver
+  support_team                = local.application_data.accounts[local.environment].support_team
+  support_email               = local.application_data.accounts[local.environment].support_email
+  moj_ip                      = local.application_data.accounts[local.environment].moj_ip
+  vpc_id                      = data.aws_vpc.shared.id
+  client_id                   = ""
 }

@@ -16,6 +16,26 @@ module "dms" {
  
 }
 
+############################################################################
+
+module "app_based_resources" {
+  source                      = "../../app_based_resources"
+  app_name                    = "transport"
+  ecs_cluster_name            = "transport"
+  db_address                  = var.rds_url
+  db_port                     = 1433
+  db_username                 = var.rds_user
+  db_password                 = var.rds_password
+  db_name                     = "transport"
+  support_email               = var.support_email
+  support_team                = var.support_team
+  curserver                   = var.curserver
+  client_id                   = var.client_id
+  vpc_id                      = var.vpc_id
+  moj_ip                      = var.moj_ip
+
+}
+
 
 resource "random_password" "new_password" {
   length  = 16

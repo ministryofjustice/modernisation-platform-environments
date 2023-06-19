@@ -9,7 +9,10 @@
       "engine_version": "15.00.4198.2.v1",
       "instance_class": "db.m5.large",
       "username": "admin",
-      "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com"
+      "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com",
+      "curserver": "DEVELOPMENT",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
     },
     "test": {
       "example_var": "test-data"
@@ -23,7 +26,10 @@
       "engine_version": "15.00.4198.2.v1",
       "instance_class": "db.m5.large",
       "username": "admin",
-      "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com"
+      "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com",
+      "curserver": "PREPRODUCTION",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
     },
     "production": {
       "moj_ip": "81.134.202.29/32",
@@ -34,7 +40,10 @@
       "engine_version": "15.00.4198.2.v1",
       "instance_class": "db.m5.large",
       "username": "admin",
-      "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com"
+      "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com",
+      "curserver": "PRODUCTION",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
     }
   },
   "ec2_sg_rules": {
