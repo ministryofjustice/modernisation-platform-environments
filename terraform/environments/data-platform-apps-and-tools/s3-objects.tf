@@ -12,9 +12,9 @@ data "template_file" "airflow_kubernetes_config" {
 }
 
 resource "aws_s3_object" "airflow_kubernetes_config" {
-  bucket      = module.airflow_s3_bucket.bucket.id
-  content     = data.template_file.airflow_kubernetes_config.rendered
-  key         = "dags/.kube/config"
+  bucket  = module.airflow_s3_bucket.bucket.id
+  content = data.template_file.airflow_kubernetes_config.rendered
+  key     = "dags/.kube/config"
   # source_hash = data.template_file.airflow_kubernetes_config.rendered_md5
 }
 
