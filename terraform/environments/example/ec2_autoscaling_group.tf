@@ -1,5 +1,5 @@
 module "ec2_test_autoscaling_group" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.0.0"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
