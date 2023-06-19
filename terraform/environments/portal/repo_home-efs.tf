@@ -28,11 +28,17 @@ resource "aws_efs_file_system" "efs" {
     performance_mode    = "generalPurpose"
     throughput_mode     = "bursting"
     encrypted           = "true"
+
     tags                = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-repo_home" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
-  )
+      local.tags,
+      { "Name" = "${local.application_name}-repo_home" },
+      local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+    )
+
+    lifecycle {
+      prevent_destroy = true
+    }
+
  }
 
 

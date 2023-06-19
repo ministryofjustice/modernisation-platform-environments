@@ -95,6 +95,36 @@ locals {
           oracle-db-name       = "T1CNOM"
         }
       }
+      t1-nomis-xtag-b = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "base_rhel_7_9_*"
+          availability_zone = null
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type          = "t2.large"
+          vpc_security_group_ids = ["private-web"]
+        })
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "nomis/DSOS-1932/xtag-improvements"
+          })
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 1
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description          = "For testing XTAG image"
+          ami                  = "base_rhel_7_9"
+          os-type              = "Linux"
+          component            = "test"
+          server-type          = "nomis-xtag"
+          nomis-environment    = "t1"
+          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T1CNOM"
+        }
+      }
 
       # blue deployment
       t2-nomis-web-a = merge(local.weblogic_ec2_a, {
@@ -250,6 +280,24 @@ locals {
           data  = { total_size = 200 }
           flash = { total_size = 50 }
         })
+      })
+
+      t1-nomis-db-2-a = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
+          nomis-environment   = "t1"
+          description         = "T1 NOMIS Audit database"
+          oracle-sids         = ""
+          instance-scheduling = "skip-scheduling"
+        })
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+          data  = { total_size = 200 }
+          flash = { total_size = 50 }
+        })
+        cloudwatch_metric_alarms = {} # disabled until commissioned
       })
 
       t2-nomis-db-1-b = merge(local.database_ec2_b, {

@@ -23,7 +23,9 @@ locals {
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
         })
       })
-
+      "t2-${local.application_name}-db-a" = merge(local.database_a, {
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      })
       "test-${local.application_name}-bip-a" = local.bip_a
     }
 
