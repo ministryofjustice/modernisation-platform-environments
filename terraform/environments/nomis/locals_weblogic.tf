@@ -204,7 +204,7 @@ locals {
       })
     })
     # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {}) 
-    autoscaling_group = merge(local.module.baseline_presets.ec2_autoscaling_group.default, {
+    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
       desired_capacity = 0
     })
     cloudwatch_metric_alarms = {}
