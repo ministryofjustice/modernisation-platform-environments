@@ -11,7 +11,7 @@ variable "account" {
 variable "enable_lambda" {
   type        = bool
   default     = false
-  description = "(Optional) Create Lambda, If Set to Yes"  
+  description = "(Optional) Create Lambda, If Set to Yes"
 }
 
 variable "s3_bucket" {

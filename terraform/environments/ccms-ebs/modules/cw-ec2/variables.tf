@@ -26,80 +26,80 @@ variable "fileSystem" {
   type        = string
   description = "the fileSystem for the alarm"
 }
-variable "short_env"{
+variable "short_env" {
   type        = string
   description = "Shortened environment name"
 }
 ###################
-variable "cpu_eval_periods"{
+variable "cpu_eval_periods" {
   type        = string
   description = "how many periods over which to evaluate the alarm"
 }
-variable "cpu_datapoints"{
+variable "cpu_datapoints" {
   type        = string
   description = "how many data points over which the specified statistic is applied"
 }
-variable "cpu_period"{
+variable "cpu_period" {
   type        = string
   description = "period in seconds over which the specified statistic is applied"
 }
-variable "cpu_threshold"{
+variable "cpu_threshold" {
   type        = string
   description = "threshold for the alarm"
 }
-variable "mem_eval_periods"{
+variable "mem_eval_periods" {
   type        = string
   description = "how many periods over which to evaluate the alarm"
 }
-variable "mem_datapoints"{
+variable "mem_datapoints" {
   type        = string
   description = "how many data points over which the specified statistic is applied"
 }
-variable "mem_period"{
+variable "mem_period" {
   type        = string
   description = "period in seconds over which the specified statistic is applied"
 }
-variable "mem_threshold"{
+variable "mem_threshold" {
   type        = string
   description = "threshold for the alarm"
 }
-variable "disk_eval_periods"{
+variable "disk_eval_periods" {
   type        = string
   description = "how many periods over which to evaluate the alarm"
 }
-variable "disk_datapoints"{
+variable "disk_datapoints" {
   type        = string
   description = "how many data points over which the specified statistic is applied"
 }
-variable "disk_period"{
+variable "disk_period" {
   type        = string
   description = "period in seconds over which the specified statistic is applied"
 }
-variable "disk_threshold"{
+variable "disk_threshold" {
   type        = string
   description = "threshold for the alarm"
 }
-variable "insthc_eval_periods"{
+variable "insthc_eval_periods" {
   type        = string
   description = "how many periods over which to evaluate the alarm"
 }
-variable "insthc_period"{
+variable "insthc_period" {
   type        = string
   description = "period in seconds over which the specified statistic is applied"
 }
-variable "insthc_threshold"{
+variable "insthc_threshold" {
   type        = string
   description = "threshold for the alarm"
 }
-variable "syshc_eval_periods"{
+variable "syshc_eval_periods" {
   type        = string
   description = "how many periods over which to evaluate the alarm"
 }
-variable "syshc_period"{
+variable "syshc_period" {
   type        = string
   description = "period in seconds over which the specified statistic is applied"
 }
-variable "syshc_threshold"{
+variable "syshc_threshold" {
   type        = string
   description = "threshold for the alarm"
 }
