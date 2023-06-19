@@ -130,17 +130,18 @@ locals {
         threshold           = "85"
         alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
       }
-      high-memory-usage-15mins = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "15"
-        datapoints_to_alarm = "15"
-        metric_name         = "mem_used_percent"
-        namespace           = "CWAgent"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "90"
-        alarm_description   = "Triggers if memory usage is continually high for 15 minutes."
-      }
+      # NOTE: see DSOS-1956 for why this is commented out temporarily
+      # high-memory-usage-15mins = {
+      #   comparison_operator = "GreaterThanOrEqualToThreshold"
+      #   evaluation_periods  = "15"
+      #   datapoints_to_alarm = "15"
+      #   metric_name         = "mem_used_percent"
+      #   namespace           = "CWAgent"
+      #   period              = "60"
+      #   statistic           = "Average"
+      #   threshold           = "90"
+      #   alarm_description   = "Triggers if memory usage is continually high for 15 minutes."
+      # }
       cpu-iowait-high-3hour = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "180"

@@ -65,7 +65,7 @@ locals {
       parent_keys = ["ec2_default"]
       alarms_list = [
         { key = "ec2_cwagent_linux", name = "free-disk-space-low-1hour" },
-        { key = "ec2_cwagent_linux", name = "high-memory-usage-15mins" },
+        # { key = "ec2_cwagent_linux", name = "high-memory-usage-15mins" },
         { key = "ec2_cwagent_linux", name = "cpu-iowait-high-3hour" },
       ]
     }
