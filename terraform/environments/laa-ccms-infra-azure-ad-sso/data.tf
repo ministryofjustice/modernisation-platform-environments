@@ -12,6 +12,21 @@ data "aws_ami" "oracle_ebs_vision_db" {
     values = ["hvm"]
   }
 }
+
+#preclone ami
+data "aws_ami" "oracle_ebs_vision__preclone_db" {
+  most_recent = true
+  owners      = [local.application_data.accounts[local.environment].ami_owner]
+
+  filter {
+    name   = "name"
+    values = [local.application_data.accounts[local.environment].load_balanced_vision_ebsdb_name]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
 ## S3 NOTIFICATIONS
 data "aws_iam_policy_document" "s3_topic_policy" {
   statement {
