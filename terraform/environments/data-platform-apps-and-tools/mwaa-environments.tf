@@ -23,18 +23,18 @@ resource "aws_mwaa_environment" "main" {
   airflow_configuration_options = merge(
     local.environment_configuration.airflow_configuration_options,
     {
-      # "smtp.smtp_host"      = "email-smtp.${data.aws_region.current.name}.amazonaws.com"
-      # "smtp.smtp_port"      = 587
-      # "smtp.smtp_starttls"  = 1
-      # "smtp.smtp_user"      = module.airflow_iam_user.iam_access_key_id
-      # "smtp.smtp_password"  = module.airflow_iam_user.iam_access_key_ses_smtp_password_v4
-      # "smtp.smtp_mail_from" = local.airflow_mail_from_address
+      "smtp.smtp_host"      = "email-smtp.${data.aws_region.current.name}.amazonaws.com"
+      "smtp.smtp_port"      = 587
+      "smtp.smtp_starttls"  = 1
+      "smtp.smtp_user"      = data.aws_secretsmanager_secret_version.airflow_iam_access_key_id.secret_string
+      "smtp.smtp_password"  = data.aws_secretsmanager_secret_version.airflow_iam_access_key_ses_smtp_password.secret_string
+      "smtp.smtp_mail_from" = local.airflow_mail_from_address
     }
   )
 
   network_configuration {
     security_group_ids = [module.airflow_security_group.security_group_id]
-    subnet_ids         = slice(data.aws_subnets.shared-private.ids, 0, 2)
+    subnet_ids         = slice(data.aws_subnets.data_platform_apps_and_tools_private.ids, 0, 2)
   }
 
   tags = local.tags
