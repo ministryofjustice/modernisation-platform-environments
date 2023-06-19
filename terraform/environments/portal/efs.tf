@@ -24,7 +24,10 @@ resource "aws_efs_file_system" "product" {
   for_each = {
     for k, v in local.efs : k => v
   }
-  encrypted = true
+  encrypted   = true
+  performance_mode    = "generalPurpose"
+  throughput_mode = "elastic"
+
 
   tags = merge(
     local.tags,

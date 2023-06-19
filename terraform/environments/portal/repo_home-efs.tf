@@ -25,9 +25,9 @@
 
 resource "aws_efs_file_system" "efs" {
 
-  performance_mode = "generalPurpose"
-  throughput_mode  = "bursting"
-  encrypted        = "true"
+    performance_mode    = "generalPurpose"
+    throughput_mode     = "elastic"
+    encrypted           = "true"
 
   tags = merge(
     local.tags,

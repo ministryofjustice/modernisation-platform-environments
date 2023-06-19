@@ -1,13 +1,14 @@
 locals {
   # EC2 User data
+  # /etc/fstab mount setting as per https://docs.aws.amazon.com/efs/latest/ug/nfs-automount-efs.html
   idm_1_userdata = <<EOF
 #!/bin/bash
-echo "${aws_efs_file_system.product["idm"].dns_name}:/fmw /IDAM/product/fmw nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.product["idm"].dns_name}:/fmw /IDAM/product/fmw nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
-echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/instances /IDAM/product/runtime/instances nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/instances /IDAM/product/runtime/instances nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 
 mount -a
 hostnamectl set-hostname ${local.application_name}-idm1-ms.${local.portal_hosted_zone}
