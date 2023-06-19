@@ -15,6 +15,20 @@ locals {
       dimensions = {
         InstanceId = aws_instance.ohs_instance_1.id
       }
+    },
+    oim_instance_1 = {
+      service_name          = "oim_1"
+      cpu_alarm_threshold = 85
+      dimensions = {
+        InstanceId = aws_instance.oim_instance_1.id
+      }
+    },
+    idm_instance_1 = {
+      service_name          = "idm_1"
+      cpu_alarm_threshold = 85
+      dimensions = {
+        InstanceId = aws_instance.idm_instance_1.id
+      }
     }
   }
   cpu_alarms_2 = {
@@ -22,16 +36,28 @@ locals {
       service_name          = "oam_2"
       cpu_alarm_threshold = 85
       dimensions = {
-        InstanceId = "alice"
-        # InstanceId = aws_instance.oam_app_instance_2.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = try(aws_instance.oam_instance_2[0].id, "")
       }
     },
     ohs_instance_2 = {
       service_name          = "oim_2"
       cpu_alarm_threshold = 85
       dimensions = {
-        InstanceId = "bob"
-        # InstanceId = aws_instance.ohs_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+      }
+    },
+    oim_instance_2 = {
+      service_name          = "oim_2"
+      cpu_alarm_threshold = 85
+      dimensions = {
+        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+      }
+    },
+    idm_instance_2 = {
+      service_name          = "idm_2"
+      cpu_alarm_threshold = 85
+      dimensions = {
+        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
       }
     }
   }
@@ -49,6 +75,20 @@ locals {
       dimensions = {
         InstanceId = aws_instance.ohs_instance_1.id
       }
+    },
+    oim_instance_1 = {
+      service_name          = "oim_1"
+      status_alarm_threshold = 1
+      dimensions = {
+        InstanceId = aws_instance.oim_instance_1.id
+      }
+    },
+    idm_instance_1 = {
+      service_name          = "idm_1"
+      status_alarm_threshold = 1
+      dimensions = {
+        InstanceId = aws_instance.idm_instance_1.id
+      }
     }
   }
   status_alarms_2 = {
@@ -56,8 +96,28 @@ locals {
       service_name          = "oam_2"
       status_alarm_threshold = 1
       dimensions = {
-        InstanceId = "alice"
-        # InstanceId = aws_instance.oam_app_instance_2.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = try(aws_instance.oam_instance_2[0].id, "")
+      }
+    },
+    ohs_instance_2 = {
+      service_name          = "ohs_2"
+      status_alarm_threshold = 1
+      dimensions = {
+        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+      }
+    },
+    oim_instance_2 = {
+      service_name          = "oim_2"
+      status_alarm_threshold = 1
+      dimensions = {
+        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+      }
+    },
+    idm_instance_2 = {
+      service_name          = "idm_2"
+      status_alarm_threshold = 1
+      dimensions = {
+        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
       }
     }
   }
@@ -75,6 +135,20 @@ locals {
       dimensions = {
         InstanceId = aws_instance.ohs_instance_1.id
       }
+    },
+    oim_instance_1 = {
+      service_name          = "oim_1"
+      memory_alarm_threshold = 80
+      dimensions = {
+        InstanceId = aws_instance.oim_instance_1.id
+      }
+    },
+    idm_instance_1 = {
+      service_name          = "idm_1"
+      memory_alarm_threshold = 80
+      dimensions = {
+        InstanceId = aws_instance.idm_instance_1.id
+      }
     }
   }
   memory_alarms_2 = {
@@ -82,16 +156,28 @@ locals {
       service_name          = "oam_2"
       memory_alarm_threshold = 80
       dimensions = {
-        InstanceId = "alice"
-        # InstanceId = aws_instance.oam_app_instance_2.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = try(aws_instance.oam_instance_2[0].id, "")
       }
     },
     ohs_instance_2 = {
       service_name          = "ohs_2"
       memory_alarm_threshold = 80
       dimensions = {
-        InstanceId = "bob"
-        # InstanceId = aws_instance.ohs2.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+      }
+    },
+    oim_instance_2 = {
+      service_name          = "oim_2"
+      memory_alarm_threshold = 80
+      dimensions = {
+        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+      }
+    },
+    idm_instance_2 = {
+      service_name          = "idm_2"
+      memory_alarm_threshold = 80
+      dimensions = {
+        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
       }
     }
   }
@@ -107,7 +193,21 @@ locals {
       service_name          = "ohs_1"
       swapspace_alarm_threshold = 50
       dimensions = {
-        InstanceId = aws_instance.ohs_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = aws_instance.ohs_instance_1.id
+      }
+    },
+    oim_instance_1 = {
+      service_name          = "oim_1"
+      swapspace_alarm_threshold = 50
+      dimensions = {
+        InstanceId = aws_instance.oim_instance_1.id
+      }
+    },
+    idm_instance_1 = {
+      service_name          = "idm_1"
+      swapspace_alarm_threshold = 50
+      dimensions = {
+        InstanceId = aws_instance.idm_instance_1.id
       }
     }
   }
@@ -116,16 +216,28 @@ locals {
       service_name          = "oam_2"
       swapspace_alarm_threshold = 50
       dimensions = {
-        InstanceId = "alice"
-        # InstanceId = aws_instance.oam_app_instance_2.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = try(aws_instance.oam_instance_2[0].id, "")
       }
     },
     ohs_instance_2 = {
       service_name          = "ohs_2"
       swapspace_alarm_threshold = 50
       dimensions = {
-        InstanceId = "bob"
-        # InstanceId = aws_instance.ohs2.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+      }
+    },
+    oim_instance_2 = {
+      service_name          = "oim_2"
+      swapspace_alarm_threshold = 50
+      dimensions = {
+        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+      }
+    },
+    idm_instance_2 = {
+      service_name          = "idm_2"
+      swapspace_alarm_threshold = 50
+      dimensions = {
+        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
       }
     }
   }
@@ -143,9 +255,27 @@ locals {
       service_name          = "ohs_1"
       diskspace_alarm_threshold = 80
       dimensions = {
-        MountPath = "/"
-        Filesystem = "/dev/nvme0n1p2"
+        path = "/"
         InstanceId = aws_instance.ohs_instance_1.id
+        fstype = "xfs"
+      }
+    },
+    oim_instance_1 = {
+      service_name          = "oim_1"
+      diskspace_alarm_threshold = 80
+      dimensions = {
+        path = "/"
+        InstanceId = aws_instance.oim_instance_1.id
+        fstype = "xfs"
+      }
+    },
+    idm_instance_1 = {
+      service_name          = "idm_1"
+      diskspace_alarm_threshold = 80
+      dimensions = {
+        path = "/"
+        InstanceId = aws_instance.idm_instance_1.id
+        fstype = "xfs"
       }
     }
   }
@@ -154,20 +284,36 @@ locals {
       service_name          = "oam_2"
       diskspace_alarm_threshold = 80
       dimensions = {
-        InstanceId = "alice"
-        MountPath = "/"
-        Filesystem = "/dev/nvme0n1p2"
-        # InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
+        path = "/"
+        InstanceId = try(aws_instance.oam_instance_2[0].id, "")
+        fstype = "xfs"
       }
     },
     ohs_instance_2 = {
       service_name          = "ohs_2"
       diskspace_alarm_threshold = 80
       dimensions = {
-        InstanceId = "alice"
-        MountPath = "/"
-        Filesystem = "/dev/nvme0n1p2"
-        # InstanceId = aws_instance.ohs2.id # TODO This needs updating when the OAM EC2 instance is built
+        path = "/"
+        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+        fstype = "xfs"
+      }
+    },
+    oim_instance_2 = {
+      service_name          = "oim_2"
+      diskspace_alarm_threshold = 80
+      dimensions = {
+        path = "/"
+        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+        fstype = "xfs"
+      }
+    },
+    idm_instance_2 = {
+      service_name          = "idm_2"
+      diskspace_alarm_threshold = 80
+      dimensions = {
+        path = "/"
+        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
+        fstype = "xfs"
       }
     }
   }
@@ -177,50 +323,72 @@ locals {
       mserver_alarm_threshold = 80
       dimensions = {
         path = "/IDAM/product/runtime/Domain/mserver"
-        # Filesystem = "/dev/nvme4n1"
         InstanceId = aws_instance.oam_instance_1.id
         fstype = "ext4"
       }
+    },
+    ohs_instance_1 = {
+      service_name          = "ohs_1"
+      mserver_alarm_threshold = 80
+      dimensions = {
+        path = "/IDAM/product/runtime/Domain/mserver"
+        InstanceId = aws_instance.ohs_instance_1.id
+        fstype = "ext4"
+      }
+    },
+    oim_instance_1 = {
+      service_name          = "oim_1"
+      mserver_alarm_threshold = 80
+      dimensions = {
+        path = "/IDAM/product/runtime/Domain/mserver"
+        InstanceId = aws_instance.oim_instance_1.id
+        fstype = "ext4"
+      }
+    },
+    idm_instance_1 = {
+      service_name          = "idm_1"
+      mserver_alarm_threshold = 80
+      dimensions = {
+        path = "/IDAM/product/runtime/Domain/mserver"
+        InstanceId = aws_instance.idm_instance_1.id
+        fstype = "ext4"
+      }
     }
-    # ohs_instance_1 = {
-    #   service_name          = "ohs_1"
-    #   mserver_alarm_threshold = 80
-    #   dimensions = {
-    #     MountPath = "/IDAM/product/runtime/Domain/mserver"
-    #     # Filesystem = "/dev/nvme4n1"
-    #     InstanceId = aws_instance.ohs_instance_1.id
-    #   }
-    # }
   }
   mserver_alarms_2 = {
     oam_instance_2 = {
       service_name          = "oam_2"
       mserver_alarm_threshold = 80
       dimensions = {
-        InstanceId = "alice"
-        MountPath = "/IDAM/product/runtime/Domain/mserver"
-        Filesystem = "/dev/nvme1n1"
-        # InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
+        path = "/IDAM/product/runtime/Domain/mserver"
+        InstanceId = aws_instance.oam_instance_1.id
+        fstype = "ext4"
       }
     },
     ohs_instance_2 = {
       service_name          = "ohs_2"
       mserver_alarm_threshold = 80
       dimensions = {
-        InstanceId = "alice"
-        MountPath = "/IDAM/product/runtime/Domain/mserver"
-        Filesystem = "/dev/nvme1n1"
-        # InstanceId = aws_instance.ohs2.id # TODO This needs updating when the OAM EC2 instance is built
+        path = "/IDAM/product/runtime/Domain/mserver"
+        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+        fstype = "ext4"
       }
-    }
-  }
-  aserver_alarms_1 = {
-    oam_instance_1 = {
-      service_name          = "oam_1"
-      aserver_alarm_threshold = 80
+    },
+    oim_instance_2 = {
+      service_name          = "oim_2"
+      mserver_alarm_threshold = 80
       dimensions = {
-        path = "/IDAM/product/runtime/Domain/aserver"
-        InstanceId = aws_instance.oam_instance_1.id
+        path = "/IDAM/product/runtime/Domain/mserver"
+        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+        fstype = "ext4"
+      }
+    },
+    idm_instance_2 = {
+      service_name          = "idm_2"
+      mserver_alarm_threshold = 80
+      dimensions = {
+        path = "/IDAM/product/runtime/Domain/mserver"
+        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
         fstype = "ext4"
       }
     }
@@ -391,34 +559,31 @@ resource "aws_cloudwatch_metric_alarm" "mserver_alarm" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "aserver_alarm" {
-  for_each = {
-    for k, v in local.aserver_alarms_1 : k => v
-  }
-
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-aserver-disk-usage-alarm"
-  alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
-  comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
-  evaluation_periods  = "5"
-  metric_name         = "disk_used_percent"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = each.value.aserver_alarm_threshold
-  alarm_actions       = [aws_sns_topic.alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data  = "breaching"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-aserver-disk-usage-alarm"
-    }
-  )
-}
-
-
-
+# resource "aws_cloudwatch_metric_alarm" "aserver_alarm" {
+#   for_each = {
+#     for k, v in local.aserver_alarms_1 : k => v
+#   }
+#
+#   alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-aserver-disk-usage-alarm"
+#   alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
+#   comparison_operator = "GreaterThanThreshold"
+#   dimensions          = each.value.dimensions
+#   evaluation_periods  = "5"
+#   metric_name         = "disk_used_percent"
+#   namespace           = "CWAgent"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = each.value.aserver_alarm_threshold
+#   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions          = [aws_sns_topic.alerting_topic.arn]
+#   treat_missing_data  = "breaching"
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "${local.application_name}-${local.environment}-${each.value.service_name}-aserver-disk-usage-alarm"
+#     }
+#   )
+# }
 
 
 data "template_file" "dashboard_prod" {
