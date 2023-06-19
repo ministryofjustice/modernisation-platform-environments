@@ -137,9 +137,9 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   statistic                 = "Average"
   insufficient_data_actions = []
 
-  evaluation_periods  = var.insthc_eval_periods
-  period              = var.insthc_period
-  threshold           = var.insthc_threshold
+  evaluation_periods = var.insthc_eval_periods
+  period             = var.insthc_period
+  threshold          = var.insthc_threshold
   alarm_actions      = [var.topic]
   dimensions = {
     InstanceId = var.instanceId
@@ -156,9 +156,9 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   statistic                 = "Average"
   insufficient_data_actions = []
 
-  evaluation_periods  = var.syshc_eval_periods
-  period              = var.syshc_period
-  threshold           = var.syshc_threshold
+  evaluation_periods = var.syshc_eval_periods
+  period             = var.syshc_period
+  threshold          = var.syshc_threshold
   alarm_actions      = [var.topic]
   dimensions = {
     InstanceId = var.instanceId
@@ -176,7 +176,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_stop_alarm" {
   threshold           = 1
 
   dimensions = {
-    InstanceId = var.instanceId  
+    InstanceId = var.instanceId
   }
 
   alarm_description = "This alarm will trigger when the EC2 instance stops."

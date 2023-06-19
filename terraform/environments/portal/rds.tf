@@ -38,7 +38,7 @@ locals {
   workspaces_cidr                 = "10.200.16.0/20"
   cp_vpc_cidr                     = "172.20.0.0/20"
   lzprd-vpc                       = "10.205.0.0/20"
- }
+}
 
 resource "aws_db_subnet_group" "igdb" {
   name       = "${local.application_name}-${local.environment}-subnetgrp-${lower(local.igdb_dbname)}"
@@ -73,38 +73,38 @@ resource "aws_db_parameter_group" "igdb-parametergroup-19c" {
 
 
   parameter {
-    name  = "open_cursors"
-    value = "1000"
+    name         = "open_cursors"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "processes"
-    value = "1000"
+    name         = "processes"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "query_rewrite_enabled"
-    value = "TRUE"
+    name         = "query_rewrite_enabled"
+    value        = "TRUE"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "query_rewrite_integrity"
-    value = "TRUSTED"
+    name         = "query_rewrite_integrity"
+    value        = "TRUSTED"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "sessions"
-    value = "1000"
+    name         = "sessions"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "sqlnetora.sqlnet.allowed_logon_version_server"
-    value = "11"
+    name         = "sqlnetora.sqlnet.allowed_logon_version_server"
+    value        = "11"
     apply_method = "pending-reboot"
   }
 
@@ -122,38 +122,38 @@ resource "aws_db_parameter_group" "iadb-parametergroup-19c" {
 
 
   parameter {
-    name  = "open_cursors"
-    value = "1000"
+    name         = "open_cursors"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "processes"
-    value = "1000"
+    name         = "processes"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "query_rewrite_enabled"
-    value = "TRUE"
+    name         = "query_rewrite_enabled"
+    value        = "TRUE"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "query_rewrite_integrity"
-    value = "TRUSTED"
+    name         = "query_rewrite_integrity"
+    value        = "TRUSTED"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "sessions"
-    value = "1000"
+    name         = "sessions"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "sqlnetora.sqlnet.allowed_logon_version_server"
-    value = "11"
+    name         = "sqlnetora.sqlnet.allowed_logon_version_server"
+    value        = "11"
     apply_method = "pending-reboot"
   }
 
@@ -250,37 +250,37 @@ resource "aws_security_group" "igdb" {
 
 
   ingress {
-    description = "Inbound TNS access from Portal IDM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal IDM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.idm_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OAM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OAM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.oam_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OIM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OIM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.oim_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OHS Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OHS Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.ohs_instance.id]
   }
 
@@ -351,37 +351,37 @@ resource "aws_security_group" "iadb" {
 
 
   ingress {
-    description = "Inbound TNS access from Portal IDM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal IDM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.idm_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OAM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OAM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.oam_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OIM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OIM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.oim_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OHS Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OHS Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.ohs_instance.id]
   }
 
@@ -468,11 +468,11 @@ resource "aws_db_instance" "appdb1" {
   password               = random_password.rds_password_igdb.result
   vpc_security_group_ids = [aws_security_group.igdb.id]
   #skip_final_snapshot             = false
-  final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
-  parameter_group_name  = aws_db_parameter_group.igdb-parametergroup-19c.name
-  db_subnet_group_name  = aws_db_subnet_group.igdb.name
-  maintenance_window    = local.igdb_maintenance_window
-  license_model         = "bring-your-own-license"
+  final_snapshot_identifier = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  parameter_group_name      = aws_db_parameter_group.igdb-parametergroup-19c.name
+  db_subnet_group_name      = aws_db_subnet_group.igdb.name
+  maintenance_window        = local.igdb_maintenance_window
+  license_model             = "bring-your-own-license"
   #TODO deletion_protection   = true
   copy_tags_to_snapshot = true
   storage_encrypted     = true
@@ -517,11 +517,11 @@ resource "aws_db_instance" "appdb2" {
   password               = random_password.rds_password_iadb.result
   vpc_security_group_ids = [aws_security_group.iadb.id]
   #skip_final_snapshot             = false
-  final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
-  parameter_group_name  = aws_db_parameter_group.iadb-parametergroup-19c.name
-  db_subnet_group_name  = aws_db_subnet_group.iadb.name
-  maintenance_window    = local.iadb_maintenance_window
-  license_model         = "bring-your-own-license"
+  final_snapshot_identifier = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  parameter_group_name      = aws_db_parameter_group.iadb-parametergroup-19c.name
+  db_subnet_group_name      = aws_db_subnet_group.iadb.name
+  maintenance_window        = local.iadb_maintenance_window
+  license_model             = "bring-your-own-license"
   #TODO deletion_protection   = true
   copy_tags_to_snapshot = true
   storage_encrypted     = true

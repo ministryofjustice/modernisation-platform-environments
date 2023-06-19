@@ -9,7 +9,7 @@ resource "aws_backup_vault" "portal" {
 # Non production backups
 resource "aws_backup_plan" "non_prod_portal" {
   count = local.environment != "production" ? 1 : 0
-  name = "${local.application_name}-backup-daily-retain-35-days"
+  name  = "${local.application_name}-backup-daily-retain-35-days"
 
   rule {
     rule_name         = "${local.application_name}-backup-daily-retain-35-days"
@@ -43,7 +43,7 @@ resource "aws_backup_plan" "non_prod_portal" {
 }
 
 resource "aws_backup_selection" "non_prod_portal" {
-  count = local.environment != "production" ? 1 : 0
+  count        = local.environment != "production" ? 1 : 0
   name         = "${local.application_name}-non-production-backup"
   iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/AWSBackup"
   plan_id      = aws_backup_plan.non_prod_portal[0].id
@@ -65,7 +65,7 @@ resource "aws_backup_selection" "non_prod_portal" {
 # TODO Not deployed yet to be checked when building for production
 resource "aws_backup_plan" "prod_portal" {
   count = local.environment == "production" ? 1 : 0
-  name = "${local.application_name}-backup-hourly-retain-35-days"
+  name  = "${local.application_name}-backup-hourly-retain-35-days"
 
   rule {
     rule_name         = "${local.application_name}-backup-hourly-retain-35-days"
@@ -99,7 +99,7 @@ resource "aws_backup_plan" "prod_portal" {
 }
 
 resource "aws_backup_selection" "prod_portal" {
-  count = local.environment == "production" ? 1 : 0
+  count        = local.environment == "production" ? 1 : 0
   name         = "${local.application_name}-production-backup"
   iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/AWSBackup"
   plan_id      = aws_backup_plan.prod_portal[0].id

@@ -31,8 +31,8 @@ resource "aws_security_group" "idm_instance" {
 
 resource "aws_vpc_security_group_egress_rule" "idm_sg_outbound" {
   security_group_id = aws_security_group.idm_instance.id
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
 }
 
 # TODO some rules will need adding referencing Landing Zone environments (e.g. VPC) for other dependent applications not migrated to MP yet but needs talking to Portal.
@@ -40,141 +40,141 @@ resource "aws_vpc_security_group_egress_rule" "idm_sg_outbound" {
 # Some rules may need updating or removing as we migrate more applications across to MP.
 
 resource "aws_vpc_security_group_ingress_rule" "weblogic_admin_port_from_shared_svs" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  count             = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.idm_instance.id
-  description = "Weblogic Admin Server port from Shared Svs"
-  cidr_ipv4   = local.nonprod_workspaces_cidr
-  from_port   = 7001
-  ip_protocol = "tcp"
-  to_port     = 7001
+  description       = "Weblogic Admin Server port from Shared Svs"
+  cidr_ipv4         = local.nonprod_workspaces_cidr
+  from_port         = 7001
+  ip_protocol       = "tcp"
+  to_port           = 7001
 }
 
 resource "aws_vpc_security_group_ingress_rule" "weblogic_admin_port2_from_shared_svs" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  count             = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.idm_instance.id
-  description = "Weblogic Admin Server port from Shared Svs"
-  cidr_ipv4   = local.nonprod_workspaces_cidr
-  from_port   = 7201
-  ip_protocol = "tcp"
-  to_port     = 7201
+  description       = "Weblogic Admin Server port from Shared Svs"
+  cidr_ipv4         = local.nonprod_workspaces_cidr
+  from_port         = 7201
+  ip_protocol       = "tcp"
+  to_port           = 7201
 }
 
 resource "aws_vpc_security_group_ingress_rule" "idm_odsm_from_workspaces" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  count             = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.idm_instance.id
-  description = "IDM ODSM access from Workspaces"
-  cidr_ipv4   = local.nonprod_workspaces_cidr
-  from_port   = 14200
-  ip_protocol = "tcp"
-  to_port     = 14200
+  description       = "IDM ODSM access from Workspaces"
+  cidr_ipv4         = local.nonprod_workspaces_cidr
+  from_port         = 14200
+  ip_protocol       = "tcp"
+  to_port           = 14200
 }
 
 resource "aws_vpc_security_group_ingress_rule" "weblogic_admin_port_from_prod_shared_svs" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "Weblogic Admin Server port from Prod Shared Svs"
-  cidr_ipv4   = local.prod_workspaces_cidr
-  from_port   = 7001
-  ip_protocol = "tcp"
-  to_port     = 7001
+  description       = "Weblogic Admin Server port from Prod Shared Svs"
+  cidr_ipv4         = local.prod_workspaces_cidr
+  from_port         = 7001
+  ip_protocol       = "tcp"
+  to_port           = 7001
 }
 
 resource "aws_vpc_security_group_ingress_rule" "idm_odsm_from_prod_workspaces" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "IDM ODSM access from Prod Workspaces"
-  cidr_ipv4   = local.prod_workspaces_cidr
-  from_port   = 14200
-  ip_protocol = "tcp"
-  to_port     = 14200
+  description       = "IDM ODSM access from Prod Workspaces"
+  cidr_ipv4         = local.prod_workspaces_cidr
+  from_port         = 14200
+  ip_protocol       = "tcp"
+  to_port           = 14200
 }
 
 resource "aws_vpc_security_group_ingress_rule" "weblogic_server_port" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "Weblogic Managed Server port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 4444
-  ip_protocol = "tcp"
-  to_port     = 4444
+  description       = "Weblogic Managed Server port"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 4444
+  ip_protocol       = "tcp"
+  to_port           = 4444
 }
 
 resource "aws_vpc_security_group_ingress_rule" "opmn_idm1_to_idm2" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "Allow Adminserver to communicate to OPMN from IDM1 to IDM2"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 6800
-  ip_protocol = "tcp"
-  to_port     = 6801
+  description       = "Allow Adminserver to communicate to OPMN from IDM1 to IDM2"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 6800
+  ip_protocol       = "tcp"
+  to_port           = 6801
 }
 
 resource "aws_vpc_security_group_ingress_rule" "idm_nodemanager" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "IDM NodeManager Port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 5556
-  ip_protocol = "tcp"
-  to_port     = 5556
+  description       = "IDM NodeManager Port"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 5556
+  ip_protocol       = "tcp"
+  to_port           = 5556
 }
 
 resource "aws_vpc_security_group_ingress_rule" "idm_server_ods" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "IDM Managed Server(ods)"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 14200
-  ip_protocol = "tcp"
-  to_port     = 14200
+  description       = "IDM Managed Server(ods)"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 14200
+  ip_protocol       = "tcp"
+  to_port           = 14200
 }
 
 resource "aws_vpc_security_group_ingress_rule" "idm_ingress_1636_tls" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "IDM Inbound on 1636 TLS"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 1636
-  ip_protocol = "tcp"
-  to_port     = 1636
+  description       = "IDM Inbound on 1636 TLS"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 1636
+  ip_protocol       = "tcp"
+  to_port           = 1636
 }
 
 resource "aws_vpc_security_group_ingress_rule" "weblogic_admin_server_port" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "Weblogic Admin Server port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 7001
-  ip_protocol = "tcp"
-  to_port     = 7001
+  description       = "Weblogic Admin Server port"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 7001
+  ip_protocol       = "tcp"
+  to_port           = 7001
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ping_echo" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "Ping Echo"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 6200
-  ip_protocol = "tcp"
-  to_port     = 6200
+  description       = "Ping Echo"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 6200
+  ip_protocol       = "tcp"
+  to_port           = 6200
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ping_allow" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "Allow ping response"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 8
-  ip_protocol = "icmp"
-  to_port     = -1
+  description       = "Allow ping response"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 8
+  ip_protocol       = "icmp"
+  to_port           = -1
 }
 
 resource "aws_vpc_security_group_ingress_rule" "weblogic_admin_server_port2" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "Weblogic Admin Server port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 7201
-  ip_protocol = "tcp"
-  to_port     = 7201
+  description       = "Weblogic Admin Server port"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 7201
+  ip_protocol       = "tcp"
+  to_port           = 7201
 }
 
 resource "aws_vpc_security_group_ingress_rule" "idm_ingress_1389_tls" {
   security_group_id = aws_security_group.idm_instance.id
-  description = "Idm Inbound on 1389"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 1389
-  ip_protocol = "tcp"
-  to_port     = 1389
+  description       = "Idm Inbound on 1389"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 1389
+  ip_protocol       = "tcp"
+  to_port           = 1389
 }
 
 ###### TO CHECK INGRESS RULES ######
@@ -197,39 +197,39 @@ resource "aws_vpc_security_group_ingress_rule" "idm_ingress_1389_tls" {
 # }
 
 resource "aws_vpc_security_group_ingress_rule" "redc_1636_tls" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  count             = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.idm_instance.id
-  cidr_ipv4   = local.redc_cidr
-  from_port   = 1636
-  ip_protocol = "tcp"
-  to_port     = 1636
+  cidr_ipv4         = local.redc_cidr
+  from_port         = 1636
+  ip_protocol       = "tcp"
+  to_port           = 1636
 }
 
 resource "aws_vpc_security_group_ingress_rule" "redc_1389_tls" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  count             = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.idm_instance.id
-  cidr_ipv4   = local.redc_cidr
-  from_port   = 1389
-  ip_protocol = "tcp"
-  to_port     = 1389
+  cidr_ipv4         = local.redc_cidr
+  from_port         = 1389
+  ip_protocol       = "tcp"
+  to_port           = 1389
 }
 
 resource "aws_vpc_security_group_ingress_rule" "atos_1636_tls" {
-  count = contains(["uat", "production"], local.environment) ? 1 : 0
+  count             = contains(["uat", "production"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.idm_instance.id
-  cidr_ipv4   = local.atos_cidr
-  from_port   = 1636
-  ip_protocol = "tcp"
-  to_port     = 1636
+  cidr_ipv4         = local.atos_cidr
+  from_port         = 1636
+  ip_protocol       = "tcp"
+  to_port           = 1636
 }
 
 resource "aws_vpc_security_group_ingress_rule" "atos_1389_tls" {
-  count = contains(["uat", "production"], local.environment) ? 1 : 0
+  count             = contains(["uat", "production"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.idm_instance.id
-  cidr_ipv4   = local.atos_cidr
-  from_port   = 1389
-  ip_protocol = "tcp"
-  to_port     = 1389
+  cidr_ipv4         = local.atos_cidr
+  from_port         = 1389
+  ip_protocol       = "tcp"
+  to_port           = 1389
 }
 
 # nfs to be replaced with efs so this ingress rule is no longer required
@@ -265,15 +265,15 @@ resource "aws_instance" "idm_instance_1" {
 }
 
 resource "aws_instance" "idm_instance_2" {
-  count = local.environment == "production" ? 1 : 0
-  ami                         = local.application_data.accounts[local.environment].idm_ami_id
-  availability_zone           = "eu-west-2b"
-  instance_type               = local.application_data.accounts[local.environment].idm_instance_type
-  vpc_security_group_ids      = [aws_security_group.idm_instance.id]
-  monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_subnets_b.id
-  iam_instance_profile        = aws_iam_instance_profile.portal.id # TODO to be updated once merging with OHS work
-  user_data_base64            = base64encode(local.oam_2_userdata)
+  count                  = local.environment == "production" ? 1 : 0
+  ami                    = local.application_data.accounts[local.environment].idm_ami_id
+  availability_zone      = "eu-west-2b"
+  instance_type          = local.application_data.accounts[local.environment].idm_instance_type
+  vpc_security_group_ids = [aws_security_group.idm_instance.id]
+  monitoring             = true
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  iam_instance_profile   = aws_iam_instance_profile.portal.id # TODO to be updated once merging with OHS work
+  user_data_base64       = base64encode(local.oam_2_userdata)
 
   tags = merge(
     local.tags,

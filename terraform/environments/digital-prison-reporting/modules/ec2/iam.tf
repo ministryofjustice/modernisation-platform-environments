@@ -124,12 +124,12 @@ data "aws_iam_policy_document" "dms" {
       "s3:ListAllMyBuckets",
       "s3:ListAccessPoints",
       "s3:ListJobs",
-      "s3:ListObjects",  
+      "s3:ListObjects",
     ]
     resources = [
       "*"
     ]
-  } 
+  }
 
   statement {
     actions = [
@@ -138,8 +138,8 @@ data "aws_iam_policy_document" "dms" {
       "iam:CreateRole",
       "iam:AttachRolePolicy",
     ]
-    resources = ["*"]   
-  } 
+    resources = ["*"]
+  }
 }
 
 ## Glue Access Policy
@@ -251,7 +251,7 @@ data "aws_iam_policy_document" "dynamo-access" {
     ]
     resources = [
       "arn:aws:dynamodb:${var.region}:${var.account}:table/*/index/*",
-      "arn:aws:dynamodb:${var.region}:${var.account}:table/*/stream/*"    ]
+    "arn:aws:dynamodb:${var.region}:${var.account}:table/*/stream/*"]
   }
 }
 
