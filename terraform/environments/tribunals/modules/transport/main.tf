@@ -35,7 +35,10 @@ module "app_based_resources" {
   moj_ip                      = var.moj_ip
   local_tags                  = var.local_tags
   shared_public_ids           = var.shared_public_ids
-
+  environment                 = var.environment 
+  networking_business_unit    = var.networking_business_unit
+  domain_name_main            = var.domain_name_main
+  domain_name_sub             = var.domain_name_sub
 }
 
 

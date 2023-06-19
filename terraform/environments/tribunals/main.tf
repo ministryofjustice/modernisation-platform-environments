@@ -144,4 +144,11 @@ module "transport" {
   client_id                   = ""
   local_tags                  = local.tags
   shared_public_ids           = data.aws_subnets.shared-public.ids
+  networking_business_unit    = var.networking[0].business-unit
+  domain_name_main            = local.domain_name_main[0]
+  domain_name_sub             = local.domain_name_sub[0]
+  domain_record_main          = local.domain_record_main
+  domain_type_main            = local.domain_type_main[0]
+  route53_zone_id             = data.aws_route53_zone.network-services.zone_id
+  locals                      = locals
 }

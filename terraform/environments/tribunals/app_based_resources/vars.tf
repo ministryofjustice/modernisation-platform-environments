@@ -49,4 +49,8 @@ variable "moj_ip" {
 variable "shared_public_ids" {  
 }
 
+variable "networking_business_unit" {  
+}
 
+variable "locals" {  
+}
