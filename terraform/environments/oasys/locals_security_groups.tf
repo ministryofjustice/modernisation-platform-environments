@@ -86,9 +86,11 @@ locals {
           from_port   = 0
           to_port     = 8080
           protocol    = "tcp"
-          cidr_blocks = [
+          # no security groups on an NLB so need to put public and private on the internal ALB
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https, 
             "10.102.0.0/16", # NOMS-Mgmt
-          ]
+          ])
           security_groups = ["public"]
         }
         https = {
@@ -96,9 +98,11 @@ locals {
           from_port   = 0
           to_port     = 443
           protocol    = "tcp"
-          cidr_blocks = [
+          # no security groups on an NLB so need to put public and private on the internal ALB
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https,
             "10.102.0.0/16", # NOMS-Mgmt
-          ]
+          ])
           security_groups = ["public"]
         }
       }
