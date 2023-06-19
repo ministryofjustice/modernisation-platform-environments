@@ -33,6 +33,8 @@ module "app_based_resources" {
   client_id                   = var.client_id
   vpc_id                      = var.vpc_id
   moj_ip                      = var.moj_ip
+  local_tags                  = var.local_tags
+  shared_public_ids           = var.shared_public_ids
 
 }
 

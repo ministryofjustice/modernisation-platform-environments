@@ -142,4 +142,6 @@ module "transport" {
   moj_ip                      = local.application_data.accounts[local.environment].moj_ip
   vpc_id                      = data.aws_vpc.shared.id
   client_id                   = ""
+  local_tags                  = local.tags
+  shared_public_ids           = data.aws_subnets.shared-public.ids
 }

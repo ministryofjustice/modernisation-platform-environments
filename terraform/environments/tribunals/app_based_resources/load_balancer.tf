@@ -40,7 +40,7 @@ resource "aws_lb" "app_lb" {
   name                       = "${var.app_name}-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.app_lb_sc.id]
-  subnets                    = data.aws_subnets.shared-public.ids
+  subnets                    = var.shared_public_ids
   enable_deletion_protection = false
   internal                   = false
   depends_on                 = [aws_security_group.app_lb_sc]

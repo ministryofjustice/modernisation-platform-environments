@@ -60,6 +60,11 @@ variable "moj_ip" {
 variable "vpc_id" {
 }
 
-variable "client_id" {
-  
+variable "client_id" { 
+}
+
+variable "local_tags" { 
+}
+
+variable "shared_public_ids" {  
 }

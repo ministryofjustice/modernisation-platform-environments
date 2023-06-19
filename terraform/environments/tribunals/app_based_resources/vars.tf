@@ -34,12 +34,19 @@ variable "curserver" {
 variable "client_id" {  
 }
 
+variable "local_tags" {  
+}
+
+
 ###################### Load Balancer ######################
 
 variable "vpc_id" {  
 }
 
 variable "moj_ip" {  
+}
+
+variable "shared_public_ids" {  
 }
 
 

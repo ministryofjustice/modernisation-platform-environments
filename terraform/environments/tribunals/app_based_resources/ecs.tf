@@ -136,7 +136,7 @@ resource "aws_iam_role" "app_execution" {
 EOF
 
   tags = merge(
-    local.tags,
+    var.local_tags,
     {
       Name = "execution-${var.app_name}"
     },
@@ -186,7 +186,7 @@ resource "aws_iam_role" "app_task" {
 EOF
 
   tags = merge(
-    local.tags,
+    var.local_tags,
     {
       Name = "task-${var.app_name}"
     },
@@ -219,7 +219,7 @@ resource "aws_iam_role_policy" "app_task" {
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port       = 80
