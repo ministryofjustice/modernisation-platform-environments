@@ -41,7 +41,7 @@ resource "aws_lb_target_group_attachment" "ebs_vision_db_attachment" {
 }
 //new preclone config
 resource "aws_lb" "ebs_vision_db_lb_pre_clone" {
-  name               = lower(format("lb-%s-%s", substr(local.application_name, 0, 23), substr(local.environment, 0, 3)))
+  name               = lower(format("lb-%s-%s-pc", substr(local.application_name, 0, 21), substr(local.environment, 0, 3)))
   internal           = true
   load_balancer_type = "application"
   //will need new one
@@ -63,7 +63,7 @@ resource "aws_lb" "ebs_vision_db_lb_pre_clone" {
 
 #
 resource "aws_lb_target_group" "ebs_vision_db_pc_tg_http" {
-  name     = lower(format("tg-%s-%s", substr(local.application_name, 0, 23), substr(local.environment, 0, 3)))
+  name     = lower(format("tg-%s-%s-pc", substr(local.application_name, 0, 21), substr(local.environment, 0, 3)))
   port     = 8000
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
