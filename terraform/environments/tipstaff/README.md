@@ -15,11 +15,11 @@ Terraform Infrastructure as code that creates 3 AWS environments for the Tipstaf
 
 ### **Service URLs:**
 
-Dev: https://tipstaff.hmcts-development.modernisation-platform.service.justice.gov.uk/
+Dev: <https://tipstaff.hmcts-development.modernisation-platform.service.justice.gov.uk/>
 
-Staging: https://tipstaff.hmcts-preproduction.modernisation-platform.service.justice.gov.uk/
+Staging: <https://tipstaff.hmcts-preproduction.modernisation-platform.service.justice.gov.uk/>
 
-Prod: https://tipstaff.service.justice.gov.uk/
+Prod: <https://tipstaff.service.justice.gov.uk/>
 
 ### **Incident response hours:**
 
@@ -39,7 +39,7 @@ Modernisation Platform
 
 ### **Other URLs:**
 
-The service's GitHub repository can be found at: https://github.com/ministryofjustice/Tipstaff
+The service's GitHub repository can be found at: <https://github.com/ministryofjustice/Tipstaff>
 
 ### **Restrictions on access:**
 

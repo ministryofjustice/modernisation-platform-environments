@@ -91,7 +91,7 @@ resource "aws_dms_endpoint" "target" {
       service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
       stream_arn                     = lookup(var.kinesis_settings, "kinesis_target_stream", null)
     }
-  }  
+  }
 
   tags = var.tags
 }

@@ -1,8 +1,8 @@
 variable "vpc" {}
 
-variable project_id {
+variable "project_id" {
   type        = string
-  description = "Project ID"  
+  description = "Project ID"
 }
 
 variable "env" {

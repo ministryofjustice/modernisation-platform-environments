@@ -24,7 +24,7 @@ resource "aws_security_group" "oim_instance" {
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
-ingress {
+  ingress {
     description = "Nodemanager port"
     from_port   = 5556
     to_port     = 5556
@@ -34,7 +34,7 @@ ingress {
   }
 
 
-ingress {
+  ingress {
     description = "OIM Admin Console from Shared Svs"
     from_port   = 7101
     to_port     = 7101
@@ -43,7 +43,7 @@ ingress {
 
   }
 
-ingress {
+  ingress {
     description = "OIM Admin Console"
     from_port   = 7101
     to_port     = 7101
@@ -106,14 +106,14 @@ ingress {
 
   }
 
-# nfs to be replaced with efs so this ingress rule is no longer required
-# ingress {
-#     description = "Inbound NFS from other OIM Instances"
-#     from_port   = 2049
-#     to_port     = 2049
-#     protocol    = "TCP"
-#     self        = true
-#   }
+  # nfs to be replaced with efs so this ingress rule is no longer required
+  # ingress {
+  #     description = "Inbound NFS from other OIM Instances"
+  #     from_port   = 2049
+  #     to_port     = 2049
+  #     protocol    = "TCP"
+  #     self        = true
+  #   }
 
   # ingress {
   #   description = "SSH access from VPC"
@@ -189,14 +189,14 @@ resource "aws_instance" "oim1" {
 
 
 resource "aws_instance" "oim2" {
-  count = local.environment == "production" ? 1 : 0
-  ami                            = local.oim_ami-id
-  instance_type                  = local.application_data.accounts[local.environment].oim_instance_type
-  vpc_security_group_ids         = [aws_security_group.oim_instance.id]
-  subnet_id                      = data.aws_subnet.data_subnets_b.id
-  iam_instance_profile           = aws_iam_instance_profile.portal.id
-  user_data_base64               = base64encode(local.oim_2_userdata)
-  user_data_replace_on_change     = true
+  count                       = local.environment == "production" ? 1 : 0
+  ami                         = local.oim_ami-id
+  instance_type               = local.application_data.accounts[local.environment].oim_instance_type
+  vpc_security_group_ids      = [aws_security_group.oim_instance.id]
+  subnet_id                   = data.aws_subnet.data_subnets_b.id
+  iam_instance_profile        = aws_iam_instance_profile.portal.id
+  user_data_base64            = base64encode(local.oim_2_userdata)
+  user_data_replace_on_change = true
 
   #   # root_block_device {
   #   # delete_on_termination     = false
