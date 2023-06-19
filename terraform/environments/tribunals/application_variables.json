@@ -12,7 +12,7 @@
       "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com",
       "curserver": "DEVELOPMENT",
       "support_team": "DTS Legacy Apps Support Team",
-      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net"
     },
     "test": {
       "example_var": "test-data"
@@ -29,7 +29,7 @@
       "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com",
       "curserver": "PREPRODUCTION",
       "support_team": "DTS Legacy Apps Support Team",
-      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net"
     },
     "production": {
       "moj_ip": "81.134.202.29/32",
@@ -43,7 +43,7 @@
       "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com",
       "curserver": "PRODUCTION",
       "support_team": "DTS Legacy Apps Support Team",
-      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net"
     }
   },
   "ec2_sg_rules": {

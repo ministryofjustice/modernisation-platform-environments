@@ -91,7 +91,7 @@ resource "aws_ecs_service" "ecs_service" {
     aws_lb_listener.app_lb
   ]
 
-  name                              = var.networking[0].application
+  name                              = var.app_name
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.ecs_task_definition.arn
   launch_type                       = "FARGATE"
@@ -117,7 +117,7 @@ resource "aws_ecs_service" "ecs_service" {
 }
 
 resource "aws_iam_role" "app_execution" {
-  name = "execution-${var.networking[0].application}"
+  name = "execution-${var.app_name}"
 
   assume_role_policy = <<EOF
 {
@@ -138,13 +138,13 @@ EOF
   tags = merge(
     local.tags,
     {
-      Name = "execution-${var.networking[0].application}"
+      Name = "execution-${var.app_name}"
     },
   )
 }
 
 resource "aws_iam_role_policy" "app_execution" {
-  name = "execution-${var.networking[0].application}"
+  name = "execution-${var.app_name}"
   role = aws_iam_role.app_execution.id
 
   policy = <<-EOF
@@ -167,7 +167,7 @@ resource "aws_iam_role_policy" "app_execution" {
 }
 
 resource "aws_iam_role" "app_task" {
-  name = "task-${var.networking[0].application}"
+  name = "task-${var.app_name}"
 
   assume_role_policy = <<EOF
 {
@@ -188,13 +188,13 @@ EOF
   tags = merge(
     local.tags,
     {
-      Name = "task-${var.networking[0].application}"
+      Name = "task-${var.app_name}"
     },
   )
 }
 
 resource "aws_iam_role_policy" "app_task" {
-  name = "task-${var.networking[0].application}"
+  name = "task-${var.app_name}"
   role = aws_iam_role.app_task.id
 
   policy = <<-EOF
