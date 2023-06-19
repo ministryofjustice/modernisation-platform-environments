@@ -41,7 +41,7 @@ resource "aws_route53_record" "ebs_db_a_record" {
 resource "aws_route53_record" "sg_ebs_vision_db_preclone_a_record" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name     = "${var.networking[0].application}-preclone.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
 
   alias {
