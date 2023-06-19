@@ -197,16 +197,16 @@ locals {
   # green deployment
   weblogic_ec2_b = merge(local.weblogic_ec2_default, {
     config = merge(local.weblogic_ec2_default.config, {
-      availability_zone = "${local.region}a" # NOTE: remove this permanently when next disabling -b instances
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "f8ece8fc507d42c638878ede0f9030455669bb74" # 2023-04-27 reporting fix
+        branch = "main"
       })
     })
-    # autoscaling_group = merge(local.module.baseline_presets.ec2_autoscaling_group.default, {
-    #   desired_capacity = 0
-    # })
+    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {}) 
+    autoscaling_group = merge(local.module.baseline_presets.ec2_autoscaling_group.default, {
+      desired_capacity = 0
+    })
     cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
       deployment = "green"
