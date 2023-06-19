@@ -454,10 +454,10 @@ variable "lbs" {
     load_balancer_type       = optional(string, "application")
     security_groups          = list(string)
     public_subnets           = list(string)
-    existing_target_groups   = optional(map(object({
+    existing_target_groups = optional(map(object({
       arn = string
     })), {})
-    tags                     = optional(map(string), {})
+    tags = optional(map(string), {})
     lb_target_groups = optional(map(object({
       port                 = optional(number)
       deregistration_delay = optional(number)

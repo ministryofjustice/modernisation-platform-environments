@@ -26,39 +26,39 @@
 resource "aws_efs_file_system" "efs" {
 
     performance_mode    = "generalPurpose"
-    throughput_mode     = "bursting"
+    throughput_mode     = "elastic"
     encrypted           = "true"
 
-    tags                = merge(
-      local.tags,
-      { "Name" = "${local.application_name}-repo_home" },
-      local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
-    )
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-repo_home" },
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+  )
 
-    lifecycle {
-      prevent_destroy = true
-    }
+  lifecycle {
+    prevent_destroy = true
+  }
 
- }
+}
 
 
 resource "aws_efs_mount_target" "target_a" {
 
-  file_system_id = aws_efs_file_system.efs.id
-  subnet_id      = data.aws_subnet.private_subnets_a.id
+  file_system_id  = aws_efs_file_system.efs.id
+  subnet_id       = data.aws_subnet.private_subnets_a.id
   security_groups = [for k, v in local.efs : aws_security_group.efs_product[k].id]
 }
 
 resource "aws_efs_mount_target" "target_b" {
 
-  file_system_id = aws_efs_file_system.efs.id
-  subnet_id      = data.aws_subnet.private_subnets_b.id
+  file_system_id  = aws_efs_file_system.efs.id
+  subnet_id       = data.aws_subnet.private_subnets_b.id
   security_groups = [for k, v in local.efs : aws_security_group.efs_product[k].id]
 }
 
 resource "aws_efs_mount_target" "target_c" {
 
-  file_system_id = aws_efs_file_system.efs.id
-  subnet_id      = data.aws_subnet.private_subnets_c.id
+  file_system_id  = aws_efs_file_system.efs.id
+  subnet_id       = data.aws_subnet.private_subnets_c.id
   security_groups = [for k, v in local.efs : aws_security_group.efs_product[k].id]
 }

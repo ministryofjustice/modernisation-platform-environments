@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "ses_identity_policy" {
     actions   = ["SES:SendEmail", "SES:SendRawEmail"]
     resources = [aws_ses_domain_identity.domain_identity.arn]
     condition {
-      test    = "StringLike"
+      test     = "StringLike"
       variable = "ses:Recipients"
       values = [
         "ashok.turamari@digital.justice.gov.uk",

@@ -126,7 +126,7 @@ locals {
         { key = "ec2", name = "instance-status-check-failed-in-last-hour" },
         { key = "ec2", name = "system-status-check-failed-in-last-hour" },
         { key = "ec2_cwagent_linux", name = "free-disk-space-low-1hour" },
-        { key = "ec2_cwagent_linux", name = "high-memory-usage-15mins" },
+        # { key = "ec2_cwagent_linux", name = "high-memory-usage-15mins" },
         { key = "ec2_cwagent_linux", name = "cpu-iowait-high-3hour" },
         { key = "database", name = "oracle-db-disconnected" },
         { key = "database", name = "oracle-batch-failure" },

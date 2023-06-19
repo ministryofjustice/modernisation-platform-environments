@@ -48,7 +48,7 @@ resource "aws_sns_topic_subscription" "s3_subscription" {
 
 #### DDoS ####
 resource "aws_sns_topic" "ddos_alarm" {
-  name              = format("%s_ddos_alarm", local.application_name)
+  name = format("%s_ddos_alarm", local.application_name)
   #kms_master_key_id = "alias/aws/sns"
 }
 resource "aws_sns_topic_policy" "ddos_policy" {

@@ -1,14 +1,14 @@
 locals {
   # EC2 User data
   # TODO The hostname is too long as the domain itself is 62 characters long... If this hostname is required, a new domain is required
-
+  # /etc/fstab mount setting as per https://docs.aws.amazon.com/efs/latest/ug/nfs-automount-efs.html
   oim_1_userdata = <<EOF
 #!/bin/bash
-echo "${aws_efs_file_system.product["oim"].dns_name}:/fmw /IDAM/product/fmw nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-echo "${aws_efs_file_system.product["oim"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-echo "${aws_efs_file_system.product["oim"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.product["oim"].dns_name}:/fmw /IDAM/product/fmw nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.product["oim"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.product["oim"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
-echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 mount -a
 hostnamectl set-hostname ${local.application_name}-oim1-ms.${local.portal_hosted_zone}
 EOF
@@ -24,7 +24,7 @@ resource "aws_security_group" "oim_instance" {
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
-ingress {
+  ingress {
     description = "Nodemanager port"
     from_port   = 5556
     to_port     = 5556
@@ -34,7 +34,7 @@ ingress {
   }
 
 
-ingress {
+  ingress {
     description = "OIM Admin Console from Shared Svs"
     from_port   = 7101
     to_port     = 7101
@@ -43,7 +43,7 @@ ingress {
 
   }
 
-ingress {
+  ingress {
     description = "OIM Admin Console"
     from_port   = 7101
     to_port     = 7101
@@ -106,14 +106,14 @@ ingress {
 
   }
 
-# nfs to be replaced with efs so this ingress rule is no longer required
-# ingress {
-#     description = "Inbound NFS from other OIM Instances"
-#     from_port   = 2049
-#     to_port     = 2049
-#     protocol    = "TCP"
-#     self        = true
-#   }
+  # nfs to be replaced with efs so this ingress rule is no longer required
+  # ingress {
+  #     description = "Inbound NFS from other OIM Instances"
+  #     from_port   = 2049
+  #     to_port     = 2049
+  #     protocol    = "TCP"
+  #     self        = true
+  #   }
 
   # ingress {
   #   description = "SSH access from VPC"
@@ -189,14 +189,14 @@ resource "aws_instance" "oim1" {
 
 
 resource "aws_instance" "oim2" {
-  count = local.environment == "production" ? 1 : 0
-  ami                            = local.oim_ami-id
-  instance_type                  = local.application_data.accounts[local.environment].oim_instance_type
-  vpc_security_group_ids         = [aws_security_group.oim_instance.id]
-  subnet_id                      = data.aws_subnet.data_subnets_b.id
-  iam_instance_profile           = aws_iam_instance_profile.portal.id
-  user_data_base64               = base64encode(local.oim_2_userdata)
-  user_data_replace_on_change     = true
+  count                       = local.environment == "production" ? 1 : 0
+  ami                         = local.oim_ami-id
+  instance_type               = local.application_data.accounts[local.environment].oim_instance_type
+  vpc_security_group_ids      = [aws_security_group.oim_instance.id]
+  subnet_id                   = data.aws_subnet.data_subnets_b.id
+  iam_instance_profile        = aws_iam_instance_profile.portal.id
+  user_data_base64            = base64encode(local.oim_2_userdata)
+  user_data_replace_on_change = true
 
   #   # root_block_device {
   #   # delete_on_termination     = false
