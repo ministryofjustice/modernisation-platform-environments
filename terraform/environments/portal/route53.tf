@@ -7,6 +7,6 @@ resource "aws_route53_zone" "private" {
 
 resource "aws_route53_vpc_association_authorization" "vpc_zone_association_auth" {
   provider  = aws.core-vpc
-  vpc_id    = aws_vpc.core-vpc.id
+  vpc_id    = data.aws_vpc.shared.id
   zone_id   = aws_route53_zone.private.id
 }
