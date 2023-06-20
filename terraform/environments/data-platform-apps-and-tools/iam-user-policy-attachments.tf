@@ -1,3 +1,4 @@
+/*
 ##################################################
 # Airflow SES
 ##################################################
@@ -6,3 +7,4 @@
 #   user       = module.airflow_iam_user.iam_user_name
 #   policy_arn = module.airflow_ses_policy.arn
 # }
+*/

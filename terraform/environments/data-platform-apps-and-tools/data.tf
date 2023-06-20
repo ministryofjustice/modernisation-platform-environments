@@ -1,3 +1,4 @@
+/*
 ##################################################
 # Data Platform Apps and Tools VPC
 ##################################################
@@ -46,3 +47,4 @@ data "aws_secretsmanager_secret_version" "airflow_iam_access_key_id" {
 data "aws_secretsmanager_secret_version" "airflow_iam_access_key_ses_smtp_password" {
   secret_id = "/${local.application_name}/${local.environment}/airflow/iam-access-key-ses-smtp-password"
 }
+*/

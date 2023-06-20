@@ -1,3 +1,4 @@
+/*
 ##################################################
 # Airflow Kubernetes Config
 ##################################################
@@ -28,3 +29,4 @@ resource "aws_s3_object" "airflow_requirements" {
   key         = local.airflow_requirements_s3_path
   source_hash = filemd5("${path.module}/src/airflow/requirements.txt")
 }
+*/

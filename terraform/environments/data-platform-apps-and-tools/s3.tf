@@ -1,3 +1,4 @@
+/*
 ##################################################
 # Airflow
 ##################################################
@@ -9,7 +10,8 @@ module "airflow_s3_bucket" {
     aws.bucket-replication = aws
   }
 
-  bucket_prefix = "moj-data-platform-airflow"
+  bucket_prefix = "moj-data-platform-airflow-${local.environment}"
 
   tags = local.tags
 }
+*/
