@@ -7,13 +7,13 @@ resource "aws_security_group" "oim_instance" {
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
-
 }
+
 
 resource "aws_vpc_security_group_ingress_rule" "oim_nodemanager" {
   security_group_id = aws_security_group.oim_instance.id
   description = "Nodemanager port"
-  cidr_ipv4   = [local.first-cidr]
+  cidr_ipv4   = local.first-cidr
   from_port   = 5556
   ip_protocol = "tcp"
   to_port     = 5556
@@ -22,7 +22,7 @@ resource "aws_vpc_security_group_ingress_rule" "oim_nodemanager" {
 resource "aws_vpc_security_group_ingress_rule" "oim_admin_Shared" {
   security_group_id = aws_security_group.oim_instance.id
   description = "OIM Admin Console from Shared Svs"
-  cidr_ipv4   = [local.second-cidr]
+  cidr_ipv4   = local.second-cidr
   from_port   = 7101
   ip_protocol = "tcp"
   to_port     = 7101
@@ -31,7 +31,7 @@ resource "aws_vpc_security_group_ingress_rule" "oim_admin_Shared" {
 resource "aws_vpc_security_group_ingress_rule" "oim_admin_console2" {
   security_group_id = aws_security_group.oim_instance.id
   description = "OIM Admin Console"
-  cidr_ipv4   = [local.first-cidr]
+  cidr_ipv4   = local.first-cidr
   from_port   = 7101
   ip_protocol = "tcp"
   to_port     = 7101
@@ -40,7 +40,7 @@ resource "aws_vpc_security_group_ingress_rule" "oim_admin_console2" {
 resource "aws_vpc_security_group_ingress_rule" "oim_ping" {
   security_group_id = aws_security_group.oim_instance.id
   description = "Allow ping response"
-  cidr_ipv4   = [local.first-cidr]
+  cidr_ipv4   = local.first-cidr
   from_port   = 8
   ip_protocol = "ICMP"
   to_port     = 1
@@ -49,7 +49,7 @@ resource "aws_vpc_security_group_ingress_rule" "oim_ping" {
 resource "aws_vpc_security_group_ingress_rule" "oim_inbound" {
   security_group_id = aws_security_group.oim_instance.id
   description = "OIM Inbound on 14000"
-  cidr_ipv4   = [local.first-cidr]
+  cidr_ipv4   = local.first-cidr
   from_port   = 14000
   ip_protocol = "TCP"
   to_port     = 14000
@@ -59,7 +59,7 @@ resource "aws_vpc_security_group_ingress_rule" "oim_inbound" {
 resource "aws_vpc_security_group_ingress_rule" "oim_bi" {
   security_group_id = aws_security_group.oim_instance.id
   description = "Oracle BI Port"
-  cidr_ipv4   = [local.first-cidr]
+  cidr_ipv4   = local.first-cidr
   from_port   = 9704
   ip_protocol = "TCP"
   to_port     = 9704
@@ -69,7 +69,7 @@ resource "aws_vpc_security_group_ingress_rule" "oim_bi" {
 resource "aws_vpc_security_group_ingress_rule" "oim_shared1" {
   security_group_id = aws_security_group.oim_instance.id
   description = "OIM Admin Console from Shared Svs"
-  cidr_ipv4   = [local.third-cidr]
+  cidr_ipv4   = local.third-cidr
   from_port   = 7101
   ip_protocol = "TCP"
   to_port     = 7101
@@ -78,7 +78,7 @@ resource "aws_vpc_security_group_ingress_rule" "oim_shared1" {
 resource "aws_vpc_security_group_ingress_rule" "oim_ssh" {
   security_group_id = aws_security_group.oim_instance.id
   description = "SSH access from prod bastions"
-  cidr_ipv4   = [local.third-cidr]
+  cidr_ipv4   = local.third-cidr
   from_port   = 22
   ip_protocol = "TCP"
   to_port     = 22
