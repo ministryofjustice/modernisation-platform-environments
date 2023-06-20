@@ -1,6 +1,9 @@
 locals {
 
   security_group_cidrs_devtest = {
+    icmp = flatten([
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
+    ])
     ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
     https = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -26,6 +29,9 @@ locals {
     ])
   }
   security_group_cidrs_preprod_prod = {
+    icmp = flatten([
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
+    ])
     ssh = module.ip_addresses.azure_fixngo_cidrs.prod
     https = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -223,6 +229,13 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+        }
+        icmp = {
+          description = "Allow icmp ingress"
+          from_port   = -1
+          to_port     = -1
+          protocol    = "icmp"
+          cidr_blocks = local.security_group_cidrs.icmp
         }
         ssh = {
           description = "Allow ssh ingress"

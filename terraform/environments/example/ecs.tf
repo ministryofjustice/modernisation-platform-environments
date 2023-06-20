@@ -2,37 +2,8 @@
 #------------------------Comment out file if not required----------------------------------
 ###########################################################################################
 
-module "ecs" {
-
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v2.1.3"
-
-  subnet_set_name         = local.subnet_set_name
-  vpc_all                 = local.vpc_all
-  app_name                = local.ecs_application_name
-  container_instance_type = local.application_data.accounts[local.environment].container_os_type
-  ami_image_id            = local.application_data.accounts[local.environment].container_ami_image_id
-  instance_type           = local.application_data.accounts[local.environment].container_instance_type
-  user_data               = base64encode(templatefile("${path.module}/templates/user_data.sh.tftpl", {}))
-  key_name                = local.application_data.accounts[local.environment].ecs_key_name
-  task_definition         = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
-  ec2_desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
-  ec2_max_size            = local.application_data.accounts[local.environment].ec2_max_size
-  ec2_min_size            = local.application_data.accounts[local.environment].ec2_min_size
-  container_cpu           = local.application_data.accounts[local.environment].container_cpu
-  container_memory        = local.application_data.accounts[local.environment].container_memory
-  task_definition_volume  = local.application_data.accounts[local.environment].task_definition_volume
-  network_mode            = local.application_data.accounts[local.environment].network_mode
-  server_port             = local.application_data.accounts[local.environment].server_port
-  app_count               = local.application_data.accounts[local.environment].app_count
-  ec2_ingress_rules       = local.ec2_ingress_rules
-  ec2_egress_rules        = local.ec2_egress_rules
-  lb_tg_name              = aws_lb_target_group.ecs_target_group.name
-  tags_common             = local.tags
-  depends_on              = [aws_lb_listener.ecs-example]
-}
-
 module "ecs-cluster" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
 
   ec2_capacity_instance_type     = local.application_data.accounts[local.environment].container_instance_type
   ec2_capacity_max_size          = local.application_data.accounts[local.environment].ec2_max_size
@@ -50,7 +21,7 @@ module "ecs-cluster" {
 }
 
 module "service" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v2.0.1"
 
   container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
   ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
@@ -152,7 +123,7 @@ locals {
 
 # Load balancer build using the module
 module "ecs_lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v3.0.0"
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
