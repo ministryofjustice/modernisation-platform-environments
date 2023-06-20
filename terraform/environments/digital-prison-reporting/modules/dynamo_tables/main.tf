@@ -85,7 +85,7 @@ resource "aws_dynamodb_table" "this" {
 
   lifecycle {
     ignore_changes = [read_capacity, write_capacity, global_secondary_index] # To Prevent Terraform Reporting Changes to Indexes always
-  }  
+  }
 }
 
 resource "aws_dynamodb_table" "autoscaled" {
