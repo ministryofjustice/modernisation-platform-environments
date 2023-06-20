@@ -1,17 +1,15 @@
-/*
 ##################################################
 # Airflow
 ##################################################
 
-module "airflow_s3_bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
+# module "airflow_s3_bucket" {
+#   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
-  providers = {
-    aws.bucket-replication = aws
-  }
+#   providers = {
+#     aws.bucket-replication = aws
+#   }
 
-  bucket_prefix = "moj-data-platform-airflow-${local.environment}"
+#   bucket_prefix = "moj-data-platform-airflow-${local.environment}"
 
-  tags = local.tags
-}
-*/
+#   tags = local.tags
+# }
