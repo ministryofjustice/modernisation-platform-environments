@@ -126,8 +126,8 @@ resource "aws_s3_bucket_policy" "cloud_trail" {
       },
       "Action": "s3:*",
       "Resource" : [
-        "arn:aws:s3:::${aws_s3_bucket.storage[0].arn}/*",
-        "arn:aws:s3:::${aws_s3_bucket.storage[0].arn}"              
+        "${aws_s3_bucket.storage[0].arn}/*",
+        "${aws_s3_bucket.storage[0].arn}"              
       ]
     }
   ]
