@@ -190,8 +190,10 @@
       "ebs_size_ebsdb_arch": 50,
       "ebs_size_ebsdb_dbf": 8000,
       "ebs_size_ebsdb_redoA": 100,
+      "ebs_size_ebsdb_redoB": 50,
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
+      "ebs_size_ebsdb_diag": 50,
       "dbf_device": "nvme3n1",
       "dbf_path": "/CCMS/EBS/dbf"
     },
