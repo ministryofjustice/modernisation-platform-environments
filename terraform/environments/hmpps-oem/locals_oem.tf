@@ -77,7 +77,7 @@ locals {
     }
 
     tags = {
-      ami                  = "base_ol_8_5"
+      # ami                = "base_ol_8_5"  # excluding while testing
       component            = "data"
       server-type          = "hmpps-oem"
       os-type              = "Linux"
