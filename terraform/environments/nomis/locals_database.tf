@@ -242,7 +242,7 @@ locals {
       os-version           = "RHEL 7.9"
       licence-requirements = "Oracle Database"
       "Patch Group"        = "RHEL"
-      monitored            = "true"
+      backup               = "true"
     }
   }
 
