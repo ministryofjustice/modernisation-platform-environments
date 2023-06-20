@@ -77,6 +77,7 @@ locals {
 
       private = {
         internal_lb              = true
+        access_logs              = false
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is default
