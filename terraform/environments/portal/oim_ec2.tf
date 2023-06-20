@@ -1,6 +1,7 @@
 
 
 
+
 # resource "aws_security_group" "oim_instance" {
 #   name        = "${local.application_name}-${local.environment}-oim-security-group"
 #   description = "RDS access with the LAA Landing Zone"
