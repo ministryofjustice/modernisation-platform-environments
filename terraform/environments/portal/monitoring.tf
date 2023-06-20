@@ -15,7 +15,7 @@ locals {
       instance_id = aws_instance.ohs_instance_1.id
     },
     oim1 = {
-      instance_id = aws_instance.oim_instance_1.id
+      instance_id = aws_instance.oim1.id
     },
     idm1 = {
       instance_id = aws_instance.idm_instance_1.id
@@ -29,7 +29,7 @@ locals {
       instance_id = try(aws_instance.ohs_instance_2[0].id, "")
     },
     oim2 = {
-      instance_id = try(aws_instance.oim_instance_2[0].id, "")
+      instance_id = try(aws_instance.oim2[0].id, "")
     },
     idm2 = {
       instance_id = try(aws_instance.idm_instance_2[0].id, "")

@@ -69,7 +69,7 @@ resource "aws_vpc_security_group_ingress_rule" "oim_bi" {
 resource "aws_vpc_security_group_ingress_rule" "oim_shared1" {
   security_group_id = aws_security_group.oim_instance.id
   description = "OIM Admin Console from Shared Svs"
-  cidr_ipv4   = [local.third-cidr]
+  cidr_ipv4   = local.third-cidr
   from_port   = 7101
   ip_protocol = "TCP"
   to_port     = 7101
