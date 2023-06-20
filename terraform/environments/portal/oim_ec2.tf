@@ -7,130 +7,88 @@ resource "aws_security_group" "oim_instance" {
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
-ingress {
-    description = "Nodemanager port"
-    from_port   = 5556
-    to_port     = 5556
-    protocol    = "TCP"
-    cidr_blocks = [local.first-cidr]
 
-  }
-
-
-ingress {
-    description = "OIM Admin Console from Shared Svs"
-    from_port   = 7101
-    to_port     = 7101
-    protocol    = "TCP"
-    cidr_blocks = [local.second-cidr]
-
-  }
-
-ingress {
-    description = "OIM Admin Console"
-    from_port   = 7101
-    to_port     = 7101
-    protocol    = "TCP"
-    cidr_blocks = [local.first-cidr]
-
-  }
-
-  ingress {
-    description = "Allow ping response"
-    from_port   = 8
-    to_port     = 1
-    protocol    = "ICMP"
-    cidr_blocks = [local.first-cidr]
-
-  }
-
-  ingress {
-    description = "OIM Inbound on 14000"
-    from_port   = 14000
-    to_port     = 14000
-    protocol    = "TCP"
-    cidr_blocks = [local.first-cidr]
-
-  }
-
-  ingress {
-    description = "Oracle BI Port"
-    from_port   = 9704
-    to_port     = 9704
-    protocol    = "TCP"
-    cidr_blocks = [local.first-cidr]
-
-  }
-
-  ingress {
-    description = "Allow ping response"
-    from_port   = 8
-    to_port     = 1
-    protocol    = "ICMP"
-    cidr_blocks = [local.first-cidr]
-
-  }
-
-  ingress {
-    description = "OIM Admin Console from Shared Svs"
-    from_port   = 7101
-    to_port     = 7101
-    protocol    = "TCP"
-    cidr_blocks = [local.third-cidr]
-
-  }
-
-  ingress {
-    description = "SSH access from prod bastions"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "TCP"
-    cidr_blocks = [local.third-cidr]
-
-  }
-
-
-  # ingress {
-  #   description = "SSH access from VPC"
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "TCP"
-  #   cidr_blocks = [local.first-cidr]
-
-  # }
-
-  #   ingress {
-  #   description = "SSH access from prod bastion"
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "TCP"
-  #   cidr_blocks = [local.prd-cidr]
-
-  # }
-  #   ingress {
-  #   description = "oim Inbound from Prod Shared Svs VPC"
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "7777"
-  #   cidr_blocks = [local.prd-cidr]
-
-  # }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-portal" }
-  )
 }
 
+resource "aws_vpc_security_group_ingress_rule" "oim_nodemanager" {
+  security_group_id = aws_security_group.oim_instance.id
+  description = "Nodemanager port"
+  cidr_ipv4   = [local.first-cidr]
+  from_port   = 5556
+  ip_protocol = "tcp"
+  to_port     = 5556
+}
+
+resource "aws_vpc_security_group_ingress_rule" "oim_admin_Shared" {
+  security_group_id = aws_security_group.oim_instance.id
+  description = "OIM Admin Console from Shared Svs"
+  cidr_ipv4   = [local.second-cidr]
+  from_port   = 7101
+  ip_protocol = "tcp"
+  to_port     = 7101
+}
+
+resource "aws_vpc_security_group_ingress_rule" "oim_admin_console2" {
+  security_group_id = aws_security_group.oim_instance.id
+  description = "OIM Admin Console"
+  cidr_ipv4   = [local.first-cidr]
+  from_port   = 7101
+  ip_protocol = "tcp"
+  to_port     = 7101
+}
+
+resource "aws_vpc_security_group_ingress_rule" "oim_ping" {
+  security_group_id = aws_security_group.oim_instance.id
+  description = "Allow ping response"
+  cidr_ipv4   = [local.first-cidr]
+  from_port   = 8
+  ip_protocol = "ICMP"
+  to_port     = 1
+}
+
+resource "aws_vpc_security_group_ingress_rule" "oim_inbound" {
+  security_group_id = aws_security_group.oim_instance.id
+  description = "OIM Inbound on 14000"
+  cidr_ipv4   = [local.first-cidr]
+  from_port   = 14000
+  ip_protocol = "TCP"
+  to_port     = 14000
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "oim_bi" {
+  security_group_id = aws_security_group.oim_instance.id
+  description = "Oracle BI Port"
+  cidr_ipv4   = [local.first-cidr]
+  from_port   = 9704
+  ip_protocol = "TCP"
+  to_port     = 9704
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "oim_shared1" {
+  security_group_id = aws_security_group.oim_instance.id
+  description = "OIM Admin Console from Shared Svs"
+  cidr_ipv4   = [local.third-cidr]
+  from_port   = 7101
+  ip_protocol = "TCP"
+  to_port     = 7101
+}
+
+resource "aws_vpc_security_group_ingress_rule" "oim_ssh" {
+  security_group_id = aws_security_group.oim_instance.id
+  description = "SSH access from prod bastions"
+  cidr_ipv4   = [local.third-cidr]
+  from_port   = 22
+  ip_protocol = "TCP"
+  to_port     = 22
+}
+
+resource "aws_vpc_security_group_egress_rule" "outbound_oim" {
+  security_group_id = aws_security_group.oim_instance.id
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "-1"
+}
 
 # TODO Depending on outcome of how EBS/EFS is used, this resource may depend on aws_instance.oam_instance_1
 
