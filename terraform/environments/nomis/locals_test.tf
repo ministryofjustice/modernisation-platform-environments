@@ -525,7 +525,6 @@ locals {
           # T1
           { name = "t1nomis-a", type = "A", ttl = "3600", records = ["10.101.3.132"] },
           { name = "t1nomis-b", type = "CNAME", ttl = "86400", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1-nomis-db-1-b", type = "CNAME", ttl = "86400", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1ndh-a", type = "A", ttl = "3600", records = ["10.101.3.132"] },
           { name = "t1ndh-b", type = "CNAME", ttl = "86400", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1or-a", type = "A", ttl = "86400", records = ["10.101.3.132"] },
@@ -535,7 +534,6 @@ locals {
           # T2
           { name = "t2nomis-a", type = "A", ttl = "3600", records = ["10.101.33.132"] },
           { name = "t2nomis-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t2-nomis-db-1-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t2ndh-a", type = "A", ttl = "3600", records = ["10.101.33.132"] },
           { name = "t2ndh-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t2or-a", type = "A", ttl = "3600", records = ["10.101.33.132"] },
@@ -544,14 +542,13 @@ locals {
           { name = "t2trdat-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           # T3
           { name = "t3nomis-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
-          { name = "t3nomis-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t3-nomis-db-1-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3nomis-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t3ndh-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
-          { name = "t3ndh-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3ndh-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t3or-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
-          { name = "t3or-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3or-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t3trdat-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
-          { name = "t3trdat-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3trdat-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           # T1
