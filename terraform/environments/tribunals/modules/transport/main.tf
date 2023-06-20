@@ -39,6 +39,7 @@ module "app_based_resources" {
   networking_business_unit    = var.networking_business_unit
   domain_name_main            = var.domain_name_main
   domain_name_sub             = var.domain_name_sub
+  tribunal_locals             = var.tribunal_locals
 }
 
 

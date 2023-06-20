@@ -72,5 +72,5 @@ variable "shared_public_ids" {
 variable "networking_business_unit" {  
 }
 
-variable "locals" {  
+variable "tribunal_locals" {  
 }

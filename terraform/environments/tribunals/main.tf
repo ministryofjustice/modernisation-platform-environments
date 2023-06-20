@@ -150,5 +150,5 @@ module "transport" {
   domain_record_main          = local.domain_record_main
   domain_type_main            = local.domain_type_main[0]
   route53_zone_id             = data.aws_route53_zone.network-services.zone_id
-  locals                      = locals
+  tribunal_locals             = locals
 }
