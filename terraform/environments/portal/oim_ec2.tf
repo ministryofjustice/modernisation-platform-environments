@@ -11,6 +11,15 @@ echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/
 echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 mount -a
 hostnamectl set-hostname ${local.application_name}-oim1-ms.${local.portal_hosted_zone}
+
+# Setting up CloudWatch Agent
+mkdir cloudwatch_agent
+cd cloudwatch_agent
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
+rpm -U ./amazon-cloudwatch-agent.rpm
+echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:cloudwatch_agent_config.json
+
 EOF
   oim_2_userdata = <<EOF
 #!/bin/bash
@@ -159,7 +168,7 @@ resource "aws_security_group" "oim_instance" {
 
 # TODO Depending on outcome of how EBS/EFS is used, this resource may depend on aws_instance.oam_instance_1
 
-resource "aws_instance" "oim1" {
+resource "aws_instance" "oim_instance_1" {
   ami                         = local.oim_ami-id
   instance_type               = local.application_data.accounts[local.environment].oim_instance_type
   monitoring                  = true
@@ -188,7 +197,7 @@ resource "aws_instance" "oim1" {
 }
 
 
-resource "aws_instance" "oim2" {
+resource "aws_instance" "oim_instance_2" {
   count                       = local.environment == "production" ? 1 : 0
   ami                         = local.oim_ami-id
   instance_type               = local.application_data.accounts[local.environment].oim_instance_type
@@ -315,5 +324,5 @@ resource "aws_ebs_volume" "oimvolume4" {
 resource "aws_volume_attachment" "oim_EC2ServerVolume04" {
   device_name = "/dev/xvde"
   volume_id   = aws_ebs_volume.oimvolume4.id
-  instance_id = aws_instance.oim1.id
+  instance_id = aws_instance.oim_instance_1.id
 }

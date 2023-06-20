@@ -11,6 +11,15 @@ echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,r
 mount -a
 
 hostnamectl set-hostname ${local.application_name}-ohs1-ms.${local.portal_hosted_zone}
+
+# Setting up CloudWatch Agent
+mkdir cloudwatch_agent
+cd cloudwatch_agent
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
+rpm -U ./amazon-cloudwatch-agent.rpm
+echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:cloudwatch_agent_config.json
+
 EOF
   #   ohs_2_userdata = <<EOF
   # #!/bin/bash
@@ -108,7 +117,7 @@ resource "aws_instance" "ohs_instance_1" {
 }
 
 
-resource "aws_instance" "ohs2" {
+resource "aws_instance" "ohs_instance_2" {
   count         = local.environment == "production" ? 1 : 0
   ami           = local.application_data.accounts[local.environment].ohs_ami_id
   instance_type = local.application_data.accounts[local.environment].ohs_instance_type
