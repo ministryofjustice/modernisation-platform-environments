@@ -99,7 +99,7 @@ run_ansible() {
    --inventory localhost, \
    --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
-   --tags "${ansible_args}" \
+   --tags "${ansible_args}, ec2provision" \
    --become
 
   echo "# Cleanup"
