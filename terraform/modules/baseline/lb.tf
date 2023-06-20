@@ -52,14 +52,14 @@ module "lb_listener" {
 
   source = "../../modules/lb_listener"
 
-  name                      = each.key
-  business_unit             = var.environment.business_unit
-  environment               = var.environment.environment
-  load_balancer             = module.lb[each.value.lb_application_name].load_balancer
-  existing_target_groups    = merge(
-                                local.asg_target_groups,
-                                var.lbs[each.value.lb_application_name].existing_target_groups
-                              )
+  name          = each.key
+  business_unit = var.environment.business_unit
+  environment   = var.environment.environment
+  load_balancer = module.lb[each.value.lb_application_name].load_balancer
+  existing_target_groups = merge(
+    local.asg_target_groups,
+    var.lbs[each.value.lb_application_name].existing_target_groups
+  )
   port                      = each.value.port
   protocol                  = each.value.protocol
   ssl_policy                = each.value.ssl_policy

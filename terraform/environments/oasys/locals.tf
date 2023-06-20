@@ -124,7 +124,7 @@ locals {
 
   database_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name = "oasys_oracle_db_*"
+      ami_name          = "oasys_oracle_db_*"
       availability_zone = "${local.region}a"
     })
     instance              = module.baseline_presets.ec2_instance.instance.default_db
@@ -220,27 +220,27 @@ locals {
       }
     }
     # Example target group setup below
-    lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
+    lb_target_groups = {}
+    tags = {
+      component                               = "data"
+      oracle-sids                             = "OASPROD BIPINFRA"
+      os-type                                 = "Linux"
+      os-major-version                        = 8
+      os-version                              = "RHEL 8.5"
+      licence-requirements                    = "Oracle Database"
+      "Patch Group"                           = "RHEL"
+      server-type                             = "${local.application_name}-db"
+      description                             = "${local.environment} ${local.application_name} database"
+      monitored                               = true
+      "${local.application_name}-environment" = local.environment
+      environment-name                        = terraform.workspace # used in provisioning script to select group vars
+    }
   }
   database_b = merge(local.database_a, {
     config = merge(local.database_a.config, {
       availability_zone = "${local.region}b"
     })
   })
-  database_tags = {
-    component                               = "data"
-    oracle-sids                             = "OASPROD BIPINFRA"
-    os-type                                 = "Linux"
-    os-major-version                        = 8
-    os-version                              = "RHEL 8.5"
-    licence-requirements                    = "Oracle Database"
-    "Patch Group"                           = "RHEL"
-    server-type                             = "${local.application_name}-db"
-    description                             = "${local.environment} ${local.application_name} database"
-    monitored                               = true
-    "${local.application_name}-environment" = local.environment
-    environment-name                        = terraform.workspace # used in provisioning script to select group vars
-  }
 
 
   bip_a = {
@@ -276,7 +276,7 @@ locals {
       availability_zone = "${local.region}b"
     })
   })
-  
+
 
   # lb_listener_defaults = {
 

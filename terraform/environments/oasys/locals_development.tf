@@ -24,7 +24,6 @@ locals {
 
       "dev-${local.application_name}-db-a" = merge(local.database_a, {
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags                  = local.database_tags
       })
       # "dev-${local.application_name}-db-b" = merge(local.database_b, {
       #   autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours

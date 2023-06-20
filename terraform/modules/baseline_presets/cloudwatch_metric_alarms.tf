@@ -130,17 +130,18 @@ locals {
         threshold           = "85"
         alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
       }
-      high-memory-usage-15mins = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "15"
-        datapoints_to_alarm = "15"
-        metric_name         = "mem_used_percent"
-        namespace           = "CWAgent"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "90"
-        alarm_description   = "Triggers if memory usage is continually high for 15 minutes."
-      }
+      # NOTE: see DSOS-1956 for why this is commented out temporarily
+      # high-memory-usage-15mins = {
+      #   comparison_operator = "GreaterThanOrEqualToThreshold"
+      #   evaluation_periods  = "15"
+      #   datapoints_to_alarm = "15"
+      #   metric_name         = "mem_used_percent"
+      #   namespace           = "CWAgent"
+      #   period              = "60"
+      #   statistic           = "Average"
+      #   threshold           = "90"
+      #   alarm_description   = "Triggers if memory usage is continually high for 15 minutes."
+      # }
       cpu-iowait-high-3hour = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "180"
@@ -154,7 +155,7 @@ locals {
       }
     }
 
-    ec2_cwagent_collectd = {
+    ec2_instance_cwagent_collectd = {
       chronyd-stopped = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
@@ -210,6 +211,18 @@ locals {
         dimensions = {
           instance = "ssm_agent_status"
         }
+      }
+    }
+    ec2_asg_cwagent_collectd = {
+      asg-collectd-services = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_exec_value"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "A service or metric that's being monitored by collectd has stopped"
       }
     }
     lb = {

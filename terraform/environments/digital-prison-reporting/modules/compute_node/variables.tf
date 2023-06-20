@@ -4,13 +4,13 @@ variable "name" {
 
 variable "env" {
   type        = string
-  default     = ""  
+  default     = ""
   description = "Current Environment"
 }
 
 variable "app_key" {
   type        = string
-  default     = ""  
+  default     = ""
   description = "Current Environment"
 }
 
@@ -22,8 +22,8 @@ variable "policies" {
 
 variable "aws_region" {
   type        = string
-  default     = ""  
-  description = "AWS Region" 
+  default     = ""
+  description = "AWS Region"
 }
 
 variable "ec2_terminate_behavior" {}

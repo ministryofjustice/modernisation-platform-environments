@@ -4,7 +4,7 @@
 
 # EC2 Created via module
 module "ec2_test_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.0.0"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -66,6 +66,16 @@ resource "aws_security_group_rule" "egress_traffic" {
   to_port                  = each.value.to_port
   type                     = "egress"
   source_security_group_id = aws_security_group.example_ec2_sg.id
+}
+
+resource "aws_security_group_rule" "ingress_traffic_icmp_from_cp" {
+  description       = "Allowing ping from CP"
+  from_port         = 8 //Echo Request
+  protocol          = "ICMP"
+  security_group_id = aws_security_group.example_ec2_sg.id
+  to_port           = 0
+  type              = "ingress"
+  cidr_blocks       = ["172.20.0.0/16"] //Cloud Platform
 }
 
 #  Build EC2 "example-ec2"
