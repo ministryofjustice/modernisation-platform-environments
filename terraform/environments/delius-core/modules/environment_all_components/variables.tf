@@ -3,8 +3,13 @@ variable "name" {
 }
 
 # Account level info
-variable "account" {
-  type = map(any)
+variable "account_info" {
+  type = object({
+    business_unit  = string,
+    region         = string,
+    vpc_id         = string,
+    mp_environment = string
+  })
 }
 
 variable "ldap_config" {

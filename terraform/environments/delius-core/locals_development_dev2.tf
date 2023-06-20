@@ -9,7 +9,8 @@ locals {
   }
 
   db_config_dev2 = {
-    name                 = "db"
+    name                 = try(local.db_config_lower_environments.name, "db")
+    ami_name             = local.db_config_lower_environments.ami_name
     some_other_attribute = "some_other_attribute_for_db_in_dev2"
   }
 }

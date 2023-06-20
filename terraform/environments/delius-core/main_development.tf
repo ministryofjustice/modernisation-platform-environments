@@ -12,9 +12,7 @@ module "environment_dev1" {
   ldap_config = local.ldap_config_dev1
   db_config   = local.db_config_dev1
 
-  account = {
-    vpc_id = data.aws_vpc.shared.id
-  }
+  account_info = local.account_info
 }
 
 module "environment_dev2" {
@@ -26,7 +24,5 @@ module "environment_dev2" {
   ldap_config = local.ldap_config_dev2
   db_config   = local.db_config_dev2
 
-  account = {
-    vpc_id = data.aws_vpc.shared.id
-  }
+  account_info = local.account_info
 }
