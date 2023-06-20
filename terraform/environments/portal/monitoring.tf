@@ -1,560 +1,482 @@
 locals {
   dashboard_name                 = "${local.application_name}-${local.environment}-application-Dashboard"
+  cpu_alarm_threshold = 85
+  status_alarm_threshold = 1
+  memory_alarm_threshold = 80
+  swapspace_alarm_threshold = 50
+  diskspace_alarm_threshold = 80
+  mserver_alarm_threshold = 80
 
-  cpu_alarms_1 = {
-    oam_instance_1 = {
-      service_name          = "oam_1"
-      cpu_alarm_threshold = 85
-      dimensions = {
-        InstanceId = aws_instance.oam_instance_1.id
-      }
+  alarms_1 = {
+    oam1 = {
+      instance_id = aws_instance.oam_instance_1.id
     },
-    ohs_instance_1 = {
-      service_name          = "ohs_1"
-      cpu_alarm_threshold = 85
-      dimensions = {
-        InstanceId = aws_instance.ohs_instance_1.id
-      }
+    ohs1 = {
+      instance_id = aws_instance.ohs_instance_1.id
     },
-    oim_instance_1 = {
-      service_name          = "oim_1"
-      cpu_alarm_threshold = 85
-      dimensions = {
-        InstanceId = aws_instance.oim_instance_1.id
-      }
+    oim1 = {
+      instance_id = aws_instance.oim_instance_1.id
     },
-    idm_instance_1 = {
-      service_name          = "idm_1"
-      cpu_alarm_threshold = 85
-      dimensions = {
-        InstanceId = aws_instance.idm_instance_1.id
-      }
+    idm1 = {
+      instance_id = aws_instance.idm_instance_1.id
     }
   }
-  cpu_alarms_2 = {
-    oam_instance_2 = {
-      service_name          = "oam_2"
-      cpu_alarm_threshold = 85
-      dimensions = {
-        InstanceId = try(aws_instance.oam_instance_2[0].id, "")
-      }
+  alarms_2 = {
+    oam2 = {
+      instance_id = try(aws_instance.oam_instance_2[0].id, "")
     },
-    ohs_instance_2 = {
-      service_name          = "oim_2"
-      cpu_alarm_threshold = 85
-      dimensions = {
-        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
-      }
+    ohs2 = {
+      instance_id = try(aws_instance.ohs_instance_2[0].id, "")
     },
-    oim_instance_2 = {
-      service_name          = "oim_2"
-      cpu_alarm_threshold = 85
-      dimensions = {
-        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
-      }
+    oim2 = {
+      instance_id = try(aws_instance.oim_instance_2[0].id, "")
     },
-    idm_instance_2 = {
-      service_name          = "idm_2"
-      cpu_alarm_threshold = 85
-      dimensions = {
-        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
-      }
+    idm2 = {
+      instance_id = try(aws_instance.idm_instance_2[0].id, "")
     }
   }
-  status_alarms_1 = {
-    oam_instance_1 = {
-      service_name          = "oam_1"
-      status_alarm_threshold = 1
-      dimensions = {
-        InstanceId = aws_instance.oam_instance_1.id
-      }
-    },
-    ohs_instance_1 = {
-      service_name          = "ohs_1"
-      status_alarm_threshold = 1
-      dimensions = {
-        InstanceId = aws_instance.ohs_instance_1.id
-      }
-    },
-    oim_instance_1 = {
-      service_name          = "oim_1"
-      status_alarm_threshold = 1
-      dimensions = {
-        InstanceId = aws_instance.oim_instance_1.id
-      }
-    },
-    idm_instance_1 = {
-      service_name          = "idm_1"
-      status_alarm_threshold = 1
-      dimensions = {
-        InstanceId = aws_instance.idm_instance_1.id
-      }
-    }
-  }
-  status_alarms_2 = {
-    oam_instance_2 = {
-      service_name          = "oam_2"
-      status_alarm_threshold = 1
-      dimensions = {
-        InstanceId = try(aws_instance.oam_instance_2[0].id, "")
-      }
-    },
-    ohs_instance_2 = {
-      service_name          = "ohs_2"
-      status_alarm_threshold = 1
-      dimensions = {
-        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
-      }
-    },
-    oim_instance_2 = {
-      service_name          = "oim_2"
-      status_alarm_threshold = 1
-      dimensions = {
-        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
-      }
-    },
-    idm_instance_2 = {
-      service_name          = "idm_2"
-      status_alarm_threshold = 1
-      dimensions = {
-        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
-      }
-    }
-  }
-  memory_alarms_1 = {
-    oam_instance_1 = {
-      service_name          = "oam_1"
-      memory_alarm_threshold = 80
-      dimensions = {
-        InstanceId = aws_instance.oam_instance_1.id
-      }
-    },
-    ohs_instance_1 = {
-      service_name          = "ohs_1"
-      memory_alarm_threshold = 80
-      dimensions = {
-        InstanceId = aws_instance.ohs_instance_1.id
-      }
-    },
-    oim_instance_1 = {
-      service_name          = "oim_1"
-      memory_alarm_threshold = 80
-      dimensions = {
-        InstanceId = aws_instance.oim_instance_1.id
-      }
-    },
-    idm_instance_1 = {
-      service_name          = "idm_1"
-      memory_alarm_threshold = 80
-      dimensions = {
-        InstanceId = aws_instance.idm_instance_1.id
-      }
-    }
-  }
-  memory_alarms_2 = {
-    oam_instance_2 = {
-      service_name          = "oam_2"
-      memory_alarm_threshold = 80
-      dimensions = {
-        InstanceId = try(aws_instance.oam_instance_2[0].id, "")
-      }
-    },
-    ohs_instance_2 = {
-      service_name          = "ohs_2"
-      memory_alarm_threshold = 80
-      dimensions = {
-        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
-      }
-    },
-    oim_instance_2 = {
-      service_name          = "oim_2"
-      memory_alarm_threshold = 80
-      dimensions = {
-        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
-      }
-    },
-    idm_instance_2 = {
-      service_name          = "idm_2"
-      memory_alarm_threshold = 80
-      dimensions = {
-        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
-      }
-    }
-  }
-  swapspace_alarms_1 = {
-    oam_instance_1 = {
-      service_name          = "oam_1"
-      swapspace_alarm_threshold = 50
-      dimensions = {
-        InstanceId = aws_instance.oam_instance_1.id
-      }
-    },
-    ohs_instance_1 = {
-      service_name          = "ohs_1"
-      swapspace_alarm_threshold = 50
-      dimensions = {
-        InstanceId = aws_instance.ohs_instance_1.id
-      }
-    },
-    oim_instance_1 = {
-      service_name          = "oim_1"
-      swapspace_alarm_threshold = 50
-      dimensions = {
-        InstanceId = aws_instance.oim_instance_1.id
-      }
-    },
-    idm_instance_1 = {
-      service_name          = "idm_1"
-      swapspace_alarm_threshold = 50
-      dimensions = {
-        InstanceId = aws_instance.idm_instance_1.id
-      }
-    }
-  }
-  swapspace_alarms_2 = {
-    oam_instance_2 = {
-      service_name          = "oam_2"
-      swapspace_alarm_threshold = 50
-      dimensions = {
-        InstanceId = try(aws_instance.oam_instance_2[0].id, "")
-      }
-    },
-    ohs_instance_2 = {
-      service_name          = "ohs_2"
-      swapspace_alarm_threshold = 50
-      dimensions = {
-        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
-      }
-    },
-    oim_instance_2 = {
-      service_name          = "oim_2"
-      swapspace_alarm_threshold = 50
-      dimensions = {
-        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
-      }
-    },
-    idm_instance_2 = {
-      service_name          = "idm_2"
-      swapspace_alarm_threshold = 50
-      dimensions = {
-        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
-      }
-    }
-  }
-  diskspace_alarms_1 = {
-    oam_instance_1 = {
-      service_name          = "oam_1"
-      diskspace_alarm_threshold = 80
-      dimensions = {
-        path = "/"
-        InstanceId = aws_instance.oam_instance_1.id
-        fstype = "xfs"
-      }
-    },
-    ohs_instance_1 = {
-      service_name          = "ohs_1"
-      diskspace_alarm_threshold = 80
-      dimensions = {
-        path = "/"
-        InstanceId = aws_instance.ohs_instance_1.id
-        fstype = "xfs"
-      }
-    },
-    oim_instance_1 = {
-      service_name          = "oim_1"
-      diskspace_alarm_threshold = 80
-      dimensions = {
-        path = "/"
-        InstanceId = aws_instance.oim_instance_1.id
-        fstype = "xfs"
-      }
-    },
-    idm_instance_1 = {
-      service_name          = "idm_1"
-      diskspace_alarm_threshold = 80
-      dimensions = {
-        path = "/"
-        InstanceId = aws_instance.idm_instance_1.id
-        fstype = "xfs"
-      }
-    }
-  }
-  diskspace_alarms_2 = {
-    oam_instance_2 = {
-      service_name          = "oam_2"
-      diskspace_alarm_threshold = 80
-      dimensions = {
-        path = "/"
-        InstanceId = try(aws_instance.oam_instance_2[0].id, "")
-        fstype = "xfs"
-      }
-    },
-    ohs_instance_2 = {
-      service_name          = "ohs_2"
-      diskspace_alarm_threshold = 80
-      dimensions = {
-        path = "/"
-        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
-        fstype = "xfs"
-      }
-    },
-    oim_instance_2 = {
-      service_name          = "oim_2"
-      diskspace_alarm_threshold = 80
-      dimensions = {
-        path = "/"
-        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
-        fstype = "xfs"
-      }
-    },
-    idm_instance_2 = {
-      service_name          = "idm_2"
-      diskspace_alarm_threshold = 80
-      dimensions = {
-        path = "/"
-        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
-        fstype = "xfs"
-      }
-    }
-  }
-  mserver_alarms_1 = {
-    oam_instance_1 = {
-      service_name          = "oam_1"
-      mserver_alarm_threshold = 80
-      dimensions = {
-        path = "/IDAM/product/runtime/Domain/mserver"
-        InstanceId = aws_instance.oam_instance_1.id
-        fstype = "ext4"
-      }
-    },
-    ohs_instance_1 = {
-      service_name          = "ohs_1"
-      mserver_alarm_threshold = 80
-      dimensions = {
-        path = "/IDAM/product/runtime/Domain/mserver"
-        InstanceId = aws_instance.ohs_instance_1.id
-        fstype = "ext4"
-      }
-    },
-    oim_instance_1 = {
-      service_name          = "oim_1"
-      mserver_alarm_threshold = 80
-      dimensions = {
-        path = "/IDAM/product/runtime/Domain/mserver"
-        InstanceId = aws_instance.oim_instance_1.id
-        fstype = "ext4"
-      }
-    },
-    idm_instance_1 = {
-      service_name          = "idm_1"
-      mserver_alarm_threshold = 80
-      dimensions = {
-        path = "/IDAM/product/runtime/Domain/mserver"
-        InstanceId = aws_instance.idm_instance_1.id
-        fstype = "ext4"
-      }
-    }
-  }
-  mserver_alarms_2 = {
-    oam_instance_2 = {
-      service_name          = "oam_2"
-      mserver_alarm_threshold = 80
-      dimensions = {
-        path = "/IDAM/product/runtime/Domain/mserver"
-        InstanceId = aws_instance.oam_instance_1.id
-        fstype = "ext4"
-      }
-    },
-    ohs_instance_2 = {
-      service_name          = "ohs_2"
-      mserver_alarm_threshold = 80
-      dimensions = {
-        path = "/IDAM/product/runtime/Domain/mserver"
-        InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
-        fstype = "ext4"
-      }
-    },
-    oim_instance_2 = {
-      service_name          = "oim_2"
-      mserver_alarm_threshold = 80
-      dimensions = {
-        path = "/IDAM/product/runtime/Domain/mserver"
-        InstanceId = try(aws_instance.oim_instance_2[0].id, "")
-        fstype = "ext4"
-      }
-    },
-    idm_instance_2 = {
-      service_name          = "idm_2"
-      mserver_alarm_threshold = 80
-      dimensions = {
-        path = "/IDAM/product/runtime/Domain/mserver"
-        InstanceId = try(aws_instance.idm_instance_2[0].id, "")
-        fstype = "ext4"
-      }
-    }
-  }
+  # status_alarms_1 = {
+  #   oam1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.oam_instance_1.id
+  #     }
+  #   },
+  #   ohs1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.ohs_instance_1.id
+  #     }
+  #   },
+  #   oim1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.oim_instance_1.id
+  #     }
+  #   },
+  #   idm1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.idm_instance_1.id
+  #     }
+  #   }
+  # }
+  # status_alarms_2 = {
+  #   oam2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.oam_instance_2[0].id, "")
+  #     }
+  #   },
+  #   ohs2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+  #     }
+  #   },
+  #   oim2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+  #     }
+  #   },
+  #   idm2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.idm_instance_2[0].id, "")
+  #     }
+  #   }
+  # }
+  # memory_alarms_1 = {
+  #   oam1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.oam_instance_1.id
+  #     }
+  #   },
+  #   ohs1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.ohs_instance_1.id
+  #     }
+  #   },
+  #   oim1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.oim_instance_1.id
+  #     }
+  #   },
+  #   idm1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.idm_instance_1.id
+  #     }
+  #   }
+  # }
+  # memory_alarms_2 = {
+  #   oam2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.oam_instance_2[0].id, "")
+  #     }
+  #   },
+  #   ohs2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+  #     }
+  #   },
+  #   oim2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+  #     }
+  #   },
+  #   idm2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.idm_instance_2[0].id, "")
+  #     }
+  #   }
+  # }
+  # swapspace_alarms_1 = {
+  #   oam1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.oam_instance_1.id
+  #     }
+  #   },
+  #   ohs1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.ohs_instance_1.id
+  #     }
+  #   },
+  #   oim1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.oim_instance_1.id
+  #     }
+  #   },
+  #   idm1 = {
+  #     dimensions = {
+  #       InstanceId = aws_instance.idm_instance_1.id
+  #     }
+  #   }
+  # }
+  # swapspace_alarms_2 = {
+  #   oam2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.oam_instance_2[0].id, "")
+  #     }
+  #   },
+  #   ohs2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+  #     }
+  #   },
+  #   oim2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+  #     }
+  #   },
+  #   idm2 = {
+  #     dimensions = {
+  #       InstanceId = try(aws_instance.idm_instance_2[0].id, "")
+  #     }
+  #   }
+  # }
+  # diskspace_alarms_1 = {
+  #   oam1 = {
+  #     dimensions = {
+  #       path = "/"
+  #       InstanceId = aws_instance.oam_instance_1.id
+  #       fstype = "xfs"
+  #     }
+  #   },
+  #   ohs1 = {
+  #     dimensions = {
+  #       path = "/"
+  #       InstanceId = aws_instance.ohs_instance_1.id
+  #       fstype = "xfs"
+  #     }
+  #   },
+  #   oim1 = {
+  #     dimensions = {
+  #       path = "/"
+  #       InstanceId = aws_instance.oim_instance_1.id
+  #       fstype = "xfs"
+  #     }
+  #   },
+  #   idm1 = {
+  #     dimensions = {
+  #       path = "/"
+  #       InstanceId = aws_instance.idm_instance_1.id
+  #       fstype = "xfs"
+  #     }
+  #   }
+  # }
+  # diskspace_alarms_2 = {
+  #   oam2 = {
+  #     diskspace_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/"
+  #       InstanceId = try(aws_instance.oam_instance_2[0].id, "")
+  #       fstype = "xfs"
+  #     }
+  #   },
+  #   ohs2 = {
+  #     diskspace_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/"
+  #       InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+  #       fstype = "xfs"
+  #     }
+  #   },
+  #   oim2 = {
+  #     diskspace_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/"
+  #       InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+  #       fstype = "xfs"
+  #     }
+  #   },
+  #   idm2 = {
+  #     diskspace_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/"
+  #       InstanceId = try(aws_instance.idm_instance_2[0].id, "")
+  #       fstype = "xfs"
+  #     }
+  #   }
+  # }
+  # mserver_alarms_1 = {
+  #   oam1 = {
+  #     mserver_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/IDAM/product/runtime/Domain/mserver"
+  #       InstanceId = aws_instance.oam_instance_1.id
+  #       fstype = "ext4"
+  #     }
+  #   },
+  #   ohs1 = {
+  #     mserver_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/IDAM/product/runtime/Domain/mserver"
+  #       InstanceId = aws_instance.ohs_instance_1.id
+  #       fstype = "ext4"
+  #     }
+  #   },
+  #   oim1 = {
+  #     mserver_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/IDAM/product/runtime/Domain/mserver"
+  #       InstanceId = aws_instance.oim_instance_1.id
+  #       fstype = "ext4"
+  #     }
+  #   },
+  #   idm1 = {
+  #     mserver_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/IDAM/product/runtime/Domain/mserver"
+  #       InstanceId = aws_instance.idm_instance_1.id
+  #       fstype = "ext4"
+  #     }
+  #   }
+  # }
+  # mserver_alarms_2 = {
+  #   oam2 = {
+  #     mserver_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/IDAM/product/runtime/Domain/mserver"
+  #       InstanceId = aws_instance.oam_instance_1.id
+  #       fstype = "ext4"
+  #     }
+  #   },
+  #   ohs2 = {
+  #     mserver_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/IDAM/product/runtime/Domain/mserver"
+  #       InstanceId = try(aws_instance.ohs_instance_2[0].id, "")
+  #       fstype = "ext4"
+  #     }
+  #   },
+  #   oim2 = {
+  #     mserver_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/IDAM/product/runtime/Domain/mserver"
+  #       InstanceId = try(aws_instance.oim_instance_2[0].id, "")
+  #       fstype = "ext4"
+  #     }
+  #   },
+  #   idm2 = {
+  #     mserver_alarm_threshold = 80
+  #     dimensions = {
+  #       path = "/IDAM/product/runtime/Domain/mserver"
+  #       InstanceId = try(aws_instance.idm_instance_2[0].id, "")
+  #       fstype = "ext4"
+  #     }
+  #   }
+  # }
 
-  cpu_alarms_list = local.environment == "production" ? merge(local.cpu_alarms_1, local.cpu_alarms_2) : local.cpu_alarms_1
-  status_alarms_list = local.environment == "production" ? merge(local.status_alarms_1, local.status_alarms_2) : local.status_alarms_1
-  memory_alarms_list = local.environment == "production" ? merge(local.memory_alarms_1, local.memory_alarms_2) : local.memory_alarms_1
-  swapspace_alarms_list = local.environment == "production" ? merge(local.swapspace_alarms_1, local.swapspace_alarms_2) : local.swapspace_alarms_1
-  diskspace_alarms_list = local.environment == "production" ? merge(local.diskspace_alarms_1, local.diskspace_alarms_2) : local.diskspace_alarms_1
-  mserver_alarms_list = local.environment == "production" ? merge(local.mserver_alarms_1, local.mserver_alarms_2) : local.mserver_alarms_1
+  alarms_list = local.environment == "production" ? merge(local.alarms_1, local.alarms_2) : local.alarms_1
+  # status_alarms_list = local.environment == "production" ? merge(local.status_alarms_1, local.status_alarms_2) : local.status_alarms_1
+  # memory_alarms_list = local.environment == "production" ? merge(local.memory_alarms_1, local.memory_alarms_2) : local.memory_alarms_1
+  # swapspace_alarms_list = local.environment == "production" ? merge(local.swapspace_alarms_1, local.swapspace_alarms_2) : local.swapspace_alarms_1
+  # diskspace_alarms_list = local.environment == "production" ? merge(local.diskspace_alarms_1, local.diskspace_alarms_2) : local.diskspace_alarms_1
+  # mserver_alarms_list = local.environment == "production" ? merge(local.mserver_alarms_1, local.mserver_alarms_2) : local.mserver_alarms_1
 
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
   for_each = {
-    for k, v in local.cpu_alarms_list : k => v
+    for k, v in local.alarms_list : k => v
   }
 
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-CPU-high-threshold-alarm"
+  alarm_name          = "${local.application_name}-${local.environment}-${each.key}-CPU-high-threshold-alarm"
   alarm_description   = "If the CPU exceeds the predefined threshold, this alarm will trigger. Please investigate."
   comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
+  dimensions          = {
+    InstanceId = each.value.instance_id
+  }
   evaluation_periods  = "5"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
   period              = "60"
   statistic           = "Average"
-  threshold           = each.value.cpu_alarm_threshold
+  threshold           = local.cpu_alarm_threshold
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-CPU-high-threshold-alarm"
+      Name = "${local.application_name}-${local.environment}-${each.key}-CPU-high-threshold-alarm"
     }
   )
 }
 
 resource "aws_cloudwatch_metric_alarm" "status_alarm" {
   for_each = {
-    for k, v in local.status_alarms_list : k => v
+    for k, v in local.alarms_list : k => v
   }
 
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-status-check-failure-alarm"
+  alarm_name          = "${local.application_name}-${local.environment}-${each.key}-status-check-failure-alarm"
   alarm_description   = "If a status check failure occurs on an instance, please investigate. http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
   comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
+  dimensions          = {
+    InstanceId = each.value.instance_id
+  }
   evaluation_periods  = "5"
   metric_name         = "StatusCheckFailed"
   namespace           = "AWS/EC2"
   period              = "60"
   statistic           = "Average"
-  threshold           = each.value.status_alarm_threshold
+  threshold           = local.status_alarm_threshold
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-status-check-failure-alarm"
+      Name = "${local.application_name}-${local.environment}-${each.key}-status-check-failure-alarm"
     }
   )
 }
 
 resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
   for_each = {
-    for k, v in local.memory_alarms_list : k => v
+    for k, v in local.alarms_list : k => v
   }
 
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-memory-usage-alarm"
+  alarm_name          = "${local.application_name}-${local.environment}-${each.key}-memory-usage-alarm"
   alarm_description   = "If the memory use exceeds the predefined threshold, this alarm will trigger. Please investigate."
   comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
+  dimensions          = {
+    InstanceId = each.value.instance_id
+  }
   evaluation_periods  = "5"
   metric_name         = "mem_used_percent"
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
-  threshold           = each.value.memory_alarm_threshold
+  threshold           = local.memory_alarm_threshold
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-memory-usage-alarm"
+      Name = "${local.application_name}-${local.environment}-${each.key}-memory-usage-alarm"
     }
   )
 }
 
 resource "aws_cloudwatch_metric_alarm" "swapspace_alarm" {
   for_each = {
-    for k, v in local.swapspace_alarms_list : k => v
+    for k, v in local.alarms_list : k => v
   }
 
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-swap-usage-alarm"
+  alarm_name          = "${local.application_name}-${local.environment}-${each.key}-swap-usage-alarm"
   alarm_description   = "If the memory use exceeds the predefined threshold, this alarm will trigger. Please investigate."
   comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
+  dimensions          = {
+    InstanceId = each.value.instance_id
+  }
   evaluation_periods  = "5"
   metric_name         = "swap_used"
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
-  threshold           = each.value.swapspace_alarm_threshold
+  threshold           = local.swapspace_alarm_threshold
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-swap-usage-alarm"
+      Name = "${local.application_name}-${local.environment}-${each.key}-swap-usage-alarm"
     }
   )
 }
 
 resource "aws_cloudwatch_metric_alarm" "diskspace_alarm" {
   for_each = {
-    for k, v in local.diskspace_alarms_list : k => v
+    for k, v in local.alarms_list : k => v
   }
 
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-root-vol-disk-usage-alarm"
+  alarm_name          = "${local.application_name}-${local.environment}-${each.key}-root-vol-disk-usage-alarm"
   alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
   comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
+  dimensions          = {
+    path = "/"
+    InstanceId = each.value.instance_id
+    fstype = "xfs"
+  }
   evaluation_periods  = "5"
   metric_name         = "disk_used_percent"
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
-  threshold           = each.value.diskspace_alarm_threshold
+  threshold           = local.diskspace_alarm_threshold
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-root-vol-disk-usage-alarm"
+      Name = "${local.application_name}-${local.environment}-${each.key}-root-vol-disk-usage-alarm"
     }
   )
 }
 
 resource "aws_cloudwatch_metric_alarm" "mserver_alarm" {
   for_each = {
-    for k, v in local.mserver_alarms_list : k => v
+    for k, v in local.alarms_list : k => v
   }
 
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-mserver-disk-usage-alarm"
+  alarm_name          = "${local.application_name}-${local.environment}-${each.key}-mserver-disk-usage-alarm"
   alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
   comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
+  dimensions          = {
+    path = "/IDAM/product/runtime/Domain/mserver"
+    InstanceId = each.value.instance_id
+    fstype = "ext4"
+  }
   evaluation_periods  = "5"
   metric_name         = "disk_used_percent"
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
-  threshold           = each.value.mserver_alarm_threshold
+  threshold           = local.mserver_alarm_threshold
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-mserver-disk-usage-alarm"
+      Name = "${local.application_name}-${local.environment}-${each.key}-mserver-disk-usage-alarm"
     }
   )
 }
@@ -564,7 +486,7 @@ resource "aws_cloudwatch_metric_alarm" "mserver_alarm" {
 #     for k, v in local.aserver_alarms_1 : k => v
 #   }
 #
-#   alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-aserver-disk-usage-alarm"
+#   alarm_name          = "${local.application_name}-${local.environment}-${each.key}-aserver-disk-usage-alarm"
 #   alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
 #   comparison_operator = "GreaterThanThreshold"
 #   dimensions          = each.value.dimensions
@@ -580,7 +502,7 @@ resource "aws_cloudwatch_metric_alarm" "mserver_alarm" {
 #   tags = merge(
 #     local.tags,
 #     {
-#       Name = "${local.application_name}-${local.environment}-${each.value.service_name}-aserver-disk-usage-alarm"
+#       Name = "${local.application_name}-${local.environment}-${each.key}-aserver-disk-usage-alarm"
 #     }
 #   )
 # }
@@ -634,9 +556,9 @@ data "template_file" "dashboard_nonprod" {
     # igdb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.RDS2WriteLataencyOverThreshold.arn
     # oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim_instance_1"].arn
     # oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_1"].arn
-    oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
+    oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam1"].arn
     # idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_1"].arn
-    ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
+    ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs1"].arn
   }
 }
 
