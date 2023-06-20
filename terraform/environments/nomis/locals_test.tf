@@ -520,11 +520,14 @@ locals {
           { name = "c-t3", type = "A", lbs_map_key = "private" },
         ]
       }
+      # NOTE: t1-nomis-db-1-b and t2-nomis-db-1-b DNS entries can be removed after migration from Azure
+      # These are used in Azure DB TNS entries
       "test.nomis.service.justice.gov.uk" = {
         records = [
           # T1
           { name = "t1nomis-a", type = "A", ttl = "3600", records = ["10.101.3.132"] },
           { name = "t1nomis-b", type = "CNAME", ttl = "86400", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1-nomis-db-1-b", type = "CNAME", ttl = "86400", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1ndh-a", type = "A", ttl = "3600", records = ["10.101.3.132"] },
           { name = "t1ndh-b", type = "CNAME", ttl = "86400", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1or-a", type = "A", ttl = "86400", records = ["10.101.3.132"] },
@@ -534,6 +537,7 @@ locals {
           # T2
           { name = "t2nomis-a", type = "A", ttl = "3600", records = ["10.101.33.132"] },
           { name = "t2nomis-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t2-nomis-db-1-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t2ndh-a", type = "A", ttl = "3600", records = ["10.101.33.132"] },
           { name = "t2ndh-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t2or-a", type = "A", ttl = "3600", records = ["10.101.33.132"] },
