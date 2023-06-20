@@ -8,7 +8,7 @@ locals {
       test-oem = merge(local.oem_ec2_default, {
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
           args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "feature/oracle-19c-fixes"
           })
         })
       })
