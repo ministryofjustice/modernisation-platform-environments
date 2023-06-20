@@ -3,14 +3,7 @@
 # Airflow Kubernetes Config
 ##################################################
 
-data "template_file" "airflow_kubernetes_config" {
-  template = file("${path.module}/src/airflow/kubernetes-config.tmpl")
-  vars = {
-    certificate_authority_data = local.environment_configuration.eks_certificate_authority_data
-    server                     = local.environment_configuration.eks_server
-    cluster_name               = local.environment_configuration.eks_cluster_name
-  }
-}
+
 
 resource "aws_s3_object" "airflow_kubernetes_config" {
   bucket  = module.airflow_s3_bucket.bucket.id
@@ -30,3 +23,12 @@ resource "aws_s3_object" "airflow_requirements" {
   source_hash = filemd5("${path.module}/src/airflow/requirements.txt")
 }
 */
+
+data "template_file" "airflow_kubernetes_config" {
+  template = file("${path.module}/src/airflow/kubernetes-config.tmpl")
+  vars = {
+    certificate_authority_data = local.environment_configuration.eks_certificate_authority_data
+    server                     = local.environment_configuration.eks_server
+    cluster_name               = local.environment_configuration.eks_cluster_name
+  }
+}
