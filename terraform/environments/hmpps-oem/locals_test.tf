@@ -8,7 +8,8 @@ locals {
       test-oem = merge(local.oem_ec2_default, {
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
           args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "feature/oracle-19c-fixes"
+            branch       = "feature/oracle-19c-fixes"
+            ansible_args = "" # don't use the default tags since we aren't using oracle 19c AMI
           })
         })
       })
