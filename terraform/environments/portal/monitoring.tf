@@ -258,8 +258,8 @@ data "template_file" "dashboard_nonprod" {
     # igdb_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.RDS2CPUoverThreshold.arn
     # igdb_read_latency_alarm_arn     = aws_cloudwatch_metric_alarm.RDS2ReadLataencyOverThreshold.arn
     # igdb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.RDS2WriteLataencyOverThreshold.arn
-    oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim1"].arn
-    oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim1"].arn
+    # oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim1"].arn
+    # oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim1"].arn
     oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam1"].arn
     idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm1"].arn
     ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs1"].arn
