@@ -5,8 +5,8 @@
       "ec2_oracle_vision_instance_type_ebsdb": "t2.xlarge",
       "imported_ebsdb_image_id": "ami-0726313862a774616",
       "imported_ebsdb_image_name": "import-ami-01083a42970b00366",
-      "load_balanced_vision_ebsdb_id": "ami-0350f7487fd84aeca",
-      "load_balanced_vision_ebsdb_name": "vision-ebs-load-balanced-config",
+      "load_balanced_vision_ebsdb_id": "ami-0a4a32ab6a869a22b",
+      "load_balanced_vision_ebsdb_name": "load-balanced-vision-ebs-sso-preclone",
       "lz_aws_workspace_nonprod_subnet_env": "10.200.0.0/20",
       "cp_dev_cidr_range": "172.20.0.0/16",
       "ami_owner": "636100868237"
