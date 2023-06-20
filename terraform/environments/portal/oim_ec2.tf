@@ -33,7 +33,7 @@ resource "aws_security_group" "oim_instance" {
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
-
+}
 
 
 resource "aws_vpc_security_group_ingress_rule" "oim_nodemanager" {
