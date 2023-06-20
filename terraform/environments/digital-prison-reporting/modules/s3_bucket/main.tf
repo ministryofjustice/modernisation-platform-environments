@@ -134,5 +134,5 @@ resource "aws_s3_bucket_policy" "cloud_trail" {
 }
 POLICY
 
- depends_on = [aws_s3_bucket.storage[0].id]
+ depends_on = [aws_s3_bucket.storage]
 }
