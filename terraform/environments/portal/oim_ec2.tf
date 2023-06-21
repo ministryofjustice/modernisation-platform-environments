@@ -28,11 +28,101 @@
 
 
 
-# resource "aws_security_group" "oim_instance" {
-#   name        = "${local.application_name}-${local.environment}-oim-security-group"
-#   description = "RDS access with the LAA Landing Zone"
-#   vpc_id      = data.aws_vpc.shared.id
-# }
+resource "aws_security_group" "oim_instance" {
+  name        = "${local.application_name}-${local.environment}-oim-security-group"
+  description = "RDS access with the LAA Landing Zone"
+  vpc_id      = data.aws_vpc.shared.id
+
+
+ingress {
+    description = "Nodemanager port"
+    from_port   = 5556
+    to_port     = 5556
+    protocol    = "TCP"
+    cidr_blocks = [local.first-cidr]
+
+  }
+
+
+ingress {
+    description = "OIM Admin Console from Shared Svs"
+    from_port   = 7101
+    to_port     = 7101
+    protocol    = "TCP"
+    cidr_blocks = [local.second-cidr]
+
+  }
+
+ingress {
+    description = "OIM Admin Console"
+    from_port   = 7101
+    to_port     = 7101
+    protocol    = "TCP"
+    cidr_blocks = [local.first-cidr]
+
+  }
+
+  ingress {
+    description = "Allow ping response"
+    from_port   = 8
+    to_port     = 1
+    protocol    = "ICMP"
+    cidr_blocks = [local.first-cidr]
+
+  }
+
+  ingress {
+    description = "OIM Inbound on 14000"
+    from_port   = 14000
+    to_port     = 14000
+    protocol    = "TCP"
+    cidr_blocks = [local.first-cidr]
+
+  }
+
+  ingress {
+    description = "Oracle BI Port"
+    from_port   = 9704
+    to_port     = 9704
+    protocol    = "TCP"
+    cidr_blocks = [local.first-cidr]
+
+  }
+
+  
+
+  ingress {
+    description = "OIM Admin Console from Shared Svs"
+    from_port   = 7101
+    to_port     = 7101
+    protocol    = "TCP"
+    cidr_blocks = [local.third-cidr]
+
+  }
+
+  ingress {
+    description = "SSH access from prod bastions"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "TCP"
+    cidr_blocks = [local.third-cidr]
+
+  }
+
+   egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-portal" }
+  )
+}
 
 # resource "aws_vpc_security_group_ingress_rule" "oim_nodemanager" {
 #   security_group_id = aws_security_group.oim_instance.id
