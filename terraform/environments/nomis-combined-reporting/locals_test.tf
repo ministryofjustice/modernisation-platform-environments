@@ -25,7 +25,7 @@ locals {
       nomis_combined_reporting_wildcard_cert = {
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
-        "*.${module.environment.domains.public.application_environment}",
+          "*.${module.environment.domains.public.application_environment}",
         ]
         tags = {
           description = "Wildcard certificate for the ${local.environment} environment"
@@ -162,7 +162,7 @@ locals {
     baseline_route53_zones = {
       (module.environment.domains.public.modernisation_platform) = {
         lb_alias_records = [
-          { name = "web.test.${ local.application_name }", type = "A", lbs_map_key = "private" }
+          { name = "web.test.${local.application_name}", type = "A", lbs_map_key = "private" }
         ]
       }
     }
