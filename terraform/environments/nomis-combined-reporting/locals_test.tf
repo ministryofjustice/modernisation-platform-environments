@@ -26,7 +26,6 @@ locals {
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
           "*.${module.environment.domains.public.short_name}",
-          "*.${module.environment.domains.internal.application_environment}",
         ]
         external_validation_records_created = true
         tags = {
