@@ -15,7 +15,7 @@ locals {
 ######################## DMS #############################################
 
 module "dms" {
-  source                      = "../modules/dms"
+  source                      = "./modules/dms"
   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   replication_task_id         = "${local.application}-migration-task"
   #target_db_instance          = 0
