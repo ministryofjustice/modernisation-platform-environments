@@ -3,7 +3,7 @@
     "development": {
       "directory_service_name": "UKGOV.DEV",
       "SES_domain": "internaltest.ppud.justice.gov.uk",
-      "WAM_ALB": "WAM-ALB-DEV"      
+      "WAM_ALB": "WAM-ALB-DEV"
     },
     "test": {
       "example_var": "test-data"

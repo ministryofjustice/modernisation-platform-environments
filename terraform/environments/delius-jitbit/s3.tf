@@ -1,6 +1,4 @@
 module "s3_bucket" {
-  count = local.environment == "development" ? 1 : 0
-
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
   providers = {

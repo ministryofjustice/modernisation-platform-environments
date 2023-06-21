@@ -53,7 +53,7 @@ resource "aws_iam_policy_attachment" "ec2-ssm" {
 }
 
 resource "aws_iam_role_policy_attachment" "this" {
-  for_each = var.enable_compute_node ? toset(var.policies): toset([])
+  for_each = var.enable_compute_node ? toset(var.policies) : toset([])
 
   role       = aws_iam_role.instance-role[0].id
   policy_arn = each.value

@@ -1,5 +1,5 @@
 data "aws_vpc" "dpr" {
-    id = var.vpc_id
+  id = var.vpc_id
 }
 
 ## RDS SG
@@ -18,13 +18,13 @@ resource "aws_security_group" "rds" {
     var.tags,
     {
       Resource_Type = "sg_group"
-      Name = "${var.name}-sg"
+      Name          = "${var.name}-sg"
     }
-  ) 
+  )
 }
 
 resource "aws_security_group_rule" "rule" {
-  count             = var.enable_rds ? 1 : 0
+  count = var.enable_rds ? 1 : 0
 
   cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]
   type              = "ingress"
@@ -35,7 +35,7 @@ resource "aws_security_group_rule" "rule" {
 }
 
 resource "aws_security_group_rule" "rds_allow_all" {
-  count             = var.enable_rds ? 1 : 0
+  count = var.enable_rds ? 1 : 0
 
   type              = "egress"
   description       = "allow all"

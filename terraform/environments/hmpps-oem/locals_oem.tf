@@ -21,7 +21,7 @@ locals {
         branch               = "main"
         ansible_repo         = "modernisation-platform-configuration-management"
         ansible_repo_basedir = "ansible"
-        ansible_args         = "--tags amibuild,ec2provision"
+        ansible_args         = "--tags ec2provision,oracle_19c_download,oracle_19c_install"
       }
       scripts = [
         "ansible-ec2provision.sh.tftpl",
@@ -77,7 +77,7 @@ locals {
     }
 
     tags = {
-      ami                  = "base_ol_8_5"
+      # ami                = "base_ol_8_5"  # not including as hardening role seems to cause an issue
       component            = "data"
       server-type          = "hmpps-oem"
       os-type              = "Linux"
