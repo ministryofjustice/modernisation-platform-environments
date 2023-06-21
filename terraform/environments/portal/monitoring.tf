@@ -28,9 +28,9 @@ locals {
     ohs2 = {
       instance_id = try(aws_instance.ohs_instance_2[0].id, "")
     },
-    oim2 = {
-      instance_id = try(aws_instance.oim_instance_2[0].id, "")
-    },
+    # oim2 = {
+    #   instance_id = try(aws_instance.oim_instance_2[0].id, "")
+    # },
     idm2 = {
       instance_id = try(aws_instance.idm_instance_2[0].id, "")
     }

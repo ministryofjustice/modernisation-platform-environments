@@ -267,13 +267,13 @@ resource "aws_security_group" "igdb" {
   }
 
 
-  ingress {
-    description     = "Inbound TNS access from Portal OIM Instances"
-    from_port       = 1521
-    to_port         = 1521
-    protocol        = "tcp"
-    security_groups = [aws_security_group.oim_instance.id]
-  }
+  # ingress {
+  #   description     = "Inbound TNS access from Portal OIM Instances"
+  #   from_port       = 1521
+  #   to_port         = 1521
+  #   protocol        = "tcp"
+  #   security_groups = [aws_security_group.oim_instance.id]
+  # }
 
 
   ingress {
@@ -368,13 +368,13 @@ resource "aws_security_group" "iadb" {
   }
 
 
-  ingress {
-    description     = "Inbound TNS access from Portal OIM Instances"
-    from_port       = 1521
-    to_port         = 1521
-    protocol        = "tcp"
-    security_groups = [aws_security_group.oim_instance.id]
-  }
+  # ingress {
+  #   description     = "Inbound TNS access from Portal OIM Instances"
+  #   from_port       = 1521
+  #   to_port         = 1521
+  #   protocol        = "tcp"
+  #   security_groups = [aws_security_group.oim_instance.id]
+  # }
 
 
   ingress {
