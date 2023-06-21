@@ -134,46 +134,49 @@ locals {
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     ebs_volumes = {
-      # "/dev/sdb" = { # /u01
-      #   size        = 100
-      #   label       = "app"
+      "/dev/sdb" = { # /u01
+        size        = 100
+        label       = "app"
+        type        = "gp3"
+      }
+      "/dev/sdc" = { # /u02
+        size        = 500
+        label       = "app"
+        type        = "gp3"
+      }
+      "/dev/sde" = { # DATA01
+        label       = "data"
+        size        = 200
+        type        = "gp3"
+      }
+      # "/dev/sdf" = {  # DATA02
+      #   label = "data"
+      #   type = null
       # }
-      # "/dev/sdc" = { # /u02
-      #   size        = 500
-      #   label       = "app"
+      # "/dev/sdg" = {  # DATA03
+      #   label = "data"
+      #   type = null
       # }
-      # "/dev/sde" = { # DATA01
-      #   label       = "data"
-      #   size        = 200
+      # "/dev/sdh" = {  # DATA04
+      #   label = "data"
+      #   type = null
       # }
-      # # "/dev/sdf" = {  # DATA02
-      # #   label = "data"
-      # #   type = null
-      # # }
-      # # "/dev/sdg" = {  # DATA03
-      # #   label = "data"
-      # #   type = null
-      # # }
-      # # "/dev/sdh" = {  # DATA04
-      # #   label = "data"
-      # #   type = null
-      # # }
-      # # "/dev/sdi" = {  # DATA05
-      # #   label = "data"
-      # #   type = null
-      # # }
-      # "/dev/sdj" = { # FLASH01
-      #   label       = "flash"
-      #   size        = 50
+      # "/dev/sdi" = {  # DATA05
+      #   label = "data"
+      #   type = null
       # }
-      # # "/dev/sdk" = { # FLASH02
-      # #   label = "flash"
-      # #   type = null
-      # # }
-      # "/dev/sds" = {
-      #   label       = "swap"
-      #   size        = 2
+      "/dev/sdj" = { # FLASH01
+        label       = "flash"
+        size        = 50
+      }
+      # "/dev/sdk" = { # FLASH02
+      #   label = "flash"
+      #   type = null
       # }
+      "/dev/sds" = {
+        label       = "swap"
+        size        = 2
+      }
     }
     ebs_volume_config = {
       data = {
