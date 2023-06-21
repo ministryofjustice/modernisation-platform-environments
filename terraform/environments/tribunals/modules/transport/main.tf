@@ -38,10 +38,6 @@ module "app_based_resources" {
   networking_business_unit    = var.networking_business_unit
   tribunal_locals             = var.tribunal_locals
 
-   providers = {
-    sm-core-network-services = aws.tribs-core-network-services
-    sm-core-vpc = aws.tribs-core-vpc
-  }
 }
 
 
