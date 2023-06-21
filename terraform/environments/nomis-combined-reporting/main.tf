@@ -60,7 +60,6 @@ module "baseline" {
     local.baseline_s3_buckets,
     lookup(local.environment_config, "baseline_s3_buckets", {}),
   )
-
   ec2_instances = merge(
     local.baseline_ec2_instances,
     lookup(local.environment_config, "baseline_ec2_instances", {}),
@@ -74,7 +73,6 @@ module "baseline" {
     lookup(local.environment_config, "baseline_lbs", {}),
   )
   rds_instances = merge(
-    module.baseline_presets.rds_instances,
     local.baseline_rds_instances,
     lookup(local.environment_config, "baseline_rds_instances", {}),
   )
