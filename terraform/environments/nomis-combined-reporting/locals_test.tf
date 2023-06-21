@@ -25,9 +25,8 @@ locals {
       nomis_combined_reporting_wildcard_cert = {
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
-          "*.${module.environment.domains.public.short_name}",
+          "*.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
         ]
-        external_validation_records_created = true
         tags = {
           description = "Wildcard certificate for the ${local.environment} environment"
         }
@@ -161,7 +160,7 @@ locals {
       }
     }
     baseline_route53_zones = {
-      "nomis-combined-reporting.service.justice.gov.uk" = {
+      "${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "web", type = "A", lbs_map_key = "private" }
         ]
