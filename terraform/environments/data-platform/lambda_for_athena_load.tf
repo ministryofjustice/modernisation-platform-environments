@@ -2,7 +2,7 @@ resource "aws_athena_workgroup" "data_product_athena_workgroup" {
   name = "data_product_workgroup"
 
   configuration {
-    enforce_workgroup_configuration    = true
+    enforce_workgroup_configuration    = false
     publish_cloudwatch_metrics_enabled = true
     engine_version {
       selected_engine_version = "Athena engine version 3"
