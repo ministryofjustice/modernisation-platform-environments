@@ -126,6 +126,7 @@ locals {
   database_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name          = "oasys_oracle_db_*"
+      ami_owner         = "self"
       availability_zone = "${local.region}a"
     })
     instance              = module.baseline_presets.ec2_instance.instance.default_db
