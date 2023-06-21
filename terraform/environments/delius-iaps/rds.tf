@@ -1,11 +1,3 @@
-# TF resource required in use case for restoring a shared, encrypted snapshot from prod (e.g. from a data refresh)
-resource "aws_db_snapshot_copy" "local" {
-  count                         = var.rds_refresh_snapshot_id != "" ? 1 : 0
-  source_db_snapshot_identifier = var.rds_refresh_snapshot_id
-  kms_key_id                    = data.aws_kms_key.rds_shared.arn
-  target_db_snapshot_identifier = "data-refresh-snapshot-${formatdate("YYYYMMDD", timestamp())}"
-}
-
 resource "aws_db_instance" "iaps" {
   engine         = "oracle-ee"
   engine_version = "19"
@@ -17,8 +9,7 @@ resource "aws_db_instance" "iaps" {
   username                    = local.application_data.accounts[local.environment].db_user
   manage_master_user_password = true
 
-  # temporary 2-layer try function, to conditionally allow a build from a snapshot originating in an external account
-  snapshot_identifier    = try(local.application_data.accounts[local.environment].db_snapshot_identifier, try(aws_db_snapshot_copy.local[0].id, null))
+  snapshot_identifier    = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
   db_subnet_group_name   = aws_db_subnet_group.iaps.id
   vpc_security_group_ids = [aws_security_group.iaps_db.id]
 
