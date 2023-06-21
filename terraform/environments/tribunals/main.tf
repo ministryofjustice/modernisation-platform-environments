@@ -148,7 +148,7 @@ module "transport" {
   tribunal_locals             = locals
 
    providers = {
-    core-network-services = aws.core-network-services
-    core-vpc = aws.core-vpc
+    tribs-core-network-services = aws.core-network-services
+    tribs-core-vpc = aws.core-vpc
   }
 }

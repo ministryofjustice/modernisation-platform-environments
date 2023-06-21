@@ -22,7 +22,7 @@ resource "aws_acm_certificate_validation" "external" {
 
 // Route53 DNS records for certificate validation
 resource "aws_route53_record" "external_validation" {
-  provider = core-network-services
+  provider = aws.sm-core-network-services
 
   allow_overwrite = true
   name            = tribunal_locals.domain_name_main[0]
@@ -33,7 +33,7 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
-  provider = core-vpc
+  provider = aws.sm-core-vpc
 
   allow_overwrite = true
   name            = tribunal_locals.domain_name_sub[0]
@@ -45,7 +45,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
 
 // Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "external" {
-  provider = core-vpc
+  provider = aws.sm-core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${tribunal_locals.environment}.modernisation-platform.service.justice.gov.uk"
@@ -84,7 +84,7 @@ resource "aws_acm_certificate_validation" "external_prod" {
 // Route53 DNS record for certificate validation
 resource "aws_route53_record" "external_validation_prod" {
   count    = tribunal_locals.is-production ? 1 : 0
-  provider = aws.core-network-services
+  provider = aws.sm-core-network-services
 
   allow_overwrite = true
   name            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name
@@ -97,7 +97,7 @@ resource "aws_route53_record" "external_validation_prod" {
 // Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "external_prod" {
   count    = tribunal_locals.is-production ? 1 : 0
-  provider = aws.core-network-services
+  provider = aws.sm-core-network-services
 
   zone_id = data.aws_route53_zone.application_zone.zone_id
   name    = "${var.app_name}.service.justice.gov.uk"
