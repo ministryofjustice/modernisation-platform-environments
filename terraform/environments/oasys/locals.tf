@@ -167,6 +167,7 @@ locals {
       # }
       "/dev/sdj" = { # FLASH01
         label       = "flash"
+        type        = "gp3"
         size        = 50
       }
       # "/dev/sdk" = { # FLASH02
@@ -175,6 +176,7 @@ locals {
       # }
       "/dev/sds" = {
         label       = "swap"
+        type        = "gp3"
         size        = 2
       }
     }
