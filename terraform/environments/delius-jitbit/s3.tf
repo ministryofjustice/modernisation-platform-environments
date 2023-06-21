@@ -1,6 +1,4 @@
 module "s3_bucket" {
-  count = local.environment == "development" ? 1 : 0
-
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
   providers = {
@@ -86,7 +84,6 @@ module "s3_bucket" {
 }
 
 resource "aws_s3_bucket_intelligent_tiering_configuration" "jitbit_bucket_tiering" {
-  count  = local.environment == "development" ? 1 : 0
   bucket = module.s3_bucket[0].bucket.id
   name   = "JitbitBucketTiering"
 
