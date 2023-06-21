@@ -520,6 +520,8 @@ locals {
           { name = "c-t3", type = "A", lbs_map_key = "private" },
         ]
       }
+      # NOTE: t1-nomis-db-1-b and t2-nomis-db-1-b DNS entries can be removed after migration from Azure
+      # These are used in Azure DB TNS entries
       "test.nomis.service.justice.gov.uk" = {
         records = [
           # T1
@@ -546,14 +548,13 @@ locals {
           { name = "t2trdat-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           # T3
           { name = "t3nomis-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
-          { name = "t3nomis-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t3-nomis-db-1-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3nomis-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t3ndh-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
-          { name = "t3ndh-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3ndh-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t3or-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
-          { name = "t3or-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3or-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t3trdat-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
-          { name = "t3trdat-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t3trdat-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           # T1
