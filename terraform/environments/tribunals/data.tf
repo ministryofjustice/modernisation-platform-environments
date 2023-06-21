@@ -14,3 +14,9 @@
 # data "aws_secretsmanager_secret_version" "source-db" {
 #   secret_id = data.aws_secretsmanager_secret.source-db-secrets.id
 # }
+
+data "aws_route53_zone" "application_zone" {
+  provider     = aws.core-network-services
+  name         = "transport.service.justice.gov.uk."
+  private_zone = false
+}
