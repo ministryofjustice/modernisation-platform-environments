@@ -84,7 +84,7 @@ module "s3_bucket" {
 }
 
 resource "aws_s3_bucket_intelligent_tiering_configuration" "jitbit_bucket_tiering" {
-  bucket = module.s3_bucket[0].bucket.id
+  bucket = module.s3_bucket.bucket.id
   name   = "JitbitBucketTiering"
 
   status = "Enabled"
