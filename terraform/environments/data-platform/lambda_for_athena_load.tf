@@ -154,6 +154,12 @@ resource "aws_lambda_function" "athena_load" {
   }
 }
 
+resource "aws_cloudwatch_event_target" "athena_load_lambda_trigger" {
+  rule      = aws_cloudwatch_event_rule.put_to_data_directory.name
+  target_id = "athena"
+  arn       = aws_lambda_function.athena_load.arn
+}
+
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_athena_load_lambda" {
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
