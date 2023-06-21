@@ -17,6 +17,6 @@
 
 data "aws_route53_zone" "application_zone" {
   provider     = aws.core-network-services
-  name         = "transport.service.justice.gov.uk."
+  name         = "hmcts-development.modernisation-platform.service.justice.gov.uk"
   private_zone = false
 }

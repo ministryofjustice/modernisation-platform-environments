@@ -160,33 +160,33 @@ resource "aws_acm_certificate_validation" "external_prod" {
 }
 
 // Route53 DNS record for certificate validation
-resource "aws_route53_record" "external_validation_prod" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
+# resource "aws_route53_record" "external_validation_prod" {
+#   count    = local.is-production ? 1 : 0
+#   provider = aws.core-network-services
 
-  allow_overwrite = true
-  name            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name
-  records         = [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value]
-  type            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type
-  zone_id         = data.aws_route53_zone.application_zone.zone_id
-  ttl             = 60
-}
+#   allow_overwrite = true
+#   name            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name
+#   records         = [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value]
+#   type            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type
+#   zone_id         = data.aws_route53_zone.application_zone.zone_id
+#   ttl             = 60
+# }
 
 // Route53 DNS record for directing traffic to the service
-resource "aws_route53_record" "external_prod" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
+# resource "aws_route53_record" "external_prod" {
+#   count    = local.is-production ? 1 : 0
+#   provider = aws.core-network-services
 
-  zone_id = data.aws_route53_zone.application_zone.zone_id
-  name    = "${local.application}.service.justice.gov.uk"
-  type    = "A"
+#   zone_id = data.aws_route53_zone.application_zone.zone_id
+#   name    = "${local.application}.service.justice.gov.uk"
+#   type    = "A"
 
-  alias {
-    name                   = aws_lb.app_lb.dns_name
-    zone_id                = aws_lb.app_lb.zone_id
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = aws_lb.app_lb.dns_name
+#     zone_id                = aws_lb.app_lb.zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
 ####################### ECS #########################################
 
@@ -264,11 +264,11 @@ resource "aws_ecs_task_definition" "app_task_definition" {
         {
           name  = "CurServer"
           value = "${local.application_data.accounts[local.environment].curserver}"
-        },
-        {
-          name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
-        }
+        }#,
+        # {
+        #   name  = "ida:ClientId"
+        #   value = "${local.application_data.accounts[local.environment].client_id}"
+        # }
       ]
     }
   ])
