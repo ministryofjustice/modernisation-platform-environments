@@ -22,7 +22,7 @@ resource "aws_acm_certificate_validation" "external" {
 
 // Route53 DNS records for certificate validation
 resource "aws_route53_record" "external_validation" {
-  provider = aws.core-network-services
+  provider = core-network-services
 
   allow_overwrite = true
   name            = tribunal_locals.domain_name_main[0]
@@ -33,7 +33,7 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
-  provider = aws.core-vpc
+  provider = core-vpc
 
   allow_overwrite = true
   name            = tribunal_locals.domain_name_sub[0]
@@ -45,7 +45,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
 
 // Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
+  provider = core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${tribunal_locals.environment}.modernisation-platform.service.justice.gov.uk"

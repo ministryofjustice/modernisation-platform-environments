@@ -146,4 +146,9 @@ module "transport" {
   shared_public_ids           = data.aws_subnets.shared-public.ids
   networking_business_unit    = var.networking[0].business-unit
   tribunal_locals             = locals
+
+   providers = {
+    core-network-services = aws.core-network-services
+    core-vpc = aws.core-vpc
+  }
 }
