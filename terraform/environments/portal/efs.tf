@@ -81,14 +81,14 @@ resource "aws_vpc_security_group_egress_rule" "efs_product_outbound" {
   ip_protocol       = "-1"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "efs_product_inbound" {
-  for_each = {
-    for k, v in local.efs : k => v
-  }
-  security_group_id            = aws_security_group.efs_product[each.key].id
-  description                  = "EFS Rule inbound for ${upper(each.key)} instance"
-  referenced_security_group_id = each.value.sec_group_id
-  from_port                    = 2049
-  ip_protocol                  = "tcp"
-  to_port                      = 2049
-}
+# resource "aws_vpc_security_group_ingress_rule" "efs_product_inbound" {
+#   for_each = {
+#     for k, v in local.efs : k => v
+#   }
+#   security_group_id            = aws_security_group.efs_product[each.key].id
+#   description                  = "EFS Rule inbound for ${upper(each.key)} instance"
+#   referenced_security_group_id = each.value.sec_group_id
+#   from_port                    = 2049
+#   ip_protocol                  = "tcp"
+#   to_port                      = 2049
+# }
