@@ -8,10 +8,10 @@ locals {
       sec_group_id = aws_security_group.oam_instance.id
 
     },
-    # oim = {
-    #   sec_group_id = aws_security_group.oim_instance.id
+    oim = {
+      sec_group_id = aws_security_group.ohs_instance.id
 
-    # },
+    },
     idm = {
       sec_group_id = aws_security_group.idm_instance.id
 
