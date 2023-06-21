@@ -12,10 +12,14 @@ resource "aws_iam_role" "get_glue_metadata_lambda_role" {
 
 data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda" {
   statement {
-    sid       = "GlueReadOnly"
-    effect    = "Allow"
-    actions   = ["glue:Get*"]
-    resources = ["*"]
+    sid     = "GlueReadOnly"
+    effect  = "Allow"
+    actions = ["glue:GetTable", "glue:GetDatabase"]
+    resources = [
+      "arn:aws:glue:${local.region}:${local.account_id}:catalog",
+      "arn:aws:glue:${local.region}:${local.account_id}:database/*",
+      "arn:aws:glue:${local.region}:${local.account_id}:table/*"
+    ]
   }
   statement {
     sid       = "LambdaLogGroup"
