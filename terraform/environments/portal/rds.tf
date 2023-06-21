@@ -477,7 +477,7 @@ resource "aws_db_instance" "appdb1" {
   copy_tags_to_snapshot = true
   storage_encrypted     = true
   #apply_immediately           = true
-  snapshot_identifier         = try(format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.igdb_snapshot_name), null)
+  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.igdb_snapshot_name)
   kms_key_id                  = data.aws_kms_key.rds_shared.arn
   publicly_accessible         = false
   allow_major_version_upgrade = true
@@ -526,7 +526,7 @@ resource "aws_db_instance" "appdb2" {
   copy_tags_to_snapshot = true
   storage_encrypted     = true
   #apply_immediately           = true
-  snapshot_identifier         = try(format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.iadb_snapshot_name), null)
+  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.iadb_snapshot_name)
   kms_key_id                  = data.aws_kms_key.rds_shared.arn
   publicly_accessible         = false
   allow_major_version_upgrade = true
