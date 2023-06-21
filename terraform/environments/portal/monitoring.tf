@@ -14,9 +14,9 @@ locals {
     ohs1 = {
       instance_id = aws_instance.ohs_instance_1.id
     },
-    oim1 = {
-      instance_id = aws_instance.oim_instance_1.id
-    },
+    # oim1 = {
+    #   instance_id = aws_instance.oim_instance_1.id
+    # },
     idm1 = {
       instance_id = aws_instance.idm_instance_1.id
     }
