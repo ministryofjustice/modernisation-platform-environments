@@ -55,23 +55,23 @@ locals {
         access_logs              = false
         enable_delete_protection = false
         existing_target_groups = {
-          "private-lb-https-443" = {
-            arn = length(data.aws_lb_target_group.private_lb) > 0 ? data.aws_lb_target_group.private_lb[0].arn : ""
-          }
+          # "private-lb-https-443" = {
+          #   arn = length(data.aws_lb_target_group.private_lb) > 0 ? data.aws_lb_target_group.private_lb[0].arn : ""
+          # }
         }
         idle_timeout    = 60 # 60 is default
         security_groups = [] # no security groups for network load balancers
         public_subnets  = module.environment.subnets["public"].ids
         tags            = local.tags
         listeners = {
-          https = {
-            port     = 443
-            protocol = "TCP"
-            default_action = {
-              type              = "forward"
-              target_group_name = "private-lb-https-443"
-            }
-          }
+          # https = {
+          #   port     = 443
+          #   protocol = "TCP"
+          #   default_action = {
+          #     type              = "forward"
+          #     target_group_name = "private-lb-https-443"
+          #   }
+          # }
         }
       }
 
@@ -121,21 +121,21 @@ locals {
             }
           }
         }
-        lb_target_groups = {
-          https-443 = {
-            port = 443
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 443
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-          }
-        }
+        # lb_target_groups = {
+        #   https-443 = {
+        #     port = 443
+        #     health_check = {
+        #       enabled             = true
+        #       interval            = 30
+        #       healthy_threshold   = 3
+        #       matcher             = "200-399"
+        #       path                = "/"
+        #       port                = 443
+        #       timeout             = 5
+        #       unhealthy_threshold = 5
+        #     }
+        #   }
+        # }
       }
     }
 
