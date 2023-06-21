@@ -37,11 +37,6 @@ module "app_based_resources" {
   shared_public_ids           = var.shared_public_ids
   networking_business_unit    = var.networking_business_unit
   tribunal_locals             = var.tribunal_locals
-
-   providers = {
-    core-network-services = aws.core-network-services
-    core-vpc = aws.core-vpc
-  }
 }
 
 
