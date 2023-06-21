@@ -14,7 +14,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda
   statement {
     sid     = "GlueReadOnly"
     effect  = "Allow"
-    actions = ["glue:GetTable", "glue:GetDatabase"]
+    actions = ["glue:GetTable", "glue:GetTables", "glue:GetDatabase", "glue:GetDatabases"]
     resources = [
       "arn:aws:glue:${local.region}:${local.account_id}:catalog",
       "arn:aws:glue:${local.region}:${local.account_id}:database/*",
