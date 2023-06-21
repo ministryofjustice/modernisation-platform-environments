@@ -71,26 +71,26 @@ resource "aws_api_gateway_integration" "proxy_to_lambda" {
   uri                     = aws_lambda_function.api_docs.invoke_arn
 }
 
-# resource "aws_api_gateway_method" "proxy_root" {
-#   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
-#   resource_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
-#   http_method   = "ANY"
-#   authorization = "NONE"
-# }
+resource "aws_api_gateway_method" "proxy_root" {
+  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+  resource_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
 
-# resource "aws_api_gateway_integration" "docs_lambda_root" {
-#   rest_api_id = aws_api_gateway_rest_api.data_platform.id
-#   resource_id = aws_api_gateway_method.proxy_root.resource_id
-#   http_method = aws_api_gateway_method.proxy_root.http_method
+resource "aws_api_gateway_integration" "docs_lambda_root" {
+  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  resource_id = aws_api_gateway_method.proxy_root.resource_id
+  http_method = aws_api_gateway_method.proxy_root.http_method
 
-#   integration_http_method = "POST"
-#   type                    = "MOCK"
-#   uri                     = aws_lambda_function.api_docs.invoke_arn
+  integration_http_method = "POST"
+  type                    = "MOCK"
+  uri                     = aws_lambda_function.api_docs.invoke_arn
 
-#   lifecycle {
-#     ignore_changes = all
-#   }
-# }
+  lifecycle {
+    ignore_changes = all
+  }
+}
 
 resource "aws_lambda_permission" "allow_apigw_to_invoke_docs_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
