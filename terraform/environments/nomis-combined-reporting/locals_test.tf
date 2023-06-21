@@ -160,9 +160,9 @@ locals {
       }
     }
     baseline_route53_zones = {
-      "${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk" = {
+      (module.environment.domains.public.modernisation_platform) = {
         lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "private" }
+          { name = "web.test.${ local.application_name }", type = "A", lbs_map_key = "private" }
         ]
       }
     }
