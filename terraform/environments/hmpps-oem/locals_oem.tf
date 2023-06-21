@@ -77,7 +77,7 @@ locals {
     }
 
     tags = {
-      # ami                = "base_ol_8_5"  # excluding while testing
+      # ami                = "base_ol_8_5"  # not including as hardening role seems to cause an issue
       component            = "data"
       server-type          = "hmpps-oem"
       os-type              = "Linux"
