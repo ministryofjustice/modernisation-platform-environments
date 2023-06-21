@@ -3,7 +3,7 @@ resource "aws_db_snapshot_copy" "local" {
   for_each                      = var.rds_refresh_snapshot_id != "" ? toset([var.rds_refresh_snapshot_id]) : []
   source_db_snapshot_identifier = each.value
   kms_key_id                    = data.aws_kms_key.rds_shared.arn
-  target_db_snapshot_identifier = "data-refresh-snapshot"
+  target_db_snapshot_identifier = "data-refresh-snapshot-${formatdate("YYYYMMDD", timestamp())}"
 }
 
 resource "aws_db_instance" "iaps" {
