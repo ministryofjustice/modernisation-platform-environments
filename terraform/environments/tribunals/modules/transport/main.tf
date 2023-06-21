@@ -38,9 +38,9 @@ module "app_based_resources" {
   networking_business_unit    = var.networking_business_unit
   tribunal_locals             = var.tribunal_locals
 
-  providers = {
-    core-network-services = core-network-services
-    core-vpc = core-vpc
+   providers = {
+    core-network-services = aws.core-network-services
+    core-vpc = aws.core-vpc
   }
 }
 
