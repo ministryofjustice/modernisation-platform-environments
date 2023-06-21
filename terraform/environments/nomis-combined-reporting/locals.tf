@@ -9,5 +9,7 @@ locals {
     preproduction = local.preproduction_config
     production    = local.production_config
   }
-  environment_config = local.environment_configs[local.environment]
+  environment_config        = local.environment_configs[local.environment]
+  baseline_acm_certificates = {}
+  baseline_route53_zones    = {}
 }
