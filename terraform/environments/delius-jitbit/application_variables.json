@@ -68,7 +68,7 @@
       "db_performance_insights_enabled": "false",
       "db_deletion_protection": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "cr-jitbit-training-db-snapshot-for-testing-migration-to-mp-copy"
+      "db_snapshot_identifier": "cr-jitbit-training-db-snapshot-for-testing-migration-to-mp-local"
     }
   }
 }
