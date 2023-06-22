@@ -8,7 +8,7 @@ resource "aws_athena_workgroup" "data_product_athena_workgroup" {
       selected_engine_version = "Athena engine version 3"
     }
     result_configuration {
-      output_location = "athena-data-product-query-results-${data.aws_caller_identity.current.account_id}"
+      output_location = "s3://athena-data-product-query-results-${data.aws_caller_identity.current.account_id}"
 
       encryption_configuration {
         encryption_option = "SSE_S3"

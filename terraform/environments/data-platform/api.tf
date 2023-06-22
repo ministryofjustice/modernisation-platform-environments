@@ -23,7 +23,7 @@ resource "aws_api_gateway_method" "upload_data_get" {
   }
 }
 
-resource "aws_api_gateway_integration" "integration" {
+resource "aws_api_gateway_integration" "upload_data_to_lambda" {
   http_method             = aws_api_gateway_method.upload_data_get.http_method
   resource_id             = aws_api_gateway_resource.upload_data.id
   rest_api_id             = aws_api_gateway_rest_api.data_platform.id
@@ -52,7 +52,10 @@ resource "aws_api_gateway_deployment" "deployment" {
     redeployment = sha1(jsonencode([
       aws_api_gateway_resource.upload_data.id,
       aws_api_gateway_method.upload_data_get.id,
-      aws_api_gateway_integration.integration.id,
+      aws_api_gateway_integration.docs_to_lambda,
+      aws_api_gateway_integration.upload_data_to_lambda,
+      aws_api_gateway_integration.proxy_to_lambda,
+      aws_api_gateway_integration.docs_lambda_root,
     ]))
   }
 
