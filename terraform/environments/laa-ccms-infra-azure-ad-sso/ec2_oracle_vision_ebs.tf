@@ -1,7 +1,7 @@
 # Build EC2 for EBS Vision
 resource "aws_instance" "ec2_oracle_vision_ebs" {
   instance_type = local.application_data.accounts[local.environment].ec2_oracle_vision_instance_type_ebsdb
-  ami           = data.aws_ami.oracle_ebs_vision_preclone_db.id
+  ami           = data.aws_ami.oracle_ebs_vision_db.id
   #subnet_id                  = data.aws_subnet.data_subnets_a.id
   subnet_id                   = local.environment == "development" ? data.aws_subnet.data_subnets_a.id : data.aws_subnet.private_subnets_a.id
   monitoring                  = true
