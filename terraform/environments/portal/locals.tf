@@ -12,4 +12,7 @@ locals {
   atos_cidr               = "10.0.0.0/8"
   portal_hosted_zone      = data.aws_route53_zone.external.name
 
+  # Temp local variable for environments where we wish to build out the EBS to be transfered to EFS
+  ebs_conditional = ["testing", "preproduction", "production"]
+
 }
