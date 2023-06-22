@@ -235,23 +235,23 @@ resource "aws_ecs_task_definition" "app_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = local.rds_url
+          value = "${local.rds_url}"
         },
         {
           name  = "RDS_PORT"
-          value = local.rds_port
+          value = "${local.rds_port}"
         },
         {
           name  = "RDS_USERNAME"
-          value = local.rds_user
+          value = "${local.rds_user}"
         },
         {
           name  = "RDS_PASSWORD"
-          value = local.rds_password
+          value = "${local.rds_password}"
         },
         {
           name  = "DB_NAME"
-          value = local.app_db_name
+          value = "${local.app_db_name}"
         },
         {
           name  = "supportEmail"
