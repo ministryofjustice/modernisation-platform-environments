@@ -102,7 +102,7 @@ resource "aws_cloudwatch_metric_alarm" "efs_connection" {
   alarm_description   = "If the instance has lost connection with its EFS system, please investigate."
   comparison_operator = "LessThanThreshold"
   dimensions          = {
-    InstanceId = aws_efs_file_system.product[each.key].id
+    FileSystemId = aws_efs_file_system.product[each.key].id
   }
   evaluation_periods  = "5"
   metric_name         = "ClientConnections"
