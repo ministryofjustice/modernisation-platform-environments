@@ -2,7 +2,7 @@ resource "aws_athena_workgroup" "data_product_athena_workgroup" {
   name = "data_product_workgroup"
 
   configuration {
-    enforce_workgroup_configuration    = true
+    enforce_workgroup_configuration    = false
     publish_cloudwatch_metrics_enabled = true
     engine_version {
       selected_engine_version = "Athena engine version 3"
@@ -152,6 +152,12 @@ resource "aws_lambda_function" "athena_load" {
       ENVIRONMENT = local.environment
     }
   }
+}
+
+resource "aws_cloudwatch_event_target" "athena_load_lambda_trigger" {
+  rule      = aws_cloudwatch_event_rule.put_to_data_directory.name
+  target_id = "athena"
+  arn       = aws_lambda_function.athena_load.arn
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_athena_load_lambda" {
