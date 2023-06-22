@@ -10,6 +10,10 @@ locals {
     baseline_s3_buckets = {
     }
 
+    baseline_ec2_instances = {
+      "t2-${local.application_name}-db-a" = local.database_a
+    }
+
     baseline_ec2_autoscaling_groups = {
       "t2-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -23,7 +27,7 @@ locals {
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
         })
       })
-
+      
       "test-${local.application_name}-bip-a" = local.bip_a
     }
 
@@ -50,19 +54,19 @@ locals {
         internal_lb              = false
         access_logs              = false
         enable_delete_protection = false
-        existing_target_groups   = {
+        existing_target_groups = {
           "private-lb-https-443" = {
             arn = length(data.aws_lb_target_group.private_lb) > 0 ? data.aws_lb_target_group.private_lb[0].arn : ""
           }
         }
-        idle_timeout             = 60 # 60 is default
-        security_groups          = [] # no security groups for network load balancers
-        public_subnets           = module.environment.subnets["public"].ids
-        tags                     = local.tags
+        idle_timeout    = 60 # 60 is default
+        security_groups = [] # no security groups for network load balancers
+        public_subnets  = module.environment.subnets["public"].ids
+        tags            = local.tags
         listeners = {
           https = {
-            port                      = 443
-            protocol                  = "TCP"
+            port     = 443
+            protocol = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "private-lb-https-443"
@@ -73,6 +77,7 @@ locals {
 
       private = {
         internal_lb              = true
+        #access_logs              = false
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is default
@@ -118,7 +123,7 @@ locals {
         }
         lb_target_groups = {
           https-443 = {
-            port                 = 443
+            port = 443
             health_check = {
               enabled             = true
               interval            = 30

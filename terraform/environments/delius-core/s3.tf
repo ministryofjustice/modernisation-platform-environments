@@ -1,5 +1,4 @@
-module "s3_bucket" {
-  count = local.environment == "development" ? 1 : 0
+module "s3_bucket_migration" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
@@ -29,30 +28,30 @@ module "s3_bucket" {
       type = "AWS"
       identifiers = [
         "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/ldap-data-migration-lambda-role"
+      ]
+    }
+    },
+    {
+      effect  = "Allow"
+      actions = ["s3:ListBucket"]
+      principals = {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/terraform"
         ]
       }
     },
     {
-        effect  = "Allow"
-        actions = ["s3:ListBucket"]
-        principals = {
-            type = "AWS"
-            identifiers = [
-                "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/terraform"
-            ]
-        }
-    },
-    {
-        effect  = "Allow"
-        actions = ["s3:ListBucket"]
-        principals = {
-            type = "AWS"
-            identifiers = [
-                "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
-            ]
-        }
+      effect  = "Allow"
+      actions = ["s3:ListBucket"]
+      principals = {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
+        ]
+      }
     }
-]
+  ]
 
   ownership_controls = "BucketOwnerEnforced" # Disable all S3 bucket ACL
 
@@ -69,36 +68,19 @@ module "s3_bucket" {
 
       noncurrent_version_transition = [
         {
-          days          = 90
+          days          = 120
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = 180
           storage_class = "GLACIER"
         }
       ]
 
       noncurrent_version_expiration = {
-        days = 730
+        days = 365
       }
     }
   ]
 
   tags = local.tags
-}
-
-resource "aws_s3_bucket_intelligent_tiering_configuration" "ldap_bucket_tiering" {
-  bucket = module.s3_bucket[0].bucket.id
-  name   = "LDAPBucketTiering"
-
-  status = "Enabled"
-
-  tiering {
-    access_tier = "ARCHIVE_ACCESS"
-    days        = 120
-  }
-
-  tiering {
-    access_tier = "DEEP_ARCHIVE_ACCESS"
-    days        = 180
-  }
 }
