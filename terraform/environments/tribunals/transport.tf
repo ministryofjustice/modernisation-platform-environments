@@ -60,21 +60,21 @@ resource "null_resource" "setup_db" {
   }
 }
 
- resource "aws_secretsmanager_secret" "db_credentials" {
-  name = "${local.application}-credentials"
-}
+#  resource "aws_secretsmanager_secret" "db_credentials" {
+#   name = "${local.application}-credentials"
+# }
 
-resource "aws_secretsmanager_secret_version" "db_credentials_version" {
-  secret_id     = aws_secretsmanager_secret.db_credentials.id
-  secret_string = <<EOF
-{
-  "username": "${local.app_db_login_name}",
-  "password": "${random_password.new_password.result}",  
-  "host": "${local.rds_url}",  
-  "database_name": "${local.app_db_name}"
-}
-EOF
-}
+# resource "aws_secretsmanager_secret_version" "db_credentials_version" {
+#   secret_id     = aws_secretsmanager_secret.db_credentials.id
+#   secret_string = <<EOF
+# {
+#   "username": "${local.app_db_login_name}",
+#   "password": "${random_password.new_password.result}",  
+#   "host": "${local.rds_url}",  
+#   "database_name": "${local.app_db_name}"
+# }
+# EOF
+# }
 
 ####################### DNS #########################################
 
