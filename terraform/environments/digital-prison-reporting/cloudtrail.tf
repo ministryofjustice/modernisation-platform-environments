@@ -15,7 +15,7 @@ resource "aws_cloudtrail" "trail" {
         Resource_Type = "Cloud Trail"
         Jira          = "DPR-471"
         }
-    )
+    ) 
 
     depends_on = [module.s3_audit_logging_bucket.bucket_id]
 }
