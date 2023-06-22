@@ -5,7 +5,7 @@ locals {
   source_db_name = "Transport"
   rds_url               = "${aws_db_instance.rdsdb.address}"      
   rds_user              = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-  rds_port              = 1433
+  rds_port              = "1433"
   rds_password          = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
   source_db_url         = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
   source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
