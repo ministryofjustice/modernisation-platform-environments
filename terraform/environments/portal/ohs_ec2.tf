@@ -9,6 +9,13 @@ file_system_id.efs.aws-region.amazonaws.com:/ mount_point nfs4
 echo "/dev/xvdc /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
 
 hostnamectl set-hostname ${local.application_name}-ohs1-ms.${local.portal_hosted_zone}
 
