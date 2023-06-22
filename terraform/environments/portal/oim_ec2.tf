@@ -133,7 +133,7 @@ resource "aws_instance" "oim_instance_1" {
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.oim_1_userdata)
-  # user_data_replace_on_change = true
+  user_data_replace_on_change = true
 
   # root_block_device {
   #   delete_on_termination      = false
