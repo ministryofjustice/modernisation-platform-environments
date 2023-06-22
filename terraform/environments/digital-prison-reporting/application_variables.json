@@ -17,7 +17,8 @@
       "setup_redshift": true,
       "enable_domain_builder_lambda": true,
       "enable_domain_builder_rds": true,
-      "enable_domain_builder_agent": true
+      "enable_domain_builder_agent": true,
+      "enable_cloud_trail": false
     },
     "test": {
       "project_short_id": "dpr",
@@ -36,7 +37,8 @@
       "setup_redshift": true,
       "enable_domain_builder_lambda": false,
       "enable_domain_builder_rds": false,
-      "enable_domain_builder_agent": false
+      "enable_domain_builder_agent": false,
+      "enable_cloud_trail": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -55,7 +57,8 @@
       "setup_redshift": true,
       "enable_domain_builder_lambda": false,
       "enable_domain_builder_rds": false,
-      "enable_domain_builder_agent": false
+      "enable_domain_builder_agent": false,
+      "enable_cloud_trail": false
     },
     "production": {
       "example_var": "production-data"
