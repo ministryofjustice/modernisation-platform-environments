@@ -7,8 +7,8 @@ run_ansible() {
 
   echo "ansible_repo:         ${ansible_repo}"
   echo "ansible_repo_basedir: ${ansible_repo_basedir}"
-  echo "ansible_args:         ${ansible_args}"
   echo "branch:               ${branch}"
+  echo "ansible_args:         ${ansible_args}"
 
   if [[ -z ${ansible_repo} ]]; then
     echo "ansible_repo not defined, not installing any ansible" >&2
@@ -93,12 +93,13 @@ run_ansible() {
   ansible-galaxy collection install -r requirements.yml
 
   # run ansible (comma after localhost deliberate)
-  echo "# Execute ansible site.yml $ansible_group_vars $ansible_args ..."
-  ansible-playbook site.yml $ansible_group_vars $ansible_args \
+  echo "# Execute ansible site.yml $ansible_group_vars ..."
+  ansible-playbook site.yml $ansible_group_vars \
    --connection=local \
    --inventory localhost, \
    --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
+   --tags "${ansible_args}, ec2provision" \
    --become
 
   echo "# Cleanup"
@@ -111,3 +112,4 @@ run_ansible() {
 echo "ansible-ec2provision.sh start" | logger -p local3.info -t user-data
 run_ansible 2>&1 | logger -p local3.info -t user-data
 echo "ansible-ec2provision.sh end" | logger -p local3.info -t user-data
+

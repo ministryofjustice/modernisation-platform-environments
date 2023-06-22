@@ -74,6 +74,7 @@ locals {
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       monitoring = true
+      #vpc_security_group_ids = ["private-web"]
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
@@ -125,6 +126,7 @@ locals {
   database_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name          = "oasys_oracle_db_*"
+      ami_owner         = "self"
       availability_zone = "${local.region}a"
     })
     instance              = module.baseline_presets.ec2_instance.instance.default_db
@@ -136,55 +138,45 @@ locals {
         size        = 100
         label       = "app"
         type        = "gp3"
-        snapshot_id = null
       }
       "/dev/sdc" = { # /u02
         size        = 500
         label       = "app"
         type        = "gp3"
-        snapshot_id = null
       }
       "/dev/sde" = { # DATA01
         label       = "data"
         size        = 200
         type        = "gp3"
-        snapshot_id = null
       }
       # "/dev/sdf" = {  # DATA02
       #   label = "data"
       #   type = null
-      #   snapshot_id = null
       # }
       # "/dev/sdg" = {  # DATA03
       #   label = "data"
       #   type = null
-      #   snapshot_id = null
       # }
       # "/dev/sdh" = {  # DATA04
       #   label = "data"
       #   type = null
-      #   snapshot_id = null
       # }
       # "/dev/sdi" = {  # DATA05
       #   label = "data"
       #   type = null
-      #   snapshot_id = null
       # }
       "/dev/sdj" = { # FLASH01
         label       = "flash"
         type        = "gp3"
-        snapshot_id = null
         size        = 50
       }
       # "/dev/sdk" = { # FLASH02
       #   label = "flash"
       #   type = null
-      #   snapshot_id = null
       # }
       "/dev/sds" = {
         label       = "swap"
         type        = "gp3"
-        snapshot_id = null
         size        = 2
       }
     }

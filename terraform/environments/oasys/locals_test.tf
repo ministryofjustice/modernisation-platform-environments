@@ -10,6 +10,10 @@ locals {
     baseline_s3_buckets = {
     }
 
+    baseline_ec2_instances = {
+      "t2-${local.application_name}-db-a" = local.database_a
+    }
+
     baseline_ec2_autoscaling_groups = {
       "t2-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -23,9 +27,7 @@ locals {
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
         })
       })
-      "t2-${local.application_name}-db-a" = merge(local.database_a, {
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-      })
+      
       "test-${local.application_name}-bip-a" = local.bip_a
     }
 
@@ -75,6 +77,7 @@ locals {
 
       private = {
         internal_lb              = true
+        #access_logs              = false
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is default

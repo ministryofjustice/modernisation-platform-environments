@@ -58,7 +58,7 @@ resource "aws_wafv2_web_acl_association" "this" {
 
 resource "aws_cloudwatch_log_group" "waf" {
   name              = "aws-waf-logs-${local.application_name}"
-  retention_in_days = 14
+  retention_in_days = 60
   tags              = local.tags
 }
 resource "aws_wafv2_web_acl_logging_configuration" "waf" {
