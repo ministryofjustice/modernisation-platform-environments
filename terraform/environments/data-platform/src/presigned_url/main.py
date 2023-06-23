@@ -22,7 +22,7 @@ def handler(event, context):
         database,
         table,
         f"extraction_timestamp={amz_date}",
-        uuid_string + ".csv",
+        uuid_string,
     )
     fields = {
         "x-amz-server-side-encryption": "AES256",
