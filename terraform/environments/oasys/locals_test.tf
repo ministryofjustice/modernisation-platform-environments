@@ -30,9 +30,9 @@ locals {
       
       "test-${local.application_name}-bip-a" = local.bip_a
 
-      "test-${local.application_name}-bip-b" = merge(local.bip_b, {
-        autoscaling_schedules    = {}
-      })
+      # "test-${local.application_name}-bip-b" = merge(local.bip_b, {
+      #   autoscaling_schedules    = {}
+      # })
     }
 
     baseline_acm_certificates = {
@@ -68,14 +68,14 @@ locals {
         public_subnets  = module.environment.subnets["public"].ids
         tags            = local.tags
         listeners = {
-          https = {
-            port     = 443
-            protocol = "TCP"
-            default_action = {
-              type              = "forward"
-              target_group_name = "private-lb-https-443"
-            }
-          }
+          # https = {
+          #   port     = 443
+          #   protocol = "TCP"
+          #   default_action = {
+          #     type              = "forward"
+          #     target_group_name = "private-lb-https-443"
+          #   }
+          # }
         }
       }
 
