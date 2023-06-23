@@ -69,14 +69,14 @@ locals {
         tags            = local.tags
         listeners = {
           # for some reason need to temporary remove this because it mentions the LB target group - maybe i should define the load balancer target group outside of the loadbalancer module for now
-          # https = {
-          #   port     = 443
-          #   protocol = "TCP"
-          #   default_action = {
-          #     type              = "forward"
-          #     target_group_name = "private-lb-https-443"
-          #   }
-          # }
+          https = {
+            port     = 443
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "private-lb-https-443"
+            }
+          }
         }
       }
 
