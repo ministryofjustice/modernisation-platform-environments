@@ -29,6 +29,10 @@ locals {
       })
       
       "test-${local.application_name}-bip-a" = local.bip_a
+
+      "test-${local.application_name}-bip-b" = merge(local.bip_b, {
+        autoscaling_schedules    = {}
+      })
     }
 
     baseline_acm_certificates = {
