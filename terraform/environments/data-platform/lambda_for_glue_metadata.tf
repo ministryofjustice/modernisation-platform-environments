@@ -75,6 +75,12 @@ resource "aws_api_gateway_method" "get_glue_metadata" {
   http_method   = "GET"
   resource_id   = aws_api_gateway_resource.get_glue_metadata.id
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+
+  request_parameters = {
+    "method.request.header.Authorization" = true,
+    "method.request.querystring.database" = true,
+    "method.request.querystring.table"    = true,
+  }
 }
 
 resource "aws_api_gateway_integration" "get_glue_metadata" {
@@ -84,6 +90,11 @@ resource "aws_api_gateway_integration" "get_glue_metadata" {
   integration_http_method = "GET"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.get_glue_metadata.invoke_arn
+
+  request_parameters = {
+    "integration.request.querystring.database" = "method.request.querystring.database",
+    "integration.request.querystring.table"    = "method.request.querystring.table"
+  }
 }
 
 output "get_glue_metadata_endpoint" {
