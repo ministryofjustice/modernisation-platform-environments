@@ -164,10 +164,6 @@ locals {
           oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T3CNOM"
         })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0 # set to 0 while testing
-        })
-        cloudwatch_metric_alarms = {} # not included while testing
       })
 
       test-oem = {
@@ -305,7 +301,6 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
-        cloudwatch_metric_alarms = {} # disabled until migration
       })
 
       t3-nomis-db-1 = merge(local.database_ec2_a, {
@@ -323,7 +318,6 @@ locals {
           data  = { total_size = 2000 }
           flash = { total_size = 500 }
         })
-        cloudwatch_metric_alarms = {} # disabled until migration
       })
 
     }
