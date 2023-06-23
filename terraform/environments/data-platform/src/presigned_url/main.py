@@ -22,23 +22,23 @@ def handler(event, context):
         database,
         table,
         f"extraction_timestamp={amz_date}",
-        uuid_string,
+        uuid_string + ".csv",
     )
     fields = {
         "x-amz-server-side-encryption": "AES256",
         "x-amz-acl": "bucket-owner-full-control",
         "x-amz-date": amz_date,
-        "Content-MD5": md5,
-        "Content-Type": "binary/octet-stream",
+        # "Content-MD5": md5,
+        # "Content-Type": "binary/octet-stream",
     }
     # File upload is capped at 5GB per single upload so content-length-range is 5GB
     conditions = [
         {"x-amz-server-side-encryption": "AES256"},
         {"x-amz-acl": "bucket-owner-full-control"},
         {"x-amz-date": amz_date},
-        {"Content-MD5": md5},
-        ["starts-with", "$Content-MD5", ""],
-        ["starts-with", "$Content-Type", ""],
+        # {"Content-MD5": md5},
+        # ["starts-with", "$Content-MD5", ""],
+        # ["starts-with", "$Content-Type", ""],
         ["starts-with", "$key", file_name],
         ["content-length-range", 0, 5000000000],
     ]
