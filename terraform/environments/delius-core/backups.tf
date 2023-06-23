@@ -100,7 +100,9 @@ data "aws_iam_policy_document" "efs_backup_policy" {
             "efs:CreateTags",
             "efs:UntagResource",
             "efs:TagResource",
-            "efs:DescribeTags"
+            "efs:DescribeTags",
+            "elasticfilesystem:Backup",
+            "elasticfilesystem:DescribeTags"
         ]
     }
 }
