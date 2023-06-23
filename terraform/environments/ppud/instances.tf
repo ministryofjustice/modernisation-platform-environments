@@ -197,7 +197,7 @@ resource "aws_instance" "s618358rgsw025" {
 
 resource "aws_instance" "s618358rgvw024" {
   count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-0d3d8251678e13330"
+  ami                    = "ami-06bc4f0d8d949ba24"
   instance_type          = "m6i.2xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
