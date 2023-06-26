@@ -60,17 +60,13 @@ resource "aws_lambda_permission" "get_glue_metadata" {
   function_name = aws_lambda_function.get_glue_metadata.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.get_glue_metadata.id}/*/${aws_api_gateway_method.get_glue_metadata.http_method}${aws_api_gateway_resource.get_glue_metadata.path}"
-}
-
-resource "aws_api_gateway_rest_api" "get_glue_metadata" {
-  name = "get_glue_metadata"
+  source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.get_glue_metadata.http_method}${aws_api_gateway_resource.get_glue_metadata.path}"
 }
 
 resource "aws_api_gateway_resource" "get_glue_metadata" {
-  parent_id   = aws_api_gateway_rest_api.get_glue_metadata.root_resource_id
+  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
   path_part   = "get_glue_metadata"
-  rest_api_id = aws_api_gateway_rest_api.get_glue_metadata.id
+  rest_api_id = aws_api_gateway_rest_api.data_platform.id
 }
 
 resource "aws_api_gateway_method" "get_glue_metadata" {
@@ -78,47 +74,29 @@ resource "aws_api_gateway_method" "get_glue_metadata" {
   authorizer_id = aws_api_gateway_authorizer.authorizer.id
   http_method   = "GET"
   resource_id   = aws_api_gateway_resource.get_glue_metadata.id
-  rest_api_id   = aws_api_gateway_rest_api.get_glue_metadata.id
+  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+
+  request_parameters = {
+    "method.request.header.Authorization" = true,
+    "method.request.querystring.database" = true,
+    "method.request.querystring.table"    = true,
+  }
 }
 
 resource "aws_api_gateway_integration" "get_glue_metadata" {
   http_method             = aws_api_gateway_method.get_glue_metadata.http_method
   resource_id             = aws_api_gateway_resource.get_glue_metadata.id
-  rest_api_id             = aws_api_gateway_rest_api.get_glue_metadata.id
-  integration_http_method = "GET"
+  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.get_glue_metadata.invoke_arn
-}
 
-resource "aws_api_gateway_deployment" "get_glue_metadata" {
-  rest_api_id = aws_api_gateway_rest_api.get_glue_metadata.id
-
-  triggers = {
-    # NOTE: The configuration below will satisfy ordering considerations,
-    #       but not pick up all future REST API changes. More advanced patterns
-    #       are possible, such as using the filesha1() function against the
-    #       Terraform configuration file(s) or removing the .id references to
-    #       calculate a hash against whole resources. Be aware that using whole
-    #       resources will show a difference after the initial implementation.
-    #       It will stabilize to only change when resources change afterwards.
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.get_glue_metadata.id,
-      aws_api_gateway_method.get_glue_metadata.id,
-      aws_api_gateway_integration.get_glue_metadata.id,
-    ]))
-  }
-
-  lifecycle {
-    create_before_destroy = true
+  request_parameters = {
+    "integration.request.querystring.database" = "method.request.querystring.database",
+    "integration.request.querystring.table"    = "method.request.querystring.table"
   }
 }
 
-resource "aws_api_gateway_stage" "get_glue_metadata" {
-  deployment_id = aws_api_gateway_deployment.get_glue_metadata.id
-  rest_api_id   = aws_api_gateway_rest_api.get_glue_metadata.id
-  stage_name    = "sandbox"
-}
-
-output "base_url" {
-  value = aws_api_gateway_deployment.get_glue_metadata.invoke_url
+output "get_glue_metadata_endpoint" {
+  value = join("", [aws_api_gateway_deployment.deployment.invoke_url, "/get_glue_metadata/"])
 }
