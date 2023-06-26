@@ -234,7 +234,6 @@ locals {
     })
   })
 
-
   bip_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "oasys_bip_release_*"
