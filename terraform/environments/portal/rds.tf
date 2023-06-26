@@ -782,7 +782,7 @@ resource "aws_cloudwatch_metric_alarm" "igdb_rds_burst_balance" {
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.appdb1.identifier
   }
-  comparison_operator = "GreaterThanOrEqualToThreshold"
+  comparison_operator = "LessThanOrEqualToThreshold"
   tags = merge(
     local.tags,
     {
@@ -990,11 +990,11 @@ resource "aws_cloudwatch_metric_alarm" "iadb_rds_swapusage" {
   namespace          = "AWS/RDS"
   metric_name        = "SwapUsage"
   statistic          = "Sum"
-  period             = local.iadb_swap_usage_threshold
-  evaluation_periods = local.iadb_swap_usage_alert_period
+  period             = local.iadb_swap_usage_alert_period
+  evaluation_periods = local.iadb_swap_usage_evaluation_period
   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
   ok_actions         = [aws_sns_topic.alerting_topic.arn]
-  threshold          = local.iadb_swap_usage_evaluation_period
+  threshold          = local.iadb_swap_usage_threshold
   treat_missing_data = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.appdb2.identifier
@@ -1023,7 +1023,7 @@ resource "aws_cloudwatch_metric_alarm" "iadb_rds_burst_balance" {
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.appdb2.identifier
   }
-  comparison_operator = "GreaterThanOrEqualToThreshold"
+  comparison_operator = "LessThanOrEqualToThreshold"
   tags = merge(
     local.tags,
     {
