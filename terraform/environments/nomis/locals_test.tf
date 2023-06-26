@@ -224,25 +224,25 @@ locals {
     }
 
     baseline_ec2_instances = {
-      # t1-nomis-db-1-a = merge(local.database_ec2_a, {
-      #  tags = merge(local.database_ec2_a.tags, {
-      #    nomis-environment   = "t1"
-      #    description         = "T1 NOMIS database"
-      #    oracle-sids         = ""
-      #    instance-scheduling = "skip-scheduling"
-      #  })
-      #  config = merge(local.database_ec2_a.config, {
-      #    ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
-      #  })
-      #  ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
-      #    "/dev/sdb" = { label = "app", size = 100 }
-      #    "/dev/sdc" = { label = "app", size = 100 }
-      #  })
-      #  ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-      #    data  = { total_size = 500 }
-      #    flash = { total_size = 50 }
-      #  })
-      # })
+      t1-nomis-db-1-a = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
+          nomis-environment   = "t1"
+          description         = "T1 NOMIS database"
+          oracle-sids         = ""
+          instance-scheduling = "skip-scheduling"
+        })
+        config = merge(local.database_ec2_a.config, {
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+        })
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+          data  = { total_size = 500 }
+          flash = { total_size = 50 }
+        })
+      })
 
       t1-nomis-db-1-b = merge(local.database_ec2_b, {
         tags = merge(local.database_ec2_b.tags, {
