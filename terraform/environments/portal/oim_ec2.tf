@@ -185,80 +185,80 @@ resource "aws_instance" "oim_instance_2" {
 
 
 
-resource "aws_ebs_volume" "oimvolume1" {
-  availability_zone = "eu-west-2a"
-  size              = "30"
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot1
+# resource "aws_ebs_volume" "oimvolume1" {
+#   availability_zone = "eu-west-2a"
+#   size              = "30"
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot1
 
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
 
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OIMVolume1" },
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OIMVolume1" },
+#   )
+# }
 
-resource "aws_volume_attachment" "oim_EC2ServerVolume01" {
-  device_name = "/dev/xvdb"
-  volume_id   = aws_ebs_volume.oimvolume1.id
-  instance_id = aws_instance.oim_instance_1.id
-}
-
-
-resource "aws_ebs_volume" "oimvolume2" {
-  availability_zone = "eu-west-2a"
-  size              = "15"
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot2
-
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OIMVolume2" },
-  )
-}
-
-resource "aws_volume_attachment" "oim_EC2ServerVolume02" {
-  device_name = "/dev/xvdc"
-  volume_id   = aws_ebs_volume.oimvolume2.id
-  instance_id = aws_instance.oim_instance_1.id
-}
+# resource "aws_volume_attachment" "oim_EC2ServerVolume01" {
+#   device_name = "/dev/xvdb"
+#   volume_id   = aws_ebs_volume.oimvolume1.id
+#   instance_id = aws_instance.oim_instance_1.id
+# }
 
 
+# resource "aws_ebs_volume" "oimvolume2" {
+#   availability_zone = "eu-west-2a"
+#   size              = "15"
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot2
 
-resource "aws_ebs_volume" "oimvolume3" {
-  availability_zone = "eu-west-2a"
-  size              = "15"
-  type              = "gp2"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot3
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
 
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OIMVolume2" },
+#   )
+# }
 
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-OIMVolume3" },
-  )
-}
+# resource "aws_volume_attachment" "oim_EC2ServerVolume02" {
+#   device_name = "/dev/xvdc"
+#   volume_id   = aws_ebs_volume.oimvolume2.id
+#   instance_id = aws_instance.oim_instance_1.id
+# }
 
-resource "aws_volume_attachment" "oim_EC2ServerVolume03" {
-  device_name = "/dev/xvdd"
-  volume_id   = aws_ebs_volume.oimvolume3.id
-  instance_id = aws_instance.oim_instance_1.id
-}
+
+
+# resource "aws_ebs_volume" "oimvolume3" {
+#   availability_zone = "eu-west-2a"
+#   size              = "15"
+#   type              = "gp2"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].oimsnapshot3
+
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-OIMVolume3" },
+#   )
+# }
+
+# resource "aws_volume_attachment" "oim_EC2ServerVolume03" {
+#   device_name = "/dev/xvdd"
+#   volume_id   = aws_ebs_volume.oimvolume3.id
+#   instance_id = aws_instance.oim_instance_1.id
+# }
 
 
 
