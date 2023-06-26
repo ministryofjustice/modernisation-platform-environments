@@ -504,6 +504,12 @@ locals {
     }
 
     baseline_route53_zones = {
+      "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
+        records = [
+          # T3 temporary bodge
+          { name = "t3-nomis-db-1-b.nomis", type = "CNAME", ttl = "3600", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+        ]
+      }
       "test.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
           # T1
