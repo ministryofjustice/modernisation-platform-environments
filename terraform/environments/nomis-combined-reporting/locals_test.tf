@@ -44,7 +44,8 @@ locals {
           vpc_security_group_ids = ["private"]
         })
         ebs_volumes = {
-          size = 50
+          size = 100
+          type = "gp3"
         }
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group = {
@@ -91,7 +92,8 @@ locals {
           vpc_security_group_ids = ["private"]
         })
         ebs_volumes = {
-          size = 50
+          size = 100
+          type = "gp3"
         }
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group = {
