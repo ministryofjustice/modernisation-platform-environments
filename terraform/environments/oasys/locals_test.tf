@@ -11,7 +11,7 @@ locals {
     }
 
     baseline_ec2_instances = {
-      # "t2-${local.application_name}-db-a" = local.database_a
+      "t2-${local.application_name}-db-a" = local.database_a
     }
 
     baseline_ec2_autoscaling_groups = {
