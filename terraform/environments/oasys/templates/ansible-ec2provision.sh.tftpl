@@ -101,8 +101,8 @@ run_ansible() {
 
   # run ansible (comma after localhost deliberate)
   # ansible_python_interpreter used unless defined in group_vars
-  echo "# Execute ansible site.yml $ansible_group_vars $ansible_args ..."
-  ansible-playbook site.yml $ansible_group_vars \
+  echo "# Execute ansible site.yml ${ansible_args} $ansible_group_vars ..."
+  ansible-playbook site.yml ${ansible_args} $ansible_group_vars \
    --connection=local \
    --inventory localhost, \
    --extra-vars "ansible_python_interpreter=$python" \
