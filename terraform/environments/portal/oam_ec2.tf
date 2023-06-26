@@ -265,7 +265,7 @@ data "local_file" "cloudwatch_agent" {
 # The exception is the mserver volume which is required live
 
 resource "aws_ebs_volume" "oam_repo_home" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = 150
   type              = "gp2"
@@ -283,19 +283,19 @@ resource "aws_ebs_volume" "oam_repo_home" {
   )
 }
 resource "aws_volume_attachment" "oam_repo_home" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.oam_repo_home[0].id
   instance_id = aws_instance.oam_instance_1.id
 }
 
 resource "aws_ebs_volume" "oam_config" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = 15
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id  # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
   snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
 
   lifecycle {
@@ -308,14 +308,14 @@ resource "aws_ebs_volume" "oam_config" {
   )
 }
 resource "aws_volume_attachment" "oam_onfig" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdd"
   volume_id   = aws_ebs_volume.oam_config[0].id
   instance_id = aws_instance.oam_instance_1.id
 }
 
 resource "aws_ebs_volume" "oam_fmw" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = 30
   type              = "gp2"
@@ -333,14 +333,14 @@ resource "aws_ebs_volume" "oam_fmw" {
   )
 }
 resource "aws_volume_attachment" "oam_fmw" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdb"
   volume_id   = aws_ebs_volume.oam_fmw[0].id
   instance_id = aws_instance.oam_instance_1.id
 }
 
 resource "aws_ebs_volume" "oam_aserver" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = 15
   type              = "gp2"
@@ -358,7 +358,7 @@ resource "aws_ebs_volume" "oam_aserver" {
   )
 }
 resource "aws_volume_attachment" "oam_aserver" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdc"
   volume_id   = aws_ebs_volume.oam_aserver[0].id
   instance_id = aws_instance.oam_instance_1.id

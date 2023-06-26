@@ -24,9 +24,9 @@ resource "aws_efs_file_system" "product" {
   for_each = {
     for k, v in local.efs : k => v
   }
-  encrypted   = true
-  performance_mode    = "generalPurpose"
-  throughput_mode = "elastic"
+  encrypted        = true
+  performance_mode = "generalPurpose"
+  throughput_mode  = "elastic"
 
 
   tags = merge(
@@ -101,18 +101,18 @@ resource "aws_cloudwatch_metric_alarm" "efs_connection" {
   alarm_name          = "${local.application_name}-${local.environment}-${each.key}-efs-connection"
   alarm_description   = "If the instance has lost connection with its EFS system, please investigate."
   comparison_operator = "LessThanThreshold"
-  dimensions          = {
+  dimensions = {
     FileSystemId = aws_efs_file_system.product[each.key].id
   }
-  evaluation_periods  = "5"
-  metric_name         = "ClientConnections"
-  namespace           = "AWS/EFS"
-  period              = "60"
-  statistic           = "Sum"
-  threshold           = 1
-  alarm_actions       = [aws_sns_topic.alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data  = "breaching"
+  evaluation_periods = "5"
+  metric_name        = "ClientConnections"
+  namespace          = "AWS/EFS"
+  period             = "60"
+  statistic          = "Sum"
+  threshold          = 1
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "breaching"
   tags = merge(
     local.tags,
     {

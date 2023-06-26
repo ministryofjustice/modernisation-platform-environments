@@ -309,7 +309,7 @@ resource "aws_instance" "idm_instance_2" {
 
 
 resource "aws_ebs_volume" "idm_fmw" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = 30
   type              = "gp2"
@@ -327,14 +327,14 @@ resource "aws_ebs_volume" "idm_fmw" {
   )
 }
 resource "aws_volume_attachment" "idm_fmw" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdb"
   volume_id   = aws_ebs_volume.idm_fmw[0].id
   instance_id = aws_instance.idm_instance_1.id
 }
 
 resource "aws_ebs_volume" "idm_aserver" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = 15
   type              = "gp2"
@@ -352,14 +352,14 @@ resource "aws_ebs_volume" "idm_aserver" {
   )
 }
 resource "aws_volume_attachment" "idm_aserver" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdc"
   volume_id   = aws_ebs_volume.idm_aserver[0].id
   instance_id = aws_instance.idm_instance_1.id
 }
 
 resource "aws_ebs_volume" "idm_config" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = 15
   type              = "gp2"
@@ -377,7 +377,7 @@ resource "aws_ebs_volume" "idm_config" {
   )
 }
 resource "aws_volume_attachment" "idm_config" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdd"
   volume_id   = aws_ebs_volume.idm_config[0].id
   instance_id = aws_instance.idm_instance_1.id
@@ -407,7 +407,7 @@ resource "aws_volume_attachment" "idm_mserver" {
 }
 
 resource "aws_ebs_volume" "idm_instances" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = 20
   type              = "gp2"
@@ -425,7 +425,7 @@ resource "aws_ebs_volume" "idm_instances" {
   )
 }
 resource "aws_volume_attachment" "idm_instances" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdf"
   volume_id   = aws_ebs_volume.idm_instances[0].id
   instance_id = aws_instance.idm_instance_1.id
