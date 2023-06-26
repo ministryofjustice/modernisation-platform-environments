@@ -26,7 +26,7 @@ module "jitbit_bucket" {
     principals = {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/jitbit-datasync-transfer-to-s3"
+        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/${local.application_data.accounts[local.environment].migration_source_account_name}-datasync-transfer-to-s3"
       ]
     }
     },

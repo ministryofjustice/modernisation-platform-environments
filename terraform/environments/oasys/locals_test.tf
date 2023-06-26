@@ -27,8 +27,12 @@ locals {
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
         })
       })
-      
-      "test-${local.application_name}-bip-a" = local.bip_a
+
+      # "test-${local.application_name}-bip-a" = local.bip_a
+
+      "test-${local.application_name}-bip-b" = merge(local.bip_b, {
+        autoscaling_schedules = {}
+      })
     }
 
     baseline_acm_certificates = {
@@ -64,6 +68,7 @@ locals {
         public_subnets  = module.environment.subnets["public"].ids
         tags            = local.tags
         listeners = {
+          # for some reason need to temporary remove this because it mentions the LB target group - maybe i should define the load balancer target group outside of the loadbalancer module for now
           https = {
             port     = 443
             protocol = "TCP"
@@ -76,7 +81,7 @@ locals {
       }
 
       private = {
-        internal_lb              = true
+        internal_lb = true
         #access_logs              = false
         enable_delete_protection = false
         existing_target_groups   = {}

@@ -9,6 +9,13 @@ file_system_id.efs.aws-region.amazonaws.com:/ mount_point nfs4
 echo "/dev/xvdc /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
 
 hostnamectl set-hostname ${local.application_name}-ohs1-ms.${local.portal_hosted_zone}
 
@@ -148,30 +155,34 @@ resource "aws_instance" "ohs_instance_2" {
 ###############################
 # OHS EBS Volumes
 ###############################
+# TODO These volume code should only removed after all the testing and deployment are done to production. This is because we need the EBS attached to the instances to do the data transfer to EFS
+# The exception is the mserver volume which is required live
 
-# resource "aws_ebs_volume" "ohsvolume1" {
-#   availability_zone = "eu-west-2a"
-#   size              = "30"
-#   type              = "gp2"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].ohssnapshot1
-#
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-OHSVolume1" },
-#   )
-# }
-#
-# resource "aws_volume_attachment" "ohs_EC2ServerVolume01" {
-#   device_name = "/dev/xvdb"
-#   volume_id   = aws_ebs_volume.ohsvolume1.id
-#   instance_id = aws_instance.ohs_instance_1.id
-# }
+resource "aws_ebs_volume" "ohsvolume1" {
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  availability_zone = "eu-west-2a"
+  size              = "30"
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].ohssnapshot1
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OHSVolume1" },
+  )
+}
+
+resource "aws_volume_attachment" "ohs_EC2ServerVolume01" {
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  device_name = "/dev/xvdb"
+  volume_id   = aws_ebs_volume.ohsvolume1[0].id
+  instance_id = aws_instance.ohs_instance_1.id
+}
 
 resource "aws_ebs_volume" "ohs_mserver" {
   availability_zone = "eu-west-2a"

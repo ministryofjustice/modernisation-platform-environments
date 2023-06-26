@@ -49,7 +49,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing tomcat 9 installation and connections with official RedHat RHEL8.5 image"
           os-type     = "Linux"
@@ -93,7 +93,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing BIP 4.3 installation and connections with official RedHat RHEL8.5 image"
           os-type     = "Linux"

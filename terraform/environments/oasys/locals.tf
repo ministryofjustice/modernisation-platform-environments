@@ -135,19 +135,19 @@ locals {
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     ebs_volumes = {
       "/dev/sdb" = { # /u01
-        size        = 100
-        label       = "app"
-        type        = "gp3"
+        size  = 100
+        label = "app"
+        type  = "gp3"
       }
       "/dev/sdc" = { # /u02
-        size        = 500
-        label       = "app"
-        type        = "gp3"
+        size  = 500
+        label = "app"
+        type  = "gp3"
       }
       "/dev/sde" = { # DATA01
-        label       = "data"
-        size        = 200
-        type        = "gp3"
+        label = "data"
+        size  = 200
+        type  = "gp3"
       }
       # "/dev/sdf" = {  # DATA02
       #   label = "data"
@@ -166,18 +166,18 @@ locals {
       #   type = null
       # }
       "/dev/sdj" = { # FLASH01
-        label       = "flash"
-        type        = "gp3"
-        size        = 50
+        label = "flash"
+        type  = "gp3"
+        size  = 50
       }
       # "/dev/sdk" = { # FLASH02
       #   label = "flash"
       #   type = null
       # }
       "/dev/sds" = {
-        label       = "swap"
-        type        = "gp3"
-        size        = 2
+        label = "swap"
+        type  = "gp3"
+        size  = 2
       }
     }
     ebs_volume_config = {

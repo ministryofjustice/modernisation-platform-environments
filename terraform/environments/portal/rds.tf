@@ -496,6 +496,13 @@ resource "aws_db_instance" "appdb1" {
     { "scheduler:ebs-snapshot" = "True" }
   )
 
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags, e.g. because a management agent
+      # updates these based on some ruleset managed elsewhere.
+      final_snapshot_identifier
+    ]
+  }
 }
 
 resource "aws_db_instance" "appdb2" {
@@ -544,6 +551,14 @@ resource "aws_db_instance" "appdb2" {
     { "Keep" = "true" },
     { "scheduler:ebs-snapshot" = "True" }
   )
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags, e.g. because a management agent
+      # updates these based on some ruleset managed elsewhere.
+      final_snapshot_identifier
+    ]
+  }
 
 }
 

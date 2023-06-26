@@ -11,6 +11,14 @@ echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/instances /IDAM/pr
 echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 
 mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
+
 hostnamectl set-hostname ${local.application_name}-idm1-ms.${local.portal_hosted_zone}
 
 # Setting up CloudWatch Agent
@@ -296,75 +304,84 @@ resource "aws_instance" "idm_instance_2" {
 ###############################
 # IDM EBS Volumes
 ###############################
+# TODO These volume code should only removed after all the testing and deployment are done to production. This is because we need the EBS attached to the instances to do the data transfer to EFS
+# The exception is the mserver volume which is required live
 
-# resource "aws_ebs_volume" "idm_fmw" {
-#   availability_zone = "eu-west-2a"
-#   size              = 30
-#   type              = "gp2"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].idm_fmw_snapshot
-#
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-IDM-fmw" },
-#   )
-# }
-# resource "aws_volume_attachment" "idm_fmw" {
-#   device_name = "/dev/xvdb"
-#   volume_id   = aws_ebs_volume.idm_fmw.id
-#   instance_id = aws_instance.idm_instance_1.id
-# }
-#
-# resource "aws_ebs_volume" "idm_aserver" {
-#   availability_zone = "eu-west-2a"
-#   size              = 15
-#   type              = "gp2"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].idm_aserver_snapshot
-#
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-IDM-aserver" },
-#   )
-# }
-# resource "aws_volume_attachment" "idm_aserver" {
-#   device_name = "/dev/xvdc"
-#   volume_id   = aws_ebs_volume.idm_aserver.id
-#   instance_id = aws_instance.idm_instance_1.id
-# }
-#
-# resource "aws_ebs_volume" "idm_config" {
-#   availability_zone = "eu-west-2a"
-#   size              = 15
-#   type              = "gp2"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].idm_config_snapshot
-#
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-IDM-config" },
-#   )
-# }
-# resource "aws_volume_attachment" "idm_config" {
-#   device_name = "/dev/xvdd"
-#   volume_id   = aws_ebs_volume.idm_config.id
-#   instance_id = aws_instance.idm_instance_1.id
-# }
+
+resource "aws_ebs_volume" "idm_fmw" {
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  availability_zone = "eu-west-2a"
+  size              = 30
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].idm_fmw_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-IDM-fmw" },
+  )
+}
+resource "aws_volume_attachment" "idm_fmw" {
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  device_name = "/dev/xvdb"
+  volume_id   = aws_ebs_volume.idm_fmw[0].id
+  instance_id = aws_instance.idm_instance_1.id
+}
+
+resource "aws_ebs_volume" "idm_aserver" {
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  availability_zone = "eu-west-2a"
+  size              = 15
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].idm_aserver_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-IDM-aserver" },
+  )
+}
+resource "aws_volume_attachment" "idm_aserver" {
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  device_name = "/dev/xvdc"
+  volume_id   = aws_ebs_volume.idm_aserver[0].id
+  instance_id = aws_instance.idm_instance_1.id
+}
+
+resource "aws_ebs_volume" "idm_config" {
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  availability_zone = "eu-west-2a"
+  size              = 15
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].idm_config_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-IDM-config" },
+  )
+}
+resource "aws_volume_attachment" "idm_config" {
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  device_name = "/dev/xvdd"
+  volume_id   = aws_ebs_volume.idm_config[0].id
+  instance_id = aws_instance.idm_instance_1.id
+}
 
 resource "aws_ebs_volume" "idm_mserver" {
   availability_zone = "eu-west-2a"
@@ -389,25 +406,27 @@ resource "aws_volume_attachment" "idm_mserver" {
   instance_id = aws_instance.idm_instance_1.id
 }
 
-# resource "aws_ebs_volume" "idm_instances" {
-#   availability_zone = "eu-west-2a"
-#   size              = 20
-#   type              = "gp2"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].idm_instances_snapshot
-#
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-IDM-instances" },
-#   )
-# }
-# resource "aws_volume_attachment" "idm_instances" {
-#   device_name = "/dev/xvdf"
-#   volume_id   = aws_ebs_volume.idm_instances.id
-#   instance_id = aws_instance.idm_instance_1.id
-# }
+resource "aws_ebs_volume" "idm_instances" {
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  availability_zone = "eu-west-2a"
+  size              = 20
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].idm_instances_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-IDM-instances" },
+  )
+}
+resource "aws_volume_attachment" "idm_instances" {
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  device_name = "/dev/xvdf"
+  volume_id   = aws_ebs_volume.idm_instances[0].id
+  instance_id = aws_instance.idm_instance_1.id
+}
