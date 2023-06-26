@@ -234,6 +234,11 @@ locals {
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
         })
+        user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
+          args = merge(local.database_ec2_a.user_data_cloud_init.args, {
+            branch = "d264cc523daa4ee5bf60d254120874bbc7b55525"
+          })
+        })
         ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 100 }
@@ -282,26 +287,31 @@ locals {
         })
       })
 
-      # t1-nomis-db-2-a = merge(local.database_ec2_a, {
-      #   tags = merge(local.database_ec2_a.tags, {
-      #     nomis-environment   = "t1"
-      #     description         = "T1 NOMIS Audit database"
-      #     oracle-sids         = ""
-      #     instance-scheduling = "skip-scheduling"
-      #   })
-      #   config = merge(local.database_ec2_a.config, {
-      #     ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T08-27-48.804Z"
-      #   })
-      #   ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
-      #     "/dev/sdb" = { label = "app", size = 100 }
-      #     "/dev/sdc" = { label = "app", size = 100 }
-      #   })
-      #   ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-      #     data  = { total_size = 200 }
-      #     flash = { total_size = 50 }
-      #   })
-      #   cloudwatch_metric_alarms = {} # disabled until commissioned
-      # })
+      t1-nomis-db-2-a = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
+          nomis-environment   = "t1"
+          description         = "T1 NOMIS Audit database"
+          oracle-sids         = ""
+          instance-scheduling = "skip-scheduling"
+        })
+        config = merge(local.database_ec2_a.config, {
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T08-27-48.804Z"
+        })
+        user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
+          args = merge(local.database_ec2_a.user_data_cloud_init.args, {
+            branch = "d264cc523daa4ee5bf60d254120874bbc7b55525"
+          })
+        })
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+          data  = { total_size = 200 }
+          flash = { total_size = 50 }
+        })
+        cloudwatch_metric_alarms = {} # disabled until commissioned
+      })
 
       t2-nomis-db-1-b = merge(local.database_ec2_b, {
         tags = merge(local.database_ec2_b.tags, {
