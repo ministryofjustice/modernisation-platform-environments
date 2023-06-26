@@ -27,11 +27,11 @@ locals {
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
         })
       })
-      
+
       # "test-${local.application_name}-bip-a" = local.bip_a
 
       "test-${local.application_name}-bip-b" = merge(local.bip_b, {
-        autoscaling_schedules    = {}
+        autoscaling_schedules = {}
       })
     }
 
@@ -81,7 +81,7 @@ locals {
       }
 
       private = {
-        internal_lb              = true
+        internal_lb = true
         #access_logs              = false
         enable_delete_protection = false
         existing_target_groups   = {}

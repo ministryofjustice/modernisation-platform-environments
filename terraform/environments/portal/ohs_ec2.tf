@@ -159,7 +159,7 @@ resource "aws_instance" "ohs_instance_2" {
 # The exception is the mserver volume which is required live
 
 resource "aws_ebs_volume" "ohsvolume1" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = "30"
   type              = "gp2"
@@ -178,7 +178,7 @@ resource "aws_ebs_volume" "ohsvolume1" {
 }
 
 resource "aws_volume_attachment" "ohs_EC2ServerVolume01" {
-  count = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdb"
   volume_id   = aws_ebs_volume.ohsvolume1[0].id
   instance_id = aws_instance.ohs_instance_1.id
