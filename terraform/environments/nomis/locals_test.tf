@@ -517,7 +517,7 @@ locals {
       # These are used in Azure DB TNS entries
       "test.nomis.service.justice.gov.uk" = {
         records = [
-          # T1 [B: T1CNOMS1, T1NDHS1, T1TRDS1]
+          # T1 [1-b: T1CNOMS1, T1NDHS1, T1TRDS1]
           { name = "t1nomis", type = "CNAME", ttl = "300", records = ["t1nomis-b.test.nomis.service.justice.gov.uk"] },
           { name = "t1nomis-a", type = "A", ttl = "3600", records = ["10.101.3.132"] },
           { name = "t1nomis-b", type = "CNAME", ttl = "86400", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
@@ -534,7 +534,10 @@ locals {
           { name = "t1audit", type = "CNAME", ttl = "300", records = ["t1audit-b.test.nomis.service.justice.gov.uk"] },
           { name = "t1audit-a", type = "CNAME", ttl = "86400", records = ["t1-nomis-db-2-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1audit-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # T2 [B: T2CNOMS, T2NDHS1, T2TRDS1]
+          { name = "t1mis", type = "CNAME", ttl = "300", records = ["t1mis-a.test.nomis.service.justice.gov.uk"] },
+          { name = "t1mis-a", type = "A", ttl = "86400", records = ["10.101.3.133"] },
+          { name = "t1mis-b", type = "CNAME", ttl = "86400", records = ["t1-nomis-db-2.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          # T2 [1-b: T2CNOMS, T2NDHS1, T2TRDS1]
           { name = "t2nomis", type = "CNAME", ttl = "300", records = ["t2nomis-b.test.nomis.service.justice.gov.uk"] },
           { name = "t2nomis-a", type = "A", ttl = "3600", records = ["10.101.33.132"] },
           { name = "t2nomis-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
@@ -548,7 +551,7 @@ locals {
           { name = "t2trdat", type = "CNAME", ttl = "300", records = ["t2trdat-b.test.nomis.service.justice.gov.uk"] },
           { name = "t2trdat-a", type = "A", ttl = "3600", records = ["10.101.33.132"] },
           { name = "t2trdat-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # T3: [B: T3CNOM]
+          # T3: [1-b: T3CNOM]
           { name = "t3nomis", type = "CNAME", ttl = "300", records = ["t3nomis-b.test.nomis.service.justice.gov.uk"] },
           { name = "t3nomis-a", type = "A", ttl = "3600", records = ["10.101.63.135"] },
           { name = "t3nomis-b", type = "CNAME", ttl = "86400", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
