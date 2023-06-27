@@ -78,6 +78,11 @@ data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
     effect    = "Deny"
     actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket.bucket.arn}/*"]
+    
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
 
     condition {
       test     = "StringNotEquals"
@@ -89,18 +94,6 @@ data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
     }
   }
 
-  statement {
-    sid       = "DenyNonSecureTransport"
-    effect    = "Deny"
-    actions   = ["s3:*"]
-    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-
-      values = ["false"]
-    }
-  }
 }
 
 resource "aws_s3_bucket_policy" "data_platform_product_bucket_policy" {
