@@ -18,7 +18,8 @@
       "enable_domain_builder_lambda": true,
       "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
-      "enable_cloud_trail": true
+      "enable_cloud_trail": true,
+      "setup_generic_lambda_sg": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -38,7 +39,8 @@
       "enable_domain_builder_lambda": false,
       "enable_domain_builder_rds": false,
       "enable_domain_builder_agent": false,
-      "enable_cloud_trail": true
+      "enable_cloud_trail": true,
+      "setup_generic_lambda_sg": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -58,7 +60,8 @@
       "enable_domain_builder_lambda": false,
       "enable_domain_builder_rds": false,
       "enable_domain_builder_agent": false,
-      "enable_cloud_trail": false
+      "enable_cloud_trail": false,
+      "setup_generic_lambda_sg": false
     },
     "production": {
       "example_var": "production-data"
