@@ -243,6 +243,7 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
+        cloudwatch_metric_alarms = {} # no alarms as -a is not currently the live environment
       })
 
       t1-nomis-db-1-b = merge(local.database_ec2_b, {
@@ -263,7 +264,6 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
-        cloudwatch_metric_alarms = {} # disabled until commissioned
       })
 
       t1-nomis-db-2 = merge(local.database_ec2_a, {
