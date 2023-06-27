@@ -4,6 +4,8 @@ data "aws_vpc" "dpr" {
 
 ## Lambda Generic SG
 resource "aws_security_group" "lambda_generic" {
+  count = var.enable_generic_lambda_sg ? 1 : 0
+
   name_prefix = "${local.generic_lambda}-sg"
   description = "Generic Lambda Security Group"
   vpc_id      = local.dpr_vpc # Lambda VPC
@@ -13,7 +15,7 @@ resource "aws_security_group" "lambda_generic" {
   }
 
   tags = merge(
-    var.tags,
+    local.all_tags,
     {
       Resource_Type = "sg_group"
       Name          = "${local.generic_lambda}-sg"
@@ -22,16 +24,18 @@ resource "aws_security_group" "lambda_generic" {
 }
 
 resource "aws_security_group_rule" "lambda_ingress_generic" {
+  count = var.enable_generic_lambda_sg ? 1 : 0
 
   cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]
   type              = "ingress"
   from_port         = 0
   to_port           = 65535
   protocol          = "tcp"
-  security_group_id = aws_security_group.lambda[0].id
+  security_group_id = aws_security_group[0].lambda_generic.id
 }
 
 resource "aws_security_group_rule" "lambda_egress_generic" {
+  count = var.enable_generic_lambda_sg ? 1 : 0
 
   type              = "egress"
   description       = "allow all"
@@ -39,5 +43,5 @@ resource "aws_security_group_rule" "lambda_egress_generic" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.lambda_generic[0].id
+  security_group_id = aws_security_group[0].lambda_generic.id
 }
