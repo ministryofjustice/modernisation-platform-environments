@@ -6,13 +6,13 @@ resource "aws_backup_vault" "default_backup_vault" {
 }
 
 resource "aws_backup_plan" "ldap_backup_plan" {
-    name = format("%s-openldap", local.application_name)
+    name = format("%s-efs-backup", local.application_name)
 
     rule {
-        rule_name         = "${local.application_name}-backup-retain-${local.application_data.accounts[local.environment].backup_retention_period}-days"
+        rule_name         = "${local.application_name}-efs-backup-retain-${local.application_data.accounts[local.environment].efs_backup_retention_period}-days"
         target_vault_name = aws_backup_vault.default_backup_vault.name
         
-        schedule = local.application_data.accounts[local.environment].backup_schedule
+        schedule = local.application_data.accounts[local.environment].efs_backup_schedule
 
         # The amount of time in minutes to start and finish a backup
         ## Start the backup within 1 hour of the schedule
@@ -21,14 +21,14 @@ resource "aws_backup_plan" "ldap_backup_plan" {
         #completion_window = (6 * 60)
         
         lifecycle {
-            delete_after = local.application_data.accounts[local.environment].backup_retention_period
+            delete_after = local.application_data.accounts[local.environment].efs_backup_retention_period
         }
     }
     
     tags = merge(
         local.tags,
         {
-            Name = format("%s-backup-plan", local.application_name)
+            Name = format("%s-efs-backup-plan", local.application_name)
         },
     )
 }
