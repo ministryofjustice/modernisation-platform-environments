@@ -27,6 +27,7 @@ locals {
   kinesis_stream_ingestor = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-ingestor-${local.environment}"
   kinesis_endpoint        = "https://kinesis.eu-west-2.amazonaws.com"
   cloud_platform_cidr     = "172.20.0.0/16"
+  enable_dpr_cloudtrail   = local.application_data.accounts[local.environment].enable_cloud_trail
 
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
