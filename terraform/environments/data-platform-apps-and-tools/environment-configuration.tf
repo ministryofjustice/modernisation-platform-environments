@@ -1,7 +1,7 @@
 locals {
   # airflow_name                            = local.environment
   # airflow_dag_s3_path                     = "dags/"
-  # airflow_requirements_s3_path            = "requirements.txt"
+  airflow_requirements_s3_path = "requirements.txt"
   # airflow_webserver_access_mode           = "PUBLIC_ONLY"
   # airflow_weekly_maintenance_window_start = "SAT:00:00"
   # airflow_mail_from_address               = "airflow@${local.ses_domain_identity}"
