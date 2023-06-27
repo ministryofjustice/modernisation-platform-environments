@@ -71,7 +71,7 @@ resource "aws_ssm_maintenance_window_target" "dev_patch_maintenance_window_targe
 
   targets {
     key    = "tag:patch_group"
-    values = [aws_ssm_patch_group.dev_win_patch.patch_group]
+    values = [aws_ssm_patch_group.win_patch_group.patch_group]
   }
 }
 
@@ -95,7 +95,7 @@ resource "aws_ssm_maintenance_window_target" "uat_patch_maintenance_window_targe
 
   targets {
     key    = "tag:patch_group"
-    values = [aws_ssm_patch_group.uat_win_patch.patch_group]
+    values = [aws_ssm_patch_group.win_patch_group.patch_group]
   }
 }
 
@@ -119,7 +119,7 @@ resource "aws_ssm_maintenance_window_target" "prod_maintenance_window_target" {
 
   targets {
     key    = "tag:patch_group"
-    values = [aws_ssm_patch_group.prod_win_patch.patch_group]
+    values = [aws_ssm_patch_group.win_patch_group.patch_group]
   }
 }
 
