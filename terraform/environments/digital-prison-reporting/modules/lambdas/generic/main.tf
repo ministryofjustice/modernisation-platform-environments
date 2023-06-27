@@ -24,6 +24,14 @@ resource "aws_lambda_function" "this" {
   tracing_config {
     mode = var.tracing
   }
+  
+  dynamic "vpc_config" {
+    for_each = var.vpc_settings != null ? [true] : []
+    content {
+      subnet_ids         = lookup(var.vpc_settings, "subnet_ids", null)
+      security_group_ids = lookup(var.vpc_settings, "security_group_ids", null)
+    }
+  }
 
   environment {
     variables = var.env_vars
