@@ -4,7 +4,7 @@ data "aws_vpc" "dpr" {
 
 ## Lambda Generic SG
 resource "aws_security_group" "lambda_generic" {
-  count = var.enable_generic_lambda_sg ? 1 : 0
+  count = local.enable_generic_lambda_sg ? 1 : 0
 
   name_prefix = "${local.generic_lambda}-sg"
   description = "Generic Lambda Security Group"
@@ -24,7 +24,7 @@ resource "aws_security_group" "lambda_generic" {
 }
 
 resource "aws_security_group_rule" "lambda_ingress_generic" {
-  count = var.enable_generic_lambda_sg ? 1 : 0
+  count = local.enable_generic_lambda_sg ? 1 : 0
 
   cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]
   type              = "ingress"
@@ -35,7 +35,7 @@ resource "aws_security_group_rule" "lambda_ingress_generic" {
 }
 
 resource "aws_security_group_rule" "lambda_egress_generic" {
-  count = var.enable_generic_lambda_sg ? 1 : 0
+  count = local.enable_generic_lambda_sg ? 1 : 0
 
   type              = "egress"
   description       = "allow all"
