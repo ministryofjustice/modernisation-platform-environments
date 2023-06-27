@@ -31,7 +31,7 @@ resource "aws_security_group_rule" "lambda_ingress_generic" {
   from_port         = 0
   to_port           = 65535
   protocol          = "tcp"
-  security_group_id = aws_security_group[0].lambda_generic.id
+  security_group_id = aws_security_group.lambda_generic[0].id
 }
 
 resource "aws_security_group_rule" "lambda_egress_generic" {
@@ -43,5 +43,5 @@ resource "aws_security_group_rule" "lambda_egress_generic" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group[0].lambda_generic.id
+  security_group_id = aws_security_group.lambda_generic[0].id
 }
