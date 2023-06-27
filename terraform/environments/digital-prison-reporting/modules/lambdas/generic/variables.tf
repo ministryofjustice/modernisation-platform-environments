@@ -101,3 +101,9 @@ variable "env_vars" {
   type        = map(any)
   default     = {}
 }
+
+variable "vpc_settings" {
+  type        = map(any)
+  description = "Configuration block for VPC settings"
+  default     = null
+}

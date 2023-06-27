@@ -28,6 +28,7 @@ locals {
   kinesis_endpoint        = "https://kinesis.eu-west-2.amazonaws.com"
   cloud_platform_cidr     = "172.20.0.0/16"
   enable_dpr_cloudtrail   = local.application_data.accounts[local.environment].enable_cloud_trail
+  generic_lambda          = "${local.project}-generic-lambda"
 
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
