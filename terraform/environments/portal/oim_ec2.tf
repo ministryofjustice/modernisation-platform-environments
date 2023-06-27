@@ -155,7 +155,7 @@ resource "aws_instance" "oim_instance_1" {
 
 
 resource "aws_instance" "oim_instance_2" {
-  count                       = local.environment == "production" ? 1 : 0
+  count                       = contains(["development", "testing"], local.environment) ? 0 : 1
   ami                         = local.oim_ami-id
   instance_type               = local.application_data.accounts[local.environment].oim_instance_type
   vpc_security_group_ids      = [aws_security_group.oim_instance.id]
@@ -287,4 +287,3 @@ resource "aws_volume_attachment" "oim_EC2ServerVolume04" {
 
   instance_id = aws_instance.oim_instance_1.id
 }
-

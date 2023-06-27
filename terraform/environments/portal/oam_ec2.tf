@@ -236,7 +236,7 @@ resource "aws_instance" "oam_instance_1" {
 }
 
 resource "aws_instance" "oam_instance_2" {
-  count                  = local.environment == "production" ? 1 : 0
+  count                  = contains(["development", "testing"], local.environment) ? 0 : 1
   ami                    = local.application_data.accounts[local.environment].oam_ami_id
   availability_zone      = "eu-west-2b"
   instance_type          = local.application_data.accounts[local.environment].oam_instance_type
@@ -498,7 +498,6 @@ resource "aws_route53_record" "oam1_nonprod" {
 }
 
 # resource "aws_route53_record" "oam1_prod" {
-#   count    = local.environment == "production" ? 1 : 0
 #   provider = aws.core-network-services
 #   zone_id  = data.aws_route53_zone.portal-oam.zone_id # TODO This hosted zone name to be determined
 #   name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
@@ -508,7 +507,7 @@ resource "aws_route53_record" "oam1_nonprod" {
 # }
 
 # resource "aws_route53_record" "oam2_prod" {
-#   count    = local.environment == "production" ? 1 : 0
+#   count    = contains(["development", "testing"], local.environment) ? 0 : 1
 #   provider = aws.core-vpc
 #   zone_id  = data.aws_route53_zone.portal-oam.zone_id # TODO This hosted zone name to be determined
 #   name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
