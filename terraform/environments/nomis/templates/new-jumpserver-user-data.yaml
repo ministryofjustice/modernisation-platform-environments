@@ -1,0 +1,34 @@
+# This is an EC2Launch V2 type user-data script
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
+# See C:\ProgramData\Amazon\EC2Launch\log for logs
+version: 1.0
+tasks:
+  - task: executeScript
+    inputs:
+      - frequency: once
+        type: powershell
+        runAs: admin
+        #not actually a secret
+        #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+        content: |
+          $ErrorActionPreference = "Stop" # set all errors to terminate script
+
+          Set-TimeZone "GMT Standard Time"
+          Set-WinSystemLocale "en-GB"
+
+          # Check CWAgent is installed, if it isn't then install it
+          $timeout = New-TimeSpan -Seconds 600
+          $endTime = (Get-Date).Add($timeout)
+          $cwagent = Get-Service -Name "AmazonCloudWatchAgent" -ErrorAction SilentlyContinue
+          if ($cwagent) {
+            Do {
+            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
+            } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
+          } else {
+            Invoke-WebRequest -Uri "https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi" -OutFile "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
+            $cwagent_installer = "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
+            Start-Process -FilePath msiexec.exe -ArgumentList "/i $cwagent_installer /qn" -Wait
+            Do {
+            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
+            } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
+          }
