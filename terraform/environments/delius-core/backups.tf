@@ -76,7 +76,11 @@ data "aws_iam_policy_document" "delius_core_backup_policy" {
             "backup:ListBackupJobs",
             "backup:ListBackupVaults",
             "backup:ListRecoveryPointsByBackupVault",
-            "backup:ListBackupPlanTemplates"
+            "backup:ListBackupPlanTemplates",
+            "backup:DescribeRestoreJob",
+            "backup:GetRecoveryPointRestoreMetadata",
+            "backup:ListRestoreJobs",
+            "backup:StartRestoreJob"
         ]
     }
 }
@@ -102,7 +106,26 @@ data "aws_iam_policy_document" "efs_backup_policy" {
             "efs:TagResource",
             "efs:DescribeTags",
             "elasticfilesystem:Backup",
-            "elasticfilesystem:DescribeTags"
+            "elasticfilesystem:DescribeTags",
+            "elasticfilesystem:CreateAccessPoint",
+            "elasticfilesystem:CreateFileSystem",
+            "elasticfilesystem:CreateMountTarget",
+            "elasticfilesystem:DeleteAccessPoint",
+            "elasticfilesystem:DeleteFileSystem",
+            "elasticfilesystem:DeleteMountTarget",
+            "elasticfilesystem:DescribeAccessPoints",
+            "elasticfilesystem:DescribeFileSystemPolicy",
+            "elasticfilesystem:DescribeFileSystems",
+            "elasticfilesystem:DescribeLifecycleConfiguration",
+            "elasticfilesystem:DescribeMountTargets",
+            "elasticfilesystem:DescribeMountTargetSecurityGroups",
+            "elasticfilesystem:PutBackupPolicy",
+            "elasticfilesystem:PutFileSystemPolicy",
+            "elasticfilesystem:PutLifecycleConfiguration",
+            "elasticfilesystem:Restore",
+            "elasticfilesystem:TagResource",
+            "elasticfilesystem:UntagResource",
+            "elasticfilesystem:UpdateFileSystem"
         ]
     }
 }
