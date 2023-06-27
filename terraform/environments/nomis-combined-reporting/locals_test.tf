@@ -54,7 +54,7 @@ locals {
         }
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
-          description = "For testing tomcat 9 installation and connections with official RedHat RHEL8.5 image"
+          description = "For testing BI Platform tomcat installation and connections with official RedHat RHEL8.5 image"
           os-type     = "Linux"
           component   = "test"
         }
