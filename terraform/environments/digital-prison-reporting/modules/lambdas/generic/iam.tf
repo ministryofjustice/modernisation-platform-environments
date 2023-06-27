@@ -47,6 +47,18 @@ data "aws_iam_policy_document" "lambda_execution" {
     resources = ["*"]
 
     actions = [
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:CreateNetworkInterface",
+        "ec2:DeleteNetworkInterface",
+        "ec2:DescribeInstances",
+        "ec2:AttachNetworkInterface"
+    ]
+  }
+
+  statement {
+    resources = ["*"]
+
+    actions = [
       "cloudwatch:PutMetricData"
     ]
   }
