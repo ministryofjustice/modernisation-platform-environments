@@ -1,15 +1,15 @@
 resource "aws_backup_vault" "default_backup_vault" {
-    name = format("%s-backup-vault", local.application_name)
+    name = format("%s-openldap-efs-backup-vault", local.application_name)
     tags = {
-        Name = format("%s-backup-vault", local.application_name)
+        Name = format("%s-openldap-efs-backup-vault", local.application_name)
     }
 }
 
 resource "aws_backup_plan" "ldap_backup_plan" {
-    name = format("%s-efs-backup", local.application_name)
+    name = format("%s-openldap-efs-backup", local.application_name)
 
     rule {
-        rule_name         = "${local.application_name}-efs-backup-retain-${local.application_data.accounts[local.environment].efs_backup_retention_period}-days"
+        rule_name         = "${local.application_name}-openldap-efs-backup-retain-${local.application_data.accounts[local.environment].efs_backup_retention_period}-days"
         target_vault_name = aws_backup_vault.default_backup_vault.name
         
         schedule = local.application_data.accounts[local.environment].efs_backup_schedule
@@ -28,13 +28,13 @@ resource "aws_backup_plan" "ldap_backup_plan" {
     tags = merge(
         local.tags,
         {
-            Name = format("%s-efs-backup-plan", local.application_name)
+            Name = format("%s-openldap-efs-backup-plan", local.application_name)
         },
     )
 }
 
 resource "aws_backup_selection" "efs_backup" {
-    name         = format("%s-openldap", local.application_name)
+    name         = format("%s-openldap-efs", local.application_name)
     iam_role_arn = aws_iam_role.efs_backup_role.arn
     plan_id      = aws_backup_plan.ldap_backup_plan.id
     resources    = [
@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "delius_core_backup" {
 }
 
 resource "aws_iam_role" "efs_backup_role" {
-    name = format("%s-efs-backup-role", local.application_name)
+    name = format("%s-openldap-efs-backup-role", local.application_name)
     assume_role_policy = data.aws_iam_policy_document.delius_core_backup.json
     tags               = local.tags
 }
