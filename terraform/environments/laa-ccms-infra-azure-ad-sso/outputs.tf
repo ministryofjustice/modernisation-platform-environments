@@ -13,11 +13,6 @@ output "route53_record_sg_ebs_vision_a_record" {
   value       = aws_route53_record.sg_ebs_vision_db_a_record.name
 }
 
-output "route53_record_ebs_vision_db_lb_cname" {
-  description = "the output from the lb cname"
-  value       = aws_route53_record.ebs_vision_db_lb_cname.fqdn
-}
-
 output "route53_record_ebs_db_a_record" {
   description = "output from db a record"
   value       = aws_route53_record.ebs_db_a_record
