@@ -40,7 +40,6 @@ locals {
           ami_name = "base_rhel_8_5_*"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t3.large",
           vpc_security_group_ids = ["private"]
         })
         ebs_volumes = {
@@ -87,7 +86,6 @@ locals {
           ami_name = "base_rhel_8_5_*"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t3.large",
           vpc_security_group_ids = ["private"]
         })
         ebs_volumes = {
