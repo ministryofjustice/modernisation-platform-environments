@@ -12,6 +12,7 @@ resource "aws_instance" "s609693lo6vw109" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   tags = {
     Name   = "s609693lo6vw109"
+    patch_group  = "dev_win_patch"
     backup = true
   }
 }
@@ -26,6 +27,8 @@ resource "aws_instance" "s609693lo6vw105" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name = "s609693lo6vw105"
+    patch_group  = "dev_win_patch"
+    backup = true
   }
 }
 
@@ -39,6 +42,8 @@ resource "aws_instance" "s609693lo6vw104" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name = "s609693lo6vw104"
+    patch_group  = "dev_win_patch"
+    backup = true
   }
 }
 
@@ -52,6 +57,7 @@ resource "aws_instance" "s609693lo6vw100" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name   = "s609693lo6vw100"
+    patch_group  = "dev_win_patch"
     backup = true
   }
 }
@@ -66,6 +72,8 @@ resource "aws_instance" "s609693lo6vw101" {
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
     Name = "s609693lo6vw101"
+    patch_group  = "dev_win_patch"
+    backup = true
   }
 }
 
@@ -79,6 +87,8 @@ resource "aws_instance" "s609693lo6vw103" {
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
     Name = "s609693lo6vw103"
+    patch_group  = "dev_win_patch"
+    backup = true
   }
 }
 
@@ -92,6 +102,8 @@ resource "aws_instance" "s609693lo6vw106" {
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
     Name = "s609693lo6vw106"
+    patch_group  = "dev_win_patch"
+    backup = true
   }
 }
 
@@ -105,6 +117,8 @@ resource "aws_instance" "s609693lo6vw107" {
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
     Name = "s609693lo6vw107"
+    patch_group  = "dev_win_patch"
+    backup = true
   }
 }
 
@@ -118,6 +132,8 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
     Name = "PPUDWEBSERVER2"
+    patch_group  = "dev_win_patch"
+    backup = true
   }
 }
 
@@ -131,6 +147,8 @@ resource "aws_instance" "s609693lo6vw102" {
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
     Name = "s609693lo6vw102"
+    patch_group  = "dev_win_patch"
+    backup = true
   }
 }
 
@@ -144,6 +162,8 @@ resource "aws_instance" "s609693lo6vw108" {
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
     Name = "s609693lo6vw108"
+    patch_group  = "dev_win_patch"
+    backup = true
   }
 }
 
@@ -163,6 +183,7 @@ resource "aws_instance" "s618358rgvw201" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name   = "s618358rgvw201"
+    patch_group  = "uat_win_patch"
     backup = true
   }
 }
@@ -177,6 +198,7 @@ resource "aws_instance" "S618358RGVW202" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name   = "S618358RGVW202"
+    patch_group  = "uat_win_patch"
     backup = true
   }
 }
@@ -191,6 +213,7 @@ resource "aws_instance" "s618358rgsw025" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name   = "s618358rgsw025"
+    patch_group  = "uat_win_patch"
     backup = true
   }
 }
@@ -205,6 +228,7 @@ resource "aws_instance" "s618358rgvw024" {
   subnet_id              = data.aws_subnet.data_subnets_a.id
   tags = {
     Name   = "s618358rgvw024"
+    patch_group  = "uat_win_patch"
     backup = true
   }
 }
@@ -219,6 +243,7 @@ resource "aws_instance" "s618358rgvw023" {
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
     Name   = "s618358rgvw023"
+    patch_group  = "uat_win_patch"
     backup = true
   }
 }
@@ -238,6 +263,7 @@ resource "aws_instance" "s618358rgvw019" {
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
     Name          = "s618358rgvw019"
+    patch_group  = "prod_win_patch"
     is-production = true
   }
 }
@@ -252,6 +278,7 @@ resource "aws_instance" "s618358rgvw020" {
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
     Name          = "s618358rgvw020"
+    patch_group  = "prod_win_patch"
     is-production = true
   }
 }
@@ -266,6 +293,7 @@ resource "aws_instance" "s618358rgvw021" {
   subnet_id              = data.aws_subnet.data_subnets_a.id
   tags = {
     Name          = "s618358rgvw021"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -280,6 +308,7 @@ resource "aws_instance" "s618358rgvw022" {
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
     Name          = "s618358rgvw022"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -294,6 +323,7 @@ resource "aws_instance" "s618358rgvw027" {
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
     Name          = "s618358rgvw027"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -308,6 +338,7 @@ resource "aws_instance" "s618358rgvw204" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name          = "s618358rgvw204"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -322,6 +353,7 @@ resource "aws_instance" "s618358rgvw205" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name          = "s618358rgvw205"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -336,6 +368,7 @@ resource "aws_instance" "s618358rgsw025p" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name   = "s618358rgsw025"
+    patch_group  = "prod_win_patch"
     backup = true
   }
 }
