@@ -22,7 +22,6 @@ resource "aws_security_group" "lambda_generic" {
 }
 
 resource "aws_security_group_rule" "lambda_ingress_generic" {
-  count = var.enable_sg_group ? 1 : 0
 
   cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]
   type              = "ingress"
@@ -33,7 +32,6 @@ resource "aws_security_group_rule" "lambda_ingress_generic" {
 }
 
 resource "aws_security_group_rule" "lambda_egress_generic" {
-  count = var.enable_sg_group ? 1 : 0
 
   type              = "egress"
   description       = "allow all"
