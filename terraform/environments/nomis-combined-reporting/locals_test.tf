@@ -43,6 +43,9 @@ locals {
           instance_type          = "t3.large",
           vpc_security_group_ids = ["private"]
         })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group = {
           desired_capacity    = 1
@@ -87,6 +90,9 @@ locals {
           instance_type          = "t3.large",
           vpc_security_group_ids = ["private"]
         })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group = {
           desired_capacity    = 1
