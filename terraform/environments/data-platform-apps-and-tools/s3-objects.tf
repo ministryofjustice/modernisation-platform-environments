@@ -9,7 +9,7 @@ resource "aws_s3_object" "airflow_kubernetes_config" {
     server                     = local.environment_configuration.eks_server
     cluster_name               = local.environment_configuration.eks_cluster_name
   })
-  key = "dags/.kube/config"
+  key = "${local.airflow_dag_s3_path}/.kube/config"
 }
 
 ##################################################
