@@ -138,12 +138,7 @@
           "404": {
             "description": "Glue database and/or table not found"
           }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ]
+        }
       }
     }
   },
