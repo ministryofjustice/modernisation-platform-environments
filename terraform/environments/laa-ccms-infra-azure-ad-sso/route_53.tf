@@ -2,7 +2,7 @@
 resource "aws_route53_record" "sg_ebs_vision_db_a_record" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name     = "ebs-vision-db-lb.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
 
   alias {
@@ -14,15 +14,15 @@ resource "aws_route53_record" "sg_ebs_vision_db_a_record" {
 }
 
 
-resource "aws_route53_record" "ebs_vision_db_lb_cname" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "ebs-vision-db-lb"
-  ttl     = "300"
-  type    = "CNAME"
-  records = [aws_route53_record.sg_ebs_vision_db_a_record.fqdn]
-}
+#resource "aws_route53_record" "ebs_vision_db_lb_cname" {
+#  provider = aws.core-vpc
+#
+#  zone_id = data.aws_route53_zone.external.zone_id
+#  name    = "ebs-vision-db-lb"
+#  ttl     = "300"
+#  type    = "CNAME"
+#  records = [aws_route53_record.sg_ebs_vision_db_a_record.fqdn]
+#}
 
 ## EBSDB
 resource "aws_route53_record" "ebs_db_a_record" {
