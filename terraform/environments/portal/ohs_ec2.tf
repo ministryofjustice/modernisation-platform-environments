@@ -125,7 +125,7 @@ resource "aws_instance" "ohs_instance_1" {
 
 
 resource "aws_instance" "ohs_instance_2" {
-  count         = local.environment == "production" ? 1 : 0
+  count             = contains(["development", "testing"], local.environment) ? 0 : 1
   ami           = local.application_data.accounts[local.environment].ohs_ami_id
   instance_type = local.application_data.accounts[local.environment].ohs_instance_type
   # vpc_security_group_ids         = [aws_security_group.ohs_instance.id]
