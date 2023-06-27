@@ -13,6 +13,9 @@ resource "aws_athena_workgroup" "data_product_athena_workgroup" {
       encryption_configuration {
         encryption_option = "SSE_S3"
       }
+      acl_configuration {
+        s3_acl_option = "BUCKET_OWNER_FULL_CONTROL"
+      }
     }
   }
 }
