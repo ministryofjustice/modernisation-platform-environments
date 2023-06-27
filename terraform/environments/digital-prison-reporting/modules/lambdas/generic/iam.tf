@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "lambda_assume_role" {
 data "aws_iam_policy_document" "lambda_execution" {
   statement {
     resources = [
-      "arn:aws:logs:${var.region}:${var.account}:log-group:/aws/lambda/${var.name}-function*"
+      "arn:aws:logs:${var.region}:${var.account}:log-group:/aws/lambda/*"
     ]
 
     actions = [
