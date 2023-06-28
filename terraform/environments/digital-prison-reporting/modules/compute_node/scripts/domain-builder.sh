@@ -35,4 +35,17 @@ launcher_script_location=/usr/bin/domain-builder
 # Get the configured API gateway for the domain builder backend API lambda
 domain_builder_url=$(aws apigatewayv2 get-apis --output json | jq -r  '.Items[] | select(.Name == "domain-builder-backend-api") | .ApiEndpoint')
 
+# Generate a launcher script for the jar that starts domain-builder in interactive mode
+# and configured to use the function URL via the DOMAIN_API_URL environment variable.
+sudo cat <<EOF > $launcher_script_location
+#!/bin/bash
+
+cd /home/ssm-user
+
+DOMAIN_API_URL="$domain_builder_url" java -jar domain-builder/jars/domain-builder-cli-vLatest-all.jar -i --enable-ansi
+
+EOF
+
+sudo chmod 0755 $launcher_script_location
+
 echo "Bootstrap Complete"
