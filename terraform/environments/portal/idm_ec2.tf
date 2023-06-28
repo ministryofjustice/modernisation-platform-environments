@@ -283,7 +283,7 @@ resource "aws_instance" "idm_instance_1" {
 }
 
 resource "aws_instance" "idm_instance_2" {
-  count                  = local.environment == "production" ? 1 : 0
+  count                  = contains(["development", "testing"], local.environment) ? 0 : 1
   ami                    = local.application_data.accounts[local.environment].idm_ami_id
   availability_zone      = "eu-west-2b"
   instance_type          = local.application_data.accounts[local.environment].idm_instance_type
