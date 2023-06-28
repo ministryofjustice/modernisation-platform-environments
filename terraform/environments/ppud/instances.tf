@@ -388,6 +388,7 @@ resource "aws_instance" "s266316rgsl200" {
   }
 }
 
+/*
 resource "aws_instance" "s265903rgsl400" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
@@ -417,6 +418,7 @@ resource "aws_instance" "s265903rgsl401" {
     is-production = true
   }
 }
+*/
 
 resource "aws_instance" "s265903rgsl400-non-cjsm" {
   count                  = local.is-production == true ? 1 : 0
@@ -454,6 +456,7 @@ resource "aws_key_pair" "cjms_instance" {
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDH6T6qfPg3nUtc+A0KiWra+Alg5MyBu31FYTDvaYUY9r8ySG1+Aiz+FlV6bGQGHFaKia2GNKc/OEQ9fIs0mDDRQRoc5jtli4wwP9VtLPd7c+VdywoVvPaqAgW8KzpqTdcH8RUC1w0+12UmVlPp/RQg1b8vSVOqI0aXOVm9Faitd+YDERtJGbxdgMjaCpoJcRMjmX3omFJFU1egjOePzagOp6RZOonvGOARYat2v0yB01m7PIMwxcmP6bClx/ME9EZ6uTWYI9+wEyBwWdRYM8MV+DRe3BcepPUI/uQVJ/CDtS1f3snSKE9GKJFnUAhBp263ezZyBlidDL4L3mPzpSHV ctl\\ac97864@GBR-5CG9525GMX"
 }
 
+/*
 # resource block for eip
 resource "aws_eip" "s265903rgsl400-eip" {
   count = local.is-production == true ? 1 : 0
@@ -470,6 +473,7 @@ resource "aws_eip" "s265903rgsl401-eip" {
     Name = "s265903rgsl401"
   }
 }
+*/
 
 # resource block for eip
 resource "aws_eip" "s265903rgsl400-non-cjsm" {
@@ -488,7 +492,7 @@ resource "aws_eip" "s265903rgsl401-cjsm" {
   }
 }
 
-
+/*
 #Associate EIP with EC2 Instance
 resource "aws_eip_association" "s265903rgsl400-eip-association" {
   count         = local.is-production == true ? 1 : 0
@@ -501,6 +505,7 @@ resource "aws_eip_association" "s265903rgsl401-eip-association" {
   instance_id   = aws_instance.s265903rgsl401[0].id
   allocation_id = aws_eip.s265903rgsl401-eip[0].id
 }
+*/
 
 #Associate EIP for SMTP Relay EC2 Instance
 resource "aws_eip_association" "s265903rgsl400-eip-association-non-cjsm" {
