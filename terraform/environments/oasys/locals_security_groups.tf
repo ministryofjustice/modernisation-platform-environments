@@ -98,8 +98,8 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            # local.security_group_cidrs.https, 
-            "10.102.0.0/16", # NOMS-Mgmt
+            local.security_group_cidrs.https, 
+            # "10.102.0.0/16", # NOMS-Mgmt
           ])
           security_groups = ["private","private_lb"]
         }
@@ -110,8 +110,8 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            # local.security_group_cidrs.https,
-            "10.102.0.0/16", # NOMS-Mgmt
+            local.security_group_cidrs.https,
+            # "10.102.0.0/16", # NOMS-Mgmt
           ])
           # security_groups = ["public"]
         }
@@ -147,8 +147,8 @@ locals {
           #   "bastion-linux",
           # ]
           cidr_blocks = flatten([
-            # local.security_group_cidrs.https,
-            "10.102.0.0/16", # NOMS-Mgmt
+            local.security_group_cidrs.https,
+            # "10.102.0.0/16", # NOMS-Mgmt
           ])
         }
         http8080 = {
@@ -158,8 +158,8 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            # local.security_group_cidrs.https, 
-            "10.102.0.0/16", # NOMS-Mgmt
+            local.security_group_cidrs.https, 
+            # "10.102.0.0/16", # NOMS-Mgmt
           ])
           security_groups = ["private","private_lb"]
         }
@@ -170,8 +170,8 @@ locals {
           protocol    = "tcp"
           security_groups = ["private","private_lb"]
           cidr_blocks = flatten([
-            # local.security_group_cidrs.https,
-            "10.102.0.0/16", # NOMS-Mgmt
+            local.security_group_cidrs.https,
+            # "10.102.0.0/16", # NOMS-Mgmt
           ])
         }
         # http7001 = {
