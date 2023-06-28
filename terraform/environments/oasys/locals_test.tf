@@ -132,21 +132,21 @@ locals {
             }
           }
         }
-        lb_target_groups = {
-          https-443 = {
-            port = 443
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 443
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-          }
-        }
+        # lb_target_groups = {
+        #   https-443 = {
+        #     port = 443
+        #     health_check = {
+        #       enabled             = true
+        #       interval            = 30
+        #       healthy_threshold   = 3
+        #       matcher             = "200-399"
+        #       path                = "/"
+        #       port                = 443
+        #       timeout             = 5
+        #       unhealthy_threshold = 5
+        #     }
+        #   }
+        # }
       }
     }
     
