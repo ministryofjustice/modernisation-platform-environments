@@ -28,4 +28,4 @@ sudo chown -R ssm-user domain-builder
 # Sync S3 Domain Builder Artifacts
 aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
 
-echo "Bootstrap Complete"
+echo "Bootstrap Completed Successfully"
