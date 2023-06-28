@@ -19,7 +19,7 @@ tasks:
           # Check CWAgent is installed, if it isn't then install it
           $timeout = New-TimeSpan -Seconds 600
           $endTime = (Get-Date).Add($timeout)
-          $cwagent = Get-Service -Name "AmazonCloudWatchAgent" -ErrorAction SilentlyContinue
+          $cwagent = Get-Service -Name "AmazonCloudWatchAgent"
           if ($cwagent) {
             Do {
             & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
@@ -32,3 +32,34 @@ tasks:
             & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
             } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
           }
+  - task: executeScript
+    inputs:
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
+          $ErrorActionPreference = "Stop" # set all errors to terminate script
+
+          $S3_BUCKET = "ec2-image-builder-nomis20220314103938567000000001"
+
+          # Download Java exe from S3 Bucket
+          Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/jre-6u33-windows-i586.exe -File C:\jumpserver-software\jre-6u33-windows-i586.exe
+
+          # Install Java
+          Start-Process -Wait -Verbose -FilePath "C:\jumpserver-software\jre-6u33-windows-i586.exe" -ArgumentList "/s", "/L C:\jumpserver-software\jre-install.log"
+
+          # Set JAVA_HOME environment variable
+          # New-Item -Path Env:\JAVA_HOME -Value "C:\Program Files (x86)\Java\jre6"
+
+          # Add Java to PATH environment variable
+          # [Environment]::SetEnvironmentVariable("Path", $env:Path + ";%JAVA_HOME%\bin", [EnvironmentVariableTarget]::Machine)
+
+          # Copy deployment config files
+          $deployment_folder = "C:\Windows\Sun\Java\Deployment"
+          New-Item -Path $deployment_folder -ItemType Directory -Force
+          Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/deployment.config -File $deployment_folder\deployment.config
+          Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/deployment.properties -File $deployment_folder\deployment.properties
+          Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/trusted.certs -File $deployment_folder\trusted.certs
+
+          # Prevent Java update check
+          # Remove-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" -Name SunJavaUpdateSched -Force 
