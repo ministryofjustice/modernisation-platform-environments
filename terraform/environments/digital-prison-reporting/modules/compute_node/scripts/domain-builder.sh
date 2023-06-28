@@ -29,4 +29,10 @@ cd /home/ssm-user
 # Sync S3 Domain Builder Artifacts
 aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
 
+# Location of script that will be used to launch the domain builder jar.
+launcher_script_location=/usr/bin/domain-builder
+
+# Get the configured API gateway for the domain builder backend API lambda
+domain_builder_url=$(aws apigatewayv2 get-apis --output json | jq -r  '.Items[] | select(.Name == "domain-builder-backend-api") | .ApiEndpoint')
+
 echo "Bootstrap Complete"
