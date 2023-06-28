@@ -98,10 +98,10 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https, 
-            # "10.102.0.0/16", # NOMS-Mgmt
+            # local.security_group_cidrs.https, 
+            "10.102.0.0/16", # NOMS-Mgmt
           ])
-          # security_groups = ["public"]
+          security_groups = ["private","private_lb"]
         }
         https = {
           description = "Allow HTTPS ingress"
@@ -110,8 +110,8 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https,
-            # "10.102.0.0/16", # NOMS-Mgmt
+            # local.security_group_cidrs.https,
+            "10.102.0.0/16", # NOMS-Mgmt
           ])
           # security_groups = ["public"]
         }
@@ -147,7 +147,8 @@ locals {
           #   "bastion-linux",
           # ]
           cidr_blocks = flatten([
-            local.security_group_cidrs.https,
+            # local.security_group_cidrs.https,
+            "10.102.0.0/16", # NOMS-Mgmt
           ])
         }
         http8080 = {
@@ -157,21 +158,20 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https, 
+            # local.security_group_cidrs.https, 
+            "10.102.0.0/16", # NOMS-Mgmt
           ])
-          # security_groups = ["public"]
+          security_groups = ["private","private_lb"]
         }
         https = {
           description = "Allow https ingress"
           from_port   = 443
           to_port     = 443
           protocol    = "tcp"
-          # security_groups = [
-          #   # "private-jumpserver",
-          #   # "bastion-linux",
-          # ]
+          security_groups = ["private","private_lb"]
           cidr_blocks = flatten([
-            local.security_group_cidrs.https,
+            # local.security_group_cidrs.https,
+            "10.102.0.0/16", # NOMS-Mgmt
           ])
         }
         # http7001 = {
