@@ -22,6 +22,11 @@ module "domain_builder_backend_Lambda" {
     "POSTGRES_PORT"     = local.rds_dbuilder_port
   }
 
+  vpc_settings = {
+    subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+    security_group_ids    = [aws_security_group.lambda_generic[0].id, ]
+  }
+  
   tags = merge(
     local.all_tags,
     {
