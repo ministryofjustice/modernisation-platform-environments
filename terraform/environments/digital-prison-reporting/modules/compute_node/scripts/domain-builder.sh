@@ -20,10 +20,11 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 ./aws/install
 
-# Set Env Configuration
-sudo mkdir -p /home/ssm-user/domain-builder/jars; chmod -R 0777 /home/ssm-user/domain-builder
+# Create home directory with dir structure for domain builder jars
+sudo mkdir -p /home/ssm-user/domain-builder/jars
+sudo chown -R ssm-user /home/ssm-user
+chmod -R 0777 /home/ssm-user/domain-builder
 cd /home/ssm-user
-sudo chown -R ssm-user domain-builder
 
 # Sync S3 Domain Builder Artifacts
 aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
