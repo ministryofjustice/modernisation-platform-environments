@@ -91,3 +91,18 @@ module "baseline" {
 #   count = local.environment == "test" ? 1 : 0
 #   name  = "private-lb-https-443"
 # }
+data "aws_lb" "private" {
+  name = "private_lb"
+}
+resource "aws_lb_target_group" "private-alb-https-443" {
+  name        = "private-alb-https-443-tg"
+  target_type = "alb"
+  port        = 443
+  protocol    = "TCP"
+  vpc_id      = module.environment.vpc.id
+}
+resource "aws_lb_target_group_attachment" "test" {
+  target_group_arn = aws_lb_target_group.private-alb-https-443.arn
+  target_id        = data.aws_lb.private.arn
+  port             = 443
+}
