@@ -184,7 +184,7 @@ resource "aws_lb_listener" "external" {
 # TODO To be enabled once Cert and CloudFront has been set up
 # resource "aws_lb_listener_rule" "external" {
 #   listener_arn = aws_lb_listener.external.arn
-#   priority     = 1
+#   priority     = 100
 #
 #   action {
 #     type             = "forward"
