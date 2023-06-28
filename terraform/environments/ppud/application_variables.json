@@ -4,7 +4,13 @@
       "directory_service_name": "UKGOV.DEV",
       "SES_domain": "internaltest.ppud.justice.gov.uk",
       "WAM_ALB": "WAM-ALB-DEV",
-      "patch_group": "dev_win_patch"
+      "patch_group": "dev_win_patch",
+      "patch_maintenance_window_name": "dev_patch_maintenance_window",
+      "patch_maintenance_schedule_cron": "cron(0 18 ? * 2#1 *)",
+      "patch_maintenance_window_duration": 3,
+      "maintenance_window_target_name": "development_maintenance_window_target",
+      "maintenance_window_target_description": "This is the dev patch maintenance window target",
+      "maintenance_window_task_name": "DEV-Instance-Patch"
     },
     "test": {
       "example_var": "test-data"
@@ -15,14 +21,26 @@
       "WAM_ALB": "WAM-ALB-UAT",
       "PPUD_Internal_ALB": "PPUD-ALB",
       "PPUD_Target": "PPUD",
-      "patch_group": "uat_win_patch"
+      "patch_group": "uat_win_patch",
+      "patch_maintenance_window_name": "uat_patch_maintenance_window",
+      "patch_maintenance_schedule_cron": "cron(0 18 ? * 3#1 *)",
+      "patch_maintenance_window_duration": 3,
+      "maintenance_window_target_name": "uat_patch_maintenance_window_target",
+      "maintenance_window_target_description": "This is the uat patch maintenance window target",
+      "maintenance_window_task_name": "UAT-Instance-Patch"
     },
     "production": {
       "directory_service_name": "PPUD.PROD",
       "WAM_ALB": "WAM-ALB-PROD",
       "PPUD_Internal_ALB": "PPUD-ALB",
       "PPUD_Target": "PPUD",
-      "patch_group": "prod_win_patch"
+      "patch_group": "prod_win_patch",
+      "patch_maintenance_window_name": "prod_patch_maintenance_window",
+      "patch_maintenance_schedule_cron": "cron(0 20 ? * 3#2 *)",
+      "patch_maintenance_window_duration": 4,
+      "maintenance_window_target_name": "prod_patch_maintenance_window_target",
+      "maintenance_window_target_description": "This is the production patch maintenance window target",
+      "maintenance_window_task_name": "Prod-Instance-Patch"
     }
   }
 }
