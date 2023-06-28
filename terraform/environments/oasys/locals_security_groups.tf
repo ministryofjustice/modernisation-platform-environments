@@ -144,16 +144,16 @@ locals {
         #     local.security_group_cidrs.https,
         #   ])
         # }
-        # http8080 = {
-        #   description = "Allow http8080 ingress"
-        #   from_port   = 0
-        #   to_port     = 8080
-        #   protocol    = "tcp"
-        #   # no security groups on an NLB so need to put public and private on the internal ALB
-        #   cidr_blocks = flatten([
-        #     local.security_group_cidrs.https, 
-        #   ])
-        # }
+        http8080 = {
+          description = "Allow http8080 ingress"
+          from_port   = 0
+          to_port     = 8080
+          protocol    = "tcp"
+          # no security groups on an NLB so need to put public and private on the internal ALB
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https, 
+          ])
+        }
         https = {
           description = "Allow https ingress"
           from_port   = 443
