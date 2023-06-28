@@ -41,15 +41,15 @@ domain_builder_url="http://localhost:8080"
 
 # Generate a launcher script for the jar that starts domain-builder in interactive mode
 # and configured to use the function URL via the DOMAIN_API_URL environment variable.
-cat <<EOF > $launcher_script_location
-#!/bin/bash
-
-cd /home/ssm-user
-
-DOMAIN_API_URL="$domain_builder_url" java -jar domain-builder/jars/domain-builder-cli-vLatest-all.jar -i --enable-ansi
-
-EOF
-
-chmod 0755 $launcher_script_location
+#cat <<EOF > $launcher_script_location
+##!/bin/bash
+#
+#cd /home/ssm-user
+#
+#DOMAIN_API_URL="$domain_builder_url" java -jar domain-builder/jars/domain-builder-cli-vLatest-all.jar -i --enable-ansi
+#
+#EOF
+#
+#chmod 0755 $launcher_script_location
 
 echo "Bootstrap Complete"
