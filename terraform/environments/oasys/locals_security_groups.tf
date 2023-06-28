@@ -99,7 +99,6 @@ locals {
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https, 
-            # "10.102.0.0/16", # NOMS-Mgmt
           ])
           security_groups = ["private","private_lb"]
         }
@@ -111,9 +110,8 @@ locals {
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
-            # "10.102.0.0/16", # NOMS-Mgmt
           ])
-          # security_groups = ["public"]
+          security_groups = ["private","private_lb"]
         }
       }
       egress = {
@@ -148,7 +146,6 @@ locals {
           # ]
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
-            # "10.102.0.0/16", # NOMS-Mgmt
           ])
         }
         http8080 = {
@@ -159,19 +156,17 @@ locals {
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https, 
-            # "10.102.0.0/16", # NOMS-Mgmt
           ])
-          security_groups = ["private","private_lb"]
+          # security_groups = ["private","private_lb"]
         }
         https = {
           description = "Allow https ingress"
           from_port   = 443
           to_port     = 443
           protocol    = "tcp"
-          security_groups = ["private","private_lb"]
+          # security_groups = ["private","private_lb"]
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
-            # "10.102.0.0/16", # NOMS-Mgmt
           ])
         }
         # http7001 = {
@@ -208,62 +203,63 @@ locals {
         }
       }
     }
-    # private_web = {
-    #   description = "Security group for web servers"
-    #   ingress = {
-    #     all-from-self = {
-    #       description = "Allow all ingress to self"
-    #       from_port   = 0
-    #       to_port     = 0
-    #       protocol    = -1
-    #       self        = true
-    #     }
-    #     ssh = {
-    #       description = "Allow ssh ingress"
-    #       from_port   = "22"
-    #       to_port     = "22"
-    #       protocol    = "TCP"
-    #       cidr_blocks = local.security_group_cidrs.ssh
-    #       security_groups = [
-    #         "bastion-linux",
-    #       ]
-    #     }
-    #     # http7001 = {
-    #     #   description = "Allow http7001 ingress"
-    #     #   from_port   = 7001
-    #     #   to_port     = 7001
-    #     #   protocol    = "tcp"
-    #     #   security_groups = [
-    #     #     "private-jumpserver",
-    #     #     "private-lb",
-    #     #     "bastion-linux",
-    #     #   ]
-    #     #   cidr_blocks = local.security_group_cidrs.http7xxx
-    #     # },
-    #     # http7777 = {
-    #     #   description = "Allow http7777 ingress"
-    #     #   from_port   = 7777
-    #     #   to_port     = 7777
-    #     #   protocol    = "tcp"
-    #     #   security_groups = [
-    #     #     "private-jumpserver",
-    #     #     "private-lb",
-    #     #     "bastion-linux",
-    #     #   ]
-    #     #   cidr_blocks = local.security_group_cidrs.http7xxx
-    #     # },
-    #   }
-    #   egress = {
-    #     all = {
-    #       description     = "Allow all egress"
-    #       from_port       = 0
-    #       to_port         = 0
-    #       protocol        = "-1"
-    #       cidr_blocks     = ["0.0.0.0/0"]
-    #       security_groups = []
-    #     }
-    #   }
-    # }
+    private_web = {
+      description = "Security group for web servers"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          # security_groups = [
+          #   "private-jumpserver",
+          #   "bastion-linux",
+          # ]
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https
+          ])
+        }
+        http8080 = {
+          description = "Allow http8080 ingress"
+          from_port   = 0
+          to_port     = 8080
+          protocol    = "tcp"
+          # no security groups on an NLB so need to put public and private on the internal ALB
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https, 
+          ])
+          security_groups = ["private_lb"]
+        }
+        https = {
+          description = "Allow HTTPS ingress"
+          from_port   = 0
+          to_port     = 443
+          protocol    = "tcp"
+          # no security groups on an NLB so need to put public and private on the internal ALB
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https,
+          ])
+          security_groups = ["private_lb"]
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
     # private_jumpserver = {
     #   description = "Security group for jumpservers"
     #   ingress = {
