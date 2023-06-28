@@ -59,32 +59,32 @@ locals {
     }
 
     baseline_lbs = {
-      public = {
-        load_balancer_type       = "network"
-        internal_lb              = false
-        access_logs              = false
-        enable_delete_protection = false
-        existing_target_groups = {
-          # "private-lb-https-443" = {
-          #   arn = length(data.aws_lb_target_group.private_lb) > 0 ? data.aws_lb_target_group.private_lb[0].arn : ""
-          # }
-        }
-        idle_timeout    = 60 # 60 is default
-        security_groups = [] # no security groups for network load balancers
-        public_subnets  = module.environment.subnets["public"].ids
-        tags            = local.tags
-        listeners = {
-          # for some reason need to temporary remove this because it mentions the LB target group - maybe i should define the load balancer target group outside of the loadbalancer module for now
-          # https = {
-          #   port     = 443
-          #   protocol = "TCP"
-          #   default_action = {
-          #     type              = "forward"
-          #     target_group_name = "private-lb-https-443"
-          #   }
-          # }
-        }
-      }
+      # public = {
+      #   load_balancer_type       = "network"
+      #   internal_lb              = false
+      #   access_logs              = false
+      #   enable_delete_protection = false
+      #   existing_target_groups = {
+      #     # "private-lb-https-443" = {
+      #     #   arn = length(data.aws_lb_target_group.private_lb) > 0 ? data.aws_lb_target_group.private_lb[0].arn : ""
+      #     # }
+      #   }
+      #   idle_timeout    = 60 # 60 is default
+      #   security_groups = [] # no security groups for network load balancers
+      #   public_subnets  = module.environment.subnets["public"].ids
+      #   tags            = local.tags
+      #   listeners = {
+      #     # for some reason need to temporary remove this because it mentions the LB target group - maybe i should define the load balancer target group outside of the loadbalancer module for now
+      #     # https = {
+      #     #   port     = 443
+      #     #   protocol = "TCP"
+      #     #   default_action = {
+      #     #     type              = "forward"
+      #     #     target_group_name = "private-lb-https-443"
+      #     #   }
+      #     # }
+      #   }
+      # }
 
       private = {
         internal_lb = true
