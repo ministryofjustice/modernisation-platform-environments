@@ -144,7 +144,9 @@ locals {
           #   # "private-jumpserver",
           #   # "bastion-linux",
           # ]
-          cidr_blocks = local.security_group_cidrs.https
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https,
+          ])
         }
         # http7001 = {
         #   description = "Allow http7001 ingress"
