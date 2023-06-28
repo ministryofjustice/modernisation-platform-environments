@@ -46,7 +46,7 @@ listener {
     healthy_threshold   = 2
     unhealthy_threshold = 10
     timeout             = 3
-    target              = "TCP:1389/"
+    target              = "TCP:1389"
     interval            = 15
   }
 
