@@ -137,13 +137,13 @@ locals {
         # }
         https = {
           description = "Allow https ingress"
-          from_port   = 443
+          from_port   = 0
           to_port     = 443
           protocol    = "tcp"
-          security_groups = [
-            # "private-jumpserver",
-            # "bastion-linux",
-          ]
+          # security_groups = [
+          #   # "private-jumpserver",
+          #   # "bastion-linux",
+          # ]
           cidr_blocks = local.security_group_cidrs.https
         }
         # http7001 = {
