@@ -105,7 +105,7 @@ resource "aws_lb_listener_rule" "host_based_internal" {
 }
 
 resource "aws_lb_listener_rule" "https_internal" {
-  listener_arn = aws_lb_listener.http_internal.arn
+  listener_arn = aws_lb_listener.https_internal.arn
   priority     = 100
 
   action {
