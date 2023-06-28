@@ -70,22 +70,23 @@ resource "aws_lb_listener" "http_internal" {
 
 }
 
-resource "aws_lb_listener" "https_internal" {
-
-  load_balancer_arn = aws_lb.internal.arn
-  port              = local.internal_lb_https_port
-  protocol        = "HTTPS"
-  ssl_policy      = null # TODO This needs updating once Cert and CloudFront has been set up
-  certificate_arn = null # TODO This needs updating once Cert and CloudFront has been set up
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.internal.arn
-  }
-
-  tags = local.tags
-
-}
+# TODO This needs uncommenting once Cert has been set up
+# resource "aws_lb_listener" "https_internal" {
+#
+#   load_balancer_arn = aws_lb.internal.arn
+#   port              = local.internal_lb_https_port
+#   protocol        = "HTTPS"
+#   ssl_policy      = null # TODO This needs updating once Cert and CloudFront has been set up
+#   certificate_arn = null # TODO This needs updating once Cert and CloudFront has been set up
+#
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.internal.arn
+#   }
+#
+#   tags = local.tags
+#
+# }
 
 resource "aws_lb_listener_rule" "host_based_internal" {
   listener_arn = aws_lb_listener.http_internal.arn
@@ -104,22 +105,23 @@ resource "aws_lb_listener_rule" "host_based_internal" {
 
 }
 
-resource "aws_lb_listener_rule" "https_internal" {
-  listener_arn = aws_lb_listener.https_internal.arn
-  priority     = 100
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.internal.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/"]
-    }
-  }
-
-}
+# TODO This needs uncommenting once Cert has been set up
+# resource "aws_lb_listener_rule" "https_internal" {
+#   listener_arn = aws_lb_listener.https_internal.arn
+#   priority     = 100
+#
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.internal.arn
+#   }
+#
+#   condition {
+#     path_pattern {
+#       values = ["/"]
+#     }
+#   }
+#
+# }
 
 resource "aws_lb_target_group" "internal" {
   name                 = "${local.application_name}-internal-ohs-target-group"
