@@ -7,7 +7,7 @@
                 "width" : 8,
                 "height" : 6,
                 "properties" : {
-                    "title" : "Application ELB 5xx Error",
+                    "title" : "External pplication ELB 5xx Error",
                     "annotations": {
                       "alarms": [
                         "${elb_5xx_alarm_arn}"
@@ -25,7 +25,7 @@
                 "width" : 8,
                 "height" : 6,
                 "properties" : {
-                    "title" : "Application ELB 4xx Error",
+                    "title" : "External Application ELB 4xx Error",
                     "annotations": {
                       "alarms": [
                         "${elb_4xx_alarm_arn}"
@@ -43,7 +43,7 @@
                 "width" : 8,
                 "height" : 6,
                 "properties" : {
-                    "title" : "Application ELB Target Response Time",
+                    "title" : "External Application ELB Target Response Time",
                     "annotations": {
                       "alarms": [
                         "${elb_response_time_alarm_arn}"
