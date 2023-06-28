@@ -88,7 +88,7 @@ locals {
             local.security_group_cidrs.https, 
             "10.102.0.0/16", # NOMS-Mgmt
           ])
-          security_groups = ["public"]
+          # security_groups = ["public"]
         }
         https = {
           description = "Allow HTTPS ingress"
@@ -100,7 +100,7 @@ locals {
             local.security_group_cidrs.https,
             "10.102.0.0/16", # NOMS-Mgmt
           ])
-          security_groups = ["public"]
+          # security_groups = ["public"]
         }
       }
       egress = {
