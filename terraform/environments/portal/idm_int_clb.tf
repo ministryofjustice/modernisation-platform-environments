@@ -21,9 +21,12 @@ resource "aws_vpc_security_group_ingress_rule" "internal_inbound1" {
   ip_protocol       = "tcp"
   to_port           = 1636
 }
+
 resource "aws_elb" "idm_lb" {
 name                       = "${local.application_name}-internal-lb"
 internal                   = true
+security_groups            = [aws_security_group.internal_idm_sg.id]
+subnets                    = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
 count                      = contains(["development", "testing"], local.environment) ? 0 : 1
 instances                  = [aws_instance.idm_instance_1.id, aws_instance.idm_instance_2[0].id]
 listener {
