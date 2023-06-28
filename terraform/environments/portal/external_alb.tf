@@ -6,6 +6,14 @@ locals {
   external_lb_port = 80 #TODO This needs changing to 443 once Cert and CloudFront has been set up
   custom_header = "X-Custom-Header-LAA-Portal"
   force_destroy_lb_logs_bucket = true
+  lb_target_response_time_threshold = 10
+  lb_target_response_time_threshold_max = 60
+  lb_unhealthy_hosts_threshold = 0
+  lb_rejected_connection_threshold = 10
+  lb_target_5xx_threshold = 10
+  lb_origin_5xx_threshold = 10
+  lb_target_4xx_threshold = 50
+  lb_origin_4xx_threshold = 10
 }
 
 
@@ -262,4 +270,201 @@ resource "aws_vpc_security_group_egress_rule" "external_lb_outbound" {
   security_group_id = aws_security_group.external_lb.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
+}
+
+############################################
+# External Portal ELB Alarms
+############################################
+
+resource "aws_cloudwatch_metric_alarm" "ext_lb_target_response_time" {
+  alarm_name          = "${local.application_name}-${local.environment}-alb-target-response-time-alarm"
+  alarm_description   = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received"
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    LoadBalancer = aws_lb.external.arn_suffix
+  }
+  evaluation_periods = "5"
+  metric_name        = "TargetResponseTime"
+  namespace          = "AWS/ApplicationELB"
+  period             = "60"
+  extended_statistic = "p99"
+  threshold          = local.lb_target_response_time_threshold
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "notBreaching"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-alb-target-response-time-alarm"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "ext_lb_target_response_time_max" {
+  alarm_name          = "${local.application_name}-${local.environment}-alb-target-response-time-alarm-maximum"
+  alarm_description   = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received. Triggered if response is longer than 60s."
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    LoadBalancer = aws_lb.external.arn_suffix
+  }
+  evaluation_periods = "1"
+  metric_name        = "TargetResponseTime"
+  namespace          = "AWS/ApplicationELB"
+  period             = "60"
+  statistic          = "Maximum"
+  threshold          = local.lb_target_response_time_threshold_max
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "notBreaching"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-alb-target-response-time-alarm-maximum"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "ext_lb_unhealthy_hosts" {
+  alarm_name          = "${local.application_name}-${local.environment}-unhealthy-hosts-alarm"
+  alarm_description   = "The unhealthy hosts alarm triggers if your load balancer recognises there is an unhealthy host and has been there for over 2 minutes."
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    TargetGroup = aws_lb_target_group.external.arn_suffix
+    LoadBalancer = aws_lb.external.arn_suffix
+  }
+  evaluation_periods = "2"
+  metric_name        = "UnHealthyHostCount"
+  namespace          = "AWS/ApplicationELB"
+  period             = "60"
+  statistic          = "Average"
+  threshold          = local.lb_unhealthy_hosts_threshold
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "notBreaching"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-unhealthy-hosts-alarm"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "ext_lb_rejected_connection" {
+  alarm_name          = "${local.application_name}-${local.environment}-rejected-connection-count-alarm"
+  alarm_description   = "There is no surge queue on ALB's. Alert triggers in ALB rejects too many requests, usually due to backend being busy."
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    LoadBalancer = aws_lb.external.arn_suffix
+  }
+  evaluation_periods = "5"
+  metric_name        = "RejectedConnectionCount"
+  namespace          = "AWS/ApplicationELB"
+  period             = "60"
+  statistic          = "Sum"
+  threshold          = local.lb_rejected_connection_threshold
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "notBreaching"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-rejected-connection-count-alarm"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "ext_lb_target_5xx" {
+  alarm_name          = "${local.application_name}-${local.environment}-http-5xx-error-alarm"
+  alarm_description   = "The number of HTTP response codes generated by the targets. This alarm will trigger if we receive 4 5XX http alerts in a 5 minute period."
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    LoadBalancer = aws_lb.external.arn_suffix
+  }
+  evaluation_periods = "5"
+  metric_name        = "HTTPCode_Target_5XX_Count"
+  namespace          = "AWS/ApplicationELB"
+  period             = "60"
+  statistic          = "Sum"
+  threshold          = local.lb_target_5xx_threshold
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "notBreaching"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-http-5xx-error-alarm"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "ext_lb_origin_5xx" {
+  alarm_name          = "${local.application_name}-${local.environment}-elb-5xx-error-alarm"
+  alarm_description   = "The number of HTTP 5XX server error codes that originate from the load balancer. This alarm will trigger if we receive 4 5XX elb alerts in a 5 minute period."
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    LoadBalancer = aws_lb.external.arn_suffix
+  }
+  evaluation_periods = "5"
+  metric_name        = "HTTPCode_ELB_5XX_Count"
+  namespace          = "AWS/ApplicationELB"
+  period             = "60"
+  statistic          = "Sum"
+  threshold          = local.lb_origin_5xx_threshold
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "notBreaching"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-elb-5xx-error-alarm"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "ext_lb_target_4xx" {
+  alarm_name          = "${local.application_name}-${local.environment}-http-4xx-error-alarm"
+  alarm_description   = "The number of HTTP response codes generated by the targets. This alarm will trigger if we receive 4 or more 4XX http alerts in a 5 minute period."
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    LoadBalancer = aws_lb.external.arn_suffix
+  }
+  evaluation_periods = "5"
+  metric_name        = "HTTPCode_Target_4XX_Count"
+  namespace          = "AWS/ApplicationELB"
+  period             = "60"
+  statistic          = "Sum"
+  threshold          = local.lb_target_4xx_threshold
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "notBreaching"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-http-4xx-error-alarm"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "ext_lb_origin_4xx" {
+  alarm_name          = "${local.application_name}-${local.environment}-elb-4xx-error-alarm"
+  alarm_description   = "The number of HTTP 4XX client error codes that originate from the load balancer. This alarm will trigger if we receive 4 4XX elb alerts in a 5 minute period."
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    LoadBalancer = aws_lb.external.arn_suffix
+  }
+  evaluation_periods = "5"
+  metric_name        = "HTTPCode_ELB_4XX_Count"
+  namespace          = "AWS/ApplicationELB"
+  period             = "60"
+  statistic          = "Sum"
+  threshold          = local.lb_origin_4xx_threshold
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "notBreaching"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-elb-4xx-error-alarm"
+    }
+  )
 }
