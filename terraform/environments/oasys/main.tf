@@ -97,7 +97,7 @@ data "aws_lb" "private" {
 }
 resource "aws_lb_target_group" "private-alb-https-443" {
   count       = local.environment == "test" ? 1 : 0
-  name        = "private-alb-https-443-tg"
+  name        = "private-alb-https-443"
   target_type = "alb"
   port        = 443
   protocol    = "TCP"
