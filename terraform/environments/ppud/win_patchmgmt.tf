@@ -6,7 +6,7 @@ resource "aws_ssm_patch_group" "win_patch_group" {
   patch_group = local.application_data.accounts[local.environment].patch_group
 }
 
-# Create Patch Baseline
+# Create Windows Patch Baseline
 # DEV, UAT and PROD
 
 resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
@@ -106,32 +106,4 @@ resource "aws_ssm_maintenance_window_task" "patch_maintenance_window_task" {
       }
     }
   }
-}
-
-# IAM Role for patching
-
-resource "aws_iam_role" "patching_role" {
-  name = "maintenance_window_task_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ssm.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-# Attach necessary policies to the role
-resource "aws_iam_role_policy_attachment" "maintenance_window_task_policy_attachment" {
-  role       = aws_iam_role.patching_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
 }
