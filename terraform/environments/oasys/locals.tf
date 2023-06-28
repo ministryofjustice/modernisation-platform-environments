@@ -146,7 +146,7 @@ locals {
       }
       "/dev/sde" = { # DATA01
         label = "data"
-        size  = 200
+        size  = 500
         type  = "gp3"
       }
       # "/dev/sdf" = {  # DATA02
