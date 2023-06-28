@@ -78,6 +78,19 @@ locals {
           protocol    = -1
           self        = true
         }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          # security_groups = [
+          #   "private-jumpserver",
+          #   "bastion-linux",
+          # ]
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https
+          ])
+        }
         http8080 = {
           description = "Allow http8080 ingress"
           from_port   = 0
@@ -124,20 +137,20 @@ locals {
           protocol    = -1
           self        = true
         }
-        # http = {
-        #   description = "Allow http ingress"
-        #   from_port   = 80
-        #   to_port     = 80
-        #   protocol    = "tcp"
-        #   security_groups = [
-        #     "private-jumpserver",
-        #     "bastion-linux",
-        #   ]
-        #   cidr_blocks = local.security_group_cidrs.https
-        # }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          # security_groups = [
+          #   "private-jumpserver",
+          #   "bastion-linux",
+          # ]
+          cidr_blocks = local.security_group_cidrs.https
+        }
         https = {
           description = "Allow https ingress"
-          from_port   = 0
+          from_port   = 443
           to_port     = 443
           protocol    = "tcp"
           # security_groups = [
