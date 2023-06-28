@@ -135,15 +135,15 @@ locals {
           protocol    = -1
           self        = true
         }
-        # http = {
-        #   description = "Allow http ingress"
-        #   from_port   = 80
-        #   to_port     = 80
-        #   protocol    = "tcp"
-        #   cidr_blocks = flatten([
-        #     local.security_group_cidrs.https,
-        #   ])
-        # }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https,
+          ])
+        }
         http8080 = {
           description = "Allow http8080 ingress"
           from_port   = 0
