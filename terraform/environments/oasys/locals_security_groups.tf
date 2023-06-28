@@ -269,7 +269,7 @@ locals {
     # }
 
     data = {
-      description = "Security group for databases"
+      description = "Security group for data subnet"
       ingress = {
         all-from-self = {
           description = "Allow all ingress to self"
