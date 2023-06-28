@@ -9,7 +9,7 @@ echo "assumeyes=1" >> /etc/yum.conf
 sudo yum -y update
 
 # Setup YUM install Utils
-sudo yum -y install curl wget unzip
+sudo yum -y install curl wget unzip jq
 
 # Install Java 11
 sudo amazon-linux-extras install java-openjdk11
