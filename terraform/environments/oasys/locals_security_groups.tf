@@ -125,7 +125,7 @@ locals {
         }
       }
     }
-    private_lb = {
+    private_lb = { # add public lb to security group lists
       description = "Security group for internal load balancer"
       ingress = {
         all-from-self = {
