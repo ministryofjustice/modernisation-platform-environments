@@ -92,7 +92,7 @@ module "baseline" {
 #   name  = "private-lb-https-443"
 # }
 data "aws_lb" "private" {
-  name = "private_lb"
+  name = "private-lb"
 }
 resource "aws_lb_target_group" "private-alb-https-443" {
   name        = "private-alb-https-443-tg"
