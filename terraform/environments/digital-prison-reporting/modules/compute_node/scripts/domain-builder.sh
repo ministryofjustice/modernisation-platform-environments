@@ -32,10 +32,12 @@ aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jar
 # Location of script that will be used to launch the domain builder jar.
 launcher_script_location=/usr/bin/domain-builder
 
+# TODO - disabled until we have an endpoint configured for the function.
 # Get the configured function url...
-function_url=$(aws lambda get-function-url-config --function-name dpr-domain-builder-backend-api-function --output table | tr -d ' ' | grep '|FunctionUrl|' | cut -d '|' -f3 )
+# function_url=$(aws lambda get-function-url-config --function-name dpr-domain-builder-backend-api-function --output table | tr -d ' ' | grep '|FunctionUrl|' | cut -d '|' -f3 )
 # ...and remove the trailing slash using vanilla bash parameter expansion.
-domain_builder_url=${function_url%?}
+# domain_builder_url=${function_url%?}
+domain_builder_url="http://localhost:8080"
 
 # Generate a launcher script for the jar that starts domain-builder in interactive mode
 # and configured to use the function URL via the DOMAIN_API_URL environment variable.
