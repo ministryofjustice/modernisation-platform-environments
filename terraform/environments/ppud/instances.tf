@@ -385,6 +385,7 @@ resource "aws_instance" "s266316rgsl200" {
   tags = {
     Name          = "s266316rgsl200"
     is-production = true
+    patch_group  = "prod_lin_patch"
   }
 }
 
@@ -401,6 +402,7 @@ resource "aws_instance" "s265903rgsl400-non-cjsm" {
   tags = {
     Name          = "s265903rgsl400-non-cjsm"
     is-production = true
+    patch_group  = "prod_lin_patch"
   }
 }
 
@@ -416,6 +418,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
   tags = {
     Name          = "s265903rgsl401-cjsm"
     is-production = true
+    patch_group  = "prod_lin_patch"
   }
 }
 
