@@ -63,7 +63,7 @@ resource "aws_ssm_maintenance_window_target" "prod_lin_maintenance_window_target
 
   targets {
     key    = "tag:patch_group"
-    values = [aws_ssm_patch_group.lin_patch_group.patch_group]
+    values = [aws_ssm_patch_group.lin_patch_group[0].patch_group]
   }
 }
 
