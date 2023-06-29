@@ -2,9 +2,9 @@ resource "aws_elb" "idm_lb" {
 name        = "${local.application_name}-internal-lb"
 internal                   = true
 security_groups            = [aws_security_group.internal_idm_sg.id]
-subnets                    = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
+subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
 #count                      = contains(["development", "testing"], local.environment) ? 0 : 1
-#instances                  = [aws_instance.idm_instance_1.id]
+instances                  = [aws_instance.idm_instance_1.id]
 
 
 listener {
