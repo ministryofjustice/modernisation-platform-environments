@@ -42,6 +42,8 @@ unzip awscliv2.zip
 
 # Install KUBECTL Libs
 curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.1/2023-04-19/bin/darwin/amd64/kubectl
+chmod +x ./kubectl
+cp ./kubectl /usr/bin/kubectl
 
 # Configure and Enable Kinesis Agent
 # /tmp/random.log*
