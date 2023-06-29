@@ -63,6 +63,15 @@ locals {
     port     = "1521"
   }
 
+  redshift_secrets_placeholder = {
+    dbClusterIdentifier = "dpr-redshift-${local.project}"
+    engine              = "redshift"
+    host                = "placeholder" #dpr-redshift-${local.project}.${generated}.eu-west-2.redshift.amazonaws.com:5439
+    password            = "placeholder" #generated elsewhere
+    port                = "5439"
+    username            = "dpruser"
+  }
+
   all_tags = merge(
     local.tags,
     {
