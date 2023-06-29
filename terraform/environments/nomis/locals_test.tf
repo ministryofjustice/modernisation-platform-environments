@@ -250,7 +250,7 @@ locals {
         tags = merge(local.database_ec2_b.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS database"
-          oracle-sids         = "T1TRDS1 T1CNOMS1 T1NDHS1"
+          oracle-sids         = "T1TRDS1 T1CNOMS1 T1NDHS1 T1ORSYS"
           instance-scheduling = "skip-scheduling"
         })
         config = merge(local.database_ec2_b.config, {
@@ -296,7 +296,7 @@ locals {
         tags = merge(local.database_ec2_a.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
-          oracle-sids         = "T1CNMAUD"
+          oracle-sids         = "T1CNMAUD T1MIS"
           instance-scheduling = "skip-scheduling"
         })
         ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
@@ -313,7 +313,7 @@ locals {
         tags = merge(local.database_ec2_b.tags, {
           nomis-environment   = "t2"
           description         = "T2 NOMIS database"
-          oracle-sids         = "T2TRDS1"
+          oracle-sids         = "T2TRDS1 T2NDHS1 T2CNOMS1"
           instance-scheduling = "skip-scheduling"
         })
         config = merge(local.database_ec2_b.config, {
