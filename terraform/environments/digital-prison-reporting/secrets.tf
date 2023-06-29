@@ -34,6 +34,7 @@ resource "aws_secretsmanager_secret" "redshift" {
       Name          = "dpr-redshift-sqlworkbench-${local.env}"
       Resource_Type = "Secrets"
       Jira          = "DPR-XXXX"
+      Redshift      = "redshift"
     }
   )
 }
