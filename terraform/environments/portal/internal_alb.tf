@@ -25,7 +25,7 @@ resource "aws_lb" "internal" {
 
   access_logs {
     bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
-    prefix  = local.application_name
+    prefix  = "${local.application_name}-internal-lb"
     enabled = true
   }
 
