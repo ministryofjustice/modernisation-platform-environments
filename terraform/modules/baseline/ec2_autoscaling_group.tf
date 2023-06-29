@@ -72,7 +72,5 @@ module "ec2_autoscaling_group" {
   # ensure service linked role is created first if defined in code
   depends_on = [
     aws_iam_service_linked_role.this,
-    aws_ssm_parameter.fixed,
-    aws_ssm_parameter.placeholder,
   ]
 }
