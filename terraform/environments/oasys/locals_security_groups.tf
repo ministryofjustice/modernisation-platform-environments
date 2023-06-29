@@ -142,6 +142,7 @@ locals {
           protocol    = "tcp"
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
+            "10.26.8.0/21", # public load balancer
           ])
         }
         http8080 = {
@@ -152,6 +153,7 @@ locals {
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https, 
+            "10.26.8.0/21", # public load balancer
           ])
         }
         https = {
@@ -161,6 +163,7 @@ locals {
           protocol    = "tcp"
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
+            "10.26.8.0/21", # public load balancer
           ])
         }
       }
@@ -192,7 +195,8 @@ locals {
           protocol    = "tcp"
           security_groups = ["private_lb"]
           cidr_blocks = flatten([
-            local.security_group_cidrs.https
+            local.security_group_cidrs.https,
+            "10.26.8.0/21", # public load balancer
           ])
         }
         http8080 = {
@@ -202,7 +206,8 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https, 
+            local.security_group_cidrs.https,
+            "10.26.8.0/21", # public load balancer
           ])
           security_groups = ["private_lb"]
         }
@@ -214,6 +219,7 @@ locals {
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
+            "10.26.8.0/21", # public load balancer
           ])
           security_groups = ["private_lb"]
         }
@@ -229,7 +235,6 @@ locals {
         }
       }
     }
-
     data = {
       description = "Security group for data subnet"
       ingress = {
