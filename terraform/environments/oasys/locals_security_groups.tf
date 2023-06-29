@@ -142,7 +142,10 @@ locals {
           protocol    = "tcp"
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
-            "10.26.8.0/21", # public load balancer
+            "10.26.8.0/21", # vpc?
+            "3.9.247.172/32",# public load balancer
+            "18.168.31.162/32",# public load balancer
+            "18.133.111.138/32",# public load balancer
           ])
         }
         http8080 = {
@@ -153,7 +156,10 @@ locals {
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https, 
-            "10.26.8.0/21", # public load balancer
+            "10.26.8.0/21", # vpc?
+            "3.9.247.172/32",# public load balancer
+            "18.168.31.162/32",# public load balancer
+            "18.133.111.138/32",# public load balancer
           ])
         }
         https = {
@@ -163,7 +169,10 @@ locals {
           protocol    = "tcp"
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
-            "10.26.8.0/21", # public load balancer
+            "10.26.8.0/21", # vpc?
+            "3.9.247.172/32",# public load balancer
+            "18.168.31.162/32",# public load balancer
+            "18.133.111.138/32",# public load balancer
           ])
         }
       }
@@ -196,7 +205,10 @@ locals {
           security_groups = ["private_lb"]
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
-            "10.26.8.0/21", # public load balancer
+            "10.26.8.0/21", # vpc?
+            "3.9.247.172/32",# public load balancer
+            "18.168.31.162/32",# public load balancer
+            "18.133.111.138/32",# public load balancer
           ])
         }
         http8080 = {
@@ -207,7 +219,10 @@ locals {
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
-            "10.26.8.0/21", # public load balancer
+            "10.26.8.0/21", # vpc?
+            "3.9.247.172/32",# public load balancer
+            "18.168.31.162/32",# public load balancer
+            "18.133.111.138/32",# public load balancer
           ])
           security_groups = ["private_lb"]
         }
@@ -219,7 +234,10 @@ locals {
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https,
-            "10.26.8.0/21", # public load balancer
+            "10.26.8.0/21", # vpc?
+            "3.9.247.172/32",# public load balancer
+            "18.168.31.162/32",# public load balancer
+            "18.133.111.138/32",# public load balancer
           ])
           security_groups = ["private_lb"]
         }
