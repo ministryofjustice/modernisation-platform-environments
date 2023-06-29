@@ -35,13 +35,6 @@ tasks:
           #   & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
           #   } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
           # }
-  - task: executeScript
-    inputs:
-      - frequency: once
-        type: powershell
-        runAs: admin
-        content: |
-          $ErrorActionPreference = "Stop" # set all errors to terminate script
 
           $S3_BUCKET = "ec2-image-builder-nomis20220314103938567000000001"
 
@@ -68,3 +61,37 @@ tasks:
           # Remove-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" -Name SunJavaUpdateSched -Force 
 
           # TODO: Add new section with check java -version and fail if not on path
+
+          ######## EDGE CHANGES GO HERE ########
+          
+          $reg_path = "HKLM:\SOFTWARE\Policies\Microsoft\Edge"
+          
+          # Turn off Edge first run experience
+          New-Item -Path $reg_path -Force
+          New-ItemProperty -Path $reg_path -Name HideFirstRunExperience -Value 1 -PropertyType DWORD -Force
+
+          # Turn on Edge IE Mode using reg_path from previous step
+          New-ItemProperty -Path $reg_path -Name InternetExplorerIntegrationLevel -Value 1 -PropertyType DWORD -Force
+
+          # Allow popups for .justice.gov.uk urls
+          $reg_path = "HKLM:\SOFTWARE\Policies\Microsoft\Edge\PopupsAllowedForUrls"
+          New-Item -Path $reg_path -Force
+          New-ItemProperty -Path $reg_path -Name 1 -Value "[*.]justice.gov.uk" -PropertyType String -Force
+
+          ######## INSTALL SQL DEVELOPER ########
+
+          # Download SQL Developer
+          Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/sqldeveloper-22.2.1.234.1810-x64.zip -File C:\jumpserver-software\sqldeveloper-22.2.1.234.1810-x64.zip
+
+          # Extract SQL Developer - there is no installer for this application
+          Expand-Archive -Path C:\jumpserver-software\sqldeveloper-22.2.1.234.1810-x64.zip -DestinationPath "C:\Program Files\Oracle"
+
+          # Create a desktop shortcut
+          $shortcut = New-Object -ComObject WScript.Shell
+          $shortcut_link = $shortcut.CreateShortcut("C:\Users\Public\Desktop\SQL Developer.lnk")
+          $shortcut_link.TargetPath = "C:\Program Files\Oracle\sqldeveloper\sqldeveloper.exe"
+          $shortcut_link.Save()
+
+          ######## INSTALL LIBREOFFICE ########
+
+          choco install -y libreoffice-still
