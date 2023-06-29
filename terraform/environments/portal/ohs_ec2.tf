@@ -5,7 +5,6 @@ locals {
   ohs_1_userdata = <<EOF
 #!/bin/bash
 echo "${aws_efs_file_system.product["ohs"].dns_name}:/fmw /IDAM/product/fmw nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
-file_system_id.efs.aws-region.amazonaws.com:/ mount_point nfs4
 echo "/dev/xvdc /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 mount -a
@@ -125,7 +124,7 @@ resource "aws_instance" "ohs_instance_1" {
 
 
 resource "aws_instance" "ohs_instance_2" {
-  count         = local.environment == "production" ? 1 : 0
+  count             = contains(["development", "testing"], local.environment) ? 0 : 1
   ami           = local.application_data.accounts[local.environment].ohs_ami_id
   instance_type = local.application_data.accounts[local.environment].ohs_instance_type
   # vpc_security_group_ids         = [aws_security_group.ohs_instance.id]
