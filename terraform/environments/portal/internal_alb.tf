@@ -1,12 +1,8 @@
 locals {
-  # lb_logs_bucket = local.application_data.accounts[local.environment].lb_access_logs_existing_bucket_name
-  # account_number = local.environment_management.account_ids[terraform.workspace]
   internal_lb_idle_timeout = 180
   internal_lb_http_port = 80
   internal_lb_https_port = 443
   internal_lb_http_hosts = ["portal-oim-internal.aws.dev.legalservices.gov.uk", "portal-oam-internal.aws.dev.legalservices.gov.uk", "portal-idm-console.aws.dev.legalservices.gov.uk"]
-  # custom_header = "X-Custom-Header-LAA-Portal"
-  # force_destroy_lb_logs_bucket = true
 }
 
 ####################################
@@ -21,7 +17,6 @@ resource "aws_lb" "internal" {
   subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   # enable_deletion_protection = local.enable_deletion_protection
   idle_timeout               = local.internal_lb_idle_timeout
-  # drop_invalid_header_fields = true
 
   access_logs {
     bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
