@@ -108,7 +108,6 @@ locals {
 
   baseline_ssm_parameters = {
     "" = {
-      prefix  = ""
       postfix = ""
       parameters = {
         cloud-watch-config-windows = {
@@ -116,14 +115,10 @@ locals {
           file        = "./templates/cloud_watch_windows.json"
           type        = "String"
         }
-        ec2-user_pem = {
-          description = "ec2-user ssh private key"
-          type        = "SecureString"
-        }
-        github-ci-user-pat = {
-          description = "for SSM docs, see ssm-documents/README.md"
-          type        = "SecureString"
-        }
+
+        # Placeholders - set values outside of terraform
+        ec2-user_pem       = { description = "ec2-user ssh private key" }
+        github-ci-user-pat = { description = "for SSM docs, see ssm-documents/README.md" }
       }
     }
   }
