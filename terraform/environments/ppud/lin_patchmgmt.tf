@@ -3,7 +3,7 @@
 # Linux instances only exist in production but using the local.environment variable allows
 # for future linux instances to be added into dev and uat with their own patch groups
 
-/*
+
 
 resource "aws_ssm_patch_group" "lin_patch_group" {
   count    = local.is-production == true ? 1 : 0
@@ -51,6 +51,7 @@ resource "aws_ssm_maintenance_window" "prod_lin_patch_maintenance_window" {
   schedule = local.application_data.accounts[local.environment].patch_lin_maintenance_schedule_cron
   duration = local.application_data.accounts[local.environment].patch_lin_maintenance_window_duration
   cutoff   = 1
+  schedule_timezone = "Europe/London"
 }
 
 resource "aws_ssm_maintenance_window_target" "prod_lin_maintenance_window_target" {
@@ -62,7 +63,7 @@ resource "aws_ssm_maintenance_window_target" "prod_lin_maintenance_window_target
 
   targets {
     key    = "tag:patch_group"
-    values = [aws_ssm_patch_group.lin_patch_group.patch_group]
+    values = [aws_ssm_patch_group.lin_patch_group[0].patch_group]
   }
 }
 
@@ -98,5 +99,3 @@ resource "aws_ssm_maintenance_window_task" "prod_lin_patch_maintenance_window_ta
     }
   }
 }
-
-*/
