@@ -143,6 +143,114 @@
                     "region": "${aws_region}",
                     "stacked": false
                 }
+              },
+              {
+              "type" : "metric",
+              "x" : 0,
+              "y" : 6,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "IADB RDS CPU",
+                  "annotations": {
+                    "alarms": [
+                      "${iadb_cpu_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+                }
+              },
+              {
+              "type" : "metric",
+              "x" : 8,
+              "y" : 6,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "IADB RDS Read Lataency",
+                  "annotations": {
+                    "alarms": [
+                      "${iadb_read_latency_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+                }
+              },
+              {
+              "type" : "metric",
+              "x" : 16,
+              "y" : 6,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "IADB RDS Write Latency",
+                  "annotations": {
+                    "alarms": [
+                      "${iadb_write_latency_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+                }
+              },
+              {
+              "type" : "metric",
+              "x" : 0,
+              "y" : 12,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "IGDB RDS CPU",
+                  "annotations": {
+                    "alarms": [
+                      "${igdb_cpu_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+                }
+              },
+              {
+              "type" : "metric",
+              "x" : 8,
+              "y" : 12,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "IGDB RDS Read Lataency",
+                  "annotations": {
+                    "alarms": [
+                      "${igdb_read_latency_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+                }
+              },
+              {
+              "type" : "metric",
+              "x" : 16,
+              "y" : 12,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "IGDB RDS Write Latency",
+                  "annotations": {
+                    "alarms": [
+                      "${igdb_write_latency_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+                }
               }
           ]
 }
