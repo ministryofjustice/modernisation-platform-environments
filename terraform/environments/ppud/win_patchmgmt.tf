@@ -60,6 +60,7 @@ resource "aws_ssm_maintenance_window" "patch_maintenance_window" {
   schedule = local.application_data.accounts[local.environment].patch_maintenance_schedule_cron
   duration = local.application_data.accounts[local.environment].patch_maintenance_window_duration
   cutoff   = 1
+  schedule_timezone = "Europe/London"
 }
 
 resource "aws_ssm_maintenance_window_target" "patch_maintenance_window_target" {
