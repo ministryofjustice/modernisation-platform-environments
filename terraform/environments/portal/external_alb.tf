@@ -102,7 +102,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       "s3:PutObject"
     ]
 
-    resources = [local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}/${local.application_name}/AWSLogs/${local.account_number}/*" : "${module.elb-logs-s3[0].bucket.arn}/${local.application_name}/AWSLogs/${local.account_number}/*"]
+    resources = [local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}/*" : "${module.elb-logs-s3[0].bucket.arn}/*"]
 
     condition {
       test     = "StringEquals"
