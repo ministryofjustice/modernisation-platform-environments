@@ -40,9 +40,7 @@ domain_builder_url=$(aws apigatewayv2 get-apis --output json | jq -r  '.Items[] 
 sudo cat <<EOF > $launcher_script_location
 #!/bin/bash
 
-cd /home/ssm-user
-
-DOMAIN_API_URL="$domain_builder_url" java -jar domain-builder/jars/domain-builder-cli-vLatest-all.jar -i --enable-ansi
+DOMAIN_API_URL="$domain_builder_url" java -jar /home/ssm-user/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar -i --enable-ansi
 
 EOF
 
