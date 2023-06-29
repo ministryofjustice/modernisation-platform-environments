@@ -3,6 +3,15 @@
 # Nomis Source Secrets
 resource "aws_secretsmanager_secret" "nomis" {
   name = "external/${local.project}-nomis-source-secrets"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-nomis-source-secrets"
+      Resource_Type = "Secrets"
+      Jira          = "DPR-XXXX"
+    }
+  )
 }
 
 # PlaceHolder Secrets
@@ -19,17 +28,18 @@ resource "aws_secretsmanager_secret_version" "nomis" {
 resource "aws_secretsmanager_secret" "redshift" {
     name = "dpr-redshift-sqlworkbench-${local.project}"
 
-    tags = {
-        Redshift        = "redshift"
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "dpr-redshift-sqlworkbench-${local.env}"
+      Resource_Type = "Secrets"
+      Jira          = "DPR-XXXX"
     }
+  )
 }
 
 #Redshift secrets and placeholders
 resource "aws_secretsmanager_secret_version" "redshift" {
   secret_id     = aws_secretsmanager_secret.redshift.id
   secret_string = jsonencode(local.redshift_secrets_placeholder)
-
-  lifecycle {
-    ignore_changes = [secret_string, ]
-  }
 }

@@ -66,10 +66,10 @@ locals {
   redshift_secrets_placeholder = {
     dbClusterIdentifier = "dpr-redshift-${local.project}"
     engine              = "redshift"
-    host                = "placeholder" #dpr-redshift-${local.project}.${generated}.eu-west-2.redshift.amazonaws.com:5439
-    password            = "placeholder" #generated elsewhere
+    host                = module.datamart.cluster_endpoint
+    password            = module.datamart.redshift_master_password
     port                = "5439"
-    username            = "dpruser"
+    username            = module.datamart.redshift_master_user
   }
 
   all_tags = merge(
