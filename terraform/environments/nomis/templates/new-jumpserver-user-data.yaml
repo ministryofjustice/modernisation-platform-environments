@@ -14,7 +14,7 @@ tasks:
           # FIXME: This step currently doesn't work as the ssm:cloud-watch-config-windows document doesn't exist
           # It's probably been removed ages ago but since this step was set to 'silently continue' no-one has noticed...
       
-          $ErrorActionPreference = "Stop" # set all errors to terminate script
+          # $ErrorActionPreference = "Stop" # set all errors to terminate script
 
           Set-TimeZone "GMT Standard Time"
           Set-WinSystemLocale "en-GB"
@@ -58,7 +58,7 @@ tasks:
           Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/trusted.certs -File $deployment_folder\trusted.certs
 
           # Prevent Java update check
-          Remove-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" -Name SunJavaUpdateSched -Force 
+          Remove-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" -Name SunJavaUpdateSched -Force -ErrorAction SilentlyContinue
 
           ######## EDGE GLOBAL CHANGES ########
           
