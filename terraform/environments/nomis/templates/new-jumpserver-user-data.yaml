@@ -58,7 +58,14 @@ tasks:
           Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/trusted.certs -File $deployment_folder\trusted.certs
 
           # Prevent Java update check
-          Remove-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" -Name SunJavaUpdateSched -Force -ErrorAction SilentlyContinue
+          $javaPath = "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run"
+          $valueName = "SunJavaUpdateSched"
+
+          $properties = Get-ItemProperty -Path $javaPath
+
+          if ($properties.PSObject.Properties.Name -contains $valueName) {
+            Remove-ItemProperty -Path $javaPath -Name $valueName -Force
+          }
 
           ######## EDGE GLOBAL CHANGES ########
           
@@ -155,7 +162,7 @@ tasks:
           $xmlDoc.Save($compatibility_site_list_path)
 
           # Add compatibility list to registry
-          New-ItemProperty -Path $reg_path -Name InternetExplorerIntegrationSiteList -Value $compatibility_site_list_path -PropertyType String -Force
+          New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Edge" -Name InternetExplorerIntegrationSiteList -Value $compatibility_site_list_path -PropertyType String -Force
 
           ######## CREATE DOMAIN ALLOW LIST FOR EDGE ########
 
@@ -174,7 +181,7 @@ tasks:
             "*.hmpp-azdt.justice.gov.uk"
           )
 
-          $registryPath = "SOFTWARE\Policies\Microsoft\Edge\EnhanceSecurityModeBypassListDomains"
+          $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Edge\EnhanceSecurityModeBypassListDomains"
 
           # Ensure the registry path exists
           if (!(Test-Path $registryPath)) {
