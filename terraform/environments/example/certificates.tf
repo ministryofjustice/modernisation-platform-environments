@@ -7,7 +7,7 @@ resource "aws_acm_certificate" "example_cert" {
   validation_method = "DNS"
 
   subject_alternative_names = [
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", local.application_name, var.networking[0].business-unit, local.environment),
+    format("%s.%s", local.application_name, data.aws_route53_zone.external.name),
   ]
 
   tags = merge(local.tags,
@@ -28,7 +28,7 @@ resource "aws_acm_certificate_validation" "example_cert" {
 }
 
 resource "aws_route53_record" "example_cert_validation" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
   for_each = {
     for dvo in aws_acm_certificate.example_cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
@@ -42,7 +42,7 @@ resource "aws_route53_record" "example_cert_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 
