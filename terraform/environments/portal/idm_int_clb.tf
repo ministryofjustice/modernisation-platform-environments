@@ -7,6 +7,12 @@ subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_sub
 
 
 
+ access_logs {
+    bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
+    prefix  = "${local.application_name}-internal-lb-idm"
+    enabled = true
+  }
+
 listener {
     instance_port     = 1389
     instance_protocol = "TCP"
@@ -78,119 +84,4 @@ resource "aws_vpc_security_group_ingress_rule" "internal_inbound1" {
 
 
 
-####################################
-# ELB Access Logging
-####################################
 
-module "elb-logs-s3" {
-  count  = local.lb_logs_bucket == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
-
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  bucket_prefix       = "${local.application_name}-lb-access-logs"
-  bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
-  replication_enabled = false
-  versioning_enabled  = true
-  force_destroy       = local.force_destroy_lb_logs_bucket
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 730
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 730
-      }
-    }
-  ]
-
-  tags = local.tags
-}
-
-data "aws_iam_policy_document" "bucket_policy" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:PutObject"
-    ]
-    resources = [local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}/*" : "${module.elb-logs-s3[0].bucket.arn}/*"]
-    principals {
-      type        = "AWS"
-      identifiers = [data.aws_elb_service_account.default.arn]
-    }
-  }
-  statement {
-    sid = "AWSLogDeliveryWrite"
-
-    principals {
-      type        = "Service"
-      identifiers = ["delivery.logs.amazonaws.com"]
-    }
-
-    actions = [
-      "s3:PutObject"
-    ]
-
-    resources = [local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}/*" : "${module.elb-logs-s3[0].bucket.arn}/*"]
-
-    condition {
-      test     = "StringEquals"
-      variable = "s3:x-amz-acl"
-
-      values = [
-        "bucket-owner-full-control"
-      ]
-    }
-  }
-
-  statement {
-    sid = "AWSLogDeliveryAclCheck"
-
-    principals {
-      type        = "Service"
-      identifiers = ["delivery.logs.amazonaws.com"]
-    }
-
-    actions = [
-      "s3:GetBucketAcl"
-    ]
-
-    resources = [
-      local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}" : module.elb-logs-s3[0].bucket.arn
-    ]
-  }
-}
-
-data "aws_elb_service_account" "default" {}
