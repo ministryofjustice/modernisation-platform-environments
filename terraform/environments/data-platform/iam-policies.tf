@@ -12,6 +12,7 @@ data "aws_iam_policy_document" "github_actions" {
       "ecr:UploadLayerPart",
       "ecr:CompleteLayerUpload",
       "ecr:UploadLayerPart",
+      "ecr:DescribeImages",
     ]
     resources = ["*"]
   }
