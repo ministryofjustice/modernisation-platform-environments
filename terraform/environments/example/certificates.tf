@@ -3,7 +3,7 @@
 ###########################################################################################
 
 resource "aws_acm_certificate" "example_cert" {
-  domain_name       = data.aws_route53_zone.external.name
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = [
