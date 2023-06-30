@@ -535,6 +535,9 @@ locals {
       # These are used in Azure DB TNS entries
       "test.nomis.service.justice.gov.uk" = {
         records = [
+          # OEM (IP hardcoded while we are testing under an ASG)
+          { name = "oem", type = "A", ttl = "300", records = ["10.26.12.202"] },
+
           # T1 [1-b: T1CNOMS1, T1NDHS1, T1TRDS1]
           { name = "t1nomis", type = "CNAME", ttl = "300", records = ["t1nomis-b.test.nomis.service.justice.gov.uk"] },
           { name = "t1nomis-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
