@@ -3,11 +3,11 @@
 ###########################################################################################
 
 resource "aws_acm_certificate" "example_cert" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = data.aws_route53_zone.external.name
   validation_method = "DNS"
 
   subject_alternative_names = [
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", local.application_name, var.networking[0].business-unit, local.environment),
+    format("%s.%s", local.application_name, data.aws_route53_zone.external.name),
   ]
 
   tags = merge(local.tags,
