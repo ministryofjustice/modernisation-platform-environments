@@ -8,8 +8,8 @@ subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_sub
 
 
  access_logs {
-    bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
-    prefix  = "${local.application_name}-internal-lb-idm"
+    bucket          = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
+    bucket_prefix   = "${local.application_name}-internal-lb-idm"
     enabled = true
   }
 
