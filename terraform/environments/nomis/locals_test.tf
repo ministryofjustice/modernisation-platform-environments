@@ -553,10 +553,10 @@ locals {
           { name = "t1trdat-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1trdat-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1audit", type = "CNAME", ttl = "300", records = ["t1audit-b.test.nomis.service.justice.gov.uk"] },
-          { name = "t1audit-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1audit-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1audit-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1mis", type = "CNAME", ttl = "300", records = ["t1mis-b.test.nomis.service.justice.gov.uk"] },
-          { name = "t1mis-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1mis-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1mis-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           # T2 [1-b: T2CNOMS, T2NDHS1, T2TRDS1]
           { name = "t2nomis", type = "CNAME", ttl = "300", records = ["t2nomis-b.test.nomis.service.justice.gov.uk"] },
