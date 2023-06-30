@@ -40,13 +40,16 @@ locals {
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
     ])
     ssh = module.ip_addresses.azure_fixngo_cidrs.prod
-    https = flatten([
+    https_internal = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
       module.ip_addresses.azure_studio_hosting_cidrs.prod,
       module.ip_addresses.azure_nomisapi_cidrs.prod,
+    ])
+    https_external = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     ])
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
