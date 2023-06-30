@@ -21,7 +21,7 @@ module "github_actions_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.22.0"
 
-  name = "${local.application_name}-github-actions"
+  name = "${local.application_name}-gha"
 
   policy = data.aws_iam_policy_document.github_actions.json
 
