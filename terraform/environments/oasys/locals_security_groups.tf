@@ -353,16 +353,16 @@ locals {
           protocol    = "icmp"
           cidr_blocks = local.security_group_cidrs.icmp
         }
-        ssh = {
-          description = "Allow ssh ingress"
-          from_port   = "22"
-          to_port     = "22"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.ssh
-          security_groups = [
-            # "bastion-linux",
-          ]
-        }
+        # ssh = {
+        #   description = "Allow ssh ingress"
+        #   from_port   = "22"
+        #   to_port     = "22"
+        #   protocol    = "TCP"
+        #   cidr_blocks = local.security_group_cidrs.ssh
+        #   security_groups = [
+        #     # "bastion-linux",
+        #   ]
+        # }
         oracle1521 = {
           description     = "Allow oracle database 1521 ingress"
           from_port       = "1521"
@@ -370,8 +370,7 @@ locals {
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.oracle_db
           security_groups = [
-            "private",
-            "private_lb",
+            "private_lb_internal",
             # "private-jumpserver",
             # "private-web",
             # "bastion-linux",
