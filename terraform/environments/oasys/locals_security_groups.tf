@@ -297,7 +297,7 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https,
+            local.security_group_cidrs.https_internal,
           ])
           security_groups = ["private_lb"]
         }
@@ -308,7 +308,7 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https,
+            local.security_group_cidrs.https_internal,
           ])
           security_groups = ["private_lb"]
         }
