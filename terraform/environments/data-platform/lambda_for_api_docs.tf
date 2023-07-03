@@ -104,5 +104,5 @@ resource "aws_lambda_permission" "allow_apigw_to_invoke_docs_lambda" {
 }
 
 output "go_to" {
-  value = join("", [aws_api_gateway_deployment.deployment.invoke_url, "/docs/"])
+  value = join("", [aws_api_gateway_deployment.deployment.invoke_url, aws_api_gateway_stage.sandbox.stage_name, "/docs/"])
 }
