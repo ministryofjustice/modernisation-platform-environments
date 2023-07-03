@@ -5,7 +5,7 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   versioning_enabled = true
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
-
+  bucket_policy       = [data.aws_iam_policy_document.data_platform_product_bucket_policy_document.json]
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
@@ -94,11 +94,6 @@ data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
     }
   }
 
-}
-
-resource "aws_s3_bucket_policy" "data_platform_product_bucket_policy" {
-  bucket = module.s3-bucket.bucket.id
-  policy = data.aws_iam_policy_document.data_platform_product_bucket_policy_document.json
 }
 
 module "s3_athena_query_results_bucket" { #tfsec:ignore:aws-s3-enable-versioning
