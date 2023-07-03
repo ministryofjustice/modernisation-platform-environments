@@ -1,3 +1,9 @@
+##
+# Some work started here to flesh out use of the mod platform-curated modernisation-platform-terraform-ec2-instance module
+# Current commented out but planned to pick this back up very soon to move away from our
+#   native ec2 instance (engineered as we were prototyping our delius core db AMIs/test instance)
+#   to a module-based ec2 instance
+##
 # module "ec2_instance" {
 #   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.0.0"
 
@@ -25,6 +31,3 @@
 #     }))
 #   })
 # }
-
-
-

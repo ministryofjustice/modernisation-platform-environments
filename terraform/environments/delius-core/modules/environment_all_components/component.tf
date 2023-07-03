@@ -1,5 +1,6 @@
 ##
-# Terraform to deploy an instance to test out a base Oracle AMI
+# Example terraform file representing Terraform to deploy a component of delius core
+# We're only showing an example AWS resources - doesn't really matter what we use
 ##
 
 # Pre-req - security group

@@ -7,8 +7,7 @@ module "environment_dev1" {
   source = "./modules/environment_all_components"
   count  = local.environment == "development" ? 1 : 0
 
-  name = "dev1"
-
+  name        = "dev1"
   ldap_config = local.ldap_config_dev1
   db_config   = local.db_config_dev1
 
