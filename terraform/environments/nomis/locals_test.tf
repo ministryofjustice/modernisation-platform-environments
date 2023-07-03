@@ -372,6 +372,31 @@ locals {
         })
         cloudwatch_metric_alarms = {} # disable for failover test
       })
+      t3-nomis-db-1-b = merge(local.database_ec2_b, {
+        tags = merge(local.database_ec2_b.tags, {
+          nomis-environment   = "t3"
+          description         = "T3 NOMIS database"
+          oracle-sids         = "T3CNOM"
+          instance-scheduling = "skip-scheduling"
+        })
+        config = merge(local.database_ec2_b.config, {
+          ami_name = "AwsBackup_i-09bba03659a0990da_e4a139ba-8881-4adb-bbdc-5fcf18b7dcd2"
+        })
+        user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
+          args = merge(local.database_ec2_a.user_data_cloud_init.args, {
+            branch       = "d264cc523daa4ee5bf60d254120874bbc7b55525"
+            ansible_args = "--tags ec2patch"
+          })
+        })
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+          data  = { total_size = 2000 }
+          flash = { total_size = 500 }
+        })
+      })
 
     }
 
