@@ -248,21 +248,21 @@ data "template_file" "dashboard_nonprod" {
 
   # TODO Update the local variables to reference the correct alarms once they are created
   vars = {
-    aws_region                      = local.aws_region
-    # elb_5xx_alarm_arn               = aws_cloudwatch_metric_alarm.ApplicationELB5xxError.arn
-    # elb_4xx_alarm_arn               = aws_cloudwatch_metric_alarm.ApplicationELB4xxError.arn
-    # elb_response_time_alarm_arn     = aws_cloudwatch_metric_alarm.TargetResponseTime.arn
+    aws_region = local.aws_region
+    elb_5xx_alarm_arn               = aws_cloudwatch_metric_alarm.ext_lb_origin_5xx.arn
+    elb_4xx_alarm_arn               = aws_cloudwatch_metric_alarm.ext_lb_origin_4xx.arn
+    elb_response_time_alarm_arn     = aws_cloudwatch_metric_alarm.ext_lb_target_response_time.arn
     iadb_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.iadb_rds_cpu.arn
     iadb_read_latency_alarm_arn     = aws_cloudwatch_metric_alarm.iadb_rds_read_latency.arn
     iadb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.iadb_rds_write_latency.arn
     igdb_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.igdb_rds_cpu.arn
     igdb_read_latency_alarm_arn     = aws_cloudwatch_metric_alarm.igdb_rds_read_latency.arn
     igdb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.igdb_rds_write_latency.arn
-    oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim1"].arn
-    oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim1"].arn
-    oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam1"].arn
-    idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm1"].arn
-    ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs1"].arn
+    oim1_cpu_alarm_arn    = aws_cloudwatch_metric_alarm.cpu_alarm["oim1"].arn
+    oim1_memory_alarm_arn = aws_cloudwatch_metric_alarm.memory_alarm["oim1"].arn
+    oam1_memory_alarm_arn = aws_cloudwatch_metric_alarm.memory_alarm["oam1"].arn
+    idm1_memory_alarm_arn = aws_cloudwatch_metric_alarm.memory_alarm["idm1"].arn
+    ohs1_memory_alarm_arn = aws_cloudwatch_metric_alarm.memory_alarm["ohs1"].arn
   }
 }
 
