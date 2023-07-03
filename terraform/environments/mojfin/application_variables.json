@@ -1,7 +1,8 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "mojfinrdssnapshotid": "rds:mojfin-2023-07-02-22-06"
     },
     "test": {
       "example_var": "test-data"
