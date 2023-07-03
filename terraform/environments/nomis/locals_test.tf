@@ -396,6 +396,7 @@ locals {
           data  = { total_size = 2000 }
           flash = { total_size = 500 }
         })
+        cloudwatch_metric_alarms = {} # disable for failover test
       })
 
     }
