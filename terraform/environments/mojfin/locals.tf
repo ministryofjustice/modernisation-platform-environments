@@ -6,8 +6,8 @@ locals {
   # RDS
   appstream_cidr             = "10.200.32.0/19"
   cidr_ire_workspace         = "10.200.96.0/19"
-  workspaces_cidr            = "10.200.16.0/20"
-  cp_vpc_cidr                = "172.20.0.0/20"
+  workspaces_cidr            = local.application_data.accounts[local.environment].london_workspace_cidr
+  cp_vpc_cidr                = local.application_data.accounts[local.environment].cp_vpc_cidr
   analytic_platform_cidr     = local.application_data.accounts[local.environment].analytic_platform_cidr
   lz_vpc                     = local.application_data.accounts[local.environment].landing_zone_vpc_cidr
   storage_size               = "2500"
