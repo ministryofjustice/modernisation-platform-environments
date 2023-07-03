@@ -93,7 +93,7 @@ module "baseline" {
 # }
 data "aws_lb" "private" {
   count = local.environment == "test" ? 1 : 0
-  name = "private-lb"
+  name  = "private-lb"
 }
 resource "aws_lb_target_group" "private-lb-https-443" {
   count       = local.environment == "test" ? 1 : 0
@@ -104,7 +104,7 @@ resource "aws_lb_target_group" "private-lb-https-443" {
   vpc_id      = module.environment.vpc.id
 }
 resource "aws_lb_target_group_attachment" "test" {
-  count = local.environment == "test" ? 1 : 0
+  count            = local.environment == "test" ? 1 : 0
   target_group_arn = aws_lb_target_group.private-lb-https-443[0].arn
   target_id        = data.aws_lb.private[0].arn
   port             = 443

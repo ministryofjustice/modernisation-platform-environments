@@ -24,7 +24,7 @@ resource "aws_lambda_function" "this" {
   tracing_config {
     mode = var.tracing
   }
-  
+
   dynamic "vpc_config" {
     for_each = var.vpc_settings != null ? [true] : []
     content {

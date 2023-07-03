@@ -91,7 +91,7 @@ locals {
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is default
-        security_groups          = ["private_lb_internal","private_lb_external"]
+        security_groups          = ["private_lb_internal", "private_lb_external"]
         public_subnets           = module.environment.subnets["private"].ids
         tags                     = local.tags
 
@@ -148,7 +148,7 @@ locals {
         # }
       }
     }
-    
+
 
     # The following zones can be found on azure:
     # az.justice.gov.uk
@@ -159,7 +159,7 @@ locals {
       #
       "${local.application_name}.service.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "t2", type = "A", lbs_map_key = "public" },    # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
+          { name = "t2", type = "A", lbs_map_key = "public" }, # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
           # { name = "db.t2", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
         ]
       }

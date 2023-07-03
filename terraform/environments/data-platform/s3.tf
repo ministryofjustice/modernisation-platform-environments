@@ -78,7 +78,7 @@ data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
     effect    = "Deny"
     actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket.bucket.arn}/*"]
-    
+
     principals {
       identifiers = ["*"]
       type        = "AWS"

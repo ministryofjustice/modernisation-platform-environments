@@ -1,8 +1,8 @@
 locals {
   internal_lb_idle_timeout = 180
-  internal_lb_http_port = 80
-  internal_lb_https_port = 443
-  internal_lb_http_hosts = ["portal-oim-internal.aws.dev.legalservices.gov.uk", "portal-oam-internal.aws.dev.legalservices.gov.uk", "portal-idm-console.aws.dev.legalservices.gov.uk"]
+  internal_lb_http_port    = 80
+  internal_lb_https_port   = 443
+  internal_lb_http_hosts   = ["portal-oim-internal.aws.dev.legalservices.gov.uk", "portal-oam-internal.aws.dev.legalservices.gov.uk", "portal-idm-console.aws.dev.legalservices.gov.uk"]
 }
 
 ####################################
@@ -10,13 +10,13 @@ locals {
 ####################################
 
 resource "aws_lb" "internal" {
-  name                       = "${local.application_name}-internal-lb"
-  internal                   = true
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.internal_lb.id]
-  subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  name               = "${local.application_name}-internal-lb"
+  internal           = true
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.internal_lb.id]
+  subnets            = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   # enable_deletion_protection = local.enable_deletion_protection
-  idle_timeout               = local.internal_lb_idle_timeout
+  idle_timeout = local.internal_lb_idle_timeout
 
   access_logs {
     bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
@@ -36,7 +36,7 @@ resource "aws_lb_listener" "http_internal" {
 
   load_balancer_arn = aws_lb.internal.arn
   port              = local.internal_lb_http_port
-  protocol        = "HTTP"
+  protocol          = "HTTP"
 
   # TODO This needs using once Cert and CloudFront has been set up
   # default_action {
@@ -132,7 +132,7 @@ resource "aws_lb_target_group" "internal" {
     timeout             = 2
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    matcher = 302
+    matcher             = 302
   }
   stickiness {
     enabled         = true
@@ -156,7 +156,7 @@ resource "aws_lb_target_group_attachment" "ohs1_internal" {
 }
 
 resource "aws_lb_target_group_attachment" "ohs2_internal" {
-  count             = contains(["development", "testing"], local.environment) ? 0 : 1
+  count            = contains(["development", "testing"], local.environment) ? 0 : 1
   target_group_arn = aws_lb_target_group.internal.arn
   target_id        = aws_instance.ohs_instance_2[0].id
   port             = 7777

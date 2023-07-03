@@ -105,9 +105,9 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal, 
+            local.security_group_cidrs.https_internal,
           ])
-          security_groups = ["private","private_lb"]
+          security_groups = ["private", "private_lb"]
         }
         https = {
           description = "Allow HTTPS ingress"
@@ -118,7 +118,7 @@ locals {
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
           ])
-          security_groups = ["private","private_lb"]
+          security_groups = ["private", "private_lb"]
         }
       }
       egress = {
@@ -149,7 +149,7 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal, 
+            local.security_group_cidrs.https_internal,
           ])
         }
         https = {
@@ -199,7 +199,7 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal, 
+            local.security_group_cidrs.https_internal,
           ])
         }
         https = {
@@ -249,7 +249,7 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_external, 
+            local.security_group_cidrs.https_external,
           ])
         }
         https = {
@@ -284,10 +284,10 @@ locals {
           self        = true
         }
         http = {
-          description = "Allow http ingress"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "tcp"
+          description     = "Allow http ingress"
+          from_port       = 80
+          to_port         = 80
+          protocol        = "tcp"
           security_groups = ["private_lb"]
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
@@ -355,11 +355,11 @@ locals {
         #   ]
         # }
         oracle1521 = {
-          description     = "Allow oracle database 1521 ingress"
-          from_port       = "1521"
-          to_port         = "1521"
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.oracle_db
+          description = "Allow oracle database 1521 ingress"
+          from_port   = "1521"
+          to_port     = "1521"
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.oracle_db
           security_groups = [
             "private_lb_internal",
             # "private-jumpserver",
@@ -379,6 +379,6 @@ locals {
         }
       }
     }
-   
+
   }
 }

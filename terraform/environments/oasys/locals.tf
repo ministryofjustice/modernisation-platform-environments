@@ -73,7 +73,7 @@ locals {
       availability_zone         = "${local.region}a"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      monitoring = true
+      monitoring             = true
       vpc_security_group_ids = ["private_web"]
     })
     cloudwatch_metric_alarms = {}
