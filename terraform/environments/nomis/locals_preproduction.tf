@@ -60,7 +60,7 @@ locals {
 
           https = merge(
             local.weblogic_lb_listeners.https, {
-              alarm_target_group_names = ["preprod-nomis-web-b-http-7777"]
+              alarm_target_group_names = ["preprod-nomis-web-a-http-7777"]
               rules = {
                 preprod-nomis-web-a-http-7777 = {
                   priority = 200
@@ -73,6 +73,9 @@ locals {
                       values = [
                         "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+                        "c.preproduction.nomis.az.justice.gov.uk",
+                        "c.preproduction.nomis.service.justice.gov.uk",
+                        "c.pp-nomis.service.justice.gov.uk",
                       ]
                     }
                   }]
@@ -88,9 +91,6 @@ locals {
                       values = [
                         "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
-                        "c.preproduction.nomis.az.justice.gov.uk",
-                        "c.preproduction.nomis.service.justice.gov.uk",
-                        "c.pp-nomis.service.justice.gov.uk",
                       ]
                     }
                   }]
@@ -112,8 +112,8 @@ locals {
       "preproduction.nomis.service.justice.gov.uk" = {
         records = [
           { name = "ppnomis", type = "A", ttl = "300", records = ["10.40.37.132"] },
-          { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
-          { name = "ppnomis-b", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis-a", type = "A", ttl = "3600", records = ["10.40.37.132"] },
+          { name = "ppnomis-b", type = "A", ttl = "3600", records = ["10.40.37.132"] },
         ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },

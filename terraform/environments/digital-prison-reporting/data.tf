@@ -13,5 +13,5 @@ data "aws_secretsmanager_secret" "nomis" {
 data "aws_secretsmanager_secret_version" "nomis" {
   secret_id = data.aws_secretsmanager_secret.nomis.id
 
-  depends_on = [aws_secretsmanager_secret.nomis]  
+  depends_on = [aws_secretsmanager_secret.nomis]
 }

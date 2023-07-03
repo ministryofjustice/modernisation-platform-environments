@@ -10,6 +10,17 @@ locals {
     baseline_s3_buckets = {
     }
 
+    baseline_ec2_instances = {
+      "t2-${local.application_name}-db-a" = local.database_a
+      # "t2-${local.application_name}-db-b" = merge(local.database_b, {
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "oasys/oracle-19c-disk-sector-size-512-change"
+      #     })
+      #   })
+      # })
+    }
+
     baseline_ec2_autoscaling_groups = {
       "t2-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -23,8 +34,11 @@ locals {
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
         })
       })
+      # "test-${local.application_name}-bip-a" = local.bip_a
 
-      "test-${local.application_name}-bip-a" = local.bip_a
+      "test-${local.application_name}-bip-b" = merge(local.bip_b, {
+        autoscaling_schedules = {}
+      })
     }
 
     baseline_acm_certificates = {
@@ -50,19 +64,19 @@ locals {
         internal_lb              = false
         access_logs              = false
         enable_delete_protection = false
-        existing_target_groups   = {
+        existing_target_groups = {
           "private-lb-https-443" = {
-            arn = length(data.aws_lb_target_group.private_lb) > 0 ? data.aws_lb_target_group.private_lb[0].arn : ""
+            arn = length(aws_lb_target_group.private-lb-https-443) > 0 ? aws_lb_target_group.private-lb-https-443[0].arn : ""
           }
         }
-        idle_timeout             = 60 # 60 is default
-        security_groups          = [] # no security groups for network load balancers
-        public_subnets           = module.environment.subnets["public"].ids
-        tags                     = local.tags
+        idle_timeout    = 60 # 60 is default
+        security_groups = [] # no security groups for network load balancers
+        public_subnets  = module.environment.subnets["public"].ids
+        tags            = local.tags
         listeners = {
           https = {
-            port                      = 443
-            protocol                  = "TCP"
+            port     = 443
+            protocol = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "private-lb-https-443"
@@ -72,11 +86,12 @@ locals {
       }
 
       private = {
-        internal_lb              = true
+        internal_lb = true
+        #access_logs              = false
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is default
-        security_groups          = ["private"]
+        security_groups          = ["private_lb_internal","private_lb_external"]
         public_subnets           = module.environment.subnets["private"].ids
         tags                     = local.tags
 
@@ -116,23 +131,24 @@ locals {
             }
           }
         }
-        lb_target_groups = {
-          https-443 = {
-            port                 = 443
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 443
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-          }
-        }
+        # lb_target_groups = {
+        #   https-443 = {
+        #     port = 443
+        #     health_check = {
+        #       enabled             = true
+        #       interval            = 30
+        #       healthy_threshold   = 3
+        #       matcher             = "200-399"
+        #       path                = "/"
+        #       port                = 443
+        #       timeout             = 5
+        #       unhealthy_threshold = 5
+        #     }
+        #   }
+        # }
       }
     }
+    
 
     # The following zones can be found on azure:
     # az.justice.gov.uk
@@ -141,12 +157,12 @@ locals {
       #
       # public
       #
-      # "t2.${local.application_name}.service.justice.gov.uk" = {
-      #   lb_alias_records = [
-      #     { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
-      #     { name = "db", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
-      #   ]
-      # }
+      "${local.application_name}.service.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "t2", type = "A", lbs_map_key = "public" },    # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
+          # { name = "db.t2", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+        ]
+      }
       # "t1.${local.application_name}.service.justice.gov.uk" = {
       #   lb_alias_records = [
       #     { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t1, 

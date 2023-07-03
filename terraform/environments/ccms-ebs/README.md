@@ -3,40 +3,70 @@
 <!-- This is a template that should be populated by the development team when moving to the modernisation platform, but also reviewed and kept up to date.
 To ensure that people looking at your runbook can get the information they need quickly, your runbook should be short but clear. Throughout, only use acronyms if you’re confident that someone who has just been woken up at 3am would understand them. -->
 
-_If you have any questions surrounding this page please post in the `#team-name` channel._
+_If you have any questions surrounding this page please post in the `#laa-ccms-support` channel._
 
 ## Mandatory Information
 
 ### **Last review date:**
 
+28-Jun-2023
+
 <!-- Adding the last date this page was reviewed, with any accompanying information -->
 
 ### **Description:**
+
+CCMS contacts, availability and other details for incidents
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
 
 ### **Service URLs:**
 
+CCMS EBS PROD - <https://ccmsebs.legalservices.gov.uk>
+
+All other environment details are in the below link
+<https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/4396647104/MP+Modernisation+Platform+EBS+Environment+Details>
+
 <!--  The URL(s) of the service’s production environment, and test environments if possible-->
 
 ### **Incident response hours:**
+
+09:00 am to 5:00 pm Monday to Friday
 
 <!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
 
 ### **Incident contact details:**
 
+Team can be reached on slack channel #laa-ccms-support .
+Please tag the primary/platforms DM in case of platforms P1/P2 incidents or a secondary DM if the primary/platforms DM is unavailable
+
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
 ### **Service team contact:**
+
+CCMS Platforms (Primary) -> rob.murley@digital.justice.gov.uk
+Civil Applications (Secondary) -> ieuan.jones@digital.justice.gov.uk
+Civil Billing & payments (Secondary) -> aruna.vemulamanda@digital.justice.gov.uk
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 
 ### **Hosting environment:**
 
+EBS DB -     ec2-ccms-ebs-production-ebsdb
+
+EBS Apps -   ec2-ccms-ebs-production-ebsapps-1
+             ec2-ccms-ebs-production-ebsapps-2
+
+Webgate -    ec2-ccms-ebs-production-webgate-1
+             ec2-ccms-ebs-production-webgate-2
+
+Accessgate - ec2-ccms-ebs-production-accessgate-1
+             ec2-ccms-ebs-production-accessgate-2
+
 ### **Migration RunBook:**
 
-https://dsdmoj.atlassian.net/wiki/spaces/~635fb1501db4d2ebcf649a1c/pages/4411392032/EBS+Migration+Runbook+-+Prod
+<https://dsdmoj.atlassian.net/wiki/spaces/~635fb1501db4d2ebcf649a1c/pages/4411392032/EBS+Migration+Runbook+-+Prod>
 
+<https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/4172054611/CCMS+DBA>
 
 Modernisation Platform
 

@@ -25,34 +25,64 @@
 
 resource "aws_efs_file_system" "efs" {
 
-    performance_mode    = "generalPurpose"
-    throughput_mode     = "bursting"
-    encrypted           = "true"
-    tags                = merge(
+  performance_mode = "generalPurpose"
+  throughput_mode  = "elastic"
+  encrypted        = "true"
+
+  tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-repo_home" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
- }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+}
 
 
 resource "aws_efs_mount_target" "target_a" {
 
-  file_system_id = aws_efs_file_system.efs.id
-  subnet_id      = data.aws_subnet.private_subnets_a.id
+  file_system_id  = aws_efs_file_system.efs.id
+  subnet_id       = data.aws_subnet.private_subnets_a.id
   security_groups = [for k, v in local.efs : aws_security_group.efs_product[k].id]
 }
 
 resource "aws_efs_mount_target" "target_b" {
 
-  file_system_id = aws_efs_file_system.efs.id
-  subnet_id      = data.aws_subnet.private_subnets_b.id
+  file_system_id  = aws_efs_file_system.efs.id
+  subnet_id       = data.aws_subnet.private_subnets_b.id
   security_groups = [for k, v in local.efs : aws_security_group.efs_product[k].id]
 }
 
 resource "aws_efs_mount_target" "target_c" {
 
-  file_system_id = aws_efs_file_system.efs.id
-  subnet_id      = data.aws_subnet.private_subnets_c.id
+  file_system_id  = aws_efs_file_system.efs.id
+  subnet_id       = data.aws_subnet.private_subnets_c.id
   security_groups = [for k, v in local.efs : aws_security_group.efs_product[k].id]
+}
+
+resource "aws_cloudwatch_metric_alarm" "efs_connection_repo_home" {
+  alarm_name          = "${local.application_name}-${local.environment}-repo-home-efs-connection"
+  alarm_description   = "If the instance has lost connection with its EFS system, please investigate."
+  comparison_operator = "LessThanThreshold"
+  dimensions = {
+    FileSystemId = aws_efs_file_system.efs.id
+  }
+  evaluation_periods = "5"
+  metric_name        = "ClientConnections"
+  namespace          = "AWS/EFS"
+  period             = "60"
+  statistic          = "Sum"
+  threshold          = 4
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "breaching"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-repo-home-efs-connection"
+    }
+  )
 }

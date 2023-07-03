@@ -38,7 +38,71 @@ locals {
   workspaces_cidr                 = "10.200.16.0/20"
   cp_vpc_cidr                     = "172.20.0.0/20"
   lzprd-vpc                       = "10.205.0.0/20"
- }
+
+  # CloudWatch Alarms IGDB
+  igdb_cpu_threshold                     = "75"
+  igdb_cpu_alert_period                  = "60"
+  igdb_cpu_evaluation_period             = "5"
+  igdb_memory_threshold                  = "500"
+  igdb_memory_alert_period               = "60"
+  igdb_memory_evaluation_period          = "5"
+  igdb_storage_space_threshold           = "50"
+  igdb_storage_space_alert_period        = "60"
+  igdb_storage_space_evaluation_period   = "5"
+  igdb_read_latency_threshold            = "0.5"
+  igdb_read_latency_alert_period         = "60"
+  igdb_read_latency_evaluation_period    = "5"
+  igdb_swap_usage_threshold              = "500000000"
+  igdb_swap_usage_alert_period           = "60"
+  igdb_swap_usage_evaluation_period      = "5"
+  igdb_burst_balance_threshold           = "1"
+  igdb_burst_balance_alert_period        = "300"
+  igdb_burst_balance_evaluation_period   = "3"
+  igdb_write_latency_threshold           = "0.5"
+  igdb_write_latency_alert_period        = "60"
+  igdb_write_latency_evaluation_period   = "5"
+  igdb_read_iops_threshold               = "300"
+  igdb_read_iops_alert_period            = "300"
+  igdb_read_iops_evaluation_period       = "3"
+  igdb_write_iops_threshold              = "300"
+  igdb_write_iops_alert_period           = "300"
+  igdb_write_iops_evaluation_period      = "3"
+  igdb_diskqueue_depth_threshold         = "4"
+  igdb_diskqueue_depth_alert_period      = "60"
+  igdb_diskqueue_depth_evaluation_period = "5"
+
+  # CloudWatch Alarms IADB
+  iadb_cpu_threshold                     = "75"
+  iadb_cpu_alert_period                  = "60"
+  iadb_cpu_evaluation_period             = "5"
+  iadb_memory_threshold                  = "500"
+  iadb_memory_alert_period               = "60"
+  iadb_memory_evaluation_period          = "5"
+  iadb_storage_space_threshold           = "50"
+  iadb_storage_space_alert_period        = "60"
+  iadb_storage_space_evaluation_period   = "5"
+  iadb_read_latency_threshold            = "0.5"
+  iadb_read_latency_alert_period         = "60"
+  iadb_read_latency_evaluation_period    = "5"
+  iadb_swap_usage_threshold              = "500000000"
+  iadb_swap_usage_alert_period           = "60"
+  iadb_swap_usage_evaluation_period      = "5"
+  iadb_burst_balance_threshold           = "1"
+  iadb_burst_balance_alert_period        = "300"
+  iadb_burst_balance_evaluation_period   = "3"
+  iadb_write_latency_threshold           = "0.5"
+  iadb_write_latency_alert_period        = "60"
+  iadb_write_latency_evaluation_period   = "5"
+  iadb_read_iops_threshold               = "300"
+  iadb_read_iops_alert_period            = "300"
+  iadb_read_iops_evaluation_period       = "3"
+  iadb_write_iops_threshold              = "300"
+  iadb_write_iops_alert_period           = "300"
+  iadb_write_iops_evaluation_period      = "3"
+  iadb_diskqueue_depth_threshold         = "4"
+  iadb_diskqueue_depth_alert_period      = "60"
+  iadb_diskqueue_depth_evaluation_period = "5"
+}
 
 resource "aws_db_subnet_group" "igdb" {
   name       = "${local.application_name}-${local.environment}-subnetgrp-${lower(local.igdb_dbname)}"
@@ -73,38 +137,38 @@ resource "aws_db_parameter_group" "igdb-parametergroup-19c" {
 
 
   parameter {
-    name  = "open_cursors"
-    value = "1000"
+    name         = "open_cursors"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "processes"
-    value = "1000"
+    name         = "processes"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "query_rewrite_enabled"
-    value = "TRUE"
+    name         = "query_rewrite_enabled"
+    value        = "TRUE"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "query_rewrite_integrity"
-    value = "TRUSTED"
+    name         = "query_rewrite_integrity"
+    value        = "TRUSTED"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "sessions"
-    value = "1000"
+    name         = "sessions"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "sqlnetora.sqlnet.allowed_logon_version_server"
-    value = "11"
+    name         = "sqlnetora.sqlnet.allowed_logon_version_server"
+    value        = "11"
     apply_method = "pending-reboot"
   }
 
@@ -122,38 +186,38 @@ resource "aws_db_parameter_group" "iadb-parametergroup-19c" {
 
 
   parameter {
-    name  = "open_cursors"
-    value = "1000"
+    name         = "open_cursors"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "processes"
-    value = "1000"
+    name         = "processes"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "query_rewrite_enabled"
-    value = "TRUE"
+    name         = "query_rewrite_enabled"
+    value        = "TRUE"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "query_rewrite_integrity"
-    value = "TRUSTED"
+    name         = "query_rewrite_integrity"
+    value        = "TRUSTED"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "sessions"
-    value = "1000"
+    name         = "sessions"
+    value        = "1000"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "sqlnetora.sqlnet.allowed_logon_version_server"
-    value = "11"
+    name         = "sqlnetora.sqlnet.allowed_logon_version_server"
+    value        = "11"
     apply_method = "pending-reboot"
   }
 
@@ -250,37 +314,37 @@ resource "aws_security_group" "igdb" {
 
 
   ingress {
-    description = "Inbound TNS access from Portal IDM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal IDM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.idm_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OAM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OAM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.oam_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OIM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OIM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.oim_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OHS Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OHS Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.ohs_instance.id]
   }
 
@@ -351,37 +415,37 @@ resource "aws_security_group" "iadb" {
 
 
   ingress {
-    description = "Inbound TNS access from Portal IDM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal IDM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.idm_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OAM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OAM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.oam_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OIM Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OIM Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.oim_instance.id]
   }
 
 
   ingress {
-    description = "Inbound TNS access from Portal OHS Instances"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Inbound TNS access from Portal OHS Instances"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [aws_security_group.ohs_instance.id]
   }
 
@@ -468,11 +532,11 @@ resource "aws_db_instance" "appdb1" {
   password               = random_password.rds_password_igdb.result
   vpc_security_group_ids = [aws_security_group.igdb.id]
   #skip_final_snapshot             = false
-  final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
-  parameter_group_name  = aws_db_parameter_group.igdb-parametergroup-19c.name
-  db_subnet_group_name  = aws_db_subnet_group.igdb.name
-  maintenance_window    = local.igdb_maintenance_window
-  license_model         = "bring-your-own-license"
+  final_snapshot_identifier = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  parameter_group_name      = aws_db_parameter_group.igdb-parametergroup-19c.name
+  db_subnet_group_name      = aws_db_subnet_group.igdb.name
+  maintenance_window        = local.igdb_maintenance_window
+  license_model             = "bring-your-own-license"
   #TODO deletion_protection   = true
   copy_tags_to_snapshot = true
   storage_encrypted     = true
@@ -496,6 +560,13 @@ resource "aws_db_instance" "appdb1" {
     { "scheduler:ebs-snapshot" = "True" }
   )
 
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags, e.g. because a management agent
+      # updates these based on some ruleset managed elsewhere.
+      final_snapshot_identifier
+    ]
+  }
 }
 
 resource "aws_db_instance" "appdb2" {
@@ -517,11 +588,11 @@ resource "aws_db_instance" "appdb2" {
   password               = random_password.rds_password_iadb.result
   vpc_security_group_ids = [aws_security_group.iadb.id]
   #skip_final_snapshot             = false
-  final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
-  parameter_group_name  = aws_db_parameter_group.iadb-parametergroup-19c.name
-  db_subnet_group_name  = aws_db_subnet_group.iadb.name
-  maintenance_window    = local.iadb_maintenance_window
-  license_model         = "bring-your-own-license"
+  final_snapshot_identifier = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  parameter_group_name      = aws_db_parameter_group.iadb-parametergroup-19c.name
+  db_subnet_group_name      = aws_db_subnet_group.iadb.name
+  maintenance_window        = local.iadb_maintenance_window
+  license_model             = "bring-your-own-license"
   #TODO deletion_protection   = true
   copy_tags_to_snapshot = true
   storage_encrypted     = true
@@ -545,6 +616,14 @@ resource "aws_db_instance" "appdb2" {
     { "scheduler:ebs-snapshot" = "True" }
   )
 
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags, e.g. because a management agent
+      # updates these based on some ruleset managed elsewhere.
+      final_snapshot_identifier
+    ]
+  }
+
 }
 
 #TODO add correct entry for DNS
@@ -566,3 +645,485 @@ resource "aws_db_instance" "appdb2" {
 #   ttl      = 60
 #   records  = [aws_db_instance.appdb2.address]
 # }
+
+#IGDB alarms
+resource "aws_cloudwatch_metric_alarm" "igdb_rds_cpu" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-CPU-utilization"
+  alarm_description  = "The average CPU utilization is too high"
+  namespace          = "AWS/RDS"
+  metric_name        = "CPUUtilization"
+  statistic          = "Average"
+  period             = local.igdb_cpu_alert_period
+  evaluation_periods = local.igdb_cpu_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.igdb_cpu_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-CPU-utilization"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "igdb_rds_memory" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-free-memory"
+  alarm_description  = "Average RDS memory usage exceeds the predefined threshold"
+  namespace          = "AWS/RDS"
+  metric_name        = "FreeableMemory"
+  statistic          = "Sum"
+  period             = local.igdb_memory_alert_period
+  evaluation_periods = local.igdb_memory_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.igdb_memory_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
+  }
+  comparison_operator = "LessThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-free-memory"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "igdb_rds_storage-space" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-free-storage-space"
+  alarm_description  = "Free Storage Space is Low"
+  namespace          = "AWS/RDS"
+  metric_name        = "FreeStorageSpace"
+  statistic          = "Average"
+  period             = local.igdb_storage_space_alert_period
+  evaluation_periods = local.igdb_storage_space_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.igdb_storage_space_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
+  }
+  comparison_operator = "LessThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-free-storage-space"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "igdb_rds_read_latency" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-read-latency"
+  alarm_description  = "Read Latency Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "ReadLatency"
+  statistic          = "Average"
+  period             = local.igdb_read_latency_alert_period
+  evaluation_periods = local.igdb_read_latency_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.igdb_read_latency_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-read-latency"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "igdb_rds_swapusage" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-swap-usage"
+  alarm_description  = "Swap Usage Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "SwapUsage"
+  statistic          = "Sum"
+  period             = local.igdb_swap_usage_alert_period
+  evaluation_periods = local.igdb_swap_usage_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.igdb_swap_usage_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-swap-usage"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "igdb_rds_burst_balance" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-burst-balance"
+  alarm_description  = "BurstBalance exceeds the threshold"
+  namespace          = "AWS/RDS"
+  metric_name        = "BurstBalance"
+  statistic          = "Sum"
+  period             = local.igdb_burst_balance_alert_period
+  evaluation_periods = local.igdb_burst_balance_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.igdb_burst_balance_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
+  }
+  comparison_operator = "LessThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-burst-balance"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "igdb_rds_write_latency" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-write-latency"
+  alarm_description  = "Write Latency Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "WriteLatency"
+  statistic          = "Average"
+  period             = local.igdb_write_latency_alert_period
+  evaluation_periods = local.igdb_write_latency_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.igdb_write_latency_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-write-latency"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "igdb_rds_read_iops" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-read-iops"
+  alarm_description  = "Read IOPS Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "ReadIOPS"
+  statistic          = "Sum"
+  period             = local.igdb_read_iops_alert_period
+  evaluation_periods = local.igdb_read_iops_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.igdb_read_iops_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-read-iops"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "igdb_rds_write_iops" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-write-iops"
+  alarm_description  = "Write IOPS Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "WriteIOPS"
+  statistic          = "Sum"
+  period             = local.igdb_write_iops_alert_period
+  evaluation_periods = local.igdb_write_iops_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.igdb_write_iops_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-write-iops"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "igdb_rds_diskqueue_depth" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-diskqueue-depth"
+  alarm_description  = "DiskQueueDepth Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "DiskQueueDepth"
+  statistic          = "Average"
+  period             = local.igdb_diskqueue_depth_alert_period
+  evaluation_periods = local.igdb_diskqueue_depth_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.igdb_diskqueue_depth_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-diskqueue-depth"
+    }
+  )
+}
+
+#IADB alarms
+resource "aws_cloudwatch_metric_alarm" "iadb_rds_cpu" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-CPU-utilization"
+  alarm_description  = "The average CPU utilization is too high"
+  namespace          = "AWS/RDS"
+  metric_name        = "CPUUtilization"
+  statistic          = "Average"
+  period             = local.iadb_cpu_alert_period
+  evaluation_periods = local.iadb_cpu_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.iadb_cpu_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb2.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-CPU-utilization"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "iadb_rds_memory" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-free-memory"
+  alarm_description  = "Average RDS memory usage exceeds the predefined threshold"
+  namespace          = "AWS/RDS"
+  metric_name        = "FreeableMemory"
+  statistic          = "Sum"
+  period             = local.iadb_memory_alert_period
+  evaluation_periods = local.iadb_memory_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.iadb_memory_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb2.identifier
+  }
+  comparison_operator = "LessThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-free-memory"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "iadb_rds_storage_space" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-free-storage-space"
+  alarm_description  = "Free Storage Space is Low"
+  namespace          = "AWS/RDS"
+  metric_name        = "FreeStorageSpace"
+  statistic          = "Average"
+  period             = local.iadb_storage_space_alert_period
+  evaluation_periods = local.iadb_storage_space_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.iadb_storage_space_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb2.identifier
+  }
+  comparison_operator = "LessThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-free-storage-space"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "iadb_rds_read_latency" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-read-latency"
+  alarm_description  = "Read Latency Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "ReadLatency"
+  statistic          = "Average"
+  period             = local.iadb_read_latency_alert_period
+  evaluation_periods = local.iadb_read_latency_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.iadb_read_latency_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb2.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-read-latency"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "iadb_rds_swapusage" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-swap-usage"
+  alarm_description  = "Swap Usage Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "SwapUsage"
+  statistic          = "Sum"
+  period             = local.iadb_swap_usage_alert_period
+  evaluation_periods = local.iadb_swap_usage_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.iadb_swap_usage_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb2.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-swap-usage"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "iadb_rds_burst_balance" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-burst-balance"
+  alarm_description  = "BurstBalance exceeds the threshold"
+  namespace          = "AWS/RDS"
+  metric_name        = "BurstBalance"
+  statistic          = "Sum"
+  period             = local.iadb_burst_balance_alert_period
+  evaluation_periods = local.iadb_burst_balance_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.iadb_burst_balance_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb2.identifier
+  }
+  comparison_operator = "LessThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-burst-balance"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "iadb_rds_write_latency" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-write-latency"
+  alarm_description  = "Write Latency Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "WriteLatency"
+  statistic          = "Average"
+  period             = local.iadb_write_latency_alert_period
+  evaluation_periods = local.iadb_write_latency_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.iadb_write_latency_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb2.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-write-latency"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "iadb_rds_read_iops" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-read-iops"
+  alarm_description  = "Read IOPS Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "ReadIOPS"
+  statistic          = "Sum"
+  period             = local.iadb_read_iops_alert_period
+  evaluation_periods = local.iadb_read_iops_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.iadb_read_iops_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb2.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-read-iops"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "iadb_rds_write_iops" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-write-iops"
+  alarm_description  = "Write IOPS Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "WriteIOPS"
+  statistic          = "Sum"
+  period             = local.iadb_write_iops_alert_period
+  evaluation_periods = local.iadb_write_iops_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.iadb_write_iops_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb2.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-write-iops"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "iadb_rds_diskqueue_depth" {
+  alarm_name         = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-diskqueue-depth"
+  alarm_description  = "DiskQueueDepth Is Too High"
+  namespace          = "AWS/RDS"
+  metric_name        = "DiskQueueDepth"
+  statistic          = "Average"
+  period             = local.iadb_diskqueue_depth_alert_period
+  evaluation_periods = local.iadb_diskqueue_depth_evaluation_period
+  alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  threshold          = local.iadb_diskqueue_depth_threshold
+  treat_missing_data = "breaching"
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.appdb2.identifier
+  }
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${lower(local.iadb_dbname)}-diskqueue-depth"
+    }
+  )
+}

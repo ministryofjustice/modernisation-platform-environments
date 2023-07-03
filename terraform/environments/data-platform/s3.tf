@@ -58,7 +58,7 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
 }
 
 
-data "aws_iam_policy_document" "bucket_policy" {
+data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
   statement {
     sid    = "AllowPutFromCiUser"
     effect = "Allow"
@@ -78,6 +78,11 @@ data "aws_iam_policy_document" "bucket_policy" {
     effect    = "Deny"
     actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket.bucket.arn}/*"]
+    
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
 
     condition {
       test     = "StringNotEquals"
@@ -89,20 +94,12 @@ data "aws_iam_policy_document" "bucket_policy" {
     }
   }
 
-  statement {
-    sid       = "DenyNonSecureTransport"
-    effect    = "Deny"
-    actions   = ["s3:*"]
-    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-
-      values = ["false"]
-    }
-  }
 }
 
+resource "aws_s3_bucket_policy" "data_platform_product_bucket_policy" {
+  bucket = module.s3-bucket.bucket.id
+  policy = data.aws_iam_policy_document.data_platform_product_bucket_policy_document.json
+}
 
 module "s3_athena_query_results_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"

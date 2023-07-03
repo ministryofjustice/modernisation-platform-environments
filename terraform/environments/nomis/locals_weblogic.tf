@@ -106,18 +106,15 @@ locals {
   }
 
   weblogic_cloudwatch_metric_alarms = {
-    weblogic-healthcheck-service = {
+    weblogic-asg-collectd-services = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
       namespace           = "CWAgent"
       metric_name         = "collectd_exec_value"
       period              = "60"
-      statistic           = "Average"
+      statistic           = "Maximum"
       threshold           = "1"
-      alarm_description   = "weblogic-healthcheck service has stopped"
-      dimensions = {
-        instance = "weblogic_healthcheck"
-      }
+      alarm_description   = "A weblogic service or metric that's being supplied by collectd has stopped"
     }
   }
 
@@ -125,11 +122,10 @@ locals {
     weblogic = {
       parent_keys = [
         "ec2_default",
-        "ec2_linux_default",
-        "ec2_linux_with_collectd_default"
+        "ec2_linux_default"
       ]
       alarms_list = [
-        { key = "weblogic", name = "weblogic-healthcheck-service" }
+        { key = "weblogic", name = "weblogic-asg-collectd-services" }
       ]
     }
   }
@@ -201,16 +197,16 @@ locals {
   # green deployment
   weblogic_ec2_b = merge(local.weblogic_ec2_default, {
     config = merge(local.weblogic_ec2_default.config, {
-      availability_zone = "${local.region}a"
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "f8ece8fc507d42c638878ede0f9030455669bb74" # 2023-04-27 reporting fix
+        branch = "main"
       })
     })
-    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
-    #   desired_capacity = 0
-    # })
+    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {}) 
+    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      desired_capacity = 0
+    })
     cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
       deployment = "green"

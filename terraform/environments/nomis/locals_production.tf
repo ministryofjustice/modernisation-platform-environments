@@ -151,7 +151,7 @@ locals {
 
           https = merge(
             local.weblogic_lb_listeners.https, {
-              alarm_target_group_names = ["prod-nomis-web-b-http-7777"]
+              alarm_target_group_names = ["prod-nomis-web-a-http-7777"]
               rules = {
                 prod-nomis-web-a-http-7777 = {
                   priority = 200
@@ -164,6 +164,9 @@ locals {
                       values = [
                         "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
+                        "c.production.nomis.az.justice.gov.uk",
+                        "c.production.nomis.service.justice.gov.uk",
+                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
@@ -179,9 +182,6 @@ locals {
                       values = [
                         "prod-nomis-web-b.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
-                        "c.production.nomis.az.justice.gov.uk",
-                        "c.production.nomis.service.justice.gov.uk",
-                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
@@ -211,8 +211,8 @@ locals {
       "production.nomis.service.justice.gov.uk" = {
         records = [
           { name = "pnomis", type = "A", ttl = "300", records = ["10.40.3.132"] },
-          { name = "pnomis-a", type = "A", ttl = "300", records = ["10.40.3.132"] },
-          { name = "pnomis-b", type = "A", ttl = "300", records = ["10.40.67.132"] },
+          { name = "pnomis-a", type = "A", ttl = "3600", records = ["10.40.3.132"] },
+          { name = "pnomis-b", type = "A", ttl = "3600", records = ["10.40.67.132"] },
         ]
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },

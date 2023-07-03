@@ -4,9 +4,22 @@ variable "name" {
   default     = ""
 }
 
+variable project_id {
+  type        = string
+  description = "Project ID"
+  default     = "dpr"
+}
+
+
 variable "tags" {
   description = "A mapping of tags to assign to the resource."
   type        = map(any)
+}
+
+variable "cloudtrail_access_policy" {
+  type        = bool
+  description = "Add CloudTrail Access Policy or Not"
+  default     = false
 }
 
 variable "s3_notification_name" {

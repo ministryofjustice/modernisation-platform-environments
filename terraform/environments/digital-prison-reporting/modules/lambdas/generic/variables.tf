@@ -11,7 +11,7 @@ variable "account" {
 variable "enable_lambda" {
   type        = bool
   default     = false
-  description = "(Optional) Create Lambda, If Set to Yes"  
+  description = "(Optional) Create Lambda, If Set to Yes"
 }
 
 variable "s3_bucket" {
@@ -100,4 +100,10 @@ variable "env_vars" {
   description = "Map of environment variables to set on the lambda."
   type        = map(any)
   default     = {}
+}
+
+variable "vpc_settings" {
+  type        = map(any)
+  description = "Configuration block for VPC settings"
+  default     = null
 }
