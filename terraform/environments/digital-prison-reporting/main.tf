@@ -26,7 +26,7 @@ module "glue_reporting_hub_job" {
   additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   execution_class              = "STANDARD"
   worker_type                  = "G.1X"
-  number_of_workers            = 2
+  number_of_workers            = 4
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
@@ -54,6 +54,7 @@ module "glue_reporting_hub_job" {
     "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/"
     "--enable-metrics"                          = true
     "--enable-spark-ui"                         = true
+    "--enable-auto-scaling"                     = true
     "--enable-job-insights"                     = true
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
     "--dpr.contract.registryName"               = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
