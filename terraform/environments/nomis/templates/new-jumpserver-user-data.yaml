@@ -199,7 +199,6 @@ tasks:
 
           # Add each domain to the trusted sites list
           $paths = @(
-              "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains"
               "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains"
           )
 
@@ -209,6 +208,15 @@ tasks:
                 New-ItemProperty -Path $path\$_ -Name https -Value 2 -PropertyType DWORD -Force
             }
           }
+
+          # Use Local Machine settings for Internet Security Settings
+          $reg_path = "HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings"
+
+          if (!(Test-Path $reg_path)) {
+            New-Item -Path $reg_path -Force
+          }
+          
+          New-ItemProperty -Path $reg_path -Name Security_HKLM_only -Value 1 -PropertyType DWORD -Force
 
           ######## INSTALL SQL DEVELOPER ########
 
