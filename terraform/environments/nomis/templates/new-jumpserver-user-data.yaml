@@ -10,31 +10,28 @@ tasks:
         runAs: admin
         #not actually a secret
         #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
-        content: |
-          # FIXME: This step currently doesn't work as the ssm:cloud-watch-config-windows document doesn't exist
-          # It's probably been removed ages ago but since this step was set to 'silently continue' no-one has noticed...
-      
+        content: |  
           # $ErrorActionPreference = "Stop" # set all errors to terminate script
 
           Set-TimeZone "GMT Standard Time"
           Set-WinSystemLocale "en-GB"
 
           # Check CWAgent is installed, if it isn't then install it
-          # $timeout = New-TimeSpan -Seconds 600
-          # $endTime = (Get-Date).Add($timeout)
-          # $cwagent = Get-Service -Name "AmazonCloudWatchAgent"
-          # if ($cwagent) {
-          #   Do {
-          #   & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
-          #   } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
-          # } else {
-          #   Invoke-WebRequest -Uri "https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi" -OutFile "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
-          #   $cwagent_installer = "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
-          #   Start-Process -FilePath msiexec.exe -ArgumentList "/i $cwagent_installer /qn" -Wait
-          #   Do {
-          #   & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
-          #   } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
-          # }
+          $timeout = New-TimeSpan -Seconds 600
+          $endTime = (Get-Date).Add($timeout)
+          $cwagent = Get-Service -Name "AmazonCloudWatchAgent"
+          if ($cwagent) {
+            Do {
+            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
+            } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
+          } else {
+            Invoke-WebRequest -Uri "https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi" -OutFile "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
+            $cwagent_installer = "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
+            Start-Process -FilePath msiexec.exe -ArgumentList "/i $cwagent_installer /qn" -Wait
+            Do {
+              & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
+            } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
+          }
 
           $S3_BUCKET = "ec2-image-builder-nomis20220314103938567000000001"
 
@@ -202,7 +199,8 @@ tasks:
 
           # Add each domain to the trusted sites list
           $paths = @(
-              "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\EscDomains"
+              "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains"
+              "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains"
           )
 
           foreach($path in $paths){
