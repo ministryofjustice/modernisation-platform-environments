@@ -1,5 +1,5 @@
 module "ssm-auto-patching" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=0.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v1.0.0"
   providers = {
     aws.bucket-replication = aws
   }
