@@ -1,16 +1,18 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "landing_zone_vpc_cidr": "10.202.0.0/20",
+      "analytic_platform_cidr": "10.200.0.0/16"
     },
     "test": {
-      "example_var": "test-data"
+      "landing_zone_vpc_cidr": "test-data"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "landing_zone_vpc_cidr": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "landing_zone_vpc_cidr": "10.205.0.0/20",
+      "analytic_platform_cidr": "10.201.0.0/16"
     }
   }
 }

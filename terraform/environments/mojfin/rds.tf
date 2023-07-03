@@ -70,11 +70,11 @@ resource "aws_security_group" "mojfin" {
 
   }
   ingress {
-    description = "Connectivity Analytic Platform use of Transit Gateway to MoJFin PROD"
+    description = "Connectivity Analytic Platform (Airflow) use of Transit Gateway to MoJFin"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.transit_gw_to_mojfinprod]
+    cidr_blocks = [local.analytic_platform_cidr]
 
   }
 
@@ -92,7 +92,7 @@ resource "aws_security_group" "mojfin" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.lzprd-vpc]
+    cidr_blocks = [local.lz_vpc]
   }
   egress {
     from_port   = 0
