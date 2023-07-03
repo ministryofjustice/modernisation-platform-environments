@@ -243,7 +243,6 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
-        cloudwatch_metric_alarms = {} # no alarms as -a is not currently the live environment
       })
 
       t1-nomis-db-1-b = merge(local.database_ec2_b, {
@@ -264,6 +263,7 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
+        cloudwatch_metric_alarms = {} # no alarms as -a is not currently the live environment
       })
 
       t1-nomis-db-2-a = merge(local.database_ec2_a, {
@@ -289,7 +289,6 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
-        cloudwatch_metric_alarms = {} # no alarms as -a is not currently the live environment
       })
 
       t1-nomis-db-2 = merge(local.database_ec2_a, {
@@ -307,6 +306,7 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
+        cloudwatch_metric_alarms = {} # no alarms as -a is not currently the live environment
       })
 
       t2-nomis-db-1-a = merge(local.database_ec2_a, {
@@ -332,6 +332,7 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
+        cloudwatch_metric_alarms = {} # no alarms as -a is not currently the live environment
       })
 
       t2-nomis-db-1-b = merge(local.database_ec2_b, {
@@ -369,6 +370,7 @@ locals {
           data  = { total_size = 2000 }
           flash = { total_size = 500 }
         })
+        cloudwatch_metric_alarms = {} # disable for failover test
       })
 
     }
