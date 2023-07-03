@@ -104,6 +104,17 @@ locals {
         instance = "fixngo_connected" # required dimension value for this metric
       }
     }
+    cpu-utilization-high-db-2hrs = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "120"
+      datapoints_to_alarm = "120"
+      metric_name         = "CPUUtilization"
+      namespace           = "AWS/EC2"
+      period              = "60"
+      statistic           = "Maximum"
+      threshold           = "95"
+      alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on a nomis-db instance"
+    }
   }
 
   database_cloudwatch_metric_alarms_lists = {
@@ -122,17 +133,17 @@ locals {
     database_dba = {
       parent_keys = []
       alarms_list = [
-        { key = "ec2", name = "cpu-utilization-high-15mins" },
         { key = "ec2", name = "instance-status-check-failed-in-last-hour" },
         { key = "ec2", name = "system-status-check-failed-in-last-hour" },
         { key = "ec2_cwagent_linux", name = "free-disk-space-low-1hour" },
-        # { key = "ec2_cwagent_linux", name = "high-memory-usage-15mins" },
+        { key = "ec2_cwagent_linux", name = "high-memory-usage-15mins" },
         { key = "ec2_cwagent_linux", name = "cpu-iowait-high-3hour" },
         { key = "database", name = "oracle-db-disconnected" },
         { key = "database", name = "oracle-batch-failure" },
         { key = "database", name = "oracle-long-running-batch" },
         { key = "database", name = "oracleasm-service" },
         { key = "database", name = "oracle-ohasd-service" },
+        { key = "database", name = "cpu-utilization-high-db-2hrs" },
       ]
     }
     database_dba_high_priority = {
