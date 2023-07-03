@@ -2,7 +2,7 @@
 # S3 Bucket
 #------------------------------------------------------------------------------
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_prefix      = "mercury-dev"
   versioning_enabled = false
