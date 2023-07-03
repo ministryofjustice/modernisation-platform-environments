@@ -167,7 +167,7 @@ resource "aws_db_instance" "appdb1" {
   db_subnet_group_name            = aws_db_subnet_group.mojfin.name
   maintenance_window              = local.maintenance_window
   license_model                   = "license-included"
-  # deletion_protection             = true
+  deletion_protection             = false
   copy_tags_to_snapshot           = true
   storage_encrypted               = true
   apply_immediately               = true
