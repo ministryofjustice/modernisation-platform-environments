@@ -18,13 +18,12 @@ locals {
     }
 
     baseline_ec2_instances = {
+      "dev-${local.application_name}-db-a" = local.database_a
+      
     }
 
     baseline_ec2_autoscaling_groups = {
 
-      "dev-${local.application_name}-db-a" = merge(local.database_a, {
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-      })
       # "dev-${local.application_name}-db-b" = merge(local.database_b, {
       #   autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       #   tags                  = local.database_tags
