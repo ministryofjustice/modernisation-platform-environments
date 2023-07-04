@@ -245,27 +245,6 @@ locals {
         })
       })
 
-      t1-nomis-db-1-b = merge(local.database_ec2_b, {
-        tags = merge(local.database_ec2_b.tags, {
-          nomis-environment   = "t1"
-          description         = "T1 NOMIS database"
-          oracle-sids         = "T1TRDS1 T1CNOMS1 T1NDHS1 T1ORSYS"
-          instance-scheduling = "skip-scheduling"
-        })
-        config = merge(local.database_ec2_b.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
-        })
-        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
-          data  = { total_size = 500 }
-          flash = { total_size = 50 }
-        })
-        cloudwatch_metric_alarms = {} # no alarms as -a is not currently the live environment
-      })
-
       t1-nomis-db-2-a = merge(local.database_ec2_a, {
         tags = merge(local.database_ec2_a.tags, {
           nomis-environment   = "t1"
@@ -289,24 +268,6 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
-      })
-
-      t1-nomis-db-2 = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
-          nomis-environment   = "t1"
-          description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
-          oracle-sids         = "T1CNMAUD T1MIS"
-          instance-scheduling = "skip-scheduling"
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-          data  = { total_size = 500 }
-          flash = { total_size = 50 }
-        })
-        cloudwatch_metric_alarms = {} # no alarms as -a is not currently the live environment
       })
 
       t2-nomis-db-1-a = merge(local.database_ec2_a, {
@@ -333,26 +294,6 @@ locals {
           flash = { total_size = 50 }
         })
         cloudwatch_metric_alarms = {} # no alarms as -a is not currently the live environment
-      })
-
-      t2-nomis-db-1-b = merge(local.database_ec2_b, {
-        tags = merge(local.database_ec2_b.tags, {
-          nomis-environment   = "t2"
-          description         = "T2 NOMIS database"
-          oracle-sids         = "T2TRDS1 T2NDHS1 T2CNOMS1"
-          instance-scheduling = "skip-scheduling"
-        })
-        config = merge(local.database_ec2_b.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
-        })
-        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
-          data  = { total_size = 500 }
-          flash = { total_size = 50 }
-        })
       })
 
       t3-nomis-db-1 = merge(local.database_ec2_a, {
@@ -584,8 +525,6 @@ locals {
           { name = "c-t3", type = "A", lbs_map_key = "private" },
         ]
       }
-      # NOTE: t1-nomis-db-1-b and t2-nomis-db-1-b DNS entries can be removed after migration from Azure
-      # These are used in Azure DB TNS entries
       "test.nomis.service.justice.gov.uk" = {
         records = [
           # OEM (IP hardcoded while we are testing under an ASG)
@@ -594,36 +533,35 @@ locals {
           # T1 [1-a: T1CNOM, T1NDH, T1TRDAT, T1ORSYS] [2-a: T1MIS, T1CNMAUD]
           { name = "t1nomis", type = "CNAME", ttl = "300", records = ["t1nomis-a.test.nomis.service.justice.gov.uk"] },
           { name = "t1nomis-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1nomis-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1nomis-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1ndh", type = "CNAME", ttl = "300", records = ["t1ndh-a.test.nomis.service.justice.gov.uk"] },
           { name = "t1ndh-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1ndh-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1ndh-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1or", type = "CNAME", ttl = "300", records = ["t1or-a.test.nomis.service.justice.gov.uk"] },
           { name = "t1or-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1or-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1or-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1trdat", type = "CNAME", ttl = "300", records = ["t1trdat-a.test.nomis.service.justice.gov.uk"] },
           { name = "t1trdat-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1trdat-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1trdat-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1audit", type = "CNAME", ttl = "300", records = ["t1audit-a.test.nomis.service.justice.gov.uk"] },
           { name = "t1audit-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1audit-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1audit-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1mis", type = "CNAME", ttl = "300", records = ["t1mis-a.test.nomis.service.justice.gov.uk"] },
           { name = "t1mis-a", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1mis-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # T2 [1-b: T2CNOM, T2NDH, T2TRDAT]
+          { name = "t1mis-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-2-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          # T2 [1-a: T2CNOM, T2NDH, T2TRDAT]
           { name = "t2nomis", type = "CNAME", ttl = "300", records = ["t2nomis-a.test.nomis.service.justice.gov.uk"] },
           { name = "t2nomis-a", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t2nomis-b", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t2-nomis-db-1-b", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t2nomis-b", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t2ndh", type = "CNAME", ttl = "300", records = ["t2ndh-a.test.nomis.service.justice.gov.uk"] },
           { name = "t2ndh-a", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t2ndh-b", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t2ndh-b", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t2or", type = "CNAME", ttl = "300", records = ["t2or-a.test.nomis.service.justice.gov.uk"] },
           { name = "t2or-a", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t2or-b", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t2or-b", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t2trdat", type = "CNAME", ttl = "300", records = ["t2trdat-a.test.nomis.service.justice.gov.uk"] },
           { name = "t2trdat-a", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t2trdat-b", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t2trdat-b", type = "CNAME", ttl = "3600", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           # T3: [1-b: T3CNOM]
           { name = "t3nomis", type = "CNAME", ttl = "300", records = ["t3nomis-b.test.nomis.service.justice.gov.uk"] },
           { name = "t3nomis-a", type = "CNAME", ttl = "300", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
