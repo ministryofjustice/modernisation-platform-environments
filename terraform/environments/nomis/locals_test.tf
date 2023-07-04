@@ -198,7 +198,7 @@ locals {
           ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/new-jumpserver-user-data.yaml"))
+          user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-jumpserver"]
