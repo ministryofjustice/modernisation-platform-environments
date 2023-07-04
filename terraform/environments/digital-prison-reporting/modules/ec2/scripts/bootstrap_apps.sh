@@ -2,7 +2,14 @@
 # send script output to /tmp so we can debug boot failures
 exec > /tmp/userdata.log 2>&1
 
-echo test of user_data | sudo tee /tmp/user_data.log
+# ENV Variables,
+namespace="dpr-nomis-port-forwarder"
+app="nomis-port-forwarder"
+local_port="1521"
+remote_port="1521"
+# Location of script that will be used to launch the domain builder jar.
+nomis_portforwarder_script="/usr/bin/nomis-port-forwarder.sh"
+kubeconfig="/home/ssm-user/.kube/config"
 
 # Setup Required Directories
 touch /tmp/hello-ec2
@@ -85,7 +92,7 @@ cp ./kubectl /usr/bin/kubectl
 mkdir -p /home/ssm-user/.kube
 
 ## Add Kubeconfig
-cat <<EOF >/home/ssm-user/.kube/config
+cat <<EOF >${kubeconfig}
 apiVersion: v1
 clusters:
 - cluster:
@@ -109,12 +116,27 @@ EOF
 
 # Configure Kubernetes Cluster for CP
 ## Permission for Config
-chmod 644 /home/ssm-user/.kube/config
+chmod 644 ${kubeconfig}
 
 ## Set Kube Config
 kubectl config use-context live.cloud-platform.service.justice.gov.uk           # set the default context to live.cloud-platform.service.justice.gov.uk
 kubectl config set-cluster live.cloud-platform.service.justice.gov.uk           # set a cluster entry in the kubeconfig
 kubectl config current-context                                                  # display the current-context
+
+## Verify Connectivity CP K8s Cluster,
+kubectl get pods
+
+# Generate a Port forwarder script 
+sudo cat <<EOF > ${nomis_portforwarder_script}
+#!/bin/bash
+
+## Port forward from CP to MP
+export POD=$(kubectl get pod -n ${namespace} -l app=${app} -o jsonpath="{.items[0].metadata.name}")
+kubectl port-forward pods/${POD} ${remote_port}:${local_port}
+EOF
+
+## Add Permissions and Execute the Forwarder
+chmod 0755 ${nomis_portforwarder_script}; su -c ${nomis_portforwarder_script} ssm-user
 
 # Start Stream at Start of the EC2
 sudo chkconfig aws-kinesis-agent on
