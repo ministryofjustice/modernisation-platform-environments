@@ -257,9 +257,10 @@ locals {
           from_port   = 443
           to_port     = 443
           protocol    = "tcp"
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_external,
-          ])
+          cidr_blocks = ["0.0.0.0/0"]
+          # cidr_blocks = flatten([
+          #   local.security_group_cidrs.https_external,
+          # ])
         }
       }
       egress = {
