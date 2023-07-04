@@ -121,7 +121,7 @@ chmod 644 ${kubeconfig}
 ## Set Kube Config
 kubectl config use-context live.cloud-platform.service.justice.gov.uk           # set the default context to live.cloud-platform.service.justice.gov.uk
 kubectl config set-cluster live.cloud-platform.service.justice.gov.uk           # set a cluster entry in the kubeconfig
-kubectl config current-context                                                  # display the current-context
+kubectl config current-context                                                  # display the current-context 
 
 ## Verify Connectivity CP K8s Cluster,
 kubectl get pods
