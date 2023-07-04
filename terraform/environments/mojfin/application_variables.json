@@ -1,16 +1,23 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "landing_zone_vpc_cidr": "10.202.0.0/20",
+      "analytic_platform_cidr": "10.200.0.0/16",
+      "cp_vpc_cidr": "172.20.0.0/20",
+      "london_workspace_cidr": "10.200.0.0/20",
+      "mojfinrdssnapshotid": "rds:mojfin-2023-07-02-22-06"
     },
     "test": {
-      "example_var": "test-data"
+      "landing_zone_vpc_cidr": "test-data"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "landing_zone_vpc_cidr": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "landing_zone_vpc_cidr": "10.205.0.0/20",
+      "analytic_platform_cidr": "10.201.0.0/16",
+      "cp_vpc_cidr": "172.20.0.0/20",
+      "london_workspace_cidr": "10.200.16.0/20"
     }
   }
 }

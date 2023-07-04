@@ -70,11 +70,11 @@ resource "aws_security_group" "mojfin" {
 
   }
   ingress {
-    description = "Connectivity Analytic Platform use of Transit Gateway to MoJFin PROD"
+    description = "Connectivity Analytic Platform (Airflow) use of Transit Gateway to MoJFin"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.transit_gw_to_mojfinprod]
+    cidr_blocks = [local.analytic_platform_cidr]
 
   }
 
@@ -92,7 +92,7 @@ resource "aws_security_group" "mojfin" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.lzprd-vpc]
+    cidr_blocks = [local.lz_vpc]
   }
   egress {
     from_port   = 0
@@ -171,7 +171,7 @@ resource "aws_db_instance" "appdb1" {
   copy_tags_to_snapshot           = true
   storage_encrypted               = true
   apply_immediately               = true
-  #snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.rds_snapshot_name)
+  # snapshot_identifier             = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.application_data.accounts[local.environment].mojfinrdssnapshotid)
   kms_key_id = data.aws_kms_key.rds_shared.arn
 
 
