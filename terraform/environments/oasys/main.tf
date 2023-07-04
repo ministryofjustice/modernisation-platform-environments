@@ -100,7 +100,7 @@ resource "aws_lb_target_group" "private-lb-https-443" {
   name        = "private-lb-https-443"
   target_type = "alb"
   port        = 443
-  protocol    = "TCP"
+  protocol    = "HTTPS"
   vpc_id      = module.environment.vpc.id
 }
 resource "aws_lb_target_group_attachment" "test" {
