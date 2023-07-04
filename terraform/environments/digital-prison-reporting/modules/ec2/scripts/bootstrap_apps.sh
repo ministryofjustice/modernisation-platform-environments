@@ -92,7 +92,7 @@ cp ./kubectl /usr/bin/kubectl
 mkdir -p /home/ssm-user/.kube
 
 ## Add Kubeconfig
-cat <<EOF >${kubeconfig}
+cat <<EOF >/home/ssm-user/.kube/config
 apiVersion: v1
 clusters:
 - cluster:
@@ -127,7 +127,7 @@ kubectl config current-context                                                  
 kubectl get pods
 
 # Generate a Port forwarder script 
-sudo cat <<EOF > ${nomis_portforwarder_script}
+sudo cat <<EOF >/usr/bin/nomis-port-forwarder.sh
 #!/bin/bash
 
 ## Port forward from CP to MP
