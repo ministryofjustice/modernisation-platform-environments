@@ -98,5 +98,5 @@ resource "aws_api_gateway_integration" "get_glue_metadata" {
 }
 
 output "get_glue_metadata_endpoint" {
-  value = join("", [aws_api_gateway_deployment.deployment.invoke_url, "/get_glue_metadata/"])
+  value = join("", [aws_api_gateway_deployment.deployment.invoke_url, aws_api_gateway_stage.sandbox.stage_name, "/get_glue_metadata/"])
 }

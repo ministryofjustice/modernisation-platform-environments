@@ -103,6 +103,6 @@ resource "aws_lambda_permission" "allow_apigw_to_invoke_docs_lambda" {
   source_arn = "${aws_api_gateway_rest_api.data_platform.execution_arn}/*/*"
 }
 
-output "go_to" {
-  value = join("", [aws_api_gateway_deployment.deployment.invoke_url, "/docs/"])
+output "docs_endpoint" {
+  value = join("", [aws_api_gateway_deployment.deployment.invoke_url, aws_api_gateway_stage.sandbox.stage_name, "/docs/"])
 }
