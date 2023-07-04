@@ -96,6 +96,11 @@ data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
 
 }
 
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket      = module.s3-bucket.bucket.id
+  eventbridge = true
+}
+
 module "s3_athena_query_results_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
