@@ -125,7 +125,7 @@ locals {
 
   database_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name          = "oasys_oracle_db_*"
+      ami_name          = "oasys_oracle_db_release_2023-06-26T10-16-03.670Z"
       ami_owner         = "self"
       availability_zone = "${local.region}a"
     })
@@ -237,7 +237,7 @@ locals {
 
   bip_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                  = "oasys_bip_release_*"
+      ami_name                  = "oasys_bip_release_2023-06-08T15-17-45.964Z"
       ssm_parameters_prefix     = "ec2-web/"
       iam_resource_names_prefix = "ec2-web"
       availability_zone         = "${local.region}a"
