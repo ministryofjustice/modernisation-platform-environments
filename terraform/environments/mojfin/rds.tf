@@ -174,10 +174,10 @@ resource "aws_db_instance" "appdb1" {
   # snapshot_identifier             = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.application_data.accounts[local.environment].mojfinrdssnapshotid)
   kms_key_id = data.aws_kms_key.rds_shared.arn
 
-  # restore_to_point_in_time {
-  #   restore_time = "2023-07-04T14:43:00Z"
-  #   source_db_instance_identifier = local.application_name
-  # }
+  restore_to_point_in_time {
+    restore_time = "2023-07-04T14:54:00Z"
+    source_db_instance_identifier = local.application_name
+  }
 
 
   timeouts {
