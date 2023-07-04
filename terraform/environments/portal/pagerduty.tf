@@ -17,7 +17,7 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 }
 
 module "pagerduty_core_alerts" {
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [local.sns_topic_name]
   pagerduty_integration_key = local.pagerduty_integration_keys[local.pagerduty_integration_key_name]
 }
