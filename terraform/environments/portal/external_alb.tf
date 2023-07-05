@@ -1,19 +1,19 @@
 locals {
-  lb_logs_bucket = local.application_data.accounts[local.environment].lb_access_logs_existing_bucket_name
-  account_number = local.environment_management.account_ids[terraform.workspace]
-  external_lb_idle_timeout = 65
-  enable_deletion_protection = true
-  external_lb_port = 80 #TODO This needs changing to 443 once Cert and CloudFront has been set up
-  custom_header = "X-Custom-Header-LAA-Portal"
-  force_destroy_lb_logs_bucket = true
-  lb_target_response_time_threshold = 10
+  lb_logs_bucket                        = local.application_data.accounts[local.environment].lb_access_logs_existing_bucket_name
+  account_number                        = local.environment_management.account_ids[terraform.workspace]
+  external_lb_idle_timeout              = 65
+  enable_deletion_protection            = true
+  external_lb_port                      = 80 #TODO This needs changing to 443 once Cert and CloudFront has been set up
+  custom_header                         = "X-Custom-Header-LAA-Portal"
+  force_destroy_lb_logs_bucket          = true
+  lb_target_response_time_threshold     = 10
   lb_target_response_time_threshold_max = 60
-  lb_unhealthy_hosts_threshold = 0
-  lb_rejected_connection_threshold = 10
-  lb_target_5xx_threshold = 10
-  lb_origin_5xx_threshold = 10
-  lb_target_4xx_threshold = 50
-  lb_origin_4xx_threshold = 10
+  lb_unhealthy_hosts_threshold          = 0
+  lb_rejected_connection_threshold      = 10
+  lb_target_5xx_threshold               = 10
+  lb_origin_5xx_threshold               = 10
+  lb_target_4xx_threshold               = 50
+  lb_origin_4xx_threshold               = 10
 }
 
 
@@ -167,9 +167,9 @@ resource "aws_lb_listener" "external" {
 
   load_balancer_arn = aws_lb.external.arn
   port              = local.external_lb_port
-  protocol        = "HTTP" #TODO This needs changing to HTTPS once Cert and CloudFront has been set up
-  ssl_policy      = null # TODO This needs changing once Cert and CloudFront has been set up
-  certificate_arn = null # TODO This needs changing once Cert and CloudFront has been set up
+  protocol          = "HTTP" #TODO This needs changing to HTTPS once Cert and CloudFront has been set up
+  ssl_policy        = null   # TODO This needs changing once Cert and CloudFront has been set up
+  certificate_arn   = null   # TODO This needs changing once Cert and CloudFront has been set up
 
   default_action {
     type             = "forward"
@@ -209,10 +209,10 @@ resource "aws_lb_listener" "external" {
 # }
 
 resource "aws_lb_target_group" "external" {
-  name                 = "${local.application_name}-ohs-target-group"
-  port                 = 7777
-  protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
+  name     = "${local.application_name}-ohs-target-group"
+  port     = 7777
+  protocol = "HTTP"
+  vpc_id   = data.aws_vpc.shared.id
   # deregistration_delay = local.target_group_deregistration_delay
   load_balancing_algorithm_type = "least_outstanding_requests"
   health_check {
@@ -222,7 +222,7 @@ resource "aws_lb_target_group" "external" {
     timeout             = 2
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    matcher = 302
+    matcher             = 302
   }
 
   tags = merge(
@@ -241,7 +241,7 @@ resource "aws_lb_target_group_attachment" "ohs1" {
 }
 
 resource "aws_lb_target_group_attachment" "ohs2" {
-  count             = contains(["development", "testing"], local.environment) ? 0 : 1
+  count            = contains(["development", "testing"], local.environment) ? 0 : 1
   target_group_arn = aws_lb_target_group.external.arn
   target_id        = aws_instance.ohs_instance_2[0].id
   port             = 7777
@@ -330,7 +330,7 @@ resource "aws_cloudwatch_metric_alarm" "ext_lb_unhealthy_hosts" {
   alarm_description   = "The unhealthy hosts alarm triggers if your load balancer recognises there is an unhealthy host and has been there for over 2 minutes."
   comparison_operator = "GreaterThanThreshold"
   dimensions = {
-    TargetGroup = aws_lb_target_group.external.arn_suffix
+    TargetGroup  = aws_lb_target_group.external.arn_suffix
     LoadBalancer = aws_lb.external.arn_suffix
   }
   evaluation_periods = "2"
