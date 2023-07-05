@@ -94,9 +94,9 @@ resource "aws_s3_bucket_policy" "PPUD" {
 # Create S3 Bucket for SSM Health Check Reports
 
 resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
-  bucket = "MoJ-Health-Check-Reports"
+  bucket = "moj-health-check-reports"
   tags = {
-    Name = "MoJ-Health-Check-Reports"
+    Name = "moj-health-check-reports"
   }
 }
 
