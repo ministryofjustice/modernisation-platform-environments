@@ -38,8 +38,8 @@ locals {
       "t1-nomis-db-2-b/MIST1"   = local.database_instance_ssm_parameters
       "t1-nomis-web-a"          = local.weblogic_ssm_parameters
       "t1-nomis-web-b"          = local.weblogic_ssm_parameters
-      "t1-nomis-xtag-a"         = local.xtag_ssm_parameters
-      "t1-nomis-xtag-b"         = local.xtag_ssm_parameters
+      "t1-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
+      "t1-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
 
       # T2
       "t2-nomis-db-1-a/CNOMT2"  = local.database_instance_ssm_parameters
