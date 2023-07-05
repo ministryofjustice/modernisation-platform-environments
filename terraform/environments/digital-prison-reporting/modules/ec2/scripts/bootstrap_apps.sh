@@ -116,7 +116,7 @@ EOF
 
 # Configure Kubernetes Cluster for CP
 ## Permission for Config
-chmod 644 $kubeconfig
+chmod 666 $kubeconfig
 
 ## Set Kube Config
 kubectl config use-context live.cloud-platform.service.justice.gov.uk           # set the default context to live.cloud-platform.service.justice.gov.uk
@@ -131,8 +131,8 @@ sudo cat <<EOF > $nomis_portforwarder_script
 #!/bin/bash
 
 ## Port forward from CP to MP
-export POD=$(kubectl get pod -n $namespace -l app=$app -o jsonpath="{.items[0].metadata.name}")
-kubectl port-forward pods/$POD $remote_port:$local_port
+export POD=$(su -c "kubectl get pod -n $namespace -l app=$app -o jsonpath=\"{.items[0].metadata.name}\"" ssm-user)
+su -c "kubectl port-forward pods/$POD $remote_port:$local_port" ssm-user
 EOF
 
 ## Add Permissions and Execute the Forwarder
