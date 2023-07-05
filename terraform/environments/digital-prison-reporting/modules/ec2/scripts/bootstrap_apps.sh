@@ -132,7 +132,8 @@ kubectl config current-context
 kubectl get pods
 
 ## Port forward from CP to MP
-kubectl port-forward pods/`kubectl get pod -n $namespace -l app=$app -o jsonpath="{.items[0].metadata.name}"` $remote_port:$local_port
+export POD=\$(kubectl get pod -n $namespace -l app=$app -o jsonpath="{.items[0].metadata.name}")
+kubectl port-forward pods/$POD $remote_port:$local_port
 EOF
 
 ## Add Permissions and Execute the Forwarder
