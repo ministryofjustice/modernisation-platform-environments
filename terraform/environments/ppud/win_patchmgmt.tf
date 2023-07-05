@@ -157,7 +157,7 @@ resource "aws_ssm_maintenance_window_task" "post_healthcheck_maintenance_window_
 
   targets {
     key    = "WindowTargetIds"
-    values = aws_ssm_maintenance_window_target.maintenance_window_target.*.id
+    values = aws_ssm_maintenance_window_target.patch_maintenance_window_target.*.id
   }
 
   task_invocation_parameters {
