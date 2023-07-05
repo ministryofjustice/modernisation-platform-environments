@@ -24,6 +24,11 @@ locals {
       }
     }
 
+    baseline_ssm_parameters = {
+      "preprod-nomis-web-a" = local.weblogic_ssm_parameters
+      "preprod-nomis-web-b" = local.weblogic_ssm_parameters
+    }
+
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       preprod-nomis-web-a = merge(local.weblogic_ec2_a, {

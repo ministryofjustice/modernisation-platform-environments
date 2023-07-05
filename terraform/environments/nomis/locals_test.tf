@@ -25,23 +25,35 @@ locals {
     }
 
     baseline_ssm_parameters = {
-      # add into code once for_each issue resolved
-      #      "t1-nomis-db-1-b"         = local.database_ssm_parameters
-      #      "t1-nomis-db-1-b/CNOMT1"  = local.database_instance_ssm_parameters
-      #      "t1-nomis-db-1-b/NDHT1"   = local.database_instance_ssm_parameters
-      #      "t1-nomis-db-1-b/TRDATT1" = local.database_instance_ssm_parameters
-      #      "t2-nomis-db-1-b"         = local.database_ssm_parameters
-      #      "t2-nomis-db-1-b/CNOMT2"  = local.database_instance_ssm_parameters
-      #      "t2-nomis-db-1-b/NDHT2"   = local.database_instance_ssm_parameters
-      #      "t2-nomis-db-1-b/TRDATT2" = local.database_instance_ssm_parameters
-      #      "t3-nomis-db-1"           = local.database_ssm_parameters
+      # T1
+      "t1-nomis-db-1-a/CNOMT1"  = local.database_instance_ssm_parameters
+      "t1-nomis-db-1-a/NDHT1"   = local.database_instance_ssm_parameters
+      "t1-nomis-db-1-a/TRDATT1" = local.database_instance_ssm_parameters
+      "t1-nomis-db-1-a/ORSYST1" = local.database_instance_ssm_parameters
+      "t1-nomis-db-1-b/CNOMT1"  = local.database_instance_ssm_parameters
+      "t1-nomis-db-1-b/NDHT1"   = local.database_instance_ssm_parameters
+      "t1-nomis-db-1-b/TRDATT1" = local.database_instance_ssm_parameters
+      "t1-nomis-db-1-b/ORSYST1" = local.database_instance_ssm_parameters
+      "t1-nomis-db-2-a/MIST1"   = local.database_instance_ssm_parameters
+      "t1-nomis-db-2-b/MIST1"   = local.database_instance_ssm_parameters
+      "t1-nomis-web-a"          = local.weblogic_ssm_parameters
+      "t1-nomis-web-b"          = local.weblogic_ssm_parameters
+      "t1-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
+      "t1-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
 
-      #      "t1-nomis-web-a" = local.weblogic_ssm_parameters
-      #      "t1-nomis-web-b" = local.weblogic_ssm_parameters
-      #      "t2-nomis-web-a" = local.weblogic_ssm_parameters
-      #      "t2-nomis-web-b" = local.weblogic_ssm_parameters
+      # T2
+      "t2-nomis-db-1-a/CNOMT2"  = local.database_instance_ssm_parameters
+      "t2-nomis-db-1-a/NDHT2"   = local.database_instance_ssm_parameters
+      "t2-nomis-db-1-a/TRDATT2" = local.database_instance_ssm_parameters
+      "t2-nomis-db-1-b/CNOMT2"  = local.database_instance_ssm_parameters
+      "t2-nomis-db-1-b/NDHT2"   = local.database_instance_ssm_parameters
+      "t2-nomis-db-1-b/TRDATT2" = local.database_instance_ssm_parameters
+      "t2-nomis-web-a"          = local.weblogic_ssm_parameters
+      "t2-nomis-web-b"          = local.weblogic_ssm_parameters
 
-      #      "t1-nomis-xtag-a" = local.xtag_ssm_parameters
+      # T3
+      "t3-nomis-web-a" = local.weblogic_ssm_parameters
+      "t3-nomis-web-b" = local.weblogic_ssm_parameters
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -525,7 +537,7 @@ locals {
       }
       "test.nomis.service.justice.gov.uk" = {
         records = [
-          # OEM (IP hardcoded while we are testing under an ASG)
+          # OEM (IP hardcoded while we are testing under an ASG)
           { name = "oem", type = "A", ttl = "300", records = ["10.26.12.202"] },
 
           # T1 [1-a: T1CNOM, T1NDH, T1TRDAT, T1ORSYS] [2-a: T1MIS, T1CNMAUD]

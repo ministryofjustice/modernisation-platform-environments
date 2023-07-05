@@ -3,14 +3,14 @@ locals {
   weblogic_ssm_parameters = {
     prefix = "/weblogic/"
     parameters = {
-      admin_username     = {}
-      admin_password     = {}
-      db_username        = {}
-      db_password        = {}
-      db_tagsar_username = {}
-      db_tagsar_password = {}
-      rms_hosts          = {}
-      rms_key            = {}
+      admin_username     = { description = "weblogic admin username" }
+      admin_password     = { description = "weblogic admin password" }
+      db_username        = { description = "nomis database username" }
+      db_password        = { description = "nomis database password" }
+      db_tagsar_username = { description = "nomis database tag username" }
+      db_tagsar_password = { description = "nomis database tag password" }
+      rms_hosts          = { description = "combined reporting host list" }
+      rms_key            = { description = "combined reporting rms key" }
     }
   }
 
