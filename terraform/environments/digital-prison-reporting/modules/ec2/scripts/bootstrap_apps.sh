@@ -92,7 +92,7 @@ cp ./kubectl /usr/bin/kubectl
 mkdir -p /home/ssm-user/.kube
 
 ## Add Kubeconfig
-cat <<EOF >/home/ssm-user/.kube/config
+cat <<EOF > $kubeconfig
 apiVersion: v1
 clusters:
 - cluster:
@@ -127,16 +127,16 @@ kubectl config current-context                                                  
 kubectl get pods
 
 # Generate a Port forwarder script 
-sudo cat <<EOF >/usr/bin/nomis-port-forwarder.sh
+sudo cat <<EOF > $nomis_portforwarder_script
 #!/bin/bash
 
 ## Port forward from CP to MP
-export POD=$(kubectl get pod -n ${namespace} -l app=${app} -o jsonpath="{.items[0].metadata.name}")
-kubectl port-forward pods/${POD} ${remote_port}:${local_port}
+export POD=$(kubectl get pod -n $namespace -l app=$app -o jsonpath="{.items[0].metadata.name}")
+kubectl port-forward pods/$POD $remote_port:$local_port
 EOF
 
 ## Add Permissions and Execute the Forwarder
-chmod 0755 ${nomis_portforwarder_script}; su -c ${nomis_portforwarder_script} ssm-user
+chmod 0755 $nomis_portforwarder_script; su -c $nomis_portforwarder_script ssm-user
 
 # Start Stream at Start of the EC2
 sudo chkconfig aws-kinesis-agent on
