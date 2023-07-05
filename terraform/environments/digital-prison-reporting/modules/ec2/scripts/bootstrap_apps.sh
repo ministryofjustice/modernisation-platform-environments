@@ -119,9 +119,7 @@ EOF
 chmod 666 $kubeconfig
 
 ## Set Kube Config
-kubectl config use-context live.cloud-platform.service.justice.gov.uk           # set the default context to live.cloud-platform.service.justice.gov.uk
-kubectl config set-cluster live.cloud-platform.service.justice.gov.uk           # set a cluster entry in the kubeconfig
-kubectl config current-context                                                  # display the current-context 
+
 
 ## Verify Connectivity CP K8s Cluster,
 kubectl get pods
@@ -130,8 +128,12 @@ kubectl get pods
 sudo cat <<EOF > $nomis_portforwarder_script
 #!/bin/bash
 
+kubectl config use-context live.cloud-platform.service.justice.gov.uk           
+kubectl config set-cluster live.cloud-platform.service.justice.gov.uk        
+kubectl config current-context
+
 ## Port forward from CP to MP
-export POD=$(su -c "kubectl get pod -n $namespace -l app=$app -o jsonpath=\"{.items[0].metadata.name}\"" ssm-user)
+export POD=$(kubectl get pod -n $namespace -l app=$app -o jsonpath="{.items[0].metadata.name}")
 su -c "kubectl port-forward pods/$POD $remote_port:$local_port" ssm-user
 EOF
 
