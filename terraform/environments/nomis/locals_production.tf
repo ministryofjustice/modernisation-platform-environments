@@ -24,6 +24,11 @@ locals {
       }
     }
 
+    baseline_ssm_parameters = {
+      "prod-nomis-web-a" = local.weblogic_ssm_parameters
+      "prod-nomis-web-b" = local.weblogic_ssm_parameters
+    }
+
     baseline_cloudwatch_log_groups = {
       session-manager-logs = {
         retention_in_days = 400

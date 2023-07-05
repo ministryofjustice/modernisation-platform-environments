@@ -6,13 +6,16 @@
 
 locals {
 
-  database_ssm_parameters = {
+  # Include this in ec2-instance ssm parameters if using oracle-db-standby-setup role with azure storage account
+  database_azure_ssm_parameters = {
     prefix = "/database/"
     parameters = {
-      az_sas_token = {}
+      az_sas_token = { description = "azure sas token for downloading azure DB backups" }
     }
   }
 
+  # Include this in ec2-instance ssm parameters if using oracle-db-standby-setup role
+  # The path should include the db_name as defined in ansible db_configs variable
   database_instance_ssm_parameters = {
     prefix = "/database/"
     parameters = {
