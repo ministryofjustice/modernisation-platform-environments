@@ -116,7 +116,7 @@ EOF
 
 # Configure Kubernetes Cluster for CP
 ## Permission for Config
-chmod 644 ${kubeconfig}
+chmod 644 $kubeconfig
 
 ## Set Kube Config
 kubectl config use-context live.cloud-platform.service.justice.gov.uk           # set the default context to live.cloud-platform.service.justice.gov.uk
