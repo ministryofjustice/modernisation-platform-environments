@@ -109,7 +109,7 @@ resource "aws_s3_bucket_versioning" "version" {
 }
 
 resource "aws_s3_bucket_policy" "cloud_trail" {
-  count  = var.create_s3 && var.cloudtrail_access_policy ? 1 : 0
+  count = var.create_s3 && var.cloudtrail_access_policy ? 1 : 0
 
   bucket = aws_s3_bucket.storage[0].id
 
@@ -134,5 +134,5 @@ resource "aws_s3_bucket_policy" "cloud_trail" {
 }
 POLICY
 
- depends_on = [aws_s3_bucket.storage]
+  depends_on = [aws_s3_bucket.storage]
 }

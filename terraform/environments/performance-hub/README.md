@@ -55,7 +55,7 @@ The typical release cycle is weekly to preprod and monthly to prod.
 
 ### **Automatic alerts:**
 
-Unhandled exceptions and serious errors generate email alerts to performance-hub@digital.justice.gov.uk
+Unhandled exceptions and serious errors generate email alerts to <performance-hub@digital.justice.gov.uk>
 
 ### **Impact of an outage:**
 

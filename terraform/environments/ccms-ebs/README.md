@@ -43,9 +43,9 @@ Please tag the primary/platforms DM in case of platforms P1/P2 incidents or a se
 
 ### **Service team contact:**
 
-CCMS Platforms (Primary) -> rob.murley@digital.justice.gov.uk
-Civil Applications (Secondary) -> ieuan.jones@digital.justice.gov.uk
-Civil Billing & payments (Secondary) -> aruna.vemulamanda@digital.justice.gov.uk
+CCMS Platforms (Primary) -> <rob.murley@digital.justice.gov.uk>
+Civil Applications (Secondary) -> <ieuan.jones@digital.justice.gov.uk>
+Civil Billing & payments (Secondary) -> <aruna.vemulamanda@digital.justice.gov.uk>
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 

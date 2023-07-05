@@ -17,7 +17,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   approval_rule {
     approve_after_days = 14
 
-  patch_filter {
+    patch_filter {
       key    = "PRODUCT"
       values = ["WindowsServer2012", "WindowsServer2016", "WindowsServer2019", "WindowsServer2022"]
     }
@@ -56,16 +56,16 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
 # Production: Second Tuesday of the month at 20:00
 
 resource "aws_ssm_maintenance_window" "patch_maintenance_window" {
-  name     = local.application_data.accounts[local.environment].patch_maintenance_window_name
-  schedule = local.application_data.accounts[local.environment].patch_maintenance_schedule_cron
-  duration = local.application_data.accounts[local.environment].patch_maintenance_window_duration
-  cutoff   = 1
+  name              = local.application_data.accounts[local.environment].patch_maintenance_window_name
+  schedule          = local.application_data.accounts[local.environment].patch_maintenance_schedule_cron
+  duration          = local.application_data.accounts[local.environment].patch_maintenance_window_duration
+  cutoff            = 1
   schedule_timezone = "Europe/London"
 }
 
 resource "aws_ssm_maintenance_window_target" "patch_maintenance_window_target" {
   window_id     = aws_ssm_maintenance_window.patch_maintenance_window.id
-  name         = local.application_data.accounts[local.environment].maintenance_window_target_name
+  name          = local.application_data.accounts[local.environment].maintenance_window_target_name
   description   = local.application_data.accounts[local.environment].maintenance_window_target_description
   resource_type = "INSTANCE"
 

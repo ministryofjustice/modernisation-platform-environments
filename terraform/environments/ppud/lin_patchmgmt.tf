@@ -6,7 +6,7 @@
 
 
 resource "aws_ssm_patch_group" "lin_patch_group" {
-  count    = local.is-production == true ? 1 : 0
+  count       = local.is-production == true ? 1 : 0
   baseline_id = aws_ssm_patch_baseline.linux_os_baseline[0].id
   patch_group = local.application_data.accounts[local.environment].lin_patch_group
 }
@@ -14,16 +14,16 @@ resource "aws_ssm_patch_group" "lin_patch_group" {
 # Create Linux Patch Baseline
 
 resource "aws_ssm_patch_baseline" "linux_os_baseline" {
-  count    = local.is-production == true ? 1 : 0
+  count            = local.is-production == true ? 1 : 0
   name             = "LinuxOS"
   description      = "Patch Linux OS"
   operating_system = "AMAZON_LINUX_2"
 
   approval_rule {
-    approve_after_days = 14
+    approve_after_days  = 14
     enable_non_security = false
 
-  patch_filter {
+    patch_filter {
       key    = "PRODUCT"
       values = ["AmazonLinux2"]
     }
@@ -46,11 +46,11 @@ resource "aws_ssm_patch_baseline" "linux_os_baseline" {
 # second Monday of the month at 20:00
 
 resource "aws_ssm_maintenance_window" "prod_lin_patch_maintenance_window" {
-  count    = local.is-production == true ? 1 : 0
-  name     = local.application_data.accounts[local.environment].patch_lin_maintenance_window_name
-  schedule = local.application_data.accounts[local.environment].patch_lin_maintenance_schedule_cron
-  duration = local.application_data.accounts[local.environment].patch_lin_maintenance_window_duration
-  cutoff   = 1
+  count             = local.is-production == true ? 1 : 0
+  name              = local.application_data.accounts[local.environment].patch_lin_maintenance_window_name
+  schedule          = local.application_data.accounts[local.environment].patch_lin_maintenance_schedule_cron
+  duration          = local.application_data.accounts[local.environment].patch_lin_maintenance_window_duration
+  cutoff            = 1
   schedule_timezone = "Europe/London"
 }
 
