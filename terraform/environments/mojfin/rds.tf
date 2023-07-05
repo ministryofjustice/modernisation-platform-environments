@@ -171,7 +171,7 @@ resource "aws_db_instance" "appdb1" {
   copy_tags_to_snapshot           = true
   storage_encrypted               = true
   apply_immediately               = true
-  snapshot_identifier             = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.application_data.accounts[local.environment].mojfinrdssnapshotid)
+  # snapshot_identifier             = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.application_data.accounts[local.environment].mojfinrdssnapshotid)
   kms_key_id = data.aws_kms_key.rds_shared.arn
 
   # restore_to_point_in_time {
