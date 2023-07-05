@@ -2,7 +2,7 @@
 # send script output to /tmp so we can debug boot failures
 exec > /tmp/userdata.log 2>&1
 
-# ENV Variables,
+# ENV Variables, 
 namespace="dpr-nomis-port-forwarder"
 app="nomis-port-forwarder"
 local_port="1521"
