@@ -167,12 +167,17 @@ resource "aws_db_instance" "appdb1" {
   db_subnet_group_name            = aws_db_subnet_group.mojfin.name
   maintenance_window              = local.maintenance_window
   license_model                   = "license-included"
-  deletion_protection             = true
+  deletion_protection             = local.deletion_production
   copy_tags_to_snapshot           = true
   storage_encrypted               = true
   apply_immediately               = true
   # snapshot_identifier             = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.application_data.accounts[local.environment].mojfinrdssnapshotid)
   kms_key_id = data.aws_kms_key.rds_shared.arn
+
+  # restore_to_point_in_time {
+  #   restore_time = "2023-07-04T14:54:00Z"
+  #   source_db_instance_identifier = local.application_name
+  # }
 
 
   timeouts {

@@ -23,6 +23,7 @@ locals {
   maintenance_window         = "Mon:01:15-Mon:06:00"
   storage_type               = "gp2"
   rds_snapshot_name          = "laws3169-mojfin-migration-v1"
+  deletion_production        = local.application_data.accounts[local.environment].deletion_protection
 
 
   # CloudWatch Alarms
