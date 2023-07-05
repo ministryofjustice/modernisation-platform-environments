@@ -25,8 +25,8 @@ module "glue_reporting_hub_job" {
   aws_kms_key                  = local.s3_kms_arn
   additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   execution_class              = "STANDARD"
-  worker_type                  = "G.025X"
-  number_of_workers            = 13
+  worker_type                  = "G.1X"
+  number_of_workers            = 4
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
