@@ -108,3 +108,87 @@ resource "aws_ssm_maintenance_window_task" "patch_maintenance_window_task" {
     }
   }
 }
+
+
+
+# Create Maintenance Window Tasks
+
+# Maintenance Window Pre Health Check Task for Dev, UAT and Prod
+
+resource "aws_ssm_maintenance_window_task" "pre_healthcheck_maintenance_window_task" {
+  window_id        = aws_ssm_maintenance_window.patch_maintenance_window.id
+  name             = "Pre-Health-Check-Report-Instance-Patch"
+  description      = "Export Health Check Report to S3"
+  task_type        = "RUN_COMMAND"
+  task_arn         = aws_ssm_document.perform_healthcheck_s3.arn
+  priority         = local.application_data.accounts[local.environment].pre_healthcheck_Priority
+  service_role_arn = aws_iam_role.patching_role.arn
+  max_concurrency  = "100%"
+  max_errors       = 0
+
+  targets {
+    key    = "WindowTargetIds"
+    values = aws_ssm_maintenance_window_target.patch_maintenance_window_target.*.id
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+       output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
+       output_s3_key_prefix = "ssm_output/"
+       timeout_seconds  = 600
+    }
+  }
+}
+
+
+# Maintenance Window Post Health Check Task for Dev, UAT and Prod
+
+
+resource "aws_ssm_maintenance_window_task" "post_healthcheck_maintenance_window_task" {
+  window_id        = aws_ssm_maintenance_window.patch_maintenance_window.id
+  name             = "Post-Health-Check-Report-Instance-Patch"
+  description      = "Export Health Check Report to S3"
+  task_type        = "RUN_COMMAND"
+  task_arn         = aws_ssm_document.perform_healthcheck_s3.arn
+  priority         = local.application_data.accounts[local.environment].post_healthcheck_Priority
+  service_role_arn = aws_iam_role.patching_role.arn
+  max_concurrency  = "100%"
+  max_errors       = 0
+
+  targets {
+    key    = "WindowTargetIds"
+    values = aws_ssm_maintenance_window_target.patch_maintenance_window_target.*.id
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+       output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
+       output_s3_key_prefix = "ssm_output/"
+       timeout_seconds  = 600
+    }
+  }
+}
+
+
+
+# Create perform_healthcheck_S3 document
+
+resource "aws_ssm_document" "perform_healthcheck_s3" {
+  name          = "perform_health_check"
+  document_type = "Command"
+  content = jsonencode(
+  {
+    "schemaVersion" = "2.2",
+    "description" = "Execute Powershell Command",
+    "mainSteps" = [
+      {
+      "action" = "aws:runPowerShellScript",
+      "name" = "health_check_reports",
+      "inputs" = {            
+            "runCommand" = ["powershell.exe -ExecutionPolicy Bypass -file 'c:\\xfer\\scripts\\health_check.ps1'"]
+          }
+      }
+    ]
+   }
+ )
+}
