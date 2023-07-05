@@ -118,19 +118,18 @@ EOF
 ## Permission for Config
 chmod 666 $kubeconfig
 
-## Set Kube Config
-
-
-## Verify Connectivity CP K8s Cluster,
-kubectl get pods
-
 # Generate a Port forwarder script 
 sudo cat <<EOF > $nomis_portforwarder_script
 #!/bin/bash
 
+## Set Kube Config
+
 kubectl config use-context live.cloud-platform.service.justice.gov.uk           
 kubectl config set-cluster live.cloud-platform.service.justice.gov.uk        
 kubectl config current-context
+
+## Verify Connectivity CP K8s Cluster,
+kubectl get pods
 
 ## Port forward from CP to MP
 export POD=$(kubectl get pod -n $namespace -l app=$app -o jsonpath="{.items[0].metadata.name}")
