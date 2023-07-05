@@ -10,7 +10,10 @@
       "patch_maintenance_window_duration": 3,
       "maintenance_window_target_name": "development_maintenance_window_target",
       "maintenance_window_target_description": "This is the dev patch maintenance window target",
-      "maintenance_window_task_name": "DEV-Instance-Patch"
+      "maintenance_window_task_name": "DEV-Instance-Patch",
+      "pre_healthcheck_Priority": 1,
+      "post_healthcheck_Priority": 20
+      
     },
     "test": {
       "example_var": "test-data"
@@ -27,7 +30,9 @@
       "patch_maintenance_window_duration": 3,
       "maintenance_window_target_name": "uat_patch_maintenance_window_target",
       "maintenance_window_target_description": "This is the uat patch maintenance window target",
-      "maintenance_window_task_name": "UAT-Instance-Patch"
+      "maintenance_window_task_name": "UAT-Instance-Patch",
+      "pre_healthcheck_Priority": 1,
+      "post_healthcheck_Priority": 20
     },
     "production": {
       "directory_service_name": "PPUD.PROD",
@@ -47,7 +52,9 @@
       "patch_lin_maintenance_window_duration": 4,
       "maintenance_lin_window_target_name": "prod_lin_patch_maintenance_window_target",
       "maintenance_lin_window_target_description": "This is the production linux patch maintenance window target",
-      "maintenance_lin_window_task_name": "Prod-Instance-Patch"
+      "maintenance_lin_window_task_name": "Prod-Instance-Patch",
+      "pre_healthcheck_Priority": 1,
+      "post_healthcheck_Priority": 20
     }
   }
 }

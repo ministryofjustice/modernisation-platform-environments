@@ -85,3 +85,76 @@ resource "aws_s3_bucket_policy" "PPUD" {
     ]
   })
 }
+
+
+###################################
+# MoJ-Health-Check-Reports Bucket
+###################################
+
+# Create S3 Bucket for SSM Health Check Reports
+
+resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
+  bucket = "MoJ-Health-Check-Reports"
+  tags = {
+    Name = "MoJ-Health-Check-Reports"
+  }
+}
+
+
+# S3 Bucket Lifecycle Configuration for SSM Health Check Reports
+
+resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
+  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
+  rule {
+    id      = "Remove_Old_SSM_Health_Check_Reports"
+    status  = "Enabled"
+
+    filter {
+     prefix = "ssm_output/"
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+  }
+}
+
+# S3 block public access
+
+resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
+  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# S3 Bucket Access Policy for SSM Health Check Reports
+# Note I was having some issues getting this policy applied, kept receiving an access denied error
+# Also it is deliberately permissive to confirm functionality, so it needs to be locked down as per the other S3 buckets
+
+/*
+resource "aws_s3_bucket_policy" "MoJ-Health-Check-Reports" {
+  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id 
+
+policy = jsonencode(
+    {
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = "*",
+        Action = "s3:*",
+        Resource = "arn:aws:s3:::MoJ-Health-Check-Reports/*"
+      }
+    ]
+  }
+ )
+}
+*/
