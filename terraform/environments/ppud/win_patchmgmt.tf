@@ -85,7 +85,7 @@ resource "aws_ssm_maintenance_window_task" "patch_maintenance_window_task" {
   description      = "Apply patch management"
   task_type        = "RUN_COMMAND"
   task_arn         = "AWS-RunPatchBaseline" # windows_os_apps_baseline
-  priority         = 1
+  priority         = 10
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "15"
   max_errors       = "1"
@@ -99,7 +99,7 @@ resource "aws_ssm_maintenance_window_task" "patch_maintenance_window_task" {
     run_command_parameters {
       parameter {
         name   = "Operation"
-        values = ["Install"]
+        values = ["Scan"]
       }
       parameter {
         name   = "RebootOption"
@@ -185,7 +185,7 @@ resource "aws_ssm_document" "perform_healthcheck_s3" {
       "action" = "aws:runPowerShellScript",
       "name" = "health_check_reports",
       "inputs" = {            
-            "runCommand" = ["powershell.exe -ExecutionPolicy Bypass -file 'c:\\xfer\\scripts\\health_check.ps1'"]
+            "runCommand" = ["powershell.exe -ExecutionPolicy Bypass -force -file 'c:\\xfer\\scripts\\health_check.ps1'"]
           }
       }
     ]

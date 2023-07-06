@@ -6,15 +6,17 @@
       "WAM_ALB": "WAM-ALB-DEV",
       "patch_group": "dev_win_patch",
       "patch_maintenance_window_name": "dev_patch_maintenance_window",
-      "patch_maintenance_schedule_cron": "cron(0 18 ? * 4#1 *)",
+      "patch_maintenance_schedule_cron": "cron(0 14 ? * 5#1 *)",
       "patch_maintenance_window_duration": 3,
       "maintenance_window_target_name": "development_maintenance_window_target",
       "maintenance_window_target_description": "This is the dev patch maintenance window target",
       "maintenance_window_task_name": "DEV-Instance-Patch",
       "pre_healthcheck_Priority": 1,
-      "post_healthcheck_Priority": 20
-      
+      "post_healthcheck_Priority": 20,
+      "ssm_health_check_reports_s3": "moj-health-check-reports-dev"
+
     },
+
     "test": {
       "example_var": "test-data"
     },
@@ -32,7 +34,8 @@
       "maintenance_window_target_description": "This is the uat patch maintenance window target",
       "maintenance_window_task_name": "UAT-Instance-Patch",
       "pre_healthcheck_Priority": 1,
-      "post_healthcheck_Priority": 20
+      "post_healthcheck_Priority": 20,
+      "ssm_health_check_reports_s3": "moj-health-check-reports-uat"
     },
     "production": {
       "directory_service_name": "PPUD.PROD",
@@ -54,7 +57,8 @@
       "maintenance_lin_window_target_description": "This is the production linux patch maintenance window target",
       "maintenance_lin_window_task_name": "Prod-Instance-Patch",
       "pre_healthcheck_Priority": 1,
-      "post_healthcheck_Priority": 20
+      "post_healthcheck_Priority": 20,
+      "ssm_health_check_reports_s3": "moj-health-check-reports-prod"
     }
   }
 }

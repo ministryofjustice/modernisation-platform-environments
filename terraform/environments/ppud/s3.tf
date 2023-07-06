@@ -87,14 +87,14 @@ resource "aws_s3_bucket_policy" "PPUD" {
 }
 
 
-###################################
-# MoJ-Health-Check-Reports Bucket
-###################################
+#####################################
+# MoJ-Health-Check-Reports S3 Bucket
+#####################################
 
 # Create S3 Bucket for SSM Health Check Reports
 
 resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
-  bucket = "moj-health-check-reports"
+  bucket = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
   tags = {
     Name = "moj-health-check-reports"
   }
@@ -114,12 +114,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
     }
 
     noncurrent_version_transition {
-      noncurrent_days = 30
+      noncurrent_days = 183
       storage_class   = "STANDARD_IA"
     }
 
     transition {
-      days          = 30
+      days          = 183
       storage_class = "STANDARD_IA"
     }
   }
