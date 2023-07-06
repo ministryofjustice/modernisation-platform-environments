@@ -54,13 +54,40 @@ locals {
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        CMS = {
+        random = {
+          length  = 11
+          special = false
+        }
+        description = "CMS password for connection to BI Platform"
+        }
         tags = {
           description = "For testing tomcat 9 installation and connections with official RedHat RHEL8.5 image"
           os-type     = "Linux"
           component   = "test"
         }
         lb_target_groups = {
-          http-7777 = {
+          admin-connection = {
+            port                 = 7010
+            protocol             = "HTTP"
+            target_type          = "instance"
+            deregistration_delay = 30
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7777
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+          }
+          connection = {
             port                 = 7777
             protocol             = "HTTP"
             target_type          = "instance"
