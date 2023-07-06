@@ -107,7 +107,7 @@ locals {
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
           ])
-          security_groups = ["private", "private_lb"]
+          security_groups = ["private", "private_lb_internal"]
         }
         https = {
           description = "Allow HTTPS ingress"
@@ -118,7 +118,7 @@ locals {
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
           ])
-          security_groups = ["private", "private_lb"]
+          security_groups = ["private", "private_lb_internal"]
         }
       }
       egress = {
