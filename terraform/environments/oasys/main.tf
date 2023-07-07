@@ -102,7 +102,7 @@ resource "aws_lb_target_group" "private-lb-https-443" {
   port        = 443
   protocol    = "TCP"
   vpc_id      = module.environment.vpc.id
-  health_check = {
+  health_check {
     enabled             = true
     interval            = 30
     healthy_threshold   = 3
