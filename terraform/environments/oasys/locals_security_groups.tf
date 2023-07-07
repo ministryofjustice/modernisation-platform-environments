@@ -11,6 +11,7 @@ locals {
       module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
       module.ip_addresses.azure_studio_hosting_cidrs.devtest,
       module.ip_addresses.azure_nomisapi_cidrs.devtest,
+      module.ip_addresses.mp_cidr["hmpps-${local.environment}"]
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
