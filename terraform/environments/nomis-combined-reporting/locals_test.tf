@@ -67,7 +67,7 @@ locals {
           component   = "test"
         }
         lb_target_groups = {
-          admin-connection = {
+          admin = {
             port                 = 7010
             protocol             = "HTTP"
             target_type          = "instance"
