@@ -44,7 +44,8 @@ locals {
           vpc_security_group_ids = ["private"]
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
+          "/dev/sdb" = { type = "gp3", size = 100 }
+          "/dev/sds" = { type = "gp3", size = 100 }
         }
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group = {
@@ -53,13 +54,42 @@ locals {
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        ssm_parameters = {
+          CMS = {
+            random = {
+              length  = 11
+              special = false
+            }
+            description = "CMS password for connection to BI Platform"
+          }
+        }
         tags = {
-          description = "For testing tomcat 9 installation and connections with official RedHat RHEL8.5 image"
+          description = "For testing SAP tomcat installation"
           os-type     = "Linux"
           component   = "test"
         }
         lb_target_groups = {
-          http-7777 = {
+          admin = {
+            port                 = 7010
+            protocol             = "HTTP"
+            target_type          = "instance"
+            deregistration_delay = 30
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7777
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+          }
+          connection = {
             port                 = 7777
             protocol             = "HTTP"
             target_type          = "instance"
@@ -79,6 +109,47 @@ locals {
               type    = "lb_cookie"
             }
           }
+          redirect = {
+            port                 = 8443
+            protocol             = "HTTP"
+            target_type          = "instance"
+            deregistration_delay = 30
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 8443
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+          }
+          shutdown = {
+            port                 = 8005
+            protocol             = "HTTP"
+            target_type          = "instance"
+            deregistration_delay = 30
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 8005
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+          }
+          
         }
       }
 
@@ -91,7 +162,8 @@ locals {
           vpc_security_group_ids = ["private"]
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
+          "/dev/sdb" = { type = "gp3", size = 100 }
+          "/dev/sds" = { type = "gp3", size = 100 }
         }
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group = {
