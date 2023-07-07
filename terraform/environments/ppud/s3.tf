@@ -176,10 +176,10 @@ resource "aws_s3_bucket" "MoJ-Powershell-Scripts" {
 resource "aws_s3_bucket_public_access_block" "MoJ-Powershell-Scripts" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.MoJ-Powershell-Scripts[0].id
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 
@@ -190,27 +190,25 @@ resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
   
   policy = jsonencode({
 
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "AllowAccessFromAccount",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": [
-                "s3:GetObject",
-                "s3:PutObject",
-                "s3:DeleteObject"
-            ],
-            "Resource": "arn:aws:s3:::moj-powershell-scripts/*",
-            "Condition": {
-                "StringEquals": {
-                    "aws:ResourceAccount": [
-                        "075585660276",
-                        "172753231260"
-                    ]
-                }
-            }
-        }
-    ]
+  "Id": "Policy1688734640187",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1688734634654",
+      "Action": [
+        "s3:DeleteObject",
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::moj-powershell-scripts/*",
+      "Principal": {
+        "AWS": [
+          "075585660276",
+          "172753231260"
+        ]
+      }
+    }
+  ]
 })
 }
