@@ -204,9 +204,9 @@ resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
       "Resource": "arn:aws:s3:::moj-powershell-scripts/*",
       "Principal": {
         "AWS": [
-          "075585660276",
-          "172753231260"
-        ]
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:root",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:root" 
+      ]
       }
     }
   ]
