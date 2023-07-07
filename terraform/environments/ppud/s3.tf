@@ -1,7 +1,7 @@
 
-#----------------------------------------------------------
+###########################################################
 # S3 Bucket for Files copying between the PPUD Environments
-#----------------------------------------------------------
+###########################################################
 
 resource "aws_s3_bucket" "PPUD" {
   count  = local.is-production == true ? 1 : 0
@@ -87,9 +87,9 @@ resource "aws_s3_bucket_policy" "PPUD" {
 }
 
 
-#####################################
-# MoJ-Health-Check-Reports S3 Bucket
-#####################################
+###################################################
+# MoJ- Patch Manager Health-Check-Reports S3 Bucket
+###################################################
 
 # Create S3 Bucket for SSM Health Check Reports
 
@@ -158,3 +158,59 @@ policy = jsonencode(
  )
 }
 */
+
+
+####################################
+# MoJ- Powershell-Scripts S3 Bucket
+####################################
+
+resource "aws_s3_bucket" "MoJ-Powershell-Scripts" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = "moj-powershell-scripts"
+  tags = {
+    Name = "moj-powershell-scripts"
+  }
+}
+
+
+resource "aws_s3_bucket_public_access_block" "MoJ-Powershell-Scripts" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.MoJ-Powershell-Scripts[0].id
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+
+resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
+  depends_on = [aws_s3_bucket_public_access_block.MoJ-Powershell-Scripts]
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.MoJ-Powershell-Scripts[0].id
+  
+  policy = jsonencode({
+
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowAccessFromAccount",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::moj-powershell-scripts/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:ResourceAccount": [
+                        "075585660276",
+                        "172753231260"
+                    ]
+                }
+            }
+        }
+    ]
+})
+}
