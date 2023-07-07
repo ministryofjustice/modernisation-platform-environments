@@ -54,10 +54,12 @@ locals {
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        CMS = {
-        random = {
-          length  = 11
-          special = false
+        ssm_parameters = {
+          CMS = {
+          random = {
+            length  = 11
+            special = false
+          }
         }
         description = "CMS password for connection to BI Platform"
         }
