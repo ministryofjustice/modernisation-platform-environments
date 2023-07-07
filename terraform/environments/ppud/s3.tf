@@ -198,10 +198,66 @@ resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
       "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
-        "s3:PutObject"
+        "s3:PutObject",
+        "s3:ListObject"
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::moj-powershell-scripts/*",
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:root",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:root" 
+      ]
+      }
+    }
+  ]
+})
+}
+
+
+####################################
+# MoJ- Release-Management S3 Bucket
+####################################
+
+resource "aws_s3_bucket" "MoJ-Release-Management" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = "moj-release-management"
+  tags = {
+    Name = "moj-release-management"
+  }
+}
+
+
+resource "aws_s3_bucket_public_access_block" "MoJ-Release-Management" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.MoJ-Release-Management[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+
+resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
+  depends_on = [aws_s3_bucket_public_access_block.MoJ-Release-Management]
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.MoJ-Release-Management[0].id
+  
+  policy = jsonencode({
+
+  "Id": "Policy1688734640188",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1688734634655",
+      "Action": [
+        "s3:DeleteObject",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::moj-release-management/*",
       "Principal": {
         "AWS": [
           "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:root",
