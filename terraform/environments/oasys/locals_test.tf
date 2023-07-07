@@ -105,8 +105,8 @@ locals {
               type = "fixed-response"
               fixed_response = {
                 content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
+                message_body = "T2 - use t2.oasys.service.justice.gov.uk"
+                status_code  = "200"
               }
             }
             rules = {
