@@ -548,6 +548,7 @@ module "datamart" {
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
   source                       = "./modules/dms"
+  enable_replication_task      = local.enable_replication_task
   name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
   vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
   source_engine_name           = "oracle"
