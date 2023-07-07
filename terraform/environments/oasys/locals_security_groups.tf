@@ -12,7 +12,7 @@ locals {
       module.ip_addresses.azure_studio_hosting_cidrs.devtest,
       module.ip_addresses.azure_nomisapi_cidrs.devtest,
       module.ip_addresses.mp_cidr["hmpps-${local.environment}"],
-      "146.200.228.107"
+      "146.200.228.107/32"
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
