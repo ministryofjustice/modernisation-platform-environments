@@ -56,12 +56,12 @@ locals {
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         ssm_parameters = {
           CMS = {
-          random = {
-            length  = 11
-            special = false
+            random = {
+              length  = 11
+              special = false
+            }
+            description = "CMS password for connection to BI Platform"
           }
-        }
-        description = "CMS password for connection to BI Platform"
         }
         tags = {
           description = "For testing SAP tomcat installation"
