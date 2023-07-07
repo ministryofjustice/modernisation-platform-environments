@@ -62,7 +62,7 @@ locals {
         description = "CMS password for connection to BI Platform"
         }
         tags = {
-          description = "For testing tomcat 9 installation and connections with official RedHat RHEL8.5 image"
+          description = "For testing SAP tomcat installation"
           os-type     = "Linux"
           component   = "test"
         }
