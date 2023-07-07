@@ -1,5 +1,5 @@
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_prefix      = "data-platform-products-${local.environment}"
   versioning_enabled = true
@@ -97,7 +97,7 @@ data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
 }
 
 module "s3_athena_query_results_bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_name        = "athena-data-product-query-results-${data.aws_caller_identity.current.account_id}"
   versioning_enabled = false
