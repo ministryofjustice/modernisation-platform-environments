@@ -34,7 +34,7 @@ data "template_file" "table-mappings" {
 }
 
 resource "aws_dms_replication_task" "dms-replication" {
-  count                     = 1
+  count                     = var.enable_replication_task ? 1 : 0
   migration_type            = var.migration_type
   replication_instance_arn  = aws_dms_replication_instance.dms.replication_instance_arn
   replication_task_id       = "${var.project_id}-dms-task-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"

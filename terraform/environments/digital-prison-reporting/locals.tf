@@ -30,6 +30,7 @@ locals {
   enable_dpr_cloudtrail    = local.application_data.accounts[local.environment].enable_cloud_trail
   generic_lambda           = "${local.project}-generic-lambda"
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
+  enable_replication_task  = local.application_data.accounts[local.environment].enable_dms_replication_task
 
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
