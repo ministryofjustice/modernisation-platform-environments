@@ -220,3 +220,8 @@ output "redshift_master_password" {
   description = "Master Password"
   value       = aws_redshift_cluster.this[0].master_password
 }
+
+output "redshift_master_user" {
+  description = "Master User"
+  value       = aws_redshift_cluster.this[0].master_username
+}
