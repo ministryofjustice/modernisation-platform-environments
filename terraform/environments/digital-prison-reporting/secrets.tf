@@ -26,7 +26,7 @@ resource "aws_secretsmanager_secret_version" "nomis" {
 
 # Redshift Access Secrets
 resource "aws_secretsmanager_secret" "redshift" {
-  name = "dpr-redshift-sqlworkbench-${local.project}"
+  name = "dpr-redshift-sqlworkbench-secrets-${local.project}"
 
   recovery_window_in_days = 0
 
