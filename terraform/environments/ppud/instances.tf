@@ -430,16 +430,16 @@ resource "aws_key_pair" "cjms_instance" {
 
 # resource block for eip
 resource "aws_eip" "s265903rgsl400-non-cjsm" {
-  count = local.is-production == true ? 1 : 0
-  domain   = "vpc"
+  count  = local.is-production == true ? 1 : 0
+  domain = "vpc"
   tags = {
     Name = "s265903rgsl400-non-cjsm"
   }
 }
 
 resource "aws_eip" "s265903rgsl401-cjsm" {
-  count = local.is-production == true ? 1 : 0
-  domain   = "vpc"
+  count  = local.is-production == true ? 1 : 0
+  domain = "vpc"
   tags = {
     Name = "s265903rgsl401-cjsm"
   }

@@ -149,7 +149,7 @@ locals {
               type    = "lb_cookie"
             }
           }
-          
+
         }
       }
 
