@@ -28,7 +28,7 @@ resource "aws_secretsmanager_secret_version" "nomis" {
 resource "aws_secretsmanager_secret" "redshift" {
   name = "dpr-redshift-sqlworkbench-${local.project}"
 
-  recovery_windows_in_days = 0
+  recovery_window_in_days = 0
 
   tags = merge(
     local.all_tags,
