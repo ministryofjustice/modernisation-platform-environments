@@ -26,7 +26,9 @@ resource "aws_secretsmanager_secret_version" "nomis" {
 
 # Redshift Access Secrets
 resource "aws_secretsmanager_secret" "redshift" {
-    name = "dpr-redshift-sqlworkbench-${local.project}"
+  name = "dpr-redshift-sqlworkbench-${local.env}"
+
+  recovery_window_in_days = 0
 
   tags = merge(
     local.all_tags,
@@ -42,5 +44,5 @@ resource "aws_secretsmanager_secret" "redshift" {
 #Redshift secrets and placeholders
 resource "aws_secretsmanager_secret_version" "redshift" {
   secret_id     = aws_secretsmanager_secret.redshift.id
-  secret_string = jsonencode(local.redshift_secrets_placeholder)
+  secret_string = jsonencode(local.redshift_secrets)
 }
