@@ -62,7 +62,7 @@ locals {
       public = {
         load_balancer_type       = "network"
         internal_lb              = false
-        access_logs              = false
+        # access_logs              = false
         s3_versioning            = false
         enable_delete_protection = false
         existing_target_groups = {
