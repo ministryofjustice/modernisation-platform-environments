@@ -6,6 +6,7 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_put_parameter ? ["PutParameterPolicy"] : [],
     var.options.enable_oracle_secure_web ? ["S3ListAllBucketsAndGetLocationPolicy"] : [],
     var.options.iam_policies_filter,
   ])
@@ -15,6 +16,7 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_put_parameter ? ["PutParameterPolicy"] : [],
     var.options.enable_oracle_secure_web ? ["S3ListAllBucketsAndGetLocationPolicy"] : [],
     var.options.iam_policies_ec2_default,
   ])
@@ -140,6 +142,16 @@ locals {
           "arn:aws:s3:::modernisation-platform-software*/*",
           "arn:aws:s3:::modernisation-platform-software*"
         ])
+      }]
+    }
+    Ec2PutParameterPolicy = {
+      description = "Permissions to allow EC2 to put parameter"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "ssm:PutParameter",
+        ]
+        resources = ["*"]
       }]
     }
 
