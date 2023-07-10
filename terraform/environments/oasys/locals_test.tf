@@ -63,6 +63,7 @@ locals {
         load_balancer_type       = "network"
         internal_lb              = false
         # access_logs              = false
+        force_destroy_bucket     = true
         s3_versioning            = false
         enable_delete_protection = false
         existing_target_groups = {
@@ -90,7 +91,7 @@ locals {
         internal_lb = true
         #access_logs              = false
         # s3_versioning            = false
-        force_destroy_bucket     = true
+        # force_destroy_bucket     = true
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is default
