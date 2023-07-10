@@ -5,7 +5,7 @@
 
 # IAM EC2 Policy with Assume Role 
 
-/*
+
 data "aws_iam_policy_document" "ec2_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -22,8 +22,8 @@ resource "aws_iam_role" "ec2_iam_role" {
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
 }
 
-*/
 
+/*
  resource "aws_iam_role" "ec2_iam_role" {
   name = "ec2_iam_role"
 
@@ -50,6 +50,8 @@ resource "aws_iam_role" "ec2_iam_role" {
     ]
   })
 }
+
+*/
 
 # Create EC2 IAM Instance Profile
 resource "aws_iam_instance_profile" "ec2_profile" {
