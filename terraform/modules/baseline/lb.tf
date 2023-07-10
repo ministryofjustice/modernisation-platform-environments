@@ -17,7 +17,7 @@ locals {
 module "lb" {
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=s3-versioning-option"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v3.0.0"
 
   providers = {
     aws.bucket-replication = aws
@@ -32,7 +32,6 @@ module "lb" {
   load_balancer_type         = each.value.load_balancer_type
   lb_target_groups           = each.value.lb_target_groups
   access_logs                = lookup(each.value, "access_logs", true)
-  s3_versioning              = lookup(each.value, "s3_versioning", true)
 
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
