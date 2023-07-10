@@ -63,7 +63,7 @@ locals {
         load_balancer_type       = "network"
         internal_lb              = false
         # access_logs              = false
-        force_destroy_bucket     = true
+        # force_destroy_bucket     = true
         s3_versioning            = false
         enable_delete_protection = false
         existing_target_groups = {
