@@ -145,13 +145,14 @@ locals {
       }]
     }
     Ec2PutParameterPolicy = {
-      description = "Permissions to allow EC2 to put parameter"
+      description = "Permissions to allow EC2 to put parameter(s) for retrieval"
       statements = [{
         effect = "Allow"
         actions = [
           "ssm:PutParameter",
+          "ssm:PutParameters"
         ]
-        resources = ["*"]
+        resources = ["arn:aws:ssm:*:*:parameter/*"]
       }]
     }
 
