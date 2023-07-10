@@ -41,9 +41,10 @@ locals {
   read_latency_evaluation_period    = "5"
 
   # PagerDuty Integration
-  sns_topic_name                 = "${local.application_name}-${local.environment}-alerting-topic"
-  pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  pagerduty_integration_key_name = "laa_mojfin_prod_alarms"
+  sns_topic_name                          = "${local.application_name}-${local.environment}-alerting-topic"
+  pagerduty_integration_keys              = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  pagerduty_integration_prod_key_name     = "laa_mojfin_prod_alarms"
+  pagerduty_integration_non_prod_key_name = "laa_mojfin_non_prod_alarms"
 
   # DB Link Secrets
   dblink_secrets = {
