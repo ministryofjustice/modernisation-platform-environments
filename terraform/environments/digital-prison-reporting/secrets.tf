@@ -44,5 +44,5 @@ resource "aws_secretsmanager_secret" "redshift" {
 #Redshift secrets and placeholders
 resource "aws_secretsmanager_secret_version" "redshift" {
   secret_id     = aws_secretsmanager_secret.redshift.id
-  secret_string = jsonencode(local.redshift_secrets_placeholder)
+  secret_string = jsonencode(local.redshift_secrets)
 }

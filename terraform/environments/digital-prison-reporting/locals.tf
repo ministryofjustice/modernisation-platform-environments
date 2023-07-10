@@ -64,7 +64,8 @@ locals {
     port     = "1521"
   }
 
-  redshift_secrets_placeholder = {
+  # Evaluate Redshift Secrets and Populate
+  redshift_secrets = {
     dbClusterIdentifier = "dpr-redshift-${local.project}"
     engine              = "redshift"
     host                = module.datamart.cluster_endpoint
