@@ -102,6 +102,17 @@ resource "aws_lb_target_group" "private-lb-https-443" {
   port        = 443
   protocol    = "TCP"
   vpc_id      = module.environment.vpc.id
+  health_check {
+    enabled             = true
+    interval            = 30
+    healthy_threshold   = 3
+    matcher             = "200-399"
+    path                = "/"
+    protocol            = "HTTPS"
+    port                = 443
+    timeout             = 5
+    unhealthy_threshold = 5
+  }
 }
 resource "aws_lb_target_group_attachment" "test" {
   count            = local.environment == "test" ? 1 : 0

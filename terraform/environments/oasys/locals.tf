@@ -74,7 +74,7 @@ locals {
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       monitoring             = true
-      vpc_security_group_ids = ["private_web"]
+      vpc_security_group_ids = ["private_web","private_web_external"]
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
