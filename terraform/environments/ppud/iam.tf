@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "ec2_assume_role" {
     actions = ["sts:AssumeRole"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:root"]
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:root"]
    }
  }
 }
