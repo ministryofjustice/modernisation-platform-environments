@@ -184,7 +184,6 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Powershell-Scripts" {
 
 
 resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
-  depends_on = [aws_s3_bucket_public_access_block.MoJ-Powershell-Scripts]
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.MoJ-Powershell-Scripts[0].id
   
@@ -198,15 +197,14 @@ resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
       "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
-        "s3:PutObject",
-        "s3:ListObject"
+        "s3:PutObject"
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::moj-powershell-scripts/*",
       "Principal": {
         "AWS": [
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:root",
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:root" 
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2_iam_role",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2_iam_role" 
       ]
       }
     }
@@ -239,7 +237,6 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Release-Management" {
 
 
 resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
-  depends_on = [aws_s3_bucket_public_access_block.MoJ-Release-Management]
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.MoJ-Release-Management[0].id
   
@@ -253,15 +250,14 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
       "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
-        "s3:PutObject",
-        "s3:ListObject"
+        "s3:PutObject"
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::moj-release-management/*",
       "Principal": {
         "AWS": [
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:root",
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:root" 
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2_iam_role",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2_iam_role" 
       ]
       }
     }
