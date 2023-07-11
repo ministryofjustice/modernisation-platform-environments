@@ -189,11 +189,9 @@ resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
   
   policy = jsonencode({
 
-  "Id": "Policy1688734640187",
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "Stmt1688734634654",
       "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
@@ -242,12 +240,10 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
   
   policy = jsonencode({
 
-  "Id": "Policy1688734640188",
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "Stmt1688734634655",
-      "Action": [
+        "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
         "s3:PutObject"
