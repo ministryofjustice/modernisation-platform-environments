@@ -115,7 +115,7 @@ EOF
 }
 
 resource "aws_ebs_volume" "stage" {
-  count = local.is-production || local.is-preproduction ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
+  count = local.is-production || local.is-preproduction || local.is-development ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -130,7 +130,7 @@ resource "aws_ebs_volume" "stage" {
   )
 }
 resource "aws_volume_attachment" "stage_att" {
-  count = local.is-production || local.is-preproduction ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
+  count = local.is-production || local.is-preproduction || local.is-development ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
   depends_on = [
     aws_ebs_volume.stage
   ]
