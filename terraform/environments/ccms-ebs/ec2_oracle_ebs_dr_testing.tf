@@ -77,7 +77,7 @@ resource "aws_ebs_volume" "dbf_dr" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf_dr
   type              = "io2"
   iops              = local.application_data.accounts[local.environment].ebs_default_iops_test
   encrypted         = true
