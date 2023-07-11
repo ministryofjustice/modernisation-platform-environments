@@ -256,6 +256,7 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
           "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2_iam_role" 
       ]
       }
+    }
     ]
   })
 }
