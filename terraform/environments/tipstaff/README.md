@@ -27,11 +27,11 @@ Prod: <https://tipstaff.service.justice.gov.uk/>
 
 ### **Incident contact details:**
 
-dts-legacy-apps-support-team@hmcts.net
+<dts-legacy-apps-support-team@hmcts.net>
 
 ### **Service team contact:**
 
-dts-legacy-apps-support-team@hmcts.net
+<dts-legacy-apps-support-team@hmcts.net>
 
 ### **Hosting environment:**
 

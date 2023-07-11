@@ -11,8 +11,9 @@ resource "aws_instance" "s609693lo6vw109" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   tags = {
-    Name   = "s609693lo6vw109"
-    backup = true
+    Name        = "s609693lo6vw109"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -25,7 +26,9 @@ resource "aws_instance" "s609693lo6vw105" {
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name = "s609693lo6vw105"
+    Name        = "s609693lo6vw105"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -38,7 +41,9 @@ resource "aws_instance" "s609693lo6vw104" {
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name = "s609693lo6vw104"
+    Name        = "s609693lo6vw104"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -51,8 +56,9 @@ resource "aws_instance" "s609693lo6vw100" {
   vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name   = "s609693lo6vw100"
-    backup = true
+    Name        = "s609693lo6vw100"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -65,7 +71,9 @@ resource "aws_instance" "s609693lo6vw101" {
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
-    Name = "s609693lo6vw101"
+    Name        = "s609693lo6vw101"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -78,7 +86,9 @@ resource "aws_instance" "s609693lo6vw103" {
   vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
-    Name = "s609693lo6vw103"
+    Name        = "s609693lo6vw103"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -91,7 +101,9 @@ resource "aws_instance" "s609693lo6vw106" {
   vpc_security_group_ids = [aws_security_group.Dev-Box-VW106[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
-    Name = "s609693lo6vw106"
+    Name        = "s609693lo6vw106"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -104,7 +116,9 @@ resource "aws_instance" "s609693lo6vw107" {
   vpc_security_group_ids = [aws_security_group.Dev-Box-VW107[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
-    Name = "s609693lo6vw107"
+    Name        = "s609693lo6vw107"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -117,7 +131,9 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
-    Name = "PPUDWEBSERVER2"
+    Name        = "PPUDWEBSERVER2"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -130,7 +146,9 @@ resource "aws_instance" "s609693lo6vw102" {
   vpc_security_group_ids = [aws_security_group.Secondary-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
-    Name = "s609693lo6vw102"
+    Name        = "s609693lo6vw102"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -143,7 +161,9 @@ resource "aws_instance" "s609693lo6vw108" {
   vpc_security_group_ids = [aws_security_group.Dev-Box-VW108[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
-    Name = "s609693lo6vw108"
+    Name        = "s609693lo6vw108"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -162,8 +182,9 @@ resource "aws_instance" "s618358rgvw201" {
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name   = "s618358rgvw201"
-    backup = true
+    Name        = "s618358rgvw201"
+    patch_group = "uat_win_patch"
+    backup      = true
   }
 }
 
@@ -176,8 +197,9 @@ resource "aws_instance" "S618358RGVW202" {
   vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name   = "S618358RGVW202"
-    backup = true
+    Name        = "S618358RGVW202"
+    patch_group = "uat_win_patch"
+    backup      = true
   }
 }
 
@@ -190,8 +212,9 @@ resource "aws_instance" "s618358rgsw025" {
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name   = "s618358rgsw025"
-    backup = true
+    Name        = "s618358rgsw025"
+    patch_group = "uat_win_patch"
+    backup      = true
   }
 }
 
@@ -204,8 +227,9 @@ resource "aws_instance" "s618358rgvw024" {
   vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
   subnet_id              = data.aws_subnet.data_subnets_a.id
   tags = {
-    Name   = "s618358rgvw024"
-    backup = true
+    Name        = "s618358rgvw024"
+    patch_group = "uat_win_patch"
+    backup      = true
   }
 }
 
@@ -218,8 +242,9 @@ resource "aws_instance" "s618358rgvw023" {
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
-    Name   = "s618358rgvw023"
-    backup = true
+    Name        = "s618358rgvw023"
+    patch_group = "uat_win_patch"
+    backup      = true
   }
 }
 
@@ -238,6 +263,7 @@ resource "aws_instance" "s618358rgvw019" {
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
     Name          = "s618358rgvw019"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -252,6 +278,7 @@ resource "aws_instance" "s618358rgvw020" {
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
     Name          = "s618358rgvw020"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -266,6 +293,7 @@ resource "aws_instance" "s618358rgvw021" {
   subnet_id              = data.aws_subnet.data_subnets_a.id
   tags = {
     Name          = "s618358rgvw021"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -280,6 +308,7 @@ resource "aws_instance" "s618358rgvw022" {
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
     Name          = "s618358rgvw022"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -294,6 +323,7 @@ resource "aws_instance" "s618358rgvw027" {
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
     Name          = "s618358rgvw027"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -308,6 +338,7 @@ resource "aws_instance" "s618358rgvw204" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name          = "s618358rgvw204"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -322,6 +353,7 @@ resource "aws_instance" "s618358rgvw205" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name          = "s618358rgvw205"
+    patch_group   = "prod_win_patch"
     is-production = true
   }
 }
@@ -335,8 +367,9 @@ resource "aws_instance" "s618358rgsw025p" {
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name   = "s618358rgsw025"
-    backup = true
+    Name        = "s618358rgsw025"
+    patch_group = "prod_win_patch"
+    backup      = true
   }
 }
 
@@ -352,38 +385,10 @@ resource "aws_instance" "s266316rgsl200" {
   tags = {
     Name          = "s266316rgsl200"
     is-production = true
+    patch_group   = "prod_lin_patch"
   }
 }
 
-resource "aws_instance" "s265903rgsl400" {
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0f43890c2b4907c29"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_b.id
-  key_name               = aws_key_pair.cjms_instance[0].key_name
-  tags = {
-    Name          = "s265903rgsl400"
-    is-production = true
-  }
-}
-
-resource "aws_instance" "s265903rgsl401" {
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0f43890c2b4907c29"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_c.id
-  key_name               = aws_key_pair.cjms_instance[0].key_name
-  tags = {
-    Name          = "s265903rgsl401"
-    is-production = true
-  }
-}
 
 resource "aws_instance" "s265903rgsl400-non-cjsm" {
   count                  = local.is-production == true ? 1 : 0
@@ -397,6 +402,7 @@ resource "aws_instance" "s265903rgsl400-non-cjsm" {
   tags = {
     Name          = "s265903rgsl400-non-cjsm"
     is-production = true
+    patch_group   = "prod_lin_patch"
   }
 }
 
@@ -412,6 +418,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
   tags = {
     Name          = "s265903rgsl401-cjsm"
     is-production = true
+    patch_group   = "prod_lin_patch"
   }
 }
 
@@ -422,26 +429,9 @@ resource "aws_key_pair" "cjms_instance" {
 }
 
 # resource block for eip
-resource "aws_eip" "s265903rgsl400-eip" {
-  count = local.is-production == true ? 1 : 0
-  vpc   = true
-  tags = {
-    Name = "s265903rgsl400"
-  }
-}
-
-resource "aws_eip" "s265903rgsl401-eip" {
-  count = local.is-production == true ? 1 : 0
-  vpc   = true
-  tags = {
-    Name = "s265903rgsl401"
-  }
-}
-
-# resource block for eip
 resource "aws_eip" "s265903rgsl400-non-cjsm" {
   count = local.is-production == true ? 1 : 0
-  vpc   = true
+  domain   = "vpc"
   tags = {
     Name = "s265903rgsl400-non-cjsm"
   }
@@ -449,25 +439,12 @@ resource "aws_eip" "s265903rgsl400-non-cjsm" {
 
 resource "aws_eip" "s265903rgsl401-cjsm" {
   count = local.is-production == true ? 1 : 0
-  vpc   = true
+  domain   = "vpc"
   tags = {
     Name = "s265903rgsl401-cjsm"
   }
 }
 
-
-#Associate EIP with EC2 Instance
-resource "aws_eip_association" "s265903rgsl400-eip-association" {
-  count         = local.is-production == true ? 1 : 0
-  instance_id   = aws_instance.s265903rgsl400[0].id
-  allocation_id = aws_eip.s265903rgsl400-eip[0].id
-}
-
-resource "aws_eip_association" "s265903rgsl401-eip-association" {
-  count         = local.is-production == true ? 1 : 0
-  instance_id   = aws_instance.s265903rgsl401[0].id
-  allocation_id = aws_eip.s265903rgsl401-eip[0].id
-}
 
 #Associate EIP for SMTP Relay EC2 Instance
 resource "aws_eip_association" "s265903rgsl400-eip-association-non-cjsm" {
@@ -475,7 +452,6 @@ resource "aws_eip_association" "s265903rgsl400-eip-association-non-cjsm" {
   instance_id   = aws_instance.s265903rgsl400-non-cjsm[0].id
   allocation_id = aws_eip.s265903rgsl400-non-cjsm[0].id
 }
-
 
 resource "aws_eip_association" "s265903rgsl401-eip-association-cjsm" {
   count         = local.is-production == true ? 1 : 0

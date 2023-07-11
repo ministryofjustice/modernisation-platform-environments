@@ -1,5 +1,5 @@
 module "ecs" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v1.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
 
   environment = local.environment
   name        = format("%s-openldap", local.application_name)
@@ -10,7 +10,7 @@ module "ecs" {
 # Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   providers = {
     aws.bucket-replication = aws
@@ -76,6 +76,16 @@ resource "aws_security_group_rule" "ldap_nlb" {
   protocol          = "TCP"
   security_group_id = aws_security_group.ldap.id
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "allow_ldap_from_legacy_env" {
+  description       = "Allow inbound LDAP traffic from corresponding legacy VPC"
+  type              = "ingress"
+  from_port         = local.openldap_port
+  to_port           = local.openldap_port
+  protocol          = "TCP"
+  security_group_id = aws_security_group.ldap.id
+  cidr_blocks       = [local.application_data.accounts[local.environment].migration_source_vpc_cidr]
 }
 
 resource "aws_cloudwatch_log_group" "openldap" {

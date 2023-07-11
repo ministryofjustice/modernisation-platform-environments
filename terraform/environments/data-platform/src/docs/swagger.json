@@ -83,6 +83,59 @@
           }
         ]
       }
+    },
+    "/get_glue_metadata": {
+      "get": {
+        "tags": ["get_glue_metadata"],
+        "summary": "Get metadata for a specified table in a specified Glue database",
+        "description": "Returns a json object with all the metadata available for the specified database and table",
+        "operationId": "getGlueMetadata",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "database",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "table",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorizationToken",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation, response format https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/glue/client/get_table.html",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Inputs supplied"
+          },
+          "404": {
+            "description": "Glue database and/or table not found"
+          }
+        }
+      }
     }
   },
   "components": {

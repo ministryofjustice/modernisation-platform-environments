@@ -24,6 +24,11 @@ locals {
       }
     }
 
+    baseline_ssm_parameters = {
+      "preprod-nomis-web-a" = local.weblogic_ssm_parameters
+      "preprod-nomis-web-b" = local.weblogic_ssm_parameters
+    }
+
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       preprod-nomis-web-a = merge(local.weblogic_ec2_a, {
@@ -112,8 +117,8 @@ locals {
       "preproduction.nomis.service.justice.gov.uk" = {
         records = [
           { name = "ppnomis", type = "A", ttl = "300", records = ["10.40.37.132"] },
-          { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
-          { name = "ppnomis-b", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis-a", type = "A", ttl = "3600", records = ["10.40.37.132"] },
+          { name = "ppnomis-b", type = "A", ttl = "3600", records = ["10.40.37.132"] },
         ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },

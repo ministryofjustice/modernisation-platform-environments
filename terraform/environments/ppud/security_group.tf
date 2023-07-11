@@ -53,6 +53,15 @@ resource "aws_security_group_rule" "PPUD-WEB-Portal-egress-1" {
   security_group_id = aws_security_group.PPUD-WEB-Portal.id
 }
 
+resource "aws_security_group_rule" "PPUD-WEB-Portal-egress-2" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.PPUD-WEB-Portal.id
+}
+
 resource "aws_security_group" "WAM-Portal" {
   vpc_id      = data.aws_vpc.shared.id
   name        = "WAM-Portal"
@@ -94,6 +103,15 @@ resource "aws_security_group_rule" "WAM-Portal-egress-1" {
   type              = "egress"
   from_port         = 443
   to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.WAM-Portal.id
+}
+
+resource "aws_security_group_rule" "WAM-Portal-egress-2" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.WAM-Portal.id
@@ -141,6 +159,15 @@ resource "aws_security_group_rule" "WAM-Data-Access-Server-Egress-1" {
   type              = "egress"
   from_port         = 443
   to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.WAM-Data-Access-Server.id
+}
+
+resource "aws_security_group_rule" "WAM-Data-Access-Server-Egress-2" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.WAM-Data-Access-Server.id
@@ -207,6 +234,15 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress-1" {
   security_group_id = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
+resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress-2" {
+  count             = local.is-development == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.SCR-Team-Foundation-Server[0].id
+}
 
 resource "aws_security_group" "Dev-Box-VW106" {
   count       = local.is-development == true ? 1 : 0
@@ -236,6 +272,16 @@ resource "aws_security_group_rule" "Dev-Box-VW106-Egress-1" {
   type              = "egress"
   from_port         = 443
   to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.Dev-Box-VW106[0].id
+}
+
+resource "aws_security_group_rule" "Dev-Box-VW106-Egress-2" {
+  count             = local.is-development == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.Dev-Box-VW106[0].id
@@ -275,6 +321,16 @@ resource "aws_security_group_rule" "Dev-Box-VW107-Egress-1" {
   security_group_id = aws_security_group.Dev-Box-VW107[0].id
 }
 
+resource "aws_security_group_rule" "Dev-Box-VW107-Egress-2" {
+  count             = local.is-development == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.Dev-Box-VW107[0].id
+}
+
 resource "aws_security_group" "Dev-Box-VW108" {
   count       = local.is-development == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
@@ -303,6 +359,16 @@ resource "aws_security_group_rule" "Dev-Box-VW108-Egress-1" {
   type              = "egress"
   from_port         = 443
   to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.Dev-Box-VW108[0].id
+}
+
+resource "aws_security_group_rule" "Dev-Box-VW108-Egress-2" {
+  count             = local.is-development == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.Dev-Box-VW108[0].id
@@ -369,6 +435,17 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Egress-1" {
   security_group_id = aws_security_group.Primary-DOC-Server[0].id
 }
 
+resource "aws_security_group_rule" "Primary-DOC-Server-Egress-2" {
+  count             = local.is-preproduction == false ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.Primary-DOC-Server[0].id
+}
+
+
 resource "aws_security_group" "Secondary-DOC-Server" {
   count       = local.is-preproduction == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
@@ -430,6 +507,16 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Egress-1" {
   security_group_id = aws_security_group.Secondary-DOC-Server[0].id
 }
 
+resource "aws_security_group_rule" "Secondary-DOC-Server-Egress-2" {
+  count             = local.is-preproduction == false ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
+}
+
 resource "aws_security_group" "PPUD-Database-Server" {
   count       = local.is-development == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
@@ -476,6 +563,16 @@ resource "aws_security_group_rule" "PPUD-Database-Server-Egress-1" {
   type              = "egress"
   from_port         = 443
   to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.PPUD-Database-Server[0].id
+}
+
+resource "aws_security_group_rule" "PPUD-Database-Server-Egress-2" {
+  count             = local.is-development == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.PPUD-Database-Server[0].id
@@ -604,6 +701,16 @@ resource "aws_security_group_rule" "UAT-Bridge-Server-Egress-1" {
   security_group_id = aws_security_group.Bridge-Server[0].id
 }
 
+resource "aws_security_group_rule" "UAT-Bridge-Server-Egress-2" {
+  count             = local.is-development == false ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.Bridge-Server[0].id
+}
+
 resource "aws_security_group" "UAT-Document-Service" {
   count       = local.is-preproduction == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
@@ -665,6 +772,16 @@ resource "aws_security_group_rule" "UAT-Document-Service-Egress-1" {
   security_group_id = aws_security_group.UAT-Document-Service[0].id
 }
 
+resource "aws_security_group_rule" "UAT-Document-Service-Egress-2" {
+  count             = local.is-preproduction == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.UAT-Document-Service[0].id
+}
+
 resource "aws_security_group" "PPUD-PROD-Database" {
   count       = local.is-production == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
@@ -716,11 +833,21 @@ resource "aws_security_group_rule" "PPUD-Database-Egress-1" {
   security_group_id = aws_security_group.PPUD-PROD-Database[0].id
 }
 
+resource "aws_security_group_rule" "PPUD-Database-Egress-2" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.PPUD-PROD-Database[0].id
+}
+
 resource "aws_security_group" "PPUD-Mail-Server" {
   count       = local.is-production == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
-  name        = "PPUD-Mail-Server-Frontend"
-  description = "PPUD-Mail-Server-Frontend"
+  name        = "PPUD-Mail-Server"
+  description = "PPUD-Mail-Server"
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
@@ -750,6 +877,16 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-Egress" {
 resource "aws_security_group_rule" "PPUD-Mail-Server-Egress-1" {
   count             = local.is-production == true ? 1 : 0
   type              = "egress"
+  from_port         = 25
+  to_port           = 25
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.PPUD-Mail-Server[0].id
+}
+
+resource "aws_security_group_rule" "PPUD-Mail-Server-Egress-2" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = "all"
@@ -757,11 +894,21 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-Egress-1" {
   security_group_id = aws_security_group.PPUD-Mail-Server[0].id
 }
 
+resource "aws_security_group_rule" "PPUD-Mail-Server-Egress-3" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.PPUD-Mail-Server[0].id
+}
+
 resource "aws_security_group" "PPUD-Mail-Server-2" {
   count       = local.is-production == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
-  name        = "PPUD-Mail-Server-Backend"
-  description = "PPUD-Mail-Server-Backend"
+  name        = "PPUD-Relay-Server"
+  description = "PPUD-Relay-Server"
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
@@ -773,16 +920,6 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-2-Ingress" {
   type              = "ingress"
   from_port         = 25
   to_port           = 25
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
-}
-
-resource "aws_security_group_rule" "PPUD-Mail-Server-2-Ingress-1" {
-  count             = local.is-production == true ? 1 : 0
-  type              = "ingress"
-  from_port         = 587
-  to_port           = 587
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
@@ -805,5 +942,25 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-2-Egress-1" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
+}
+
+resource "aws_security_group_rule" "PPUD-Mail-Server-2-Egress-2" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "egress"
+  from_port         = 25
+  to_port           = 25
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
+}
+
+resource "aws_security_group_rule" "PPUD-Mail-Server-2-Egress-3" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
 }

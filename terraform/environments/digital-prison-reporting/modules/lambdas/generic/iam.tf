@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "lambda_assume_role" {
 data "aws_iam_policy_document" "lambda_execution" {
   statement {
     resources = [
-      "arn:aws:logs:${var.region}:${var.account}:log-group:/aws/lambda/${var.name}-function*"
+      "arn:aws:logs:eu-west-2:*:*"
     ]
 
     actions = [
@@ -40,6 +40,18 @@ data "aws_iam_policy_document" "lambda_execution" {
 
     actions = [
       "cloudwatch:PutMetricData"
+    ]
+  }
+
+  statement {
+    resources = ["*"]
+
+    actions = [
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:CreateNetworkInterface",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeInstances",
+      "ec2:AttachNetworkInterface"
     ]
   }
 

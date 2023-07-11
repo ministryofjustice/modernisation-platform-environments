@@ -8,8 +8,6 @@
       "server_port": "5000",
       "container_instance_type": "linux",
       "container_version": "development",
-      "container_cpu": "2048",
-      "container_memory": "3072",
       "task_definition_volume": "upload_volume",
       "instance_type": "t3.medium",
       "key_name": "jitbit-ec2",
@@ -43,8 +41,6 @@
       "server_port": "5000",
       "container_instance_type": "linux",
       "container_version": "development",
-      "container_cpu": "2048",
-      "container_memory": "3072",
       "task_definition_volume": "upload_volume",
       "instance_type": "t3.medium",
       "key_name": "jitbit-ec2",
@@ -69,6 +65,12 @@
       "db_deletion_protection": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "cr-jitbit-training-db-snapshot-for-testing-migration-to-mp-local"
+    },
+    "preproduction": {
+      "db_instance_class": "db.t3.xlarge"
+    },
+    "production": {
+      "db_instance_class": "db.t3.xlarge"
     }
   }
 }

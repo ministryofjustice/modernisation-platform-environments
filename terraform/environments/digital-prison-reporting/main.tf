@@ -26,7 +26,7 @@ module "glue_reporting_hub_job" {
   additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   execution_class              = "STANDARD"
   worker_type                  = "G.1X"
-  number_of_workers            = 2
+  number_of_workers            = 4
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
@@ -53,7 +53,8 @@ module "glue_reporting_hub_job" {
     "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/"
     "--enable-metrics"                          = true
-    "--enable-spark-ui"                         = false
+    "--enable-spark-ui"                         = true
+    "--enable-auto-scaling"                     = true
     "--enable-job-insights"                     = true
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
     "--dpr.contract.registryName"               = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
@@ -547,6 +548,7 @@ module "datamart" {
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
   source                       = "./modules/dms"
+  enable_replication_task      = local.enable_replication_task
   name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
   vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
   source_engine_name           = "oracle"
@@ -569,6 +571,8 @@ module "dms_nomis_ingestor" {
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
+
+  extra_attributes           = "supportResetlog=TRUE"
 
   kinesis_settings = {
     "include_null_and_empty"         = "true"

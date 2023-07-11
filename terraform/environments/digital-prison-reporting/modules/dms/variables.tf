@@ -2,6 +2,12 @@ variable "name" {
   description = "DMS Replication name."
 }
 
+variable "enable_replication_task" {
+  description = "Enable DMS Replication Task, True or False" 
+  type        = bool
+  default     = false
+}
+
 variable "project_id" {
   type        = string
   description = "(Required) Project Short ID that will be used for resources."

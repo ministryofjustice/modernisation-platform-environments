@@ -13,7 +13,7 @@ locals {
 module "ec2_autoscaling_group" {
   for_each = var.ec2_autoscaling_groups
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.0.0"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -72,7 +72,5 @@ module "ec2_autoscaling_group" {
   # ensure service linked role is created first if defined in code
   depends_on = [
     aws_iam_service_linked_role.this,
-    aws_ssm_parameter.fixed,
-    aws_ssm_parameter.placeholder,
   ]
 }

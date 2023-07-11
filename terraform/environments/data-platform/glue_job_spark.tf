@@ -12,6 +12,7 @@ resource "aws_s3_object" "object" {
   key         = "glue_script/glue_spark_transform_script.py"
   source      = "glue_script/glue_spark_transform_script.py"
   source_hash = filemd5("glue_script/glue_spark_transform_script.py")
+  acl         = "bucket-owner-full-control"
 }
 
 resource "aws_glue_job" "glue_job" {

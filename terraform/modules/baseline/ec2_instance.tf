@@ -1,7 +1,7 @@
 module "ec2_instance" {
   for_each = var.ec2_instances
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v1.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.0.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -54,9 +54,4 @@ module "ec2_instance" {
   }
 
   tags = merge(local.tags, each.value.tags)
-
-  depends_on = [
-    aws_ssm_parameter.fixed,
-    aws_ssm_parameter.placeholder,
-  ]
 }

@@ -24,6 +24,11 @@ locals {
       }
     }
 
+    baseline_ssm_parameters = {
+      "prod-nomis-web-a" = local.weblogic_ssm_parameters
+      "prod-nomis-web-b" = local.weblogic_ssm_parameters
+    }
+
     baseline_cloudwatch_log_groups = {
       session-manager-logs = {
         retention_in_days = 400
@@ -211,8 +216,8 @@ locals {
       "production.nomis.service.justice.gov.uk" = {
         records = [
           { name = "pnomis", type = "A", ttl = "300", records = ["10.40.3.132"] },
-          { name = "pnomis-a", type = "A", ttl = "300", records = ["10.40.3.132"] },
-          { name = "pnomis-b", type = "A", ttl = "300", records = ["10.40.67.132"] },
+          { name = "pnomis-a", type = "A", ttl = "3600", records = ["10.40.3.132"] },
+          { name = "pnomis-b", type = "A", ttl = "3600", records = ["10.40.67.132"] },
         ]
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },

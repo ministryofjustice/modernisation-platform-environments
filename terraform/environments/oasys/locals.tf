@@ -73,8 +73,8 @@ locals {
       availability_zone         = "${local.region}a"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      monitoring = true
-      #vpc_security_group_ids = ["private-web"]
+      monitoring             = true
+      vpc_security_group_ids = ["private_web","private_web_external"]
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
@@ -125,7 +125,7 @@ locals {
 
   database_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name          = "oasys_oracle_db_*"
+      ami_name          = "oasys_oracle_db_release_2023-06-26T10-16-03.670Z"
       ami_owner         = "self"
       availability_zone = "${local.region}a"
     })
@@ -146,7 +146,7 @@ locals {
       }
       "/dev/sde" = { # DATA01
         label = "data"
-        size  = 200
+        size  = 500
         type  = "gp3"
       }
       # "/dev/sdf" = {  # DATA02
@@ -237,7 +237,7 @@ locals {
 
   bip_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                  = "oasys_bip_release_*"
+      ami_name                  = "oasys_bip_release_2023-06-08T15-17-45.964Z"
       ssm_parameters_prefix     = "ec2-web/"
       iam_resource_names_prefix = "ec2-web"
       availability_zone         = "${local.region}a"

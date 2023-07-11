@@ -13,6 +13,9 @@ resource "aws_athena_workgroup" "data_product_athena_workgroup" {
       encryption_configuration {
         encryption_option = "SSE_S3"
       }
+      acl_configuration {
+        s3_acl_option = "BUCKET_OWNER_FULL_CONTROL"
+      }
     }
   }
 }
@@ -140,8 +143,8 @@ resource "aws_iam_role_policy_attachment" "policy_from_json" {
 resource "aws_lambda_function" "athena_load" {
   function_name                  = "data_product_athena_load_${local.environment}"
   description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
-  reserved_concurrent_executions = 10
-  image_uri                      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:0.0.1"
+  reserved_concurrent_executions = 100
+  image_uri                      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:1.0.0"
   package_type                   = "Image"
   role                           = aws_iam_role.athena_load_lambda_role.arn
   timeout                        = 600

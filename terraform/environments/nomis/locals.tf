@@ -17,6 +17,7 @@ locals {
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
     enable_oracle_secure_web                     = true
+    enable_ec2_put_parameter                     = false
     cloudwatch_metric_alarms = {
       weblogic = local.weblogic_cloudwatch_metric_alarms
       database = local.database_cloudwatch_metric_alarms
@@ -107,19 +108,19 @@ locals {
   baseline_sns_topics = {}
 
   baseline_ssm_parameters = {
-    # Add these into code once for_each issue fixed
-    #    "" = {
-    #      prefix  = ""
-    #      postfix = ""
-    #      parameters = {
-    #        cloud-watch-config-windows = {
-    #          description = "cloud watch agent config for windows"
-    #          file        = "./templates/cloud_watch_windows.json"
-    #          type = "String"
-    #        }
-    #        ec2-user_pem       = {}
-    #        github-ci-user-pat = {}
-    #      }
-    #    }
+    "" = {
+      postfix = ""
+      parameters = {
+        cloud-watch-config-windows = {
+          description = "cloud watch agent config for windows"
+          file        = "./templates/cloud_watch_windows.json"
+          type        = "String"
+        }
+
+        # Placeholders - set values outside of terraform
+        ec2-user_pem       = { description = "ec2-user ssh private key" }
+        github-ci-user-pat = { description = "for SSM docs, see ssm-documents/README.md" }
+      }
+    }
   }
 }

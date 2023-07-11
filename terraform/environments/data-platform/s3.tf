@@ -1,11 +1,11 @@
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_prefix      = "data-platform-products-${local.environment}"
   versioning_enabled = true
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
-
+  bucket_policy       = [data.aws_iam_policy_document.data_platform_product_bucket_policy_document.json]
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
@@ -58,7 +58,7 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
 }
 
 
-data "aws_iam_policy_document" "bucket_policy" {
+data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
   statement {
     sid    = "AllowPutFromCiUser"
     effect = "Allow"
@@ -79,6 +79,11 @@ data "aws_iam_policy_document" "bucket_policy" {
     actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket.bucket.arn}/*"]
 
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+
     condition {
       test     = "StringNotEquals"
       variable = "s3:x-amz-acl"
@@ -89,23 +94,10 @@ data "aws_iam_policy_document" "bucket_policy" {
     }
   }
 
-  statement {
-    sid       = "DenyNonSecureTransport"
-    effect    = "Deny"
-    actions   = ["s3:*"]
-    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-
-      values = ["false"]
-    }
-  }
 }
 
-
 module "s3_athena_query_results_bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_name        = "athena-data-product-query-results-${data.aws_caller_identity.current.account_id}"
   versioning_enabled = false
