@@ -100,10 +100,10 @@ resource "aws_iam_policy_attachment" "ec2_attach3" {
 }
 resource "aws_iam_policy_attachment" "ec2_attach4" {
   count      = local.is-production == true ? 1 : 0
-  depends_on = [aws_iam_role.patching_role]
+  depends_on = [aws_iam_policy.linux-patching]
   name       = "ec2-iam-attachment"
   roles      = [aws_iam_role.ec2_iam_role.id]
-  policy_arn = "arn:aws:iam::aws:policy/linux-patching"
+  policy_arn = "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:policy/linux-patching"
 }
 
 ########################
