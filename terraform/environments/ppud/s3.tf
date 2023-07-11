@@ -201,8 +201,8 @@ resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
       "Resource": "arn:aws:s3:::moj-powershell-scripts/*",
       "Principal": {
         "AWS": [
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2_iam_role",
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2_iam_role" 
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role" 
       ]
       }
     }
@@ -252,8 +252,8 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
       "Resource": "arn:aws:s3:::moj-release-management/*",
       "Principal": {
         "AWS": [
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2_iam_role",
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2_iam_role" 
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role" 
       ]
       }
     }
