@@ -900,7 +900,7 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-Egress-3" {
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.PPUD-Mail-Server[0].id
 }
 
