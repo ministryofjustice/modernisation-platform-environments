@@ -17,3 +17,23 @@ module "s3_audit_logging_bucket" {
     }
   )
 }
+
+# S3 Logging Bucket, DPR-504
+module "s3_transfer_artifacts_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-transfer-artifacts-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+  cloudtrail_access_policy  = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-transfer-artifacts-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR-504"
+    }
+  )
+}
