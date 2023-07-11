@@ -6,9 +6,10 @@
 /terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-apps-and-tools @ministryofjustice/data-platform-core-infra @ministryofjustice/data-tech-archs @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform @ministryofjustice/data-platform-core-infra @ministryofjustice/data-platform-labs @ministryofjustice/data-platform-security-and-auditors @ministryofjustice/data-tech-archs @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform @ministryofjustice/data-platform-core-infra @ministryofjustice/data-platform-hackathon @ministryofjustice/data-platform-labs @ministryofjustice/data-platform-security-and-auditors @ministryofjustice/data-tech-archs @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-iaps @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-jitbit @ministryofjustice/hmpps-delius-jitbit-devs @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
