@@ -20,7 +20,7 @@ locals {
           ami         = "base_ol_8_5"
           os-type     = "Linux"
           component   = "test"
-          server-type = "base-ol-8-5"
+          servser-type = "base-ol-8-5"
         }
       }
     }
