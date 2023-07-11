@@ -9,6 +9,9 @@ locals {
   # 10.172.0.0/16
   # 10.208.0.0/12
   # 172.17.0.0/16 ??
+  #
+  # Mod Platform firewall is now allowing 10.0.0.0/8 for HTTPS for
+  # production and preproduction accounts
 
   security_group_cidrs_devtest = {
     icmp = flatten([
