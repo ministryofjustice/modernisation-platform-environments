@@ -106,11 +106,11 @@ resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
 resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
   bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
   rule {
-    id      = "Remove_Old_SSM_Health_Check_Reports"
-    status  = "Enabled"
+    id     = "Remove_Old_SSM_Health_Check_Reports"
+    status = "Enabled"
 
     filter {
-     prefix = "ssm_output/"
+      prefix = "ssm_output/"
     }
 
     noncurrent_version_transition {
@@ -128,7 +128,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
 # S3 block public access
 
 resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
-  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
+  bucket                  = aws_s3_bucket.MoJ-Health-Check-Reports.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -174,8 +174,8 @@ resource "aws_s3_bucket" "MoJ-Powershell-Scripts" {
 
 
 resource "aws_s3_bucket_public_access_block" "MoJ-Powershell-Scripts" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.MoJ-Powershell-Scripts[0].id
+  count                   = local.is-production == true ? 1 : 0
+  bucket                  = aws_s3_bucket.MoJ-Powershell-Scripts[0].id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -225,8 +225,8 @@ resource "aws_s3_bucket" "MoJ-Release-Management" {
 
 
 resource "aws_s3_bucket_public_access_block" "MoJ-Release-Management" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.MoJ-Release-Management[0].id
+  count                   = local.is-production == true ? 1 : 0
+  bucket                  = aws_s3_bucket.MoJ-Release-Management[0].id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -257,6 +257,6 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
       ]
       }
     }
-  ]
-})
+    ]
+  })
 }
