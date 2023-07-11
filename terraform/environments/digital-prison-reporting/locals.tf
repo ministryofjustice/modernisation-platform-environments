@@ -64,6 +64,16 @@ locals {
     port     = "1521"
   }
 
+  # Evaluate Redshift Secrets and Populate
+  redshift_secrets = {
+    dbClusterIdentifier = "dpr-redshift-${local.project}"
+    engine              = "redshift"
+    host                = module.datamart.cluster_endpoint
+    password            = module.datamart.redshift_master_password
+    port                = "5439"
+    username            = module.datamart.redshift_master_user
+  }
+
   all_tags = merge(
     local.tags,
     {

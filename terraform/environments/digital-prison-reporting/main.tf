@@ -47,13 +47,13 @@ module "glue_reporting_hub_job" {
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
     "--dpr.aws.region"                          = local.account_region
     "--dpr.curated.s3.path"                     = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.kinesis.reader.batchDurationSeconds" = 1
+    "--dpr.kinesis.reader.batchDurationSeconds" = 60
     "--dpr.kinesis.reader.streamName"           = local.kinesis_stream_ingestor
     "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/"
     "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/"
     "--enable-metrics"                          = true
-    "--enable-spark-ui"                         = true
+    "--enable-spark-ui"                         = false
     "--enable-auto-scaling"                     = true
     "--enable-job-insights"                     = true
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
@@ -571,6 +571,8 @@ module "dms_nomis_ingestor" {
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
+
+  extra_attributes           = "supportResetlog=TRUE"
 
   kinesis_settings = {
     "include_null_and_empty"         = "true"

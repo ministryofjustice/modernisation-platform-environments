@@ -39,7 +39,7 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": false,
       "enable_domain_builder_rds": false,
-      "enable_domain_builder_agent": false,
+      "enable_domain_builder_agent": true,
       "enable_cloud_trail": true
     },
     "preproduction": {
@@ -60,7 +60,7 @@
       "enable_dms_replication_task": false,
       "enable_domain_builder_lambda": false,
       "enable_domain_builder_rds": false,
-      "enable_domain_builder_agent": false,
+      "enable_domain_builder_agent": true,
       "enable_cloud_trail": false
     },
     "production": {

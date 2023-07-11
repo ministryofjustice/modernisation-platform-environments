@@ -62,7 +62,9 @@ locals {
       public = {
         load_balancer_type       = "network"
         internal_lb              = false
-        access_logs              = false
+        access_logs              = false # NLB don't have access logs unless they have a tls listener
+        # force_destroy_bucket     = true
+        # s3_versioning            = false
         enable_delete_protection = false
         existing_target_groups = {
           "private-lb-https-443" = {
@@ -88,6 +90,8 @@ locals {
       private = {
         internal_lb = true
         #access_logs              = false
+        # s3_versioning            = false
+        force_destroy_bucket     = true
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is default
@@ -105,8 +109,8 @@ locals {
               type = "fixed-response"
               fixed_response = {
                 content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
+                message_body = "T2 - use t2.oasys.service.justice.gov.uk"
+                status_code  = "200"
               }
             }
             rules = {

@@ -1,5 +1,18 @@
 locals {
 
+  # NOTE: Following traffic also seen 
+  # 10.0.0.0/11 (10.5.14.151/32 and 10.7.44.0/24 and 10.18.40.75/32)
+  # 10.41.16.0/21
+  # 10.148.0.0/14
+  # 10.152.0.0/15
+  # 10.171.0.0/16
+  # 10.172.0.0/16
+  # 10.208.0.0/12
+  # 172.17.0.0/16 ??
+  #
+  # Mod Platform firewall is now allowing 10.0.0.0/8 for HTTPS for
+  # production and preproduction accounts
+
   security_group_cidrs_devtest = {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
