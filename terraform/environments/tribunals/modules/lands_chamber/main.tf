@@ -1,5 +1,3 @@
-#Lands Chamber Tribunal
-
 module "dms" {
   source                      = "../dms"
   replication_instance_arn    = var.replication_instance_arn
@@ -16,6 +14,30 @@ module "dms" {
   source_username             = var.source_db_user
   source_password             = var.source_db_password
  
+}
+
+############################################################################
+
+module "app_based_resources" {
+  source                      = "../../app_based_resources"
+  app_name                    = "lands"
+  ecs_cluster_name            = "lands"
+  db_address                  = var.rds_url
+  db_port                     = 1433
+  db_username                 = var.rds_user
+  db_password                 = var.rds_password
+  db_name                     = "lands"
+  support_email               = var.support_email
+  support_team                = var.support_team
+  curserver                   = var.curserver
+  client_id                   = var.client_id
+  vpc_id                      = var.vpc_id
+  moj_ip                      = var.moj_ip
+  local_tags                  = var.local_tags
+  shared_public_ids           = var.shared_public_ids
+  networking_business_unit    = var.networking_business_unit
+  tribunal_locals             = var.tribunal_locals
+
 }
 
 
