@@ -4,7 +4,7 @@
 module "remote_supervision_s3" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
-  bucket_prefix                            = "s3-bucket"
+  bucket_prefix                            = "remote-supervision"
   versioning_enabled                       = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
