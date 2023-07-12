@@ -58,7 +58,7 @@ locals {
     }
 
     baseline_lbs = {
-      # nlb = {
+      # external = {
       #   load_balancer_type       = "network"
       #   internal_lb              = false
       #   access_logs              = false # NLB don't have access logs unless they have a tls listener
@@ -66,8 +66,8 @@ locals {
       #   # s3_versioning            = false
       #   enable_delete_protection = false
       #   existing_target_groups = {
-      #     "private-lb-https-443" = {
-      #       arn = length(aws_lb_target_group.private-lb-https-443) > 0 ? aws_lb_target_group.private-lb-https-443[0].arn : ""
+      #     "internal-lb-https-443" = {
+      #       arn = length(aws_lb_target_group.internal-lb-https-443) > 0 ? aws_lb_target_group.internal-lb-https-443[0].arn : ""
       #     }
       #   }
       #   idle_timeout    = 60 # 60 is default
@@ -80,15 +80,15 @@ locals {
       #       protocol = "TCP"
       #       default_action = {
       #         type              = "forward"
-      #         target_group_name = "private-lb-https-443"
+      #         target_group_name = "internal-lb-https-443"
       #       }
       #     }
       #   }
       # }
 
-      # alb = {
+      # internal = {
       #   internal_lb = true
-      #   #access_logs              = false
+      #   access_logs              = false
       #   # s3_versioning            = false
       #   force_destroy_bucket     = true
       #   enable_delete_protection = false
@@ -143,21 +143,12 @@ locals {
       #
       "${local.application_name}.service.justice.gov.uk" = {
         lb_alias_records = [
-          # { name = "dev", type = "A", lbs_map_key = "nlb" }, # dev.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> dev, 
-          # { name = "db.dev", type = "A", lbs_map_key = "public" },  # db.dev.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+          # { name = "dev", type = "A", lbs_map_key = "external" }, # dev.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> dev, 
+          # { name = "db.dev", type = "A", lbs_map_key = "external" },  # db.dev.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
         ]
       }
-      # "t1.${local.application_name}.service.justice.gov.uk" = {
-      #   lb_alias_records = [
-      #     { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t1, 
-      #     { name = "db", type = "A", lbs_map_key = "public" },
-      #   ]
-      # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
         # lb_alias_records = [
-        #   { name = "dev.${local.application_name}", type = "A", lbs_map_key = "public" },     # dev.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-        #   { name = "web.dev.${local.application_name}", type = "A", lbs_map_key = "public" }, # web.dev.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-        #   { name = "db.dev.${local.application_name}", type = "A", lbs_map_key = "public" },
         # ]
       }
       #
@@ -171,10 +162,6 @@ locals {
           { name = "db.dev.${local.application_name}", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.dev.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T2ODL0009
         ]
         lb_alias_records = [
-          # { name = "dev.${local.application_name}", type = "A", lbs_map_key = "public" },
-          # { name = "web.dev.${local.application_name}", type = "A", lbs_map_key = "public" },
-          # { name = "t1.${local.application_name}", type = "A", lbs_map_key = "public" },
-          # { name = "web.t1.${local.application_name}", type = "A", lbs_map_key = "public" },
         ]
       }
     }
