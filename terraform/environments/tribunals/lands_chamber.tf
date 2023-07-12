@@ -127,12 +127,12 @@ resource "aws_route53_record" "lands_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.lands_application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${local.lands}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
-    name                   = aws_lb.app_lb.dns_name
-    zone_id                = aws_lb.app_lb.zone_id
+    name                   = aws_lb.lands_lb.dns_name
+    zone_id                = aws_lb.lands_lb.zone_id
     evaluate_target_health = true
   }
 }
@@ -284,7 +284,7 @@ resource "aws_ecs_service" "lands_ecs_service" {
     aws_lb_listener.lands_lb
   ]
 
-  name                              = local.application
+  name                              = local.lands
   cluster                           = aws_ecs_cluster.lands_cluster.id
   task_definition                   = aws_ecs_task_definition.lands_task_definition.arn
   launch_type                       = "FARGATE"
@@ -300,7 +300,7 @@ resource "aws_ecs_service" "lands_ecs_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.lands_target_group.arn
-    container_name   = "${local.application}-container"
+    container_name   = "${local.lands}-container"
     container_port   = 80
   }
 
@@ -310,7 +310,7 @@ resource "aws_ecs_service" "lands_ecs_service" {
 }
 
 resource "aws_iam_role" "lands_execution" {
-  name = "execution-${local.application}"
+  name = "execution-${local.lands}"
 
   assume_role_policy = <<EOF
 {
@@ -331,13 +331,13 @@ EOF
   tags = merge(
     local.tags,
     {
-      Name = "execution-${local.application}"
+      Name = "execution-${local.lands}"
     },
   )
 }
 
 resource "aws_iam_role_policy" "lands_execution" {
-  name = "execution-${local.application}"
+  name = "execution-${local.lands}"
   role = aws_iam_role.lands_execution.id
 
   policy = <<-EOF
@@ -360,7 +360,7 @@ resource "aws_iam_role_policy" "lands_execution" {
 }
 
 resource "aws_iam_role" "lands_task" {
-  name = "task-${local.application}"
+  name = "task-${local.lands}"
 
   assume_role_policy = <<EOF
 {
@@ -381,13 +381,13 @@ EOF
   tags = merge(
     local.tags,
     {
-      Name = "task-${local.application}"
+      Name = "task-${local.lands}"
     },
   )
 }
 
 resource "aws_iam_role_policy" "lands_task" {
-  name = "task-${local.application}"
+  name = "task-${local.lands}"
   role = aws_iam_role.lands_task.id
 
   policy = <<-EOF
@@ -431,7 +431,7 @@ resource "aws_security_group" "lands_ecs_service" {
 }
 
 resource "aws_ecr_repository" "lands-ecr-repo" {
-  name         = "${local.application}-ecr-repo"
+  name         = "${local.lands}-ecr-repo"
   force_delete = true
 }
 
@@ -474,7 +474,7 @@ resource "aws_security_group" "lands_lb_sc" {
 }
 
 resource "aws_lb" "lands_lb" {
-  name                       = "${local.application}-load-balancer"
+  name                       = "${local.lands}-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.lands_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
@@ -484,7 +484,7 @@ resource "aws_lb" "lands_lb" {
 }
 
 resource "aws_lb_target_group" "lands_target_group" {
-  name                 = "${local.application}-target-group"
+  name                 = "${local.lands}-target-group"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
