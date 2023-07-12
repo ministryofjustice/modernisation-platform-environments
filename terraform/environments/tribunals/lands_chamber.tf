@@ -15,67 +15,67 @@ locals {
 
 ######################## DMS #############################################
 
-module "lands_dms" {
-  source                      = "./modules/dms"
-  replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
-  replication_task_id         = "${local.lands}-migration-task"
-  #target_db_instance          = 0
-  target_endpoint_id          = "${local.lands}-target"
-  target_database_name        = local.lands_db_name
-  target_server_name          = local.lands_rds_url
-  target_username             = local.lands_rds_user
-  target_password             = local.lands_rds_password
-  source_endpoint_id          = "${local.lands}-source"
-  source_database_name        = local.lands_source_db_name
-  source_server_name          = local.lands_source_db_url
-  source_username             = local.lands_source_db_user
-  source_password             = local.lands_source_db_password
+# module "lands_dms" {
+#   source                      = "./modules/dms"
+#   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
+#   replication_task_id         = "${local.lands}-migration-task"
+#   #target_db_instance          = 0
+#   target_endpoint_id          = "${local.lands}-target"
+#   target_database_name        = local.lands_db_name
+#   target_server_name          = local.lands_rds_url
+#   target_username             = local.lands_rds_user
+#   target_password             = local.lands_rds_password
+#   source_endpoint_id          = "${local.lands}-source"
+#   source_database_name        = local.lands_source_db_name
+#   source_server_name          = local.lands_source_db_url
+#   source_username             = local.lands_source_db_user
+#   source_password             = local.lands_source_db_password
  
-}
+# }
 
 ############################################################################
 
-resource "random_password" "lands_new_password" {
-  length  = 16
-  special = false 
-}
+# resource "random_password" "lands_new_password" {
+#   length  = 16
+#   special = false 
+# }
 
-resource "null_resource" "lands_setup_db" {
+# resource "null_resource" "lands_setup_db" {
  
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
+#   provisioner "local-exec" {
+#     interpreter = ["bash", "-c"]
+#     command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
 
-    environment = {
-      DB_URL = local.lands_rds_url   
-      USER_NAME = local.lands_rds_user
-      PASSWORD = local.lands_rds_password
-      NEW_DB_NAME = local.lands_db_name
-      NEW_USER_NAME = local.lands_db_login_name
-      NEW_PASSWORD = random_password.lands_new_password.result
-      APP_FOLDER = local.lands_folder
-    }
-  }
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
+#     environment = {
+#       DB_URL = local.lands_rds_url   
+#       USER_NAME = local.lands_rds_user
+#       PASSWORD = local.lands_rds_password
+#       NEW_DB_NAME = local.lands_db_name
+#       NEW_USER_NAME = local.lands_db_login_name
+#       NEW_PASSWORD = random_password.lands_new_password.result
+#       APP_FOLDER = local.lands_folder
+#     }
+#   }
+#   triggers = {
+#     always_run = "${timestamp()}"
+#   }
+# }
 
- resource "aws_secretsmanager_secret" "lands_db_credentials" {
-  name = "${local.lands}-credentials"
-}
+#  resource "aws_secretsmanager_secret" "lands_db_credentials" {
+#   name = "${local.lands}-credentials"
+# }
 
-resource "aws_secretsmanager_secret_version" "lands_db_credentials_version" {
-  secret_id     = aws_secretsmanager_secret.lands_db_credentials.id
-  secret_string = <<EOF
-{
-  "username": "${local.lands_db_login_name}",
-  "password": "${random_password.lands_new_password.result}",  
-  "host": "${local.lands_rds_url}",  
-  "database_name": "${local.lands_db_name}"
-}
-EOF
-}
+# resource "aws_secretsmanager_secret_version" "lands_db_credentials_version" {
+#   secret_id     = aws_secretsmanager_secret.lands_db_credentials.id
+#   secret_string = <<EOF
+# {
+#   "username": "${local.lands_db_login_name}",
+#   "password": "${random_password.lands_new_password.result}",  
+#   "host": "${local.lands_rds_url}",  
+#   "database_name": "${local.lands_db_name}"
+# }
+# EOF
+# }
 
 ####################### DNS #########################################
 
