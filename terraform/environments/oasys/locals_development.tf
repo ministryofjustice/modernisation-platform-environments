@@ -141,29 +141,29 @@ locals {
       #
       # public
       #
-      "${local.application_name}.service.justice.gov.uk" = {
-        lb_alias_records = [
-          # { name = "dev", type = "A", lbs_map_key = "external" }, # dev.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> dev, 
-          # { name = "db.dev", type = "A", lbs_map_key = "external" },  # db.dev.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
-        ]
-      }
-      (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
-        # lb_alias_records = [
-        # ]
-      }
-      #
-      # internal/private
-      #
-      (module.environment.domains.internal.business_unit_environment) = { # hmpps-test.modernisation-platform.internal
-        vpc = {                                                           # this makes it a private hosted zone
-          id = module.environment.vpc.id
-        }
-        records = [
-          # { name = "db.dev.${local.application_name}", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.dev.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T2ODL0009
-        ]
-        lb_alias_records = [
-        ]
-      }
+      # "${local.application_name}.service.justice.gov.uk" = {
+      #   lb_alias_records = [
+      #     # { name = "dev", type = "A", lbs_map_key = "external" }, # dev.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> dev, 
+      #     # { name = "db.dev", type = "A", lbs_map_key = "external" },  # db.dev.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+      #   ]
+      # }
+      # (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
+      #   # lb_alias_records = [
+      #   # ]
+      # }
+      # #
+      # # internal/private
+      # #
+      # (module.environment.domains.internal.business_unit_environment) = { # hmpps-test.modernisation-platform.internal
+      #   vpc = {                                                           # this makes it a private hosted zone
+      #     id = module.environment.vpc.id
+      #   }
+      #   records = [
+      #     # { name = "db.dev.${local.application_name}", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.dev.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T2ODL0009
+      #   ]
+      #   lb_alias_records = [
+      #   ]
+      # }
     }
   }
 }
