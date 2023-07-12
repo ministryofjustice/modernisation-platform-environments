@@ -5,9 +5,6 @@
 
 # IAM EC2 Policy with Assume Role 
 
-
-
-/*
 data "aws_iam_policy_document" "ec2_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -18,8 +15,7 @@ data "aws_iam_policy_document" "ec2_assume_role" {
   }
 }
 
-*/
-
+/*
 data "aws_iam_policy_document" "ec2_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -37,6 +33,8 @@ data "aws_iam_policy_document" "ec2_assume_role" {
    }
  }
 }
+
+*/
 
 # Create EC2 IAM Role
 resource "aws_iam_role" "ec2_iam_role" {
@@ -88,27 +86,61 @@ resource "aws_iam_policy_attachment" "ec2_attach1" {
   roles      = [aws_iam_role.ec2_iam_role.id]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
+
 resource "aws_iam_policy_attachment" "ec2_attach2" {
   name       = "ec2-iam-attachment"
   roles      = [aws_iam_role.ec2_iam_role.id]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }
+
 resource "aws_iam_policy_attachment" "ec2_attach3" {
   name       = "ec2-iam-attachment"
   roles      = [aws_iam_role.ec2_iam_role.id]
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
-resource "aws_iam_policy_attachment" "ec2_attach4" {
+
+resource "aws_iam_policy_attachment" "linux-patching" {
   count      = local.is-production == true ? 1 : 0
   depends_on = [aws_iam_policy.linux-patching]
   name       = "ec2-iam-attachment"
   roles      = [aws_iam_role.ec2_iam_role.id]
-  policy_arn = "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:policy/linux-patching"
+  policy_arn = aws_iam_policy.linux-patching[0].arn
 }
 
-########################
-# IAM Role for patching
-########################
+resource "aws_iam_policy_attachment" "production-s3-access" {
+  count      = local.is-production == false ? 1 : 0
+  depends_on = [aws_iam_policy.production-s3-access]
+  name       = "dev-s3-access-attachment"
+  roles      = [aws_iam_role.ec2_iam_role.id]
+  policy_arn = aws_iam_policy.production-s3-access[0].arn
+}
+
+
+#####################################
+# IAM Policy for Prodcution S3 access
+#####################################
+
+resource "aws_iam_policy" "production-s3-access" {
+  count      = local.is-production == false ? 1 : 0
+  name        = "production-s3-access"
+  path        = "/"
+  description = "production-s3-access"
+  policy = jsonencode({
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Action": "s3:ListBucket",
+    "Effect": "Allow",
+    "Resource": [
+       "arn:aws:s3:::moj-powershell-scripts/*",
+       "arn:aws:s3:::moj-release-management/*"
+    ]
+  }]
+})
+}
+
+#################################
+# IAM Role for SSM Patch Manager
+#################################
 
 resource "aws_iam_role" "patching_role" {
   name = "maintenance_window_task_role"
@@ -142,7 +174,7 @@ resource "aws_iam_role_policy_attachment" "maintenance_window_task_policy_attach
 ###################################################
 
 resource "aws_iam_policy" "linux-patching" {
-
+  count      = local.is-production == true ? 1 : 0
   name        = "linux-patching"
   path        = "/"
   description = "linux-patching"
