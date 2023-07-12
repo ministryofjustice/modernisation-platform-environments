@@ -28,7 +28,7 @@ locals {
       #   tags = merge(local.webserver_a.tags, {
       #     oracle-db-hostname                      = "db.dev.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
       #   })
-      })
+      # })
 
       # "dev-${local.application_name}-db-b" = merge(local.database_b, {
       #   autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
