@@ -54,13 +54,28 @@ then
   echo "Falling back to: $domain_builder_url"
 fi
 
+# TODO - retrieve api-key secret so it can be passed to the launcher script
+#        see DPR-604
+domain_builder_api_key="TODO"
+
 # Generate a launcher script for the jar that starts domain-builder in interactive mode
-# and configured to use the function URL via the DOMAIN_API_URL environment variable.
+# and configured to use the function URL via the DOMAIN_API_URL environment variable
+# and the api-key passed via the DOMAIN_API_KEY environment variable.
 sudo cat <<EOF > $launcher_script_location
 #!/bin/bash
 
-DOMAIN_API_URL="$domain_builder_url" java -jar /home/ssm-user/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar -i --enable-ansi
+# If no args are specified launch interactive domain builder session otherwise
+# pass any args to the domain builder in batch mode.
+if [ $# -eq 0 ]
+then
+  args="-i --enable-ansi"
+else
+  args=$@
+fi
 
+    DOMAIN_API_URL="$domain_builder_url" \
+      DOMAIN_API_KEY="$domain_builder_api_key" \
+          java -jar /home/ssm-user/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar $args
 EOF
 
 sudo chmod 0755 $launcher_script_location
