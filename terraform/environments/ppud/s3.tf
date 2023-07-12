@@ -195,10 +195,14 @@ resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
       "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
-        "s3:PutObject"
+        "s3:PutObject",
+        "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::moj-powershell-scripts/*",
+      "Resource": [
+      "arn:aws:s3:::moj-powershell-scripts",
+      "arn:aws:s3:::moj-powershell-scripts/*"
+      ],
       "Principal": {
         "AWS": [
           "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
@@ -246,10 +250,14 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
         "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
-        "s3:PutObject"
+        "s3:PutObject",
+        "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::moj-release-management/*",
+      "Resource": [
+        "arn:aws:s3:::moj-release-management",
+        "arn:aws:s3:::moj-release-management/*"
+      ],
       "Principal": {
         "AWS": [
           "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",

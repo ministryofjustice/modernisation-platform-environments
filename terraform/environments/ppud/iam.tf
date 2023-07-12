@@ -131,7 +131,9 @@ resource "aws_iam_policy" "production-s3-access" {
     "Action": "s3:ListBucket",
     "Effect": "Allow",
     "Resource": [
+       "arn:aws:s3:::moj-powershell-scripts",
        "arn:aws:s3:::moj-powershell-scripts/*",
+       "arn:aws:s3:::moj-release-management",
        "arn:aws:s3:::moj-release-management/*"
     ]
   }]
