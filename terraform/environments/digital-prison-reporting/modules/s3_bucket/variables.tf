@@ -80,12 +80,12 @@ variable "enable_notification" {
 #}
 
 variable "bucket_notifications" {
-  type        = map(object({
-    lambda_function_arn = string
-    events = map(list(string))
-    filter_prefix = string
-    filter_suffix = string
-  }))
+  type = any
   description = "AWS S3 Bucket Notifications"
-  default     = null
+  default = {
+    lambda_function_arn = null,
+    events = [],
+    filter_prefix = null,
+    filter_suffix = null
+   }
 }
