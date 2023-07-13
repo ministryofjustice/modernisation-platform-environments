@@ -152,5 +152,4 @@ resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
       filter_suffix         = lookup(var.bucket_notifications, "filter_suffix", null)
     }
   }
-
 }
