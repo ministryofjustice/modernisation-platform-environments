@@ -116,4 +116,5 @@ variable "lambda_trigger" {
 variable "trigger_bucket_arn" {
   description = "Lambda Trigger S3 Bucket ARN"
   type        = string
+  default     = ""
 }
