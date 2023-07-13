@@ -56,12 +56,12 @@ locals {
   lambda_dbuilder_policies       = [aws_iam_policy.s3_read_access_policy.arn, ]
   enable_domain_builder_agent    = local.application_data.accounts[local.environment].enable_domain_builder_agent
   enable_dbuilder_flyway_lambda  = local.application_data.accounts[local.environment].enable_dbuilder_flyway_lambda
-  flyway_dbuilder_name           = "${local.project}-domain-builder-flyway-tool"
+  flyway_dbuilder_name           = "${local.project}-domain-builder-flyway"
   flyway_dbuilder_code_s3_bucket = module.s3_artifacts_store.bucket_id
   flyway_dbuilder_code_s3_key    = "third-party/flyway-generic/flyway-lambda-0.9.jar"
   flyway_dbuilder_handler        = "com.geekoosh.flyway.FlywayHandler"
   flyway_dbuilder_runtime        = "java11"
-  flyway_dbuilder_policies       = [aws_iam_policy.s3_read_access_policy.arn, ]
+  flyway_dbuilder_policies       = [aws_iam_policy.s3_read_access_policy.arn, "arn:aws:iam::aws:policy/AmazonRDSFullAccess", ]
   flyway_dbuilder_tracing        = "Active"
 
   nomis_secrets_placeholder = {
