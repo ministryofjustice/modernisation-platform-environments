@@ -54,7 +54,7 @@ resource "aws_db_instance" "jitbit" {
   username       = local.application_data.accounts[local.environment].db_user
   password       = aws_secretsmanager_secret_version.db_admin_password.secret_string
 
-  snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
+  snapshot_identifier = length(data.aws_ssm_parameter.iaps_snapshot_id.value) > 0 ? data.aws_ssm_parameter.iaps_snapshot_id.value : null
 
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.sqlserver-se-15.0"
