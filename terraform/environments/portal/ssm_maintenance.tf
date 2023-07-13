@@ -62,8 +62,8 @@ resource "aws_ssm_maintenance_window_task" "commands" {
     run_command_parameters {
       document_version = "$LATEST"
 
-      parameter {
-        name = "Commands"
+     parameter {
+        name = "commands"
         values = [local.script]
       }
     }
