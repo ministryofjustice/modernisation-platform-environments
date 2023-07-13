@@ -32,13 +32,13 @@ resource "aws_security_group" "postgresql_db_sc" {
     description = "MOJ Digital VPN access"
     cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
   }
-#   ingress {
-#     from_port       = 5432
-#     to_port         = 5432
-#     protocol        = "tcp"
-#     description     = "Allows ECS service to access RDS"
-#     security_groups = [aws_security_group.ecs_service.id]
-#   }
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    description     = "Allows ECS service to access RDS"
+    security_groups = [aws_security_group.ecs_service.id]
+  }
 #   ingress {
 #     from_port   = 5432
 #     to_port     = 5432
