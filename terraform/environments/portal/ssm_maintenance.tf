@@ -24,7 +24,7 @@ EOF
 
 resource "aws_ssm_maintenance_window" "window" {
   name     = "ohs1-diagnostics-log-archive-poc"
-  schedule = "cron(0 */30 * * * ? *)"
+  schedule = "cron(0 0 5 ? * * *)"
   duration = 4
   cutoff   = 1
   schedule_timezone = "Europe/London"
