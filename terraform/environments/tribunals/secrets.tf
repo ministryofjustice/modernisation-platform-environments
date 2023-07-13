@@ -1,12 +1,12 @@
 # #### This file can be used to store secrets specific to the member account ####
 
-# resource "random_password" "password" {
-#   length  = 16
-#   lower   = true
-#   upper   = true
-#   numeric = true
-#   special = false
-# }
+resource "random_password" "password" {
+  length  = 16
+  lower   = true
+  upper   = true
+  numeric = true
+  special = false
+}
 
 # resource "aws_secretsmanager_secret" "resource_rds_secret" {
 #   name = "${local.application_data.accounts[local.environment].db_identifier}-credentials"
