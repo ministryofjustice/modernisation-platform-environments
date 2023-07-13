@@ -17,7 +17,6 @@ locals {
         }
       }
       selection = {
-        not_resources = ["*vol-*"]
         selection_tags = [{
           type  = "STRINGEQUALS"
           key   = "backup-plan"
@@ -41,7 +40,6 @@ locals {
         }
       }
       selection = {
-        not_resources = ["*vol-*"]
         selection_tags = [{
           type  = "STRINGEQUALS"
           key   = "backup-plan"
