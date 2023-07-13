@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "ci_assume_role" {
 }
 
 locals {
-  iaps_rds_snapshot_arn_pattern = "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*${aws_db_instance.iaps.id}-*"
+  iaps_rds_snapshot_arn_pattern = "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*iaps-*"
 }
 
 data "aws_iam_policy_document" "snapshot_sharer" {
@@ -60,14 +60,14 @@ data "aws_iam_policy_document" "snapshot_sharer" {
 }
 
 resource "aws_iam_policy" "snapshot_sharer" {
-  count       = local.is-production ? 1 : 0
+  count       = local.is-production || local.is-preproduction ? 1 : 0
   name        = "snapshot_sharer"
   description = "Allows sharing of RDS snapshots"
   policy      = data.aws_iam_policy_document.snapshot_sharer.json
 }
 
 resource "aws_iam_role_policy_attachment" "ci_data_refresher" {
-  count      = local.is-production ? 1 : 0
+  count      = local.is-production || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.snapshot_sharer[0].arn
   role       = aws_iam_role.ci_data_refresher[0].name
 }
