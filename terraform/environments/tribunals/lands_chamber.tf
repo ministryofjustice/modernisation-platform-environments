@@ -437,7 +437,7 @@ resource "aws_ecr_repository" "lands-ecr-repo" {
 
 ####################### LOAD BALANCER #########################################
 resource "aws_security_group" "lands_lb_sc" {
-  name        = "load balancer security group"
+  name        = "${local.lands} load balancer security group"
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
