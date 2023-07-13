@@ -15,64 +15,12 @@ data "aws_iam_policy_document" "ec2_assume_role" {
   }
 }
 
-/*
-data "aws_iam_policy_document" "ec2_assume_role" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:root"]
-   }
- }
-}
-
-*/
-
 # Create EC2 IAM Role
 resource "aws_iam_role" "ec2_iam_role" {
   name               = "ec2-iam-role"
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
 }
-
-
-/*
- resource "aws_iam_role" "ec2_iam_role" {
-  name = "ec2_iam_role"
-
-  assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "AWS": [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:root"
-          ]
-        },
-        "Action": "sts:AssumeRole"
-      },
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "type": "Service"
-          "identifiers": "ec2.amazonaws.com"
-        },
-        "Action": "sts:AssumeRole"
-      }
-    ]
-  })
-}
-
-*/
 
 # Create EC2 IAM Instance Profile
 resource "aws_iam_instance_profile" "ec2_profile" {
@@ -93,24 +41,10 @@ resource "aws_iam_policy_attachment" "ec2_attach2" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }
 
-resource "aws_iam_policy_attachment" "ec2_attach3" {
-  name       = "ec2-iam-attachment"
-  roles      = [aws_iam_role.ec2_iam_role.id]
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-}
-
-resource "aws_iam_policy_attachment" "linux-patching" {
-  count      = local.is-production == true ? 1 : 0
-  depends_on = [aws_iam_policy.linux-patching]
-  name       = "ec2-iam-attachment"
-  roles      = [aws_iam_role.ec2_iam_role.id]
-  policy_arn = aws_iam_policy.linux-patching[0].arn
-}
-
 resource "aws_iam_policy_attachment" "production-s3-access" {
   count      = local.is-production == false ? 1 : 0
   depends_on = [aws_iam_policy.production-s3-access]
-  name       = "dev-s3-access-attachment"
+  name       = "Prod-s3-access-attachment"
   roles      = [aws_iam_role.ec2_iam_role.id]
   policy_arn = aws_iam_policy.production-s3-access[0].arn
 }
@@ -168,35 +102,4 @@ EOF
 resource "aws_iam_role_policy_attachment" "maintenance_window_task_policy_attachment" {
   role       = aws_iam_role.patching_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
-}
-
-
-####################################################
-# IAM Policy for Private Subnet Linux host patching
-###################################################
-
-resource "aws_iam_policy" "linux-patching" {
-  count      = local.is-production == true ? 1 : 0
-  name        = "linux-patching"
-  path        = "/"
-  description = "linux-patching"
-  policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": "s3:GetObject",
-            "Resource": [
-                "arn:aws:s3:::aws-windows-downloads-eu-west-2/*",
-                "arn:aws:s3:::amazon-ssm-eu-west-2/*",
-                "arn:aws:s3:::amazon-ssm-packages-eu-west-2/*",
-                "arn:aws:s3:::eu-west-2-birdwatcher-prod/*",
-                "arn:aws:s3:::aws-ssm-document-attachments-eu-west-2/*",
-                "arn:aws:s3:::patch-baseline-snapshot-eu-west-2/*",
-                "arn:aws:s3:::aws-ssm-eu-west-2/*",
-                "arn:aws:s3:::aws-patchmanager-macos-eu-west-2/*"
-            ]
-        }
-    ]
- })
 }

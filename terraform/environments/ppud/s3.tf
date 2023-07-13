@@ -135,30 +135,6 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
   restrict_public_buckets = true
 }
 
-# S3 Bucket Access Policy for SSM Health Check Reports
-# Note I was having some issues getting this policy applied, kept receiving an access denied error
-# Also it is deliberately permissive to confirm functionality, so it needs to be locked down as per the other S3 buckets
-
-/*
-resource "aws_s3_bucket_policy" "MoJ-Health-Check-Reports" {
-  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id 
-
-policy = jsonencode(
-    {
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = "*",
-        Action = "s3:*",
-        Resource = "arn:aws:s3:::MoJ-Health-Check-Reports/*"
-      }
-    ]
-  }
- )
-}
-*/
-
 
 ####################################
 # MoJ- Powershell-Scripts S3 Bucket
@@ -227,6 +203,24 @@ resource "aws_s3_bucket" "MoJ-Release-Management" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Release-Management" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.MoJ-Release-Management[0].id
+  rule {
+    id     = "Remove_Old_MoJ-Release-Management"
+    status = "Enabled"
+
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+  }
+}
 
 resource "aws_s3_bucket_public_access_block" "MoJ-Release-Management" {
   count                   = local.is-production == true ? 1 : 0
