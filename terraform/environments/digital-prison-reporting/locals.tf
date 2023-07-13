@@ -61,7 +61,7 @@ locals {
   flyway_dbuilder_code_s3_key    = "third-party/flyway-generic/flyway-lambda-0.9.jar"
   flyway_dbuilder_handler        = "com.geekoosh.flyway.FlywayHandler"
   flyway_dbuilder_runtime        = "java11"
-  flyway_dbuilder_policies       = [aws_iam_policy.s3_read_access_policy.arn, "arn:aws:iam::aws:policy/AmazonRDSFullAccess", ]
+  flyway_dbuilder_policies       = [aws_iam_policy.s3_read_access_policy.arn, data.aws_iam_policy.rds_full_access.arn, ]
   flyway_dbuilder_tracing        = "Active"
 
   nomis_secrets_placeholder = {

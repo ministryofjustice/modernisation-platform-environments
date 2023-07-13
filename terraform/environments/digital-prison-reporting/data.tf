@@ -15,3 +15,8 @@ data "aws_secretsmanager_secret_version" "nomis" {
 
   depends_on = [aws_secretsmanager_secret.nomis]
 }
+
+# AWS _IAM_ Policy
+data "aws_iam_policy" "rds_full_access" {
+  arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+}

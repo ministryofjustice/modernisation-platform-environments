@@ -316,6 +316,3 @@ resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
   role       = aws_iam_role.redshift-spectrum-role.name
   policy_arn = each.value
 }
-
-
-AmazonRDSFullAccess
