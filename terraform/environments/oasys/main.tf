@@ -125,7 +125,7 @@ resource "aws_lb_target_group_attachment" "test" {
 resource "aws_lb_target_group" "public2-t2-oasys-web-a-http-8080" { 
   count       = local.environment == "test" ? 1 : 0
   name        = "public2-t2-oasys-web-a-http-8080"
-  target_type = "alb"
+  target_type = "instance"
   port        = 8080
   protocol    = "HTTP"
   vpc_id      = module.environment.vpc.id
