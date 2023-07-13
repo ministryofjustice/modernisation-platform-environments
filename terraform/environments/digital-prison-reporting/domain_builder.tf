@@ -96,6 +96,8 @@ module "domain_builder_cli_agent" {
       Resource_Type = "EC2 Instance"
     }
   )
+
+  depends_on = [aws_iam_policy.apigateway_get]
 }
 
 # Domain Builder Flyway Lambda 
