@@ -244,7 +244,8 @@ locals {
           protocol        = "tcp"
           security_groups = ["private_lb_internal"]
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
+            # local.security_group_cidrs.https_internal,
+            "0.0.0.0/0",
           ])
         }
         http8080 = {
@@ -254,7 +255,8 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
+            # local.security_group_cidrs.https_internal,
+            "0.0.0.0/0",
           ])
           security_groups = ["private_lb_internal"]
         }
@@ -265,7 +267,8 @@ locals {
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
+            # local.security_group_cidrs.https_internal,
+            "0.0.0.0/0",
           ])
           security_groups = ["private_lb_internal"]
         }
@@ -297,17 +300,19 @@ locals {
           to_port     = 80
           protocol    = "tcp"
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_external,
+            "0.0.0.0/0",
+            # local.security_group_cidrs.https_external,
           ])
         }
         http8080 = {
           description = "Allow http8080 ingress"
-          from_port   = 0
+          from_port   = 8080
           to_port     = 8080
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_external,
+            "0.0.0.0/0",
+            # local.security_group_cidrs.https_external,
           ])
         }
         https = {
@@ -316,7 +321,8 @@ locals {
           to_port     = 443
           protocol    = "tcp"
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_external,
+            "0.0.0.0/0",
+            # local.security_group_cidrs.https_external,
           ])
         }
       }
