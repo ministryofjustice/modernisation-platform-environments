@@ -34,17 +34,6 @@ resource "aws_db_subnet_group" "jitbit" {
   tags = local.tags
 }
 
-resource "aws_ssm_parameter" "iaps_snapshot_id" {
-  name        = "/iaps/snapshot_id"
-  description = "The parameter description"
-  type        = "SecureString"
-  value       = ""
-
-  tags = {
-    environment = "production"
-  }
-}
-
 resource "aws_db_instance" "jitbit" {
   engine         = "sqlserver-se"
   license_model  = "license-included"
