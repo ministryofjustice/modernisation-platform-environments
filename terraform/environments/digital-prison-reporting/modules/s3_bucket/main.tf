@@ -140,7 +140,7 @@ POLICY
 
 # S3 bucket lambda trigger
 resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
-  count = var.enable_notification ? 1 : 0  
+  count = var.create_s3 && var.enable_notification ? 1 : 0  
   bucket = aws_s3_bucket.storage[0].id
 
   dynamic "lambda_function" {

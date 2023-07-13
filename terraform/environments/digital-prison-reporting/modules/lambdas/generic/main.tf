@@ -41,7 +41,7 @@ resource "aws_lambda_function" "this" {
 }
 
 resource "aws_lambda_permission" "this" {
-  count         = var.lambda_trigger ? 1 : 0
+  count         = var.enable_lambda && var.lambda_trigger ? 1 : 0
   statement_id  = "AllowS3Invoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.this[0].function_name
