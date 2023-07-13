@@ -14,7 +14,7 @@ cd $LHOME
 #find . -name "*.log*" -mtime +90 -exec ls -1t {} \; |while read FILE
 find . -type f \( -name "*.log" -o -name "*_log*" -o -name "oblog.log.*" \) -mtime +90 -exec ls -1t {} \; |while read FILE
 do
-  aws s3 cp $FILE s3://laa-portal-development-archive-mp/ohs1//$FOL/
+  aws s3 cp $FILE s3://laa-portal-development-archive-mp/ohs1/$FOL/
   rm $FILE
 done
 
