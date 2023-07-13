@@ -1,7 +1,7 @@
 
 locals {
- script= <<EOF
-  #!/bin/bash
+  scripts = <<EOF
+#!/bin/bash
 . $HOME/.bash_profile
 FOL=`date +%d%m%y`
 LHOME=/IDAM/product/runtime/Domain/mserver/instances/ohs1/diagnostics/logs/OHS/ohs1
@@ -19,6 +19,7 @@ do
 done
 
 EOF
+
 }
 
 resource "aws_ssm_maintenance_window" "window" {
