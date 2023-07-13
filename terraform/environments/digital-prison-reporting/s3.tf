@@ -18,7 +18,7 @@ module "s3_audit_logging_bucket" {
   )
 }
 
-# S3 Logging Bucket, DPR-504
+# S3 Transfer Bucket, DPR-504
 module "s3_transfer_artifacts_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets

@@ -107,3 +107,8 @@ variable "vpc_settings" {
   description = "Configuration block for VPC settings"
   default     = null
 }
+
+variable "trigger_bucket_arn" {
+  description = "Lambda Trigger S3 Bucket ARN"
+  type        = string
+}

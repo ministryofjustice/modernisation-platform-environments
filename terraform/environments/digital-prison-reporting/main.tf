@@ -369,6 +369,14 @@ module "s3_artifacts_store" {
   name           = "${local.project}-artifact-store-${local.environment}"
   custom_kms_key = local.s3_kms_arn
 
+  # Dynamic, supports multiple notifications blocks
+  bucket_notifications = {
+    lambda_function_arn   = module.domain_builder_flyway_Lambda.lambda_function
+    events                = ["s3:ObjectCreated:*"]
+    filter_prefix         = "build-artifacts/domain-builder/jars/"
+    filter_suffix         = ".jar"
+  }
+
   tags = merge(
     local.all_tags,
     {
