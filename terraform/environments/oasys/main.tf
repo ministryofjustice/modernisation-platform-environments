@@ -87,10 +87,6 @@ module "baseline" {
   security_groups        = local.baseline_security_groups
 }
 
-# data "aws_lb_target_group" "private_lb" {
-#   count = local.environment == "test" ? 1 : 0
-#   name  = "private-lb-https-443"
-# }
 data "aws_lb" "private" {
   count = local.environment == "test" ? 1 : 0
   name  = "private-lb"
