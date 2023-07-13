@@ -9,6 +9,7 @@ variable "ip_addresses" {
 variable "options" {
   description = "Map of options controlling what resources to return"
   type = object({
+    backup_plans          = optional(list(string), [])
     cloudwatch_log_groups = optional(list(string))
     cloudwatch_metric_alarms = optional(map(map(object({
       comparison_operator = string
