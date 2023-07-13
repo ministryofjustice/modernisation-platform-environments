@@ -67,119 +67,75 @@ locals {
         # s3_versioning            = false
         enable_delete_protection = false
         existing_target_groups = {
-          "private-lb-https-443" = {
-            arn = length(aws_lb_target_group.private-lb-https-443) > 0 ? aws_lb_target_group.private-lb-https-443[0].arn : ""
-          }
+          # "private-lb-https-443" = {
+          #   arn = length(aws_lb_target_group.private-lb-https-443) > 0 ? aws_lb_target_group.private-lb-https-443[0].arn : ""
+          # }
         }
         idle_timeout    = 60 # 60 is default
         security_groups = [] # no security groups for network load balancers
         public_subnets  = module.environment.subnets["public"].ids
         tags            = local.tags
         listeners = {
-          https = {
-            port     = 443
-            protocol = "TCP"
-            default_action = {
-              type              = "forward"
-              target_group_name = "private-lb-https-443"
-            }
-          }
+          # https = {
+          #   port     = 443
+          #   protocol = "TCP"
+          #   default_action = {
+          #     type              = "forward"
+          #     target_group_name = "private-lb-https-443"
+          #   }
+          # }
         }
       }
 
-      # public = {
-      #   load_balancer_type       = "network"
-      #   internal_lb              = false
-      #   access_logs              = false # NLB don't have access logs unless they have a tls listener
-      #   # force_destroy_bucket     = true
+      # internal = {
+      #   internal_lb = true
+      #   access_logs              = false
       #   # s3_versioning            = false
-      #   enable_cross_zone_load_balancing = true
+      #   force_destroy_bucket     = true
       #   enable_delete_protection = false
-      #   existing_target_groups = {
-      #     "private-lb-https-443" = {
-      #       arn = length(aws_lb_target_group.private-lb-https-443) > 0 ? aws_lb_target_group.private-lb-https-443[0].arn : ""
-      #     }
-      #   }
-      #   idle_timeout    = 60 # 60 is default
-      #   security_groups = [] # no security groups for network load balancers
-      #   public_subnets  = module.environment.subnets["private"].ids
-      #   tags            = local.tags
+      #   existing_target_groups   = {}
+      #   idle_timeout             = 60 # 60 is default
+      #   security_groups          = ["private_lb_internal", "private_lb_external"]
+      #   public_subnets           = module.environment.subnets["public"].ids
+      #   tags                     = local.tags
+
       #   listeners = {
       #     https = {
-      #       port     = 443
-      #       protocol = "TCP"
+      #       port                      = 443
+      #       protocol                  = "HTTPS"
+      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
+      #       certificate_names_or_arns = ["t2_${local.application_name}_cert"]
       #       default_action = {
-      #         type              = "forward"
-      #         target_group_name = "private-lb-https-443"
+      #         type = "fixed-response"
+      #         fixed_response = {
+      #           content_type = "text/plain"
+      #           message_body = "T2 - use t2.oasys.service.justice.gov.uk"
+      #           status_code  = "200"
+      #         }
+      #       }
+      #       rules = {
+      #         t2-web-http-8080 = {
+      #           priority = 100
+      #           actions = [{
+      #             type              = "forward"
+      #             target_group_name = "t2-${local.application_name}-web-a-http-8080"
+      #           }]
+      #           conditions = [
+      #             {
+      #               host_header = {
+      #                 values = [
+      #                   "t2.oasys.service.justice.gov.uk",
+      #                   "*.t2.oasys.service.justice.gov.uk",
+      #                   "t2-oasys.hmpp-azdt.justice.gov.uk",
+      #                 ]
+      #               }
+      #             }
+      #           ]
+      #         }
       #       }
       #     }
       #   }
       # }
-
-      private = {
-        internal_lb = true
-        #access_logs              = false
-        # s3_versioning            = false
-        force_destroy_bucket     = true
-        enable_delete_protection = false
-        existing_target_groups   = {}
-        idle_timeout             = 60 # 60 is default
-        security_groups          = ["private_lb_internal", "private_lb_external"]
-        public_subnets           = module.environment.subnets["private"].ids
-        tags                     = local.tags
-
-        listeners = {
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["t2_${local.application_name}_cert"]
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "T2 - use t2.oasys.service.justice.gov.uk"
-                status_code  = "200"
-              }
-            }
-            rules = {
-              t2-web-http-8080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-${local.application_name}-web-a-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = [
-                        "t2.oasys.service.justice.gov.uk",
-                        "*.t2.oasys.service.justice.gov.uk",
-                        "t2-oasys.hmpp-azdt.justice.gov.uk",
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
-        # lb_target_groups = {
-        #   https-443 = {
-        #     port = 443
-        #     health_check = {
-        #       enabled             = true
-        #       interval            = 30
-        #       healthy_threshold   = 3
-        #       matcher             = "200-399"
-        #       path                = "/"
-        #       port                = 443
-        #       timeout             = 5
-        #       unhealthy_threshold = 5
-        #     }
-        #   }
-        # }
-      }
     }
 
 
