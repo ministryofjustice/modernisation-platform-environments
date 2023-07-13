@@ -87,17 +87,17 @@ module "baseline" {
   security_groups        = local.baseline_security_groups
 }
 
-# data "aws_lb_target_group" "private_lb" {
+# data "aws_lb_target_group" "internal_lb" {
 #   count = local.environment == "test" ? 1 : 0
-#   name  = "private-lb-https-443"
+#   name  = "internal-lb-https-443"
 # }
-# data "aws_lb" "private" {
+# data "aws_lb" "internal" {
 #   count = local.environment == "test" ? 1 : 0
-#   name  = "private-lb"
+#   name  = "internal-lb"
 # }
-# resource "aws_lb_target_group" "private-lb-https-443" {
+# resource "aws_lb_target_group" "internal-lb-https-443" {
 #   count       = local.environment == "test" ? 1 : 0
-#   name        = "private-lb-https-443"
+#   name        = "internal-lb-https-443"
 #   target_type = "alb"
 #   port        = 443
 #   protocol    = "TCP"
@@ -116,7 +116,7 @@ module "baseline" {
 # }
 # resource "aws_lb_target_group_attachment" "test" {
 #   count            = local.environment == "test" ? 1 : 0
-#   target_group_arn = aws_lb_target_group.private-lb-https-443[0].arn
-#   target_id        = data.aws_lb.private[0].arn
+#   target_group_arn = aws_lb_target_group.internal-lb-https-443[0].arn
+#   target_id        = data.aws_lb.internal[0].arn
 #   port             = 443
 # }
