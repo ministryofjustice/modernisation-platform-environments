@@ -76,14 +76,20 @@ locals {
         public_subnets  = module.environment.subnets["public"].ids
         tags            = local.tags
         listeners = {
-          # https = {
-          #   port     = 443
-          #   protocol = "TCP"
-          #   default_action = {
-          #     type              = "forward"
-          #     target_group_name = "private-lb-https-443"
-          #   }
-          # }
+          https = {
+            port     = 443
+            protocol = "TCP"
+            default_action = {
+              # type              = "forward"
+              # target_group_name = "private-lb-https-443"
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "temp"
+                status_code  = "200"
+              }
+            }
+          }
         }
       }
 
