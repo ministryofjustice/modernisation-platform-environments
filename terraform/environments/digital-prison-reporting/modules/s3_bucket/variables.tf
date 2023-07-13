@@ -82,7 +82,7 @@ variable "enable_notification" {
 variable "bucket_notifications" {
   type        = map(object({
     lambda_function_arn = string
-    events = list(map(string))
+    events = map(list(string))
     filter_prefix = string
     filter_suffix = string
   }))
