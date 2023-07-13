@@ -1,8 +1,8 @@
 data "aws_iam_policy_document" "airflow_user" {
   statement {
-    sid = "AllowAirflowCreateWebLoginToken"
-    effect = "Allow"
-    actions = ["airflow:CreateWebLoginToken"],
+    sid       = "AllowAirflowCreateWebLoginToken"
+    effect    = "Allow"
+    actions   = ["airflow:CreateWebLoginToken"]
     resources = ["arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:role/${local.airflow_name}/User"]
   }
 }
