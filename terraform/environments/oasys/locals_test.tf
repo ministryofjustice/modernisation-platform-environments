@@ -86,6 +86,56 @@ locals {
           }
         }
       }
+      # this routes directly to the webservers
+      public2 = { # this is a temporary workaround - we really want public and private load balancers working, but while investigating, get public2 and private2 up
+        internal_lb = false
+        access_logs              = false
+        # s3_versioning            = false
+        force_destroy_bucket     = true
+        enable_delete_protection = false
+        existing_target_groups   = {}
+        idle_timeout             = 60 # 60 is default
+        security_groups          = ["private_lb_internal", "private_lb_external"]
+        public_subnets           = module.environment.subnets["public"].ids
+        tags                     = local.tags
+
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["t2_${local.application_name}_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "T2 - use t2.oasys.service.justice.gov.uk"
+                status_code  = "200"
+              }
+            }
+            rules = {
+              # t2-web-http-8080 = {
+              #   priority = 100
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "t2-${local.application_name}-web-a-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "t2.oasys.service.justice.gov.uk",
+              #           "*.t2.oasys.service.justice.gov.uk",
+              #           "t2-oasys.hmpp-azdt.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
+            }
+          }
+        }
+      }
 
       private = {
         internal_lb = true
@@ -132,6 +182,55 @@ locals {
               #     }
               #   ]
               # }
+            }
+          }
+        }
+      }
+      private2 = { # this is a temporary workaround - we really want public and private load balancers working, but while investigating, get public2 and private2 up
+        internal_lb = true
+        access_logs              = false
+        # s3_versioning            = false
+        force_destroy_bucket     = true
+        enable_delete_protection = false
+        existing_target_groups   = {}
+        idle_timeout             = 60 # 60 is default
+        security_groups          = ["private_lb_internal", "private_lb_external"]
+        public_subnets           = module.environment.subnets["private"].ids
+        tags                     = local.tags
+
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["t2_${local.application_name}_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "T2 - use t2.oasys.service.justice.gov.uk"
+                status_code  = "200"
+              }
+            }
+            rules = {
+              t2-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-${local.application_name}-web-a-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2.oasys.service.justice.gov.uk",
+                        "*.t2.oasys.service.justice.gov.uk",
+                        "t2-oasys.hmpp-azdt.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         }
