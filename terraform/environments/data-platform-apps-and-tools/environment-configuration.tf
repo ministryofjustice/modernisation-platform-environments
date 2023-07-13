@@ -1,4 +1,5 @@
 locals {
+  airflow_name                 = "${local.application_name}-${local.environment}"
   airflow_dag_s3_path          = "dags/"
   airflow_requirements_s3_path = "requirements.txt"
 
