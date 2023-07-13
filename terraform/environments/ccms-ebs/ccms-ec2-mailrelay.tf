@@ -1,4 +1,4 @@
-#  Build EC2 
+# Build EC2 
 resource "aws_instance" "ec2_mailrelay" {
   instance_type          = local.application_data.accounts[local.environment].ec2_instance_type_mailrelay
   ami                    = local.application_data.accounts[local.environment].mailrelay_ami_id
@@ -81,7 +81,6 @@ resource "aws_security_group_rule" "egress_traffic_mailrelay" {
   //  source_security_group_id = aws_security_group.ec2_sg_mailrelay.id
 }
 
-
 module "cw-mailrelay-ec2" {
   source = "./modules/cw-ec2"
 
@@ -116,10 +115,7 @@ module "cw-mailrelay-ec2" {
   syshc_eval_periods = local.application_data.cloudwatch_ec2.syshc.eval_periods
   syshc_period       = local.application_data.cloudwatch_ec2.syshc.period
   syshc_threshold    = local.application_data.cloudwatch_ec2.syshc.threshold
-
 }
-
-
 
 # This should be added only after the initial cutover is done - so EBS will not
 # start send messages without an explicit configuration in its /etc/hosts

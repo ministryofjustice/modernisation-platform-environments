@@ -124,6 +124,7 @@ resource "aws_iam_policy" "cw_logging_policy" {
     }
   )
 }
+
 resource "aws_iam_role_policy_attachment" "cw_logging_policy" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.cw_logging_policy.arn
@@ -171,6 +172,7 @@ resource "aws_iam_policy" "rman_to_s3" {
     }
   )
 }
+
 resource "aws_iam_role_policy_attachment" "rman_to_s3_policy" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.rman_to_s3.arn

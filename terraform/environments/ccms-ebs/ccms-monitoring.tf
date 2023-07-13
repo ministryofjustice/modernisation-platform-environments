@@ -16,6 +16,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_alb" {
     ResourceArn = aws_lb.ebsapps_lb.arn
   }
 }
+
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_nlb" {
   alarm_name          = "DDoSDetectedEBSNLB"
   comparison_operator = "GreaterThanThreshold"
@@ -49,6 +50,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_webgate_alb" {
     ResourceArn = aws_lb.webgate_public_lb.arn
   }
 }
+
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_webgate_nlb" {
   alarm_name          = "DDoSDetectedWebGateNLB"
   comparison_operator = "GreaterThanThreshold"

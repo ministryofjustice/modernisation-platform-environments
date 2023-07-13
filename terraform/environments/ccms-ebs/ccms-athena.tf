@@ -54,7 +54,6 @@ resource "aws_athena_named_query" "http_requests_ebsapp" {
   )
 }
 
-
 resource "aws_athena_named_query" "main_table_wgate" {
   name      = lower(format("%s-%s-create-table", local.application_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id

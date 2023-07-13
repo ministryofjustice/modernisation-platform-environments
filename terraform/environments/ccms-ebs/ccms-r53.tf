@@ -14,7 +14,6 @@ resource "aws_route53_record" "external" {
 }
 
 # Prod LB EBS Apps DNS
-
 resource "aws_route53_record" "prod_ebsapp_lb" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
@@ -39,7 +38,6 @@ resource "aws_route53_record" "ebslb_cname" {
   records = [aws_route53_record.external.fqdn]
 }
 
-
 ## EBSDB
 resource "aws_route53_record" "ebsdb" {
   provider = aws.core-vpc
@@ -50,7 +48,6 @@ resource "aws_route53_record" "ebsdb" {
   ttl     = 300
   records = [aws_instance.ec2_oracle_ebs.private_ip]
 }
-
 
 ## PROD EBSDB
 resource "aws_route53_record" "prod_ebsdb" {
@@ -123,7 +120,6 @@ resource "aws_route53_record" "ebswgate" {
     evaluate_target_health = false
   }
 }
-
 
 ## PROD EBSWEBGATE
 resource "aws_route53_record" "prod_ebswgate" {
@@ -244,7 +240,6 @@ resource "aws_route53_record" "accessgate_ec2_single" {
   records = [aws_route53_record.ebsagate[count.index].fqdn]
 }*/
 
-
 ## ClamAV
 resource "aws_route53_record" "clamav" {
 
@@ -255,7 +250,6 @@ resource "aws_route53_record" "clamav" {
   ttl      = 300
   records  = [aws_instance.ec2_clamav.private_ip]
 }
-
 
 ## PROD ClamAV
 resource "aws_route53_record" "prod_clamav" {

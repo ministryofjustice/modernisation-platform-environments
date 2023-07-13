@@ -1,4 +1,4 @@
-#  Build EC2 
+# Build EC2 
 resource "aws_instance" "ec2_oracle_ebs" {
   instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
   #ami                         = data.aws_ami.oracle_db.id
@@ -104,11 +104,13 @@ resource "aws_ebs_volume" "export_home" {
     { Name = "export/home" }
   )
 }
+
 resource "aws_volume_attachment" "export_home_att" {
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.export_home.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
 resource "aws_ebs_volume" "u01" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -123,11 +125,13 @@ resource "aws_ebs_volume" "u01" {
     { Name = "u01" }
   )
 }
+
 resource "aws_volume_attachment" "u01_att" {
   device_name = "/dev/sdi"
   volume_id   = aws_ebs_volume.u01.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
 resource "aws_ebs_volume" "arch" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -142,11 +146,13 @@ resource "aws_ebs_volume" "arch" {
     { Name = "arch" }
   )
 }
+
 resource "aws_volume_attachment" "arch_att" {
   device_name = "/dev/sdj"
   volume_id   = aws_ebs_volume.arch.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
 resource "aws_ebs_volume" "dbf" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -161,11 +167,13 @@ resource "aws_ebs_volume" "dbf" {
     { Name = "dbf" }
   )
 }
+
 resource "aws_volume_attachment" "dbf_att" {
   device_name = "/dev/sdk"
   volume_id   = aws_ebs_volume.dbf.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
 resource "aws_ebs_volume" "redoA" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -180,11 +188,13 @@ resource "aws_ebs_volume" "redoA" {
     { Name = "redoA" }
   )
 }
+
 resource "aws_volume_attachment" "redoA_att" {
   device_name = "/dev/sdl"
   volume_id   = aws_ebs_volume.redoA.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
 resource "aws_ebs_volume" "techst" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -199,11 +209,13 @@ resource "aws_ebs_volume" "techst" {
     { Name = "techst" }
   )
 }
+
 resource "aws_volume_attachment" "techst_att" {
   device_name = "/dev/sdm"
   volume_id   = aws_ebs_volume.techst.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
 resource "aws_ebs_volume" "backup" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -218,11 +230,13 @@ resource "aws_ebs_volume" "backup" {
     { Name = "backup" }
   )
 }
+
 resource "aws_volume_attachment" "backup_att" {
   device_name = "/dev/sdn"
   volume_id   = aws_ebs_volume.backup.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
 resource "aws_ebs_volume" "redoB" {
   count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   lifecycle {
@@ -238,6 +252,7 @@ resource "aws_ebs_volume" "redoB" {
     { Name = "redoB" }
   )
 }
+
 resource "aws_volume_attachment" "redoB_att" {
   count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   depends_on = [
@@ -247,6 +262,7 @@ resource "aws_volume_attachment" "redoB_att" {
   volume_id   = aws_ebs_volume.redoB[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
 resource "aws_ebs_volume" "diag" {
   count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   lifecycle {
@@ -262,6 +278,7 @@ resource "aws_ebs_volume" "diag" {
     { Name = "diag" }
   )
 }
+
 resource "aws_volume_attachment" "diag_att" {
   count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   depends_on = [
@@ -290,6 +307,7 @@ resource "aws_ebs_volume" "dbf2" {
     { Name = "dbf2" }
   )
 }
+
 resource "aws_volume_attachment" "dbf2_att" {
   count = local.is-production ? 1 : 0
   device_name = "/dev/sdo"
@@ -332,9 +350,7 @@ module "cw-ebs-ec2" {
   syshc_eval_periods = local.application_data.cloudwatch_ec2.syshc.eval_periods
   syshc_period       = local.application_data.cloudwatch_ec2.syshc.period
   syshc_threshold    = local.application_data.cloudwatch_ec2.syshc.threshold
-
 }
-
 
 # Disk Free Alarm for EBSDB /dbf mount
 resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
@@ -361,4 +377,3 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
     device       = local.application_data.accounts[local.environment].dbf_device
   }
 }
-

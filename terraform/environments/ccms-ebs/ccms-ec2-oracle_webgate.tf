@@ -1,9 +1,9 @@
-resource "aws_instance" "ec2_ebsapps" {
-  count                  = local.application_data.accounts[local.environment].ebsapps_no_instances
-  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
-  ami                    = data.aws_ami.oracle_base_prereqs.id
+resource "aws_instance" "ec2_webgate" {
+  count                  = local.application_data.accounts[local.environment].webgate_no_instances
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
+  ami                    = data.aws_ami.webgate.id
   key_name               = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids = [aws_security_group.ec2_sg_ebsapps.id]
+  vpc_security_group_ids = [aws_security_group.ec2_sg_webgate.id]
   subnet_id              = local.private_subnets[count.index]
   #subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
@@ -11,12 +11,17 @@ resource "aws_instance" "ec2_ebsapps" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
-  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ebsapps
-  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsapps
+  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_webgate
+  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_webgate
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
+  # Also includes ebs_optimized and cpu_core_count due to changing instance family from c5d.2xlarge to m5d.large
   lifecycle {
-    ignore_changes = [ebs_block_device]
+    ignore_changes = [
+      ebs_block_device,
+      ebs_optimized,
+      cpu_core_count
+    ]
   }
   user_data_replace_on_change = false
   user_data                   = <<EOF
@@ -77,79 +82,34 @@ EOF
   }
 
   # non-AMI mappings start at /dev/sdh
-  # /export/home
+  # u01
   ebs_block_device {
     device_name = "/dev/sdh"
     volume_type = "io2"
-    volume_size = local.application_data.accounts[local.environment].ebsapps_exhome_size
-    iops        = local.application_data.accounts[local.environment].ebsapps_default_iops
-    encrypted   = true
-    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
-  }
-  # u01
-  ebs_block_device {
-    device_name = "/dev/sdi"
-    volume_type = "io2"
-    volume_size = local.application_data.accounts[local.environment].ebsapps_u01_size
-    iops        = local.application_data.accounts[local.environment].ebsapps_default_iops
-    encrypted   = true
-    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
-  }
-  # u03
-  ebs_block_device {
-    device_name = "/dev/sdj"
-    volume_type = "io2"
-    volume_size = local.application_data.accounts[local.environment].ebsapps_u03_size
-    iops        = local.application_data.accounts[local.environment].ebsapps_default_iops
+    volume_size = local.application_data.accounts[local.environment].webgate_u01_size
+    iops        = local.application_data.accounts[local.environment].webgate_default_iops
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-ebsapps-%s", local.application_name, local.environment, count.index + 1)) },
+    { Name = lower(format("ec2-%s-%s-webgate-%s", local.application_name, local.environment, count.index + 1)) },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
     { backup = "true" }
   )
-  depends_on = [aws_security_group.ec2_sg_ebsapps]
-
+  depends_on = [aws_security_group.ec2_sg_webgate]
 }
 
-resource "aws_ebs_volume" "stage" {
-  count = local.is-production || local.is-preproduction || local.is-development ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  availability_zone = aws_instance.ec2_ebsapps[count.index].availability_zone
-  size              = local.application_data.accounts[local.environment].ebsapps_stage_size
-  type              = "io2"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = "stage" }
-  )
-}
-resource "aws_volume_attachment" "stage_att" {
-  count = local.is-production || local.is-preproduction || local.is-development ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
-  depends_on = [
-    aws_ebs_volume.stage
-  ]
-  device_name = "/dev/sdk"
-  volume_id   = aws_ebs_volume.stage[count.index].id
-  instance_id = aws_instance.ec2_ebsapps[count.index].id
-}
-
-
-module "cw-ebsapps-ec2" {
+module "cw-webgate-ec2" {
   source = "./modules/cw-ec2"
-  count  = local.application_data.accounts[local.environment].ebsapps_no_instances
+  count  = local.application_data.accounts[local.environment].webgate_no_instances
 
   short_env    = local.application_data.accounts[local.environment].short_env
-  name         = "ec2-ebsapps-${count.index + 1}"
+  name         = "ec2-webgate-${count.index + 1}"
   topic        = aws_sns_topic.cw_alerts.arn
-  instanceId   = aws_instance.ec2_ebsapps[count.index].id
-  imageId      = data.aws_ami.oracle_base_prereqs.id
-  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
+  instanceId   = aws_instance.ec2_webgate[count.index].id
+  imageId      = data.aws_ami.webgate.id
+  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
   fileSystem   = "xfs"       # Linux root filesystem
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 

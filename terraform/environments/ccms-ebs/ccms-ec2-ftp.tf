@@ -1,10 +1,10 @@
-#  Build EC2 
+# Build EC2 
 resource "aws_instance" "ec2_ftp" {
-  instance_type          = local.application_data.accounts[local.environment].ec2_instance_type_ftp
-  ami                    = local.application_data.accounts[local.environment].ftp_ami_id
-  key_name               = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids = [aws_security_group.ec2_sg_ftp.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  instance_type               = local.application_data.accounts[local.environment].ec2_instance_type_ftp
+  ami                         = local.application_data.accounts[local.environment].ftp_ami_id
+  key_name                    = local.application_data.accounts[local.environment].key_name
+  vpc_security_group_ids      = [aws_security_group.ec2_sg_ftp.id]
+  subnet_id                   = data.aws_subnet.private_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
@@ -131,7 +131,6 @@ EOF
   depends_on = [aws_security_group.ec2_sg_ftp]
 }
 
-
 module "cw-ftp-ec2" {
   source = "./modules/cw-ec2"
 
@@ -166,5 +165,4 @@ module "cw-ftp-ec2" {
   syshc_eval_periods = local.application_data.cloudwatch_ec2.syshc.eval_periods
   syshc_period       = local.application_data.cloudwatch_ec2.syshc.period
   syshc_threshold    = local.application_data.cloudwatch_ec2.syshc.threshold
-
 }

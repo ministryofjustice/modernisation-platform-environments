@@ -1,7 +1,8 @@
-## Certs
+## Certificates
 #   *.laa-development.modernisation-platform.service.justice.gov.uk
 #   *.laa-test.modernisation-platform.service.justice.gov.uk
 #   *.laa-preproduction.modernisation-platform.service.justice.gov.uk
+
 resource "aws_acm_certificate" "external" {
   count = local.is-production ? 0 : 1
 
@@ -20,7 +21,7 @@ resource "aws_acm_certificate" "external" {
   }
 }
 
-#   *.service.justice.gov.uk
+# *.service.justice.gov.uk
 resource "aws_acm_certificate" "external-service" {
   count = local.is-production ? 1 : 0
 
@@ -41,7 +42,6 @@ resource "aws_acm_certificate" "external-service" {
 
 ## Validation 
 resource "aws_route53_record" "external_validation" {
-
   depends_on = [
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,

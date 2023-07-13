@@ -11,6 +11,7 @@ resource "aws_ssm_document" "cloud_watch_agent" {
     },
   )
 }
+
 resource "aws_cloudwatch_log_group" "groups" {
   for_each          = local.application_data.cw_log_groups
   name              = each.key
@@ -23,6 +24,7 @@ resource "aws_cloudwatch_log_group" "groups" {
     },
   )
 }
+
 resource "aws_ssm_parameter" "cw_agent_config" {
   description = "cloud watch agent config"
   name        = "cloud-watch-config"

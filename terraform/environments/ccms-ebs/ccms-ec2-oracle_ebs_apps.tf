@@ -1,9 +1,9 @@
-resource "aws_instance" "ec2_accessgate" {
-  count                  = local.application_data.accounts[local.environment].accessgate_no_instances
-  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
-  ami                    = data.aws_ami.accessgate.id
+resource "aws_instance" "ec2_ebsapps" {
+  count                  = local.application_data.accounts[local.environment].ebsapps_no_instances
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
+  ami                    = data.aws_ami.oracle_base_prereqs.id
   key_name               = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids = [aws_security_group.ec2_sg_accessgate.id]
+  vpc_security_group_ids = [aws_security_group.ec2_sg_ebsapps.id]
   subnet_id              = local.private_subnets[count.index]
   #subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
@@ -11,17 +11,12 @@ resource "aws_instance" "ec2_accessgate" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
-  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_accessgate
-  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_accessgate
+  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ebsapps
+  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsapps
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
-  # Also includes ebs_optimized and cpu_core_count due to changing instance family from c5d.2xlarge to m5d.large
   lifecycle {
-    ignore_changes = [
-      ebs_block_device,
-      ebs_optimized,
-      cpu_core_count
-    ]
+    ignore_changes = [ebs_block_device]
   }
   user_data_replace_on_change = false
   user_data                   = <<EOF
@@ -82,37 +77,76 @@ EOF
   }
 
   # non-AMI mappings start at /dev/sdh
-  # u01
+  # /export/home
   ebs_block_device {
     device_name = "/dev/sdh"
     volume_type = "io2"
-    volume_size = local.application_data.accounts[local.environment].accessgate_u01_size
-    iops        = local.application_data.accounts[local.environment].accessgate_default_iops
+    volume_size = local.application_data.accounts[local.environment].ebsapps_exhome_size
+    iops        = local.application_data.accounts[local.environment].ebsapps_default_iops
+    encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+  }
+  # u01
+  ebs_block_device {
+    device_name = "/dev/sdi"
+    volume_type = "io2"
+    volume_size = local.application_data.accounts[local.environment].ebsapps_u01_size
+    iops        = local.application_data.accounts[local.environment].ebsapps_default_iops
+    encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+  }
+  # u03
+  ebs_block_device {
+    device_name = "/dev/sdj"
+    volume_type = "io2"
+    volume_size = local.application_data.accounts[local.environment].ebsapps_u03_size
+    iops        = local.application_data.accounts[local.environment].ebsapps_default_iops
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
   }
 
-
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-accessgate-%s", local.application_name, local.environment, count.index + 1)) },
+    { Name = lower(format("ec2-%s-%s-ebsapps-%s", local.application_name, local.environment, count.index + 1)) },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
     { backup = "true" }
   )
-  depends_on = [aws_security_group.ec2_sg_accessgate]
-
+  depends_on = [aws_security_group.ec2_sg_ebsapps]
 }
 
+resource "aws_ebs_volume" "stage" {
+  count = local.is-production || local.is-preproduction || local.is-development ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = aws_instance.ec2_ebsapps[count.index].availability_zone
+  size              = local.application_data.accounts[local.environment].ebsapps_stage_size
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "stage" }
+  )
+}
 
-module "cw-accgate-ec2" {
+resource "aws_volume_attachment" "stage_att" {
+  count       = local.is-production || local.is-preproduction || local.is-development ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
+  depends_on  = [aws_ebs_volume.stage]
+  device_name = "/dev/sdk"
+  volume_id   = aws_ebs_volume.stage[count.index].id
+  instance_id = aws_instance.ec2_ebsapps[count.index].id
+}
+
+module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
-  count  = local.application_data.accounts[local.environment].accessgate_no_instances
+  count  = local.application_data.accounts[local.environment].ebsapps_no_instances
 
   short_env    = local.application_data.accounts[local.environment].short_env
-  name         = "ec2-accgate-${count.index + 1}"
+  name         = "ec2-ebsapps-${count.index + 1}"
   topic        = aws_sns_topic.cw_alerts.arn
-  instanceId   = aws_instance.ec2_accessgate[count.index].id
-  imageId      = data.aws_ami.accessgate.id
-  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
+  instanceId   = aws_instance.ec2_ebsapps[count.index].id
+  imageId      = data.aws_ami.oracle_base_prereqs.id
+  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
   fileSystem   = "xfs"       # Linux root filesystem
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 
@@ -138,5 +172,4 @@ module "cw-accgate-ec2" {
   syshc_eval_periods = local.application_data.cloudwatch_ec2.syshc.eval_periods
   syshc_period       = local.application_data.cloudwatch_ec2.syshc.period
   syshc_threshold    = local.application_data.cloudwatch_ec2.syshc.threshold
-
 }
