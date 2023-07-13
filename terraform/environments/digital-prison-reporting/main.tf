@@ -371,8 +371,8 @@ module "s3_artifacts_store" {
 
   # Dynamic, supports multiple notifications blocks
   bucket_notifications = {
-    "lambda_function_arn"   = module.domain_builder_flyway_Lambda.lambda_function
-    "events"                = ["s3:ObjectCreated:*"]
+    "lambda_function_arn"   = "${module.domain_builder_flyway_Lambda.lambda_function}"
+    "events"                = "[s3:ObjectCreated:*]"
     "filter_prefix"         = "build-artifacts/domain-builder/jars/"
     "filter_suffix"         = ".jar"
   }
