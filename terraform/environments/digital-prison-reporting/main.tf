@@ -377,13 +377,6 @@ module "s3_artifacts_store" {
     "filter_suffix"         = ".jar"
   }
 
-  kinesis_settings = {
-    "include_null_and_empty"         = "true"
-    "partition_include_schema_table" = "true"
-    "include_partition_value"        = "true"
-    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
-  }
-
   tags = merge(
     local.all_tags,
     {
