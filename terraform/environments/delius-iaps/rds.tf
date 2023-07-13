@@ -52,6 +52,10 @@ resource "aws_ssm_parameter" "iaps_snapshot_id" {
   tags = {
     environment = "production"
   }
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_db_subnet_group" "iaps" {
