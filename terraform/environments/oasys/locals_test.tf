@@ -93,7 +93,7 @@ locals {
       #   }
       # }
 
-      internal = {
+      private = {
         internal_lb = true
         access_logs              = false
         # s3_versioning            = false
