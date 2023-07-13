@@ -10,6 +10,8 @@
       "lz_aws_workspace_nonprod_subnet_env": "10.200.0.0/20",
       "cp_dev_cidr_range": "172.20.0.0/16",
       "vpn_cidr_range": "81.134.202.29/32",
+      "vpn_proxy_cidr_range_a": "35.177.125.252/32",
+      "vpn_proxy_cidr_range_b": "35.177.137.160/32",
       "ami_owner": "636100868237"
     }
   },
