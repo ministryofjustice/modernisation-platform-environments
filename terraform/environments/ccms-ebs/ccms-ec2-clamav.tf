@@ -37,8 +37,11 @@ rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 
 yum install -y clamav clamav-update clamd
+
 freshclam
+
 systemctl enable clamd@scan.service
+
 systemctl start clamd@scan.service
 
 EOF
