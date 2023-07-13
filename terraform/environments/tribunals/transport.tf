@@ -436,8 +436,8 @@ resource "aws_ecr_repository" "app-ecr-repo" {
 
 ####################### LOAD BALANCER #########################################
 resource "aws_security_group" "app_lb_sc" {
-  name        = "load balancer security group"
-  description = "control access to the load balancer"
+  name        = "${local.application} load balancer security group"
+  description = "control access to the ${local.application} load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
