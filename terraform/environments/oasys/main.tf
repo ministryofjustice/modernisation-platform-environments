@@ -91,6 +91,10 @@ data "aws_lb" "private" {
   count = local.environment == "test" ? 1 : 0
   name  = "private-lb"
 }
+data "aws_lb" "public2" {
+  count = local.environment == "test" ? 1 : 0
+  name  = "public2-lb"
+}
 resource "aws_lb_target_group" "private-lb-https-443" {
   count       = local.environment == "test" ? 1 : 0
   name        = "private-lb-https-443"
@@ -115,4 +119,31 @@ resource "aws_lb_target_group_attachment" "test" {
   target_group_arn = aws_lb_target_group.private-lb-https-443[0].arn
   target_id        = data.aws_lb.private[0].arn
   port             = 443
+}
+
+
+resource "aws_lb_target_group" "public2-t2-oasys-web-a-http-8080" { 
+  count       = local.environment == "test" ? 1 : 0
+  name        = "public2-t2-oasys-web-a-http-8080"
+  target_type = "alb"
+  port        = 8080
+  protocol    = "HTTP"
+  vpc_id      = module.environment.vpc.id
+  health_check {
+    enabled             = true
+    interval            = 30
+    healthy_threshold   = 3
+    matcher             = "200-399"
+    path                = "/"
+    protocol            = "HTTP"
+    port                = 8080
+    timeout             = 5
+    unhealthy_threshold = 5
+  }
+}
+resource "aws_lb_target_group_attachment" "test" {
+  count            = local.environment == "test" ? 1 : 0
+  target_group_arn = aws_lb_target_group.public2-t2-oasys-web-a-http-8080[0].arn
+  target_id        = data.aws_lb.public2[0].arn
+  port             = 8080
 }

@@ -118,7 +118,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t2-${local.application_name}-web-a-http-8080"
+                  target_group_name = "public2-t2-${local.application_name}-web-a-http-8080"
                 }]
                 conditions = [
                   {
