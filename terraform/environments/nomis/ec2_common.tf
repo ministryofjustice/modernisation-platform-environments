@@ -389,7 +389,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" 
 }
 
 resource "aws_cloudwatch_log_metric_filter" "rman_backup_success_filter" {
-  for_each = toset(local.environment_configs[local.environment].monitored_database_backups)
+  for_each = try(toset(local.environment_configs[local.environment].rman_database_backups), {})
 
   name           = "rman-backup-success-${each.value}"
   pattern        = "Backup of ${each.value} completed successfully"
@@ -397,13 +397,13 @@ resource "aws_cloudwatch_log_metric_filter" "rman_backup_success_filter" {
 
   metric_transformation {
     name      = "RmanBackupSuccess${each.value}"
-    namespace = "LogMetricFilter" # CWAgent (create custom namespace)
+    namespace = "RmanBackupMetrics" # (custom namespace)
     value     = "0"
   }
 }
 
 resource "aws_cloudwatch_log_metric_filter" "rman_backup_failure_filter" {
-  for_each = toset(local.environment_configs[local.environment].monitored_database_backups)
+  for_each = try(toset(local.environment_configs[local.environment].rman_database_backups), {})
 
   name           = "rman-backup-failure-${each.value}"
   pattern        = "Rman reported errors for ${each.value}"
@@ -411,20 +411,20 @@ resource "aws_cloudwatch_log_metric_filter" "rman_backup_failure_filter" {
 
   metric_transformation {
     name      = "RmanBackupFailure${each.value}"
-    namespace = "LogMetricFilter" # CWAgent (create custom namespace)
+    namespace = "RmanBackupMetrics" # custom namespace
     value     = "1"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "rman_backup_success_failure_alarm" {
-  for_each = toset(local.environment_configs[local.environment].monitored_database_backups)
+  for_each = try(toset(local.environment_configs[local.environment].rman_database_backups), {})
 
   alarm_name          = "rman-backup-success-failure-alarm-${each.value}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   threshold           = "1"
-  alarm_description = "Rman reported successful backup"
-  alarm_actions     = [""]
+  alarm_description   = "Rman reported successful backup"
+  # alarm_actions       = [""] # SNS Topic required
 
   metric_query {
     id          = "e1"
@@ -439,7 +439,7 @@ resource "aws_cloudwatch_metric_alarm" "rman_backup_success_failure_alarm" {
 
     metric {
       metric_name = "RmanBackupFailure${each.value}"
-      namespace   = "LogMetricFilter"
+      namespace   = "RmanBackupMetrics" # custom namespace
       period      = "300"
       stat        = "SampleCount"
     }
@@ -451,23 +451,23 @@ resource "aws_cloudwatch_metric_alarm" "rman_backup_success_failure_alarm" {
 
     metric {
       metric_name = "RmanBackupSuccess${each.value}"
-      namespace   = "LogMetricFilter"
+      namespace   = "RmanBackupMetrics" # custom namespace
       period      = "300"
       stat        = "SampleCount"
     }
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "rman_backup_missing" {
-  for_each = toset(local.environment_configs[local.environment].monitored_database_backups)
+resource "aws_cloudwatch_metric_alarm" "rman_backup_missing_24h" {
+  for_each = try(toset(local.environment_configs[local.environment].rman_database_backups), {})
 
-  alarm_name          = "rman-backup-missing-${each.value}"
+  alarm_name          = "rman-backup-missing-24h-${each.value}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   threshold           = "1"
-  treat_missing_data = "breaching"
-  alarm_description = "Rman reported missing backup"
-  alarm_actions     = [""]
+  treat_missing_data  = "breaching"
+  alarm_description   = "Rman reported missing backup, no backup in the last 24 hours"
+  # alarm_actions       = [""] # SNS Topic required
 
   metric_query {
     id          = "e1"
@@ -482,10 +482,10 @@ resource "aws_cloudwatch_metric_alarm" "rman_backup_missing" {
 
     metric {
       metric_name = "RmanBackupSuccess${each.value}"
-      namespace   = "LogMetricFilter"
-      period      = "300"
+      namespace   = "RmanBackupMetrics" # custom namespace
+      period      = "86400"             # 24 hours in seconds
       stat        = "SampleCount"
     }
   }
-  
+
 }
