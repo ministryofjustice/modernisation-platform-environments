@@ -92,16 +92,13 @@ EOF
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
   }
 
-
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-webgate-%s", local.application_name, local.environment, count.index + 1)) },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
     { backup = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_webgate]
-
 }
-
 
 module "cw-webgate-ec2" {
   source = "./modules/cw-ec2"
@@ -138,5 +135,4 @@ module "cw-webgate-ec2" {
   syshc_eval_periods = local.application_data.cloudwatch_ec2.syshc.eval_periods
   syshc_period       = local.application_data.cloudwatch_ec2.syshc.period
   syshc_threshold    = local.application_data.cloudwatch_ec2.syshc.threshold
-
 }

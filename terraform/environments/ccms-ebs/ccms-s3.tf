@@ -1,6 +1,4 @@
-#------------------------------------------------------------------------------
 # S3 Bucket - Artefacts
-#------------------------------------------------------------------------------
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
@@ -69,6 +67,7 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
     { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_s3_bucket_notification" "artefact_bucket_notification" {
   bucket = module.s3-bucket.bucket.id
 
@@ -78,6 +77,7 @@ resource "aws_s3_bucket_notification" "artefact_bucket_notification" {
     filter_suffix = ".log"
   }
 }
+
 data "aws_iam_policy_document" "artefacts_s3_policy" {
   statement {
     principals {
@@ -92,9 +92,7 @@ data "aws_iam_policy_document" "artefacts_s3_policy" {
   }
 }
 
-#------------------------------------------------------------------------------
 # S3 Bucket - Logging
-#------------------------------------------------------------------------------
 module "s3-bucket-logging" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
@@ -162,6 +160,7 @@ module "s3-bucket-logging" {
     { Name = lower(format("s3-%s-%s-logging", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_s3_bucket_notification" "logging_bucket_notification" {
   bucket = module.s3-bucket-logging.bucket.id
 
@@ -171,6 +170,7 @@ resource "aws_s3_bucket_notification" "logging_bucket_notification" {
     filter_suffix = ".log"
   }
 }
+
 data "aws_iam_policy_document" "logging_s3_policy" {
   statement {
     principals {
@@ -182,9 +182,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
   }
 }
 
-#------------------------------------------------------------------------------
 # S3 Bucket - R-sync
-#------------------------------------------------------------------------------
 module "s3-bucket-dbbackup" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
@@ -252,6 +250,7 @@ module "s3-bucket-dbbackup" {
     { Name = lower(format("s3-%s-%s-dbbackup", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_s3_bucket_notification" "dbbackup_bucket_notification" {
   bucket = module.s3-bucket-dbbackup.bucket.id
 
@@ -261,6 +260,7 @@ resource "aws_s3_bucket_notification" "dbbackup_bucket_notification" {
     filter_suffix = ".log"
   }
 }
+
 data "aws_iam_policy_document" "dbbackup_s3_policy" {
   statement {
     principals {
@@ -275,6 +275,4 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
     ]
     resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
   }
-
 }
-

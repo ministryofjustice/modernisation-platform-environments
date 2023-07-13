@@ -1,4 +1,4 @@
-#  Build EC2 for ClamAV
+# Build EC2 for ClamAV
 
 resource "aws_instance" "ec2_clamav" {
   instance_type               = local.application_data.accounts[local.environment].ec2_instance_type_clamav
@@ -37,11 +37,8 @@ rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 
 yum install -y clamav clamav-update clamd
-
 freshclam
-
 systemctl enable clamd@scan.service
-
 systemctl start clamd@scan.service
 
 EOF
@@ -82,7 +79,6 @@ EOF
   depends_on = [aws_security_group.ec2_sg_clamav]
 }
 
-
 module "cw-clamav-ec2" {
   source = "./modules/cw-ec2"
 
@@ -117,5 +113,4 @@ module "cw-clamav-ec2" {
   syshc_eval_periods = local.application_data.cloudwatch_ec2.syshc.eval_periods
   syshc_period       = local.application_data.cloudwatch_ec2.syshc.period
   syshc_threshold    = local.application_data.cloudwatch_ec2.syshc.threshold
-
 }

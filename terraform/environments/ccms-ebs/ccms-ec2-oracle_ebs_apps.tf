@@ -111,7 +111,6 @@ EOF
     { backup = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_ebsapps]
-
 }
 
 resource "aws_ebs_volume" "stage" {
@@ -129,16 +128,14 @@ resource "aws_ebs_volume" "stage" {
     { Name = "stage" }
   )
 }
+
 resource "aws_volume_attachment" "stage_att" {
-  count = local.is-production || local.is-preproduction || local.is-development ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
-  depends_on = [
-    aws_ebs_volume.stage
-  ]
+  count       = local.is-production || local.is-preproduction || local.is-development ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
+  depends_on  = [aws_ebs_volume.stage]
   device_name = "/dev/sdk"
   volume_id   = aws_ebs_volume.stage[count.index].id
   instance_id = aws_instance.ec2_ebsapps[count.index].id
 }
-
 
 module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
