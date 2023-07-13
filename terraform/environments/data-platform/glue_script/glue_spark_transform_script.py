@@ -30,6 +30,7 @@ raw_key = args["key"]
 
 # setup spark
 sc = SparkContext()
+sc._jsc.hadoopConfiguration().set("fs.s3.canned.acl", "BucketOwnerFullControl")
 glue_context = GlueContext(sc)
 spark = glue_context.spark_session
 job = Job(glue_context)
