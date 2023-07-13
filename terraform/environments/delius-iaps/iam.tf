@@ -39,8 +39,7 @@ data "aws_iam_policy_document" "snapshot_sharer" {
     actions = [
       "rds:CopyDBSnapshot",
       "rds:DescribeDBSnapshots",
-      "rds:ModifyDBSnapshotAttribute",
-      "ssm:PutParameter"
+      "rds:ModifyDBSnapshotAttribute"
     ]
     resources = [
       local.iaps_rds_snapshot_arn_pattern_preprod,
@@ -48,6 +47,19 @@ data "aws_iam_policy_document" "snapshot_sharer" {
       aws_db_instance.iaps.arn
     ]
   }
+
+  statement {
+    sid    = "AllowSSMUsage"
+    effect = "Allow"
+    actions = [
+      "ssm:PutParameter",
+      "ssm:DescribeParameters"
+    ]
+    resources = [
+      aws_ssm_parameter.iaps_snapshot_data_refresh_id.arn
+    ]
+  }
+
   statement {
     sid    = "AllowKMSUsage"
     effect = "Allow"
