@@ -154,8 +154,10 @@ resource "aws_iam_role_policy" "app_execution" {
       {
            "Action": [
               "ecr:*",
+              "logs:CreateLogGroup",
               "logs:CreateLogStream",
               "logs:PutLogEvents",
+              "logs:DescribeLogStreams"
               "secretsmanager:GetSecretValue"
            ],
            "Resource": "*",
