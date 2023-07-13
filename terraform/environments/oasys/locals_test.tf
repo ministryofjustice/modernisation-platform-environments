@@ -93,7 +93,11 @@ locals {
         # s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
-        existing_target_groups   = {}
+        existing_target_groups = {
+          "public2-t2-oasys-web-a-http-8080" = {
+            arn = length(aws_lb_target_group.public2-t2-oasys-web-a-http-8080) > 0 ? aws_lb_target_group.public2-t2-oasys-web-a-http-8080[0].arn : ""
+          }
+        }
         idle_timeout             = 60 # 60 is default
         security_groups          = ["private_lb_internal", "private_lb_external"]
         public_subnets           = module.environment.subnets["public"].ids
