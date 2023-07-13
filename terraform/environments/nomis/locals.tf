@@ -11,6 +11,10 @@ locals {
   baseline_environment_config = local.environment_configs[local.environment]
 
   baseline_presets_options = {
+    backup_plans = [
+      "daily_except_sunday",
+      "weekly_on_sunday"
+    ]
     enable_application_environment_wildcard_cert = false
     enable_business_unit_kms_cmks                = true
     enable_image_builder                         = true
@@ -47,6 +51,8 @@ locals {
   }
 
   baseline_acm_certificates = {}
+
+  baseline_backup_plans = {}
 
   baseline_bastion_linux = {
     public_key_data = merge(
