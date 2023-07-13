@@ -8,7 +8,7 @@ resource "aws_db_instance" "iaps" {
 
   username                    = local.application_data.accounts[local.environment].db_user
   manage_master_user_password = true
-
+  # swap to this after resource for ssm created
   # snapshot_identifier    = length(data.aws_ssm_parameter.iaps_snapshot_id.value) > 0 ? data.aws_ssm_parameter.iaps_snapshot_id.value : null
   snapshot_identifier    = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
   db_subnet_group_name   = aws_db_subnet_group.iaps.id
