@@ -1,6 +1,6 @@
 
 locals {
-  scripts = <<EOF
+  script = <<EOF
 #!/bin/bash
 . $HOME/.bash_profile
 FOL=`date +%d%m%y`
