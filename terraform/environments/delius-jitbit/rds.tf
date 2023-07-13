@@ -38,7 +38,7 @@ resource "aws_ssm_parameter" "iaps_snapshot_id" {
   name        = "/iaps/snapshot_id"
   description = "The parameter description"
   type        = "SecureString"
-  value       = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
+  value       = ""
 
   tags = {
     environment = "production"
