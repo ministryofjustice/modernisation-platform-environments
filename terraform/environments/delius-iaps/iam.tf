@@ -51,7 +51,8 @@ data "aws_iam_policy_document" "snapshot_sharer" {
     actions = [
       "kms:DescribeKey",
       "kms:Decrypt",
-      "kms:GenerateDataKey"
+      "kms:GenerateDataKey",
+      "kms:CreateGrant"
     ]
     resources = [
       "*"
