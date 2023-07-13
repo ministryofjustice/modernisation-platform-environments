@@ -12,7 +12,7 @@ module "airflow_user" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "~> 5.0"
 
-  name   = "${local.application_name}-${local.environment}-airflow-user"
+  name   = "data-platform-airflow-user"
   policy = data.aws_iam_policy_document.airflow_user.json
 
   tags = local.tags
