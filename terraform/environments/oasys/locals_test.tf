@@ -94,9 +94,6 @@ locals {
         force_destroy_bucket     = true
         enable_delete_protection = false
         existing_target_groups = {
-          "public2-t2-oasys-web-a-http-8080" = {
-            arn = length(aws_lb_target_group.public2-t2-oasys-web-a-http-8080) > 0 ? aws_lb_target_group.public2-t2-oasys-web-a-http-8080[0].arn : ""
-          }
         }
         idle_timeout             = 60 # 60 is default
         security_groups          = ["private_lb_internal", "private_lb_external"]
@@ -118,24 +115,24 @@ locals {
               }
             }
             rules = {
-              t2-web-http-8080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "public2-t2-oasys-web-a-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = [
-                        "t2.oasys.service.justice.gov.uk",
-                        "*.t2.oasys.service.justice.gov.uk",
-                        "t2-oasys.hmpp-azdt.justice.gov.uk",
-                      ]
-                    }
-                  }
-                ]
-              }
+              # t2-web-http-8080 = {
+              #   priority = 100
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "public2-t2-oasys-web-a-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "t2.oasys.service.justice.gov.uk",
+              #           "*.t2.oasys.service.justice.gov.uk",
+              #           "t2-oasys.hmpp-azdt.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
             }
           }
         }
