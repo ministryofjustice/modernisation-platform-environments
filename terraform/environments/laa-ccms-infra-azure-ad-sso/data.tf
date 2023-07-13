@@ -14,7 +14,7 @@ data "aws_ami" "oracle_ebs_vision_db" {
 }
 
 #preclone ami
-data "aws_ami" "oracle_ebs_vision_preclone_db" {
+data "aws_ami" "oracle_ebs_vision_load_balanced_db" {
   most_recent = true
   owners      = [local.application_data.accounts[local.environment].ami_owner]
 

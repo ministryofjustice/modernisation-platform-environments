@@ -44,14 +44,13 @@ resource "aws_acm_certificate_validation" "ebs_vision_db_lb_cert_validation" {
 
 # Route 53 Certificate Validation Record
 resource "aws_route53_record" "ebs_vision_db_cert_validation" {
-  provider = aws.core-network-services
-
+  provider        = aws.core-network-services
   allow_overwrite = true
   name            = local.domain_name_main[0]
   records         = local.domain_record_main
-  ttl             = 60
+  ttl     = 60
   type            = local.domain_type_main[0]
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  zone_id = data.aws_route53_zone.network-services.zone_id
 }
 
 resource "aws_route53_record" "ebs_vision_db_cert_validation_subdomain" {
@@ -63,7 +62,7 @@ resource "aws_route53_record" "ebs_vision_db_cert_validation_subdomain" {
   ttl             = 60
   type            = local.domain_type_sub[0]
   zone_id         = data.aws_route53_zone.external.zone_id
-}
+  }
 
 
 
@@ -96,9 +95,9 @@ resource "aws_route53_record" "ebs_vision_db_cert_validation_subdomain" {
 
 resource "aws_lb_listener" "ebs_vision_db_listener_https" {
   depends_on = [
-    /*aws_acm_certificate.ebs_vision_db_lb_cert,
+    aws_acm_certificate.ebs_vision_db_lb_cert,
     aws_route53_record.ebs_vision_db_cert_validation,
-    aws_route53_record.ebs_vision_db_cert_validation_subdomain,*/
+    aws_route53_record.ebs_vision_db_cert_validation_subdomain,
     aws_acm_certificate_validation.ebs_vision_db_lb_cert_validation
   ]
 

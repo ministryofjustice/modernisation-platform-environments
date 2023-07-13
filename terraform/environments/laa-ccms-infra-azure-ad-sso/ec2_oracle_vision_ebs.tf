@@ -1,8 +1,7 @@
 # Build EC2 for EBS Vision
 resource "aws_instance" "ec2_oracle_vision_ebs" {
   instance_type = local.application_data.accounts[local.environment].ec2_oracle_vision_instance_type_ebsdb
-  ami           = data.aws_ami.oracle_ebs_vision_db.id
-  #subnet_id                  = data.aws_subnet.data_subnets_a.id
+  ami           = data.aws_ami.oracle_ebs_vision_load_balanced_db.id
   subnet_id                   = local.environment == "development" ? data.aws_subnet.data_subnets_a.id : data.aws_subnet.private_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
@@ -37,7 +36,7 @@ EOF
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-vision", local.application_name, local.environment)) },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
-    { backup = "true" }
+    { backup = "false" }
   )
   depends_on = [aws_security_group.ec2_sg_ebs_vision_db]
 }
