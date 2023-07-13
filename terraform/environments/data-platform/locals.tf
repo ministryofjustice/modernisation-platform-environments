@@ -17,7 +17,7 @@ locals {
   name                             = "data-platform-product"
   glue_version                     = "4.0"
   max_retries                      = 0
-  worker_type                      = "G.1X"
+  worker_type                      = "G.2X"
   number_of_workers                = 10
   timeout                          = 120 # minutes
   execution_class                  = "STANDARD"
