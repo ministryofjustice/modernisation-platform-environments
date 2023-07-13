@@ -73,8 +73,19 @@ variable "enable_notification" {
   default     = false
 }
 
+#variable "bucket_notifications" {
+#  type        = map(any)
+#  description = "AWS S3 Bucket Notifications"
+#  default     = null
+#}
+
 variable "bucket_notifications" {
-  type        = map(any)
+  type        = map(object({
+    lambda_function_arn = string
+    events = list(map(string))
+    filter_prefix = string
+    filter_suffix = string
+  }))
   description = "AWS S3 Bucket Notifications"
   default     = null
 }
