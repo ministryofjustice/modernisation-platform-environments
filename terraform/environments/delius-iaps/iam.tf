@@ -39,7 +39,8 @@ data "aws_iam_policy_document" "snapshot_sharer" {
     actions = [
       "rds:CopyDBSnapshot",
       "rds:DescribeDBSnapshots",
-      "rds:ModifyDBSnapshotAttribute"
+      "rds:ModifyDBSnapshotAttribute",
+      "ssm:PutParameter"
     ]
     resources = [
       local.iaps_rds_snapshot_arn_pattern_preprod,
