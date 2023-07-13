@@ -157,7 +157,7 @@ resource "aws_iam_role_policy" "app_execution" {
               "logs:CreateLogGroup",
               "logs:CreateLogStream",
               "logs:PutLogEvents",
-              "logs:DescribeLogStreams"
+              "logs:DescribeLogStreams",
               "secretsmanager:GetSecretValue"
            ],
            "Resource": "*",
