@@ -11,6 +11,8 @@ locals {
   # baseline config
   development_config = {
 
+    # monitored_database_backups = ["ALPHA", "BETA"]
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
