@@ -458,15 +458,15 @@ resource "aws_cloudwatch_metric_alarm" "rman_backup_success_failure_alarm" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "rman_backup_missing_24h" {
+resource "aws_cloudwatch_metric_alarm" "rman_backup_missing_36h" {
   for_each = try(toset(local.environment_configs[local.environment].rman_database_backups), {})
 
-  alarm_name          = "rman-backup-missing-24h-${each.value}"
+  alarm_name          = "rman-backup-missing-36h-${each.value}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   threshold           = "1"
   treat_missing_data  = "breaching"
-  alarm_description   = "Rman reported missing backup, no backup in the last 24 hours"
+  alarm_description   = "Rman reported missing backup, no backup in the last 36 hours"
   # alarm_actions       = [""] # SNS Topic required
 
   metric_query {
@@ -483,7 +483,7 @@ resource "aws_cloudwatch_metric_alarm" "rman_backup_missing_24h" {
     metric {
       metric_name = "RmanBackupSuccess${each.value}"
       namespace   = "RmanBackupMetrics" # custom namespace
-      period      = "86400"             # 24 hours in seconds
+      period      = "129600"             # 36 hours in seconds
       stat        = "SampleCount"
     }
   }
