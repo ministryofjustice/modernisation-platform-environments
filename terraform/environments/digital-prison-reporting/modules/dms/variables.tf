@@ -3,7 +3,7 @@ variable "name" {
 }
 
 variable "enable_replication_task" {
-  description = "Enable DMS Replication Task, True or False" 
+  description = "Enable DMS Replication Task, True or False"
   type        = bool
   default     = false
 }

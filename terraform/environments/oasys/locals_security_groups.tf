@@ -6,18 +6,14 @@ locals {
     ])
     ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
     https_internal = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
-      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
-      module.ip_addresses.azure_nomisapi_cidrs.devtest,
-      module.ip_addresses.mp_cidr["hmpps-${local.environment}"],
+      "10.0.0.0/8",
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
       "146.200.228.107/32"
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
-      "3.9.247.172/32", "18.168.31.162/32", "18.133.111.138/32", # public load balancer
+      "18.130.186.240/32", "18.170.161.71/32", "13.42.150.41/32", # public load balancer
     ])
 
     http7xxx = flatten([
@@ -43,11 +39,8 @@ locals {
     ])
     ssh = module.ip_addresses.azure_fixngo_cidrs.prod
     https_internal = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
+      "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
-      module.ip_addresses.azure_studio_hosting_cidrs.prod,
-      module.ip_addresses.azure_nomisapi_cidrs.prod,
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
@@ -252,6 +245,7 @@ locals {
           security_groups = ["private_lb_internal"]
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
+            # "0.0.0.0/0",
           ])
         }
         http8080 = {
@@ -262,6 +256,7 @@ locals {
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
+            #"0.0.0.0/0",
           ])
           security_groups = ["private_lb_internal"]
         }
@@ -273,6 +268,7 @@ locals {
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
+            #"0.0.0.0/0",
           ])
           security_groups = ["private_lb_internal"]
         }
@@ -304,16 +300,18 @@ locals {
           to_port     = 80
           protocol    = "tcp"
           cidr_blocks = flatten([
+            #"0.0.0.0/0",
             local.security_group_cidrs.https_external,
           ])
         }
         http8080 = {
           description = "Allow http8080 ingress"
-          from_port   = 0
+          from_port   = 8080
           to_port     = 8080
           protocol    = "tcp"
           # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
+            #"0.0.0.0/0",
             local.security_group_cidrs.https_external,
           ])
         }
@@ -323,6 +321,7 @@ locals {
           to_port     = 443
           protocol    = "tcp"
           cidr_blocks = flatten([
+            #"0.0.0.0/0",
             local.security_group_cidrs.https_external,
           ])
         }

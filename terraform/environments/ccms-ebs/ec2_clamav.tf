@@ -5,7 +5,7 @@ resource "aws_instance" "ec2_clamav" {
   ami                         = local.application_data.accounts[local.environment].clamav_ami_id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_clamav.id]
-  subnet_id                   = local.environment == "development" ? data.aws_subnet.data_subnets_a.id : data.aws_subnet.private_subnets_a.id
+  subnet_id                   = data.aws_subnet.private_subnets_a.id
   monitoring                  = true
   ebs_optimized               = true
   associate_public_ip_address = false

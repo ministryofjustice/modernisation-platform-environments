@@ -133,9 +133,9 @@ resource "aws_ssm_maintenance_window_task" "pre_healthcheck_maintenance_window_t
 
   task_invocation_parameters {
     run_command_parameters {
-       output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
-       output_s3_key_prefix = "ssm_output/"
-       timeout_seconds  = 600
+      output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
+      output_s3_key_prefix = "ssm_output/"
+      timeout_seconds      = 600
     }
   }
 }
@@ -162,9 +162,9 @@ resource "aws_ssm_maintenance_window_task" "post_healthcheck_maintenance_window_
 
   task_invocation_parameters {
     run_command_parameters {
-       output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
-       output_s3_key_prefix = "ssm_output/"
-       timeout_seconds  = 600
+      output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
+      output_s3_key_prefix = "ssm_output/"
+      timeout_seconds      = 600
     }
   }
 }
@@ -177,18 +177,18 @@ resource "aws_ssm_document" "perform_healthcheck_s3" {
   name          = "perform_health_check"
   document_type = "Command"
   content = jsonencode(
-  {
-    "schemaVersion" = "2.2",
-    "description" = "Execute Powershell Command",
-    "mainSteps" = [
-      {
-      "action" = "aws:runPowerShellScript",
-      "name" = "health_check_reports",
-      "inputs" = {            
+    {
+      "schemaVersion" = "2.2",
+      "description"   = "Execute Powershell Command",
+      "mainSteps" = [
+        {
+          "action" = "aws:runPowerShellScript",
+          "name"   = "health_check_reports",
+          "inputs" = {
             "runCommand" = ["powershell.exe -ExecutionPolicy Bypass -file 'c:\\xfer\\scripts\\health_check.ps1' -force"]
           }
-      }
-    ]
-   }
- )
+        }
+      ]
+    }
+  )
 }
