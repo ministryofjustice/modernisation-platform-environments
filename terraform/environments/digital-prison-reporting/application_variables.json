@@ -17,6 +17,7 @@
       "setup_redshift": true,
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
       "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": true
@@ -38,6 +39,7 @@
       "setup_redshift": true,
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": false,
+      "enable_dbuilder_flyway_lambda": false,
       "enable_domain_builder_rds": false,
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": true
@@ -59,6 +61,7 @@
       "setup_redshift": true,
       "enable_dms_replication_task": false,
       "enable_domain_builder_lambda": false,
+      "enable_dbuilder_flyway_lambda": false,
       "enable_domain_builder_rds": false,
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": false
