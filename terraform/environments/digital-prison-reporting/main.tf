@@ -364,11 +364,12 @@ module "s3_violation_bucket" {
 
 # S3 Bucket (Application Artifacts Store)
 module "s3_artifacts_store" {
-  source         = "./modules/s3_bucket"
-  create_s3      = local.setup_buckets
-  name           = "${local.project}-artifact-store-${local.environment}"
-  custom_kms_key = local.s3_kms_arn
-
+  source              = "./modules/s3_bucket"
+  create_s3           = local.setup_buckets
+  name                = "${local.project}-artifact-store-${local.environment}"
+  custom_kms_key      = local.s3_kms_arn
+  enable_notification = true
+ 
   # Dynamic, supports multiple notifications blocks
   bucket_notifications = {
     "lambda_function_arn"   = "${module.domain_builder_flyway_Lambda.lambda_function}"
