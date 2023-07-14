@@ -111,20 +111,20 @@ locals {
       }
       t1-nomis-xtag-b = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name          = "base_rhel_7_9_*"
+          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_test_2023-07-14T09-19-32.865Z"
           availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t2.large"
+          instance_type          = "t3.medium"
           vpc_security_group_ids = ["private-web"]
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "main"
+            branch = "nomis/DSOS-2000/create-xtag-ami"
           })
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
