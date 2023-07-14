@@ -104,7 +104,7 @@ resource "aws_route53_record" "lands_external_validation" {
   provider = aws.core-network-services
 
   allow_overwrite = true
-  name            = local.land_domain_name_main[0]
+  name            = local.lands_domain_name_main[0]
   records         = local.lands_domain_record_main
   ttl             = 60
   type            = local.lands_domain_type_main[0]
