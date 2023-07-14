@@ -45,7 +45,7 @@ resource "aws_ssm_maintenance_window_target" "reg_target" {
 
 resource "aws_ssm_maintenance_window_task" "commands" {
   max_concurrency = 2
-  max_errors      = 1
+  max_errors      = 3
   priority        = 1
   task_arn        = "AWS-RunShellScript"
   task_type       = "RUN_COMMAND"
