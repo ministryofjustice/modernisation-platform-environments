@@ -143,7 +143,7 @@ resource "aws_lb_target_group" "private2-lb-https-443" {
     unhealthy_threshold = 5
   }
 }
-resource "aws_lb_target_group_attachment" "test" {
+resource "aws_lb_target_group_attachment" "public3-private2" {
   count            = local.environment == "test" ? 1 : 0
   target_group_arn = aws_lb_target_group.private2-lb-https-443[0].arn
   target_id        = data.aws_lb.private2[0].arn
