@@ -178,32 +178,6 @@ locals {
         })
       })
 
-      test-oem = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name          = "base_ol_8_5_*"
-          availability_zone = null
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private-web"]
-        })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "main"
-          })
-        })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
-        })
-        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
-          description = "For testing Oracle Enterprise Manager image"
-          ami         = "base_ol_8_5"
-          os-type     = "Linux"
-          component   = "test"
-          server-type = "base_rhel85"
-        }
-      }
-
       test-jumpserver-2022 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -322,32 +296,6 @@ locals {
           data  = { total_size = 2000 }
           flash = { total_size = 500 }
         })
-      })
-      t3-nomis-db-1-b = merge(local.database_ec2_b, {
-        tags = merge(local.database_ec2_b.tags, {
-          nomis-environment   = "t3"
-          description         = "T3 NOMIS database"
-          oracle-sids         = "T3CNOM"
-          instance-scheduling = "skip-scheduling"
-        })
-        config = merge(local.database_ec2_b.config, {
-          ami_name = "AwsBackup_i-09bba03659a0990da_e4a139ba-8881-4adb-bbdc-5fcf18b7dcd2"
-        })
-        user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
-          args = merge(local.database_ec2_a.user_data_cloud_init.args, {
-            branch       = "d264cc523daa4ee5bf60d254120874bbc7b55525"
-            ansible_args = "--tags ec2patch"
-          })
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 500 }
-        })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-          data  = { total_size = 2000 }
-          flash = { total_size = 500 }
-        })
-        cloudwatch_metric_alarms = {} # disable for failover test
       })
 
     }
