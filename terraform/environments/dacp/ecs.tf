@@ -70,10 +70,6 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
           value = "${local.application_data.accounts[local.environment].support_team}"
         },
         {
-          name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].curserver}"
-        },
-        {
           name  = "ida:ClientId"
           value = "${local.application_data.accounts[local.environment].client_id}"
         }
