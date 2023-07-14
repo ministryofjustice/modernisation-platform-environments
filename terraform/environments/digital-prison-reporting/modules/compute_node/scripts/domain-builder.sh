@@ -66,16 +66,16 @@ sudo cat <<EOF > $launcher_script_location
 
 # If no args are specified launch interactive domain builder session otherwise
 # pass any args to the domain builder in batch mode.
-if [ $# -eq 0 ]
+if [ \$# -eq 0 ]
 then
   args="-i --enable-ansi"
 else
-  args=$@
+  args=\$@
 fi
 
     DOMAIN_API_URL="$domain_builder_url" \
       DOMAIN_API_KEY="$domain_builder_api_key" \
-          java -jar /home/ssm-user/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar $args
+          java -jar /home/ssm-user/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar \$args
 EOF
 
 sudo chmod 0755 $launcher_script_location

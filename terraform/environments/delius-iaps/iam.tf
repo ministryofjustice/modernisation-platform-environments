@@ -28,7 +28,8 @@ data "aws_iam_policy_document" "ci_assume_role" {
 }
 
 locals {
-  iaps_rds_snapshot_arn_pattern = "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*iaps-*"
+  iaps_rds_snapshot_arn_pattern_prod    = "arn:aws:rds:${data.aws_region.current.name}:${local.environment_management.account_ids["delius-iaps-production"]}:snapshot:*iaps-*"
+  iaps_rds_snapshot_arn_pattern_preprod = "arn:aws:rds:${data.aws_region.current.name}:${local.environment_management.account_ids["delius-iaps-preproduction"]}:snapshot:*iaps-*"
 }
 
 data "aws_iam_policy_document" "snapshot_sharer" {
@@ -41,17 +42,32 @@ data "aws_iam_policy_document" "snapshot_sharer" {
       "rds:ModifyDBSnapshotAttribute"
     ]
     resources = [
-      local.iaps_rds_snapshot_arn_pattern,
+      local.iaps_rds_snapshot_arn_pattern_preprod,
+      local.iaps_rds_snapshot_arn_pattern_prod,
       aws_db_instance.iaps.arn
     ]
   }
+
+  statement {
+    sid    = "AllowSSMUsage"
+    effect = "Allow"
+    actions = [
+      "ssm:PutParameter",
+      "ssm:DescribeParameters"
+    ]
+    resources = [
+      aws_ssm_parameter.iaps_snapshot_data_refresh_id.arn
+    ]
+  }
+
   statement {
     sid    = "AllowKMSUsage"
     effect = "Allow"
     actions = [
       "kms:DescribeKey",
       "kms:Decrypt",
-      "kms:GenerateDataKey"
+      "kms:GenerateDataKey",
+      "kms:CreateGrant"
     ]
     resources = [
       "*"
