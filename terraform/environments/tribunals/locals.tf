@@ -1,6 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
   # create name, record,type for monitoring lb aka tribunals_lb
+  #transport
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value
@@ -14,5 +15,37 @@ locals {
   domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+
+
+  #lands chamber
+  lands_domain_types = { for dvo in aws_acm_certificate.lands_external.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
+    }
+  }
+
+  lands_domain_name_main   = [for k, v in local.lands_domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  lands_domain_name_sub    = [for k, v in local.lands_domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  lands_domain_record_main = [for k, v in local.lands_domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  lands_domain_record_sub  = [for k, v in local.lands_domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  lands_domain_type_main   = [for k, v in local.lands_domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  lands_domain_type_sub    = [for k, v in local.lands_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+
+
+  #administrative appeals
+  appeals_domain_types = { for dvo in aws_acm_certificate.appeals_external.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
+    }
+  }
+
+  appeals_domain_name_main   = [for k, v in local.appeals_domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  appeals_domain_name_sub    = [for k, v in local.appeals_domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  appeals_domain_record_main = [for k, v in local.appeals_domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  appeals_domain_record_sub  = [for k, v in local.appeals_domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  appeals_domain_type_main   = [for k, v in local.appeals_domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  appeals_domain_type_sub    = [for k, v in local.appeals_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
 }

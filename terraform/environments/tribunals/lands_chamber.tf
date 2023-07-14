@@ -96,7 +96,7 @@ resource "aws_acm_certificate" "lands_external" {
 
 resource "aws_acm_certificate_validation" "lands_external" {
   certificate_arn         = aws_acm_certificate.lands_external.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = [local.lands_domain_name_main[0], local.lands_domain_name_sub[0]]
 }
 
 // Route53 DNS records for certificate validation
@@ -104,10 +104,10 @@ resource "aws_route53_record" "lands_external_validation" {
   provider = aws.core-network-services
 
   allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
+  name            = local.land_domain_name_main[0]
+  records         = local.lands_domain_record_main
   ttl             = 60
-  type            = local.domain_type_main[0]
+  type            = local.lands_domain_type_main[0]
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
@@ -115,10 +115,10 @@ resource "aws_route53_record" "lands_external_validation_subdomain" {
   provider = aws.core-vpc
 
   allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
+  name            = local.lands_domain_name_sub[0]
+  records         = local.lands_domain_record_sub
   ttl             = 60
-  type            = local.domain_type_sub[0]
+  type            = local.lands_domain_type_sub[0]
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
