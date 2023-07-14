@@ -1,5 +1,5 @@
 locals {
-  appeals = "administrative-appeals" 
+  appeals = "appeals" 
   appeals_folder = "administrative_appeals"
   appeals_db_name = "ossc" 
   appeals_db_login_name = "ossc-app"
