@@ -177,7 +177,7 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_lambda_role" {
  count      = local.is-production == true ? 1 : 0
- role        = aws_iam_role.lambda_role.name
+ role        = aws_iam_role.lambda_role[0].name
  policy_arn  = aws_iam_policy.iam_policy_for_lambda[0].arn
 }
 
