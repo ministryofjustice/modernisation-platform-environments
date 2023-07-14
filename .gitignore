@@ -20,3 +20,6 @@ out/
 .idea_modules/
 
 .tfsec/
+
+# vim
+**/*.swp
