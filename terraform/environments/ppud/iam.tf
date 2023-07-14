@@ -80,8 +80,8 @@ resource "aws_iam_policy" "production-s3-access" {
     "Action": "s3:ListBucket",
     "Effect": "Allow",
     "Resource": [
-       "arn:aws:s3:::moj-powershell-scripts",
-       "arn:aws:s3:::moj-powershell-scripts/*",
+       "arn:aws:s3:::moj-scripts",
+       "arn:aws:s3:::moj-scripts/*",
        "arn:aws:s3:::moj-release-management",
        "arn:aws:s3:::moj-release-management/*"
     ]
@@ -118,3 +118,66 @@ resource "aws_iam_role_policy_attachment" "maintenance_window_task_policy_attach
   role       = aws_iam_role.patching_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
 }
+
+################################
+# IAM Role & Policy for Lambda
+###############################
+
+resource "aws_iam_role" "lambda_role" {
+count      = local.is-production == true ? 1 : 0
+name   = "PPUD_Lambda_Function_Role"
+assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+
+resource "aws_iam_policy" "iam_policy_for_lambda" {
+ count      = local.is-production == true ? 1 : 0
+ name         = "aws_iam_policy_for_terraform_aws_lambda_role"
+ path         = "/"
+ description  = "AWS IAM Policy for managing aws lambda role"
+ policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+       "logs:CreateLogGroup",
+       "logs:CreateLogStream",
+       "logs:PutLogEvents"
+     ],
+     "Resource": "arn:aws:logs:*:*:*"
+    },
+   {
+     "Effect": "Allow",
+     "Action": [
+        "ec2:Start*",
+        "ec2:Stop*"
+      ],
+      "Resource": "*"
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_lambda_role" {
+ count      = local.is-production == true ? 1 : 0
+ role        = aws_iam_role.lambda_role.name
+ policy_arn  = aws_iam_policy.iam_policy_for_lambda[0].arn
+}
+
