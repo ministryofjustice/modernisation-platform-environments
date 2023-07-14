@@ -101,7 +101,27 @@ locals {
           type    = "lb_cookie"
         }
       }
-      public-http-8080 = {
+      private2-http-8080 = {
+        port                 = 8080
+        protocol             = "HTTP"
+        target_type          = "instance"
+        deregistration_delay = 30
+        health_check = {
+          enabled             = true
+          interval            = 30
+          healthy_threshold   = 3
+          matcher             = "200-399"
+          path                = "/"
+          port                = 8080
+          timeout             = 5
+          unhealthy_threshold = 5
+        }
+        stickiness = {
+          enabled = true
+          type    = "lb_cookie"
+        }
+      }
+      public2-http-8080 = {
         port                 = 8080
         protocol             = "HTTP"
         target_type          = "instance"
