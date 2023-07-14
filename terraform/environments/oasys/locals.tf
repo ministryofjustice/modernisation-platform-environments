@@ -101,7 +101,7 @@ locals {
           type    = "lb_cookie"
         }
       }
-      private2-http-8080 = {
+      pv2-http-8080 = {
         port                 = 8080
         protocol             = "HTTP"
         target_type          = "instance"
@@ -121,7 +121,7 @@ locals {
           type    = "lb_cookie"
         }
       }
-      public2-http-8080 = {
+      pb2-http-8080 = {
         port                 = 8080
         protocol             = "HTTP"
         target_type          = "instance"

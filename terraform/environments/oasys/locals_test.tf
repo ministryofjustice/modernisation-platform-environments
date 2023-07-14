@@ -107,12 +107,14 @@ locals {
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["t2_${local.application_name}_cert"]
             default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "T2 - use t2.oasys.service.justice.gov.uk"
-                status_code  = "200"
-              }
+              # type = "fixed-response"
+              # fixed_response = {
+              #   content_type = "text/plain"
+              #   message_body = "T2 - use t2.oasys.service.justice.gov.uk"
+              #   status_code  = "200"
+              # }
+              type              = "forward"
+              target_group_name = "t2-${local.application_name}-web-a-pb2-http-8080"
             }
             rules = {
               # t2-web-http-8080 = {
@@ -243,7 +245,7 @@ locals {
               #   status_code  = "200"
               # }
               type              = "forward"
-              target_group_name = "t2-${local.application_name}-web-a-private2-http-8080"
+              target_group_name = "t2-${local.application_name}-web-a-pv2-http-8080"
             }
             rules = {
               # t2-web-http-8080 = {
