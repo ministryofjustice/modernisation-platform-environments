@@ -1,7 +1,7 @@
 
-##########################################
-# IAM Policy, Role, Profile for SSM and S3
-##########################################
+####################################################
+# IAM Policy, Role, Profile for SSM, S3 & Cloudwatch
+####################################################
 
 # IAM EC2 Policy with Assume Role 
 
@@ -49,6 +49,21 @@ resource "aws_iam_policy_attachment" "production-s3-access" {
   policy_arn = aws_iam_policy.production-s3-access[0].arn
 }
 
+resource "aws_iam_policy_attachment" "CloudWatchAgentAdminPolicy" {
+  count      = local.is-production == true ? 1 : 0
+  depends_on = [aws_iam_policy.production-s3-access]
+  name       = "CloudWatchAgentAdminPolicy-attachment"
+  roles      = [aws_iam_role.ec2_iam_role.id]
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentAdminPolicy"
+}
+
+resource "aws_iam_policy_attachment" "CloudWatchAgentServerPolicy" {
+  count      = local.is-production == true ? 1 : 0
+  depends_on = [aws_iam_policy.production-s3-access]
+  name       = "CloudWatchAgentServerPolicy-attachment"
+  roles      = [aws_iam_role.ec2_iam_role.id]
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
 
 #####################################
 # IAM Policy for Prodcution S3 access
