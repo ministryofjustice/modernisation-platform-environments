@@ -111,7 +111,7 @@ locals {
       }
       t1-nomis-xtag-b = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_test_2023-07-14T09-19-32.865Z"
+          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_test_2023-07-14T12-57-19.815Z"
           availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
