@@ -49,3 +49,17 @@ resource "aws_lb_target_group" "ldap" {
     }
   )
 }
+
+# Internal DNS name for LDAP load balancer - Internal LDAP consumers will use this
+resource "aws_route53_record" "ldap_dns_internal" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.inner.zone_id
+  name     = "ldap.${local.application_name}.${data.aws_route53_zone.inner.name}"
+  type     = "A"
+
+  alias {
+    name                   = "ldap-${local.application_name}.${data.aws_route53_zone.inner.name}"
+    zone_id                = aws_lb.ldap.zone_id
+    evaluate_target_health = true # Could be true or false based on https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-values-alias.html#rrsets-values-alias-evaluate-target-health
+  }
+}
