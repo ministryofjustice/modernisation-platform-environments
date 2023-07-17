@@ -134,8 +134,30 @@ module "domain_builder_flyway_Lambda" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "${local.project}-domain-builder-flyway-${local.environment}"
-      Jira           = "DPR-584"
+      Name = local.flyway_dbuilder_name
+      Jira = "DPR-584"
     }
   )
 }
+
+# Domain Builder API Gateway
+module "domain_builder_api_gateway" {
+  source              =  "./modules/apigateway/serverless-lambda"
+
+  enable_gateway      = local.enable_dbuilder_serverless_gw
+  name                = "${local.project}-serverless-lambda"
+  lambda_arn          = module.domain_builder_backend_Lambda.lambda_function
+  lambda_name         = module.domain_builder_backend_Lambda.lambda_name
+  subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  security_group_ids  = [aws_security_group.lambda_generic[0].id, ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name           = "${local.project}-serverless-lambda-gw-${local.env}"
+      Resource_Group = "domain-builder"
+      Jira           = "DPR-583"
+      Resource_Type  = "apigateway"
+    }
+  )
+}  
