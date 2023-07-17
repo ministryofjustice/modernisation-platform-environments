@@ -23,6 +23,15 @@ locals {
     }
   }
 
+  database_instance_misload_ssm_parameters = {
+    parameters = {
+      misloadusername = {}
+      misloadpassword = {}
+    }
+  }
+
+  
+
   database_cloudwatch_metric_alarms = {
     oracle-db-disconnected = {
       comparison_operator = "GreaterThanOrEqualToThreshold"

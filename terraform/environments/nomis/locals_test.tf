@@ -36,6 +36,8 @@ locals {
       "t1-nomis-db-1-b/ORSYST1" = local.database_instance_ssm_parameters
       "t1-nomis-db-2-a/MIST1"   = local.database_instance_ssm_parameters
       "t1-nomis-db-2-b/MIST1"   = local.database_instance_ssm_parameters
+      "t1-nomis-db-2-a"         = local.database_instance_misload_ssm_parameters
+      "t1-nomis-db-2-b"         = local.database_instance_misload_ssm_parameters
       "t1-nomis-web-a"          = local.weblogic_ssm_parameters
       "t1-nomis-web-b"          = local.weblogic_ssm_parameters
       "t1-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
