@@ -30,7 +30,7 @@ module "domain_builder_backend_Lambda" {
     "POSTGRES_USERNAME" = local.rds_dbuilder_user
     "POSTGRES_PASSWORD" = module.domain_builder_backend_db.master_password
     "POSTGRES_PORT"     = local.rds_dbuilder_port
-    "DOMAIN_API_KEY"    = module.domain_builder_api_key[0].secret
+    "DOMAIN_API_KEY"    = module.domain_builder_api_key[*].secret
   }
 
   vpc_settings = {
@@ -100,7 +100,7 @@ module "domain_builder_cli_agent" {
   app_key                     = "domain-builder"
 
   env_vars = {
-      DOMAIN_API_KEY = "${module.domain_builder_api_key[0].secret}"
+      DOMAIN_API_KEY = "${module.domain_builder_api_key[*].secret}"
   }
 
   tags = merge(
