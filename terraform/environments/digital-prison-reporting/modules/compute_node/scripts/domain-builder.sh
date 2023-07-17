@@ -6,7 +6,7 @@ exec > >(tee /tmp/userdata.log|logger -t user-data-extra -s 2>/dev/console) 2>&1
 echo "assumeyes=1" >> /etc/yum.conf
 
 # Pass Variables into a file
-echo "DOMAIN_API_KEY=${DOMAIN_API_KEY}" | sudo tee /etc/profile.d/domain_variables.sh
+echo "DOMAIN_API_KEY=${DOMAIN_API_KEY}" >> /etc/environment
 
 # Update all packages
 sudo yum -y update
@@ -66,6 +66,8 @@ domain_builder_api_key="TODO"
 # and the api-key passed via the DOMAIN_API_KEY environment variable.
 sudo cat <<EOF > $launcher_script_location
 #!/bin/bash
+
+DOMAIN_API_KEY="${DOMAIN_API_KEY}"
 
 # If no args are specified launch interactive domain builder session otherwise
 # pass any args to the domain builder in batch mode.
