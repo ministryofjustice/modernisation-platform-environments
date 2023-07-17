@@ -66,6 +66,7 @@ locals {
   enable_dbuilder_serverless_gw  = local.application_data.accounts[local.environment].enable_dbuilder_serverless_gw
   include_dbuilder_gw_vpclink    = local.application_data.accounts[local.environment].include_dbuilder_gw_vpclink        
   serverless_gw_dbuilder_name    = "${local.project}-serverless-lambda"
+  enable_dbuilder_apikey         = local.application_data.accounts[local.environment].enable_dbuilder_apikey
 
   nomis_secrets_placeholder = {
     db_name  = "nomis"
