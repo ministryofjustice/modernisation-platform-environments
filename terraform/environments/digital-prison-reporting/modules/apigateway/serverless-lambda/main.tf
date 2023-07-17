@@ -45,6 +45,7 @@ resource "aws_apigatewayv2_integration" "this" {
   integration_uri     = var.lambda_arn
   integration_type    = "AWS_PROXY"
   integration_method  = "POST"
+  connection_type     = "VPC_LINK"
 }
 
 # Endpoint Route
