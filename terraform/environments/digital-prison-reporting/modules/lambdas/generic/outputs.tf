@@ -4,5 +4,5 @@ output "lambda_function" {
 
 output "lambda_name" {
   description = "The name of the Lambda function"
-  value       = var.enable_lambda ? join("", aws_lambda_function.this.*.function_name)
+  value       = var.enable_lambda ? join("", aws_lambda_function.this.*.function_name) : ""
 }
