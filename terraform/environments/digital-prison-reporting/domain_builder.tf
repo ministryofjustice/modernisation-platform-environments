@@ -1,6 +1,15 @@
 ##########################
 #    Domain Builder TF   # 
 ##########################
+# Generate API Secret for Serverless Lambda Gateway
+module "domain_builder_api_key {
+  source            = "./modules/secrets_manager"
+  name              = "${local.project}-domain-apikey-${local.environment}"
+  description       = "Serverless Lambda GW API Key"
+  length            = 20
+  override_special  = "{};<>?,./"  
+}
+
 # Domain Builder Backend Lambda function
 module "domain_builder_backend_Lambda" {
   source = "./modules/lambdas/generic"
@@ -21,6 +30,7 @@ module "domain_builder_backend_Lambda" {
     "POSTGRES_USERNAME" = local.rds_dbuilder_user
     "POSTGRES_PASSWORD" = module.domain_builder_backend_db.master_password
     "POSTGRES_PORT"     = local.rds_dbuilder_port
+    "DOMAIN_API_KEY"    = module.domain_builder_api_key[0].secret
   }
 
   vpc_settings = {
@@ -88,6 +98,10 @@ module "domain_builder_cli_agent" {
   account                     = local.account_id
   env                         = local.env
   app_key                     = "domain-builder"
+
+  env_vars = {
+      DOMAIN_API_KEY = "${module.domain_builder_api_key[0].secret}"
+  }
 
   tags = merge(
     local.all_tags,

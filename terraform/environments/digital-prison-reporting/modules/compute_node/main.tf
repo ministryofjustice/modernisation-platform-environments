@@ -3,9 +3,7 @@ data "aws_caller_identity" "current" {}
 data "template_file" "user_data" {
   template = file("${path.module}/scripts/${var.app_key}.sh")
 
-  vars = {
-    some_var = "some_value"
-  }
+  vars = var.env_vars
 }
 
 # Keypair for ec2-user
