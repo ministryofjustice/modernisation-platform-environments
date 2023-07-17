@@ -2,7 +2,7 @@
 #    Domain Builder TF   # 
 ##########################
 # Generate API Secret for Serverless Lambda Gateway
-module "domain_builder_api_key {
+module "domain_builder_api_key" {
   source            = "./modules/secrets_manager"
   name              = "${local.project}-domain-apikey-${local.environment}"
   description       = "Serverless Lambda GW API Key"
