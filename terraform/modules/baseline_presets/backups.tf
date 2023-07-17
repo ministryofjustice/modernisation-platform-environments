@@ -10,9 +10,7 @@ locals {
         schedule          = "cron(30 23 * * MON-SAT *)"
         start_window      = 60
         completion_window = 3600
-        lifecycle = {
-          delete_after = lookup(var.options, "backup_plan_daily_delete_after", 7)
-        }
+        delete_after      = lookup(var.options, "backup_plan_daily_delete_after", 7)
       }
       advanced_backup_setting = {
         backup_options = {
@@ -33,9 +31,7 @@ locals {
         schedule          = "cron(30 23 * * SUN *)"
         start_window      = 60
         completion_window = 3600
-        lifecycle = {
-          delete_after = lookup(var.options, "backup_plan_weekly_delete_after", 28)
-        }
+        delete_after      = lookup(var.options, "backup_plan_weekly_delete_after", 28)
       }
       advanced_backup_setting = {
         backup_options = {

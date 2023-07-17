@@ -32,14 +32,14 @@ variable "backups" {
   description = "map of backup_vaults with associated backup plans to create, where the plan name is the backup_vault name and plan key combined.  Use  'everything' as the map key to use the modernisation platform managed vault"
   type = map(object({
     plans = map(object({
-      schedule                 = optional(string)
-      enable_continuous_backup = optional(bool)
-      start_window             = optional(number)
-      completion_window        = optional(number)
-      lifecycle = optional(object({
-        cold_storage_after = optional(number)
-        delete_after       = optional(number)
-      }))
+      rule = object({
+        schedule                 = optional(string)
+        enable_continuous_backup = optional(bool)
+        start_window             = optional(number)
+        completion_window        = optional(number)
+        cold_storage_after       = optional(number)
+        delete_after             = number
+      })
       advanced_backup_setting = optional(object({
         backup_options = object({
           WindowsVSS = string

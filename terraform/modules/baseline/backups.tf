@@ -55,20 +55,17 @@ resource "aws_backup_plan" "this" {
     start_window             = each.value.start_window
     completion_window        = each.value.completion_window
 
-    dynamic "lifecycle" {
-      for_each = each.value.lifecycle != null ? [each.value.lifecycle] : []
-      content {
-        cold_storage_after = lifecycle.cold_storage_after
-        delete_after       = lifecycle.delete_after
-      }
+    lifecycle {
+      cold_storage_after = each.value.cold_storage_after
+      delete_after       = each.value.delete_after
     }
   }
 
   dynamic "advanced_backup_setting" {
     for_each = each.value.advanced_backup_setting != null ? [each.value.advanced_backup_setting] : []
     content {
-      backup_options = advanced_backup_setting.backup_options
-      resource_type  = advanced_backup_setting.resource_type
+      backup_options = advanced_backup_setting.value.backup_options
+      resource_type  = advanced_backup_setting.value.resource_type
     }
   }
 
