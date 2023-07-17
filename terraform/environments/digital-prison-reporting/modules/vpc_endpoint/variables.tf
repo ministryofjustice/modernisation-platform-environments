@@ -8,11 +8,11 @@ variable "account" {
   default     = ""
 }
 
-variable "setup_vpc_endpoint" {
-  type        = bool
-  default     = false
-  description = "(Optional) Create VPC Endpoint, If Set to Yes"
-}
+#variable "setup_vpc_endpoint" {
+#  type        = bool
+#  default     = false
+#  description = "(Optional) Create VPC Endpoint, If Set to Yes"
+#}
 
 variable "tags" {
   description = "Additional tags to apply to the log group."

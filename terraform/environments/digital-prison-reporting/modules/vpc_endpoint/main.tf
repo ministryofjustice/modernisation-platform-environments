@@ -1,6 +1,4 @@
 resource "aws_vpc_endpoint" "this" {
-  count               = var.setup_vpc_endpoint ? 1 : 0
-
   vpc_id              = var.vpc_id
   service_name        = "com.amazonaws.${var.region}.execute-api"
   private_dns_enabled = true
