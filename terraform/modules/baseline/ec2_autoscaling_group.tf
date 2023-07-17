@@ -13,7 +13,8 @@ locals {
 module "ec2_autoscaling_group" {
   for_each = var.ec2_autoscaling_groups
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.0.0"
+  # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=DSOS-1987-more-control-over-tagging"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -40,6 +41,7 @@ module "ec2_autoscaling_group" {
   ebs_volumes_copy_all_from_ami = each.value.config.ebs_volumes_copy_all_from_ami
   ebs_kms_key_id                = coalesce(each.value.config.ebs_kms_key_id, var.environment.kms_keys["ebs"].arn)
   ebs_volume_config             = each.value.ebs_volume_config
+  ebs_volume_tags               = each.value.ebs_volume_tags
   ebs_volumes                   = each.value.ebs_volumes
   user_data_raw                 = each.value.config.user_data_raw
   user_data_cloud_init          = each.value.user_data_cloud_init

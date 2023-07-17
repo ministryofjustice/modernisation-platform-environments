@@ -119,6 +119,7 @@ variable "ec2_autoscaling_groups" {
         enable_resource_name_dns_a_record    = optional(bool)
         hostname_type                        = string
       }))
+      tags = optional(map(string), {})
     })
     user_data_cloud_init = optional(object({
       args    = optional(map(string))
@@ -136,6 +137,7 @@ variable "ec2_autoscaling_groups" {
       type       = optional(string)
       kms_key_id = optional(string)
     })), {})
+    ebs_volume_tags = optional(map(string), {})
     ebs_volumes = optional(map(object({
       label       = optional(string)
       snapshot_id = optional(string)
@@ -260,6 +262,7 @@ variable "ec2_instances" {
         enable_resource_name_dns_a_record    = optional(bool)
         hostname_type                        = string
       }))
+      tags = optional(map(string), {})
     })
     user_data_cloud_init = optional(object({
       args    = optional(map(string))
@@ -277,6 +280,7 @@ variable "ec2_instances" {
       type       = optional(string)
       kms_key_id = optional(string)
     })), {})
+    ebs_volume_tags = optional(map(string), {})
     ebs_volumes = optional(map(object({
       label       = optional(string)
       snapshot_id = optional(string)
