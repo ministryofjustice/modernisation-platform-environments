@@ -25,7 +25,7 @@ resource "aws_api_gateway_integration" "this" {
   rest_api_id             = aws_api_gateway_rest_api.this.id
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
-  uri                     = aws_lambda_function.this.invoke_arn
+  uri                     = var.lambda_arn
 }
 
 resource "aws_lambda_permission" "apigw_lambda" {
