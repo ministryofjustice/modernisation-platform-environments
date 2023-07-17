@@ -68,7 +68,7 @@ resource "aws_security_group" "serverless_gw" {
 }
 
 resource "aws_security_group_rule" "serverless_gw_ingress" {
-  count = local.enable_generic_lambda_sg ? 1 : 0
+  count = local.enable_dbuilder_serverless_gw ? 1 : 0
 
   type              = "ingress"
   from_port         = 0
@@ -79,7 +79,7 @@ resource "aws_security_group_rule" "serverless_gw_ingress" {
 }
 
 resource "aws_security_group_rule" "serverless_gw_egress" {
-  count = local.enable_generic_lambda_sg ? 1 : 0
+  count = local.enable_dbuilder_serverless_gw ? 1 : 0
 
   type              = "egress"
   description       = "allow all"
