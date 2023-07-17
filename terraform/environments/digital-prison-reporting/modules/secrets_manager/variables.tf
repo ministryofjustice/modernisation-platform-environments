@@ -134,3 +134,9 @@ variable "use_upper" {
   description = "Use upper case characters"
   type        = bool
 }
+
+variable "secrets" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Map of Key Value Secrets"
+}
