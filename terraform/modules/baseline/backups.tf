@@ -49,15 +49,15 @@ resource "aws_backup_plan" "this" {
 
   rule {
     rule_name                = each.key
-    target_vault_name        = each.value.target_vault_name
-    schedule                 = each.value.schedule
-    enable_continuous_backup = each.value.enable_continuous_backup
-    start_window             = each.value.start_window
-    completion_window        = each.value.completion_window
+    target_vault_name        = each.value.rule.target_vault_name
+    schedule                 = each.value.rule.schedule
+    enable_continuous_backup = each.value.rule.enable_continuous_backup
+    start_window             = each.value.rule.start_window
+    completion_window        = each.value.rule.completion_window
 
     lifecycle {
-      cold_storage_after = each.value.cold_storage_after
-      delete_after       = each.value.delete_after
+      cold_storage_after = each.value.rule.cold_storage_after
+      delete_after       = each.value.rule.delete_after
     }
   }
 
