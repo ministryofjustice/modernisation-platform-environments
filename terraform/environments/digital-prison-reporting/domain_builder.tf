@@ -142,7 +142,7 @@ module "domain_builder_flyway_Lambda" {
 
 # Deploy API GW VPC Link
 module "domain_builder_gw_vpclink" {
-  count               = local.include_gw_vpclink == true ? 1 : 0
+  count               = local.include_dbuilder_gw_vpclink == true ? 1 : 0
 
   source              =  "./modules/vpc_endpoint"
   vpc_id              = local.dpr_vpc
@@ -172,7 +172,7 @@ module "domain_builder_api_gateway" {
   lambda_name         = module.domain_builder_backend_Lambda.lambda_name
   subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
   security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.serverless_gw[0].id, ] : []
-  endpoint_ids        = local.include_gw_vpclink ? [ module.domain_builder_gw_vpclink.vpc_endpoint_id, ] : []
+  endpoint_ids        = local.include_dbuilder_gw_vpclink ? [ module.domain_builder_gw_vpclink.vpc_endpoint_id, ] : []
 
   tags = merge(
     local.all_tags,
