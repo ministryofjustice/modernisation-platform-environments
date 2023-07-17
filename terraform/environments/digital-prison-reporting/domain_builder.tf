@@ -149,7 +149,7 @@ module "domain_builder_api_gateway" {
   lambda_arn          = module.domain_builder_backend_Lambda.lambda_function
   lambda_name         = module.domain_builder_backend_Lambda.lambda_name
   subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
-  security_group_ids  = local.enable_dbuilder_serverless_gw ? : [aws_security_group.serverless_gw[0].id, ] : []
+  security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.serverless_gw[0].id, ] : []
 
   tags = merge(
     local.all_tags,
