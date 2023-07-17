@@ -86,5 +86,5 @@ resource "aws_lambda_permission" "this" {
   function_name = var.lambda_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*/*"
+  source_arn = "${aws_apigatewayv2_api.this[0].execution_arn}/*/*"
 }

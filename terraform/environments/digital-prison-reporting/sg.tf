@@ -45,3 +45,47 @@ resource "aws_security_group_rule" "lambda_egress_generic" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.lambda_generic[0].id
 }
+
+## Serverless Lambda GW VPC Link SG
+resource "aws_security_group" "serverless_gw" {
+  count = local.enable_dbuilder_serverless_gw ? 1 : 0
+
+  name_prefix = "${local.serverless_gw_dbuilder_name}-sg"
+  description = "Serverless GW Security Group"
+  vpc_id      = local.dpr_vpc # DPR VPC
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Type = "sg_group"
+      Name          = "${local.serverless_gw_dbuilder_name}-sg"
+    }
+  )
+}
+
+resource "aws_security_group_rule" "serverless_gw_ingress" {
+  count = local.enable_generic_lambda_sg ? 1 : 0
+
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.serverless_gw[0].id
+}
+
+resource "aws_security_group_rule" "serverless_gw_egress" {
+  count = local.enable_generic_lambda_sg ? 1 : 0
+
+  type              = "egress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.serverless_gw[0].id
+}
