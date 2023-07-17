@@ -20,12 +20,12 @@ resource "aws_api_gateway_method" "this" {
 }
 
 resource "aws_api_gateway_integration" "this" {
-  http_method             = aws_api_gateway_method.this_method.http_method
+  http_method             = aws_api_gateway_method.this.http_method
   resource_id             = aws_api_gateway_resource.this.id
   rest_api_id             = aws_api_gateway_rest_api.this.id
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
-  uri                     = aws_lambda_function.this_lambda.invoke_arn
+  uri                     = aws_lambda_function.this.invoke_arn
 }
 
 resource "aws_lambda_permission" "apigw_lambda" {
@@ -34,34 +34,6 @@ resource "aws_lambda_permission" "apigw_lambda" {
   function_name = var.lambda_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.this.execution_arn}/*/*"
-}
-
-resource "aws_api_gateway_rest_api_policy" "this_policy" {
-  rest_api_id = aws_api_gateway_rest_api.this.id
-  policy      = <<EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "execute-api:Invoke",
-            "Resource": "${aws_api_gateway_rest_api.this.execution_arn}/*"
-        },
-        {
-            "Effect": "Deny",
-            "Principal": "*",
-            "Action": "execute-api:Invoke",
-            "Resource": "${aws_api_gateway_rest_api.this.execution_arn}/*",
-            "Condition": {
-                "StringNotEquals": {
-                    "aws:SourceVpce": "${aws_vpc_endpoint.api_gateway_endpoint.id}"
-                }
-            }
-        }
-    ]
-}
-EOF
 }
 
 resource "aws_api_gateway_deployment" "default_deployment" {
