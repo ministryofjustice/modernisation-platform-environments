@@ -140,18 +140,18 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
 # MoJ- Powershell-Scripts S3 Bucket
 ####################################
 
-resource "aws_s3_bucket" "MoJ-Powershell-Scripts" {
+resource "aws_s3_bucket" "moj-scripts" {
   count  = local.is-production == true ? 1 : 0
-  bucket = "moj-powershell-scripts"
+  bucket = "moj-scripts"
   tags = {
-    Name = "moj-powershell-scripts"
+    Name = "moj-scripts"
   }
 }
 
 
-resource "aws_s3_bucket_public_access_block" "MoJ-Powershell-Scripts" {
+resource "aws_s3_bucket_public_access_block" "moj-scripts" {
   count                   = local.is-production == true ? 1 : 0
-  bucket                  = aws_s3_bucket.MoJ-Powershell-Scripts[0].id
+  bucket                  = aws_s3_bucket.moj-scripts[0].id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -159,9 +159,9 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Powershell-Scripts" {
 }
 
 
-resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
+resource "aws_s3_bucket_policy" "moj-scripts" {
   count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.MoJ-Powershell-Scripts[0].id
+  bucket = aws_s3_bucket.moj-scripts[0].id
   
   policy = jsonencode({
 
@@ -176,8 +176,8 @@ resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
       ],
       "Effect": "Allow",
       "Resource": [
-      "arn:aws:s3:::moj-powershell-scripts",
-      "arn:aws:s3:::moj-powershell-scripts/*"
+      "arn:aws:s3:::moj-scripts",
+      "arn:aws:s3:::moj-scripts/*"
       ],
       "Principal": {
         "AWS": [
