@@ -81,7 +81,7 @@ locals {
     autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group        = module.baseline_presets.ec2_autoscaling_group.default
     lb_target_groups = {
-      http-8080 = {
+      pv-http-8080 = {
         port                 = 8080
         protocol             = "HTTP"
         target_type          = "instance"
@@ -101,27 +101,7 @@ locals {
           type    = "lb_cookie"
         }
       }
-      pv2-http-8080 = {
-        port                 = 8080
-        protocol             = "HTTP"
-        target_type          = "instance"
-        deregistration_delay = 30
-        health_check = {
-          enabled             = true
-          interval            = 30
-          healthy_threshold   = 3
-          matcher             = "200-399"
-          path                = "/"
-          port                = 8080
-          timeout             = 5
-          unhealthy_threshold = 5
-        }
-        stickiness = {
-          enabled = true
-          type    = "lb_cookie"
-        }
-      }
-      pb2-http-8080 = {
+      pb-http-8080 = {
         port                 = 8080
         protocol             = "HTTP"
         target_type          = "instance"
