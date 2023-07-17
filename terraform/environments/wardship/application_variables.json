@@ -3,9 +3,6 @@
     "development": {
       "example_var": "dev-data"
     },
-    "test": {
-      "example_var": "test-data"
-    },
     "preproduction": {
       "example_var": "preproduction-data"
     },
