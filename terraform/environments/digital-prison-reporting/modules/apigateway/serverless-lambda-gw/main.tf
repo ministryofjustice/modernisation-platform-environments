@@ -8,7 +8,7 @@ resource "aws_api_gateway_rest_api" "this" {
 
 resource "aws_api_gateway_resource" "this" {
   parent_id   = aws_api_gateway_rest_api.this.root_resource_id
-  path_part   = "/domain"
+  path_part   = "domain"
   rest_api_id = aws_api_gateway_rest_api.this.id
 }
 

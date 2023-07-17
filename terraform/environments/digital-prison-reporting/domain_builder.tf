@@ -173,7 +173,7 @@ module "domain_builder_api_gateway" {
   #endpoint_id        = module.domain_builder_gw_vpclink.vpc_endpoint_id
   subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
   security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.serverless_gw[0].id, ] : []
-  endpoint_ids        = [ module.domain_builder_gw_vpclink[0].vpc_endpoint_id, ]
+  endpoint_ids        = [module.domain_builder_gw_vpclink[0].vpc_endpoint_id, ]
 
   tags = merge(
     local.all_tags,
