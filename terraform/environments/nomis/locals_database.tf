@@ -23,14 +23,15 @@ locals {
     }
   }
 
-  database_instance_misload_ssm_parameters = {
+  # Include these in ec2-instance ssm parameters if using the misload role
+  # paths are /database/<ec2_instance_name>/<each_parameter>
+  database_ec2_misload_ssm_parameters = {
+    prefix = "/database/"
     parameters = {
       misloadusername = {}
       misloadpassword = {}
     }
-  }
-
-  
+  }  
 
   database_cloudwatch_metric_alarms = {
     oracle-db-disconnected = {
