@@ -151,10 +151,8 @@ locals {
     instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
       instance_type          = "t2.large"
       vpc_security_group_ids = ["private-web"]
-      tags = { foo: "ec2-bar" }
     })
 
-    ebs_volume_tags = { foo: "ebs-bar" }
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
     autoscaling_group    = module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool
 

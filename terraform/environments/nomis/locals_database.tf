@@ -238,8 +238,6 @@ locals {
       }
     }
 
-    ebs_volume_tags = { foo: "ebs-bar" }
-
     route53_records = {
       create_internal_record = true
       create_external_record = true
