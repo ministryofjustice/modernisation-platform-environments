@@ -4,6 +4,7 @@
 exec > >(tee /tmp/userdata.log|logger -t user-data-extra -s 2>/dev/console) 2>&1
 
 echo "assumeyes=1" >> /etc/yum.conf
+echo "DOMAIN_API_KEY=${DOMAIN_API_KEY}" >> /etc/environment
 
 # Update all packages
 sudo yum -y update

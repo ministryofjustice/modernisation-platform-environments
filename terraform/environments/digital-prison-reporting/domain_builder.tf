@@ -9,7 +9,8 @@ module "domain_builder_api_key" {
   name              = "${local.project}-domain-apikey-${local.environment}"
   description       = "Serverless Lambda GW API Key"
   length            = 20
-  override_special  = "{};<>?,./"  
+  override_special  = "{};<>?,./"
+  generate_random   = true
 }
 
 # Domain Builder Backend Lambda function
