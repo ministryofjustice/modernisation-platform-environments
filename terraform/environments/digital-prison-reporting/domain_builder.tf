@@ -146,7 +146,7 @@ module "domain_builder_gw_vpclink" {
 
   source              =  "./modules/vpc_endpoint"
   vpc_id              = local.dpr_vpc
-  aws_region          = local.account_region
+  region              = local.account_region
   subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
   security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.gateway_endpoint_sg[0].id, ] : []
 

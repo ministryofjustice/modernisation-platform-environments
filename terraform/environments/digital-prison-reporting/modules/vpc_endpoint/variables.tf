@@ -14,11 +14,6 @@ variable "setup_vpc_endpoint" {
   description = "(Optional) Create VPC Endpoint, If Set to Yes"
 }
 
-variable "name" {
-  description = "(Required) Name of the service"
-  type        = string
-}
-
 variable "tags" {
   description = "Additional tags to apply to the log group."
   type        = map(any)
