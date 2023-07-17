@@ -13,12 +13,12 @@ locals {
         lifecycle = {
           delete_after = lookup(var.options, "backup_plan_daily_delete_after", 7)
         }
-        advanced_backup_setting = {
-          backup_options = {
-            WindowsVSS = "enabled"
-          }
-          resource_type = "EC2"
+      }
+      advanced_backup_setting = {
+        backup_options = {
+          WindowsVSS = "enabled"
         }
+        resource_type = "EC2"
       }
       selection = {
         selection_tags = [{
@@ -36,12 +36,12 @@ locals {
         lifecycle = {
           delete_after = lookup(var.options, "backup_plan_weekly_delete_after", 28)
         }
-        advanced_backup_setting = {
-          backup_options = {
-            WindowsVSS = "enabled"
-          }
-          resource_type = "EC2"
+      }
+      advanced_backup_setting = {
+        backup_options = {
+          WindowsVSS = "enabled"
         }
+        resource_type = "EC2"
       }
       selection = {
         selection_tags = [{

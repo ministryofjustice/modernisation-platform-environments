@@ -67,7 +67,7 @@ resource "aws_backup_plan" "this" {
   dynamic "advanced_backup_setting" {
     for_each = each.value.advanced_backup_setting != null ? [each.value.advanced_backup_setting] : []
     content {
-      backup_options = advanced_backup_settings.backup_options
+      backup_options = advanced_backup_setting.backup_options
       resource_type  = advanced_backup_setting.resource_type
     }
   }
