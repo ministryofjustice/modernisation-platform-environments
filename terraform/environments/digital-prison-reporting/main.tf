@@ -369,13 +369,13 @@ module "s3_artifacts_store" {
   name                = "${local.project}-artifact-store-${local.environment}"
   custom_kms_key      = local.s3_kms_arn
   enable_notification = true
- 
+
   # Dynamic, supports multiple notifications blocks
   bucket_notifications = {
-    "lambda_function_arn"   = "${module.domain_builder_flyway_Lambda.lambda_function}"
-    "events"                = ["s3:ObjectCreated:*"]
-    "filter_prefix"         = "build-artifacts/domain-builder/jars/"
-    "filter_suffix"         = ".jar"
+    "lambda_function_arn" = "${module.domain_builder_flyway_Lambda.lambda_function}"
+    "events"              = ["s3:ObjectCreated:*"]
+    "filter_prefix"       = "build-artifacts/domain-builder/jars/"
+    "filter_suffix"       = ".jar"
   }
 
   tags = merge(
@@ -581,7 +581,7 @@ module "dms_nomis_ingestor" {
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
 
-  extra_attributes           = "supportResetlog=TRUE"
+  extra_attributes = "supportResetlog=TRUE"
 
   kinesis_settings = {
     "include_null_and_empty"         = "true"

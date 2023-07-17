@@ -483,7 +483,7 @@ resource "aws_cloudwatch_metric_alarm" "rman_backup_missing_36h" {
     metric {
       metric_name = "RmanBackupSuccess${each.value}"
       namespace   = "RmanBackupMetrics" # custom namespace
-      period      = "129600"             # 36 hours in seconds
+      period      = "129600"            # 36 hours in seconds
       stat        = "SampleCount"
     }
   }

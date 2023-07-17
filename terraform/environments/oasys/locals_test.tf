@@ -60,9 +60,9 @@ locals {
 
     baseline_lbs = {
       public = {
-        load_balancer_type       = "network"
-        internal_lb              = false
-        access_logs              = false # NLB don't have access logs unless they have a tls listener
+        load_balancer_type = "network"
+        internal_lb        = false
+        access_logs        = false # NLB don't have access logs unless they have a tls listener
         # force_destroy_bucket     = true
         # s3_versioning            = false
         enable_delete_protection = false

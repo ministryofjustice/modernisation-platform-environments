@@ -104,26 +104,26 @@ module "domain_builder_cli_agent" {
 module "domain_builder_flyway_Lambda" {
   source = "./modules/lambdas/generic"
 
-  enable_lambda       = local.enable_dbuilder_flyway_lambda
-  name                = local.flyway_dbuilder_name
-  s3_bucket           = local.flyway_dbuilder_code_s3_bucket
-  s3_key              = local.flyway_dbuilder_code_s3_key
-  handler             = local.flyway_dbuilder_handler
-  runtime             = local.flyway_dbuilder_runtime
-  policies            = local.flyway_dbuilder_policies
-  tracing             = local.flyway_dbuilder_tracing
-  timeout             = 60
-  lambda_trigger      = true
-  trigger_bucket_arn  = module.s3_artifacts_store.bucket_arn
+  enable_lambda      = local.enable_dbuilder_flyway_lambda
+  name               = local.flyway_dbuilder_name
+  s3_bucket          = local.flyway_dbuilder_code_s3_bucket
+  s3_key             = local.flyway_dbuilder_code_s3_key
+  handler            = local.flyway_dbuilder_handler
+  runtime            = local.flyway_dbuilder_runtime
+  policies           = local.flyway_dbuilder_policies
+  tracing            = local.flyway_dbuilder_tracing
+  timeout            = 60
+  lambda_trigger     = true
+  trigger_bucket_arn = module.s3_artifacts_store.bucket_arn
 
   env_vars = {
-    "DB_CONNECTION_STRING"  = "jdbc:postgresql://dpr-backend-rds.cja8lnnvvipo.eu-west-2.rds.amazonaws.com/dpr_domain_builder"
-    "DB_USERNAME"           = local.rds_dbuilder_user
-    "DB_PASSWORD"           = module.domain_builder_backend_db.master_password
-    "FLYWAY_METHOD"         = "migrate"
-    "GIT_BRANCH"            = "main"
-    "GIT_FOLDERS"           = "backend/src/main/resources/db/migration"
-    "GIT_REPOSITORY"        = "https://github.com/ministryofjustice/digital-prison-reporting-domain-builder"
+    "DB_CONNECTION_STRING" = "jdbc:postgresql://dpr-backend-rds.cja8lnnvvipo.eu-west-2.rds.amazonaws.com/dpr_domain_builder"
+    "DB_USERNAME"          = local.rds_dbuilder_user
+    "DB_PASSWORD"          = module.domain_builder_backend_db.master_password
+    "FLYWAY_METHOD"        = "migrate"
+    "GIT_BRANCH"           = "main"
+    "GIT_FOLDERS"          = "backend/src/main/resources/db/migration"
+    "GIT_REPOSITORY"       = "https://github.com/ministryofjustice/digital-prison-reporting-domain-builder"
   }
 
   vpc_settings = {
