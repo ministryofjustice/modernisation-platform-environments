@@ -7,7 +7,7 @@ locals {
     baseline_ec2_instances = {
       t3-csr-db-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name          = "base_ol_8_5_*"
+          ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           ami_owner         = "self"
           availability_zone = "${local.region}a"
         })
@@ -24,7 +24,7 @@ locals {
           branch               = "main"
           ansible_repo         = "modernisation-platform-configuration-management"
           ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision,oracle_19c_download,oracle_19c_install"
+          ansible_args         = "--tags ec2provision"
         }
         scripts = [
           "ansible-ec2provision.sh.tftpl",
