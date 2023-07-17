@@ -124,28 +124,4 @@ resource "aws_lb_target_group_attachment" "test" {
   target_id        = data.aws_lb.private[0].arn
   port             = 443
 }
-resource "aws_lb_target_group" "private2-lb-https-443" {
-  count       = local.environment == "test" ? 1 : 0
-  name        = "private2-lb-https-443"
-  target_type = "alb"
-  port        = 443
-  protocol    = "TCP"
-  vpc_id      = module.environment.vpc.id
-  health_check {
-    enabled             = true
-    interval            = 30
-    healthy_threshold   = 3
-    matcher             = "200-399"
-    path                = "/"
-    protocol            = "HTTPS"
-    port                = 443
-    timeout             = 5
-    unhealthy_threshold = 5
-  }
-}
-resource "aws_lb_target_group_attachment" "public3-private2" {
-  count            = local.environment == "test" ? 1 : 0
-  target_group_arn = aws_lb_target_group.private2-lb-https-443[0].arn
-  target_id        = data.aws_lb.private2[0].arn
-  port             = 443
-}
+
