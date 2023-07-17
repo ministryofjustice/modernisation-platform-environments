@@ -1,91 +1,85 @@
-# Gateway Resource
-resource "aws_apigatewayv2_api" "this" {
-  count         = var.enable_gateway ? 1 : 0
-
-  name          = "${var.name}-gw"
-  protocol_type = "HTTP"
-
-  tags          = var.tags
-}
-
-resource "aws_apigatewayv2_stage" "this" {
-  count       = var.enable_gateway ? 1 : 0
-
-  api_id      = aws_apigatewayv2_api.this[0].id
-
-  name        = "${var.name}-stage"
-  auto_deploy = true
-  tags        = var.tags
-
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.this[0].arn
-
-    format = jsonencode({
-      requestId               = "$context.requestId"
-      sourceIp                = "$context.identity.sourceIp"
-      requestTime             = "$context.requestTime"
-      protocol                = "$context.protocol"
-      httpMethod              = "$context.httpMethod"
-      resourcePath            = "$context.resourcePath"
-      routeKey                = "$context.routeKey"
-      status                  = "$context.status"
-      responseLength          = "$context.responseLength"
-      integrationErrorMessage = "$context.integrationErrorMessage"
-      }
-    )
+resource "aws_api_gateway_rest_api" "this" {
+  name = "${var.name}-rest-gw"
+  endpoint_configuration {
+    types            = ["PRIVATE"]
+    vpc_endpoint_ids = var.endpoint_ids
   }
 }
 
-# Lambda Integration
-resource "aws_apigatewayv2_integration" "this" {
-  count               = var.enable_gateway ? 1 : 0
-
-  api_id              = aws_apigatewayv2_api.this[0].id
-  connection_id       = aws_apigatewayv2_vpc_link.this[0].id
-  integration_uri     = var.lambda_arn
-  integration_type    = "HTTP_PROXY"
-  integration_method  = "POST"
-  connection_type     = "VPC_LINK"
+resource "aws_api_gateway_resource" "this" {
+  parent_id   = aws_api_gateway_rest_api.this.root_resource_id
+  path_part   = "/domain"
+  rest_api_id = aws_api_gateway_rest_api.this.id
 }
 
-# Endpoint Route
-resource "aws_apigatewayv2_route" "this" {
-  count     = var.enable_gateway ? 1 : 0
-
-  api_id    = aws_apigatewayv2_api.this[0].id
-
-  route_key = "ANY /domain"
-  target    = "integrations/${aws_apigatewayv2_integration.this[0].id}"
+resource "aws_api_gateway_method" "this" {
+  authorization = "NONE"
+  http_method   = "ANY"
+  resource_id   = aws_api_gateway_resource.this.id
+  rest_api_id   = aws_api_gateway_rest_api.this.id
 }
 
-# LogGroup
-resource "aws_cloudwatch_log_group" "this" {
-  count               = var.enable_gateway ? 1 : 0
-
-  name                = "/aws/api_gw/${aws_apigatewayv2_api.this[0].name}"
-  retention_in_days   = 30
-  tags                = var.tags
+resource "aws_api_gateway_integration" "this" {
+  http_method             = aws_api_gateway_method.this_method.http_method
+  resource_id             = aws_api_gateway_resource.this.id
+  rest_api_id             = aws_api_gateway_rest_api.this.id
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.this_lambda.invoke_arn
 }
 
-# Endpoint Route
-resource "aws_apigatewayv2_vpc_link" "this" {
-  count              = var.enable_gateway ? 1 : 0
-
-  name               = "${var.name}-vpclink"
-  security_group_ids = var.security_group_ids
-  subnet_ids         = var.subnet_ids
-
-  tags               = var.tags
-}
-
-# Lambda Permissions
-resource "aws_lambda_permission" "this" {
-  count         = var.enable_gateway ? 1 : 0
-
+resource "aws_lambda_permission" "apigw_lambda" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = var.lambda_name
   principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.this.execution_arn}/*/*"
+}
 
-  source_arn = "${aws_apigatewayv2_api.this[0].execution_arn}/*/*"
+resource "aws_api_gateway_rest_api_policy" "this_policy" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  policy      = <<EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "${aws_api_gateway_rest_api.this.execution_arn}/*"
+        },
+        {
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "${aws_api_gateway_rest_api.this.execution_arn}/*",
+            "Condition": {
+                "StringNotEquals": {
+                    "aws:SourceVpce": "${aws_vpc_endpoint.api_gateway_endpoint.id}"
+                }
+            }
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_api_gateway_deployment" "default_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.this.id,
+      aws_api_gateway_method.this.id,
+      aws_api_gateway_integration.this.id,
+    ]))
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "default_deployment" {
+  deployment_id = aws_api_gateway_deployment.default_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.this.id
+  stage_name    = "default"
 }

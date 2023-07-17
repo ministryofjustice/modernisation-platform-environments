@@ -64,6 +64,7 @@ locals {
   flyway_dbuilder_policies       = [aws_iam_policy.s3_read_access_policy.arn, data.aws_iam_policy.rds_full_access.arn, ]
   flyway_dbuilder_tracing        = "Active"
   enable_dbuilder_serverless_gw  = local.application_data.accounts[local.environment].enable_dbuilder_serverless_gw
+  include_dbuilder_gw_vpclink    = local.application_data.accounts[local.environment].include_dbuilder_gw_vpclink        
   serverless_gw_dbuilder_name    = "${local.project}-serverless-lambda"
 
   nomis_secrets_placeholder = {

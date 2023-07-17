@@ -140,16 +140,39 @@ module "domain_builder_flyway_Lambda" {
   )
 }
 
+# Deploy API GW VPC Link
+module "domain_builder_gw_vpclink" {
+  count               = local.include_gw_vpclink == true ? 1 : 0
+
+  source              =  "./modules/vpc_endpoint"
+  vpc_id              = local.dpr_vpc
+  aws_region          = local.account_region
+  subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.gateway_endpoint_sg[0].id, ] : []
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "domain-builder"
+      Jira           = "DPR-583"
+      Resource_Type  = "vpc_endpoint"
+    }
+  )
+}
+
+
 # Domain Builder API Gateway
 module "domain_builder_api_gateway" {
-  source              =  "./modules/apigateway/serverless-lambda"
+  count               = local.enable_dbuilder_serverless_gw == true ? 1 : 0
 
+  source              =  "./modules/apigateway/serverless-lambda"
   enable_gateway      = local.enable_dbuilder_serverless_gw
   name                = local.serverless_gw_dbuilder_name
   lambda_arn          = module.domain_builder_backend_Lambda.lambda_function
   lambda_name         = module.domain_builder_backend_Lambda.lambda_name
   subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
   security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.serverless_gw[0].id, ] : []
+  endpoint_ids        = local.include_gw_vpclink ? [ module.domain_builder_gw_vpclink.vpc_endpoint_id, ] : []
 
   tags = merge(
     local.all_tags,
@@ -160,4 +183,4 @@ module "domain_builder_api_gateway" {
       Resource_Type  = "apigateway"
     }
   )
-}  
+}

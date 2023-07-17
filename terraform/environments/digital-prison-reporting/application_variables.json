@@ -21,6 +21,7 @@
       "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": true,
+      "include_dbuilder_gw_vpclink": true,
       "enable_dbuilder_serverless_gw": true
     },
     "test": {
@@ -44,6 +45,7 @@
       "enable_domain_builder_rds": false,
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": true,
+      "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": false
     },
     "preproduction": {
@@ -67,6 +69,7 @@
       "enable_domain_builder_rds": false,
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": false,
+      "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": false
     },
     "production": {

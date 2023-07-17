@@ -8,10 +8,10 @@ variable "account" {
   default     = ""
 }
 
-variable "enable_gateway" {
+variable "setup_vpc_endpoint" {
   type        = bool
   default     = false
-  description = "(Optional) Create Lambda, If Set to Yes"
+  description = "(Optional) Create VPC Endpoint, If Set to Yes"
 }
 
 variable "name" {
@@ -23,16 +23,6 @@ variable "tags" {
   description = "Additional tags to apply to the log group."
   type        = map(any)
   default     = {}
-}
-
-variable "lambda_arn" {
-  description = "(Required) ARN of the Lambda"
-  type        = string
-}
-
-variable "lambda_name" {
-  description = "(Required) Name of the Lambda Service"
-  type        = string
 }
 
 variable "subnet_ids" {
@@ -47,8 +37,7 @@ variable "security_group_ids" {
   default     = []  
 }
 
-variable "endpoint_ids" {
-  description = "An List of VPC Endpoint IDS"
-  type        = list(string)
-  default     = []
+variable "vpc_id" {
+  description = "Current AWS VPC ID."
+  default     = ""
 }

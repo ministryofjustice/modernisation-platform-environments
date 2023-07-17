@@ -89,3 +89,35 @@ resource "aws_security_group_rule" "serverless_gw_egress" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.serverless_gw[0].id
 }
+
+# VPC Gateway Endpoint SG
+resource "aws_security_group" "gateway_endpoint_sg" {
+  count       = local.include_gw_vpclink ? 1 : 0
+
+  name        = "${local.serverless_gw_dbuilder_name}-sg"
+  description = "Allow HTTPS inbound traffic"
+  vpc_id      = local.dpr_vpc # DPR VPC
+
+  ingress {
+    description = "HTTPS from VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.dpr.cidr_block, ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Type = "sg_group"
+      Name          = "${local.serverless_gw_dbuilder_name}-sg-${local.env}"
+    }
+  )
+}
