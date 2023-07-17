@@ -10,7 +10,7 @@ output "backup_plans" {
   description = "Map of backup_plans to create depending on options provided"
 
   value = {
-    for key, value in local.backup_plans : key => value if contains(var.options.backup_plans, key)
+    for key, value in local.backup_plans : key => value if contains(local.backup_plans_filter, key)
   }
 }
 

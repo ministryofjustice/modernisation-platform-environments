@@ -1,5 +1,9 @@
 locals {
 
+  backup_plans_filter = flatten([
+    var.options.enable_backup_plan_daily_and_weekly ? ["daily_except_sunday", "weekly_on_sunday"] : []
+  ])
+
   backup_plans = {
     daily_except_sunday = {
       rule = {
@@ -7,7 +11,7 @@ locals {
         start_window      = 60
         completion_window = 3600
         lifecycle = {
-          delete_after = "7"
+          delete_after = lookup(var.options, "backup_plan_daily_delete_after", 7)
         }
         advanced_backup_setting = {
           backup_options = {
@@ -20,7 +24,7 @@ locals {
         selection_tags = [{
           type  = "STRINGEQUALS"
           key   = "backup-plan"
-          value = "daily-weekly"
+          value = "daily-and-weekly"
         }]
       }
     }
@@ -30,7 +34,7 @@ locals {
         start_window      = 60
         completion_window = 3600
         lifecycle = {
-          delete_after = "28"
+          delete_after = lookup(var.options, "backup_plan_weekly_delete_after", 28)
         }
         advanced_backup_setting = {
           backup_options = {
@@ -43,7 +47,7 @@ locals {
         selection_tags = [{
           type  = "STRINGEQUALS"
           key   = "backup-plan"
-          value = "daily-weekly"
+          value = "daily-and-weekly"
         }]
       }
     }
