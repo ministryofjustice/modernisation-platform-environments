@@ -49,7 +49,7 @@ resource "aws_backup_plan" "this" {
 
   rule {
     rule_name                = each.key
-    target_vault_name        = each.value.rule.target_vault_name
+    target_vault_name        = each.value.target_vault_name
     schedule                 = each.value.rule.schedule
     enable_continuous_backup = each.value.rule.enable_continuous_backup
     start_window             = each.value.rule.start_window
