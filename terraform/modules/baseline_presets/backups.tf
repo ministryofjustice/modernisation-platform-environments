@@ -5,9 +5,13 @@ locals {
   ])
 
   backup_plans = {
+
+    # Cron Format: Minutes Hours Day-of-month Month Day-of-week Year
+    # Note: You cannot use * in both the Day-of-month and Day-of-week fields. If you use it in one, you must use ? in the other.
+
     daily_except_sunday = {
       rule = {
-        schedule          = "cron(30 23 * * MON-SAT *)"
+        schedule          = "cron(30 23 ? * MON-SAT *)"
         start_window      = 60
         completion_window = 3600
         delete_after      = lookup(var.options, "backup_plan_daily_delete_after", 7)
@@ -28,7 +32,7 @@ locals {
     }
     weekly_on_sunday = {
       rule = {
-        schedule          = "cron(30 23 * * SUN *)"
+        schedule          = "cron(30 23 ? * SUN *)"
         start_window      = 60
         completion_window = 3600
         delete_after      = lookup(var.options, "backup_plan_weekly_delete_after", 28)
