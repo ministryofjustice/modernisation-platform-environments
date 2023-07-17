@@ -43,7 +43,7 @@ resource "aws_apigatewayv2_integration" "this" {
   api_id              = aws_apigatewayv2_api.this[0].id
   connection_id       = aws_apigatewayv2_vpc_link.this[0].id
   integration_uri     = var.lambda_arn
-  integration_type    = "AWS_PROXY"
+  integration_type    = "HTTP_PROXY"
   integration_method  = "POST"
   connection_type     = "VPC_LINK"
 }
