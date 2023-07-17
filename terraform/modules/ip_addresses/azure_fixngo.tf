@@ -42,11 +42,13 @@ locals {
     noms_mgmt_vnet            = "10.102.0.0/16"
     noms_test_dr_vnet         = "10.111.0.0/16"
     noms_mgmt_dr_vnet         = "10.112.0.0/16"
+    corporate_staff_rostering_T3 = "10.0.0.0/8"
 
     noms_transit_live_fw_devtest    = "52.142.189.87/32"
     noms_transit_live_fw_prod       = "52.142.189.118/32"
     noms_transit_live_dr_fw_devtest = "20.90.217.135/32"
     noms_transit_live_dr_fw_prod    = "20.90.217.127/32"
+    corporate_staff_rostering_T3_outbound = "0.0.0.0/0"
   }
 
   azure_fixngo_cidrs = {
@@ -56,6 +58,7 @@ locals {
       local.azure_fixngo_cidr.noms_mgmt_vnet,
       local.azure_fixngo_cidr.noms_test_dr_vnet,
       local.azure_fixngo_cidr.noms_mgmt_dr_vnet,
+      local.azure_fixngo_cidr.corporate_staff_rostering
     ]
 
     prod = [
