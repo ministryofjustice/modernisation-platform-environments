@@ -97,7 +97,7 @@ locals {
         existing_target_groups = {
         }
         idle_timeout             = 60 # 60 is default
-        security_groups          = ["private_lb_internal", "private_lb_external"]
+        security_groups          = ["public_lb"]
         public_subnets           = module.environment.subnets["public"].ids
         tags                     = local.tags
 
@@ -148,7 +148,7 @@ locals {
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is default
-        security_groups          = ["private_lb_internal", "private_lb_external"]
+        security_groups          = ["private_lb"]
         public_subnets           = module.environment.subnets["private"].ids
         tags                     = local.tags
 
