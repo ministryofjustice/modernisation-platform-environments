@@ -46,16 +46,22 @@ aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jar
 launcher_script_location=/usr/bin/domain-builder
 
 # Get the configured API gateway for the domain builder backend API lambda
-domain_builder_url=$(aws apigatewayv2 get-apis --output json | jq -r  '.Items[] | select(.Name == "domain-builder-backend-api") | .ApiEndpoint')
+## domain_builder_url=$(aws apigatewayv2 get-apis --output json | jq -r  '.Items[] | select(.Name == "domain-builder-backend-api") | .ApiEndpoint')
 
-if [ -z "$domain_builder_url" ];
-then
-  domain_builder_url="https://3utboj866g.execute-api.eu-west-2.amazonaws.com"
-  echo "Unable to retrieve domain builder url from api gateway."
-  echo "Falling back to: $domain_builder_url"
-fi
+## if [ -z "$domain_builder_url" ];
+## then
+##   domain_builder_url="https://3utboj866g.execute-api.eu-west-2.amazonaws.com"
+##  echo "Unable to retrieve domain builder url from api gateway."
+##  echo "Falling back to: $domain_builder_url"
+## fi
 
+# Retrieve configured API gateway for the domain builder backend API lambda
 domain_builder_api_key="${DOMAIN_API_KEY}"
+domain_builder_url="${REST_API_EXEC_ARN}"
+domain_builder_api_id="${REST_API_ID}"
+
+# Debug
+echo "___domain_builder_url: $domain_builder_url, ____domain_builder_api_id: $domain_builder_api_id"
 
 # Generate a launcher script for the jar that starts domain-builder in interactive mode
 # and configured to use the function URL via the DOMAIN_API_URL environment variable

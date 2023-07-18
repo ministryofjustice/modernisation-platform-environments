@@ -105,9 +105,9 @@ module "domain_builder_cli_agent" {
   app_key                     = "domain-builder"
 
   env_vars = {
-      DOMAIN_API_KEY = "${module.domain_builder_api_key[0].secret}"
-      REST_API_EXEC_ARN = "${module.domain_builder_api_gateway[0].rest_api_execution_arn}"
-      REST_API_ID = "${module.domain_builder_api_gateway[0].rest_api_id}"
+      DOMAIN_API_KEY = module.domain_builder_api_key[0].secret ? module.domain_builder_api_key[0].secret : ""
+      REST_API_EXEC_ARN = module.domain_builder_api_gateway[0].rest_api_execution_arn ? module.domain_builder_api_gateway[0].rest_api_execution_arn : ""
+      REST_API_ID = module.domain_builder_api_gateway[0].rest_api_id ? module.domain_builder_api_gateway[0].rest_api_id : ""
   }
 
   tags = merge(
