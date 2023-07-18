@@ -1,13 +1,9 @@
-# nomis-development environment settings
+# csr-development environment settings
 locals {
 
   # baseline config
   development_config = {
-    security_groups = {
-      config = merge(local.security_groups.T3-CSR-App-SG)
-    }
-
-
+    
     baseline_ec2_autoscaling_groups = {
       dev-base-ol85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {

@@ -14,7 +14,6 @@ locals {
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
-    test          = local.security_group_cidrs_devtest
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
@@ -22,7 +21,7 @@ locals {
     data_db = {
       description = "Security group for database servers"
       ingress = {
-        allow-from-self = {
+        all-from-self = {
           description = "Allow all ingress to self"
           from_port   = 0
           to_port     = 0
@@ -43,7 +42,7 @@ locals {
     
     }
 
-    T3-CSR-Web = {
+    Web-SG-migration = {
       description = "Security group for web servers"
       ingress = {
         allow-from-self = {
@@ -164,7 +163,7 @@ locals {
       }
     }
 
-    T3-CSR-App-SG ={
+    App-SG-migration = {
       description = "security group for application servers"
       ingress = {
         allow-from-self = {
@@ -298,7 +297,7 @@ locals {
         }
       }
     }
-    T3-CSR-DB-SG = {
+    DB-SG-migration = {
       description = "Security group for database servers"
       ingress = {
         allow-from-self = {
