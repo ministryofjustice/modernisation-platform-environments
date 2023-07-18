@@ -75,7 +75,7 @@ resource "aws_ssm_maintenance_window_target" "reg_target_oim" {
 
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.oim1_instance_1.id]
+    values = [aws_instance.oim_instance_1.id]
   }
 }
 
@@ -89,7 +89,7 @@ resource "aws_ssm_maintenance_window_task" "commands_oim" {
 
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.oim1_instance_1.id]
+    values = [aws_instance.oim_instance_1.id]
   }
 
 
