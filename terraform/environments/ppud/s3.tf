@@ -136,9 +136,9 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
 }
 
 
-####################################
-# MoJ- Powershell-Scripts S3 Bucket
-####################################
+##########################
+# MoJ- Scripts S3 Bucket
+##########################
 
 resource "aws_s3_bucket" "moj-scripts" {
   count  = local.is-production == true ? 1 : 0
