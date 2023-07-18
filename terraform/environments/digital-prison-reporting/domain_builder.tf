@@ -185,7 +185,7 @@ module "domain_builder_api_gateway" {
   source              =  "./modules/apigateway/serverless-lambda-gw"
   enable_gateway      = local.enable_dbuilder_serverless_gw
   name                = local.serverless_gw_dbuilder_name
-  lambda_arn          = module.domain_builder_backend_Lambda.lambda_function
+  lambda_arn          = module.domain_builder_backend_Lambda.lambda_invoke_arn
   lambda_name         = module.domain_builder_backend_Lambda.lambda_name
   #endpoint_id        = module.domain_builder_gw_vpclink.vpc_endpoint_id
   subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
