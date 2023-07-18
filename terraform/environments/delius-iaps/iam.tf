@@ -1,6 +1,35 @@
+resource "aws_iam_role" "ci_secrets_rotator" {
+  count              = local.is-production || local.is-preproduction ? 1 : 0
+  name               = "ci-secrets-rotator"
+  assume_role_policy = data.aws_iam_policy_document.ci_secrets_rotator_role.json
+  tags               = local.tags
+}
+
 locals {
   iaps_ds_arn              = "arn:aws:ds:eu-west-2:${data.aws_caller_identity.current.account_id}:directory/${aws_directory_service_directory.active_directory.id}"
   iaps_ds_admin_secret_arn = aws_secretsmanager_secret.ad_password.arn
+}
+
+data "aws_iam_policy_document" "ci_secrets_rotator_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      values   = ["sts.amazonaws.com"]
+      variable = "token.actions.githubusercontent.com:aud"
+    }
+    condition {
+      test     = "StringLike"
+      values   = ["repo:ministryofjustice/modernisation-platform-configuration-management:*"]
+      variable = "token.actions.githubusercontent.com:sub"
+    }
+  }
 }
 
 data "aws_iam_policy_document" "ci_secrets_rotator" {
@@ -39,35 +68,9 @@ resource "aws_iam_role_policy_attachment" "ci_secrets_rotator" {
   role       = aws_iam_role.ci_secrets_rotator[0].name
 }
 
-
-resource "aws_iam_role" "ci_secrets_rotator" {
-  count              = local.is-production || local.is-preproduction ? 1 : 0
-  name               = "ci-secrets-rotator"
-  assume_role_policy = data.aws_iam_policy_document.ci_secrets_rotator_role.json
-  tags               = local.tags
-}
-
-data "aws_iam_policy_document" "ci_secrets_rotator" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-
-    principals {
-      type        = "Federated"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
-    }
-    condition {
-      test     = "StringEquals"
-      values   = ["sts.amazonaws.com"]
-      variable = "token.actions.githubusercontent.com:aud"
-    }
-    condition {
-      test     = "StringLike"
-      values   = ["repo:ministryofjustice/modernisation-platform-configuration-management:*"]
-      variable = "token.actions.githubusercontent.com:sub"
-    }
-  }
-}
+####################
+# CI Data Refresher
+####################
 
 resource "aws_iam_role" "ci_data_refresher" {
   count              = local.is-production || local.is-preproduction ? 1 : 0
