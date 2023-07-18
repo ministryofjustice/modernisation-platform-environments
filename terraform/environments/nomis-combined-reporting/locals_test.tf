@@ -89,7 +89,7 @@ locals {
           ami         = "base_rhel_8_5"
           os-type     = "Linux"
           component   = "test"
-          server_type = "ncr-tomcat"
+          server-type = "ncr-tomcat"
         }
         lb_target_groups = {
           admin = {
@@ -203,7 +203,7 @@ locals {
           ami         = "base_rhel_8_5"
           os-type     = "Linux"
           component   = "test"
-          server_type = "ncr-bip"
+          server-type = "ncr-bip"
         }
         lb_target_groups = {
           http = {
