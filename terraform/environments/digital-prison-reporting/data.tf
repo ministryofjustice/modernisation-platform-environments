@@ -27,3 +27,12 @@ data "aws_iam_policy" "rds_full_access" {
 #  vpc_id       = local.dpr_vpc
 #  service_name = "hmpps-development-com.amazonaws.eu-west-2.execute-api"
 #}
+
+data "aws_vpc_endpoint" "api" {
+  provider     = aws.core-vpc
+  vpc_id       = data.aws_vpc.shared.id
+  service_name = "com.amazonaws.${data.aws_region.current.name}.execute-api"
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.execute-api"
+  }
+}
