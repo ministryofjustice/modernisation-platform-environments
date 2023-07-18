@@ -47,6 +47,7 @@ locals {
         # and put the wildcard in the san
         domain_name = "t2.oasys.service.justice.gov.uk"
         subject_alternate_names = [
+          "t2-int.oasys.service.justice.gov.uk",
           "*.t2.oasys.service.justice.gov.uk",
           "t2-oasys.hmpp-azdt.justice.gov.uk",
         ]
