@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda
 }
 
 module "data_product_get_glue_metadata_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v1.1.0"
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.0"
   application_name               = "data_product_get_glue_metadata"
   tags                           = local.tags
   description                    = "Lambda to retrieve Glue metadata for a specified table in a database"
