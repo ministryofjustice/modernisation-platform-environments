@@ -35,7 +35,7 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
 
-      tomcat-webserver = {
+      tomcat = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "base_rhel_8_5_*"
         })
