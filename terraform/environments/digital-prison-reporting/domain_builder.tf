@@ -3,14 +3,15 @@
 ##########################
 # Generate API Secret for Serverless Lambda Gateway
 module "domain_builder_api_key" {
-  count             = local.enable_dbuilder_lambda || local.enable_domain_builder_agent ? 1 : 0
+  count                   = local.enable_dbuilder_lambda || local.enable_domain_builder_agent ? 1 : 0
 
-  source            = "./modules/secrets_manager"
-  name              = "${local.project}-domain-apikey-${local.environment}"
-  description       = "Serverless Lambda GW API Key"
-  length            = 20
-  override_special  = "{};<>?,./"
-  generate_random   = true
+  source                  = "./modules/secrets_manager"
+  name                    = "${local.project}-domain-apikey-${local.environment}"
+  description             = "Serverless Lambda GW API Key"
+  length                  = 20
+  override_special        = "{};<>?,./"
+  generate_random         = true
+  recovery_window_in_days = 0
 }
 
 # Domain Builder Backend Lambda function
