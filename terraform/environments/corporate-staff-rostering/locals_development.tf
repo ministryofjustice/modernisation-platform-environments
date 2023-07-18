@@ -3,6 +3,10 @@ locals {
 
   # baseline config
   development_config = {
+    security_groups = {
+      config = merge(module.security_groups.T3-CSR-App)
+    }
+
 
     baseline_ec2_autoscaling_groups = {
       dev-base-ol85 = {
