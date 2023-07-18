@@ -4,7 +4,7 @@ locals {
   # baseline config
   development_config = {
     security_groups = {
-      config = merge(local.security_groups)
+      config = merge(local.security_groups.T3-CSR-App-SG)
     }
 
 
