@@ -12,6 +12,7 @@ module "domain_builder_api_key" {
   override_special        = "{};<>?,./"
   generate_random         = true
   recovery_window_in_days = 0
+  pass_version            = 2
 }
 
 # Domain Builder Backend Lambda function

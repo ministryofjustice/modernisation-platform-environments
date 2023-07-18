@@ -2,7 +2,7 @@ resource "random_password" "random_string" {
   count            = var.generate_random ? 1 : 0  
   length           = var.length
   lower            = var.use_lower
-  number           = var.use_number
+  numeric          = var.use_number
   min_lower        = var.min_lower
   min_numeric      = var.min_numeric
   min_special      = var.min_special
