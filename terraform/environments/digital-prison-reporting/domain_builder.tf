@@ -6,7 +6,7 @@ module "domain_builder_api_key" {
   count                   = local.enable_dbuilder_lambda || local.enable_domain_builder_agent ? 1 : 0
 
   source                  = "./modules/secrets_manager"
-  name                    = "${local.project}-domain-apikey-${local.environment}-new"
+  name                    = "${local.project}-domain-apikey-${local.environment}"
   description             = "Serverless Lambda GW API Key"
   length                  = 20
   override_special        = "{};<>?,./"
@@ -192,9 +192,9 @@ module "domain_builder_api_gateway" {
   subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
   security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.serverless_gw[0].id, ] : []
   #endpoint_ids       = module.domain_builder_gw_vpclink[*].vpc_endpoint_id 
-  endpoint_ids        = ["vpce-05d9421e74348aafb", ] # This Endpoint is managed and provisioned by MP Team
+  #endpoint_ids       = ["vpce-05d9421e74348aafb", ] # This Endpoint is managed and provisioned by MP Team
   #endpoint_id        = data.aws_vpc_endpoint.api.id
-  #endpoint_ids       = [data.aws_vpc_endpoint.api.id, ]
+  endpoint_ids        = [data.aws_vpc_endpoint.api.id, ]
 
   tags = merge(
     local.all_tags,
