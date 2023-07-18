@@ -6,7 +6,7 @@ module "domain_builder_api_key" {
   count                   = local.enable_dbuilder_lambda || local.enable_domain_builder_agent ? 1 : 0
 
   source                  = "./modules/secrets_manager"
-  name                    = "${local.project}-domain-apikey-${local.environment}"
+  name                    = "${local.project}-domain-api-key-${local.environment}"
   description             = "Serverless Lambda GW API Key"
   length                  = 20
   override_special        = "{};<>?,./"
