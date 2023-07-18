@@ -155,7 +155,6 @@ locals {
         security_groups          = ["private_lb"]
         public_subnets           = module.environment.subnets["private"].ids
         tags                     = local.tags
-
         listeners = {
           https = {
             port                      = 443
