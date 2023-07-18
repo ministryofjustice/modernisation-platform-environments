@@ -11,7 +11,6 @@ resource "aws_security_group" "database_security_group" {
     security_groups = [
       aws_security_group.jitbit.id,
       module.bastion_linux.bastion_security_group,
-      aws_security_group.onprem_gateway.id
     ]
   }
 
