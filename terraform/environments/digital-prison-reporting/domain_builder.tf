@@ -191,7 +191,7 @@ module "domain_builder_api_gateway" {
   security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.serverless_gw[0].id, ] : []
   #endpoint_ids       = module.domain_builder_gw_vpclink[*].vpc_endpoint_id 
   #endpoint_ids       = ["vpce-05d9421e74348aafb", ] # This Endpoint is managed and provisioned by MP Team
-  endpoint_id         = data.aws_vpc_endpoint.api.id
+  #endpoint_id        = data.aws_vpc_endpoint.api.id
   endpoint_ids        = [data.aws_vpc_endpoint.api.id, ]
 
   tags = merge(
