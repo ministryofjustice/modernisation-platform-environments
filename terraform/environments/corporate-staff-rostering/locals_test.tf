@@ -79,15 +79,15 @@ locals {
       }
     }
 
-        tags = {
-          description = "Test CSR DB server"
-          ami         = "base_ol_8_5"
-          os-type     = "Linux"
-          component   = "test"
-          server-type = "csr-db"
-        }
+    tags = {
+      description = "Test CSR DB server"
+      ami         = "base_ol_8_5"
+      os-type     = "Linux"
+      component   = "test"
+      server-type = "csr-db"
+    }
       }
-
+    }
       baseline_route53_zones = {
         "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
           records = [
@@ -107,7 +107,5 @@ locals {
         iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
-
   }
-}
 }
