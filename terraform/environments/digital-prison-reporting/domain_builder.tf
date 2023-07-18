@@ -13,6 +13,16 @@ module "domain_builder_api_key" {
   generate_random         = true
   recovery_window_in_days = 0
   pass_version            = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "domain-builder"
+      Jira           = "DPR-604"
+      Resource_Type  = "Secret"
+      Name           = "${local.project}-domain-api-key-${local.environment}"      
+    }
+  )
 }
 
 # Domain Builder Backend Lambda function
@@ -46,8 +56,10 @@ module "domain_builder_backend_Lambda" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "${local.project}-domain-builder-backend-${local.environment}"
+      Resource_Group = "domain-builder"
       Jira           = "DPR-407"
+      Resource_Type  = "lambda"
+      Name           = local.lambda_dbuilder_name      
     }
   )
 }
@@ -72,8 +84,10 @@ module "domain_builder_backend_db" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "${local.project}-domain-builder-backend-${local.environment}"
+      Resource_Group = "domain-builder"
       Jira           = "DPR-407"
+      Resource_Type  = "lambda"
+      Name           = local.rds_dbuilder_name
     }
   )
 }
@@ -113,8 +127,10 @@ module "domain_builder_cli_agent" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-builder-agent-${local.env}"
-      Resource_Type = "EC2 Instance"
+      Name            = "${local.project}-domain-builder-agent-${local.env}"
+      Resource_Type   = "EC2 Instance"
+      Resource_Group  = "domain-builder"
+      Name            = "${local.project}-domain-builder-agent-${local.env}"
     }
   )
 
@@ -157,6 +173,8 @@ module "domain_builder_flyway_Lambda" {
     {
       Name = local.flyway_dbuilder_name
       Jira = "DPR-584"
+      Resource_Group = "domain-builder"
+      Resource_Type  = "lambda"
     }
   )
 }
@@ -193,10 +211,7 @@ module "domain_builder_api_gateway" {
   lambda_name         = module.domain_builder_backend_Lambda.lambda_name
   subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
   security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.serverless_gw[0].id, ] : []
-  #endpoint_ids       = module.domain_builder_gw_vpclink[*].vpc_endpoint_id 
-  #endpoint_ids       = ["vpce-05d9421e74348aafb", ] # This Endpoint is managed and provisioned by MP Team
-  #endpoint_id        = data.aws_vpc_endpoint.api.id
-  endpoint_ids        = [data.aws_vpc_endpoint.api.id, ]
+  endpoint_ids        = [data.aws_vpc_endpoint.api.id, ] # This Endpoint is managed and provisioned by MP Team, Dev "vpce-05d9421e74348aafb"
 
   tags = merge(
     local.all_tags,
