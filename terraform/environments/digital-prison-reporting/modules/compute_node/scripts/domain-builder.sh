@@ -55,7 +55,7 @@ then
   echo "Falling back to: $domain_builder_url"
 fi
 
-domain_builder_api_key="$DOMAIN_API_KEY"
+domain_builder_api_key="${DOMAIN_API_KEY}"
 
 # Generate a launcher script for the jar that starts domain-builder in interactive mode
 # and configured to use the function URL via the DOMAIN_API_URL environment variable
