@@ -197,6 +197,9 @@ locals {
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
       vpc_security_group_ids       = ["data-db"]
+      tags = {
+        backup-plan = "daily-and-weekly"
+      }
     })
 
     user_data_cloud_init = {
@@ -267,7 +270,6 @@ locals {
       os-version           = "RHEL 7.9"
       licence-requirements = "Oracle Database"
       "Patch Group"        = "RHEL"
-      backup               = "true"
     }
   }
 
