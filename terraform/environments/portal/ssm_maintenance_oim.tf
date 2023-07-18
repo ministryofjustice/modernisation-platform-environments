@@ -59,7 +59,7 @@ EOF
 }
 
 resource "aws_ssm_maintenance_window" "oim_window" {
-  name     = "oam1-diagnostics-log-archive-poc"
+  name     = "oim1-diagnostics-log-archive-poc"
   schedule = "cron(0 0 9 ? * * *)"
   duration = 4
   cutoff   = 1
