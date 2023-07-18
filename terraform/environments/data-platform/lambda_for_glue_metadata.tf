@@ -23,7 +23,7 @@ module "data_product_get_glue_metadata_lambda" {
   tags                           = local.tags
   description                    = "Lambda to retrieve Glue metadata for a specified table in a database"
   role_name                      = "get_glue_metadata_lambda_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_get_glue_metadata_lambda
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_get_glue_metadata_lambda.json
   function_name                  = "data_product_get_glue_metadata_${local.environment}"
   create_role                    = true
   reserved_concurrent_executions = 1
