@@ -187,7 +187,7 @@ locals {
           to_port = 22
           protocol = "tcp"
           cidr_blocks = local.security_group_cidrs.ssh
-          security_groups = ["Web-SG-migration", "data-db","DB-SG-migration"]
+          security_groups = []
         }
         rdp = {
           description = "Allow ingress from port 3389"
@@ -195,7 +195,7 @@ locals {
           to_port         = 3389
           protocol        = "TCP"
           cidr_blocks     = ["10.0.0.0/8"]
-          security_groups = ["Web-SG-migration", "data-db","DB-SG-migration"]
+          security_groups = []
         }
         # http2109 = {
         #   description = "Allow ingress from port 2109"
@@ -313,7 +313,7 @@ locals {
           to_port = 22
           protocol = "tcp"
           cidr_blocks = local.security_group_cidrs.ssh
-          security_groups = ["Web-SG-migration", "data-db","App-SG-migration"]
+          security_groups = []
         }
         # http49152_65535 = {
         #   description = "Allow ingress from port 49152-65535"
