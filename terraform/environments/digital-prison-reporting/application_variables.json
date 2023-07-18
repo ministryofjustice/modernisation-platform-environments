@@ -41,14 +41,14 @@
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
       "enable_dms_replication_task": true,
-      "enable_domain_builder_lambda": false,
-      "enable_dbuilder_flyway_lambda": false,
-      "enable_domain_builder_rds": false,
+      "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
+      "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": true,
       "include_dbuilder_gw_vpclink": false,
-      "enable_dbuilder_serverless_gw": false,
-      "enable_dbuilder_apikey": false
+      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_apikey": true
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -66,14 +66,14 @@
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
       "enable_dms_replication_task": false,
-      "enable_domain_builder_lambda": false,
-      "enable_dbuilder_flyway_lambda": false,
-      "enable_domain_builder_rds": false,
+      "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
+      "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
-      "enable_dbuilder_serverless_gw": false,
-      "enable_dbuilder_apikey": false
+      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_apikey": true
     },
     "production": {
       "example_var": "production-data"
