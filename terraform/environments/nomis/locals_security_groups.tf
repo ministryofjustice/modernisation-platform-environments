@@ -17,7 +17,10 @@ locals {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
     ])
-    ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
+    ssh = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+    ])
     https = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -31,18 +34,21 @@ locals {
       module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
       module.ip_addresses.azure_studio_hosting_cidrs.devtest,
       module.ip_addresses.azure_nomisapi_cidrs.devtest,
-      module.ip_addresses.mp_cidr.hmpps-development,
-      module.ip_addresses.mp_cidr.hmpps-test,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
   }
   security_group_cidrs_preprod_prod = {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
     ])
-    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
+    ssh = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+    ])
     https = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -56,9 +62,11 @@ locals {
       module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
       module.ip_addresses.azure_studio_hosting_cidrs.prod,
       module.ip_addresses.azure_nomisapi_cidrs.prod,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
   }
 
@@ -156,6 +164,13 @@ locals {
           security_groups = [
             "bastion-linux",
           ]
+        }
+        oracle3872 = {
+          description = "Allow oem agent ingress"
+          from_port   = "3872"
+          to_port     = "3872"
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
         }
         http7001 = {
           description = "Allow http7001 ingress"
@@ -270,11 +285,6 @@ locals {
           to_port     = "3872"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-          security_groups = [
-            "private-jumpserver",
-            "private-web",
-            "bastion-linux",
-          ]
         }
       }
       egress = {
