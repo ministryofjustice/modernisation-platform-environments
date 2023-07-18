@@ -12,6 +12,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
   }
+  security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_groups = {
     data_db = {
