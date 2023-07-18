@@ -203,7 +203,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
       "SNS:Receive"
     ]
     resources = [
-      aws_sns_topic.cw_alerts.arn
+      aws_sns_topic.cw_alerts[0].arn
     ]
   }
 }
