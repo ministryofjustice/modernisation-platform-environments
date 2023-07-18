@@ -2,7 +2,7 @@
 locals {
 
   # baseline config
-  test_config = {
+  database_config = {
 
     baseline_ec2_instances = {
       t3-csr-db-a = {
