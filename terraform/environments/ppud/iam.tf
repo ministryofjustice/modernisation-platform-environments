@@ -183,6 +183,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_lambda_role" 
 
 ## SNS IAM Policies
 data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
+  count         = local.is-production == true ? 1 : 0
   policy_id = "SnsTopicId"
   statement {
     sid = "statement1"

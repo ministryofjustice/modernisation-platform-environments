@@ -27,6 +27,7 @@ resource "aws_secretsmanager_secret_version" "sversion" {
 
   #### Secret for SNS email address ###
 resource "aws_secretsmanager_secret" "support_email_account" {
+  count       = local.is-production == true ? 1 : 0
   name        = "Application_email_account"
   description = "email address of the support account for cw alerts"
   recovery_window_in_days = 0
@@ -34,7 +35,8 @@ resource "aws_secretsmanager_secret" "support_email_account" {
 
 
 resource "aws_secretsmanager_secret_version" "support_email_account" {
-  secret_id     = aws_secretsmanager_secret.support_email_account.id
+  count         = local.is-production == true ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.support_email_account[0].id
   secret_string = "umesh.ray@lumen.com"
   lifecycle {
     ignore_changes = [secret_string, ]

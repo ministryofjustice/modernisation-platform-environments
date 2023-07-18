@@ -1,5 +1,5 @@
 
-variable "instances" {
+variable "prod_instances" {
     default = ["i-00413756d2dfcf6d2", "i-0dba6054c0f5f7a11", "i-014bce95a85aaeede", "i-0b5ef7cb90938fb82", "i-04bbb6312b86648be"]
 }
 
@@ -9,7 +9,7 @@ variable "instances" {
 
 # Low Available Memory Alarm
 resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
-  count               = length(var.instances)
+  count               = length(var.prod_instances)
   alarm_name          = "Prod-${count.index}-low-available-memory"
   comparison_operator = "LessThanOrEqualToThreshold"
   period              = "60"
@@ -21,8 +21,8 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   namespace           = "CWAgent"
   statistic           = "Average"
   alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is less than 10% for 2 minutes, the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  dimensions = { InstanceId = "${element(var.instances, count.index)}"}
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
     tags = {
     Name = "low_available_memory"
   }
@@ -30,7 +30,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
 
 # High CPU IOwait Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
-  count               = length(var.instances)
+  count               = length(var.prod_instances)
   alarm_name          = "Prod-${count.index}-cpu-usage-iowait"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "6"
@@ -42,8 +42,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   statistic           = "Average"
   threshold           = "90"
   alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  dimensions = { InstanceId = "${element(var.instances, count.index)}"}
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
     tags = {
     Name = "cpu_usage_iowait"
   }
@@ -51,7 +51,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
 
 # Disk Free Alarm
 resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
-  count = length(var.instances)
+  count = length(var.prod_instances)
   alarm_name = "Prod-${count.index}-high-disk-usage"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -63,8 +63,8 @@ resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
   threshold           = "5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 2 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  dimensions = { InstanceId = "${element(var.instances, count.index)}"}
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
    tags = {
     Name = "disk_free"
   }
@@ -72,7 +72,7 @@ resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
 
 # CPU Utilization Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu" {
-  count               = length(var.instances)
+  count               = length(var.prod_instances)
   alarm_name          = "Prod-${count.index}-CPU-High"    # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold"   # threshold to trigger the alarm state
   period              = "60"                              # period in seconds over which the specified statistic is applied
@@ -84,8 +84,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   namespace           = "AWS/EC2"                         # namespace of the alarm's associated metric
   statistic           = "Average"                         # could be Average/Minimum/Maximum etc.
   alarm_description   = "Monitors ec2 cpu utilisation"
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  dimensions = { InstanceId = "${element(var.instances, count.index)}"}
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
     tags = {
     Name = "CPU_High"
   }
@@ -97,7 +97,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
 
 # Instance Health Alarm
 resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
-  count               = length(var.instances)
+  count               = length(var.prod_instances)
   alarm_name          = "Prod-${count.index}-instance-health-check-failed"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -109,8 +109,8 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  dimensions = { InstanceId = "${element(var.instances, count.index)}"}
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
     tags = {
     Name = "instance_health_check"
   }
@@ -118,7 +118,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
 
 # Status Check Alarm
 resource "aws_cloudwatch_metric_alarm" "system_health_check" {
-  count               = length(var.instances)
+  count               = length(var.prod_instances)
   alarm_name          = "Prod-${count.index}-system-health-check-failed"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -130,8 +130,8 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  dimensions = { InstanceId = "${element(var.instances, count.index)}"}
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
   tags = {
     Name = "system_health_check"
   }
@@ -144,7 +144,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
 
 # Status Check Alarm
 resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
-  count               = length(var.instances)
+  count               = length(var.prod_instances)
   alarm_name          = "Prod-${count.index}-IIS-failure"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -156,9 +156,9 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  dimensions = { InstanceId = "${element(var.instances, count.index)}"}
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
     tags = {
-    Name = "system_health_check"
+    Name = "Windows_IIS_check"
   }
 }
