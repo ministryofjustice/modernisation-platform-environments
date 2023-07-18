@@ -22,7 +22,7 @@ data "aws_iam_policy" "rds_full_access" {
 }
 
 # Get APIGateway Endpoint ID
-# Declare the data source
+# Declare the data source - NOT working
 data "aws_vpc_endpoint" "api" {
   vpc_id       = local.dpr_vpc
   service_name = "hmpps-development-com.amazonaws.eu-west-2.execute-api"
