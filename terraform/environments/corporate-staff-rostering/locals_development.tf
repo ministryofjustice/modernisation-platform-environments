@@ -4,8 +4,7 @@ locals {
   # baseline config
   development_config = {
     security_groups = {
-      source = "./locals_security_groups.tf"
-      config = merge(security_groups.T3-CSR-App)
+      config = merge(local.security_groups)
     }
 
 
