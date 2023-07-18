@@ -74,7 +74,7 @@ locals {
           to_port         = 443
           protocol        = "TCP"
           cidr_blocks     = ["10.0.0.0/8"]
-          security_groups = ["App-SG-migration","DB-SG-migration"]
+          security_groups = []
         }
 
          http = {
@@ -83,7 +83,7 @@ locals {
           to_port         = 80
           protocol        = "TCP"
           cidr_blocks     = ["10.0.0.0/8"]
-          security_groups = ["App-SG-migration","DB-SG-migration"]
+          security_groups = []
         }
         # http445 = {
         #   description = "Allow ingress from port 445"
@@ -99,7 +99,7 @@ locals {
           to_port         = 3389
           protocol        = "TCP"
           cidr_blocks     = ["10.0.0.0/8"]
-          security_groups = ["App-SG-migration","DB-SG-migration"]
+          security_groups = []
         }
         # http5985 = {
         #   description = "Allow ingress from port 5985"
