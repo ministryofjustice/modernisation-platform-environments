@@ -55,3 +55,20 @@ resource "aws_api_gateway_stage" "default_deployment" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
   stage_name    = "default"
 }
+
+resource "aws_api_gateway_rest_api_policy" "this" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  policy      = <<EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "${aws_api_gateway_rest_api.this.execution_arn}/*"
+        }
+    ]
+}
+EOF
+}

@@ -20,3 +20,10 @@ data "aws_secretsmanager_secret_version" "nomis" {
 data "aws_iam_policy" "rds_full_access" {
   arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
+
+# Get APIGateway Endpoint ID
+# Declare the data source
+data "aws_vpc_endpoint" "api" {
+  vpc_id       = local.dpr_vpc
+  service_name = "com.amazonaws.eu-west-2.execute-api"
+}
