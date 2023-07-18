@@ -10,7 +10,7 @@ resource "aws_sns_topic_policy" "sns_policy" {
   policy = data.aws_iam_policy_document.sns_topic_policy_ec2cw[0].json
 }
 resource "aws_sns_topic_subscription" "cw_subscription" {
-  topic_arn = aws_sns_topic.cw_alerts[0].arn
+  topic_arn = aws_sns_topic.cw_alerts.arn
   protocol  = "email"
-  endpoint  = aws_secretsmanager_secret_version.support_email_account[0].secret_string
+  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
 }

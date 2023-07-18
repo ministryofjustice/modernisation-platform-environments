@@ -21,7 +21,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   namespace           = "CWAgent"
   statistic           = "Average"
   alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is less than 10% for 2 minutes, the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
     tags = {
     Name = "low_available_memory"
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   statistic           = "Average"
   threshold           = "90"
   alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
     tags = {
     Name = "cpu_usage_iowait"
@@ -63,7 +63,7 @@ resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
   threshold           = "5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 2 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
    tags = {
     Name = "disk_free"
@@ -84,7 +84,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   namespace           = "AWS/EC2"                         # namespace of the alarm's associated metric
   statistic           = "Average"                         # could be Average/Minimum/Maximum etc.
   alarm_description   = "Monitors ec2 cpu utilisation"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
     tags = {
     Name = "CPU_High"
@@ -109,7 +109,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
     tags = {
     Name = "instance_health_check"
@@ -130,7 +130,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
   tags = {
     Name = "system_health_check"
@@ -156,7 +156,7 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   dimensions = { InstanceId = "${element(var.prod_instances, count.index)}"}
     tags = {
     Name = "Windows_IIS_check"
