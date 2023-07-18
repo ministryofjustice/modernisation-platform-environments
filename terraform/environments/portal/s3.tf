@@ -46,3 +46,8 @@ resource "aws_s3_object" "object_oim" {
   bucket = "laa-${local.application_name}-${local.environment}-archive-mp"
   key = "oim1/"
 }
+
+resource "aws_s3_object" "object_ohs" {
+  bucket = "laa-${local.application_name}-${local.environment}-archive-mp"
+  key = "ohs1/"
+}
