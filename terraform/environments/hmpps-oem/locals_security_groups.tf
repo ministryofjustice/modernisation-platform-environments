@@ -4,7 +4,7 @@ locals {
     oracle_db = flatten([
       "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
-    oracle_oem_agent = flatten([
+    oracle_oem_target_hosts = flatten([
       "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
     oracle_oem_console = flatten([
@@ -16,7 +16,7 @@ locals {
     oracle_db = flatten([
       "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
-    oracle_oem_agent = flatten([
+    oracle_oem_target_hosts = flatten([
       "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
     oracle_oem_console = flatten([
@@ -43,6 +43,13 @@ locals {
           protocol    = -1
           self        = true
         }
+        ssh = {
+          description = "Allow ssh ingress"
+          from_port   = "22"
+          to_port     = "22"
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.oracle_oem_target_hosts
+        }
         oracle1521 = {
           description = "Allow oracle database 1521 ingress"
           from_port   = "1521"
@@ -55,7 +62,14 @@ locals {
           from_port   = "3872"
           to_port     = "3872"
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
+          cidr_blocks = local.security_group_cidrs.oracle_oem_target_hosts
+        }
+        oracle4903 = {
+          description = "Allow oracle OEM https upload"
+          from_port   = "4903"
+          to_port     = "4903"
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.oracle_oem_target_hosts
         }
         oracle7803 = {
           description = "Allow oracle OEM console"
