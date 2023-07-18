@@ -45,7 +45,7 @@ locals {
     Web-SG-migration = {
       description = "Security group for web servers"
       ingress = {
-        allow-from-self = {
+        all-from-self = {
           description = "Allow all ingress to self"
           from_port   = 0
           to_port     = 0
@@ -166,7 +166,7 @@ locals {
     App-SG-migration = {
       description = "security group for application servers"
       ingress = {
-        allow-from-self = {
+        all-from-self = {
           description = "Allow all ingress to self"
           from_port   = 0
           to_port     = 0
@@ -300,7 +300,7 @@ locals {
     DB-SG-migration = {
       description = "Security group for database servers"
       ingress = {
-        allow-from-self = {
+        all-from-self = {
           description = "Allow all ingress to self"
           from_port   = 0
           to_port     = 0
