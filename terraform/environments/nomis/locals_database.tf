@@ -31,7 +31,7 @@ locals {
       misloadusername = {}
       misloadpassword = {}
     }
-  }  
+  }
 
   database_cloudwatch_metric_alarms = {
     oracle-db-disconnected = {
