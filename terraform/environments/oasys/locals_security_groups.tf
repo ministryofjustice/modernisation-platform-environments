@@ -127,7 +127,7 @@ locals {
         }
       }
     }
-    private_lb_internal = {
+    private_lb = {
       description = "Security group for internal load balancer"
       ingress = {
         all-from-self = {
@@ -177,7 +177,7 @@ locals {
         }
       }
     }
-    private_lb_external = {
+    public_lb = {
       description = "Security group for internal load balancer"
       ingress = {
         all-from-self = {
