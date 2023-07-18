@@ -25,5 +25,5 @@ data "aws_iam_policy" "rds_full_access" {
 # Declare the data source
 data "aws_vpc_endpoint" "api" {
   vpc_id       = local.dpr_vpc
-  service_name = "com.amazonaws.eu-west-2.execute-api"
+  service_name = "hmpps-development-com.amazonaws.eu-west-2.execute-api"
 }
