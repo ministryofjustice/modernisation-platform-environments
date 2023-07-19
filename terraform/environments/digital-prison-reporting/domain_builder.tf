@@ -1,6 +1,30 @@
 ##########################
 #    Domain Builder TF   # 
 ##########################
+# Generate API Secret for Serverless Lambda Gateway
+module "domain_builder_api_key" {
+  count                   = local.enable_dbuilder_lambda || local.enable_domain_builder_agent ? 1 : 0
+
+  source                  = "./modules/secrets_manager"
+  name                    = "${local.project}-domain-api-key-${local.environment}"
+  description             = "Serverless Lambda GW API Key"
+  length                  = 20
+  override_special        = "{};<>?,./"
+  generate_random         = true
+  recovery_window_in_days = 0
+  pass_version            = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "domain-builder"
+      Jira           = "DPR-604"
+      Resource_Type  = "Secret"
+      Name           = "${local.project}-domain-api-key-${local.environment}"      
+    }
+  )
+}
+
 # Domain Builder Backend Lambda function
 module "domain_builder_backend_Lambda" {
   source = "./modules/lambdas/generic"
@@ -21,6 +45,7 @@ module "domain_builder_backend_Lambda" {
     "POSTGRES_USERNAME" = local.rds_dbuilder_user
     "POSTGRES_PASSWORD" = module.domain_builder_backend_db.master_password
     "POSTGRES_PORT"     = local.rds_dbuilder_port
+    "DOMAIN_API_KEY"    = module.domain_builder_api_key[0].secret
   }
 
   vpc_settings = {
@@ -31,8 +56,10 @@ module "domain_builder_backend_Lambda" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "${local.project}-domain-builder-backend-${local.environment}"
+      Resource_Group = "domain-builder"
       Jira           = "DPR-407"
+      Resource_Type  = "lambda"
+      Name           = local.lambda_dbuilder_name      
     }
   )
 }
@@ -57,8 +84,10 @@ module "domain_builder_backend_db" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "${local.project}-domain-builder-backend-${local.environment}"
+      Resource_Group = "domain-builder"
       Jira           = "DPR-407"
+      Resource_Type  = "lambda"
+      Name           = local.rds_dbuilder_name
     }
   )
 }
@@ -89,11 +118,20 @@ module "domain_builder_cli_agent" {
   env                         = local.env
   app_key                     = "domain-builder"
 
+  env_vars = {
+      DOMAIN_API_KEY = tostring(try(module.domain_builder_api_key[0].secret, null))
+      REST_API_EXEC_ARN = tostring(try(module.domain_builder_api_gateway[0].rest_api_execution_arn, null))
+      REST_API_ID = tostring(try(module.domain_builder_api_gateway[0].rest_api_id, null))
+      ENV = local.env
+  }
+
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-builder-agent-${local.env}"
-      Resource_Type = "EC2 Instance"
+      Name            = "${local.project}-domain-builder-agent-${local.env}"
+      Resource_Type   = "EC2 Instance"
+      Resource_Group  = "domain-builder"
+      Name            = "${local.project}-domain-builder-agent-${local.env}"
     }
   )
 
@@ -117,7 +155,7 @@ module "domain_builder_flyway_Lambda" {
   trigger_bucket_arn  = module.s3_artifacts_store.bucket_arn
 
   env_vars = {
-    "DB_CONNECTION_STRING"  = "jdbc:postgresql://dpr-backend-rds.cja8lnnvvipo.eu-west-2.rds.amazonaws.com/dpr_domain_builder"
+    "DB_CONNECTION_STRING"  = "jdbc:postgresql://${module.domain_builder_backend_db.rds_host}/${local.rds_dbuilder_db_identifier}"
     "DB_USERNAME"           = local.rds_dbuilder_user
     "DB_PASSWORD"           = module.domain_builder_backend_db.master_password
     "FLYWAY_METHOD"         = "migrate"
@@ -134,8 +172,55 @@ module "domain_builder_flyway_Lambda" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "${local.project}-domain-builder-flyway-${local.environment}"
-      Jira           = "DPR-584"
+      Name = local.flyway_dbuilder_name
+      Jira = "DPR-584"
+      Resource_Group = "domain-builder"
+      Resource_Type  = "lambda"
+    }
+  )
+}
+
+# Deploy API GW VPC Link
+module "domain_builder_gw_vpclink" {
+  count               = local.include_dbuilder_gw_vpclink == true ? 1 : 0
+
+  source              =  "./modules/vpc_endpoint"
+  vpc_id              = local.dpr_vpc
+  region              = local.account_region
+  subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.gateway_endpoint_sg[0].id, ] : []
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "domain-builder"
+      Jira           = "DPR-583"
+      Resource_Type  = "vpc_endpoint"
+    }
+  )
+}
+
+
+# Domain Builder API Gateway
+module "domain_builder_api_gateway" {
+  count               = local.enable_dbuilder_serverless_gw == true ? 1 : 0
+
+  source              =  "./modules/apigateway/serverless-lambda-gw"
+  enable_gateway      = local.enable_dbuilder_serverless_gw
+  name                = local.serverless_gw_dbuilder_name
+  lambda_arn          = module.domain_builder_backend_Lambda.lambda_invoke_arn
+  lambda_name         = module.domain_builder_backend_Lambda.lambda_name
+  subnet_ids          = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  security_group_ids  = local.enable_dbuilder_serverless_gw ? [aws_security_group.serverless_gw[0].id, ] : []
+  endpoint_ids        = [data.aws_vpc_endpoint.api.id, ] # This Endpoint is managed and provisioned by MP Team, Dev "vpce-05d9421e74348aafb"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name           = "${local.serverless_gw_dbuilder_name}-gw-${local.env}"
+      Resource_Group = "domain-builder"
+      Jira           = "DPR-583"
+      Resource_Type  = "apigateway"
     }
   )
 }

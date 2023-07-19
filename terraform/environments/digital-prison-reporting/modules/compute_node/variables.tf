@@ -138,3 +138,9 @@ variable "account" {
 #variable "s3_policy_arn" {
 #  description = "S3 policy ARN, to be attached to Ec2 Instance Profile"
 #}
+
+variable "env_vars" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Key-value map of resource env vars."
+}
