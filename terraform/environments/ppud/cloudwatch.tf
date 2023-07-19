@@ -12,7 +12,6 @@ data "aws_instance" "prod_windows_instances" {
 
 # Disk Free Alarm
 resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
-  count      = local.is-production == true ? 1 : 0
   for_each = data.aws_instance.prod_windows_instances
   alarm_name = "high-disk-usage-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
@@ -34,7 +33,6 @@ resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
 
 # Low Available Memory Alarm
 resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
-  count      = local.is-production == true ? 1 : 0
   for_each = data.aws_instance.prod_windows_instances
   alarm_name          = "low-available-memory-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
@@ -55,7 +53,6 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
 
 # High CPU IOwait Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
-  count      = local.is-production == true ? 1 : 0
   for_each = data.aws_instance.prod_windows_instances
   alarm_name          = "cpu-usage-iowait-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -76,7 +73,6 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
 
 # CPU Utilization Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu" {
-  count      = local.is-production == true ? 1 : 0
   for_each = data.aws_instance.prod_windows_instances
   alarm_name          = "CPU-High-${each.key}"    # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold"   # threshold to trigger the alarm state
@@ -101,7 +97,6 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
 
 # Instance Health Alarm
 resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
-  count      = local.is-production == true ? 1 : 0
   for_each = data.aws_instance.prod_windows_instances
   alarm_name          = "instance-health-check-failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -122,7 +117,6 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
 
 # Status Check Alarm
 resource "aws_cloudwatch_metric_alarm" "system_health_check" {
-  count      = local.is-production == true ? 1 : 0
   for_each = data.aws_instance.prod_windows_instances
   alarm_name          = "system-health-check-failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -148,7 +142,6 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
 
 # Status Check Alarm
 resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
-  count      = local.is-production == true ? 1 : 0
   for_each = data.aws_instance.prod_windows_instances
   alarm_name          = "IIS-failure-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
