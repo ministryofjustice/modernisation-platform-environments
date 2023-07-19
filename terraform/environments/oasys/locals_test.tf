@@ -131,9 +131,8 @@ locals {
                     host_header = {
                       values = [
                         "t2.oasys.service.justice.gov.uk",
+                        "t2-a.oasys.service.justice.gov.uk",
                         "ords.t2.oasys.service.justice.gov.uk",
-                        "*.t2.oasys.service.justice.gov.uk",
-                        "t2-oasys.hmpp-azdt.justice.gov.uk",
                       ]
                     }
                   }
@@ -184,8 +183,7 @@ locals {
                     host_header = {
                       values = [
                         "t2-int.oasys.service.justice.gov.uk",
-                        "t2-oasys.hmpp-azdt.justice.gov.uk",
-                        "*.t2.oasys.service.justice.gov.uk",
+                        "t2-a-int.oasys.service.justice.gov.uk",
                         "t2-oasys.hmpp-azdt.justice.gov.uk",
                       ]
                     }
