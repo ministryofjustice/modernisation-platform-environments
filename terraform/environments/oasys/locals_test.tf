@@ -42,21 +42,20 @@ locals {
     }
 
     baseline_acm_certificates = {
-      # "t2_${local.application_name}_cert" = {
-      #   # domain_name limited to 64 chars so use modernisation platform domain for this
-      #   # and put the wildcard in the san
-      #   domain_name = "t2.oasys.service.justice.gov.uk"
-      #   subject_alternate_names = [
-      #     "t2-int.oasys.service.justice.gov.uk",
-      #     "*.t2.oasys.service.justice.gov.uk",
-      #     "t2-oasys.hmpp-azdt.justice.gov.uk",
-      #   ]
-      #   external_validation_records_created = true
-      #   cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
-      #   tags = {
-      #     description = "cert for t2 ${local.application_name} ${local.environment} domains"
-      #   }
-      # }
+      "t2_${local.application_name}_cert" = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = "t2.oasys.service.justice.gov.uk"
+        subject_alternate_names = [
+          "*.oasys.service.justice.gov.uk",
+          "*.hmpp-azdt.justice.gov.uk",
+        ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
+        tags = {
+          description = "cert for t2 ${local.application_name} ${local.environment} domains"
+        }
+      }
     }
 
     # options for LBs https://docs.google.com/presentation/d/1RpXpfNY_hw7FjoMw0sdMAdQOF7kZqLUY6qVVtLNavWI/edit?usp=sharing
