@@ -29,6 +29,28 @@ resource "aws_db_parameter_group" "mojfin" {
   )
 }
 
+resource "aws_db_option_group" "mojfin" {
+  name                     = "${local.application_name}-${local.environment}-optiongroup"
+  option_group_description = "MOJFIN DB - enables TIMEZONE"
+  engine_name              = "oracle-se2-19"
+  major_engine_version     = "19"
+
+  option {
+    option_name = "TIMEZONE"
+
+    option_settings {
+      name  = "TIME_ZONE"
+      value = "Europe/London"
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-optiongroup" },
+    { "Keep" = "true" }
+  )
+}
+
 resource "aws_security_group" "mojfin" {
   name        = "${local.application_name}-${local.environment}-secgroup"
   description = "RDS access with the LAA Landing Zone"
@@ -174,6 +196,7 @@ resource "aws_db_instance" "appdb1" {
   # snapshot_identifier             = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.application_data.accounts[local.environment].mojfinrdssnapshotid)
   kms_key_id = data.aws_kms_key.rds_shared.arn
   multi_az                        = true
+  option_group_name               = aws_db_option_group.mojfin.name
 
   # restore_to_point_in_time {
   #   restore_time = "2023-07-04T14:54:00Z"
