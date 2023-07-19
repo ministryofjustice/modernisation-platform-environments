@@ -5,12 +5,9 @@ locals {
 
       t1-ndh-app-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
-          ami_owner = "374269020027"
+          ami_name = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private"]
-        })
+        instance             = merge(module.baseline_presets.ec2_instance.instance.default, {})
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         tags = {
           description = "Standalone EC2 for testing RHEL7.9 NDH App"
@@ -22,12 +19,9 @@ locals {
 
       t1-ndh-ems-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
-          ami_owner = "374269020027"
+          ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private"]
-        })
+        instance             = merge(module.baseline_presets.ec2_instance.instance.default, {})
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         tags = {
           description = "Standalone EC2 for testing RHEL7.9 NDH ems"
