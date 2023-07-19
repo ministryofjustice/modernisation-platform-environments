@@ -39,13 +39,15 @@ sudo mkdir -p /home/ssm-user/domain-builder/jars
 sudo chown -R ssm-user /home/ssm-user
 chmod -R 0777 /home/ssm-user/domain-builder
 
+# Retrieve Env Variables
+environment="${ENV}"
+domain_builder_api_key="${DOMAIN_API_KEY}"
+
 # Sync S3 Domain Builder Artifacts
-aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
+aws s3 cp s3://dpr-artifact-store-$environment/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
 
 # Location of script that will be used to launch the domain builder jar.
 launcher_script_location=/usr/bin/domain-builder
-
-domain_builder_api_key="${DOMAIN_API_KEY}"
 
 # Construct the default endpoint URL which follows a consistent pattern.
 domain_builder_url="https://${REST_API_ID}.execute-api.eu-west-2.amazonaws.com/default"

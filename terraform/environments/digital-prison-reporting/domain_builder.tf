@@ -122,6 +122,7 @@ module "domain_builder_cli_agent" {
       DOMAIN_API_KEY = tostring(try(module.domain_builder_api_key[0].secret, null))
       REST_API_EXEC_ARN = tostring(try(module.domain_builder_api_gateway[0].rest_api_execution_arn, null))
       REST_API_ID = tostring(try(module.domain_builder_api_gateway[0].rest_api_id, null))
+      ENV = local.env
   }
 
   tags = merge(
