@@ -58,7 +58,7 @@ locals {
     })
     user_data_cloud_init = merge(local.xtag_ec2_default.user_data_cloud_init, {
       args = merge(local.xtag_ec2_default.user_data_cloud_init.args, {
-        branch = "nomis/DSOS-1990/xtag-bits-and-bobs"
+        branch = "3c5a4f32dd350feb6df797e9ec19ffe4ed0c47f9" # from AMI, but no collectd
       })
     })
     autoscaling_group = merge(local.xtag_ec2_default.autoscaling_group, {
