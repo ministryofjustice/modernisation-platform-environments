@@ -41,12 +41,7 @@ locals {
       })
     }
 
-    # If your DNS records are in Fix 'n' Go and you have not yet created the
-    # validation record(s) provided by AWS:
-    #
-    # 1. Set 'external_validation_records_created' to 'false'.
-    # 2. Create the validation record in Fix 'n' Go.
-    # 3. Change 'external_validation_records_created' to 'true'.
+    # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
     baseline_acm_certificates = {
       "t2_${local.application_name}_cert" = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -56,7 +51,7 @@ locals {
           "*.oasys.service.justice.gov.uk",
           "*.hmpp-azdt.justice.gov.uk",
         ]
-        external_validation_records_created = false
+        external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
         tags = {
           description = "cert for t2 ${local.application_name} ${local.environment} domains"
