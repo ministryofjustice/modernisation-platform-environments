@@ -10,7 +10,7 @@ resource "aws_sns_topic_policy" "sns_policy" {
 }
 resource "aws_sns_topic_subscription" "cw_subscription" {
   count     = local.is-production == true ? 1 : 0
-  topic_arn = aws_sns_topic.cw_alerts.arn
+  topic_arn = aws_sns_topic.cw_alerts[0].arn
   protocol  = "email"
-  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
+  endpoint  = aws_secretsmanager_secret_version.support_email_account[0].secret_string
 }
