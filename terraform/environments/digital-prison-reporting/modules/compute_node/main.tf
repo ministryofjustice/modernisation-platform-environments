@@ -136,7 +136,7 @@ resource "aws_autoscaling_group" "bastion_linux_daily" {
 
 instance_refresh {
     strategy = "Rolling"
-    triggers = ["launch_template", "desired_capacity" ] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
+    triggers = ["launch_template", "desired_capacity"] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
   }  
 
   dynamic "tag" {

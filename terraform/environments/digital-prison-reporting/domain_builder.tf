@@ -155,7 +155,7 @@ module "domain_builder_flyway_Lambda" {
   trigger_bucket_arn  = module.s3_artifacts_store.bucket_arn
 
   env_vars = {
-    "DB_CONNECTION_STRING"  = "jdbc:postgresql://dpr-backend-rds.cja8lnnvvipo.eu-west-2.rds.amazonaws.com/dpr_domain_builder"
+    "DB_CONNECTION_STRING"  = "jdbc:postgresql://${module.domain_builder_backend_db.rds_host}/${local.rds_dbuilder_db_identifier}"
     "DB_USERNAME"           = local.rds_dbuilder_user
     "DB_PASSWORD"           = module.domain_builder_backend_db.master_password
     "FLYWAY_METHOD"         = "migrate"
