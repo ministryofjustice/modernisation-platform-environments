@@ -36,7 +36,7 @@ resource "aws_db_option_group" "mojfin" {
   major_engine_version     = "19"
 
   option {
-    option_name = "TIMEZONE"
+    option_name = "TIME_ZONE"
 
     option_settings {
       name  = "TIME_ZONE"
