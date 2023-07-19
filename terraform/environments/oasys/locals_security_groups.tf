@@ -221,6 +221,28 @@ locals {
         }
       }
     }
+    private_web_external = {
+      description = "Security group for web servers"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
     data = {
       description = "Security group for data subnet"
       ingress = {
