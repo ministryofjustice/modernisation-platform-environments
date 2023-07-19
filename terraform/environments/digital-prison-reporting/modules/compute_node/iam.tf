@@ -19,6 +19,14 @@ resource "aws_iam_role" "instance-role" {
         {
             "Action": "sts:AssumeRole",
             "Principal": {
+               "Service": "apigateway.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        },        
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
                "Service": "dms.amazonaws.com"
             },
             "Effect": "Allow",

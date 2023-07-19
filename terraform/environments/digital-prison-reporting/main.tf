@@ -368,7 +368,7 @@ module "s3_artifacts_store" {
   create_s3           = local.setup_buckets
   name                = "${local.project}-artifact-store-${local.environment}"
   custom_kms_key      = local.s3_kms_arn
-  enable_notification = true
+  enable_notification = true #
  
   # Dynamic, supports multiple notifications blocks
   bucket_notifications = {
@@ -377,6 +377,8 @@ module "s3_artifacts_store" {
     "filter_prefix"         = "build-artifacts/domain-builder/jars/"
     "filter_suffix"         = ".jar"
   }
+
+  dependency_lambda = [module.domain_builder_flyway_Lambda.lambda_function] # Required if bucket_notications is enabled
 
   tags = merge(
     local.all_tags,
