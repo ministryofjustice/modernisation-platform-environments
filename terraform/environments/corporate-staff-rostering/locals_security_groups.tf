@@ -14,6 +14,7 @@ locals {
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
+    test = local.security_group_cidrs_devtest
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
