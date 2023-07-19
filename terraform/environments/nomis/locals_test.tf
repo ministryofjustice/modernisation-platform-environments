@@ -118,7 +118,7 @@ locals {
         })
       })
 
-      t1-nomis-xtag-a = merge(local.xtag_ec2_a, {
+      t2-nomis-xtag-a = merge(local.xtag_ec2_a, {
         tags = merge(local.xtag_ec2_a.tags, {
           nomis-environment    = "t2"
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
@@ -126,7 +126,7 @@ locals {
           oracle-db-name       = "T2CNOM"
         })
       })
-      t1-nomis-xtag-b = merge(local.xtag_ec2_b, {
+      t2-nomis-xtag-b = merge(local.xtag_ec2_b, {
         tags = merge(local.xtag_ec2_b.tags, {
           nomis-environment    = "t2"
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
