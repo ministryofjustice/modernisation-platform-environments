@@ -32,7 +32,7 @@ resource "aws_db_parameter_group" "mojfin" {
 resource "aws_db_option_group" "mojfin" {
   name                     = "${local.application_name}-${local.environment}-optiongroup"
   option_group_description = "MOJFIN DB - enables TIMEZONE"
-  engine_name              = "oracle-se2-19"
+  engine_name              = "oracle-se2"
   major_engine_version     = "19"
 
   option {
