@@ -120,7 +120,7 @@ resource "aws_autoscaling_group" "bastion_linux_daily" {
     version = "$Latest"
   }
   availability_zones        = ["${var.aws_region}a"]
-  name                      = "${var.name}_daily"
+  name                      = "${var.name}_$Latest"
   max_size                  = 1
   min_size                  = 1
   health_check_grace_period = 300
