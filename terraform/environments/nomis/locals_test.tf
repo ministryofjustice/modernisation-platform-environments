@@ -42,6 +42,8 @@ locals {
       "t1-nomis-web-b"          = local.weblogic_ssm_parameters
       "t1-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
       "t1-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
+      "t2-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
+      "t2-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
 
       # T2
       "t2-nomis-db-1-a/CNOMT2"  = local.database_instance_ssm_parameters
@@ -79,66 +81,22 @@ locals {
         })
       })
 
-      t1-nomis-xtag-a = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name          = "base_rhel_7_9_*"
-          availability_zone = null
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t2.large"
-          vpc_security_group_ids = ["private-web"]
-        })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "main"
-          })
-        })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 1
-        })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
-          description          = "For testing XTAG image"
-          ami                  = "base_rhel_7_9"
-          os-type              = "Linux"
-          component            = "test"
-          server-type          = "nomis-xtag"
+      t1-nomis-xtag-a = merge(local.xtag_ec2_a, {
+        tags = merge(local.xtag_ec2_a.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
-        }
-      }
-      t1-nomis-xtag-b = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_test_2023-07-14T12-57-19.815Z"
-          availability_zone = null
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t2.large"
-          vpc_security_group_ids = ["private-web"]
-        })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "nomis/DSOS-2000/create-xtag-ami"
-          })
-        })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 1
-        })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
-          description          = "For testing XTAG image"
-          ami                  = "base_rhel_7_9"
-          os-type              = "Linux"
-          component            = "test"
-          server-type          = "nomis-xtag"
+      })
+      t1-nomis-xtag-b = merge(local.xtag_ec2_b, {
+        tags = merge(local.xtag_ec2_b.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
-        }
-      }
+        })
+      })
 
       # blue deployment
       t2-nomis-web-a = merge(local.weblogic_ec2_a, {
