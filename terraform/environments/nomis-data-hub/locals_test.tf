@@ -14,7 +14,6 @@ locals {
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         tags = {
           description = "Standalone EC2 for testing RHEL7.9 NDH App"
-          os-type     = "Linux"
           component   = "ndh"
           server-type = "ndh-app"
           monitored   = false
@@ -32,7 +31,6 @@ locals {
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         tags = {
           description = "Standalone EC2 for testing RHEL7.9 NDH ems"
-          os-type     = "Linux"
           component   = "ndh"
           server-type = "ndh-ems"
           monitored   = false
