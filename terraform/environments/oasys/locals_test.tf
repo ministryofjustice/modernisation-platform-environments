@@ -108,44 +108,44 @@ locals {
         tags                     = local.tags
 
         listeners = {
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = [] #["t2_${local.application_name}_cert"]
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "T2 - use t2.oasys.service.justice.gov.uk"
-                status_code  = "200"
-              }
-            }
-            # default_action = {
-            #   type              = "forward"
-            #   target_group_name = "t2-${local.application_name}-web-a-pb-http-8080"
-            # }
-            rules = {
-              t2-web-http-8080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-${local.application_name}-web-a-pb-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = [
-                        "t2.oasys.service.justice.gov.uk",
-                        "t2-a.oasys.service.justice.gov.uk",
-                        "ords.t2.oasys.service.justice.gov.uk",
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          }
+          # https = {
+          #   port                      = 443
+          #   protocol                  = "HTTPS"
+          #   ssl_policy                = "ELBSecurityPolicy-2016-08"
+          #   certificate_names_or_arns = [] #["t2_${local.application_name}_cert"]
+          #   default_action = {
+          #     type = "fixed-response"
+          #     fixed_response = {
+          #       content_type = "text/plain"
+          #       message_body = "T2 - use t2.oasys.service.justice.gov.uk"
+          #       status_code  = "200"
+          #     }
+          #   }
+          #   # default_action = {
+          #   #   type              = "forward"
+          #   #   target_group_name = "t2-${local.application_name}-web-a-pb-http-8080"
+          #   # }
+          #   rules = {
+          #     t2-web-http-8080 = {
+          #       priority = 100
+          #       actions = [{
+          #         type              = "forward"
+          #         target_group_name = "t2-${local.application_name}-web-a-pb-http-8080"
+          #       }]
+          #       conditions = [
+          #         {
+          #           host_header = {
+          #             values = [
+          #               "t2.oasys.service.justice.gov.uk",
+          #               "t2-a.oasys.service.justice.gov.uk",
+          #               "ords.t2.oasys.service.justice.gov.uk",
+          #             ]
+          #           }
+          #         }
+          #       ]
+          #     }
+          #   }
+          # }
         }
       }
       private = { # this is a temporary workaround - we really want public and private load balancers working, but while investigating, get public2 and private2 up
@@ -160,44 +160,44 @@ locals {
         public_subnets           = module.environment.subnets["private"].ids
         tags                     = local.tags
         listeners = {
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = [] #["t2_${local.application_name}_cert"]
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "T2 - use t2-int.oasys.service.justice.gov.uk"
-                status_code  = "200"
-              }
-            }
-            # default_action = {
-            #   type              = "forward"
-            #   target_group_name = "t2-${local.application_name}-web-a-pv-http-8080"
-            # }
-            rules = {
-              t2-web-http-8080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-${local.application_name}-web-a-pv-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = [
-                        "t2-int.oasys.service.justice.gov.uk",
-                        "t2-a-int.oasys.service.justice.gov.uk",
-                        "t2-oasys.hmpp-azdt.justice.gov.uk",
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          }
+          # https = {
+          #   port                      = 443
+          #   protocol                  = "HTTPS"
+          #   ssl_policy                = "ELBSecurityPolicy-2016-08"
+          #   certificate_names_or_arns = [] #["t2_${local.application_name}_cert"]
+          #   default_action = {
+          #     type = "fixed-response"
+          #     fixed_response = {
+          #       content_type = "text/plain"
+          #       message_body = "T2 - use t2-int.oasys.service.justice.gov.uk"
+          #       status_code  = "200"
+          #     }
+          #   }
+          #   # default_action = {
+          #   #   type              = "forward"
+          #   #   target_group_name = "t2-${local.application_name}-web-a-pv-http-8080"
+          #   # }
+          #   rules = {
+          #     t2-web-http-8080 = {
+          #       priority = 100
+          #       actions = [{
+          #         type              = "forward"
+          #         target_group_name = "t2-${local.application_name}-web-a-pv-http-8080"
+          #       }]
+          #       conditions = [
+          #         {
+          #           host_header = {
+          #             values = [
+          #               "t2-int.oasys.service.justice.gov.uk",
+          #               "t2-a-int.oasys.service.justice.gov.uk",
+          #               "t2-oasys.hmpp-azdt.justice.gov.uk",
+          #             ]
+          #           }
+          #         }
+          #       ]
+          #     }
+          #   }
+          # }
         }
       }
     }
