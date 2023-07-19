@@ -3,17 +3,18 @@
 # =====================
 
 # Create a data source to fetch the tags of each instance
-data "aws_instance" "prod_windows_instances" {
-  for_each = toset(var.prod_instance_ids)
-
-  instance_id = each.value
+data "aws_instances" "tagged_instances" {
+  filter {
+     name = "tag:patch_group"
+     values = ["prod_win_patch"]
+  }
 }
 
 
 # Disk Free Alarm
 resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
-  for_each = data.aws_instance.prod_windows_instances
-  alarm_name = "high-disk-usage-${each.key}"
+  for_each            = toset(data.aws_instances.tagged_instances.ids)
+  alarm_name          = "high-disk-usage-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "3"
   datapoints_to_alarm = "2"
@@ -26,14 +27,13 @@ resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 2 minutes, the alarm will trigger"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    InstanceId = each.value.id
+    InstanceId = each.key
   }
 }
 
-
 # Low Available Memory Alarm
 resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
-  for_each = data.aws_instance.prod_windows_instances
+  for_each            = toset(data.aws_instances.tagged_instances.ids)
   alarm_name          = "low-available-memory-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
   period              = "60"
@@ -47,13 +47,13 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is less than 10% for 2 minutes, the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = { 
-    InstanceId = each.value.id
+    InstanceId = each.key
   }
 }
 
 # High CPU IOwait Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
-  for_each = data.aws_instance.prod_windows_instances
+  for_each            = toset(data.aws_instances.tagged_instances.ids)
   alarm_name          = "cpu-usage-iowait-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "6"
@@ -67,13 +67,13 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = { 
-    InstanceId = each.value.id
+    InstanceId = each.key
   }
 }
 
 # CPU Utilization Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu" {
-  for_each = data.aws_instance.prod_windows_instances
+  for_each            = toset(data.aws_instances.tagged_instances.ids)
   alarm_name          = "CPU-High-${each.key}"    # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold"   # threshold to trigger the alarm state
   period              = "60"                              # period in seconds over which the specified statistic is applied
@@ -87,7 +87,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   alarm_description   = "Monitors ec2 cpu utilisation"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = { 
-    InstanceId = each.value.id
+    InstanceId = each.key
   }
 }
 
@@ -97,7 +97,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
 
 # Instance Health Alarm
 resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
-  for_each = data.aws_instance.prod_windows_instances
+  for_each            = toset(data.aws_instances.tagged_instances.ids)
   alarm_name          = "instance-health-check-failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -111,13 +111,13 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = { 
-    InstanceId = each.value.id
+    InstanceId = each.key
   }
 }
 
 # Status Check Alarm
 resource "aws_cloudwatch_metric_alarm" "system_health_check" {
-  for_each = data.aws_instance.prod_windows_instances
+  for_each            = toset(data.aws_instances.tagged_instances.ids)
   alarm_name          = "system-health-check-failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -131,7 +131,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = { 
-    InstanceId = each.value.id
+    InstanceId = each.key
   }
 }
 
@@ -142,7 +142,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
 
 # Status Check Alarm
 resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
-  for_each = data.aws_instance.prod_windows_instances
+  for_each            = toset(data.aws_instances.tagged_instances.ids)
   alarm_name          = "IIS-failure-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -156,6 +156,6 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = { 
-    InstanceId = each.value.id
+    InstanceId = each.key
   }
 }
