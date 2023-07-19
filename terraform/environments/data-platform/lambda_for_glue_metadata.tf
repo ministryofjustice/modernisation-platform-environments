@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda
 }
 
 module "data_product_get_glue_metadata_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.0"
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
   application_name               = "data_product_get_glue_metadata"
   tags                           = local.tags
   description                    = "Lambda to retrieve Glue metadata for a specified table in a database"
@@ -71,7 +71,7 @@ resource "aws_api_gateway_integration" "get_glue_metadata" {
   rest_api_id             = aws_api_gateway_rest_api.data_platform.id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = module.data_product_get_glue_metadata_lambda.lambda_function_arn
+  uri                     = module.data_product_get_glue_metadata_lambda.lambda_function_invoke_arn
 
   request_parameters = {
     "integration.request.querystring.database" = "method.request.querystring.database",
