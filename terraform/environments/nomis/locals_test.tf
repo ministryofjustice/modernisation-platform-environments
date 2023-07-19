@@ -118,6 +118,23 @@ locals {
         })
       })
 
+      t1-nomis-xtag-a = merge(local.xtag_ec2_a, {
+        tags = merge(local.xtag_ec2_a.tags, {
+          nomis-environment    = "t2"
+          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T2CNOM"
+        })
+      })
+      t1-nomis-xtag-b = merge(local.xtag_ec2_b, {
+        tags = merge(local.xtag_ec2_b.tags, {
+          nomis-environment    = "t2"
+          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T2CNOM"
+        })
+      })
+
       # blue deployment
       t3-nomis-web-a = merge(local.weblogic_ec2_a, {
         tags = merge(local.weblogic_ec2_a.tags, {

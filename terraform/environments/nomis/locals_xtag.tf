@@ -14,7 +14,7 @@ locals {
     cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].ec2_linux_default
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name          = "base_rhel_7_9_*"
+      ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
       availability_zone = null
     })
 
@@ -35,6 +35,7 @@ locals {
     }
   }
 
+  # old solution - building directly from base
   xtag_ec2_a = merge(local.xtag_ec2_default, {
     cloudwatch_metric_alarms = {}
     config = merge(local.xtag_ec2_default.config, {
@@ -46,6 +47,7 @@ locals {
       })
     })
     autoscaling_group = merge(local.xtag_ec2_default.autoscaling_group, {
+      desired_capacity = 0
     })
   })
 
@@ -60,7 +62,7 @@ locals {
       })
     })
     autoscaling_group = merge(local.xtag_ec2_default.autoscaling_group, {
-      desired_capacity = 0
+      desired_capacity = 1
     })
     tags = merge(local.xtag_ec2_default.tags, {
       ami = "nomis_rhel_7_9_weblogic_xtag_10_3"
