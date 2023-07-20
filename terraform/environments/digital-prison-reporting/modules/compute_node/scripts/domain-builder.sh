@@ -12,7 +12,7 @@ echo "DOMAIN_API_KEY=${DOMAIN_API_KEY}" >> /etc/environment
 sudo yum -y update
 
 # Setup YUM install Utils
-sudo yum -y install curl wget unzip jq
+sudo yum -y install curl wget unzip jq nc
 
 # Install Java 11
 sudo amazon-linux-extras install java-openjdk11
