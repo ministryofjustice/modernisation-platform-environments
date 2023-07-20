@@ -40,7 +40,9 @@
       "example_var": "test-data"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "example_var": "preproduction-data",
+      "url": "s3://laa-portal-preproduction-archive-mp",
+      "maintenance_window_name": "diagnostics-log-archive-preproduction"
     },
     "production": {
       "example_var": "production-data",
