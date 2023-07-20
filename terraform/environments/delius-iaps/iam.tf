@@ -60,9 +60,6 @@ data "aws_iam_policy_document" "ci_secrets_rotator" {
     resources = [
       local.iaps_ds_arn
     ]
-    resources = [
-      local.iaps_ds_arn
-    ]
   }
 }
 
