@@ -47,6 +47,7 @@ data "aws_iam_policy_document" "ci_secrets_rotator" {
       "secretsmanager:UpdateSecretVersionStage",
     ]
     resources = [
+      local.iaps_ds_admin_secret_arn
     ]
   }
   statement {
@@ -55,6 +56,9 @@ data "aws_iam_policy_document" "ci_secrets_rotator" {
     actions = [
       "directoryservice:ResetUserPassword",
       "directoryservice:DescribeDirectories"
+    ]
+    resources = [
+      local.iaps_ds_arn
     ]
   }
 }
