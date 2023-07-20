@@ -68,7 +68,7 @@ resource "aws_ssm_maintenance_window_target" "reg_target_ohs" {
 
 resource "aws_ssm_maintenance_window_target" "reg_target_ohs2" {
   count         = contains(["development", "testing"], local.environment) ? 0 : 1
-  window_id     = aws_ssm_maintenance_window.ohs2_window.id 
+  window_id     = aws_ssm_maintenance_window.ohs2_window[0].id
   name          = "maintenance-window-target"
   description   = "This is a maintenance window target"
   resource_type = "INSTANCE"
@@ -115,7 +115,7 @@ resource "aws_ssm_maintenance_window_task" "commands_ohs2" {
   priority        = 1
   task_arn        = "AWS-RunShellScript"
   task_type       = "RUN_COMMAND"
-  window_id       = aws_ssm_maintenance_window.ohs2_window.id
+  window_id       = aws_ssm_maintenance_window.ohs2_window[0].id
 
   targets {
     key    = "InstanceIds"
