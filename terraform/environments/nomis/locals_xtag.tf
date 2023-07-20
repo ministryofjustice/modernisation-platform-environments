@@ -58,7 +58,7 @@ locals {
     })
     user_data_cloud_init = merge(local.xtag_ec2_default.user_data_cloud_init, {
       args = merge(local.xtag_ec2_default.user_data_cloud_init.args, {
-        branch = "3c5a4f32dd350feb6df797e9ec19ffe4ed0c47f9" # from AMI, but no collectd
+        branch = "61f2bd80235ff8453f516d6549c9fb89bf38feec" # from AMI, no collectd, NDH taken from tag
       })
     })
     autoscaling_group = merge(local.xtag_ec2_default.autoscaling_group, {
