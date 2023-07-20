@@ -49,7 +49,6 @@ data "aws_iam_policy_document" "ci_secrets_rotator" {
     resources = [
       local.iaps_ds_admin_secret_arn
     ]
-    ]
   }
   statement {
     sid    = "ResetDSUserPassword"
