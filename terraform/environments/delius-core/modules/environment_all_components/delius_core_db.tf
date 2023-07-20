@@ -22,7 +22,7 @@
     environment      = var.account_info.environment # equates to one of the 4 MP environment names, e.g. development
     subnet_id        = data.aws_subnet.private_subnets_a.id
     
-    tags = = merge(local.tags, {
+    tags = merge(local.tags, {
     Name = lower(format("%s-%s", local.application_name, local.environment))
   })
 
