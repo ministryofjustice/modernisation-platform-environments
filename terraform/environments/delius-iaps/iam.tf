@@ -11,7 +11,7 @@ resource "aws_iam_role" "ci_secrets_rotator" {
 
 locals {
   iaps_ds_arn              = "arn:aws:ds:eu-west-2:${data.aws_caller_identity.current.account_id}:directory/${aws_directory_service_directory.active_directory.id}"
-  iaps_ds_admin_secret_arn = aws_secretsmanager_secret.ad_password.arn
+  iaps_ds_admin_secret_arn = "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:*"
 }
 
 data "aws_iam_policy_document" "ci_secrets_rotator_role" {
