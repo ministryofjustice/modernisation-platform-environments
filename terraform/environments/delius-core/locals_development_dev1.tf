@@ -13,4 +13,11 @@ locals {
     ami_name             = local.db_config_lower_environments.ami_name
     some_other_attribute = "some_other_attribute_for_db_in_dev1"
   }
+  
+  db_config = {
+    instance = merge(local.db_config.instance, {
+      instance_type = "r6i.xlarge"
+      monitoring    = false
+    })
+  }
 }
