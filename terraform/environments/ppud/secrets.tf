@@ -36,7 +36,7 @@ resource "aws_secretsmanager_secret" "support_email_account" {
 resource "aws_secretsmanager_secret_version" "support_email_account" {
   count         = local.is-production == true ? 1 : 0
   secret_id     = aws_secretsmanager_secret.support_email_account[0].id
-  secret_string = "umesh.ray@lumen.com"
+  secret_string = "default@email.com"
   lifecycle {
     ignore_changes = [secret_string, ]
   }
