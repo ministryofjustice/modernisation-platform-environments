@@ -71,41 +71,6 @@ locals {
           protocol    = -1
           self        = true
         }
-        http = {
-          description = "Allow http ingress"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "tcp"
-          # security_groups = [
-          #   "private-jumpserver",
-          #   "bastion-linux",
-          # ]
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal
-          ])
-        }
-        http8080 = {
-          description = "Allow http8080 ingress"
-          from_port   = 8080
-          to_port     = 8080
-          protocol    = "tcp"
-          # no security groups on an NLB so need to put public and private on the internal ALB
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
-          ])
-          security_groups = ["private", "private_lb"]
-        }
-        https = {
-          description = "Allow HTTPS ingress"
-          from_port   = 0
-          to_port     = 443
-          protocol    = "tcp"
-          # no security groups on an NLB so need to put public and private on the internal ALB
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
-          ])
-          security_groups = ["private", "private_lb"]
-        }
       }
       egress = {
         all = {
