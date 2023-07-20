@@ -21,10 +21,6 @@
     region           = var.account_info.region # eu-west-2
     environment      = var.account_info.environment # equates to one of the 4 MP environment names, e.g. development
     subnet_id        = data.aws_subnet.private_subnets_a.id
-    
-    tags = merge(local.tags, {
-    Name = lower(format("%s-%s", local.application_name, local.environment))
-  })
 
     ami_name                      = var.db_config.ami_name # delius_core_ol_8_5_oracle_db_19c_patch_2023-06-12T12-32-07.259Z
     ami_owner                     = local.environment_management.account_ids["core-shared-services-production"] # 
@@ -42,9 +38,9 @@
         )
     )
 
-    ebs_volume_config             = {}
-    ebs_volumes                   = {}
-    route53_records               = {}
+    ebs_volume_config             = local.db_config.ebs_volume_config
+    ebs_volumes                   = local.db_config.ebs_volumes
+    route53_records               = local.db_config.route53_records
 
     iam_resource_names_prefix = "ec2-test-instance"
     instance_profile_policies = [
@@ -53,6 +49,9 @@
         aws_iam_policy.core_shared_services_bucket_access.arn,
         aws_iam_policy.ec2_access_for_ansible.arn
     ]
+    tags = merge(local.tags, {
+    Name = lower(format("%s-%s", local.application_name, local.environment))
+  })
 
 }
 

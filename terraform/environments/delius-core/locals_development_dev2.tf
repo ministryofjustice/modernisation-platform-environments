@@ -11,6 +11,9 @@ locals {
   db_config_dev2 = {
     name                 = try(local.db_config_lower_environments.name, "db")
     ami_name             = local.db_config_lower_environments.ami_name
+    ebs_volume_config    = {}
+    ebs_volumes          = {}
+    route53_records      = {}
     instance = merge(local.db_config_lower_environments.instance, {
       instance_type = "r6i.large"
       monitoring    = false
