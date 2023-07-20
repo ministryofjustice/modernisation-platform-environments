@@ -35,4 +35,7 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+
+  enable_slack_alerts     = local.is-development ? false : true
+  enable_pagerduty_alerts = local.is-production || local.is-preproduction ? true : false
 }

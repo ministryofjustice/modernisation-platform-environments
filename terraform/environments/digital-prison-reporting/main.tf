@@ -5,6 +5,8 @@
 ## Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 locals {
   glue_avro_registry = split("/", module.glue_registry_avro.registry_name)
+  pagerduty_key_name = "pagerduty_integration_key"
+  slack_url_name     = "slack_integration_url"
 }
 
 module "glue_reporting_hub_job" {
@@ -735,4 +737,36 @@ module "dynamo_tab_application_tf_state" {
       Resource_Type = "Dynamo Table"
     }
   )
+}
+
+###################################################
+# Glue Notifications: /modules/glue_notifications
+###################################################
+module "glue_notifications" {
+  source         = "./modules/glue_notifications"
+  rule_name      = "${local.project}-glue-jobs-status-change-rule-${local.environment}"
+  target_name    = "${local.project}-glue-notification-target-${local.environment}"
+  sns_topic_name = "${local.project}-glue-notification-topic-${local.environment}"
+
+  enable_slack_alerts     = local.enable_slack_alerts
+  enable_pagerduty_alerts = local.enable_pagerduty_alerts
+
+  slack_email_url      = local.enable_slack_alerts ? jsondecode(data.aws_secretsmanager_secret_version.slack_integration.secret_string)[local.slack_url_name] : null
+  pagerduty_alerts_url = local.enable_pagerduty_alerts ? "https://events.pagerduty.com/integration/${jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration.secret_string)[local.pagerduty_key_name]}/enqueue" : null
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name = "${local.project}-glue-notifications-${local.environment}"
+    }
+  )
+}
+
+module "glue_job_pagerduty_notifications" {
+  count      = local.enable_pagerduty_alerts ? 1 : 0
+  depends_on = [module.glue_notifications]
+
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = ["${local.project}-glue-notification-topic-${local.environment}"]
+  pagerduty_integration_key = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration.secret_string)[local.pagerduty_key_name]
 }

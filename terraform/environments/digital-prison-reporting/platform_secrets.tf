@@ -15,3 +15,23 @@ data "aws_secretsmanager_secret_version" "environment_management" {
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.environment_management.id
 }
+
+data "aws_secretsmanager_secret" "slack_integration" {
+  provider = aws.modernisation-platform
+  name     = "dpr_slack_integration"
+}
+
+data "aws_secretsmanager_secret_version" "slack_integration" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.slack_integration.id
+}
+
+data "aws_secretsmanager_secret" "pagerduty_integration" {
+  provider = aws.modernisation-platform
+  name     = "dpr_pagerduty_integration"
+}
+
+data "aws_secretsmanager_secret_version" "pagerduty_integration" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration.id
+}
