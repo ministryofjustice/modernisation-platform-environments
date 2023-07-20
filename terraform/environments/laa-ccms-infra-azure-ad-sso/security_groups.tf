@@ -18,7 +18,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebs_vision_db" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].cp_dev_cidr_range, local.application_data.accounts[local.environment].vpn_cidr_range, local.application_data.accounts[local.environment].vpn_proxy_cidr_range_a, local.application_data.accounts[local.environment].vpn_proxy_cidr_range_b]
+  cidr_blocks = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].cp_dev_cidr_range, local.application_data.accounts[local.environment].vpn_cidr_range, local.application_data.accounts[local.environment].vpn_proxy_cidr_range_a, local.application_data.accounts[local.environment].vpn_proxy_cidr_range_b, local.application_data.accounts[local.environment].ark_corsham_internet_egress_exponential_e_1, local.application_data.accounts[local.environment].ark_corsham_internet_egress_exponential_e_2]
 }
 
 
@@ -68,7 +68,7 @@ resource "aws_security_group_rule" "ingress_traffic_lb" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].cp_dev_cidr_range, local.application_data.accounts[local.environment].vpn_cidr_range, local.application_data.accounts[local.environment].vpn_proxy_cidr_range_a, local.application_data.accounts[local.environment].vpn_proxy_cidr_range_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].cp_dev_cidr_range, local.application_data.accounts[local.environment].vpn_cidr_range, local.application_data.accounts[local.environment].vpn_proxy_cidr_range_a, local.application_data.accounts[local.environment].vpn_proxy_cidr_range_b, local.application_data.accounts[local.environment].ark_corsham_internet_egress_exponential_e_1, local.application_data.accounts[local.environment].ark_corsham_internet_egress_exponential_e_2]
 }
 
 

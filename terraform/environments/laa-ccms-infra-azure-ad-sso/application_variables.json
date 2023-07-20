@@ -12,6 +12,8 @@
       "vpn_cidr_range": "81.134.202.29/32",
       "vpn_proxy_cidr_range_a": "35.177.125.252/32",
       "vpn_proxy_cidr_range_b": "35.177.137.160/32",
+      "ark_corsham_internet_egress_exponential_e_1": "51.149.249.0/27",
+      "ark corsham internet egress exponential_e_2": "51.149.249.32/27",
       "ami_owner": "636100868237"
     }
   },
