@@ -6,8 +6,4 @@ locals {
     application_name = local.application_name
     mp_environment   = local.environment
   }
-
-  db_config_all = {
-    ami_name     = "delius_core_ol_8_5_oracle_db_19c_patch_2023-06-12T12-32-07.259Z"
-  }
 }
