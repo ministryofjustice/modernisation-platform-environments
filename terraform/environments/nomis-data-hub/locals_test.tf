@@ -11,7 +11,9 @@ locals {
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/ndh-user-data.yaml"))
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {})
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private"]
+        })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
