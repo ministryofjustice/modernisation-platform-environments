@@ -8,7 +8,7 @@
     source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.0.0"
 
    providers = {
-    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+    #aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 #
 #  for_each = try(local.ec2_test.ec2_test_instances, {})
