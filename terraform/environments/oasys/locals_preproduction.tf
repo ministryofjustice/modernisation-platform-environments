@@ -43,14 +43,14 @@ locals {
     }
 
     baseline_route53_zones = {
-      "pp.${module.environment.domains.public.short_name}" = { # "pp.oasys.service.justice.gov.uk"
-        records = [
-          { name = "db", type = "A", ttl = "300", records = ["10.40.40.133"] }, # "db.pp.oasys.service.justice.gov.uk" currently pointing to azure db PPODL00009
-        ]
-        # lb_alias_records = [
-        #   { name = "web", type = "A", lbs_map_key = "private" }, # "web.pp.oasys.service.justice.gov.uk"
-        # ]
-      }
+      # "pp.${module.environment.domains.public.short_name}" = { # "pp.oasys.service.justice.gov.uk"
+      #   records = [
+      #     { name = "db", type = "A", ttl = "300", records = ["10.40.40.133"] }, # "db.pp.oasys.service.justice.gov.uk" currently pointing to azure db PPODL00009
+      #   ]
+      #   # lb_alias_records = [
+      #   #   { name = "web", type = "A", lbs_map_key = "private" }, # "web.pp.oasys.service.justice.gov.uk"
+      #   # ]
+      # }
     }
 
     baseline_ec2_instances = {

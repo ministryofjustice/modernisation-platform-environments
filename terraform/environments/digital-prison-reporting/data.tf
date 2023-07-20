@@ -20,3 +20,13 @@ data "aws_secretsmanager_secret_version" "nomis" {
 data "aws_iam_policy" "rds_full_access" {
   arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
+
+# Get APIGateway Endpoint ID
+data "aws_vpc_endpoint" "api" {
+  provider     = aws.core-vpc
+  vpc_id       = data.aws_vpc.shared.id
+  service_name = "com.amazonaws.${data.aws_region.current.name}.execute-api"
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.execute-api"
+  }
+}

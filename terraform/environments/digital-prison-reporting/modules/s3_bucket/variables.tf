@@ -89,3 +89,8 @@ variable "bucket_notifications" {
     filter_suffix = null
    }
 }
+
+variable "dependency_lambda" {
+  type    = any
+  default = []
+}

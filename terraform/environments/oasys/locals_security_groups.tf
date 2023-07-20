@@ -8,17 +8,11 @@ locals {
     https_internal = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
-      "146.200.228.107/32"
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
-      "18.130.186.240/32", "18.170.161.71/32", "13.42.150.41/32", # public load balancer
-    ])
-
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -45,10 +39,7 @@ locals {
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
-    ])
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -102,7 +93,7 @@ locals {
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
           ])
-          security_groups = ["private", "private_lb_internal"]
+          security_groups = ["private", "private_lb"]
         }
         https = {
           description = "Allow HTTPS ingress"
@@ -113,7 +104,7 @@ locals {
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
           ])
-          security_groups = ["private", "private_lb_internal"]
+          security_groups = ["private", "private_lb"]
         }
       }
       egress = {
@@ -127,7 +118,7 @@ locals {
         }
       }
     }
-    private_lb_internal = {
+    private_lb = {
       description = "Security group for internal load balancer"
       ingress = {
         all-from-self = {
@@ -136,25 +127,6 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
-        }
-        http = {
-          description = "Allow http ingress"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "tcp"
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
-          ])
-        }
-        http8080 = {
-          description = "Allow http8080 ingress"
-          from_port   = 8080
-          to_port     = 8080
-          protocol    = "tcp"
-          # no security groups on an NLB so need to put public and private on the internal ALB
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
-          ])
         }
         https = {
           description = "Allow https ingress"
@@ -177,7 +149,7 @@ locals {
         }
       }
     }
-    private_lb_external = {
+    public_lb = {
       description = "Security group for internal load balancer"
       ingress = {
         all-from-self = {
@@ -186,25 +158,6 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
-        }
-        http = {
-          description = "Allow http ingress"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "tcp"
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_external,
-          ])
-        }
-        http8080 = {
-          description = "Allow http8080 ingress"
-          from_port   = 0
-          to_port     = 8080
-          protocol    = "tcp"
-          # no security groups on an NLB so need to put public and private on the internal ALB
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_external,
-          ])
         }
         https = {
           description = "Allow https ingress"
@@ -237,93 +190,15 @@ locals {
           protocol    = -1
           self        = true
         }
-        http = {
-          description     = "Allow http ingress"
-          from_port       = 80
-          to_port         = 80
-          protocol        = "tcp"
-          security_groups = ["private_lb_internal"]
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
-            # "0.0.0.0/0",
-          ])
-        }
         http8080 = {
           description = "Allow http8080 ingress"
           from_port   = 8080
           to_port     = 8080
           protocol    = "tcp"
-          # no security groups on an NLB so need to put public and private on the internal ALB
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
-            #"0.0.0.0/0",
           ])
-          security_groups = ["private_lb_internal"]
-        }
-        https = {
-          description = "Allow HTTPS ingress"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "tcp"
-          # no security groups on an NLB so need to put public and private on the internal ALB
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
-            #"0.0.0.0/0",
-          ])
-          security_groups = ["private_lb_internal"]
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
-    private_web_external = {
-      description = "Security group for web servers"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        http = {
-          description = "Allow http ingress"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "tcp"
-          cidr_blocks = flatten([
-            #"0.0.0.0/0",
-            local.security_group_cidrs.https_external,
-          ])
-        }
-        http8080 = {
-          description = "Allow http8080 ingress"
-          from_port   = 8080
-          to_port     = 8080
-          protocol    = "tcp"
-          # no security groups on an NLB so need to put public and private on the internal ALB
-          cidr_blocks = flatten([
-            #"0.0.0.0/0",
-            local.security_group_cidrs.https_external,
-          ])
-        }
-        https = {
-          description = "Allow https ingress"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "tcp"
-          cidr_blocks = flatten([
-            #"0.0.0.0/0",
-            local.security_group_cidrs.https_external,
-          ])
+          security_groups = ["private_lb"]
         }
       }
       egress = {
@@ -371,7 +246,7 @@ locals {
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.oracle_db
           security_groups = [
-            "private_lb_internal",
+            "private_lb",
             # "private-jumpserver",
             # "private-web",
             # "bastion-linux",

@@ -40,7 +40,6 @@ resource "aws_lambda_function" "presigned_url" {
   filename         = data.archive_file.presigned_url_zip.output_path
   source_code_hash = data.archive_file.presigned_url_zip.output_base64sha256
   role             = aws_iam_role.presigned_url_lambda_role.arn
-  depends_on       = [aws_iam_role_policy_attachment.attach_code_lambda_policy_to_iam_role]
   environment {
     variables = {
       BUCKET_NAME = module.s3-bucket.bucket.id

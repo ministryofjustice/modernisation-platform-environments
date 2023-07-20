@@ -3,9 +3,7 @@ data "aws_caller_identity" "current" {}
 data "template_file" "user_data" {
   template = file("${path.module}/scripts/${var.app_key}.sh")
 
-  vars = {
-    some_var = "some_value"
-  }
+  vars = var.env_vars
 }
 
 # Keypair for ec2-user
@@ -119,10 +117,10 @@ resource "aws_autoscaling_group" "bastion_linux_daily" {
 
   launch_template {
     id      = aws_launch_template.ec2_template[0].id
-    version = "$Latest"
+    version = aws_launch_template.ec2_template[0].latest_version
   }
   availability_zones        = ["${var.aws_region}a"]
-  name                      = "${var.name}_daily"
+  name                      = "${var.name}_asg"
   max_size                  = 1
   min_size                  = 1
   health_check_grace_period = 300
@@ -135,6 +133,11 @@ resource "aws_autoscaling_group" "bastion_linux_daily" {
     value               = "aws_autoscaling_group"
     propagate_at_launch = true
   }
+
+instance_refresh {
+    strategy = "Rolling"
+    triggers = ["launch_template", "desired_capacity"] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
+  }  
 
   dynamic "tag" {
     for_each = var.tags

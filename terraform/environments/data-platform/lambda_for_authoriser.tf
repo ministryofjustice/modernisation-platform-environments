@@ -57,7 +57,6 @@ resource "aws_lambda_function" "authoriser" {
   filename         = data.archive_file.authoriser_zip.output_path
   source_code_hash = data.archive_file.authoriser_zip.output_base64sha256
   role             = aws_iam_role.authoriser_lambda_role.arn
-  depends_on       = [aws_iam_role_policy_attachment.attach_code_lambda_policy_to_iam_role]
   environment {
     variables = {
       authorizationToken = "placeholder"
