@@ -87,6 +87,7 @@ locals {
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
+          ndh-ems-hostname     = "t1pml0005"
         })
       })
       t1-nomis-xtag-b = merge(local.xtag_ec2_b, {
@@ -95,6 +96,7 @@ locals {
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
+          ndh-ems-hostname     = "t1pml0005"
         })
       })
 
@@ -124,6 +126,7 @@ locals {
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T2CNOM"
+          ndh-ems-hostname     = "t2pml0008"
         })
       })
       t2-nomis-xtag-b = merge(local.xtag_ec2_b, {
@@ -132,6 +135,7 @@ locals {
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T2CNOM"
+          ndh-ems-hostname     = "t2pml0008"
         })
       })
 
