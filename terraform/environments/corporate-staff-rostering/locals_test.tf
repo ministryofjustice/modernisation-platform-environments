@@ -88,13 +88,13 @@ locals {
     # }
     #   }
     }
-      baseline_route53_zones = {
-        "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
-          records = [
-            { name = "t3-csr-db-a", type = "CNAME", ttl = "300", records = ["t3-csr-db-a.corporate-staff-rostering.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          ]
-        }
-    }
+    #   baseline_route53_zones = {
+    #     "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
+    #       records = [
+    #         { name = "t3-csr-db-a", type = "CNAME", ttl = "300", records = ["t3-csr-db-a.corporate-staff-rostering.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+    #       ]
+    #     }
+    # }
 
 
     baseline_s3_buckets = {
