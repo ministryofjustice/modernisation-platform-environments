@@ -13,7 +13,6 @@ locals {
     ])
     rdp = {
       inbound = ["10.40.165.0/26","10.112.3.0/26","10.102.3.0/26"]
-      outbound = ["10.0.0.0/8"]
     }
   }
 
@@ -31,7 +30,6 @@ locals {
     ])
     rdp = {
       inbound = ["10.40.165.0/26"]
-      outbound = ["10.0.0.0/8"]
     }
   }
   security_group_cidrs_by_environment = {
