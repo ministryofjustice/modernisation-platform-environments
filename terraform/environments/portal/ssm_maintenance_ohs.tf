@@ -75,7 +75,7 @@ resource "aws_ssm_maintenance_window_target" "reg_target_ohs2" {
 
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.ohs_instance_2.id]
+    values = [aws_instance.ohs_instance_2[0].id]
   }
 }
 
@@ -119,7 +119,7 @@ resource "aws_ssm_maintenance_window_task" "commands_ohs2" {
 
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.ohs_instance_2.id]
+    values = [aws_instance.ohs_instance_2[0].id]
   }
 
 

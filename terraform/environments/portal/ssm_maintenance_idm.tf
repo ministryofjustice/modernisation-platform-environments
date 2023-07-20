@@ -118,7 +118,7 @@ resource "aws_ssm_maintenance_window_target" "reg_target_idm2" {
 
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.idm_instance_2.id]
+    values = [aws_instance.idm_instance_2[0].id]
   }
 }
 
@@ -162,7 +162,7 @@ resource "aws_ssm_maintenance_window_task" "commands_idm2" {
 
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.idm_instance_2.id]
+    values = [aws_instance.idm_instance_2[0].id]
   }
 
 
