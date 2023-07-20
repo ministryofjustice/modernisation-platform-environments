@@ -61,30 +61,8 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   baseline_security_groups = {
-    # private = {
-    #   description = "Security group for private subnet"
-    #   ingress = {
-    #     all-within-subnet = {
-    #       description = "Allow all ingress to self"
-    #       from_port   = 0
-    #       to_port     = 0
-    #       protocol    = -1
-    #       self        = true
-    #     }
-    #   }
-    #   egress = {
-    #     all = {
-    #       description     = "Allow all egress"
-    #       from_port       = 0
-    #       to_port         = 0
-    #       protocol        = "-1"
-    #       cidr_blocks     = ["0.0.0.0/0"]
-    #       security_groups = []
-    #     }
-    #   }
-    # }
-    public = {
-      description = "Security group for public subnet"
+    private = {
+      description = "Security group for private subnet"
       ingress = {
         all-within-subnet = {
           description = "Allow all ingress to self"
