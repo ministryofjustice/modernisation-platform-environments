@@ -15,6 +15,6 @@ locals {
       instance_type = "r6i.xlarge"
       monitoring    = false
     })
-  some_other_attribute = "some_other_attribute_for_db_in_dev1"
+    some_other_attribute = "some_other_attribute_for_db_in_dev1"
   }
 }
