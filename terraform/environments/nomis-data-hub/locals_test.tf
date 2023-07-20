@@ -3,6 +3,26 @@ locals {
 
     baseline_ec2_instances = {
 
+      test-managementserver-2022 = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
+          availability_zone             = null
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/ndh-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {})
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description = "Windows Server 2022 Management server for NDH"
+          os-type     = "Windows"
+          component   = "managementserver"
+          server-type = "ndh-management-server"
+        }
+      }
+
       t1-ndh-app-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
