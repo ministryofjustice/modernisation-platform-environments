@@ -24,10 +24,11 @@ tasks:
           $apps = @(
             "firefox"
             "libreoffice-still"
-            "notepadplusplus"
-            "putty"
-            "winscp"
+            "notepadplusplus.install"
+            "putty.install"
+            "winscp.install"
             "postman"
+            "vcredist140" # dependency for wireshark
             "wireshark"
           )
 
