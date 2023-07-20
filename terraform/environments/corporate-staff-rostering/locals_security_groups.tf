@@ -11,10 +11,32 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
+    rdp = {
+      inbound = ["10.40.165.0/26","10.112.3.0/26","10.102.3.0/26"]
+    }
+  }
+
+  security_group_cidrs_preprod_prod = {
+    ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
+    https = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
+    ])
+    http7xxx = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+    ])
+    rdp = {
+      inbound = ["10.40.165.0/26"]
+    }
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
     test = local.security_group_cidrs_devtest
+    preproduction = local.security_group_cidrs_preprod_prod
+    production = local.security_group_cidrs_preprod_prod
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
@@ -99,7 +121,7 @@ locals {
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
-          cidr_blocks     = ["10.0.0.0/8"]
+          cidr_blocks     = local.security_group_cidrs.rdp.inbound
           security_groups = []
         }
         # http5985 = {
