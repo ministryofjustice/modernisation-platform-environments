@@ -15,17 +15,16 @@
 #
 #  name = each.key
 
-    name = local.db_config.name
+    name             = local.db_config.name
     business_unit    = var.account_info.business_unit # hmpps
     application_name = var.account_info.application_name # delius-core
     region           = var.account_info.region # eu-west-2
-    mp_environment   = var.account_info.environment # equates to one of the 4 MP environment names, e.g. development
-    #region           = local.region
-    #availability_zone  = local.availability_zone_1
+    environment      = var.account_info.environment # equates to one of the 4 MP environment names, e.g. development
     subnet_id        = data.aws_subnet.private_subnets_a.id
-    #tags = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
-    #account_ids_lookup       = local.environment_management.account_ids
-    #cloudwatch_metric_alarms = {}
+    
+    tags = = merge(local.tags, {
+    Name = lower(format("%s-%s", local.application_name, local.environment))
+  })
 
     ami_name                      = var.db_config.ami_name # delius_core_ol_8_5_oracle_db_19c_patch_2023-06-12T12-32-07.259Z
     ami_owner                     = local.environment_management.account_ids["core-shared-services-production"] # 
@@ -42,13 +41,10 @@
             }
         )
     )
-    #ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
-    #ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
-    #ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
-    #ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
-    #ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
-    #ssm_parameters                = lookup(each.value, "ssm_parameters", null)
-    #route53_records               = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
+
+    ebs_volume_config             = {}
+    ebs_volumes                   = {}
+    route53_records               = {}
 
     iam_resource_names_prefix = "ec2-test-instance"
     instance_profile_policies = [
