@@ -61,9 +61,9 @@ data "aws_iam_policy_document" "ci_secrets_rotator" {
 
 resource "aws_iam_policy" "ci_secrets_rotator" {
   count       = local.is-production || local.is-preproduction ? 1 : 0
-  name        = "snapshot_sharer"
-  description = "Allows sharing of RDS snapshots"
-  policy      = data.aws_iam_policy_document.snapshot_sharer.json
+  name        = "ci_secrets_rotator"
+  description = "Allows rotating secrets in the DS"
+  policy      = data.aws_iam_policy_document.ci_secrets_rotator.json
 }
 
 resource "aws_iam_role_policy_attachment" "ci_secrets_rotator" {
