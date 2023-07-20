@@ -6,8 +6,7 @@ locals {
       test-managementserver-2022 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
-          # availability_zone             = null
+          ami_name                      = "mp_WindowsServer2022_2023-*"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/ndh-user-data.yaml"))
         })
