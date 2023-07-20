@@ -7,15 +7,15 @@
  module "ec2_instance" {
     source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.0.0"
 
-#   providers = {
-#    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-#  }
+   providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
 #
 #  for_each = try(local.ec2_test.ec2_test_instances, {})
 #
 #  name = each.key
 
-    name = "delius-core-db-test"
+    name = local.db_config.name
     business_unit    = var.account_info.business_unit # hmpps
     application_name = var.account_info.application_name # delius-core
     region           = var.account_info.region # eu-west-2
