@@ -14,11 +14,6 @@ locals {
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
-
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-    ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -44,10 +39,7 @@ locals {
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
-    ])
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
