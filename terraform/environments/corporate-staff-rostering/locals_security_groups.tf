@@ -11,6 +11,9 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
+    rdp = {
+      inbound = ["10.40.165.0/26","10.112.3.0/26","10.102.3.0/26"]
+    }
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
@@ -99,7 +102,7 @@ locals {
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
-          cidr_blocks     = ["10.0.0.0/8"]
+          cidr_blocks     = local.security_group_cidrs_devtest.rdp.inbound
           security_groups = []
         }
         # http5985 = {
