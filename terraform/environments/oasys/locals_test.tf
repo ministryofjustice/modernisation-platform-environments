@@ -41,14 +41,15 @@ locals {
       })
     }
 
+    # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
     baseline_acm_certificates = {
       "t2_${local.application_name}_cert" = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
         domain_name = "t2.oasys.service.justice.gov.uk"
         subject_alternate_names = [
-          "*.t2.oasys.service.justice.gov.uk",
-          "t2-oasys.hmpp-azdt.justice.gov.uk",
+          "*.oasys.service.justice.gov.uk",
+          "*.hmpp-azdt.justice.gov.uk",
         ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
@@ -88,8 +89,8 @@ locals {
       #   }
       # }
 
-      public = { # this is a temporary workaround - we really want public and private load balancers working, but while investigating, get public2 and private2 up
-        internal_lb = false
+      public = {
+        internal_lb              = false
         access_logs              = false
         # s3_versioning            = false
         force_destroy_bucket     = true
@@ -108,40 +109,42 @@ locals {
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["t2_${local.application_name}_cert"]
             default_action = {
-              # type = "fixed-response"
-              # fixed_response = {
-              #   content_type = "text/plain"
-              #   message_body = "T2 - use t2.oasys.service.justice.gov.uk"
-              #   status_code  = "200"
-              # }
-              type              = "forward"
-              target_group_name = "t2-${local.application_name}-web-a-pb-http-8080"
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "T2 - use t2.oasys.service.justice.gov.uk"
+                status_code  = "200"
+              }
             }
+            # default_action = {
+            #   type              = "forward"
+            #   target_group_name = "t2-${local.application_name}-web-a-pb-http-8080"
+            # }
             rules = {
-              # t2-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "t2-${local.application_name}-web-a-public-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "t2.oasys.service.justice.gov.uk",
-              #           "*.t2.oasys.service.justice.gov.uk",
-              #           "t2-oasys.hmpp-azdt.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
+              t2-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-${local.application_name}-web-a-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2.oasys.service.justice.gov.uk",
+                        "t2-a.oasys.service.justice.gov.uk",
+                        "ords.t2.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         }
       }
-      private = { # this is a temporary workaround - we really want public and private load balancers working, but while investigating, get public2 and private2 up
-        internal_lb = true
+      private = {
+        internal_lb              = true
         access_logs              = false
         # s3_versioning            = false
         force_destroy_bucket     = true
@@ -151,7 +154,6 @@ locals {
         security_groups          = ["private_lb"]
         public_subnets           = module.environment.subnets["private"].ids
         tags                     = local.tags
-
         listeners = {
           https = {
             port                      = 443
@@ -159,34 +161,36 @@ locals {
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["t2_${local.application_name}_cert"]
             default_action = {
-              # type = "fixed-response"
-              # fixed_response = {
-              #   content_type = "text/plain"
-              #   message_body = "T2 - use t2.oasys.service.justice.gov.uk"
-              #   status_code  = "200"
-              # }
-              type              = "forward"
-              target_group_name = "t2-${local.application_name}-web-a-pv-http-8080"
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "T2 - use t2-int.oasys.service.justice.gov.uk"
+                status_code  = "200"
+              }
             }
+            # default_action = {
+            #   type              = "forward"
+            #   target_group_name = "t2-${local.application_name}-web-a-pv-http-8080"
+            # }
             rules = {
-              # t2-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "t2-${local.application_name}-web-a-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "t2.oasys.service.justice.gov.uk",
-              #           "*.t2.oasys.service.justice.gov.uk",
-              #           "t2-oasys.hmpp-azdt.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
+              t2-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-${local.application_name}-web-a-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2-int.oasys.service.justice.gov.uk",
+                        "t2-a-int.oasys.service.justice.gov.uk",
+                        "t2-oasys.hmpp-azdt.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         }
@@ -201,12 +205,12 @@ locals {
       #
       # public
       #
-      "${local.application_name}.service.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "t2", type = "A", lbs_map_key = "public" }, # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
+      # "${local.application_name}.service.justice.gov.uk" = {
+      #   lb_alias_records = [
+          # { name = "t2", type = "A", lbs_map_key = "public" }, # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
           # { name = "db.t2", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
-        ]
-      }
+      #   ]
+      # }
       # "t1.${local.application_name}.service.justice.gov.uk" = {
       #   lb_alias_records = [
       #     { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t1, 
