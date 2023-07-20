@@ -217,7 +217,7 @@ locals {
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
-          cidr_blocks     = ["10.0.0.0/8"]
+          cidr_blocks     = local.security_group_cidrs.rdp.inbound
           security_groups = []
         }
         # http2109 = {
