@@ -15,6 +15,7 @@
 #
 #  name = each.key
 
+    name = "delius-core-db-test"
     business_unit    = var.account_info.business_unit # hmpps
     application_name = var.account_info.application_name # delius-core
     region           = var.account_info.region # eu-west-2
@@ -27,7 +28,7 @@
     #cloudwatch_metric_alarms = {}
 
     ami_name                      = var.db_config.ami_name # delius_core_ol_8_5_oracle_db_19c_patch_2023-06-12T12-32-07.259Z
-    ami_owner                     = local.environment_management.account_ids["core-shared-services-production"]} # 
+    ami_owner                     = local.environment_management.account_ids["core-shared-services-production"] # 
     instance                      = local.db_config.instance
                    
     user_data_raw = base64encode(

@@ -15,7 +15,9 @@ locals {
   }
   
   db_config = {
-    instance = merge(local.db_config.instance, {
+    name                 = try(local.db_config_lower_environments.name, "db")
+    ami_name             = local.db_config_lower_environments.ami_name
+    instance = merge(local.db_config_lower_environments.instance, {
       instance_type = "r6i.xlarge"
       monitoring    = false
     })
