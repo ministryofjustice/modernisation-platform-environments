@@ -181,3 +181,32 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_lambda_role" 
  policy_arn  = aws_iam_policy.iam_policy_for_lambda[0].arn
 }
 
+###################
+# SNS IAM Policies
+###################
+
+data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
+  count         = local.is-production == true ? 1 : 0
+  policy_id = "SnsTopicId"
+  statement {
+    sid = "statement1"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Allow"
+    actions = [
+      "SNS:GetTopicAttributes",
+      "SNS:SetTopicAttributes",
+      "SNS:AddPermission",
+      "SNS:DeleteTopic",
+      "SNS:Subscribe",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:Publish",
+      "SNS:Receive"
+    ]
+    resources = [
+      aws_sns_topic.cw_alerts[0].arn
+    ]
+  }
+}
