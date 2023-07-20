@@ -54,8 +54,8 @@ data "aws_iam_policy_document" "ci_secrets_rotator" {
     sid    = "ResetDSUserPassword"
     effect = "Allow"
     actions = [
-      "directoryservice:ResetUserPassword",
-      "directoryservice:DescribeDirectories"
+      "ds:ResetUserPassword",
+      "ds:DescribeDirectories"
     ]
     resources = [
       local.iaps_ds_arn
