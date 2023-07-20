@@ -1,3 +1,7 @@
+####################
+# Secrets Rotator
+####################
+
 resource "aws_iam_role" "ci_secrets_rotator" {
   count              = local.is-production || local.is-preproduction ? 1 : 0
   name               = "ci-secrets-rotator"
