@@ -1,0 +1,31 @@
+# This is an EC2Launch V2 type user-data script
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
+# See C:\ProgramData\Amazon\EC2Launch\log for logs
+version: 1.0
+tasks:
+  - task: executeScript
+    inputs:
+      - frequency: once
+
+        type: powershell
+        runAs: admin
+        content: |
+          # Set time to local and locale
+          $ErrorActionPreference = "Stop" # set all errors to terminate script
+
+          Set-TimeZone "GMT Standard Time"
+          Set-WinSystemLocale "en-GB"        
+  - task: executeScript
+    inputs:
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
+          # Install apps
+          $ErrorActionPreference = "Stop" # set all errors to terminate script
+
+          $apps = "firefox", "libreoffice-still", "notepadplusplus", "putty", "winscp", "postman", "wireshark"
+
+          foreach ($app in $apps) {
+            choco install $app -y
+          }
