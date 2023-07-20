@@ -6,26 +6,33 @@ tasks:
   - task: executeScript
     inputs:
       - frequency: once
-
         type: powershell
         runAs: admin
         content: |
           # Set time to local and locale
-          $ErrorActionPreference = "Stop" # set all errors to terminate script
+          # $ErrorActionPreference = "Stop" # set all errors to terminate script
 
           Set-TimeZone "GMT Standard Time"
           Set-WinSystemLocale "en-GB"        
-  - task: executeScript
-    inputs:
-      - frequency: once
-        type: powershell
-        runAs: admin
-        content: |
-          # Install apps
-          $ErrorActionPreference = "Stop" # set all errors to terminate script
+  # - task: executeScript
+  #   inputs:
+  #     - frequency: once
+  #       type: powershell
+  #       runAs: admin
+  #       content: |
+  #         # Install apps
+  #         # $ErrorActionPreference = "Stop" # set all errors to terminate script
 
-          $apps = "firefox", "libreoffice-still", "notepadplusplus", "putty", "winscp", "postman", "wireshark"
+  #         $apps = @(
+  #           "firefox"
+  #           "libreoffice-still"
+  #           "notepadplusplus"
+  #           "putty"
+  #           "winscp"
+  #           "postman"
+  #           "wireshark"
+  #         )
 
-          foreach ($app in $apps) {
-            choco install $app -y
-          }
+  #         foreach ($app in $apps) {
+  #           choco install $app -y
+  #         }
