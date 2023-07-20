@@ -14,8 +14,6 @@ tasks:
 
           Set-TimeZone "GMT Standard Time"
           Set-WinSystemLocale "en-GB"        
-  - task: executeScript
-    inputs:
       - frequency: once
         type: powershell
         runAs: admin
