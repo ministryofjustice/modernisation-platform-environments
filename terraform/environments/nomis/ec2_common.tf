@@ -407,7 +407,7 @@ resource "aws_cloudwatch_metric_alarm" "rman_backup_test_fail" {
 
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = 1
-  metric_name         = "rman-backup-status"
+  metric_name         = "RmanBackupStatus"
   namespace           = "RmanBackupMetrics"
   period              = "60"
   statistic           = "Minimum"
@@ -425,7 +425,7 @@ resource "aws_cloudwatch_metric_alarm" "rman_backup_test_missing" {
 
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 3
-  metric_name         = "rman-backup-status"
+  metric_name         = "RmanBackupStatus"
   namespace           = "RmanBackupMetrics"
   period              = "60"
   statistic           = "Minimum"
