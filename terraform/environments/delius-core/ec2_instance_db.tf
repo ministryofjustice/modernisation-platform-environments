@@ -130,7 +130,7 @@ data "template_file" "userdata" {
   template = file("${path.module}/templates/userdata.sh.tftpl")
 
   vars = {
-    branch               = "main"
+    branch               = "oracle_bootstrap"
     ansible_repo         = "modernisation-platform-configuration-management"
     ansible_repo_basedir = "ansible"
     ansible_args         = "oracle_19c_install, oracle-db-bootstrap"
