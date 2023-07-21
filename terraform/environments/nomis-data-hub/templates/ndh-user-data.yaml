@@ -35,3 +35,20 @@ tasks:
           foreach ($app in $apps) {
             choco install $app -y
           }
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
+          # Download SQL Developer
+          $S3_BUCKET = mod-platform-image-artefact-bucket20230203091453221500000001
+
+          Read-S3Object -BucketName $S3_BUCKET -Key hmpps/sqldeveloper/sqldeveloper-22.2.1.234.1810-x64.zip -File C:\management-server-software\sqldeveloper-22.2.1.234.1810-x64.zip
+
+          # Extract SQL Developer - there is no installer for this application
+          Expand-Archive -Path C:\management-server-software\sqldeveloper-22.2.1.234.1810-x64.zip -DestinationPath "C:\Program Files\Oracle"
+
+          # Create a desktop shortcut
+          $shortcut = New-Object -ComObject WScript.Shell
+          $shortcut_link = $shortcut.CreateShortcut("C:\Users\Public\Desktop\SQL Developer.lnk")
+          $shortcut_link.TargetPath = "C:\Program Files\Oracle\sqldeveloper\sqldeveloper.exe"
+          $shortcut_link.Save()          
