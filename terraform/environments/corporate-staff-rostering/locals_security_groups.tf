@@ -83,9 +83,6 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.oracle_db
           security_groups = [
-            "private-jumpserver",
-            "private-web",
-            "bastion-linux",
           ]
         }
         oracle3872 = {
