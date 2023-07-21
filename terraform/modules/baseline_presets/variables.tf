@@ -47,6 +47,7 @@ variable "options" {
     enable_ec2_put_parameter                     = optional(bool, false)
     enable_shared_s3                             = optional(bool, false)
     enable_oracle_secure_web                     = optional(bool, false)
+    db_backup_s3                                 = optional(bool, false)
     route53_resolver_rules                       = optional(map(list(string)), {})
     iam_policies_filter                          = optional(list(string), [])
     iam_policies_ec2_default                     = optional(list(string), [])
