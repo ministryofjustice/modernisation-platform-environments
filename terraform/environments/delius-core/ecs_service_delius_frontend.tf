@@ -277,10 +277,10 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
           }
         ]
         environment = [
-          {
-            name  = "LDAP_HOST"
-            value = aws_lb.ldap.dns_name
-          }
+          # {
+          #   name  = "LDAP_HOST"
+          #   value = aws_lb.ldap.dns_name
+          # }
         ]
       }
   ])
