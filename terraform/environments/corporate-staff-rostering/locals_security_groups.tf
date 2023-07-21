@@ -14,6 +14,18 @@ locals {
     rdp = {
       inbound = ["10.40.165.0/26","10.112.3.0/26","10.102.3.0/26"]
     }
+    oracle_db = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
+      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
+      module.ip_addresses.azure_nomisapi_cidrs.devtest,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+    ])
+    oracle_oem_agent = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+    ])
   }
 
   security_group_cidrs_preprod_prod = {
@@ -31,6 +43,19 @@ locals {
     rdp = {
       inbound = ["10.40.165.0/26"]
     }
+    oracle_db = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
+      module.ip_addresses.azure_studio_hosting_cidrs.prod,
+      module.ip_addresses.azure_nomisapi_cidrs.prod,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+    ])
+    oracle_oem_agent = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+    ])
+    
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
@@ -50,6 +75,25 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+        }
+        oracle1521 = {
+          description = "Allow oracle database 1521 ingress"
+          from_port   = "1521"
+          to_port     = "1521"
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.oracle_db
+          security_groups = [
+            "private-jumpserver",
+            "private-web",
+            "bastion-linux",
+          ]
+        }
+        oracle3872 = {
+          description = "Allow oem agent ingress"
+          from_port   = "3872"
+          to_port     = "3872"
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
         }
       }
       egress = {
