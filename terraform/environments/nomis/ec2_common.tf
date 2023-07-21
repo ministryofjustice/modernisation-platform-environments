@@ -387,6 +387,20 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" 
   role       = aws_iam_role.cloudwatch-datasource-role.name
 
 }
+resource "aws_cloudwatch_log_metric_filter" "rman_backup_test" {
+  name           = "rman-backup-status"
+  pattern        = "[month, day, time, hostname, process, message = rman-backup-result, dbname, value]"
+  log_group_name = "cwagent-var-log-messages"
+
+  metric_transformation {
+    name      = "RmanBackupStatus"
+    namespace = "RmanBackupMetrics" # custom namespace
+    value     = "$value"
+    dimensions = {
+      dbname = "$dbname"
+    }
+  }
+}
 
 resource "aws_cloudwatch_log_metric_filter" "rman_backup_success_filter" {
   for_each = try(toset(local.environment_configs[local.environment].rman_database_backups), {})
