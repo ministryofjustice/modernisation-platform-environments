@@ -30,6 +30,7 @@ tasks:
             "postman"
             "vcredist140" # dependency for wireshark
             "wireshark"
+            "jre8"
           )
 
           foreach ($app in $apps) {
@@ -40,15 +41,48 @@ tasks:
         runAs: admin
         content: |
           # Download SQL Developer
-          $S3_BUCKET = mod-platform-image-artefact-bucket20230203091453221500000001
+          $S3_BUCKET = "mod-platform-image-artefact-bucket20230203091453221500000001"
 
-          Read-S3Object -BucketName $S3_BUCKET -Key hmpps/sqldeveloper/sqldeveloper-22.2.1.234.1810-x64.zip -File C:\management-server-software\sqldeveloper-22.2.1.234.1810-x64.zip
+          Read-S3Object -BucketName $S3_BUCKET -Key "hmpps/sqldeveloper/sqldeveloper-22.2.1.234.1810-x64.zip" -File "C:\management-server-software\sqldeveloper-22.2.1.234.1810-x64.zip"
 
           # Extract SQL Developer - there is no installer for this application
-          Expand-Archive -Path C:\management-server-software\sqldeveloper-22.2.1.234.1810-x64.zip -DestinationPath "C:\Program Files\Oracle"
+          Expand-Archive -Path "C:\management-server-software\sqldeveloper-22.2.1.234.1810-x64.zip" -DestinationPath "C:\Program Files\Oracle"
 
           # Create a desktop shortcut
           $shortcut = New-Object -ComObject WScript.Shell
           $shortcut_link = $shortcut.CreateShortcut("C:\Users\Public\Desktop\SQL Developer.lnk")
           $shortcut_link.TargetPath = "C:\Program Files\Oracle\sqldeveloper\sqldeveloper.exe"
-          $shortcut_link.Save()          
+          $shortcut_link.Save()
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
+          # Download NDH specific files
+          # Doing it this way because 'Get-Objects' (folder download) permissions are not available
+
+          $S3_BUCKET_NDH = "nomis-data-hub-software20230309164626754200000003"
+
+          $objects = Get-S3Object -BucketName $S3_BUCKET_NDH -Prefix "ndh-installation-files/Windows Installs"
+          
+          foreach($obj in $objects) {
+            $obj.Key
+            $splitted = $obj.Key.Split('/', [System.StringSplitOptions]::RemoveEmptyEntries)
+            $file = $splitted[2..($splitted.Length - 1)] -join '/'
+            Read-S3Object -BucketName $S3_BUCKET_NDH -Key $obj.Key -File "C:\tibco\files\$file" 
+          }
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
+          # Download NDH Gems files
+          # Doing it this way because 'Get-Objects' (folder download) permissions are not available
+
+          $S3_BUCKET_NDH = "nomis-data-hub-software20230309164626754200000003"
+
+          $objects = Get-S3Object -BucketName $S3_BUCKET_NDH -Prefix "ndh-installation-files/Windows Installs/Gems4/"
+
+          foreach($obj in $objects) {
+            $file=$obj.Key.Split("/")[-1]
+            Read-S3Object -BucketName $S3_BUCKET_NDH -Key $obj.Key -File "C:\tibco\files\GEMS4\$file" 
+          }
+
