@@ -162,7 +162,7 @@ locals {
         total_size = 50
       }
     }
-    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_only
+    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
     ssm_parameters = {
       ASMSYS = {
         random = {
