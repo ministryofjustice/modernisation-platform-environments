@@ -233,7 +233,7 @@ locals {
           id = module.environment.vpc.id
         }
         records = [
-          { name = "db.t2.${local.application_name}", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.t2.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T2ODL0009
+          { name = "db.t2.${local.application_name}", type = "A", ttl = "300", records = ["10.26.12.211"] }, # db.t2.oasys.hmpps-test.modernisation-platform.internal currently pointing to t2-oasys-db-a
           { name = "db.t1.${local.application_name}", type = "A", ttl = "300", records = ["10.101.6.132"] },  # db.t1.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T1ODL0007
         ]
         lb_alias_records = [
