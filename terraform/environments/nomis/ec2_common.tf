@@ -406,33 +406,14 @@ resource "aws_cloudwatch_metric_alarm" "rman_backup_test_fail" {
   alarm_name = "rman-backup-test-fail"
 
   comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = 1
-  metric_name         = "RmanBackupStatus"
-  namespace           = "RmanBackupMetrics"
-  period              = "60"
-  statistic           = "Minimum"
-  threshold           = "0"
-  alarm_description   = "test"
-  datapoints_to_alarm = 1
-  treat_missing_data  = "notBreaching"
-  dimensions = {
-    dbname = "T1CNOM"
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "rman_backup_test_missing" {
-  alarm_name = "rman-backup-test-missing"
-
-  comparison_operator = "LessThanThreshold"
   evaluation_periods  = 3
   metric_name         = "RmanBackupStatus"
   namespace           = "RmanBackupMetrics"
   period              = "60"
-  statistic           = "Minimum"
+  statistic           = "Maximum"
   threshold           = "0"
   alarm_description   = "test"
   datapoints_to_alarm = 1
-  treat_missing_data  = "breaching"
   dimensions = {
     dbname = "T1CNOM"
   }
