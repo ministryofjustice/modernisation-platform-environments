@@ -149,7 +149,7 @@ locals {
         }
         http8080 = {
           description = "Allow http8080 ingress"
-          from_port   = 8080
+          from_port   = 0
           to_port     = 8080
           protocol    = "tcp"
           cidr_blocks = flatten([
