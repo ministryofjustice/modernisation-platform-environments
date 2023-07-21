@@ -219,7 +219,7 @@ locals {
       # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
         records = [
-          { name = "db.t2.${local.application_name}", type = "A", ttl = "300", records = ["10.26.12.211"] }, # db.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk currently pointing to t2-oasys-db-a
+          { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "300", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         # lb_alias_records = [
         #   { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
@@ -236,7 +236,7 @@ locals {
           id = module.environment.vpc.id
         }
         records = [
-          { name = "db.t2.${local.application_name}", type = "A", ttl = "300", records = ["10.26.12.211"] }, # db.t2.oasys.hmpps-test.modernisation-platform.internal currently pointing to t2-oasys-db-a
+          { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "300", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
           { name = "db.t1.${local.application_name}", type = "A", ttl = "300", records = ["10.101.6.132"] },  # db.t1.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T1ODL0007
         ]
         lb_alias_records = [
