@@ -15,13 +15,8 @@ locals {
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
     oracle_db = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
-      module.ip_addresses.azure_nomisapi_cidrs.devtest,
-      module.ip_addresses.mp_cidr.hmpps-development,
-      module.ip_addresses.mp_cidr.hmpps-test,
+      "10.0.0.0/8",
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -42,11 +37,8 @@ locals {
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
     oracle_db = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
+      "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.prod,
-      module.ip_addresses.azure_nomisapi_cidrs.prod,
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -204,6 +196,19 @@ locals {
         #     # "bastion-linux",
         #   ]
         # }
+        http8080 = {
+          description = "Allow http 8080 ingress"
+          from_port   = 8080
+          to_port     = 8080
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.oracle_db
+          security_groups = [
+            "private_lb",
+            # "private-jumpserver",
+            # "private-web",
+            # "bastion-linux",
+          ]
+        }
         oracle1521 = {
           description = "Allow oracle database 1521 ingress"
           from_port   = "1521"
