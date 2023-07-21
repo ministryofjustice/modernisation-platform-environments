@@ -4,7 +4,7 @@ locals {
   # baseline config
   development_config = {
     
-    baseline_ec2_autoscaling_groups = {
+    baseline_ec2_instances = {
       dev-csr-db-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
