@@ -154,6 +154,7 @@ locals {
           protocol    = "tcp"
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
+            "0.0.0.0/0"
           ])
           security_groups = ["private_lb","public_lb"]
         }
