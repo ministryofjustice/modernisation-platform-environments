@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "allow_invoke_authoriser_lambda_doc" {
   statement {
     effect    = "Allow"
     actions   = ["lambda:InvokeFunction"]
-    resources = [aws_lambda_function.authoriser.arn]
+    resources = [module.data_product_authorizer_lambda.lambda_function_arn]
   }
 }
 
