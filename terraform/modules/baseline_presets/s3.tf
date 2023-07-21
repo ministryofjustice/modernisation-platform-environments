@@ -96,7 +96,7 @@ locals {
         type = "AWS"
         identifiers = [
           for account_name in var.environment.account_names :
-          endswith(name, "-preproduction") ? var.environment.account_root_arns[account_name] : ""
+          endswith(account_name, "-preproduction") ? var.environment.account_root_arns[account_name] : ""
         ]
       }
     }
