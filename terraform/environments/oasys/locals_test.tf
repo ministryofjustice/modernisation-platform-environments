@@ -218,6 +218,9 @@ locals {
       #   ]
       # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
+        records = [
+          { name = "db.t2.${local.application_name}", type = "A", ttl = "300", records = ["10.26.12.211"] }, # db.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk currently pointing to t2-oasys-db-a
+        ]
         # lb_alias_records = [
         #   { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
         #   { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" }, # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
