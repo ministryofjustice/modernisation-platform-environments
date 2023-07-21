@@ -94,7 +94,8 @@ locals {
       ]
       principals = {
         type = "AWS"
-        identifiers = [ for account_name in var.environment.account_names : [
+        identifiers = [
+          for account_name in var.environment.account_names :
           endswith(name, "-preproduction") ? var.environment.account_root_arns[account_name] : ""
         ]
       }
