@@ -159,3 +159,21 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
     InstanceId = each.key
   }
 }
+
+resource "aws_cloudwatch_log_group" "IIS-Logs" {
+count  = local.is-production == true ? 1 : 0
+  name = "IIS-Logs"
+  retention_in_days = 365
+}
+
+resource "aws_cloudwatch_log_group" "System-Event-Logs" {
+count  = local.is-production == true ? 1 : 0
+  name = "System-Event-Logs"
+  retention_in_days = 365
+}
+
+resource "aws_cloudwatch_log_group" "Application-Event-Logs" {
+count  = local.is-production == true ? 1 : 0
+  name = "Application-Event-Logs"
+  retention_in_days = 365
+}
