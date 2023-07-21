@@ -894,16 +894,6 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-Egress-2" {
   security_group_id = aws_security_group.PPUD-Mail-Server[0].id
 }
 
-resource "aws_security_group_rule" "PPUD-Mail-Server-Egress-3" {
-  count             = local.is-production == true ? 1 : 0
-  type              = "egress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.PPUD-Mail-Server[0].id
-}
-
 resource "aws_security_group" "PPUD-Mail-Server-2" {
   count       = local.is-production == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
@@ -954,17 +944,6 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-2-Egress-2" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
 }
-
-resource "aws_security_group_rule" "PPUD-Mail-Server-2-Egress-3" {
-  count             = local.is-production == true ? 1 : 0
-  type              = "egress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
-}
-
 
 resource "aws_security_group" "docker-build-server" {
   count       = local.is-production == true ? 1 : 0

@@ -6,7 +6,7 @@
 data "aws_instances" "tagged_instances" {
   filter {
      name = "tag:patch_group"
-     values = ["prod_win_patch"]
+     values = ["prod_win_patch", "prod_lin_patch"]
   }
 }
 
