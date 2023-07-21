@@ -104,12 +104,14 @@ resource "aws_launch_template" "ec2_template" {
 }
 
 resource "aws_autoscaling_group" "bastion_linux_daily" {
+  
   launch_template {
     id      = aws_launch_template.ec2_template.id
-    version = "$Latest"
+    version = aws_launch_template.ec2_template.latest_version
   }
+
   availability_zones        = ["${var.aws_region}a"]
-  name                      = "${var.name}_daily"
+  name                      = "${var.name}_asg"
   max_size                  = 1
   min_size                  = 1
   health_check_grace_period = 300
