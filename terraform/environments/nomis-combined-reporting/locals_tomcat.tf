@@ -31,54 +31,6 @@ locals {
     }
   }
 
-  tomcat_lb_listeners = {
-
-    http = {
-      port     = 80
-      protocol = "HTTP"
-
-      default_action = {
-        type = "redirect"
-        redirect = {
-          port        = 443
-          protocol    = "HTTPS"
-          status_code = "HTTP_301"
-        }
-      }
-    }
-
-    http7777 = {
-      port     = 7777
-      protocol = "HTTP"
-
-      default_action = {
-        type = "fixed-response"
-        fixed_response = {
-          content_type = "text/plain"
-          message_body = "Not implemented"
-          status_code  = "501"
-        }
-      }
-    }
-
-    https = {
-      port                      = 443
-      protocol                  = "HTTPS"
-      ssl_policy                = "ELBSecurityPolicy-2016-08"
-      certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
-      cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].lb_default
-
-      default_action = {
-        type = "fixed-response"
-        fixed_response = {
-          content_type = "text/plain"
-          message_body = "Not implemented"
-          status_code  = "501"
-        }
-      }
-    }
-  }
-
   tomcat_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
