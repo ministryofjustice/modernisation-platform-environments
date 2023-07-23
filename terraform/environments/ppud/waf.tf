@@ -1,4 +1,4 @@
-
+/*
 resource "aws_wafv2_web_acl" "WAM-rule" {
   name  = "PPUD-WAM-rule"
   scope = "REGIONAL"
@@ -183,3 +183,4 @@ resource "aws_wafv2_web_acl_association" "WAM-WAF" {
   resource_arn = aws_lb.WAM-ALB.arn
   web_acl_arn  = aws_wafv2_web_acl.WAM-rule.arn
 }
+*/
