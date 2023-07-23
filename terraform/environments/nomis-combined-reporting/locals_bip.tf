@@ -1,6 +1,15 @@
 locals {
 
-  bip_ec2_default = {
+  bip_ssm_parameters = {
+      prefix = "/bi-platform/"
+      parameters = {
+        bobj_password     = { description = "bobj account password" }
+        oracle_password   = { description = "oracle account password" }
+        product_key       = { description = "BIP product key" }
+      }
+    }
+
+  bi-platform_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name          = "base_rhel_8_5_*"
