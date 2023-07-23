@@ -59,8 +59,7 @@ locals {
       }
       t1-cmc-repo-database = {
         config = merge(module.baseline_presets.ec2_instance.config.db, {
-          ami_name          = "ncr_oracle_db_release_2023-07-23T19-00-00.670Z"
-          ami_owner         = "self"
+          ami_name          = "ncr_oracle_db"
           availability_zone = "${local.region}a"
         })
         instance              = module.baseline_presets.ec2_instance.instance.default_db
