@@ -46,3 +46,24 @@ resource "aws_secretsmanager_secret_version" "redshift" {
   secret_id     = aws_secretsmanager_secret.redshift.id
   secret_string = jsonencode(local.redshift_secrets)
 }
+
+# Slack ALerts URL
+module "slack_alerts_url" {
+  count                   = local.enable_slack_alerts_url ? 1 : 0
+
+  source                  = "./modules/secrets_manager"
+  name                    = "${local.project}-slack-alerts-url-${local.environment}"
+  description             = "DPR Slack Alerts URL"
+  type                    = "MONO"
+  secret_value            = "SLACK_ALERTS_URL_PLACEHOLDER"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "monitoring"
+      Jira           = "DPR-569"
+      Resource_Type  = "Secret"
+      Name           = "${local.project}-slack-alerts-url-${local.environment}"      
+    }
+  )
+}

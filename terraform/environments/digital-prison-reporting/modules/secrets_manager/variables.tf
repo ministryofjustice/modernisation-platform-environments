@@ -138,5 +138,22 @@ variable "use_upper" {
 variable "secrets" {
   type        = map(string)
   default     = {}
-  description = "(Optional) Map of Key Value Secrets"
+  description = "(Optional) Map of Key Value Secrets, if Type set to KEY_VALUE"
+}
+
+variable "type" {
+  type    = string
+  default = "MONO"
+}
+
+variable "secret_value" {
+  type    = string
+  default = ""
+  description = "(Optional) Value if the type is set to MONO"
+}
+
+variable "ignore_changes" {
+  description = "Ignore Changes, Dynamic Block"
+  type        = list(string)
+  default     = []
 }

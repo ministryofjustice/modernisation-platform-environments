@@ -23,9 +23,22 @@ resource "aws_secretsmanager_secret" "secret" {
   kms_key_id              = var.kms_key_id
   recovery_window_in_days = var.recovery_window_in_days
   tags                    = var.tags
+
+  lifecycle {
+    ignore_changes = var.ignore_changes
+  }
 }
 
 resource "aws_secretsmanager_secret_version" "secret_val" {
+  count         = var.type == "MONO" ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.secret.id
+  secret_string = var.generate_random ? random_password.random_string[0].result : var.secret_value
+}
+
+resource "aws_secretsmanager_secret_version" "secret_val" {
+  count         = var.type == "KEY_VALUE" ? 1 : 0
+
   secret_id     = aws_secretsmanager_secret.secret.id
   secret_string = var.generate_random ? random_password.random_string[0].result : jsonencode("${var.secrets}")
 }
