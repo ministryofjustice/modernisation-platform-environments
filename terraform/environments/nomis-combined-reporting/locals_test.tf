@@ -56,6 +56,13 @@ locals {
           "/dev/sds" = { type = "gp3", size = 100 }
         }
         route53_records = module.baseline_presets.ec2_instance.route53_records.internal_only
+        tags = {
+          description = "For testing SAP BI CMC installation"
+          ami         = "base_rhel_8_5"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "ncr-bip-cmc"
+        }
       }
       # t1-cmc-repo-database = {
       #   config = merge(module.baseline_presets.ec2_instance.config.db, {
