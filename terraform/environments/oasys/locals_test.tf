@@ -156,6 +156,22 @@ locals {
                   }
                 ]
               }
+              t2-web-b-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-${local.application_name}-web-b-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2-b.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         }
@@ -203,6 +219,22 @@ locals {
                         "t2-int.oasys.service.justice.gov.uk",
                         "t2-a-int.oasys.service.justice.gov.uk",
                         "t2-oasys.hmpp-azdt.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              t2-web-b-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-${local.application_name}-web-b-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2-b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
