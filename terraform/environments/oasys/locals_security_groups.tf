@@ -20,6 +20,7 @@ locals {
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
   }
   security_group_cidrs_preprod_prod = {
@@ -42,6 +43,7 @@ locals {
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
   }
   security_group_cidrs_by_environment = {
@@ -187,16 +189,16 @@ locals {
           protocol    = "icmp"
           cidr_blocks = local.security_group_cidrs.icmp
         }
-        # ssh = {
-        #   description = "Allow ssh ingress"
-        #   from_port   = "22"
-        #   to_port     = "22"
-        #   protocol    = "TCP"
-        #   cidr_blocks = local.security_group_cidrs.ssh
-        #   security_groups = [
-        #     # "bastion-linux",
-        #   ]
-        # }
+        ssh = {
+          description = "Allow ssh ingress"
+          from_port   = "22"
+          to_port     = "22"
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.ssh
+          security_groups = [
+            # "bastion-linux",
+          ]
+        }
         http8080 = {
           description = "Allow http 8080 ingress"
           from_port   = 8080
@@ -222,6 +224,13 @@ locals {
             # "private-web",
             # "bastion-linux",
           ]
+        }
+        oracle3872 = {
+          description = "Allow oem agent ingress"
+          from_port   = "3872"
+          to_port     = "3872"
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
         }
       }
       egress = {
