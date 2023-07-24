@@ -31,7 +31,24 @@ locals {
         tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
           "${local.application_name}-environment" = "t2"
-          oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
+          oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+        })
+      })
+      "t2-${local.application_name}-web-b" = merge(local.webserver_b, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "oasys_webserver_release_*"
+          ssm_parameters_prefix     = "ec2-web-t2/"
+          iam_resource_names_prefix = "ec2-web-t2"
+        })
+        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+            branch = "oasys/web-index-html-updation"
+          })
+        })
+        tags = merge(local.webserver_a.tags, {
+          description                             = "t2 ${local.application_name} web"
+          "${local.application_name}-environment" = "t2"
+          oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
         })
       })
       # "test-${local.application_name}-bip-a" = local.bip_a
