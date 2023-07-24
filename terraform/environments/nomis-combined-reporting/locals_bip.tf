@@ -122,7 +122,7 @@ locals {
 
     tags = {
       description = "ncr bip webtier component"
-      ami         = "base_rhel_8_5*"
+      ami         = "base_rhel_8_5"
       os-type     = "Linux"
       server-type = "ncr-bip"
       component   = "web"
