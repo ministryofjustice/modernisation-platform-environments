@@ -33,7 +33,7 @@ resource "aws_secretsmanager_secret" "secret_remote" {
 }
 
 resource "aws_secretsmanager_secret" "secret" {
-  count                   = var.ignore_secret_string ? 1 : 0
+  count                   = var.ignore_secret_string ? 0 : 1
 
   name                    = var.name == "" ? null : var.name
   name_prefix             = var.name == "" ? var.name_prefix : null
