@@ -35,123 +35,18 @@ locals {
 
     baseline_ssm_parameters = {
       # T1
-      "tomcat"          = local.tomcat_ssm_parameters
-      "bip"             = local.bip_ssm_parameters
+      "t1-ncr-tomcat"          = local.tomcat_ssm_parameters
+      "t1-ncr-bip"             = local.bip_ssm_parameters
     }
 
     baseline_ec2_instances = {
-      bi-platform-cmc = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_8_5_*"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t3.large",
-          vpc_security_group_ids = ["private"]
-        })
-        autoscaling_schedules = {}
-        user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        ebs_volumes = {
-          "/dev/sdb" = { type = "gp3", size = 100 }
-          "/dev/sds" = { type = "gp3", size = 100 }
-        }
-        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_only
-        tags = {
+      bi-platform-cmc = merge(local.bi-platform_ec2_default, {
+        tags = merge(local.bi-platform_ec2_default.tags, {
           description = "For testing SAP BI CMC installation"
-          ami         = "base_rhel_8_5"
-          os-type     = "Linux"
-          component   = "test"
           server-type = "ncr-bip-cmc"
-        }
-      }
-      # t1-cmc-repo-database = {
-      #   config = merge(module.baseline_presets.ec2_instance.config.db, {
-      #     ami_name          = "ncr_oracle_db_release_*"
-      #     ami_owner         = "self"
-      #     availability_zone = "${local.region}a"
-      #   })
-      #   instance              = module.baseline_presets.ec2_instance.instance.default_db
-      #   autoscaling_schedules = {}
-      #   autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
-      #   user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
-      #   ebs_volumes = {
-      #     "/dev/sdb" = { # /u01
-      #       size  = 100
-      #       label = "app"
-      #       type  = "gp3"
-      #     }
-      #     "/dev/sdc" = { # /u02
-      #       size  = 500
-      #       label = "app"
-      #       type  = "gp3"
-      #     }
-      #     "/dev/sde" = { # DATA01
-      #       label = "data"
-      #       size  = 500
-      #       type  = "gp3"
-      #     }
-      #     # "/dev/sdf" = {  # DATA02
-      #     #   label = "data"
-      #     #   type = null
-      #     # }
-      #     # "/dev/sdg" = {  # DATA03
-      #     #   label = "data"
-      #     #   type = null
-      #     # }
-      #     # "/dev/sdh" = {  # DATA04
-      #     #   label = "data"
-      #     #   type = null
-      #     # }
-      #     # "/dev/sdi" = {  # DATA05
-      #     #   label = "data"
-      #     #   type = null
-      #     # }
-      #     "/dev/sdj" = { # FLASH01
-      #       label = "flash"
-      #       type  = "gp3"
-      #       size  = 50
-      #     }
-      #     # "/dev/sdk" = { # FLASH02
-      #     #   label = "flash"
-      #     #   type = null
-      #     # }
-      #     "/dev/sds" = {
-      #       label = "swap"
-      #       type  = "gp3"
-      #       size  = 2
-      #     }
-      #   }
-      #   ebs_volume_config = {
-      #     data = {
-      #       iops       = 3000
-      #       type       = "gp3"
-      #       throughput = 125
-      #       total_size = 200
-      #     }
-      #     flash = {
-      #       iops       = 3000
-      #       type       = "gp3"
-      #       throughput = 125
-      #       total_size = 50
-      #     }
-      #   }
-      #   route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
-      #   # Example target group setup below
-      #   lb_target_groups = {}
-      #   tags = {
-      #     component                               = "cms"
-      #     os-type                                 = "Linux"
-      #     os-major-version                        = 8
-      #     os-version                              = "RHEL 8.5"
-      #     licence-requirements                    = "Oracle Database"
-      #     "Patch Group"                           = "RHEL"
-      #     server-type                             = "ncr-db"
-      #     description                             = "BIP CMS database"
-      #     monitored                               = true
-      #     "${local.application_name}-environment" = local.environment
-      #     environment-name                        = terraform.workspace # used in provisioning script to select group vars
-      #   }
-      # }
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
     }
     
     baseline_ec2_autoscaling_groups = {
@@ -247,95 +142,102 @@ locals {
         }
       }
 
-      bi-platform = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_8_5_*"
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t3.large",
-          vpc_security_group_ids = ["private"]
-        })
-        ebs_volumes = {
-          "/dev/sdb" = { type = "gp3", size = 100 }
-          "/dev/sds" = { type = "gp3", size = 100 }
-        }
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 2
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
-        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
+      bi-platform = merge(local.bi-platform_ec2_default, {
+        tags = merge(local.bi-platform_ec2_default.tags, {
           description = "For testing BIP 4.3 installation and connections with official RedHat RHEL8.5 image"
-          ami         = "base_rhel_8_5"
-          os-type     = "Linux"
-          component   = "test"
-          server-type = "ncr-bip"
-        }
-        lb_target_groups = {
-          http = {
-            port                 = 7777
-            protocol             = "HTTP"
-            target_type          = "instance"
-            deregistration_delay = 30
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7777
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-          }
-          sia = {
-            port                 = 6410
-            protocol             = "HTTP"
-            target_type          = "instance"
-            deregistration_delay = 30
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 6410
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-          }
-          cms = {
-            port                 = 6400
-            protocol             = "HTTP"
-            target_type          = "instance"
-            deregistration_delay = 30
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 6400
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-          }
-        }
-      }
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
+
+      # bi-platform = {
+      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #     ami_name = "base_rhel_8_5_*"
+      #   })
+      #   instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      #     instance_type          = "t3.large",
+      #     vpc_security_group_ids = ["private"]
+      #   })
+      #   ebs_volumes = {
+      #     "/dev/sdb" = { type = "gp3", size = 100 }
+      #     "/dev/sds" = { type = "gp3", size = 100 }
+      #   }
+      #   user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      #   autoscaling_group = {
+      #     desired_capacity    = 0
+      #     max_size            = 2
+      #     vpc_zone_identifier = module.environment.subnets["private"].ids
+      #   }
+      #   # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      #   tags = {
+      #     description = "For testing BIP 4.3 installation and connections with official RedHat RHEL8.5 image"
+      #     ami         = "base_rhel_8_5"
+      #     os-type     = "Linux"
+      #     component   = "test"
+      #     server-type = "ncr-bip"
+      #   }
+      #   lb_target_groups = {
+      #     http = {
+      #       port                 = 7777
+      #       protocol             = "HTTP"
+      #       target_type          = "instance"
+      #       deregistration_delay = 30
+      #       health_check = {
+      #         enabled             = true
+      #         interval            = 30
+      #         healthy_threshold   = 3
+      #         matcher             = "200-399"
+      #         path                = "/"
+      #         port                = 7777
+      #         timeout             = 5
+      #         unhealthy_threshold = 5
+      #       }
+      #       stickiness = {
+      #         enabled = true
+      #         type    = "lb_cookie"
+      #       }
+      #     }
+      #     sia = {
+      #       port                 = 6410
+      #       protocol             = "HTTP"
+      #       target_type          = "instance"
+      #       deregistration_delay = 30
+      #       health_check = {
+      #         enabled             = true
+      #         interval            = 30
+      #         healthy_threshold   = 3
+      #         matcher             = "200-399"
+      #         path                = "/"
+      #         port                = 6410
+      #         timeout             = 5
+      #         unhealthy_threshold = 5
+      #       }
+      #       stickiness = {
+      #         enabled = true
+      #         type    = "lb_cookie"
+      #       }
+      #     }
+      #     cms = {
+      #       port                 = 6400
+      #       protocol             = "HTTP"
+      #       target_type          = "instance"
+      #       deregistration_delay = 30
+      #       health_check = {
+      #         enabled             = true
+      #         interval            = 30
+      #         healthy_threshold   = 3
+      #         matcher             = "200-399"
+      #         path                = "/"
+      #         port                = 6400
+      #         timeout             = 5
+      #         unhealthy_threshold = 5
+      #       }
+      #       stickiness = {
+      #         enabled = true
+      #         type    = "lb_cookie"
+      #       }
+      #     }
+      #   }
+      # }
     }
     baseline_lbs = {
       private = {
