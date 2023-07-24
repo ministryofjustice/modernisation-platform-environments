@@ -33,6 +33,21 @@ locals {
     }
   }
 
+  database_cloudwatch_log_metric_filters = {
+    rman-backup-status = {
+      pattern        = "[month, day, time, hostname, process, message = rman-backup-result, dbname, value]"
+      log_group_name = "cwagent-var-log-messages"
+      metric_transformation = {
+        name      = "RmanBackupStatus"
+        namespace = "Database" # custom namespace
+        value     = "$value"
+        dimensions = {
+          dbname = "$dbname"
+        }
+      }
+    }
+  }
+
   database_cloudwatch_metric_alarms = {
     oracle-db-disconnected = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -128,6 +143,17 @@ locals {
       threshold           = "95"
       alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on a nomis-db instance"
     }
+    rman-backup-failed = {
+      comparison_operator = "LessThanOrEqualToThreshold"
+      evaluation_periods  = 3
+      metric_name         = "RmanBackupStatus"
+      namespace           = "Database"
+      period              = "60"
+      statistic           = "Maximum"
+      threshold           = "0"
+      alarm_description   = "Triggers if there has been no successful rman backup"
+      datapoints_to_alarm = 1
+    }
   }
 
   database_cloudwatch_metric_alarms_lists = {
@@ -157,6 +183,12 @@ locals {
         { key = "database", name = "oracleasm-service" },
         { key = "database", name = "oracle-ohasd-service" },
         { key = "database", name = "cpu-utilization-high-db-2hrs" },
+      ]
+    }
+    database_dba_by_dbname = {
+      parent_keys = []
+      alarms_list = [
+        { key = "database", name = "rman-backup-failed" },
       ]
     }
     database_dba_high_priority = {

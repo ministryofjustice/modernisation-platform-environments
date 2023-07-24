@@ -4,7 +4,16 @@ locals {
   # baseline config
   test_config = {
 
-    rman_database_backups = ["T1CNOM", "T1NDH", "T1TRDAT", "T1ORSYS", "T1MIS", "T1CNMAUD", "T2CNOM", "T2NDH", "T2TRDAT", "T3CNOM"]
+    cloudwatch_metric_alarms_dbnames = [
+      "T1CNOM",
+      "T1NDH",
+      "T1MIS",
+      "T1CNMAUD",
+      "T2CNOM",
+      "T2NDH",
+      "T3CNOM"
+    ]
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this

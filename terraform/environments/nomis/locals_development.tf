@@ -11,7 +11,7 @@ locals {
   # baseline config
   development_config = {
 
-    # rman_database_backups = ["ALPHA", "BETA"] <== for testing only, list of "fake" database
+    cloudwatch_metric_alarms_dbnames = []
 
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
