@@ -3,10 +3,10 @@ locals {
 
     baseline_ec2_instances = {
 
-      /* test-managementserver-2022 = {
+      test-managementserver-2022 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "" # FIXME: new ami needed with correct KMS key
+          ami_name                      = "hmpps_windows_server_2022_test_2023-07-*"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/ndh-user-data.yaml"))
         })
@@ -22,7 +22,7 @@ locals {
           component   = "managementserver"
           server-type = "ndh-management-server"
         }
-      } */
+      }
 
       t1-ndh-app-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
