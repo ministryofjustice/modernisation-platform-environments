@@ -41,11 +41,6 @@ locals {
 
     baseline_ec2_instances = {
       t1-ncr-biplatform-cmc = merge(local.bi-platform_ec2_default, {
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 2
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
         tags = merge(local.bi-platform_ec2_default.tags, {
           description = "For testing SAP BI CMC installation and configurations"
           server-type = "ncr-bip-cmc"
@@ -69,6 +64,11 @@ locals {
       })
 
       t1-ncr-biplatform = merge(local.bi-platform_ec2_default, {
+        autoscaling_group = {
+          desired_capacity    = 0
+          max_size            = 2
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
         tags = merge(local.bi-platform_ec2_default.tags, {
           description = "For testing BIP 4.3 installation and configurations"
           nomis-combined-reporting-environment = "t1"
