@@ -12,7 +12,7 @@ locals {
     }
   }
 
-  bip_target_group_http7777 = {
+  bip_target_group_http_7777 = {
     port                 = 7777
     protocol             = "HTTP"
     target_type          = "instance"
@@ -32,7 +32,7 @@ locals {
       type    = "lb_cookie"
     }
   }
-  bip_target_group_http6410 = {
+  bip_target_group_http_6410 = {
     port                 = 6410
     protocol             = "HTTP"
     target_type          = "instance"
@@ -52,7 +52,7 @@ locals {
       type    = "lb_cookie"
     }
   }
-  bip_target_group_http6400 = {
+  bip_target_group_http_6400 = {
     port                 = 6400
     protocol             = "HTTP"
     target_type          = "instance"
@@ -72,7 +72,7 @@ locals {
       type    = "lb_cookie"
     }
   }
-  bip_target_group_http6455 = {
+  bip_target_group_http_6455 = {
     port                 = 6455
     protocol             = "HTTP"
     target_type          = "instance"
@@ -83,7 +83,7 @@ locals {
       healthy_threshold   = 3
       matcher             = "200-399"
       path                = "/"
-      port                = 6400
+      port                = 6455
       timeout             = 5
       unhealthy_threshold = 5
     }
@@ -114,10 +114,10 @@ locals {
     }
 
     lb_target_groups = {
-      http-7777 = local.bip_target_group_http7777
-      listening = local.bip_target_group_http6455
-      sia       = local.bip_target_group_http6410
-      cms       = local.bip_target_group_http6400
+      http-7777 = local.bip_target_group_http_7777
+      listening = local.bip_target_group_http_6455
+      sia       = local.bip_target_group_http_6410
+      cms       = local.bip_target_group_http_6400
     }
 
     tags = {
