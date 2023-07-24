@@ -23,6 +23,10 @@ module "data_product_presigned_url_lambda" {
   tracing_mode = "Active"
   memory_size  = 512
 
+  environment_variables = {
+    BUCKET_NAME = module.s3-bucket.bucket.id
+  }
+
   allowed_triggers = {
 
     AllowExecutionFromAPIGateway = {
