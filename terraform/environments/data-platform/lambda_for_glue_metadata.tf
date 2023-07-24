@@ -1,15 +1,3 @@
-data "archive_file" "get_glue_metadata_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/src/get_glue_metadata"
-  output_path = "${path.module}/src/get_glue_metadata_${local.environment}/get_glue_metadata_lambda.zip"
-}
-
-resource "aws_iam_role" "get_glue_metadata_lambda_role" {
-  name               = "get_glue_metadata_role_${local.environment}"
-  assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
-  tags               = local.tags
-}
-
 data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda" {
   statement {
     sid     = "GlueReadOnly"
@@ -29,38 +17,32 @@ data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda
   }
 }
 
-resource "aws_iam_policy" "get_glue_metadata_lambda_policy" {
-  name        = "get_glue_metadata_policy_${local.environment}"
-  path        = "/"
-  description = "AWS IAM Policy for managing get_glue_metadata lambda role"
-  policy      = data.aws_iam_policy_document.iam_policy_document_for_get_glue_metadata_lambda.json
-  tags        = local.tags
-}
+module "data_product_get_glue_metadata_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
+  application_name               = "data_product_get_glue_metadata"
+  tags                           = local.tags
+  description                    = "Lambda to retrieve Glue metadata for a specified table in a database"
+  role_name                      = "get_glue_metadata_lambda_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_get_glue_metadata_lambda.json
+  function_name                  = "data_product_get_glue_metadata_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
 
-resource "aws_iam_role_policy_attachment" "attach_get_glue_metadata_lambda_policy_to_iam_role" {
-  role       = aws_iam_role.get_glue_metadata_lambda_role.name
-  policy_arn = aws_iam_policy.get_glue_metadata_lambda_policy.arn
-}
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-get-glue-metadata-lambda-ecr-repo:1.0.0"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 512
 
-resource "aws_lambda_function" "get_glue_metadata" {
-  function_name    = "get_glue_metadata_${local.environment}"
-  description      = "api gateway get_glue_metadata"
-  handler          = "main.handler"
-  runtime          = local.lambda_runtime
-  filename         = data.archive_file.get_glue_metadata_zip.output_path
-  source_code_hash = data.archive_file.get_glue_metadata_zip.output_base64sha256
-  role             = aws_iam_role.get_glue_metadata_lambda_role.arn
-  depends_on       = [aws_iam_role_policy_attachment.attach_code_lambda_policy_to_iam_role]
-  tags             = local.tags
-}
+  allowed_triggers = {
 
-resource "aws_lambda_permission" "get_glue_metadata" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.get_glue_metadata.function_name
-  principal     = "apigateway.amazonaws.com"
+    AllowExecutionFromAPIGateway = {
+      action        = "lambda:InvokeFunction"
+      function_name = "data_product_get_glue_metadata_${local.environment}"
+      principal     = "apigateway.amazonaws.com"
+      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.get_glue_metadata.http_method}${aws_api_gateway_resource.get_glue_metadata.path}"
+    }
+  }
 
-  source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.get_glue_metadata.http_method}${aws_api_gateway_resource.get_glue_metadata.path}"
 }
 
 resource "aws_api_gateway_resource" "get_glue_metadata" {
@@ -89,7 +71,7 @@ resource "aws_api_gateway_integration" "get_glue_metadata" {
   rest_api_id             = aws_api_gateway_rest_api.data_platform.id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.get_glue_metadata.invoke_arn
+  uri                     = module.data_product_get_glue_metadata_lambda.lambda_function_invoke_arn
 
   request_parameters = {
     "integration.request.querystring.database" = "method.request.querystring.database",

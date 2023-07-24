@@ -1,34 +1,34 @@
-resource "aws_efs_file_system" "openldap" {
-  creation_token = format("%s-openldap", local.application_name)
-  tags = {
-    Name = format("%s-openldap", local.application_name)
-  }
-}
+# resource "aws_efs_file_system" "openldap" {
+#   creation_token = format("%s-openldap", local.application_name)
+#   tags = {
+#     Name = format("%s-openldap", local.application_name)
+#   }
+# }
 
-resource "aws_security_group" "efs" {
-  name        = format("%s-openldap-efs", local.application_name)
-  description = format("%s-openldap-efs", local.application_name)
-  vpc_id      = data.aws_vpc.shared.id
-  tags        = local.tags
-}
+# resource "aws_security_group" "efs" {
+#   name        = format("%s-openldap-efs", local.application_name)
+#   description = format("%s-openldap-efs", local.application_name)
+#   vpc_id      = data.aws_vpc.shared.id
+#   tags        = local.tags
+# }
 
-resource "aws_security_group_rule" "efs_ingress" {
-  type                     = "ingress"
-  from_port                = 2049
-  to_port                  = 2049
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.ldap.id
-  security_group_id        = aws_security_group.efs.id
-}
+# resource "aws_security_group_rule" "efs_ingress" {
+#   type                     = "ingress"
+#   from_port                = 2049
+#   to_port                  = 2049
+#   protocol                 = "tcp"
+#   source_security_group_id = aws_security_group.ldap.id
+#   security_group_id        = aws_security_group.efs.id
+# }
 
-resource "aws_security_group_rule" "efs_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "all"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.efs.id
-}
+# resource "aws_security_group_rule" "efs_egress" {
+#   type              = "egress"
+#   from_port         = 0
+#   to_port           = 0
+#   protocol          = "all"
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+#   security_group_id = aws_security_group.efs.id
+# }
 
 module "s3_bucket_openldap_migration" {
 

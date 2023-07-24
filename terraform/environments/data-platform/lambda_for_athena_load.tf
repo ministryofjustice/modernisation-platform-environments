@@ -158,7 +158,7 @@ resource "aws_lambda_function" "athena_load" {
 }
 
 resource "aws_cloudwatch_event_target" "athena_load_lambda_trigger" {
-  rule      = aws_cloudwatch_event_rule.put_to_data_directory.name
+  rule      = aws_cloudwatch_event_rule.object_created_raw_data.name
   target_id = "athena"
   arn       = aws_lambda_function.athena_load.arn
 }
@@ -168,5 +168,5 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_athena_load_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.athena_load.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.put_to_data_directory.arn
+  source_arn    = aws_cloudwatch_event_rule.object_created_raw_data.arn
 }

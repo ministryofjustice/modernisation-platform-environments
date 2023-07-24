@@ -57,6 +57,10 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   tags = local.tags
 }
 
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket      = module.s3-bucket.bucket.id
+  eventbridge = true
+}
 
 data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
   statement {

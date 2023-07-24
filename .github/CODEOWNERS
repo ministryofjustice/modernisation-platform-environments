@@ -42,6 +42,7 @@
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/tribunals @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
+/terraform/environments/wardship @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/xhibit-portal @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
 **/providers.tf @ministryofjustice/modernisation-platform
 **/backend.tf @ministryofjustice/modernisation-platform

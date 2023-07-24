@@ -48,6 +48,16 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_acm_certificates", {})
   )
 
+  backups = {
+    "everything" = {
+      plans = merge(
+        module.baseline_presets.backup_plans,
+        local.baseline_backup_plans,
+        lookup(local.baseline_environment_config, "baseline_backup_plans", {})
+      )
+    }
+  }
+
   bastion_linux = merge(
     local.baseline_bastion_linux,
     lookup(local.baseline_environment_config, "baseline_bastion_linux", {})

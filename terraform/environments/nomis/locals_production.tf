@@ -58,6 +58,7 @@ locals {
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
           oracle-db-name       = "PCNOM"
+          is-production        = "true-no-default-backup-workaround"
         })
       })
 
@@ -68,6 +69,7 @@ locals {
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
           oracle-db-name       = "PCNOM"
+          is-production        = "true-no-default-backup-workaround"
         })
       })
     }
@@ -78,6 +80,7 @@ locals {
           nomis-environment = "preprod"
           description       = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
           oracle-sids       = "PPCNMAUD"
+          is-production     = "true-no-default-backup-workaround"
         })
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
@@ -102,6 +105,7 @@ locals {
           description               = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
           oracle-sids               = "CNMAUD"
           fixngo-connection-targets = "10.40.0.136 4903 10.40.129.79 22" # fixngo connection alarm
+          is-production             = "true-no-default-backup-workaround"
         })
         instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.2xlarge"
@@ -124,6 +128,7 @@ locals {
           nomis-environment = "prod"
           description       = "Production NOMIS HA database to replace Azure PDPDL00062"
           oracle-sids       = "PCNOMHA"
+          is-production     = "true-no-default-backup-workaround"
         })
         instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.4xlarge"
@@ -201,7 +206,7 @@ locals {
 
       "hmpps-production.modernisation-platform.internal" = {
         records = [
-          { name = "oem.nomis", type = "A", ttl = "3600", records = ["10.40.0.136"] },
+          { name = "oem.nomis", type = "A", ttl = "300", records = ["10.40.0.136"] },
         ]
       }
       "nomis.service.justice.gov.uk" = {
@@ -216,8 +221,8 @@ locals {
       "production.nomis.service.justice.gov.uk" = {
         records = [
           { name = "pnomis", type = "A", ttl = "300", records = ["10.40.3.132"] },
-          { name = "pnomis-a", type = "A", ttl = "3600", records = ["10.40.3.132"] },
-          { name = "pnomis-b", type = "A", ttl = "3600", records = ["10.40.67.132"] },
+          { name = "pnomis-a", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "pnomis-b", type = "A", ttl = "300", records = ["10.40.67.132"] },
         ]
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },

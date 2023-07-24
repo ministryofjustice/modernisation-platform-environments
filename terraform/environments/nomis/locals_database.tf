@@ -23,6 +23,16 @@ locals {
     }
   }
 
+  # Include these in ec2-instance ssm parameters if using the misload role
+  # paths are /database/<ec2_instance_name>/<each_parameter>
+  database_ec2_misload_ssm_parameters = {
+    prefix = "/database/"
+    parameters = {
+      misloadusername = {}
+      misloadpassword = {}
+    }
+  }
+
   database_cloudwatch_metric_alarms = {
     oracle-db-disconnected = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -187,6 +197,9 @@ locals {
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
       vpc_security_group_ids       = ["data-db"]
+      tags = {
+        backup-plan = "daily-and-weekly"
+      }
     })
 
     user_data_cloud_init = {
@@ -257,7 +270,6 @@ locals {
       os-version           = "RHEL 7.9"
       licence-requirements = "Oracle Database"
       "Patch Group"        = "RHEL"
-      backup               = "true"
     }
   }
 
