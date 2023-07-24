@@ -5,7 +5,7 @@ locals {
         key = "${alarm_key}-${dimension_value}"
         value = merge(alarm_value, {
           dimensions = merge(alarm_value.dimensions, {
-            dimension_name = dimension_value
+            (alarm_value.split_by_dimension.dimension_name) = dimension_value
           })
         })
       }]
