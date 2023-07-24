@@ -66,7 +66,7 @@ variable "instance" {
     iam_database_authentication_enabled = optional(bool, false)
     instance_class                      = string
     iops                                = optional(number, 0)
-    kms_key_id                          = optional(string)
+    kms_key_id                          = string
     license_model                       = optional(string)
     maintenance_window                  = optional(string)
     max_allocated_storage               = optional(number)
