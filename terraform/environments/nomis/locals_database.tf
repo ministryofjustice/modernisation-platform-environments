@@ -145,10 +145,10 @@ locals {
     }
     rman-backup-failed = {
       comparison_operator = "LessThanOrEqualToThreshold"
-      evaluation_periods  = 3
+      evaluation_periods  = 2
       metric_name         = "RmanBackupStatus"
       namespace           = "Database"
-      period              = "60"
+      period              = "3600"
       statistic           = "Maximum"
       threshold           = "0"
       alarm_description   = "Triggers if there has been no successful rman backup"
