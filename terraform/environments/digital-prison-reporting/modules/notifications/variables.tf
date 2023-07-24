@@ -1,22 +1,12 @@
-variable "rule_name" {
-  type        = string
-  description = "(Required) Glue jobs status change rule name."
-}
-
-variable "target_name" {
-  type        = string
-  description = "(Required) Glue jobs notification target name."
-}
-
 variable "sns_topic_name" {
   type        = string
-  description = "(Required) Glue jobs notification SNS topic name."
+  description = "(Required) Digital Prison Reporting SNS notifications topic name."
 }
 
 variable "enable_slack_alerts" {
   type        = bool
   default     = false
-  description = "(Optional) Enable Slack alerts."
+  description = "(Optional) Enable Digital Prison Reporting Slack alerts."
 }
 
 variable "slack_email_url" {
@@ -24,13 +14,13 @@ variable "slack_email_url" {
   nullable    = true
   sensitive   = true
   default     = null
-  description = "(Optional) Slack email url."
+  description = "(Optional) Digital Prison Reporting Slack email url."
 }
 
 variable "enable_pagerduty_alerts" {
   type        = bool
   default     = false
-  description = "(Optional) Enable PagerDuty alerts."
+  description = "(Optional) Enable Digital Prison Reporting PagerDuty alerts."
 }
 
 variable "pagerduty_alerts_url" {
@@ -38,7 +28,7 @@ variable "pagerduty_alerts_url" {
   nullable    = true
   sensitive   = true
   default     = null
-  description = "(Optional) PagerDuty alert url"
+  description = "(Optional) Digital Prison Reporting PagerDuty alert url"
 }
 
 variable "tags" {

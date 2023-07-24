@@ -22,7 +22,8 @@ locals {
     { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
   )
 
-  environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
+#  environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
+  environment     = "development"
   vpc_name        = var.networking[0].business-unit
   subnet_set      = var.networking[0].set
   vpc_all         = "${local.vpc_name}-${local.environment}"
@@ -36,6 +37,6 @@ locals {
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
 
-  enable_slack_alerts     = local.is-development ? false : true
+  enable_slack_alerts     = local.is-development ? true : true
   enable_pagerduty_alerts = local.is-production || local.is-preproduction ? true : false
 }
