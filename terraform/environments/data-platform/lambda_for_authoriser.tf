@@ -48,6 +48,7 @@ module "data_product_authorizer_lambda" {
   application_name               = "data_product_authorizer"
   tags                           = local.tags
   description                    = "Lambda to authorize access to endpoints"
+  create_role                    = false
   function_name                  = "data_product_authorizer_${local.environment}"
   reserved_concurrent_executions = 1
 
