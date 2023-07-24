@@ -23,7 +23,8 @@
       "enable_cloud_trail": true,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
-      "enable_dbuilder_apikey": true
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts_url": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -48,7 +49,8 @@
       "enable_cloud_trail": true,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
-      "enable_dbuilder_apikey": true
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts_url": true
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -73,7 +75,8 @@
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
-      "enable_dbuilder_apikey": true
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts_url": false
     },
     "production": {
       "example_var": "production-data"

@@ -32,6 +32,9 @@ locals {
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
   enable_replication_task  = local.application_data.accounts[local.environment].enable_dms_replication_task
 
+  # DPR Alerts
+  enable_slack_alerts_url  = local.application_data.accounts[local.environment].enable_slack_alerts_url
+
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
   dpr_subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
