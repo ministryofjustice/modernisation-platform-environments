@@ -36,7 +36,7 @@ resource "aws_secretsmanager_secret_version" "secret_val" {
   secret_string = var.generate_random ? random_password.random_string[0].result : var.secret_value
 }
 
-resource "aws_secretsmanager_secret_version" "secret_val" {
+resource "aws_secretsmanager_secret_version" "secret_key_val" {
   count         = var.type == "KEY_VALUE" ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
