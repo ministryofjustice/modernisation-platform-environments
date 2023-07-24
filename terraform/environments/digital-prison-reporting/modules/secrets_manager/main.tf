@@ -16,42 +16,46 @@ resource "random_password" "random_string" {
   }
 }
 
-resource "aws_secretsmanager_secret" "secret_remote" {
-  count                   = var.ignore_secret_string ? 1 : 0
-
+resource "aws_secretsmanager_secret" "secret" {
   name                    = var.name == "" ? null : var.name
   name_prefix             = var.name == "" ? var.name_prefix : null
   description             = var.description
   kms_key_id              = var.kms_key_id
   recovery_window_in_days = var.recovery_window_in_days
   tags                    = var.tags
+}
 
+resource "aws_secretsmanager_secret_version" "secret_val_1" {
+  count         = var.type == "MONO" && var.ignore_secret_string == true ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.secret.id
+  secret_string = var.generate_random ? random_password.random_string[0].result : var.secret_value
 
   lifecycle {
     ignore_changes = [secret_string, ]
   }
 }
 
-resource "aws_secretsmanager_secret" "secret" {
-  count                   = var.ignore_secret_string ? 0 : 1
-
-  name                    = var.name == "" ? null : var.name
-  name_prefix             = var.name == "" ? var.name_prefix : null
-  description             = var.description
-  kms_key_id              = var.kms_key_id
-  recovery_window_in_days = var.recovery_window_in_days
-  tags                    = var.tags
-}
-
-resource "aws_secretsmanager_secret_version" "secret_val" {
-  count         = var.type == "MONO" ? 1 : 0
+resource "aws_secretsmanager_secret_version" "secret_val_2" {
+  count         = var.type == "MONO" && var.ignore_secret_string == false ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
   secret_string = var.generate_random ? random_password.random_string[0].result : var.secret_value
 }
 
-resource "aws_secretsmanager_secret_version" "secret_key_val" {
-  count         = var.type == "KEY_VALUE" ? 1 : 0
+resource "aws_secretsmanager_secret_version" "secret_key_val_1" {
+  count         = var.type == "KEY_VALUE" && var.ignore_secret_string == true ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.secret.id
+  secret_string = var.generate_random ? random_password.random_string[0].result : jsonencode("${var.secrets}")
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "secret_key_val_2" {
+  count         = var.type == "KEY_VALUE" && var.ignore_secret_string == false ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
   secret_string = var.generate_random ? random_password.random_string[0].result : jsonencode("${var.secrets}")
