@@ -33,7 +33,8 @@ locals {
   enable_replication_task  = local.application_data.accounts[local.environment].enable_dms_replication_task
 
   # DPR Alerts
-  enable_slack_alerts_url  = local.application_data.accounts[local.environment].enable_slack_alerts_url
+  enable_slack_alerts      = local.application_data.accounts[local.environment].enable_slack_alerts
+  enable_pagerduty_alerts  = local.application_data.accounts[local.environment].enable_pagerduty_alerts
 
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id

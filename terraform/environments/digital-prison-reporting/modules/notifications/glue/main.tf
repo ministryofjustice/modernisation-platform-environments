@@ -22,5 +22,5 @@ PATTERN
 resource "aws_cloudwatch_event_target" "glue-jobs-notification-target" {
   rule      = aws_cloudwatch_event_rule.glue-jobs-status-change-rule.name
   target_id = var.glue_rule_target_name
-  arn       = var.aws_sns_topic_arn
+  arn       = var.sns_topic_arn
 }

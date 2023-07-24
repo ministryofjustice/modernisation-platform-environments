@@ -8,8 +8,8 @@ variable "glue_rule_target_name" {
   description = "(Required) Digital Prison Reporting Glue jobs notification target name."
 }
 
-variable "aws_sns_topic_arn" {
-  type = string
+variable "sns_topic_arn" {
+  type        = string
   description = "(Required) Digital Prison Reporting SNS topic ARN."
 }
 

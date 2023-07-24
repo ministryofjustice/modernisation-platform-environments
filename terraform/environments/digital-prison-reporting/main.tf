@@ -5,8 +5,6 @@
 ## Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 locals {
   glue_avro_registry = split("/", module.glue_registry_avro.registry_name)
-  pagerduty_key_name = "pagerduty_integration_key"
-  slack_url_name     = "slack_integration_url"
 }
 
 module "glue_reporting_hub_job" {
@@ -735,58 +733,6 @@ module "dynamo_tab_application_tf_state" {
     {
       Name          = "${local.project}-terraform-state-${local.environment}"
       Resource_Type = "Dynamo Table"
-    }
-  )
-}
-
-###################################################
-# DPR Notifications
-###################################################
-# Common notification module
-module "notifications" {
-  source         = "./modules/notifications"
-  sns_topic_name = "${local.project}-notification-topic-${local.environment}"
-
-  enable_slack_alerts     = local.enable_slack_alerts
-  enable_pagerduty_alerts = local.enable_pagerduty_alerts
-
-  slack_email_url      = local.enable_slack_alerts ? jsondecode(data.aws_secretsmanager_secret_version.slack_integration.secret_string)[local.slack_url_name] : null
-  pagerduty_alerts_url = local.enable_pagerduty_alerts ? "https://events.pagerduty.com/integration/${jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration.secret_string)[local.pagerduty_key_name]}/enqueue" : null
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name = "${local.project}-notifications-${local.environment}"
-      Jira = "DPR-569",
-      Dept = "Digital-Prison-Reporting"
-    }
-  )
-}
-
-# PagerDuty notifications
-module "pagerduty_notifications" {
-  count      = local.enable_pagerduty_alerts ? 1 : 0
-  depends_on = [module.notifications]
-
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = ["${local.project}-notification-topic-${local.environment}"]
-  pagerduty_integration_key = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration.secret_string)[local.pagerduty_key_name]
-}
-
-# Glue status change rule
-module "glue_status_change" {
-  depends_on = [module.notifications]
-
-  source         = "./modules/notifications/glue"
-  sns_topic_arn  = module.notifications.sns_topic_arn
-  glue_rule_name = "${local.project}-glue-jobs-status-change-rule-${local.environment}"
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name = "${local.project}-glue-status-change-rule-${local.environment}",
-      Jira = "DPR-569",
-      Dept = "Digital-Prison-Reporting"
     }
   )
 }
