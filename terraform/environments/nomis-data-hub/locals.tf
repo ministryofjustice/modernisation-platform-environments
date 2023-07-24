@@ -9,6 +9,7 @@ locals {
     preproduction = local.preproduction_config
     production    = local.production_config
   }
+  baseline_environment_config = local.environment_configs[local.environment]
   environment_config = local.environment_configs[local.environment]
   ndh_secrets = [
     "ndh_admin_user",
@@ -24,4 +25,11 @@ locals {
     "ndh_host_os_version",
     "ndh_harkemsadmin_ssl_pass",
   ]
+
+  baseline_ssm_parameters = {}
+  baseline_s3_buckets = {
+    s3-bucket = {
+      iam_policies = module.baseline_presets.s3_iam_policies
+    }
+  }
 }
