@@ -157,7 +157,7 @@ locals {
                 ]
               }
               t2-web-b-http-8080 = {
-                priority = 100
+                priority = 200
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-${local.application_name}-web-b-pb-http-8080"
@@ -225,7 +225,7 @@ locals {
                 ]
               }
               t2-web-b-http-8080 = {
-                priority = 100
+                priority = 200
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-${local.application_name}-web-b-pv-http-8080"
