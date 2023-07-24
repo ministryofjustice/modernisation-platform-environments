@@ -92,6 +92,7 @@ locals {
         "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
           records = [
             { name = "t3-csr-db-a", type = "CNAME", ttl = "300", records = ["t3-csr-db-a.corporate-staff-rostering.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+            { name = "dev-csr-db-a", type = "CNAME", ttl = "300", records = ["dev-csr-db-a.corporate-staff-rostering.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
           ]
         }
     }
