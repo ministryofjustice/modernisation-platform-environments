@@ -8,11 +8,13 @@ locals {
     https_internal = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
+      "0.0.0.0/0"
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
+      "0.0.0.0/0"
     ])
     oracle_db = flatten([
       "10.0.0.0/8",
@@ -87,6 +89,16 @@ locals {
           protocol    = -1
           self        = true
         }
+        http8080 = {
+          description = "Allow http8080 ingress"
+          from_port   = 0
+          to_port     = 8080
+          protocol    = "tcp"
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https_internal,
+          ])
+          security_groups = ["private_lb","public_lb"]
+        }
         https = {
           description = "Allow https ingress"
           from_port   = 443
@@ -117,6 +129,16 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+        }
+        http8080 = {
+          description = "Allow http8080 ingress"
+          from_port   = 0
+          to_port     = 8080
+          protocol    = "tcp"
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https_external,
+          ])
+          security_groups = ["private_lb","public_lb"]
         }
         https = {
           description = "Allow https ingress"
@@ -149,6 +171,17 @@ locals {
           protocol    = -1
           self        = true
         }
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https_internal,
+            local.security_group_cidrs.https_external,
+          ])
+          security_groups = ["private_lb","public_lb"]
+        }
         http8080 = {
           description = "Allow http8080 ingress"
           from_port   = 0
@@ -156,7 +189,7 @@ locals {
           protocol    = "tcp"
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
-            "0.0.0.0/0"
+            local.security_group_cidrs.https_external,
           ])
           security_groups = ["private_lb","public_lb"]
         }
