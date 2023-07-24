@@ -95,7 +95,7 @@ locals {
           cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
           ])
-          security_groups = ["private_lb","public_lb"]
+          security_groups = []
         }
         https = {
           description = "Allow https ingress"
@@ -135,9 +135,8 @@ locals {
           protocol    = "tcp"
           cidr_blocks = flatten([
             local.security_group_cidrs.https_external,
-            "0.0.0.0/0"
           ])
-          security_groups = ["private_lb","public_lb"]
+          security_groups = []
         }
         https = {
           description = "Allow https ingress"
@@ -146,7 +145,6 @@ locals {
           protocol    = "tcp"
           cidr_blocks = flatten([
             local.security_group_cidrs.https_external,
-            "0.0.0.0/0"
           ])
         }
       }
