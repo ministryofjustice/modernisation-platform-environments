@@ -20,6 +20,7 @@ locals {
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
   }
   security_group_cidrs_preprod_prod = {
@@ -42,6 +43,7 @@ locals {
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
   }
   security_group_cidrs_by_environment = {
@@ -85,6 +87,16 @@ locals {
           protocol    = -1
           self        = true
         }
+        http8080 = {
+          description = "Allow http8080 ingress"
+          from_port   = 0
+          to_port     = 8080
+          protocol    = "tcp"
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https_internal,
+          ])
+          security_groups = []
+        }
         https = {
           description = "Allow https ingress"
           from_port   = 443
@@ -115,6 +127,16 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+        }
+        http8080 = {
+          description = "Allow http8080 ingress"
+          from_port   = 0
+          to_port     = 8080
+          protocol    = "tcp"
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https_external,
+          ])
+          security_groups = []
         }
         https = {
           description = "Allow https ingress"
@@ -147,15 +169,27 @@ locals {
           protocol    = -1
           self        = true
         }
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = distinct(flatten([
+            local.security_group_cidrs.https_internal,
+            local.security_group_cidrs.https_external,
+          ]))
+          security_groups = ["private_lb","public_lb"]
+        }
         http8080 = {
           description = "Allow http8080 ingress"
-          from_port   = 8080
+          from_port   = 0
           to_port     = 8080
           protocol    = "tcp"
-          cidr_blocks = flatten([
+          cidr_blocks = distinct(flatten([
             local.security_group_cidrs.https_internal,
-          ])
-          security_groups = ["private_lb"]
+            local.security_group_cidrs.https_external,
+          ]))
+          security_groups = ["private_lb","public_lb"]
         }
       }
       egress = {
@@ -186,16 +220,16 @@ locals {
           protocol    = "icmp"
           cidr_blocks = local.security_group_cidrs.icmp
         }
-        # ssh = {
-        #   description = "Allow ssh ingress"
-        #   from_port   = "22"
-        #   to_port     = "22"
-        #   protocol    = "TCP"
-        #   cidr_blocks = local.security_group_cidrs.ssh
-        #   security_groups = [
-        #     # "bastion-linux",
-        #   ]
-        # }
+        ssh = {
+          description = "Allow ssh ingress"
+          from_port   = "22"
+          to_port     = "22"
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.ssh
+          security_groups = [
+            # "bastion-linux",
+          ]
+        }
         http8080 = {
           description = "Allow http 8080 ingress"
           from_port   = 8080
@@ -221,6 +255,13 @@ locals {
             # "private-web",
             # "bastion-linux",
           ]
+        }
+        oracle3872 = {
+          description = "Allow oem agent ingress"
+          from_port   = "3872"
+          to_port     = "3872"
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
         }
       }
       egress = {

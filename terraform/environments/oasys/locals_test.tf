@@ -31,7 +31,24 @@ locals {
         tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
           "${local.application_name}-environment" = "t2"
-          oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
+          oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+        })
+      })
+      "t2-${local.application_name}-web-b" = merge(local.webserver_b, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "oasys_webserver_release_*"
+          ssm_parameters_prefix     = "ec2-web-t2/"
+          iam_resource_names_prefix = "ec2-web-t2"
+        })
+        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+            branch = "oasys/web-index-html-updation"
+          })
+        })
+        tags = merge(local.webserver_a.tags, {
+          description                             = "t2 ${local.application_name} web"
+          "${local.application_name}-environment" = "t2"
+          oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
         })
       })
       # "test-${local.application_name}-bip-a" = local.bip_a
@@ -42,6 +59,7 @@ locals {
     }
 
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
+    # if making changes, comment out the listeners that use the cert, edit the cert, recreate the listeners
     baseline_acm_certificates = {
       "t2_${local.application_name}_cert" = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -50,6 +68,8 @@ locals {
         subject_alternate_names = [
           "*.oasys.service.justice.gov.uk",
           "*.hmpp-azdt.justice.gov.uk",
+          "ords.t2.oasys.service.justice.gov.uk",
+          "ords.t1.oasys.service.justice.gov.uk",
         ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
@@ -139,6 +159,22 @@ locals {
                   }
                 ]
               }
+              t2-web-b-http-8080 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-${local.application_name}-web-b-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2-b.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         }
@@ -186,6 +222,22 @@ locals {
                         "t2-int.oasys.service.justice.gov.uk",
                         "t2-a-int.oasys.service.justice.gov.uk",
                         "t2-oasys.hmpp-azdt.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              t2-web-b-http-8080 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-${local.application_name}-web-b-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2-b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
