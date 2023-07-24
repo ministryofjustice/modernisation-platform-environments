@@ -24,9 +24,15 @@ resource "aws_secretsmanager_secret" "secret" {
   recovery_window_in_days = var.recovery_window_in_days
   tags                    = var.tags
 
-  lifecycle {
-    ignore_changes = var.ignore_local_changes ? [secret_string, ] : []
-  }
+
+  dynamic "lifecycle" {
+    for_each = can(var.lifecycle_rules) ? [var.lifecycle_rules] : []
+
+    content {
+      ignore_changes = try(lifecycle.value.ignore_canges)
+    }
+  }  
+
 }
 
 resource "aws_secretsmanager_secret_version" "secret_val" {

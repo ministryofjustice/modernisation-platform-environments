@@ -58,6 +58,10 @@ module "slack_alerts_url" {
   secret_value            = "SLACK_ALERTS_URL_PLACEHOLDER"
   ignore_local_changes    = true
 
+  lifecycle_rules = {
+    ignore_changes = [secret_string, ]
+  }
+  
   tags = merge(
     local.all_tags,
     {

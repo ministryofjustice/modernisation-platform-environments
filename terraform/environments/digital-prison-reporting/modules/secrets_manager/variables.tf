@@ -152,8 +152,8 @@ variable "secret_value" {
   description = "(Optional) Value if the type is set to MONO"
 }
 
-variable "ignore_local_changes" {
-  description = "Ignore Changes, Dynamic Block"
-  type        = bool
-  default     = false
+variable "lifecycle_rules" {
+  description = "Lifecycle Rules"
+  type        = any
+  default     = {}
 }
