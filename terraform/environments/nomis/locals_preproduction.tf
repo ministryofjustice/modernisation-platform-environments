@@ -24,6 +24,11 @@ locals {
       }
     }
 
+    baseline_ssm_parameters = {
+      "preprod-nomis-web-a" = local.weblogic_ssm_parameters
+      "preprod-nomis-web-b" = local.weblogic_ssm_parameters
+    }
+
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       preprod-nomis-web-a = merge(local.weblogic_ec2_a, {
@@ -60,7 +65,7 @@ locals {
 
           https = merge(
             local.weblogic_lb_listeners.https, {
-              alarm_target_group_names = ["preprod-nomis-web-b-http-7777"]
+              alarm_target_group_names = ["preprod-nomis-web-a-http-7777"]
               rules = {
                 preprod-nomis-web-a-http-7777 = {
                   priority = 200
@@ -73,6 +78,9 @@ locals {
                       values = [
                         "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+                        "c.preproduction.nomis.az.justice.gov.uk",
+                        "c.preproduction.nomis.service.justice.gov.uk",
+                        "c.pp-nomis.service.justice.gov.uk",
                       ]
                     }
                   }]
@@ -88,9 +96,6 @@ locals {
                       values = [
                         "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
-                        "c.preproduction.nomis.az.justice.gov.uk",
-                        "c.preproduction.nomis.service.justice.gov.uk",
-                        "c.pp-nomis.service.justice.gov.uk",
                       ]
                     }
                   }]

@@ -12,11 +12,13 @@ locals {
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
+    enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
     enable_oracle_secure_web                     = true
+    enable_ec2_put_parameter                     = false
     cloudwatch_metric_alarms = {
       weblogic = local.weblogic_cloudwatch_metric_alarms
       database = local.database_cloudwatch_metric_alarms
@@ -46,6 +48,8 @@ locals {
   }
 
   baseline_acm_certificates = {}
+
+  baseline_backup_plans = {}
 
   baseline_bastion_linux = {
     public_key_data = merge(
@@ -105,5 +109,21 @@ locals {
   }
 
   baseline_sns_topics = {}
-}
 
+  baseline_ssm_parameters = {
+    "" = {
+      postfix = ""
+      parameters = {
+        cloud-watch-config-windows = {
+          description = "cloud watch agent config for windows"
+          file        = "./templates/cloud_watch_windows.json"
+          type        = "String"
+        }
+
+        # Placeholders - set values outside of terraform
+        ec2-user_pem       = { description = "ec2-user ssh private key" }
+        github-ci-user-pat = { description = "for SSM docs, see ssm-documents/README.md" }
+      }
+    }
+  }
+}

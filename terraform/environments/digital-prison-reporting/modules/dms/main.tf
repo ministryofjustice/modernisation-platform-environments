@@ -34,7 +34,7 @@ data "template_file" "table-mappings" {
 }
 
 resource "aws_dms_replication_task" "dms-replication" {
-  count                     = 1
+  count                     = var.enable_replication_task ? 1 : 0
   migration_type            = var.migration_type
   replication_instance_arn  = aws_dms_replication_instance.dms.replication_instance_arn
   replication_task_id       = "${var.project_id}-dms-task-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
@@ -56,7 +56,7 @@ resource "aws_dms_endpoint" "source" {
   engine_name   = var.source_engine_name
   password      = var.source_app_password
   port          = var.source_db_port
-  server_name   = var.source_address // TBC
+  server_name   = var.source_address
   ssl_mode      = "none"
   username      = var.source_app_username
 
@@ -91,7 +91,7 @@ resource "aws_dms_endpoint" "target" {
       service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
       stream_arn                     = lookup(var.kinesis_settings, "kinesis_target_stream", null)
     }
-  }  
+  }
 
   tags = var.tags
 }

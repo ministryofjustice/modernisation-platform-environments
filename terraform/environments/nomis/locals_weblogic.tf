@@ -1,5 +1,19 @@
 locals {
 
+  weblogic_ssm_parameters = {
+    prefix = "/weblogic/"
+    parameters = {
+      admin_username     = { description = "weblogic admin username" }
+      admin_password     = { description = "weblogic admin password" }
+      db_username        = { description = "nomis database username" }
+      db_password        = { description = "nomis database password" }
+      db_tagsar_username = { description = "nomis database tag username" }
+      db_tagsar_password = { description = "nomis database tag password" }
+      rms_hosts          = { description = "combined reporting host list" }
+      rms_key            = { description = "combined reporting rms key" }
+    }
+  }
+
   weblogic_target_group_http_7001 = {
     port                 = 7001
     protocol             = "HTTP"
@@ -92,18 +106,15 @@ locals {
   }
 
   weblogic_cloudwatch_metric_alarms = {
-    weblogic-node-manager-service = {
+    weblogic-asg-collectd-services = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
       namespace           = "CWAgent"
       metric_name         = "collectd_exec_value"
       period              = "60"
-      statistic           = "Average"
+      statistic           = "Maximum"
       threshold           = "1"
-      alarm_description   = "weblogic-node-manager service has stopped"
-      dimensions = {
-        instance = "weblogic_node_manager"
-      }
+      alarm_description   = "A weblogic service or metric that's being supplied by collectd has stopped"
     }
   }
 
@@ -111,11 +122,10 @@ locals {
     weblogic = {
       parent_keys = [
         "ec2_default",
-        "ec2_linux_default",
-        "ec2_linux_with_collectd_default"
+        "ec2_linux_default"
       ]
       alarms_list = [
-        { key = "weblogic", name = "weblogic-node-manager-service" }
+        { key = "weblogic", name = "weblogic-asg-collectd-services" }
       ]
     }
   }
@@ -130,7 +140,7 @@ locals {
 
     cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].weblogic
 
-    # Note: use any avaiability zone since DB latency does not appear to be an issue
+    # Note: use any availability zone since DB latency does not appear to be an issue
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
       availability_zone         = null
@@ -171,14 +181,14 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "nomis/DSOS-1820/weblogic-init-tweak-v2"
+        branch = "b13cad848c48c9b7e4b99a253f40b6602206a9d8" # 2023-06-12 update DSOS-1934
       })
     })
-    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
-    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
-      desired_capacity = 0
-    })
-    cloudwatch_metric_alarms = {}
+    autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {})
+    # autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+    #  desired_capacity = 0
+    # })
+    # cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
       deployment = "blue"
     })
@@ -187,17 +197,17 @@ locals {
   # green deployment
   weblogic_ec2_b = merge(local.weblogic_ec2_default, {
     config = merge(local.weblogic_ec2_default.config, {
-      availability_zone = "${local.region}a"
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "f8ece8fc507d42c638878ede0f9030455669bb74" # 2023-04-27 reporting fix
+        branch = "main"
       })
     })
-    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
-    #   desired_capacity = 0
-    # })
-    # cloudwatch_metric_alarms = {}
+    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {}) 
+    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      desired_capacity = 0
+    })
+    cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
       deployment = "green"
     })

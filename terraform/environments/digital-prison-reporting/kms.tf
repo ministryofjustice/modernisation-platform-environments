@@ -77,7 +77,7 @@ resource "aws_kms_key" "redshift-kms-key" {
   description         = "Encryption key for Redshift Cluster"
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.redhsift-kms.json
-  is_enabled          = true  
+  is_enabled          = true
 
   tags = merge(
     local.tags,
@@ -105,4 +105,39 @@ data "aws_iam_policy_document" "redhsift-kms" {
 resource "aws_kms_alias" "redshift-kms-alias" {
   name          = "alias/${local.project}-redshift-kms"
   target_key_id = aws_kms_key.redshift-kms-key.arn
+}
+
+### RDS, Postgres KMS
+resource "aws_kms_key" "rds" {
+  description         = "Encryption key for RDS Instance"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.rds-kms.json
+  is_enabled          = true
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-rds-kms"
+    }
+  )
+}
+
+data "aws_iam_policy_document" "rds-kms" {
+  statement {
+    #checkov:skip=CKV_AWS_111
+    #checkov:skip=CKV_AWS_109       
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
+    }
+  }
+}
+
+resource "aws_kms_alias" "rds-kms-alias" {
+  name          = "alias/${local.project}-rds-kms"
+  target_key_id = aws_kms_key.rds.arn
 }

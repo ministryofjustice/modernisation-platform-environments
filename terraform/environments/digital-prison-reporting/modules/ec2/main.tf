@@ -4,7 +4,7 @@ data "template_file" "user_data" {
   template = file("${path.module}/scripts/bootstrap_apps.sh")
 
   vars = {
-    some_var = "some_value"
+    environment = var.env
   }
 }
 

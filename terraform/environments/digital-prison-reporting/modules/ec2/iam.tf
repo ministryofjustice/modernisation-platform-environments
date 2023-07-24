@@ -51,9 +51,9 @@ data "aws_iam_policy_document" "kinesis-data-stream" {
       "kinesis:GetRecords",
     ]
     resources = [
-      "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-data-domain-development",
-      "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-ingestor-development",
-      "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-data-demo-development"
+      "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-data-domain-${var.env}",
+      "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-ingestor-${var.env}",
+      "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-data-demo-${var.env}"
     ]
   }
 }
@@ -124,12 +124,12 @@ data "aws_iam_policy_document" "dms" {
       "s3:ListAllMyBuckets",
       "s3:ListAccessPoints",
       "s3:ListJobs",
-      "s3:ListObjects",  
+      "s3:ListObjects",
     ]
     resources = [
       "*"
     ]
-  } 
+  }
 
   statement {
     actions = [
@@ -138,8 +138,8 @@ data "aws_iam_policy_document" "dms" {
       "iam:CreateRole",
       "iam:AttachRolePolicy",
     ]
-    resources = ["*"]   
-  } 
+    resources = ["*"]
+  }
 }
 
 ## Glue Access Policy
@@ -155,11 +155,22 @@ resource "aws_iam_policy" "glue-full-access" {
 data "aws_iam_policy_document" "glue-access" {
   statement {
     actions = [
-      "glue:*",
-      "secretsmanager:GetSecretValue",
+      "glue:*"
     ]
     resources = [
       "*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "secretsmanager:CreateSecret",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:List*"
+    ]
+    resources = [
+      "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:*"
     ]
   }
 
@@ -240,7 +251,7 @@ data "aws_iam_policy_document" "dynamo-access" {
     ]
     resources = [
       "arn:aws:dynamodb:${var.region}:${var.account}:table/*/index/*",
-      "arn:aws:dynamodb:${var.region}:${var.account}:table/*/stream/*"    ]
+    "arn:aws:dynamodb:${var.region}:${var.account}:table/*/stream/*"]
   }
 }
 

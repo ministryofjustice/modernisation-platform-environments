@@ -1,7 +1,7 @@
 module "ec2_instance" {
   for_each = var.ec2_instances
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v1.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.1.0"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -29,6 +29,7 @@ module "ec2_instance" {
   ebs_volumes_copy_all_from_ami = each.value.config.ebs_volumes_copy_all_from_ami
   ebs_kms_key_id                = coalesce(each.value.config.ebs_kms_key_id, var.environment.kms_keys["ebs"].arn)
   ebs_volume_config             = each.value.ebs_volume_config
+  ebs_volume_tags               = each.value.ebs_volume_tags
   ebs_volumes                   = each.value.ebs_volumes
   user_data_raw                 = each.value.config.user_data_raw
   user_data_cloud_init          = each.value.user_data_cloud_init

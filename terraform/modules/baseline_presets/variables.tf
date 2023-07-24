@@ -9,7 +9,9 @@ variable "ip_addresses" {
 variable "options" {
   description = "Map of options controlling what resources to return"
   type = object({
-    cloudwatch_log_groups = optional(list(string))
+    backup_plan_daily_delete_after  = optional(number, 7)
+    backup_plan_weekly_delete_after = optional(number, 28)
+    cloudwatch_log_groups           = optional(list(string))
     cloudwatch_metric_alarms = optional(map(map(object({
       comparison_operator = string
       evaluation_periods  = number
@@ -37,12 +39,15 @@ variable "options" {
       actions_key     = string
     }))
     enable_application_environment_wildcard_cert = optional(bool, false)
+    enable_backup_plan_daily_and_weekly          = optional(bool, false)
     enable_business_unit_kms_cmks                = optional(bool, false)
     enable_image_builder                         = optional(bool, false)
     enable_ec2_cloud_watch_agent                 = optional(bool, false)
     enable_ec2_self_provision                    = optional(bool, false)
+    enable_ec2_put_parameter                     = optional(bool, false)
     enable_shared_s3                             = optional(bool, false)
     enable_oracle_secure_web                     = optional(bool, false)
+    db_backup_s3                                 = optional(bool, false)
     route53_resolver_rules                       = optional(map(list(string)), {})
     iam_policies_filter                          = optional(list(string), [])
     iam_policies_ec2_default                     = optional(list(string), [])

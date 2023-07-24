@@ -62,6 +62,30 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
   tags = local.tags
 }
 
+data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_host" {
+  name = format("/%s/LDAP_HOST", local.application_name)
+}
+
+data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_port" {
+  name = format("/%s/LDAP_PORT", local.application_name)
+}
+
+data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_principal" {
+  name = format("/%s/LDAP_PRINCIPAL", local.application_name)
+}
+
+data "aws_ssm_parameter" "delius_core_frontend_env_var_user_context" {
+  name = format("/%s/USER_CONTEXT", local.application_name)
+}
+
+data "aws_ssm_parameter" "delius_core_frontend_env_var_eis_user_context" {
+  name = format("/%s/EIS_USER_CONTEXT", local.application_name)
+}
+
+data "aws_secretsmanager_secret" "ldap_credential" {
+  name = "${local.application_name}-openldap-bind-password"
+}
+
 ##
 # IAM for ECS services and tasks
 ##
@@ -113,7 +137,8 @@ data "aws_iam_policy_document" "delius_core_frontend_ecs_service_policy" {
       "ec2:Describe*",
       "ec2:AuthorizeSecurityGroupIngress",
       "elasticloafrontendalancing:RegisterTargets",
-      "elasticloafrontendalancing:DeregisterTargets"
+      "elasticloafrontendalancing:DeregisterTargets",
+      "secretsmanager:GetSecretValue"
     ]
   }
 }
@@ -175,7 +200,8 @@ data "aws_iam_policy_document" "delius_core_frontend_ecs_exec" {
       "ecr:BatchGetImage",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:PutLogEvents",
+      "secretsmanager:GetSecretValue"
     ]
   }
 }
@@ -227,17 +253,34 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
             valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_password.arn
           },
           {
-            name      = "DEV_USERNAME"
-            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.arn
-          },
-          {
-            name      = "DEV_PASSWORD"
-            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.arn
-          },
-          {
             name      = "TEST_MODE"
             valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_test_mode.arn
+          },
+          {
+            name      = "LDAP_PORT"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_port.arn
+          },
+          {
+            name      = "LDAP_PRINCIPAL"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_principal.arn
+          },
+          { name      = "LDAP_CREDENTIAL"
+            valueFrom = data.aws_secretsmanager_secret.ldap_credential.arn
+          },
+          {
+            name      = "USER_CONTEXT"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_user_context.arn
+          },
+          {
+            name      = "EIS_USER_CONTEXT"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_eis_user_context.arn
           }
+        ]
+        environment = [
+          # {
+          #   name  = "LDAP_HOST"
+          #   value = aws_lb.ldap.dns_name
+          # }
         ]
       }
   ])
@@ -276,6 +319,24 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_gr
   referenced_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_tcp" {
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "ingress from ldap server tcp"
+  from_port         = 389
+  to_port           = 389
+  ip_protocol       = "tcp"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_udp" {
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "ingress from ldap server"
+  from_port         = 389
+  to_port           = 389
+  ip_protocol       = "udp"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+}
+
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
   security_group_id = aws_security_group.delius_core_frontend_security_group.id
   description       = "outbound from weblogic to any secure endpoint"
@@ -283,6 +344,24 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_gro
   to_port           = 443
   from_port         = 443
   cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_ldap_tcp" {
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "outbound from weblogic to any secure endpoint"
+  ip_protocol       = "tcp"
+  to_port           = 389
+  from_port         = 389
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_ldap_udp" {
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "outbound from weblogic to any secure endpoint"
+  ip_protocol       = "udp"
+  to_port           = 389
+  from_port         = 389
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_db" {

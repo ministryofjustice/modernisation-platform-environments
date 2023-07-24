@@ -4,9 +4,22 @@ variable "name" {
   default     = ""
 }
 
+variable "project_id" {
+  type        = string
+  description = "Project ID"
+  default     = "dpr"
+}
+
+
 variable "tags" {
   description = "A mapping of tags to assign to the resource."
   type        = map(any)
+}
+
+variable "cloudtrail_access_policy" {
+  type        = bool
+  description = "Add CloudTrail Access Policy or Not"
+  default     = false
 }
 
 variable "s3_notification_name" {
@@ -53,4 +66,31 @@ variable "enable_versioning_config" {
 variable "enable_s3_versioning" {
   description = "Enable Versioning for S3 Bucket, Default is false"
   default     = false
+}
+
+variable "enable_notification" {
+  description = "Enable S3 Bucket Notifications, Default is false"
+  default     = false
+}
+
+#variable "bucket_notifications" {
+#  type        = map(any)
+#  description = "AWS S3 Bucket Notifications"
+#  default     = null
+#}
+
+variable "bucket_notifications" {
+  type = any
+  description = "AWS S3 Bucket Notifications"
+  default = {
+    lambda_function_arn = null,
+    events = [],
+    filter_prefix = null,
+    filter_suffix = null
+   }
+}
+
+variable "dependency_lambda" {
+  type    = any
+  default = []
 }

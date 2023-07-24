@@ -28,6 +28,40 @@ variable "acm_certificates" {
   default = {}
 }
 
+variable "backups" {
+  description = "map of backup_vaults with associated backup plans to create, where the plan name is the backup_vault name and plan key combined.  Use  'everything' as the map key to use the modernisation platform managed vault"
+  type = map(object({
+    plans = map(object({
+      rule = object({
+        schedule                 = optional(string)
+        enable_continuous_backup = optional(bool)
+        start_window             = optional(number)
+        completion_window        = optional(number)
+        cold_storage_after       = optional(number)
+        delete_after             = number
+      })
+      advanced_backup_setting = optional(object({
+        backup_options = object({
+          WindowsVSS = string
+        })
+        resource_type = string
+      }))
+      selection = object({
+        resources     = optional(list(string))
+        not_resources = optional(list(string))
+        selection_tags = list(object({
+          type  = string
+          key   = string
+          value = string
+        }))
+      })
+      tags = optional(map(string), {})
+    }))
+    tags = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "bastion_linux" {
   description = "set this if you want a bastion linux created"
   type = object({
@@ -85,6 +119,7 @@ variable "ec2_autoscaling_groups" {
         enable_resource_name_dns_a_record    = optional(bool)
         hostname_type                        = string
       }))
+      tags = optional(map(string), {})
     })
     user_data_cloud_init = optional(object({
       args    = optional(map(string))
@@ -102,6 +137,7 @@ variable "ec2_autoscaling_groups" {
       type       = optional(string)
       kms_key_id = optional(string)
     })), {})
+    ebs_volume_tags = optional(map(string), {})
     ebs_volumes = optional(map(object({
       label       = optional(string)
       snapshot_id = optional(string)
@@ -226,6 +262,7 @@ variable "ec2_instances" {
         enable_resource_name_dns_a_record    = optional(bool)
         hostname_type                        = string
       }))
+      tags = optional(map(string), {})
     })
     user_data_cloud_init = optional(object({
       args    = optional(map(string))
@@ -243,6 +280,7 @@ variable "ec2_instances" {
       type       = optional(string)
       kms_key_id = optional(string)
     })), {})
+    ebs_volume_tags = optional(map(string), {})
     ebs_volumes = optional(map(object({
       label       = optional(string)
       snapshot_id = optional(string)
@@ -450,10 +488,39 @@ variable "lbs" {
     force_destroy_bucket     = optional(bool, false)
     idle_timeout             = string
     internal_lb              = optional(bool, false)
+    access_logs              = optional(bool, true)
+    load_balancer_type       = optional(string, "application")
     security_groups          = list(string)
     public_subnets           = list(string)
-    existing_target_groups   = optional(map(any), {})
-    tags                     = optional(map(string), {})
+    existing_target_groups = optional(map(object({
+      arn = string
+    })), {})
+    tags = optional(map(string), {})
+    lb_target_groups = optional(map(object({
+      port                 = optional(number)
+      deregistration_delay = optional(number)
+      health_check = optional(object({
+        enabled             = optional(bool)
+        interval            = optional(number)
+        healthy_threshold   = optional(number)
+        matcher             = optional(string)
+        path                = optional(string)
+        port                = optional(number)
+        timeout             = optional(number)
+        unhealthy_threshold = optional(number)
+      }))
+      stickiness = optional(object({
+        enabled         = optional(bool)
+        type            = string
+        cookie_duration = optional(number)
+        cookie_name     = optional(string)
+      }))
+      attachments = optional(list(object({
+        target_id         = string
+        port              = optional(number)
+        availability_zone = optional(string)
+      })), [])
+    })), {})
     listeners = optional(map(object({
       alarm_target_group_names  = optional(list(string), [])
       port                      = number
@@ -716,6 +783,45 @@ variable "sns_topics" {
       endpoint      = string
       filter_policy = optional(string)
     })), {})
+  }))
+  default = {}
+}
+
+variable "ssm_parameters" {
+  # Example usage:
+  # my_ec2_params = {
+  #   prefix = "/ec2"
+  #   postfix = "/"
+  #   parameters = {
+  #     username = { value = "myusername" }
+  #     password = { description = "placeholder for password" }
+  #   }
+  # }
+  # ssm_parameters = {
+  #   my_ec2_1 = local.my_ec2_params
+  #   my_ec2_2 = local.my_ec2_params
+  # }
+  # Will create SSM params as follows
+  # /ec2/my_ec2_1/username
+  # /ec2/my_ec2_1/password
+  # /ec2/my_ec2_2/username
+  # /ec2/my_ec2_2/password
+  #
+  description = "Create a placeholder SSM parameter, or a SSM parameter with a given value (randomly generated, from file, or value set directly).  The top-level key is used as a prefix for the SSM parameters, e.g. /ec2/myec2name.  Then define a map of parameters to create underneath that prefix.  SSM parameter name is {prefix}{top-level-map-key}{postfix}{parameters-map-key}"
+  type = map(object({
+    prefix  = optional(string, "")
+    postfix = optional(string, "/")
+    parameters = map(object({
+      description = optional(string)
+      type        = optional(string, "SecureString")
+      key_id      = optional(string, null)
+      file        = optional(string)
+      random = optional(object({
+        length  = number
+        special = optional(bool)
+      }))
+      value = optional(string)
+    }))
   }))
   default = {}
 }

@@ -54,7 +54,7 @@ locals {
       }
       # assumes there is a 'data' security group created
       default_db = {
-        disable_api_termination      = false
+        disable_api_termination      = true
         instance_type                = "r6i.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token

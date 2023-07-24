@@ -15,12 +15,12 @@ def handler(event, context):
     database = event["queryStringParameters"]["database"]
     table = event["queryStringParameters"]["table"]
     amz_date = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-    md5 = str(event["queryStringParameters"]["Content-MD5"])
+    md5 = str(event["queryStringParameters"]["contentMD5"])
     uuid_string = str(uuid.uuid4())
     file_name = os.path.join(
-        "curated_data",
-        f"database_name={database}",
-        f"table_name={table}",
+        "raw_data",
+        database,
+        table,
         f"extraction_timestamp={amz_date}",
         uuid_string,
     )
@@ -28,17 +28,17 @@ def handler(event, context):
         "x-amz-server-side-encryption": "AES256",
         "x-amz-acl": "bucket-owner-full-control",
         "x-amz-date": amz_date,
-        "Content-MD5": md5,
-        "Content-Type": "binary/octet-stream",
+        # "Content-MD5": md5,
+        # "Content-Type": "binary/octet-stream",
     }
     # File upload is capped at 5GB per single upload so content-length-range is 5GB
     conditions = [
         {"x-amz-server-side-encryption": "AES256"},
         {"x-amz-acl": "bucket-owner-full-control"},
         {"x-amz-date": amz_date},
-        {"Content-MD5": md5},
-        ["starts-with", "$Content-MD5", ""],
-        ["starts-with", "$Content-Type", ""],
+        # {"Content-MD5": md5},
+        # ["starts-with", "$Content-MD5", ""],
+        # ["starts-with", "$Content-Type", ""],
         ["starts-with", "$key", file_name],
         ["content-length-range", 0, 5000000000],
     ]

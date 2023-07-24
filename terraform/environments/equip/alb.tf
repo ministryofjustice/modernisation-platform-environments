@@ -5,8 +5,9 @@
 ##############################################################
 
 data "aws_acm_certificate" "equip_cert" {
-  domain   = "equip.service.justice.gov.uk"
-  statuses = ["ISSUED"]
+  domain      = "equip.service.justice.gov.uk"
+  statuses    = ["ISSUED"]
+  most_recent = true
 }
 
 #Load balancer needs to be publically accessible

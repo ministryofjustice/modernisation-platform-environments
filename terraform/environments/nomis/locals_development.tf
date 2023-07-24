@@ -10,6 +10,9 @@ locals {
 
   # baseline config
   development_config = {
+
+    # rman_database_backups = ["ALPHA", "BETA"] <== for testing only, list of "fake" database
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -24,6 +27,9 @@ locals {
           description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
         }
       }
+    }
+
+    baseline_ssm_parameters = {
     }
 
     baseline_ec2_autoscaling_groups = {

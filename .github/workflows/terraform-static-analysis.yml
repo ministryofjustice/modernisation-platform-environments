@@ -24,11 +24,11 @@ jobs:
     if: github.event_name != 'workflow_dispatch' && github.event_name != 'schedule'
     steps:
     - name: Checkout
-      uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@de29cc1c65fc53d32c3f72e8e248396f16040585 # v13
+      uses: ministryofjustice/github-actions/terraform-static-analysis@7c689fe2de15e1692f5cceceb132919ab854081c # v14
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -44,11 +44,11 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     steps:
     - name: Checkout
-      uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@de29cc1c65fc53d32c3f72e8e248396f16040585 # v13
+      uses: ministryofjustice/github-actions/terraform-static-analysis@7c689fe2de15e1692f5cceceb132919ab854081c # v14
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -62,11 +62,11 @@ jobs:
     if: github.event_name == 'schedule'
     steps:
     - name: Checkout
-      uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@de29cc1c65fc53d32c3f72e8e248396f16040585
+      uses: ministryofjustice/github-actions/terraform-static-analysis@7c689fe2de15e1692f5cceceb132919ab854081c
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:

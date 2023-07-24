@@ -4,10 +4,49 @@ data "archive_file" "authoriser_zip" {
   output_path = "${path.module}/src/authoriser_${local.environment}/authoriser_lambda.zip"
 }
 
-resource "aws_iam_role" "authoriser_lambda_role" {
+data "aws_iam_policy_document" "apigateway_trust_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["apigateway.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "authoriser_role" {
   name               = "authoriser_role_${local.environment}"
+  assume_role_policy = data.aws_iam_policy_document.apigateway_trust_policy.json
+  tags               = local.tags
+}
+
+data "aws_iam_policy_document" "allow_invoke_authoriser_lambda_doc" {
+  statement {
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = [aws_lambda_function.authoriser.arn]
+  }
+}
+
+resource "aws_iam_policy" "allow_invoke_authoriser_lambda" {
+  name   = "allow_invoke_authoriser_lambda"
+  path   = "/"
+  policy = data.aws_iam_policy_document.allow_invoke_authoriser_lambda_doc.json
+  tags   = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "attach_allow_invoke_authoriser_lambda" {
+  role       = aws_iam_role.authoriser_role.name
+  policy_arn = aws_iam_policy.allow_invoke_authoriser_lambda.arn
+}
+
+resource "aws_iam_role" "authoriser_lambda_role" {
+  name               = "authoriser_lambda_role_${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
-  tags = local.tags
+  tags               = local.tags
 }
 
 resource "aws_lambda_function" "authoriser" {
@@ -18,12 +57,20 @@ resource "aws_lambda_function" "authoriser" {
   filename         = data.archive_file.authoriser_zip.output_path
   source_code_hash = data.archive_file.authoriser_zip.output_base64sha256
   role             = aws_iam_role.authoriser_lambda_role.arn
-  depends_on       = [aws_iam_role_policy_attachment.attach_code_lambda_policy_to_iam_role]
   environment {
     variables = {
-      authorisationToken = "placeholder"
-      api_resource_arn   = "placeholder"
+      authorizationToken = "placeholder"
+      api_resource_arn   = "${aws_api_gateway_rest_api.data_platform.execution_arn}/*/*"
     }
   }
   tags = local.tags
+}
+
+resource "aws_lambda_permission" "api_gw_authorizer" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.authoriser.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.data_platform.execution_arn}/*/*"
 }

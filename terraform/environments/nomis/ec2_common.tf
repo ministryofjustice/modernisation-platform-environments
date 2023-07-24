@@ -51,50 +51,6 @@ resource "aws_ssm_document" "cloud_watch_agent" {
   )
 }
 
-/* resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
-  name             = aws_ssm_document.cloud_watch_agent.name
-  association_name = "manage-cloud-watch-agent"
-  parameters = { # name of ssm parameter containing cloud watch agent config file
-    optionalConfigurationLocation = aws_ssm_parameter.cloud_watch_config_linux.name
-  }
-  targets {
-    key    = "tag:os_type"
-    values = ["Linux"]
-  }
-  apply_only_at_cron_interval = false
-  schedule_expression         = "cron(45 7 ? * TUE *)"
-} */
-
-resource "aws_ssm_parameter" "cloud_watch_config_linux" {
-  #checkov:skip=CKV2_AWS_34:there should not be anything secret in this config
-  description = "cloud watch agent config for linux"
-  name        = "cloud-watch-config-linux"
-  type        = "String"
-  value       = file("./templates/cloud_watch_linux.json")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "cloud-watch-config-linux"
-    },
-  )
-}
-
-resource "aws_ssm_parameter" "cloud_watch_config_windows" {
-  #checkov:skip=CKV2_AWS_34:there should not be anything secret in this config
-  description = "cloud watch agent config for windows"
-  name        = "cloud-watch-config-windows"
-  type        = "String"
-  value       = file("./templates/cloud_watch_windows.json")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "cloud-watch-config-windows"
-    },
-  )
-}
-
 #------------------------------------------------------------------------------
 # SSM Agent - update Systems Manager Agent
 #------------------------------------------------------------------------------
@@ -432,3 +388,104 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" 
 
 }
 
+resource "aws_cloudwatch_log_metric_filter" "rman_backup_success_filter" {
+  for_each = try(toset(local.environment_configs[local.environment].rman_database_backups), {})
+
+  name           = "rman-backup-success-${each.value}"
+  pattern        = "Backup of ${each.value} completed successfully"
+  log_group_name = "cwagent-var-log-messages"
+
+  metric_transformation {
+    name      = "RmanBackupSuccess${each.value}"
+    namespace = "RmanBackupMetrics" # (custom namespace)
+    value     = "0"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "rman_backup_failure_filter" {
+  for_each = try(toset(local.environment_configs[local.environment].rman_database_backups), {})
+
+  name           = "rman-backup-failure-${each.value}"
+  pattern        = "Rman reported errors for ${each.value}"
+  log_group_name = "cwagent-var-log-messages"
+
+  metric_transformation {
+    name      = "RmanBackupFailure${each.value}"
+    namespace = "RmanBackupMetrics" # custom namespace
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "rman_backup_success_failure_alarm" {
+  for_each = try(toset(local.environment_configs[local.environment].rman_database_backups), {})
+
+  alarm_name          = "rman-backup-success-failure-alarm-${each.value}"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  threshold           = "1"
+  alarm_description   = "Rman reported successful backup"
+  # alarm_actions       = [""] # SNS Topic required
+
+  metric_query {
+    id          = "e1"
+    expression  = "IF(m1 > m2 OR m1 == 1, 1, 0)"
+    label       = "Expression1"
+    return_data = true
+  }
+
+  metric_query {
+    id          = "m1"
+    return_data = false
+
+    metric {
+      metric_name = "RmanBackupFailure${each.value}"
+      namespace   = "RmanBackupMetrics" # custom namespace
+      period      = "300"
+      stat        = "SampleCount"
+    }
+  }
+
+  metric_query {
+    id          = "m2"
+    return_data = false
+
+    metric {
+      metric_name = "RmanBackupSuccess${each.value}"
+      namespace   = "RmanBackupMetrics" # custom namespace
+      period      = "300"
+      stat        = "SampleCount"
+    }
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "rman_backup_missing_24h" {
+  for_each = try(toset(local.environment_configs[local.environment].rman_database_backups), {})
+
+  alarm_name          = "rman-backup-missing-24h-${each.value}"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  threshold           = "1"
+  treat_missing_data  = "breaching"
+  alarm_description   = "Rman reported missing backup, no backup in the last 24 hours"
+  # alarm_actions       = [""] # SNS Topic required
+
+  metric_query {
+    id          = "e1"
+    expression  = "IF(m1 == 0, 1, 0)"
+    label       = "Expression1"
+    return_data = true
+  }
+
+  metric_query {
+    id          = "m1"
+    return_data = false
+
+    metric {
+      metric_name = "RmanBackupSuccess${each.value}"
+      namespace   = "RmanBackupMetrics" # custom namespace
+      period      = "86400"             # 24 hours in seconds
+      stat        = "SampleCount"
+    }
+  }
+
+}

@@ -1,6 +1,8 @@
 {
   "accounts": {
     "development": {
+      "migration_source_account_id": "010587221707",
+      "migration_source_vpc_cidr": "10.161.20.0/22",
       "rds_create": "false",
       "rds_instance_class": "db.t3.large",
       "rds_db_name": "MODNDA",
@@ -21,7 +23,9 @@
       "rds_enabled_cloudwatch_logs_exports": ["alert", "audit"],
       "rds_performance_insights_enabled": "false",
       "rds_skip_final_snapshot": "true",
-      "rds_apply_immediately": "true"
+      "rds_apply_immediately": "true",
+      "efs_backup_schedule": "cron(0 19 * * ? *)",
+      "efs_backup_retention_period": "30"
     },
     "test": {
       "example_var": "test-data"

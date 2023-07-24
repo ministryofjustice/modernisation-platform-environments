@@ -1,5 +1,5 @@
 module "ecs" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v1.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
 
   environment = local.environment
   name        = local.application_name
@@ -10,13 +10,15 @@ module "ecs" {
 #Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   providers = {
     aws.bucket-replication = aws
   }
   bucket_name        = "${local.application_name}-${local.environment}-deployment"
   versioning_enabled = true
+
+  ownership_controls = "BucketOwnerEnforced"
 
   lifecycle_rule = [
     {

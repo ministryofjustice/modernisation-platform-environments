@@ -14,6 +14,24 @@ locals {
         local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
       ]
       iam_policies = local.s3_iam_policies
+    } } : {},
+    var.options.db_backup_s3 && var.environment.environment == "production" ? { "prod-${var.environment.application_name}-db-backup-bucket-" = {
+      bucket_policy_v2 = [
+        local.s3_bucket_policies.PreprodReadOnlyAccessBucketPolicy
+      ]
+      iam_policies = local.s3_iam_policies
+    } } : {},
+    var.options.db_backup_s3 && var.environment.environment == "preproduction" ? { "preprod-${var.environment.application_name}-db-backup-bucket-" = {
+      bucket_policy_v2 = [
+        local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy
+      ]
+      iam_policies = local.s3_iam_policies
+    } } : {},
+    var.options.db_backup_s3 && var.options.enable_shared_s3 && var.environment.environment == "test" ? { "devtest-${var.environment.application_name}-db-backup-bucket-" = {
+      bucket_policy_v2 = [
+        local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
+      ]
+      iam_policies = local.s3_iam_policies
     } } : {}
   )
 
@@ -37,8 +55,10 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:PutObjectTagging",
         "s3:ListBucket"
       ]
       principals = {
@@ -53,6 +73,7 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket"
       ]
       principals = {
@@ -63,14 +84,32 @@ locals {
         ]
       }
     }
+    
+    PreprodReadOnlyAccessBucketPolicy = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:GetObjectTagging",
+        "s3:ListBucket"
+      ]
+      principals = {
+        type = "AWS"
+        identifiers = [
+          for account_name in var.environment.account_names :
+          endswith(account_name, "-preproduction") ? var.environment.account_root_arns[account_name] : ""
+        ]
+      }
+    }
 
     AllEnvironmentsWriteAccessBucketPolicy = {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:PutObjectTagging",
       ]
       principals = {
         type = "AWS"
@@ -84,9 +123,11 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:PutObjectTagging",
       ]
       principals = {
         type = "AWS"
@@ -100,9 +141,11 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:PutObjectTagging",
         "s3:DeleteObject",
       ]
       principals = {
@@ -117,9 +160,11 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:PutObjectTagging",
         "s3:DeleteObject",
         "s3:DeleteObjectVersion",
       ]
@@ -138,6 +183,7 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging",
           "s3:ListBucket",
         ]
       }
@@ -147,9 +193,11 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
+          "s3:PutObjectTagging",
         ]
       }
     ]
@@ -158,9 +206,11 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
+          "s3:PutObjectTagging",
           "s3:DeleteObject",
         ]
       }

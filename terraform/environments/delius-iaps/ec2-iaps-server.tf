@@ -62,6 +62,7 @@ locals {
           delius_iaps_rds_db_address          = aws_db_instance.iaps.address
           ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
           im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
+          vpc_dns_ip                          = cidrhost(data.aws_vpc.shared.cidr_block, 2) # Derive IP of Amazon DNS endpoint in VPC
         }
       )
     )
@@ -238,7 +239,7 @@ resource "aws_iam_policy" "ssm_least_privilege_policy" {
 # Resources - Create ASG and launch template using module
 ##
 module "ec2_iaps_server" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.2.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.0.0"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts

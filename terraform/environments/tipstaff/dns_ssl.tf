@@ -1,70 +1,111 @@
-# resource "aws_acm_certificate" "external" {
-#   domain_name       = local.is-production ? "${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}" : local.application_data.accounts[local.environment].domain_name
-#   validation_method = "DNS"
+// DEV + PRE-PRODUCTION DNS CONFIGURATION
 
-#   subject_alternative_names = local.is-production ? ["${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}"] : ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"]
-#   tags = {
-#     Environment = local.environment
-#   }
+// ACM Public Certificate
+resource "aws_acm_certificate" "external" {
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  validation_method = "DNS"
 
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  tags = {
+    Environment = local.environment
+  }
 
-# resource "aws_route53_record" "external_validation" {
-#   provider = aws.core-network-services
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
-#   allow_overwrite = true
-#   name            = local.domain_name_main[0]
-#   records         = local.domain_record_main
-#   ttl             = 60
-#   type            = local.domain_type_main[0]
-#   zone_id         = data.aws_route53_zone.network-services.zone_id
-# }
+resource "aws_acm_certificate_validation" "external" {
+  certificate_arn         = aws_acm_certificate.external.arn
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+}
 
-# resource "aws_route53_record" "external" {
-#   count    = local.is-production ? 0 : 1
-#   provider = aws.core-vpc
+// Route53 DNS records for certificate validation
+resource "aws_route53_record" "external_validation" {
+  provider = aws.core-network-services
 
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
-#   type    = "A"
+  allow_overwrite = true
+  name            = local.domain_name_main[0]
+  records         = local.domain_record_main
+  ttl             = 60
+  type            = local.domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+}
 
-#   alias {
-#     name                   = aws_lb.tipstaff_lb.dns_name
-#     zone_id                = aws_lb.tipstaff_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+resource "aws_route53_record" "external_validation_subdomain" {
+  provider = aws.core-vpc
 
-# resource "aws_route53_record" "external_prod" {
-#   count    = local.is-production ? 1 : 0
-#   provider = aws.core-network-services
+  allow_overwrite = true
+  name            = local.domain_name_sub[0]
+  records         = local.domain_record_sub
+  ttl             = 60
+  type            = local.domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
 
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}"
-#   type    = "A"
+// Route53 DNS record for directing traffic to the service
+resource "aws_route53_record" "external" {
+  provider = aws.core-vpc
 
-#   alias {
-#     name                   = aws_lb.tipstaff_lb.dns_name
-#     zone_id                = aws_lb.tipstaff_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
 
-# resource "aws_route53_record" "external_validation_subdomain" {
-#   provider = aws.core-vpc
+  alias {
+    name                   = aws_lb.tipstaff_lb.dns_name
+    zone_id                = aws_lb.tipstaff_lb.zone_id
+    evaluate_target_health = true
+  }
+}
 
-#   allow_overwrite = true
-#   name            = local.domain_name_sub[0]
-#   records         = local.domain_record_sub
-#   ttl             = 60
-#   type            = local.domain_type_sub[0]
-#   zone_id         = data.aws_route53_zone.external.zone_id
-# }
+// PRODUCTION DNS CONFIGURATION
 
-# resource "aws_acm_certificate_validation" "external" {
-#   certificate_arn         = aws_acm_certificate.external.arn
-#   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
-# }
+// ACM Public Certificate
+resource "aws_acm_certificate" "external_prod" {
+  count = local.is-production ? 1 : 0
+
+  domain_name       = "tipstaff.service.justice.gov.uk"
+  validation_method = "DNS"
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "external_prod" {
+  count = local.is-production ? 1 : 0
+
+  certificate_arn         = aws_acm_certificate.external_prod[0].arn
+  validation_record_fqdns = [aws_route53_record.external_validation_prod[0].fqdn]
+  timeouts {
+    create = "10m"
+  }
+}
+
+// Route53 DNS record for certificate validation
+resource "aws_route53_record" "external_validation_prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name
+  records         = [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value]
+  type            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type
+  zone_id         = data.aws_route53_zone.application_zone.zone_id
+  ttl             = 60
+}
+
+// Route53 DNS record for directing traffic to the service
+resource "aws_route53_record" "external_prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.application_zone.zone_id
+  name    = "tipstaff.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.tipstaff_lb.dns_name
+    zone_id                = aws_lb.tipstaff_lb.zone_id
+    evaluate_target_health = true
+  }
+}

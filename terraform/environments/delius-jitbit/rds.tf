@@ -10,7 +10,8 @@ resource "aws_security_group" "database_security_group" {
     to_port     = 1433
     security_groups = [
       aws_security_group.jitbit.id,
-      module.bastion_linux.bastion_security_group
+      module.bastion_linux.bastion_security_group,
+      aws_security_group.onprem_gateway.id
     ]
   }
 
@@ -50,6 +51,7 @@ resource "aws_db_instance" "jitbit" {
   skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
   allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
+  storage_type                = local.application_data.accounts[local.environment].db_storage_type
   maintenance_window          = local.application_data.accounts[local.environment].db_maintenance_window
   auto_minor_version_upgrade  = local.application_data.accounts[local.environment].db_auto_minor_version_upgrade
   allow_major_version_upgrade = local.application_data.accounts[local.environment].db_allow_major_version_upgrade

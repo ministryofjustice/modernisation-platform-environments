@@ -1,7 +1,5 @@
-module "s3_bucket" {
-  count = local.environment == "development" ? 1 : 0
-
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
+module "jitbit_bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   providers = {
     aws.bucket-replication = aws
@@ -28,7 +26,7 @@ module "s3_bucket" {
     principals = {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/jitbit-datasync-transfer-to-s3"
+        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/${local.application_data.accounts[local.environment].migration_source_account_name}-datasync-transfer-to-s3"
       ]
     }
     },
@@ -85,8 +83,8 @@ module "s3_bucket" {
   tags = local.tags
 }
 
-resource "aws_s3_bucket_intelligent_tiering_configuration" "jitbit_bucket_tiering" {
-  bucket = module.s3_bucket[0].bucket.id
+resource "aws_s3_bucket_intelligent_tiering_configuration" "jitbit" {
+  bucket = module.jitbit_bucket.bucket.id
   name   = "JitbitBucketTiering"
 
   status = "Enabled"
@@ -101,3 +99,4 @@ resource "aws_s3_bucket_intelligent_tiering_configuration" "jitbit_bucket_tierin
     days        = 180
   }
 }
+

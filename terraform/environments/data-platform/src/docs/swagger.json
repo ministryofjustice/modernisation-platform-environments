@@ -1,0 +1,253 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Data Product API",
+    "description": "The Data Product API docs are based on the OpenAPI 3.0 specification.",
+    "version": "0.0.1"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "https://our-cloudfront-mask-for-the-api/sandbox"
+    },
+    {
+      "url": "https://our-cloudfront-mask-for-the-api/dev"
+    }
+  ],
+  "paths": {
+    "/upload_data": {
+      "get": {
+        "tags": ["upload_data"],
+        "summary": "Get a presigned url to upload some data to an existing data product.",
+        "description": "Returns a presigned url to post data to.",
+        "operationId": "uploadData",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "database",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "table",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "contentMD5",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorizationToken",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Inputs supplied"
+          },
+          "404": {
+            "description": "Data Product not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/get_glue_metadata": {
+      "get": {
+        "tags": ["get_glue_metadata"],
+        "summary": "Get metadata for a specified table in a specified Glue database",
+        "description": "Returns a json object with all the metadata available for the specified database and table",
+        "operationId": "getGlueMetadata",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "database",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "table",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorizationToken",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation, response format https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/glue/client/get_table.html",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Inputs supplied"
+          },
+          "404": {
+            "description": "Glue database and/or table not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UploadDataRequest": {
+        "required": ["database", "table", "contentMD5"],
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string",
+            "example": "example_prison_data_product"
+          },
+          "table": {
+            "type": "string",
+            "example": "adjudications"
+          },
+          "contentMD5": {
+            "type": "string",
+            "example": "YojAHEZqfNk6B8zNmmLQhw=="
+          }
+        }
+      },
+      "URL": {
+        "type": "object",
+        "required": ["url", "fields"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "example": "https://data-platform-products.s3.amazonaws.com/"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/fields"
+          }
+        }
+      },
+      "UploadDataResponse": {
+        "type": "object",
+        "required": ["URL"],
+        "properties": {
+          "URL": {
+            "$ref": "#/components/schemas/URL"
+          }
+        }
+      },
+      "fields": {
+        "type": "object",
+        "properties": {
+          "x-amz-server-side-encryption": {
+            "type": "string",
+            "example": "AES256"
+          },
+          "x-amz-acl": {
+            "type": "string",
+            "example": "bucket-owner-full-control"
+          },
+          "x-amz-date": {
+            "type": "string",
+            "example": "20230609T130209Z"
+          },
+          "Content-MD5": {
+            "type": "string",
+            "example": "YojAHEZqfNk6B8zNmmLQhw=="
+          },
+          "Content-Type": {
+            "type": "string",
+            "example": "binary/octet-stream"
+          },
+          "key": {
+            "type": "string",
+            "example": "curated_data/test/test/extraction_timestamp=20230609T130209Z/452b1aef-ca12-46ff-9dbf-42cbc80412f0"
+          },
+          "x-amz-algorithm": {
+            "type": "string",
+            "example": "AWS4-HMAC-SHA256"
+          },
+          "x-amz-credential": {
+            "type": "string",
+            "example": "ASIAQGIFY4DVKJW2ZNKM/20230609/eu-west-2/s3/aws4_request"
+          },
+          "x-amz-security-token": {
+            "type": "string",
+            "example": "IQo..."
+          },
+          "x-amz-signature": {
+            "type": "string",
+            "example": "54a..."
+          },
+          "policy": {
+            "type": "string",
+            "example": "eyJ..."
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "upload_data_request": {
+        "description": "Request to upload data to the data platform.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UploadDataRequest"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "name": "api_key",
+        "in": "header"
+      }
+    }
+  }
+}

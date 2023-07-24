@@ -154,7 +154,7 @@ locals {
       }
     }
 
-    ec2_cwagent_collectd = {
+    ec2_instance_cwagent_collectd = {
       chronyd-stopped = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
@@ -210,6 +210,18 @@ locals {
         dimensions = {
           instance = "ssm_agent_status"
         }
+      }
+    }
+    ec2_asg_cwagent_collectd = {
+      asg-collectd-services = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_exec_value"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "A service or metric that's being monitored by collectd has stopped"
       }
     }
     lb = {

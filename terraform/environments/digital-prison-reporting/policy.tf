@@ -5,6 +5,21 @@ locals {
   dms_iam_role_permissions_boundary = null
 }
 
+# APIGateway Get Policy
+resource "aws_iam_policy" "apigateway_get" {
+  name = "${local.project}_apigateway_get_policy"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "APIGatewayGETPermissions",
+        "Action" : ["apigateway:GET"],
+        "Effect" : "Allow",
+        "Resource" : ["arn:aws:apigateway:${local.current_account_region}::/apis/*"]
+      }
+    ]
+  })
+}
 
 ## Glue DB Default Policy
 resource "aws_glue_resource_policy" "glue_policy" {
@@ -49,7 +64,7 @@ resource "aws_iam_policy" "s3_read_access_policy" {
         ],
         "Resource" : [
           "arn:aws:s3:::${local.project}-*/*",
-          "arn:aws:s3:::${local.project}-*"              
+          "arn:aws:s3:::${local.project}-*"
         ]
       }
     ]
@@ -72,7 +87,7 @@ resource "aws_iam_policy" "kms_read_access_policy" {
           "kms:DescribeKey",
         ],
         "Resource" : [
-          "arn:aws:kms:*:${local.account_id}:key/*"              
+          "arn:aws:kms:*:${local.account_id}:key/*"
         ]
       }
     ]
@@ -83,8 +98,8 @@ resource "aws_iam_policy" "kms_read_access_policy" {
 # Amazon Redshift supports only identity-based policies (IAM policies).
 
 resource "aws_iam_role" "redshift-role" {
-#  count = local.setup_datamart ? 1 : 0
-  name  = "${local.project}-redshift-cluster-role"
+  #  count = local.setup_datamart ? 1 : 0
+  name = "${local.project}-redshift-cluster-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -245,7 +260,7 @@ EOF
 
 ### Iam User Role for AWS Redshift Spectrum, 
 resource "aws_iam_role" "redshift-spectrum-role" {
-  name  = "${local.project}-redshift-spectrum-role"
+  name = "${local.project}-redshift-spectrum-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -271,28 +286,28 @@ resource "aws_iam_role" "redshift-spectrum-role" {
   )
 }
 
-data "aws_iam_policy_document" "redshift_spectrum" {   
+data "aws_iam_policy_document" "redshift_spectrum" {
   statement {
     actions = [
-				"glue:BatchCreatePartition",
-				"glue:UpdateDatabase",
-				"glue:CreateTable",
-				"glue:DeleteDatabase",
-				"glue:GetTables",
-				"glue:GetPartitions",
-				"glue:BatchDeletePartition",
-				"glue:UpdateTable",
-				"glue:BatchGetPartition",
-				"glue:DeleteTable",
-				"glue:GetDatabases",
-				"glue:GetTable",
-				"glue:GetDatabase",
-				"glue:GetPartition",
-				"glue:CreateDatabase",
-				"glue:BatchDeleteTable",
-				"glue:CreatePartition",
-				"glue:DeletePartition",
-				"glue:UpdatePartition"
+      "glue:BatchCreatePartition",
+      "glue:UpdateDatabase",
+      "glue:CreateTable",
+      "glue:DeleteDatabase",
+      "glue:GetTables",
+      "glue:GetPartitions",
+      "glue:BatchDeletePartition",
+      "glue:UpdateTable",
+      "glue:BatchGetPartition",
+      "glue:DeleteTable",
+      "glue:GetDatabases",
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetPartition",
+      "glue:CreateDatabase",
+      "glue:BatchDeleteTable",
+      "glue:CreatePartition",
+      "glue:DeletePartition",
+      "glue:UpdatePartition"
     ]
     resources = [
       "*"
@@ -313,6 +328,6 @@ resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
     "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.redshift_spectrum_policy.name}"
   ])
 
-  role = aws_iam_role.redshift-spectrum-role.name
+  role       = aws_iam_role.redshift-spectrum-role.name
   policy_arn = each.value
 }

@@ -46,7 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
     InstanceType = var.instanceType
   }
 }
-
+/*
 # Disk Free Alarm
 resource "aws_cloudwatch_metric_alarm" "disk_free" {
   alarm_name                = "${var.short_env}-${local.name}-disk_free_root"
@@ -69,7 +69,32 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
     path         = "/"
     device       = var.rootDevice
     fstype       = var.fileSystem
+  }
+}
+*/
 
+# Disk Used % Alarm (more adapable than the Disk Free alarm, due to percentage instead of bytes)
+resource "aws_cloudwatch_metric_alarm" "disk_used" {
+  alarm_name                = "${var.short_env}-${local.name}-disk_used_root"
+  alarm_description         = "This metric monitors the amount of used disk space on the instance. If the amount of free disk space on root exceeds 80% for 2 minutes, the alarm will trigger"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  metric_name               = "disk_used_percent"
+  namespace                 = "CWAgent"
+  statistic                 = "Average"
+  insufficient_data_actions = []
+
+  evaluation_periods  = var.disk_eval_periods
+  datapoints_to_alarm = var.disk_datapoints
+  period              = var.disk_period
+  threshold           = var.disk_threshold
+  alarm_actions       = [var.topic]
+  dimensions = {
+    InstanceId   = var.instanceId
+    ImageId      = var.imageId
+    InstanceType = var.instanceType
+    path         = "/"
+    device       = var.rootDevice
+    fstype       = var.fileSystem
   }
 }
 
@@ -112,9 +137,9 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   statistic                 = "Average"
   insufficient_data_actions = []
 
-  evaluation_periods  = var.insthc_eval_periods
-  period              = var.insthc_period
-  threshold           = var.insthc_threshold
+  evaluation_periods = var.insthc_eval_periods
+  period             = var.insthc_period
+  threshold          = var.insthc_threshold
   alarm_actions      = [var.topic]
   dimensions = {
     InstanceId = var.instanceId
@@ -131,9 +156,9 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   statistic                 = "Average"
   insufficient_data_actions = []
 
-  evaluation_periods  = var.syshc_eval_periods
-  period              = var.syshc_period
-  threshold           = var.syshc_threshold
+  evaluation_periods = var.syshc_eval_periods
+  period             = var.syshc_period
+  threshold          = var.syshc_threshold
   alarm_actions      = [var.topic]
   dimensions = {
     InstanceId = var.instanceId
@@ -142,7 +167,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
 
 resource "aws_cloudwatch_metric_alarm" "ec2_stop_alarm" {
   alarm_name          = "${var.short_env}-${local.name}-ec2-stopped-${var.short_env}"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
+  comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "StatusCheckFailed"
   namespace           = "AWS/EC2"
@@ -151,7 +176,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_stop_alarm" {
   threshold           = 1
 
   dimensions = {
-    InstanceId = var.instanceId  
+    InstanceId = var.instanceId
   }
 
   alarm_description = "This alarm will trigger when the EC2 instance stops."
