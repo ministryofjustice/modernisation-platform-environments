@@ -67,6 +67,8 @@ tasks:
 
           $objects = Get-S3Object -BucketName $S3_BUCKET_NDH -Prefix "ndh-installation-files/WindowsInstalls/" -Delimiter '/'
 
+          $objects = $objects[1..($objects.Length-1)] # removes folder itself from objects list
+
           foreach($obj in $objects) {
             $file=$obj.Key.Split("/")[-1]
             Read-S3Object -BucketName $S3_BUCKET_NDH -Key $obj.Key -File "C:\tibco\files\$file" 
