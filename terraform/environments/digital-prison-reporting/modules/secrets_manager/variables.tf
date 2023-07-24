@@ -80,6 +80,7 @@ variable "secret_access_notification_arn" {
 variable "length" {
   description = "Length of string"
   type        = number
+  default     = 10
 }
 
 variable "min_lower" {
