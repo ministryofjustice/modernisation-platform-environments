@@ -90,17 +90,17 @@ locals {
       # }
 
       public = {
-        internal_lb              = false
-        access_logs              = false
+        internal_lb = false
+        access_logs = false
         # s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
         existing_target_groups = {
         }
-        idle_timeout             = 60 # 60 is default
-        security_groups          = ["public_lb"]
-        public_subnets           = module.environment.subnets["public"].ids
-        tags                     = local.tags
+        idle_timeout    = 60 # 60 is default
+        security_groups = ["public_lb"]
+        public_subnets  = module.environment.subnets["public"].ids
+        tags            = local.tags
 
         listeners = {
           https = {
@@ -144,8 +144,8 @@ locals {
         }
       }
       private = {
-        internal_lb              = true
-        access_logs              = false
+        internal_lb = true
+        access_logs = false
         # s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
@@ -207,8 +207,8 @@ locals {
       #
       # "${local.application_name}.service.justice.gov.uk" = {
       #   lb_alias_records = [
-          # { name = "t2", type = "A", lbs_map_key = "public" }, # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
-          # { name = "db.t2", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+      # { name = "t2", type = "A", lbs_map_key = "public" }, # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
+      # { name = "db.t2", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
       #   ]
       # }
       # "t1.${local.application_name}.service.justice.gov.uk" = {
@@ -237,7 +237,7 @@ locals {
         }
         records = [
           { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "300", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
-          { name = "db.t1.${local.application_name}", type = "A", ttl = "300", records = ["10.101.6.132"] },  # db.t1.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T1ODL0007
+          { name = "db.t1.${local.application_name}", type = "A", ttl = "300", records = ["10.101.6.132"] }, # db.t1.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T1ODL0007
         ]
         lb_alias_records = [
           # { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },

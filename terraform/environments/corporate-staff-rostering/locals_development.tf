@@ -3,7 +3,7 @@ locals {
 
   # baseline config
   development_config = {
-    
+
     baseline_ec2_autoscaling_groups = {
       dev-base-ol85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {

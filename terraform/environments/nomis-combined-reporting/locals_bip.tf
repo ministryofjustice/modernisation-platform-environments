@@ -3,7 +3,7 @@ locals {
   bip_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name          = "base_rhel_8_5_*"
+      ami_name = "base_rhel_8_5_*"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"

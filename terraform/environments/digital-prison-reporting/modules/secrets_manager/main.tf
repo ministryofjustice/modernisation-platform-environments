@@ -1,5 +1,5 @@
 resource "random_password" "random_string" {
-  count            = var.generate_random ? 1 : 0  
+  count            = var.generate_random ? 1 : 0
   length           = var.length
   lower            = var.use_lower
   numeric          = var.use_number
