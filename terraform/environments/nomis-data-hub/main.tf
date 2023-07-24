@@ -1,3 +1,45 @@
+module "ip_addresses" {
+  source = "../../modules/ip_addresses"
+}
+
+module "environment" {
+  source = "../../modules/environment"
+
+  providers = {
+    aws.modernisation-platform = aws.modernisation-platform
+    aws.core-network-services  = aws.core-network-services
+    aws.core-vpc               = aws.core-vpc
+  }
+
+  environment_management = local.environment_management
+  business_unit          = local.business_unit
+  application_name       = local.application_name
+  environment            = local.environment
+  subnet_set             = local.subnet_set
+}
+
+module "baseline_presets" {
+  source = "../../modules/baseline_presets"
+
+  environment  = module.environment
+  ip_addresses = module.ip_addresses
+
+  options = {
+    enable_application_environment_wildcard_cert = true
+    enable_business_unit_kms_cmks                = true
+    enable_image_builder                         = true
+    enable_ec2_cloud_watch_agent                 = true
+    enable_ec2_self_provision                    = true
+    iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+    iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+    s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+
+    # comment this in if you need to resolve FixNGo hostnames
+    # route53_resolver_rules = {
+    #   outbound-data-and-private-subnets = ["azure-fixngo-domain"]
+    # }
+  }
+}
 module "baseline" {
   source = "../../modules/baseline"
 
@@ -19,11 +61,21 @@ module "baseline" {
   key_pairs                = module.baseline_presets.key_pairs
   kms_grants               = module.baseline_presets.kms_grants
   route53_resolvers        = module.baseline_presets.route53_resolvers
-  s3_buckets               = merge(local.baseline_s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
 
   ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
   lbs                    = lookup(local.environment_config, "baseline_lbs", {})
+
+  ssm_parameters = merge(
+    local.baseline_ssm_parameters,
+    lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
+  )
+
+  s3_buckets = merge(
+    module.baseline_presets.s3_buckets,
+    local.baseline_s3_buckets,
+    lookup(local.baseline_environment_config, "baseline_s3_buckets", {})
+  )
 }
 
 #create random value for defualt values
