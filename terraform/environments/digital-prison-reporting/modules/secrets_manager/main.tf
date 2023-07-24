@@ -16,7 +16,9 @@ resource "random_password" "random_string" {
   }
 }
 
-resource "aws_secretsmanager_secret" "secret" {
+resource "aws_secretsmanager_secret" "secret_remote" {
+  count                   = var.ignore_secret_string ? 1 : 0
+
   name                    = var.name == "" ? null : var.name
   name_prefix             = var.name == "" ? var.name_prefix : null
   description             = var.description
@@ -25,14 +27,20 @@ resource "aws_secretsmanager_secret" "secret" {
   tags                    = var.tags
 
 
-  dynamic "lifecycle" {
-    for_each = can(var.lifecycle_rules) ? [var.lifecycle_rules] : []
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
 
-    content {
-      ignore_changes = try(lifecycle.value.ignore_canges)
-    }
-  }  
+resource "aws_secretsmanager_secret" "secret" {
+  count                   = var.ignore_secret_string ? 1 : 0
 
+  name                    = var.name == "" ? null : var.name
+  name_prefix             = var.name == "" ? var.name_prefix : null
+  description             = var.description
+  kms_key_id              = var.kms_key_id
+  recovery_window_in_days = var.recovery_window_in_days
+  tags                    = var.tags
 }
 
 resource "aws_secretsmanager_secret_version" "secret_val" {

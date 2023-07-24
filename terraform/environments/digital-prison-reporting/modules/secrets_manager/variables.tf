@@ -153,8 +153,8 @@ variable "secret_value" {
   description = "(Optional) Value if the type is set to MONO"
 }
 
-variable "lifecycle_rules" {
-  description = "Lifecycle Rules"
-  type        = any
-  default     = {}
+variable "ignore_secret_string" {
+  description = "If to Ignore Local Secret Value changes"
+  type        = bool
+  default     = false
 }
