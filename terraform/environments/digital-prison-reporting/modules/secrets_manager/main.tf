@@ -25,7 +25,7 @@ resource "aws_secretsmanager_secret" "secret" {
   tags                    = var.tags
 
   lifecycle {
-    ignore_changes = var.ignore_changes
+    ignore_changes = var.ignore_local_changes ? [secret_string, ] : []
   }
 }
 

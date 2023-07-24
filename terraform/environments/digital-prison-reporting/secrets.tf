@@ -56,6 +56,7 @@ module "slack_alerts_url" {
   description             = "DPR Slack Alerts URL"
   type                    = "MONO"
   secret_value            = "SLACK_ALERTS_URL_PLACEHOLDER"
+  ignore_local_changes    = true
 
   tags = merge(
     local.all_tags,

@@ -152,8 +152,8 @@ variable "secret_value" {
   description = "(Optional) Value if the type is set to MONO"
 }
 
-variable "ignore_changes" {
+variable "ignore_local_changes" {
   description = "Ignore Changes, Dynamic Block"
-  type        = list(string)
-  default     = []
+  type        = bool
+  default     = false
 }
