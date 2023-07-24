@@ -48,10 +48,7 @@ module "data_product_authorizer_lambda" {
   application_name               = "data_product_authorizer"
   tags                           = local.tags
   description                    = "Lambda to authorize access to endpoints"
-  role_name                      = "authorizer_lambda_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.lambda_trust_policy_doc.json
   function_name                  = "data_product_authorizer_${local.environment}"
-  create_role                    = true
   reserved_concurrent_executions = 1
 
   image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-auhorizer-lambda-ecr-repo:1.0.0"
