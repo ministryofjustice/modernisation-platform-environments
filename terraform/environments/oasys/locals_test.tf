@@ -262,7 +262,7 @@ locals {
               type = "fixed-response"
               fixed_response = {
                 content_type = "text/plain"
-                message_body = "T2 - use t2-int.oasys.service.justice.gov.uk"
+                message_body = "T2 - use t2-int.oasys.service.justice.gov.uk, T1 - use t1-int.oasys.service.justice.gov.uk"
                 status_code  = "200"
               }
             }
