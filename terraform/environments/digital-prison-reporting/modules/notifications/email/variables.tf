@@ -1,9 +1,9 @@
-variable "slack_email_url" {
+variable "email_url" {
   type        = string
   nullable    = true
   sensitive   = true
   default     = null
-  description = "(Optional) Digital Prison Reporting Slack email url."
+  description = "(Optional) Digital Prison Reporting notification email url."
 }
 
 variable "sns_topic_arn" {

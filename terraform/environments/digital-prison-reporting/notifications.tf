@@ -22,10 +22,10 @@ module "slack_alerts" {
   count = local.enable_slack_alerts ? 1 : 0
 
   depends_on = [module.notifications_sns]
-  source     = "./modules/notifications/slack"
+  source     = "modules/notifications/email"
 
   sns_topic_arn   = module.notifications_sns.sns_topic_arn
-  slack_email_url = local.enable_slack_alerts ? data.aws_secretsmanager_secret_version.slack_integration[0].secret_string : null
+  email_url = local.enable_slack_alerts ? data.aws_secretsmanager_secret_version.slack_integration[0].secret_string : null
 
   tags = merge(
     local.all_tags,
