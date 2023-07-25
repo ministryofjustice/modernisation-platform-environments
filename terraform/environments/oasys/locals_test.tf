@@ -219,24 +219,24 @@ locals {
                   }
                 ]
               }
-              # t1-web-http-8080 = {
-              #   priority = 300
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "t1-${local.application_name}-web-a-pb-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "t1.oasys.service.justice.gov.uk",
-              #           "t1-a.oasys.service.justice.gov.uk",
-              #           "ords.t1.oasys.service.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
+              t1-web-http-8080 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-${local.application_name}-web-a-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t1.oasys.service.justice.gov.uk",
+                        "t1-a.oasys.service.justice.gov.uk",
+                        "ords.t1.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         }
@@ -305,24 +305,24 @@ locals {
                   }
                 ]
               }
-              # t1-web-http-8080 = {
-              #   priority = 300
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "t1-${local.application_name}-web-a-pv-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "t1-int.oasys.service.justice.gov.uk",
-              #           "t1-a-int.oasys.service.justice.gov.uk",
-              #           "t1-oasys.hmpp-azdt.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
+              t1-web-http-8080 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-${local.application_name}-web-a-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t1-int.oasys.service.justice.gov.uk",
+                        "t1-a-int.oasys.service.justice.gov.uk",
+                        "t1-oasys.hmpp-azdt.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         }
