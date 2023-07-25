@@ -81,18 +81,18 @@ locals {
       ##
       ## T1
       ##
-      # "t1-${local.application_name}-web-a" = merge(local.webserver_a, {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name                  = "oasys_webserver_release_*"
-      #     ssm_parameters_prefix     = "ec2-web-t1/"
-      #     iam_resource_names_prefix = "ec2-web-t1"
-      #   })
-      #   tags = merge(local.webserver_a.tags, {
-      #     description                             = "t1 ${local.application_name} web"
-      #     "${local.application_name}-environment" = "t1"
-      #     oracle-db-hostname                      = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
-      #   })
-      # })
+      "t1-${local.application_name}-web-a" = merge(local.webserver_a, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "oasys_webserver_release_*"
+          ssm_parameters_prefix     = "ec2-web-t1/"
+          iam_resource_names_prefix = "ec2-web-t1"
+        })
+        tags = merge(local.webserver_a.tags, {
+          description                             = "t1 ${local.application_name} web"
+          "${local.application_name}-environment" = "t1"
+          oracle-db-hostname                      = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
+        })
+      })
 
       ##
       ## test
@@ -126,7 +126,7 @@ locals {
 
     # options for LBs https://docs.google.com/presentation/d/1RpXpfNY_hw7FjoMw0sdMAdQOF7kZqLUY6qVVtLNavWI/edit?usp=sharing
     baseline_lbs = {
-      # public = {
+      # public = { # just left here to see how to set up an NLB
       #   load_balancer_type       = "network"
       #   internal_lb              = false
       #   access_logs              = false # NLB don't have access logs unless they have a tls listener
