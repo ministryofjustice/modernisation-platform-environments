@@ -11,6 +11,9 @@ locals {
     }
 
     baseline_ec2_instances = {
+      ##
+      ## T2
+      ##
       "t2-${local.application_name}-db-a" = local.database_a
       # "t2-${local.application_name}-db-b" = merge(local.database_b, {
       #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
@@ -19,9 +22,17 @@ locals {
       #     })
       #   })
       # })
+      
+      ##
+      ## T1
+      ##
+      "t1-${local.application_name}-db-a" = local.database_a
     }
 
     baseline_ec2_autoscaling_groups = {
+      ##
+      ## T2
+      ##
       "t2-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "oasys_webserver_release_*"
@@ -52,8 +63,27 @@ locals {
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
         })
       })
-      # "test-${local.application_name}-bip-a" = local.bip_a
 
+      ##
+      ## T1
+      ##
+      # "t1-${local.application_name}-web-a" = merge(local.webserver_a, {
+      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #     ami_name                  = "oasys_webserver_release_*"
+      #     ssm_parameters_prefix     = "ec2-web-t1/"
+      #     iam_resource_names_prefix = "ec2-web-t1"
+      #   })
+      #   tags = merge(local.webserver_a.tags, {
+      #     description                             = "t1 ${local.application_name} web"
+      #     "${local.application_name}-environment" = "t1"
+      #     oracle-db-hostname                      = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
+      #   })
+      # })
+
+      ##
+      ## test
+      ##
+      # "test-${local.application_name}-bip-a" = local.bip_a
       "test-${local.application_name}-bip-b" = merge(local.bip_b, {
         autoscaling_schedules = {}
       })
@@ -113,7 +143,6 @@ locals {
       public = {
         internal_lb              = false
         access_logs              = false
-        # s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
         existing_target_groups = {
@@ -133,7 +162,7 @@ locals {
               type = "fixed-response"
               fixed_response = {
                 content_type = "text/plain"
-                message_body = "T2 - use t2.oasys.service.justice.gov.uk"
+                message_body = "T2 - use t2.oasys.service.justice.gov.uk, T1 - use t1.oasys.service.justice.gov.uk"
                 status_code  = "200"
               }
             }
@@ -176,6 +205,24 @@ locals {
                   }
                 ]
               }
+              # t1-web-http-8080 = {
+              #   priority = 300
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "t1-${local.application_name}-web-a-pb-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "t1.oasys.service.justice.gov.uk",
+              #           "t1-a.oasys.service.justice.gov.uk",
+              #           "ords.t1.oasys.service.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
             }
           }
         }
@@ -244,6 +291,24 @@ locals {
                   }
                 ]
               }
+              # t1-web-http-8080 = {
+              #   priority = 300
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "t1-${local.application_name}-web-a-pv-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "t1-int.oasys.service.justice.gov.uk",
+              #           "t1-a-int.oasys.service.justice.gov.uk",
+              #           "t1-oasys.hmpp-azdt.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
             }
           }
         }
@@ -273,6 +338,7 @@ locals {
       (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
         records = [
           { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "300", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "db.t1.${local.application_name}", type = "CNAME", ttl = "300", records = ["t1-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         # lb_alias_records = [
         #   { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
@@ -290,7 +356,7 @@ locals {
         }
         records = [
           { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "300", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
-          { name = "db.t1.${local.application_name}", type = "A", ttl = "300", records = ["10.101.6.132"] },  # db.t1.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T1ODL0007
+          # { name = "db.t1.${local.application_name}", type = "CNAME", ttl = "300", records = ["t1-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
         ]
         lb_alias_records = [
           # { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },
