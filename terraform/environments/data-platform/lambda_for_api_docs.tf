@@ -29,7 +29,7 @@ module "data_product_docs_lambda" {
       action        = "lambda:InvokeFunction"
       function_name = "data_product_docs_${local.environment}"
       principal     = "apigateway.amazonaws.com"
-      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.docs.http_method}${aws_api_gateway_resource.docs.path}"
+      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/*"
     }
   }
 
