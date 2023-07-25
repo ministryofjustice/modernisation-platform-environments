@@ -48,13 +48,24 @@ module "pagerduty_notifications" {
 }
 
 # Glue status change rule
-module "glue_status_change" {
+module "glue_status_change_rule" {
   depends_on = [module.notifications_sns]
 
-  source                = "./modules/notifications/glue"
+  source                = "modules/notifications/eventbridge"
   sns_topic_arn         = module.notifications_sns.sns_topic_arn
-  glue_rule_name        = "${local.project}-glue-jobs-status-change-rule-${local.environment}"
-  glue_rule_target_name = "${local.project}-glue-rule-target-${local.environment}"
+
+  rule_name         = "${local.project}-glue-jobs-status-change-rule-${local.environment}"
+  event_target_name = "${local.project}-glue-rule-target-${local.environment}"
+
+  event_pattern = <<PATTERN
+{
+  "source": ["aws.glue"],
+  "detail-type": ["Glue Job State Change"],
+  "detail": {
+    "state": ["STOPPED", "FAILED", "TIMEOUT"]
+  }
+}
+PATTERN
 
   tags = merge(
     local.all_tags,
