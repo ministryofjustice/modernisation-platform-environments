@@ -1,5 +1,33 @@
 {
   "accounts": {
+    "development": {
+      "region": "eu-west-2",
+      "ami_image_id": "ami-0da248407de409f02",
+      "instance_type": "t3.medium",
+      "key_name": "performance-hub-ec2",
+      "app_count": "1",
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 3,
+      "ec2_min_size": 2,
+      "server_port": "80",
+      "container_instance_type": "windows",
+      "container_version": "development",
+      "container_cpu": "2048",
+      "container_memory": "3072",
+      "task_definition_volume": "upload_volume",
+      "network_mode": "none",
+      "db_instance_class": "db.m5.large",
+      "db_user": "admin",
+      "db_allocated_storage": "100",
+      "db_snapshot_identifier": "performance-hub-final-snapshot",
+      "env_name": "development",
+      "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
+      "friendly_name": "HMPPS Development Hub",
+      "app_db_name": "NomsPMU",
+      "memebership_db_name": "Membership",
+      "cert_arn": "977c968e-1992-46a4-bfe8-e4043ab5a982",
+      "hub_wwwroot": "C:/inetpub/wwwroot"
+    },
     "preproduction": {
       "region": "eu-west-2",
       "ami_image_id": "ami-0da248407de409f02",
