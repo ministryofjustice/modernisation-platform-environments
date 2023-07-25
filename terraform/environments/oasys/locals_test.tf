@@ -14,19 +14,33 @@ locals {
       ##
       ## T2
       ##
-      "t2-${local.application_name}-db-a" = local.database_a
+      "t2-${local.application_name}-db-a" = merge(local.database_a, {
+        tags = merge(local.database_a.tags, {
+          description                             = "t2 ${local.application_name} database"
+          "${local.application_name}-environment" = "t2"
+        })
+      })
       # "t2-${local.application_name}-db-b" = merge(local.database_b, {
       #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
       #       branch = "oasys/oracle-19c-disk-sector-size-512-change"
       #     })
       #   })
+      #   tags = merge(local.database_b.tags, {
+      #     description                             = "t2 ${local.application_name} database"
+      #     "${local.application_name}-environment" = "t2"
+      #   })
       # })
       
       ##
       ## T1
       ##
-      "t1-${local.application_name}-db-a" = local.database_a
+      "t1-${local.application_name}-db-a" = merge(local.database_a, {
+        tags = merge(local.database_a.tags, {
+          description                             = "t1 ${local.application_name} database"
+          "${local.application_name}-environment" = "t1"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
