@@ -1,28 +1,27 @@
-data "archive_file" "docs_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/src/docs"
-  output_path = "${path.module}/src/docs_${local.environment}/docs_lambda.zip"
-}
+module "data_product_docs_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
+  application_name               = "data_product_docs"
+  tags                           = local.tags
+  description                    = "Lambda for swagger api docs"
+  function_name                  = "data_product_docs_${local.environment}"
+  create_role                    = false
+  reserved_concurrent_executions = 1
 
-resource "aws_lambda_function" "api_docs" {
-  function_name = "api_docs"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-docs-lambda-ecr-repo:1.0.0"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 512
 
-  filename         = "${path.module}/src/docs_${local.environment}/docs_lambda.zip"
-  source_code_hash = data.archive_file.docs_zip.output_base64sha256
-  handler          = "main.handler"
-  runtime          = "nodejs14.x"
+  allowed_triggers = {
 
-  role = aws_iam_role.api_docs_lambda_role.arn
-}
+    AllowExecutionFromAPIGateway = {
+      action        = "lambda:InvokeFunction"
+      function_name = "data_product_docs_${local.environment}"
+      principal     = "apigateway.amazonaws.com"
+      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.docs.http_method}${aws_api_gateway_resource.docs.path}"
+    }
+  }
 
-resource "aws_iam_role" "api_docs_lambda_role" {
-  name               = "api_docs_lambda_role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
-}
-
-resource "aws_iam_role_policy_attachment" "attach_policy_to_lambda_role" {
-  role       = aws_iam_role.api_docs_lambda_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_api_gateway_resource" "docs" {
@@ -45,7 +44,7 @@ resource "aws_api_gateway_integration" "docs_to_lambda" {
 
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.api_docs.invoke_arn
+  uri                     = module.data_product_docs_lambda.lambda_function_invoke_arn
 }
 
 resource "aws_api_gateway_resource" "proxy" {
@@ -68,7 +67,7 @@ resource "aws_api_gateway_integration" "proxy_to_lambda" {
 
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.api_docs.invoke_arn
+  uri                     = module.data_product_docs_lambda.lambda_function_invoke_arn
 }
 
 resource "aws_api_gateway_method" "proxy_root" {
@@ -85,22 +84,11 @@ resource "aws_api_gateway_integration" "docs_lambda_root" {
 
   integration_http_method = "POST"
   type                    = "MOCK"
-  uri                     = aws_lambda_function.api_docs.invoke_arn
+  uri                     = module.data_product_docs_lambda.lambda_function_invoke_arn
 
   lifecycle {
     ignore_changes = all
   }
-}
-
-resource "aws_lambda_permission" "allow_apigw_to_invoke_docs_lambda" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.api_docs.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  # The "/*/*" portion grants access from any method on any resource
-  # within the API Gateway REST API.
-  source_arn = "${aws_api_gateway_rest_api.data_platform.execution_arn}/*/*"
 }
 
 output "docs_endpoint" {
