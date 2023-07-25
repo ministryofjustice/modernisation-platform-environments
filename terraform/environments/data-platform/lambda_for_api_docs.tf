@@ -1,10 +1,21 @@
+data "aws_iam_policy_document" "iam_policy_document_for_docs_lambda" {
+  statement {
+    sid       = "LambdaLogGroup"
+    effect    = "Allow"
+    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
+  }
+}
+
 module "data_product_docs_lambda" {
   source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
   application_name               = "data_product_docs"
   tags                           = local.tags
   description                    = "Lambda for swagger api docs"
   function_name                  = "data_product_docs_${local.environment}"
-  create_role                    = false
+  role_name                      = "docs_lambda_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_docs_lambda.json
+  create_role                    = true
   reserved_concurrent_executions = 1
 
   image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-docs-lambda-ecr-repo:1.0.0"
