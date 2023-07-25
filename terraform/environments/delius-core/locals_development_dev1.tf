@@ -39,7 +39,5 @@ locals {
       { Name = lower(format("ec2-%s-%s-base-ami-test-instance", local.application_name, local.environment)) },
       { server-type = "delius_core_db" }
     )
-
-    some_other_attribute = "some_other_attribute_for_db_in_dev1"
   }
 }

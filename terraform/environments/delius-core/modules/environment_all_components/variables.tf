@@ -16,11 +16,9 @@ variable "account_info" {
 variable "ldap_config" {
   type = object({
     name                 = string
-    some_other_attribute = optional(string)
   })
   default = {
     name                 = "default_name"
-    some_other_attribute = "default_some_other_attribute"
   }
 
 }
@@ -31,14 +29,12 @@ variable "db_config" {
     ami_name             = string
     ami_owner            = string
     user_data_raw        = string
-    some_other_attribute = optional(string)
   })
   default = {
     name                 = "default_name"
     ami_name             = "default_ami_name"
     ami_owner            = "default_ami_owner"
     user_data_raw        = null
-    some_other_attribute = "default_some_other_attribute"
   }
 }
 

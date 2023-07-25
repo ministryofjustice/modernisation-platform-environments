@@ -5,7 +5,7 @@ locals {
   }
 
   db_config_lower_environments = {
-    name                 = "db_for_lower_environments"
+    name                 = "delius-core-db"
     ami_name             = "delius_core_ol_8_5_oracle_db_19c_patch_2023-06-12T12-32-07.259Z"
     instance             = {
       disable_api_termination       = true
@@ -19,15 +19,9 @@ locals {
       vpc_security_group_ids        = []
       private_dns_name_options      = {
         enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = false
-        hostname_type                        = "host_name_type_here"
+        enable_resource_name_dns_a_record    = true
+        hostname_type                        = "ip-name"
       }
     }
-    some_other_attribute = "some_other_attribute_for_db_from_lower_environment_config"
   }
-
-  #user_data_raw       = var.db_config.user_data_raw
-  #ebs_volume_config   = var.db_config_ebs_volume_config
-  #ebs_volumes         = var.db_config_ebs_volumes
-  #route53_records     = var.db_config_route53_records
 }
