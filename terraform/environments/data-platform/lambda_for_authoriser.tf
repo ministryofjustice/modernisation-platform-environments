@@ -1,3 +1,10 @@
+data "archive_file" "authoriser_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/src/authoriser"
+  output_path = "${path.module}/src/authoriser_${local.environment}/authoriser_lambda.zip"
+
+}
+
 data "aws_iam_policy_document" "iam_policy_document_for_authorizer_lambda" {
   statement {
     sid       = "LambdaLogGroup"
