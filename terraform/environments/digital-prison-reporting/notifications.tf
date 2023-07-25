@@ -24,8 +24,8 @@ module "slack_alerts" {
   depends_on = [module.notifications_sns]
   source     = "modules/notifications/email"
 
-  sns_topic_arn   = module.notifications_sns.sns_topic_arn
-  email_url = local.enable_slack_alerts ? data.aws_secretsmanager_secret_version.slack_integration[0].secret_string : null
+  sns_topic_arn = module.notifications_sns.sns_topic_arn
+  email_url     = local.enable_slack_alerts ? data.aws_secretsmanager_secret_version.slack_integration[0].secret_string : null
 
   tags = merge(
     local.all_tags,
@@ -51,8 +51,8 @@ module "pagerduty_notifications" {
 module "glue_status_change_rule" {
   depends_on = [module.notifications_sns]
 
-  source                = "modules/notifications/eventbridge"
-  sns_topic_arn         = module.notifications_sns.sns_topic_arn
+  source        = "modules/notifications/eventbridge"
+  sns_topic_arn = module.notifications_sns.sns_topic_arn
 
   rule_name         = "${local.project}-glue-jobs-status-change-rule-${local.environment}"
   event_target_name = "${local.project}-glue-rule-target-${local.environment}"
