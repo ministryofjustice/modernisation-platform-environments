@@ -8,18 +8,23 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
-        #not actually a secret
-        #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
         content: |
           # $ErrorActionPreference = "Stop" # set all errors to terminate script
 
           Set-TimeZone "GMT Standard Time"
           Set-WinSystemLocale "en-GB"
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        #not actually a secret
+        #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+        content: |
+          # $ErrorActionPreference = "Stop" # set all errors to terminate script
           # Check CWAgent is installed, if it isn't then install it
           $timeout = New-TimeSpan -Seconds 600
           $endTime = (Get-Date).Add($timeout)
           $cwagent = Get-Service -Name "AmazonCloudWatchAgent"
+          # TODO: check the ssm document is there first before trying to use it
           if ($cwagent) {
             Do {
             & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
@@ -32,7 +37,10 @@ tasks:
             & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
             } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
           }
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
           $S3_BUCKET = "ec2-image-builder-nomis20220314103938567000000001"
 
           # Download Java exe from S3 Bucket
@@ -63,7 +71,10 @@ tasks:
           if ($properties.PSObject.Properties.Name -contains $valueName) {
             Remove-ItemProperty -Path $javaPath -Name $valueName -Force
           }
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
           ######## EDGE GLOBAL CHANGES ########
           
           $reg_path = "HKLM:\SOFTWARE\Policies\Microsoft\Edge"
@@ -79,7 +90,10 @@ tasks:
           $reg_path = "HKLM:\SOFTWARE\Policies\Microsoft\Edge\PopupsAllowedForUrls"
           New-Item -Path $reg_path -Force
           New-ItemProperty -Path $reg_path -Name 1 -Value "[*.]justice.gov.uk" -PropertyType String -Force
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
           ######## IE COMPATIBILITY MODE SITE LIST ########
 
           $ie_compatibility_mode_site_list = @(
@@ -160,7 +174,10 @@ tasks:
 
           # Add compatibility list to registry
           New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Edge" -Name InternetExplorerIntegrationSiteList -Value $compatibility_site_list_path -PropertyType String -Force
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
           ######## CREATE DOMAIN ALLOW LIST FOR EDGE ########
 
           # The jumpserver is using IE Enhanced Security so each domain needs to be explicitly added to the following
@@ -217,8 +234,13 @@ tasks:
           }
           
           New-ItemProperty -Path $reg_path -Name Security_HKLM_only -Value 1 -PropertyType DWORD -Force
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
           ######## INSTALL SQL DEVELOPER ########
+
+          $S3_BUCKET = "ec2-image-builder-nomis20220314103938567000000001"
 
           # Download SQL Developer
           Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/sqldeveloper-22.2.1.234.1810-x64.zip -File C:\jumpserver-software\sqldeveloper-22.2.1.234.1810-x64.zip
@@ -231,13 +253,19 @@ tasks:
           $shortcut_link = $shortcut.CreateShortcut("C:\Users\Public\Desktop\SQL Developer.lnk")
           $shortcut_link.TargetPath = "C:\Program Files\Oracle\sqldeveloper\sqldeveloper.exe"
           $shortcut_link.Save()
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
           ######## INSTALL LIBREOFFICE ########
 
           choco install -y libreoffice-still
 
           ######## ADD DESKTOP SHORTCUTS FOR T1-3 ########
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
           for ($i = 1; $i -le 3; $i++) {
 
             $url = "https://c-t$i.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
