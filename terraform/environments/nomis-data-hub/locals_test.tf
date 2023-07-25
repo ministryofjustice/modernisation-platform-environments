@@ -24,7 +24,7 @@ locals {
         }
       }
 
-      t1-ndh-app-a = {
+      test_ndh_app_a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
         })
@@ -38,7 +38,7 @@ locals {
         }
       }
 
-      t1-ndh-ems-a = {
+      test_ndh_ems_a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
         })
