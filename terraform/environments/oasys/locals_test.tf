@@ -45,6 +45,7 @@ locals {
             branch = "oasys/web-index-html-updation"
           })
         })
+        autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
         tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
           "${local.application_name}-environment" = "t2"
