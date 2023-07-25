@@ -1,4 +1,8 @@
-variable "name" {
+variable "env_name" {
+  type = string
+}
+
+variable "app_name" {
   type = string
 }
 
@@ -12,16 +16,39 @@ variable "account_info" {
   })
 }
 
-variable "ldap_config" {
+variable "ldap_migration_bucket_arn" {
+  type = string
+}
+
+variable "network_config" {
   type = object({
-    name                 = string
-    some_other_attribute = optional(string)
+    shared_vpc_cidr                = string
+    private_subnet_ids             = list(string)
+    route53_inner_zone_info        = any
+    migration_environment_vpc_cidr = optional(string)
+    some_other_attribute           = optional(string)
   })
   default = {
-    name                 = "default_name"
-    some_other_attribute = "default_some_other_attribute"
+    shared_vpc_cidr                = "default_shared_vpc_cidr"
+    private_subnet_ids             = ["default_private_subnet_a_id"]
+    route53_inner_zone_info        = {}
+    migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
+    some_other_attribute           = "default_some_other_attribute"
   }
+}
 
+variable "ldap_config" {
+  type = object({
+    name                        = string
+    efs_backup_schedule         = string
+    efs_backup_retention_period = string
+
+  })
+  default = {
+    name                        = "default_name"
+    efs_backup_schedule         = "default_efs_backup_schedule",
+    efs_backup_retention_period = "default_efs_backup_retention_period"
+  }
 }
 
 variable "db_config" {
@@ -33,4 +60,8 @@ variable "db_config" {
     name                 = "default_name"
     some_other_attribute = "default_some_other_attribute"
   }
+}
+
+variable "tags" {
+  type = any
 }
