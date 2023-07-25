@@ -11,7 +11,7 @@
       "ec2_min_size": 2,
       "server_port": "80",
       "container_instance_type": "windows",
-      "container_version": "developmeßnt",
+      "container_version": "development",
       "container_cpu": "2048",
       "container_memory": "3072",
       "task_definition_volume": "upload_volume",
