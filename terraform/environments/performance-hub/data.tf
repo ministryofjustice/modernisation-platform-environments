@@ -16,7 +16,7 @@ data "template_file" "task_definition" {
     server_port                      = local.app_data.accounts[local.environment].server_port
     aws_region                       = local.app_data.accounts[local.environment].region
     container_version                = local.app_data.accounts[local.environment].container_version
-    db_host                          = aws_db_instance.database[0].address
+    db_host                          = local.app_data.accounts[local.environment].db_enabled ? aws_db_instance.database[0].address : "none"
     db_user                          = local.app_data.accounts[local.environment].db_user
     db_password                      = aws_secretsmanager_secret_version.db_password.arn
     mojhub_cnnstr                    = aws_secretsmanager_secret_version.mojhub_cnnstr.arn
