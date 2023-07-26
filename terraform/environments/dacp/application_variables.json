@@ -21,10 +21,46 @@
       "domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "moj_ip": "81.134.202.29/32",
+      "db_name": "dacp_db_pre_prod",
+      "identifier": "dacp-db-pre-prod",
+      "db_username": "dbadmin",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "engine": "postgres",
+      "engine_version": "14.4",
+      "instance_class": "db.t3.micro",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "client_id": "4c3ac31e-58d7-495e-bd98-e6eadf782d4a",
+      "curserver": "PREPRODUCTION",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432",
+      "domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "production": {
-      "example_var": "production-data"
+      "moj_ip": "81.134.202.29/32",
+      "db_name": "dacp_db_prod",
+      "identifier": "dacp-db-prod",
+      "db_username": "dbadmin",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "engine": "postgres",
+      "engine_version": "14.4",
+      "instance_class": "db.t3.micro",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "client_id": "304de4e5-f8be-4b00-9c0e-9e5495ab94a3",
+      "curserver": "PRODUCTION",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432",
+      "domain_name": "dacp.service.justice.gov.uk"
     }
   }
 }
