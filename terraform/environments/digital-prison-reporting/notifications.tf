@@ -21,7 +21,6 @@ module "notifications_sns" {
 module "slack_alerts" {
   count = local.enable_slack_alerts ? 1 : 0
 
-  depends_on = [module.notifications_sns]
   source     = "./modules/notifications/email"
 
   sns_topic_arn = module.notifications_sns.sns_topic_arn
@@ -36,7 +35,7 @@ module "slack_alerts" {
     }
   )
 
-  depends_on = [module.slack_alerts_url.secret_id]
+  depends_on = [module.notifications_sns, module.slack_alerts_url.secret_id]
 }
 
 # PagerDuty notifications
