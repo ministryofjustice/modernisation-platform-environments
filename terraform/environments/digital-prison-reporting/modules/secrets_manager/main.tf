@@ -25,7 +25,8 @@ resource "aws_secretsmanager_secret" "secret" {
   tags                    = var.tags
 }
 
-resource "aws_secretsmanager_secret_version" "secret_val_1" {
+# value managed on ui/console
+resource "aws_secretsmanager_secret_version" "secret_val_remote" {
   count         = var.type == "MONO" && var.ignore_secret_string == true ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
@@ -36,14 +37,15 @@ resource "aws_secretsmanager_secret_version" "secret_val_1" {
   }
 }
 
-resource "aws_secretsmanager_secret_version" "secret_val_2" {
+resource "aws_secretsmanager_secret_version" "secret_val" {
   count         = var.type == "MONO" && var.ignore_secret_string == false ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
   secret_string = var.generate_random ? random_password.random_string[0].result : var.secret_value
 }
 
-resource "aws_secretsmanager_secret_version" "secret_key_val_1" {
+# value managed on ui/console
+resource "aws_secretsmanager_secret_version" "secret_key_val_remote" {
   count         = var.type == "KEY_VALUE" && var.ignore_secret_string == true ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
@@ -54,7 +56,7 @@ resource "aws_secretsmanager_secret_version" "secret_key_val_1" {
   }
 }
 
-resource "aws_secretsmanager_secret_version" "secret_key_val_2" {
+resource "aws_secretsmanager_secret_version" "secret_key_val" {
   count         = var.type == "KEY_VALUE" && var.ignore_secret_string == false ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
