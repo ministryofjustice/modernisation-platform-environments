@@ -44,7 +44,15 @@ locals {
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
-    autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+    autoscaling_schedules    = {
+      "scale_up" = {
+        recurrence = "0 5 * * Mon-Fri"
+      }
+      "scale_down" = {
+        desired_capacity = 0
+        recurrence       = "0 19 * * Mon-Fri"
+      }
+    }
     autoscaling_group        = module.baseline_presets.ec2_autoscaling_group.default
     lb_target_groups = {
       pv-http-8080 = local.target_group_http_8080
