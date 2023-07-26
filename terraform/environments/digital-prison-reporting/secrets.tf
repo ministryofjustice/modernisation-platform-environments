@@ -77,7 +77,7 @@ module "pagerduty_integration_key" {
   name                    = "${local.project}-pagerduty-integration-key-${local.environment}"
   description             = "DPR PagerDuty Integration Key"
   type                    = "MONO"
-  secret_value            = "PAGERDUTY_INTEGRATION_KEY_PLACEHOLDER"
+  secret_value            = "PLACEHOLDER@EMAIL.COM"
   ignore_secret_string    = true
 
   tags = merge(
