@@ -1,15 +1,15 @@
 # This is an EC2Launch V2 type user-data script
 # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
 # See C:\ProgramData\Amazon\EC2Launch\log for logs
-version: 1.0
+version: 1.1
 tasks:
   - task: executeScript
     inputs:
       - frequency: once
         type: powershell
         runAs: admin
+        # Set time to local and locale
         content: |
-          # Set time to local and locale
           # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script 
 
           Set-TimeZone "GMT Standard Time"
@@ -17,8 +17,8 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
+        # Install apps        
         content: |
-          # Install apps
           # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script
 
           $apps = @(
@@ -39,8 +39,8 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
+        # Download SQL Developer
         content: |
-          # Download SQL Developer
           # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script
 
           $S3_BUCKET = "mod-platform-image-artefact-bucket20230203091453221500000001"
@@ -58,11 +58,10 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
+        # Download NDH specific files
+        # Doing it this way because 'Get-Objects' (folder download) permissions are not available
         content: |
-          # Download NDH specific files
-          # Doing it this way because 'Get-Objects' (folder download) permissions are not available
           # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script
-
           $S3_BUCKET_NDH = "nomis-data-hub-software20230309164626754200000003"
 
           $objects = Get-S3Object -BucketName $S3_BUCKET_NDH -Prefix "ndh-installation-files/WindowsInstalls/" -Delimiter '/'
@@ -87,37 +86,33 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
+        #not actually a secret
+        #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+        # Install Cloudwatch agent if missing, otherwise update config and start it
         content: |
-          # Configure and Start Amazon CloudWatch Agent or install and start if missing
-
-          # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script
-
-          $S3_BUCKET = "mod-platform-image-artefact-bucket20230203091453221500000001"
-          $cloud_watch_config = "C:\Program Files\Amazon\AmazonCloudWatchAgent\cloud_watch_windows.json"
-
-          Read-S3Object -BucketName $S3_BUCKET -Key "hmpps/cloudwatch/cloud_watch_windows.json" -File $cloud_watch_config
-
-          # terminates if cloud watch config file is missing
-          if (-Not (Test-Path $cloud_watch_config)) {
-            Write-Error "cloud watch config file for windows missing from $cloud_watch_config"
-            exit 1 
-          } else {
-            Write-Output "cloud watch config file for windows is present at $cloud_watch_config"
-          }
-
-          # Check CWAgent is installed, if it isn't then install it
+          # $ErrorActionPreference = "Stop" # set all errors to terminate script
           $timeout = New-TimeSpan -Seconds 600
           $endTime = (Get-Date).Add($timeout)
           $cwagent = Get-Service -Name "AmazonCloudWatchAgent"
+          
+          # Check if parameter doc exists before trying to use it
+          Get-SSMParameter -Name 'cloud-watch-config-windows' -Region 'eu-west-2'
+          if ($?) {
+            Write-Host "Parameter cloud-watch-config-windows found, continuing"
+          } else {
+            Write-Host "Parameter cloud-watch-config-windows not found, exiting"
+            exit 1
+          }
+
           if ($cwagent) {
             Do {
-            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c file:$cloud_watch_config
+            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
             } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
           } else {
             Invoke-WebRequest -Uri "https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi" -OutFile "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
             $cwagent_installer = "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
             Start-Process -FilePath msiexec.exe -ArgumentList "/i $cwagent_installer /qn" -Wait
             Do {
-            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c file:$cloud_watch_config
+            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
             } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
           }
