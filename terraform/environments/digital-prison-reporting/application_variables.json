@@ -23,7 +23,9 @@
       "enable_cloud_trail": true,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
-      "enable_dbuilder_apikey": true
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": false,
+      "enable_pagerduty_alerts": false
     },
     "test": {
       "project_short_id": "dpr",
@@ -48,7 +50,9 @@
       "enable_cloud_trail": true,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
-      "enable_dbuilder_apikey": true
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": true,
+      "enable_pagerduty_alerts": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -73,7 +77,9 @@
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
-      "enable_dbuilder_apikey": true
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": true,
+      "enable_pagerduty_alerts": true
     },
     "production": {
       "example_var": "production-data"
