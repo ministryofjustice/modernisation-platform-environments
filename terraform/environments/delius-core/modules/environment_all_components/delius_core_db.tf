@@ -24,14 +24,14 @@ module "ec2_instance" {
 
     ami_name            = var.db_config.ami_name # delius_core_ol_8_5_oracle_db_19c_patch_2023-06-12T12-32-07.259Z
     ami_owner           = var.db_config.ami_owner # 
-    instance            = merge(var.db_config_instance, {
+    instance            = merge(var.db_config.instance, {
         vpc_security_group_ids = [aws_security_group.base_ami_test_instance_sg.id] 
     })
 
     user_data_raw       = var.db_config.user_data_raw
-    ebs_volume_config   = var.db_config_ebs_volume_config
-    ebs_volumes         = var.db_config_ebs_volumes
-    route53_records     = var.db_config_route53_records
+    ebs_volume_config   = var.db_config.ebs_volume_config
+    ebs_volumes         = var.db_config.ebs_volumes
+    route53_records     = var.db_config.route53_records
 
     instance_profile_policies = [
         aws_iam_policy.base_ami_test_instance_iam_assume_policy.arn,
@@ -39,7 +39,7 @@ module "ec2_instance" {
         aws_iam_policy.core_shared_services_bucket_access.arn,
         aws_iam_policy.ec2_access_for_ansible.arn
     ]
-    tags = var.db_config_tags
+    tags = var.db_config.tags
 }
 
 

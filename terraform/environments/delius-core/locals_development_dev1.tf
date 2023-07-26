@@ -12,16 +12,6 @@ locals {
     name                 = try(local.db_config_lower_environments.name, "db")
     ami_name             = local.db_config_lower_environments.ami_name
     ami_owner            = local.environment_management.account_ids["core-shared-services-production"]
-    ebs_volume_config    = {}
-    ebs_volumes          = {}
-    route53_records      = {
-      create_internal_record = false
-      create_external_record = false
-    }
-    instance = merge(local.db_config_lower_environments.instance, {
-      instance_type = "r6i.xlarge"
-      monitoring    = false
-    })
 
     user_data_raw = base64encode(
       templatefile(
@@ -34,7 +24,38 @@ locals {
         }
       )
     )
-
+    instance = merge(local.db_config_lower_environments.instance, {
+      instance_type = "r6i.xlarge"
+      monitoring    = false
+    })
+    ebs_volumes = {}
+    #ebs_volumes          = merge(local.database_ec2_a.ebs_volumes, {
+    #  "/dev/sda1" = { label = "app", size = 30, type = "gp3" }
+    #  "/dev/sdb" = { label = "app", size = 200, type = "gp3" }
+    #  "/dev/sdc" = { label = "app", size = 100, type = "gp3" }
+    #  "/dev/sds" = { label = "app", size = 4, type = "gp3" }
+    #  "/dev/sde" = { label = "app", size = 1, type = "gp3" }
+    #  "/dev/sdf" = { label = "app", size = 1, type = "gp3" }
+    #  "/dev/sdg" = { label = "app", size = 1, type = "gp3" }
+    #  "/dev/sdh" = { label = "app", size = 1, type = "gp3" }
+    #  "/dev/sdi" = { label = "app", size = 1, type = "gp3" }
+    #  "/dev/sdj" = { label = "app", size = 1, type = "gp3" }
+    #  "/dev/sdk" = { label = "app", size = 1, type = "gp3" }
+    #})
+    ebs_volume_config = {}
+    #ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+    #  data  = 
+    #  {
+    #    total_size = 500 
+    #  }
+    #  flash = { 
+    #    total_size = 50 
+    #  }
+    #})
+    route53_records      = {
+      create_internal_record = true
+      create_external_record = false
+    }
     tags = merge(local.tags_all,
       { Name = lower(format("ec2-%s-%s-base-ami-test-instance", local.application_name, local.environment)) },
       { server-type = "delius_core_db" }
