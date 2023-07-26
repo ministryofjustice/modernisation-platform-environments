@@ -62,7 +62,7 @@ resource "null_resource" "cares_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "cares_db_credentials" {
-  name = "${local.cares}-credentials"
+  name = "${local.cares}-db-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "cares_db_credentials_version" {
