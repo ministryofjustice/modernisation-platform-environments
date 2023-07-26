@@ -35,22 +35,23 @@ module "slack_alerts" {
       Dept = "Digital-Prison-Reporting"
     }
   )
+
+  depends_on = [module.slack_alerts_url.secret_id]
 }
 
 # PagerDuty notifications
 module "pagerduty_notifications" {
   count      = local.enable_pagerduty_alerts ? 1 : 0
-  depends_on = [module.notifications_sns]
 
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = ["${local.project}-notification-topic-${local.environment}"]
   pagerduty_integration_key = data.aws_secretsmanager_secret_version.pagerduty_integration[0].secret_string
+
+  depends_on = [module.notifications_sns, module.pagerduty_integration_key.secret_id]
 }
 
 # Glue status change rule
 module "glue_status_change_rule" {
-  depends_on = [module.notifications_sns]
-
   source        = "./modules/notifications/eventbridge"
   sns_topic_arn = module.notifications_sns.sns_topic_arn
 
@@ -75,4 +76,6 @@ PATTERN
       Dept = "Digital-Prison-Reporting"
     }
   )
+
+  depends_on = [module.notifications_sns]
 }
