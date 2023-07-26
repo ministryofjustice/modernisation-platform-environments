@@ -136,3 +136,22 @@ POLICY
 
   depends_on = [aws_s3_bucket.storage]
 }
+
+
+# S3 bucket lambda trigger
+resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
+  count = var.create_s3 && var.enable_notification ? 1 : 0  
+  bucket = aws_s3_bucket.storage[0].id
+
+  dynamic "lambda_function" {
+    for_each = var.bucket_notifications != null ? [true] : []
+    content {
+      lambda_function_arn   = lookup(var.bucket_notifications, "lambda_function_arn", null)
+      events                = lookup(var.bucket_notifications, "events", null)
+      filter_prefix         = lookup(var.bucket_notifications, "filter_prefix", null)
+      filter_suffix         = lookup(var.bucket_notifications, "filter_suffix", null)
+    }
+  }
+
+  depends_on = [var.dependency_lambda]
+}

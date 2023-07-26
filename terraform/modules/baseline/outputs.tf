@@ -3,6 +3,21 @@ output "acm_certificates" {
   value       = module.acm_certificate
 }
 
+output "backups" {
+  description = "map of backups corresponding to var.backups"
+  value = {
+    for vault_key, vault_value in var.backups : vault_key => {
+      vault = vault_key == "everything" ? data.aws_backup_vault.everything : aws_backup_vault.this[vault_key]
+      plans = {
+        for plan_key, plan_value in vault_value.plans : plan_key => {
+          plan      = aws_backup_plan.this["${vault_key}-${plan_key}"]
+          selection = aws_backup_selection.this["${vault_key}-${plan_key}"]
+        }
+      }
+    }
+  }
+}
+
 output "bastion_linux" {
   description = "See bastion_linux module github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux for more detail"
   value       = length(module.bastion_linux) == 1 ? module.bastion_linux[0] : null
@@ -11,6 +26,16 @@ output "bastion_linux" {
 output "cloudwatch_log_groups" {
   description = "map of aws_cloudwatch_log_group resources"
   value       = aws_cloudwatch_log_group.this
+}
+
+output "cloudwatch_log_metric_filters" {
+  description = "map of aws_cloudwatch_log_metric_filter resources"
+  value       = aws_cloudwatch_log_metric_filter.this
+}
+
+output "cloudwatch_metric_alarms" {
+  description = "map of aws_cloudwatch_metric_alarm resources"
+  value       = aws_cloudwatch_metric_alarm.this
 }
 
 output "ec2_autoscaling_groups" {

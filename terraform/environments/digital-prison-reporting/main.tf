@@ -47,13 +47,13 @@ module "glue_reporting_hub_job" {
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
     "--dpr.aws.region"                          = local.account_region
     "--dpr.curated.s3.path"                     = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.kinesis.reader.batchDurationSeconds" = 1
+    "--dpr.kinesis.reader.batchDurationSeconds" = 60
     "--dpr.kinesis.reader.streamName"           = local.kinesis_stream_ingestor
     "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/"
     "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/"
     "--enable-metrics"                          = true
-    "--enable-spark-ui"                         = true
+    "--enable-spark-ui"                         = false
     "--enable-auto-scaling"                     = true
     "--enable-job-insights"                     = true
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
@@ -364,10 +364,21 @@ module "s3_violation_bucket" {
 
 # S3 Bucket (Application Artifacts Store)
 module "s3_artifacts_store" {
-  source         = "./modules/s3_bucket"
-  create_s3      = local.setup_buckets
-  name           = "${local.project}-artifact-store-${local.environment}"
-  custom_kms_key = local.s3_kms_arn
+  source              = "./modules/s3_bucket"
+  create_s3           = local.setup_buckets
+  name                = "${local.project}-artifact-store-${local.environment}"
+  custom_kms_key      = local.s3_kms_arn
+  enable_notification = true #
+ 
+  # Dynamic, supports multiple notifications blocks
+  bucket_notifications = {
+    "lambda_function_arn"   = "${module.domain_builder_flyway_Lambda.lambda_function}"
+    "events"                = ["s3:ObjectCreated:*"]
+    "filter_prefix"         = "build-artifacts/domain-builder/jars/"
+    "filter_suffix"         = ".jar"
+  }
+
+  dependency_lambda = [module.domain_builder_flyway_Lambda.lambda_function] # Required if bucket_notications is enabled
 
   tags = merge(
     local.all_tags,

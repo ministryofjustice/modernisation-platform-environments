@@ -285,7 +285,7 @@ resource "aws_instance" "s618358rgvw020" {
 
 resource "aws_instance" "s618358rgvw021" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-031ef868c45661b8e"
+  ami                    = "ami-05ddec53aa481cbc3"
   instance_type          = "m5.2xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -300,7 +300,7 @@ resource "aws_instance" "s618358rgvw021" {
 
 resource "aws_instance" "s618358rgvw022" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0ea8a11d51f242c52"
+  ami                    = "ami-02f8251c8cdf2464f"
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -315,7 +315,7 @@ resource "aws_instance" "s618358rgvw022" {
 
 resource "aws_instance" "s618358rgvw027" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0280b58742d303104"
+  ami                    = "ami-0e203fec985af6465"
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -422,6 +422,27 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
   }
 }
 
+resource "aws_instance" "docker-build-server" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0b026d11830afcbac"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.docker-build-server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+  root_block_device {
+    delete_on_termination = true
+    volume_size = "40"
+    volume_type = "gp2"
+  }
+  tags = {
+    Name          = "docker-build-server"
+    is-production = true
+    patch_group   = "prod_lin_patch"
+  }
+}
+
 resource "aws_key_pair" "cjms_instance" {
   count      = local.is-production == true ? 1 : 0
   key_name   = "linuxcjms"
@@ -430,16 +451,16 @@ resource "aws_key_pair" "cjms_instance" {
 
 # resource block for eip
 resource "aws_eip" "s265903rgsl400-non-cjsm" {
-  count = local.is-production == true ? 1 : 0
-  domain   = "vpc"
+  count  = local.is-production == true ? 1 : 0
+  domain = "vpc"
   tags = {
     Name = "s265903rgsl400-non-cjsm"
   }
 }
 
 resource "aws_eip" "s265903rgsl401-cjsm" {
-  count = local.is-production == true ? 1 : 0
-  domain   = "vpc"
+  count  = local.is-production == true ? 1 : 0
+  domain = "vpc"
   tags = {
     Name = "s265903rgsl401-cjsm"
   }

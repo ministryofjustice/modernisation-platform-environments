@@ -15,11 +15,17 @@
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
-      "enable_dms_replication_task": true,      
+      "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
       "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
-      "enable_cloud_trail": true
+      "enable_cloud_trail": true,
+      "include_dbuilder_gw_vpclink": false,
+      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": false,
+      "enable_pagerduty_alerts": false
     },
     "test": {
       "project_short_id": "dpr",
@@ -37,10 +43,16 @@
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
       "enable_dms_replication_task": true,
-      "enable_domain_builder_lambda": false,
-      "enable_domain_builder_rds": false,
-      "enable_domain_builder_agent": false,
-      "enable_cloud_trail": true
+      "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
+      "enable_domain_builder_rds": true,
+      "enable_domain_builder_agent": true,
+      "enable_cloud_trail": true,
+      "include_dbuilder_gw_vpclink": false,
+      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": true,
+      "enable_pagerduty_alerts": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -57,11 +69,17 @@
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
-      "enable_dms_replication_task": false,      
-      "enable_domain_builder_lambda": false,
-      "enable_domain_builder_rds": false,
-      "enable_domain_builder_agent": false,
-      "enable_cloud_trail": false
+      "enable_dms_replication_task": false,
+      "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
+      "enable_domain_builder_rds": true,
+      "enable_domain_builder_agent": true,
+      "enable_cloud_trail": false,
+      "include_dbuilder_gw_vpclink": false,
+      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": true,
+      "enable_pagerduty_alerts": true
     },
     "production": {
       "example_var": "production-data"

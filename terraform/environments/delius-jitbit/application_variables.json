@@ -24,6 +24,7 @@
       "db_user": "admin",
       "db_allocated_storage": "100",
       "db_max_allocated_storage": "200",
+      "db_storage_type": "gp3",
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
@@ -57,6 +58,7 @@
       "db_user": "admin",
       "db_allocated_storage": "100",
       "db_max_allocated_storage": "200",
+      "db_storage_type": "gp3",
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
@@ -64,13 +66,15 @@
       "db_performance_insights_enabled": "false",
       "db_deletion_protection": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "cr-jitbit-training-db-snapshot-for-testing-migration-to-mp-local"
+      "db_snapshot_identifier": "copied-jitbit-training-migration-mp"
     },
     "preproduction": {
-      "db_instance_class": "db.t3.xlarge"
+      "db_instance_class": "db.t3.xlarge",
+      "db_storage_type": "gp3"
     },
     "production": {
-      "db_instance_class": "db.t3.xlarge"
+      "db_instance_class": "db.t3.xlarge",
+      "db_storage_type": "gp3"
     }
   }
 }

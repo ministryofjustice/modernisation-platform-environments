@@ -12,6 +12,7 @@ locals {
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
+    enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
@@ -48,6 +49,8 @@ locals {
 
   baseline_acm_certificates = {}
 
+  baseline_backup_plans = {}
+
   baseline_bastion_linux = {
     public_key_data = merge(
       jsondecode(file(".ssh/user-keys.json"))["all-environments"],
@@ -64,6 +67,19 @@ locals {
   baseline_cloudwatch_log_groups = merge(
     local.weblogic_cloudwatch_log_groups,
     local.database_cloudwatch_log_groups,
+  )
+
+  baseline_cloudwatch_metric_alarms = {
+    for key, value in module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dba_pagerduty"].database_dba_by_dbname : key => merge(value, {
+      split_by_dimension = {
+        dimension_name   = "dbname"
+        dimension_values = local.baseline_environment_config.cloudwatch_metric_alarms_dbnames
+      }
+    })
+  }
+
+  baseline_cloudwatch_log_metric_filters = merge(
+    local.database_cloudwatch_log_metric_filters,
   )
 
   baseline_ec2_autoscaling_groups   = {}

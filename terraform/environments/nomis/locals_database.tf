@@ -23,6 +23,31 @@ locals {
     }
   }
 
+  # Include these in ec2-instance ssm parameters if using the misload role
+  # paths are /database/<ec2_instance_name>/<each_parameter>
+  database_ec2_misload_ssm_parameters = {
+    prefix = "/database/"
+    parameters = {
+      misloadusername = {}
+      misloadpassword = {}
+    }
+  }
+
+  database_cloudwatch_log_metric_filters = {
+    rman-backup-status = {
+      pattern        = "[month, day, time, hostname, process, message = rman-backup-result, dbname, value]"
+      log_group_name = "cwagent-var-log-messages"
+      metric_transformation = {
+        name      = "RmanBackupStatus"
+        namespace = "Database" # custom namespace
+        value     = "$value"
+        dimensions = {
+          dbname = "$dbname"
+        }
+      }
+    }
+  }
+
   database_cloudwatch_metric_alarms = {
     oracle-db-disconnected = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -118,6 +143,17 @@ locals {
       threshold           = "95"
       alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on a nomis-db instance"
     }
+    rman-backup-failed = {
+      comparison_operator = "LessThanOrEqualToThreshold"
+      evaluation_periods  = 2
+      metric_name         = "RmanBackupStatus"
+      namespace           = "Database"
+      period              = "3600"
+      statistic           = "Maximum"
+      threshold           = "0"
+      alarm_description   = "Triggers if there has been no successful rman backup"
+      datapoints_to_alarm = 1
+    }
   }
 
   database_cloudwatch_metric_alarms_lists = {
@@ -147,6 +183,12 @@ locals {
         { key = "database", name = "oracleasm-service" },
         { key = "database", name = "oracle-ohasd-service" },
         { key = "database", name = "cpu-utilization-high-db-2hrs" },
+      ]
+    }
+    database_dba_by_dbname = {
+      parent_keys = []
+      alarms_list = [
+        { key = "database", name = "rman-backup-failed" },
       ]
     }
     database_dba_high_priority = {
@@ -187,6 +229,9 @@ locals {
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
       vpc_security_group_ids       = ["data-db"]
+      tags = {
+        backup-plan = "daily-and-weekly"
+      }
     })
 
     user_data_cloud_init = {
@@ -257,7 +302,6 @@ locals {
       os-version           = "RHEL 7.9"
       licence-requirements = "Oracle Database"
       "Patch Group"        = "RHEL"
-      backup               = "true"
     }
   }
 

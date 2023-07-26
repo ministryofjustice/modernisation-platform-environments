@@ -51,6 +51,9 @@ locals {
 
   baseline_security_groups = {
     data-db = local.security_groups.data_db
+    migration-web-sg = local.security_groups.Web-SG-migration
+    migration-app-sg = local.security_groups.App-SG-migration
+    migration-db-sg = local.security_groups.DB-SG-migration
   }
 
   baseline_sns_topics = {}

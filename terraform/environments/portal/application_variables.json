@@ -30,18 +30,26 @@
       "idm_config_snapshot": "snap-0ec8e0fb2421b8b8f",
       "idm_mserver_snapshot": "snap-0f196a2f2f8bc532f",
       "idm_instances_snapshot": "snap-058ee73f8e4a01b75",
-      "lb_access_logs_existing_bucket_name": ""
+      "lb_access_logs_existing_bucket_name": "",
+      "url": "s3://laa-portal-development-archive-mp",
+      "maintenance_window_name": "diagnostics-log-archive-poc"
+
+
     },
     "test": {
       "example_var": "test-data"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "example_var": "preproduction-data",
+      "url": "s3://laa-portal-preproduction-archive-mp",
+      "maintenance_window_name": "diagnostics-log-archive-preproduction"
     },
     "production": {
       "example_var": "production-data",
       "existing_archive_bucket_name": "",
-      "ohs_instance_type": "m5.xlarge"
+      "ohs_instance_type": "m5.xlarge",
+      "url": "s3://laa-portal-production-archive-mp",
+      "maintenance_window_name": "diagnostics-log-archive-production"
     }
   }
 }

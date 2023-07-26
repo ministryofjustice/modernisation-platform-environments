@@ -5,6 +5,21 @@ locals {
   dms_iam_role_permissions_boundary = null
 }
 
+# APIGateway Get Policy
+resource "aws_iam_policy" "apigateway_get" {
+  name = "${local.project}_apigateway_get_policy"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "APIGatewayGETPermissions",
+        "Action" : ["apigateway:GET"],
+        "Effect" : "Allow",
+        "Resource" : ["arn:aws:apigateway:${local.current_account_region}::/apis/*"]
+      }
+    ]
+  })
+}
 
 ## Glue DB Default Policy
 resource "aws_glue_resource_policy" "glue_policy" {

@@ -29,7 +29,7 @@ resource "aws_api_gateway_integration" "upload_data_to_lambda" {
   rest_api_id             = aws_api_gateway_rest_api.data_platform.id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.presigned_url.invoke_arn
+  uri                     = module.data_product_presigned_url_lambda.lambda_function_invoke_arn
 
   request_parameters = {
     "integration.request.querystring.database"   = "method.request.querystring.database",
@@ -75,7 +75,7 @@ resource "aws_api_gateway_stage" "sandbox" {
 resource "aws_api_gateway_authorizer" "authorizer" {
   name                   = "authorizer-${local.environment}"
   rest_api_id            = aws_api_gateway_rest_api.data_platform.id
-  authorizer_uri         = aws_lambda_function.authoriser.invoke_arn
+  authorizer_uri         = module.data_product_authorizer_lambda.lambda_function_invoke_arn
   authorizer_credentials = aws_iam_role.authoriser_role.arn
   identity_source        = "method.request.header.authorizationToken"
 }

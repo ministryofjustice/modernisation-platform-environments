@@ -106,11 +106,11 @@ resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
 resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
   bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
   rule {
-    id      = "Remove_Old_SSM_Health_Check_Reports"
-    status  = "Enabled"
+    id     = "Remove_Old_SSM_Health_Check_Reports"
+    status = "Enabled"
 
     filter {
-     prefix = "ssm_output/"
+      prefix = "ssm_output/"
     }
 
     noncurrent_version_transition {
@@ -128,54 +128,30 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
 # S3 block public access
 
 resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
-  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
+  bucket                  = aws_s3_bucket.MoJ-Health-Check-Reports.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
-# S3 Bucket Access Policy for SSM Health Check Reports
-# Note I was having some issues getting this policy applied, kept receiving an access denied error
-# Also it is deliberately permissive to confirm functionality, so it needs to be locked down as per the other S3 buckets
 
-/*
-resource "aws_s3_bucket_policy" "MoJ-Health-Check-Reports" {
-  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id 
+#########################
+# MoJ- Scripts S3 Bucket
+#########################
 
-policy = jsonencode(
-    {
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = "*",
-        Action = "s3:*",
-        Resource = "arn:aws:s3:::MoJ-Health-Check-Reports/*"
-      }
-    ]
-  }
- )
-}
-*/
-
-
-####################################
-# MoJ- Powershell-Scripts S3 Bucket
-####################################
-
-resource "aws_s3_bucket" "MoJ-Powershell-Scripts" {
+resource "aws_s3_bucket" "moj-scripts" {
   count  = local.is-production == true ? 1 : 0
-  bucket = "moj-powershell-scripts"
+  bucket = "moj-scripts"
   tags = {
-    Name = "moj-powershell-scripts"
+    Name = "moj-scripts"
   }
 }
 
 
-resource "aws_s3_bucket_public_access_block" "MoJ-Powershell-Scripts" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.MoJ-Powershell-Scripts[0].id
+resource "aws_s3_bucket_public_access_block" "moj-scripts" {
+  count                   = local.is-production == true ? 1 : 0
+  bucket                  = aws_s3_bucket.moj-scripts[0].id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -183,30 +159,30 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Powershell-Scripts" {
 }
 
 
-resource "aws_s3_bucket_policy" "MoJ-Powershell-Scripts" {
-  depends_on = [aws_s3_bucket_public_access_block.MoJ-Powershell-Scripts]
+resource "aws_s3_bucket_policy" "moj-scripts" {
   count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.MoJ-Powershell-Scripts[0].id
+  bucket = aws_s3_bucket.moj-scripts[0].id
   
   policy = jsonencode({
 
-  "Id": "Policy1688734640187",
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "Stmt1688734634654",
       "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
         "s3:PutObject",
-        "s3:ListObject"
+        "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::moj-powershell-scripts/*",
+      "Resource": [
+      "arn:aws:s3:::moj-scripts",
+      "arn:aws:s3:::moj-scripts/*"
+      ],
       "Principal": {
         "AWS": [
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:root",
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:root" 
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role" 
       ]
       }
     }
@@ -227,10 +203,28 @@ resource "aws_s3_bucket" "MoJ-Release-Management" {
   }
 }
 
-
-resource "aws_s3_bucket_public_access_block" "MoJ-Release-Management" {
+resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Release-Management" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.MoJ-Release-Management[0].id
+  rule {
+    id     = "Remove_Old_MoJ-Release-Management"
+    status = "Enabled"
+
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "MoJ-Release-Management" {
+  count                   = local.is-production == true ? 1 : 0
+  bucket                  = aws_s3_bucket.MoJ-Release-Management[0].id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -239,32 +233,32 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Release-Management" {
 
 
 resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
-  depends_on = [aws_s3_bucket_public_access_block.MoJ-Release-Management]
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.MoJ-Release-Management[0].id
   
   policy = jsonencode({
 
-  "Id": "Policy1688734640188",
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "Stmt1688734634655",
-      "Action": [
+        "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
         "s3:PutObject",
-        "s3:ListObject"
+        "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::moj-release-management/*",
+      "Resource": [
+        "arn:aws:s3:::moj-release-management",
+        "arn:aws:s3:::moj-release-management/*"
+      ],
       "Principal": {
         "AWS": [
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:root",
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:root" 
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role" 
       ]
       }
     }
-  ]
-})
+    ]
+  })
 }

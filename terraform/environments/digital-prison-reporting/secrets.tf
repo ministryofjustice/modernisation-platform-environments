@@ -46,3 +46,47 @@ resource "aws_secretsmanager_secret_version" "redshift" {
   secret_id     = aws_secretsmanager_secret.redshift.id
   secret_string = jsonencode(local.redshift_secrets)
 }
+
+# Slack Alerts URL
+module "slack_alerts_url" {
+  count                   = local.enable_slack_alerts ? 1 : 0
+
+  source                  = "./modules/secrets_manager"
+  name                    = "${local.project}-slack-alerts-url-${local.environment}"
+  description             = "DPR Slack Alerts URL"
+  type                    = "MONO"
+  secret_value            = "SLACK_ALERTS_URL_PLACEHOLDER"
+  ignore_secret_string    = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "monitoring"
+      Jira           = "DPR-569"
+      Resource_Type  = "Secret"
+      Name           = "${local.project}-slack-alerts-url-${local.environment}"      
+    }
+  )
+}
+
+# PagerDuty Integration Key
+module "pagerduty_integration_key" {
+  count                   = local.enable_pagerduty_alerts ? 1 : 0
+
+  source                  = "./modules/secrets_manager"
+  name                    = "${local.project}-pagerduty-integration-key-${local.environment}"
+  description             = "DPR PagerDuty Integration Key"
+  type                    = "MONO"
+  secret_value            = "PLACEHOLDER@EMAIL.COM"
+  ignore_secret_string    = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "monitoring"
+      Jira           = "DPR-569"
+      Resource_Type  = "Secret"
+      Name           = "${local.project}-pagerduty-integration-key-${local.environment}"
+    }
+  )
+}
