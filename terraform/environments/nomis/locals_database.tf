@@ -46,6 +46,18 @@ locals {
         }
       }
     }
+    misload-status = {
+      pattern = "[month, day, time, hostname, process, message = misload-status, dbname, value, message = last-triggered:, year-month-day, utc-time]"
+      log_group_name = "cwagent-var-log-messages"
+      metric_transformation = {
+        name      = "MisloadStatus"
+        namespace = "Database" # custom namespace
+        value     = "$value"
+        dimensions = {
+          dbname = "$dbname"
+        }
+      }
+    }
   }
 
   database_cloudwatch_metric_alarms = {
@@ -154,6 +166,17 @@ locals {
       alarm_description   = "Triggers if there has been no successful rman backup"
       datapoints_to_alarm = 1
     }
+    /* misload-failed = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = 2
+      metric_name         = "MisloadStatus"
+      namespace           = "Database"
+      period              = "3600"
+      statistic           = "Maximum"
+      threshold           = "1"
+      alarm_description   = "Triggers if misload failed"
+      datapoints_to_alarm = 2
+    } */
   }
 
   database_cloudwatch_metric_alarms_lists = {
