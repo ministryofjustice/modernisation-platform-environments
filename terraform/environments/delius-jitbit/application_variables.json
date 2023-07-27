@@ -39,7 +39,7 @@
     },
     "test": {
       "migration_source_account_id": "377957503799",
-      "migration_source_account_name": "cr-jitbit-preproduction",
+      "migration_source_account_name": "cr-jitbit-training",
       "network_mode": "bridge",
       "app_count": "1",
       "server_port": "5000",
@@ -76,7 +76,7 @@
     },
     "preproduction": {
       "migration_source_account_id": "377957503799",
-      "migration_source_account_name": "cr-jitbit-training",
+      "migration_source_account_name": "cr-jitbit-preproduction",
       "network_mode": "bridge",
       "app_count": "1",
       "server_port": "5000",
