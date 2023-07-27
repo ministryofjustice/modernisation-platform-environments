@@ -26,7 +26,7 @@ resource "aws_db_instance" "database" {
   backup_window                       = "03:00-06:00"
   final_snapshot_identifier           = "final-snapshot"
   kms_key_id                          = aws_kms_key.rds.arn
-  deletion_protection                 = false
+  deletion_protection                 = true
   option_group_name                   = aws_db_option_group.db_option_group.name
   db_subnet_group_name                = aws_db_subnet_group.db.id
   enabled_cloudwatch_logs_exports     = ["error"]
