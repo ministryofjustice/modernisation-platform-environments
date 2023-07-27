@@ -238,7 +238,6 @@ resource "aws_volume_attachment" "backup_att" {
 }
 
 resource "aws_ebs_volume" "redoB" {
-  count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -254,7 +253,6 @@ resource "aws_ebs_volume" "redoB" {
 }
 
 resource "aws_volume_attachment" "redoB_att" {
-  count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   depends_on = [
     aws_ebs_volume.redoB
   ]
@@ -264,7 +262,6 @@ resource "aws_volume_attachment" "redoB_att" {
 }
 
 resource "aws_ebs_volume" "diag" {
-  count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -280,7 +277,6 @@ resource "aws_ebs_volume" "diag" {
 }
 
 resource "aws_volume_attachment" "diag_att" {
-  count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   depends_on = [
     aws_ebs_volume.diag
   ]
