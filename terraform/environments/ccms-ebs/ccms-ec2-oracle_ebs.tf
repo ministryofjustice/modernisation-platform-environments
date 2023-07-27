@@ -257,7 +257,7 @@ resource "aws_volume_attachment" "redoB_att" {
     aws_ebs_volume.redoB
   ]
   device_name = "/dev/sdo"
-  volume_id   = aws_ebs_volume.redoB[0].id
+  volume_id   = aws_ebs_volume.redoB.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
