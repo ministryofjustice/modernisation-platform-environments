@@ -5,7 +5,6 @@
 
 resource "aws_security_group" "sg_db" {
   name        = format("%s-%s-sg", var.env_name, var.db_config.name)
-  description = var.db_config.some_other_attribute
   vpc_id      = var.account_info.vpc_id
   tags        = {}
 }

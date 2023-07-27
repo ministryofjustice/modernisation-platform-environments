@@ -17,7 +17,6 @@ locals {
     migration_lambda_role       = local.ldap_config_lower_environments.migration_lambda_role
     efs_throughput_mode         = local.ldap_config_lower_environments.efs_throughput_mode
     efs_provisioned_throughput  = local.ldap_config_lower_environments.efs_provisioned_throughput
-    some_other_attribute        = "some_other_attribute_for_ldap_in_dev"
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
   }
@@ -25,7 +24,6 @@ locals {
   db_config_dev = {
     name                 = try(local.db_config_lower_environments.name, "db")
     ami_name             = local.db_config_lower_environments.ami_name
-    some_other_attribute = "some_other_attribute_for_db_in_dev"
   }
 
 }

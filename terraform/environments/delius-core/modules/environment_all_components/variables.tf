@@ -28,7 +28,6 @@ variable "network_config" {
     route53_inner_zone_info        = any
     migration_environment_vpc_cidr = optional(string)
     general_shared_kms_key_arn      = optional(string)
-    some_other_attribute           = optional(string)
   })
   default = {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
@@ -36,7 +35,6 @@ variable "network_config" {
     route53_inner_zone_info        = {}
     migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
     general_shared_kms_key_arn      = "default_general_shared_kms_key_arn"
-    some_other_attribute           = "default_some_other_attribute"
   }
 }
 
@@ -65,11 +63,9 @@ variable "ldap_config" {
 variable "db_config" {
   type = object({
     name                 = string
-    some_other_attribute = optional(string)
   })
   default = {
     name                 = "default_name"
-    some_other_attribute = "default_some_other_attribute"
   }
 }
 
