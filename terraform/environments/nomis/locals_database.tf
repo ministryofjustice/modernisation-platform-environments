@@ -47,7 +47,7 @@ locals {
       }
     }
     misload-status = {
-      pattern = "[month, day, time, hostname, process, message1 = misload-status, dbname, value, message2 = last-triggered, yearmonthday, utctime]"
+      pattern = "[month, day, time, hostname, process, message1 = misload-status, dbname, value, last-triggered, yearmonthday, utctime]"
       log_group_name = "cwagent-var-log-messages"
       metric_transformation = {
         name      = "MisloadStatus"
