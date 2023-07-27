@@ -64,7 +64,7 @@ resource "aws_route53_record" "external" {
 resource "aws_acm_certificate" "external_prod" {
   count = local.is-production ? 1 : 0
 
-  domain_name       = "dacp.service.justice.gov.uk"
+  domain_name       = "divorce-section-search.service.justice.gov.uk"
   validation_method = "DNS"
   lifecycle {
     create_before_destroy = true
@@ -100,7 +100,7 @@ resource "aws_route53_record" "external_prod" {
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application_zone.zone_id
-  name    = "dacp.service.justice.gov.uk"
+  name    = "divorce-section-search.service.justice.gov.uk"
   type    = "A"
 
   alias {
