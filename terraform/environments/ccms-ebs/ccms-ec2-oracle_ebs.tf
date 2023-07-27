@@ -238,7 +238,6 @@ resource "aws_volume_attachment" "backup_att" {
 }
 
 resource "aws_ebs_volume" "redoB" {
-  count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -254,17 +253,15 @@ resource "aws_ebs_volume" "redoB" {
 }
 
 resource "aws_volume_attachment" "redoB_att" {
-  count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   depends_on = [
     aws_ebs_volume.redoB
   ]
   device_name = "/dev/sdo"
-  volume_id   = aws_ebs_volume.redoB[0].id
+  volume_id   = aws_ebs_volume.redoB.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 resource "aws_ebs_volume" "diag" {
-  count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -280,12 +277,11 @@ resource "aws_ebs_volume" "diag" {
 }
 
 resource "aws_volume_attachment" "diag_att" {
-  count = local.is-production || local.is-preproduction || local.is-development ? 1 : 0
   depends_on = [
     aws_ebs_volume.diag
   ]
   device_name = "/dev/sdp"
-  volume_id   = aws_ebs_volume.diag[0].id
+  volume_id   = aws_ebs_volume.diag.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 /*
