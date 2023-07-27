@@ -133,7 +133,7 @@ resource "aws_volume_attachment" "stage_att" {
   count       = local.application_data.accounts[local.environment].ebsapps_no_instances
   depends_on  = [aws_ebs_volume.stage]
   device_name = "/dev/sdk"
-  volume_id   = aws_ebs_volume.stage.id
+  volume_id   = aws_ebs_volume.stage[count.index].id
   instance_id = aws_instance.ec2_ebsapps[count.index].id
 }
 
