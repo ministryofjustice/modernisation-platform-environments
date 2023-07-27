@@ -37,14 +37,14 @@ module "s3_bucket_ldap_deployment" {
     }
   ]
 
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_security_group" "ldap" {
   name        = "${var.env_name}-ldap-sg"
   description = "Security group for the ${var.env_name} ldap service"
   vpc_id      = var.account_info.vpc_id
-  tags        = var.tags
+  tags        = local.tags
   lifecycle {
     create_before_destroy = true
   }
@@ -104,7 +104,7 @@ data "aws_iam_policy_document" "ecs_task" {
 resource "aws_iam_role" "ldap_ecs_task" {
   name               = "${var.env_name}-ldap-task"
   assume_role_policy = data.aws_iam_policy_document.ecs_task.json
-  tags               = var.tags
+  tags               = local.tags
 }
 
 data "aws_iam_policy_document" "ecs_service" {
@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "ecs_service" {
 resource "aws_iam_role" "ldap_ecs_service" {
   name               = "${var.env_name}-ldap-service"
   assume_role_policy = data.aws_iam_policy_document.ecs_service.json
-  tags               = var.tags
+  tags               = local.tags
 }
 
 data "aws_iam_policy_document" "ecs_service_policy" {
@@ -165,7 +165,7 @@ data "aws_iam_policy_document" "ecs_ssm_exec" {
 data "aws_iam_policy_document" "ecs_s3" {
   statement {
     effect    = "Allow"
-    resources = [var.ldap_migration_bucket_arn]
+    resources = [module.s3_bucket_migration.bucket.arn]
 
     actions = [
       "s3:*"
@@ -200,7 +200,7 @@ data "aws_iam_policy_document" "ecs_task_exec" {
 resource "aws_iam_role" "ldap_ecs_exec" {
   name               = "${var.env_name}-ldap-task-exec"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_exec.json
-  tags               = var.tags
+  tags               = local.tags
 }
 
 data "aws_iam_policy_document" "ecs_exec" {

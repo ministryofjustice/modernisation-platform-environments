@@ -15,7 +15,7 @@ module "environment_dev1" {
   env_name = "dev1"
   app_name = local.application_name
 
-  ldap_migration_bucket_arn = module.s3_bucket_migration.bucket.arn
+  #ldap_migration_bucket_arn = module.s3_bucket_migration.bucket.arn
 
   network_config = local.network_config_dev1
   ldap_config    = local.ldap_config_dev1

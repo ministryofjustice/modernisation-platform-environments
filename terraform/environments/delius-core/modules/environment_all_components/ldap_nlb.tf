@@ -2,7 +2,7 @@ locals {
   ldap_name     = "${var.env_name}-ldap"
   ldap_nlb_name = "${local.ldap_name}-nlb"
   ldap_nlb_tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = local.ldap_nlb_name
     }
@@ -44,7 +44,7 @@ resource "aws_lb_target_group" "ldap" {
   target_type          = "ip"
   deregistration_delay = "30"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = local.ldap_name
     }
@@ -55,7 +55,7 @@ resource "aws_lb_target_group" "ldap" {
 resource "aws_route53_record" "ldap_dns_internal" {
   provider = aws.core-vpc
   zone_id  = var.network_config.route53_inner_zone_info.zone_id
-  name     = "${var.env_name}.ldap.${var.network_config.route53_inner_zone_info.zone_id}"
+  name     = "${var.env_name}.ldap.${var.account_info.application_name}"
   type     = "A"
 
   alias {

@@ -1,7 +1,7 @@
 resource "aws_backup_vault" "ldap_backup_vault" {
   name = "${var.env_name}-ldap-efs-backup-vault"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.env_name}-ldap-efs-backup-vault"
     },
@@ -29,7 +29,7 @@ resource "aws_backup_plan" "ldap_backup_plan" {
   }
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.env_name}-ldap-efs-backup-plan"
     },
@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "delius_core_backup" {
 resource "aws_iam_role" "ldap_efs_backup_role" {
   name               = "${var.env_name}-ldap-efs-backup-role"
   assume_role_policy = data.aws_iam_policy_document.delius_core_backup.json
-  tags               = var.tags
+  tags               = local.tags
 }
 
 data "aws_iam_policy_document" "delius_core_backup_policy" {

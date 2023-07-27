@@ -9,16 +9,17 @@ variable "app_name" {
 # Account level info
 variable "account_info" {
   type = object({
-    business_unit  = string,
-    region         = string,
-    vpc_id         = string,
-    mp_environment = string
+    business_unit    = string,
+    region           = string,
+    vpc_id           = string,
+    application_name = string,
+    mp_environment   = string
   })
 }
 
-variable "ldap_migration_bucket_arn" {
-  type = string
-}
+#variable "ldap_migration_bucket_arn" {
+#  type = string
+#}
 
 variable "network_config" {
   type = object({
@@ -40,13 +41,17 @@ variable "network_config" {
 variable "ldap_config" {
   type = object({
     name                        = string
+    migration_source_account_id = string
+    migration_lambda_role       = string
     efs_backup_schedule         = string
     efs_backup_retention_period = string
 
   })
   default = {
     name                        = "default_name"
-    efs_backup_schedule         = "default_efs_backup_schedule",
+    migration_source_account_id = "default_migration_source_account_id"
+    migration_lambda_role       = "default_migration_lambda_role"
+    efs_backup_schedule         = "default_efs_backup_schedule"
     efs_backup_retention_period = "default_efs_backup_retention_period"
   }
 }

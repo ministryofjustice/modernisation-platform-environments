@@ -4,5 +4,5 @@ module "ecs" {
   environment = var.env_name
   name        = var.app_name
 
-  tags = var.tags
+  tags = local.tags
 }

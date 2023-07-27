@@ -1,13 +1,18 @@
 resource "aws_efs_file_system" "ldap" {
   creation_token = "${var.env_name}-ldap"
-  tags = var.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.env_name}-ldap-efs"
+    }
+  )
 }
 
 resource "aws_security_group" "ldap_efs" {
   name        = "${var.env_name}-ldap-efs"
   description = "Allow traffic between ldap service and efs in ${var.env_name}"
   vpc_id      = var.account_info.vpc_id
-  tags        = var.tags
+  tags        = local.tags
 }
 
 resource "aws_security_group_rule" "efs_ingress" {
