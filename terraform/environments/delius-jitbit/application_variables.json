@@ -28,13 +28,53 @@
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
-      "db_enabled_cloudwatch_logs_exports": ["agent", "error"],
+      "db_enabled_cloudwatch_logs_exports": [
+        "agent",
+        "error"
+      ],
       "db_performance_insights_enabled": "false",
       "db_deletion_protection": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "cr-jitbit-dev-db-snapshot-for-testing-migration-to-mp-copy"
     },
     "test": {
+      "migration_source_account_id": "377957503799",
+      "migration_source_account_name": "cr-jitbit-preproduction",
+      "network_mode": "bridge",
+      "app_count": "1",
+      "server_port": "5000",
+      "container_instance_type": "linux",
+      "container_version": "development",
+      "task_definition_volume": "upload_volume",
+      "instance_type": "t3.medium",
+      "key_name": "jitbit-ec2",
+      "ec2_desired_capacity": "1",
+      "ec2_max_size": "2",
+      "ec2_min_size": "1",
+      "db_engine_version": "15.00.4073.23.v1",
+      "db_auto_minor_version_upgrade": "true",
+      "db_allow_major_version_upgrade": "false",
+      "db_backup_window": "03:00-06:00",
+      "db_retention_period": "15",
+      "db_maintenance_window": "mon:00:00-mon:03:00",
+      "db_instance_class": "db.t3.xlarge",
+      "db_user": "admin",
+      "db_allocated_storage": "100",
+      "db_max_allocated_storage": "200",
+      "db_storage_type": "gp3",
+      "db_multi_az": "false",
+      "db_iam_database_authentication_enabled": "false",
+      "db_monitoring_interval": "5",
+      "db_enabled_cloudwatch_logs_exports": [
+        "agent",
+        "error"
+      ],
+      "db_performance_insights_enabled": "false",
+      "db_deletion_protection": "false",
+      "db_skip_final_snapshot": "true",
+      "db_snapshot_identifier": "copied-jitbit-training-migration-mp"
+    },
+    "preproduction": {
       "migration_source_account_id": "377957503799",
       "migration_source_account_name": "cr-jitbit-training",
       "network_mode": "bridge",
@@ -62,15 +102,13 @@
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
-      "db_enabled_cloudwatch_logs_exports": ["agent", "error"],
+      "db_enabled_cloudwatch_logs_exports": [
+        "agent",
+        "error"
+      ],
       "db_performance_insights_enabled": "false",
       "db_deletion_protection": "false",
-      "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "copied-jitbit-training-migration-mp"
-    },
-    "preproduction": {
-      "db_instance_class": "db.t3.xlarge",
-      "db_storage_type": "gp3"
+      "db_skip_final_snapshot": "true"
     },
     "production": {
       "db_instance_class": "db.t3.xlarge",
