@@ -9,8 +9,8 @@
 
 #   name = "test1"
 
-#   ldap_config = local.ldap_config_dev1
-#   db_config   = local.db_config_dev1
+#   ldap_config = local.ldap_config_dev
+#   db_config   = local.db_config_dev
 
 #   account_info = local.account_info
 # }

@@ -2,7 +2,7 @@
 # Modules for each environment 
 # Separate per environment to allow different versions
 ##
-module "environment_dev1" {
+module "environment_dev" {
   # We're in dev account and dev environment, could reference different version
   source = "./modules/environment_all_components"
   count  = local.environment == "development" ? 1 : 0
@@ -12,14 +12,14 @@ module "environment_dev1" {
     aws.core-vpc           = aws.core-vpc
   }
 
-  env_name = "dev1"
+  env_name = "dev"
   app_name = local.application_name
 
   #ldap_migration_bucket_arn = module.s3_bucket_migration.bucket.arn
 
-  network_config = local.network_config_dev1
-  ldap_config    = local.ldap_config_dev1
-  db_config      = local.db_config_dev1
+  network_config = local.network_config_dev
+  ldap_config    = local.ldap_config_dev
+  db_config      = local.db_config_dev
 
   account_info = local.account_info
 
