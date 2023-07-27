@@ -228,8 +228,8 @@ resource "aws_iam_role_policy" "ecs_exec" {
   role   = aws_iam_role.ldap_ecs_exec.id
 }
 
-# temp log group for testinng ldap
+# temp log group for testing ldap
 resource "aws_cloudwatch_log_group" "ldap_test" {
-  name              = "/ecs/ldap_test"
+  name              = "/ecs/ldap_${var.env_name}"
   retention_in_days = 7
 }
