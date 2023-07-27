@@ -1,5 +1,9 @@
 resource "aws_efs_file_system" "ldap" {
-  creation_token = "${var.env_name}-ldap"
+  creation_token                  = "${var.env_name}-ldap"
+  encrypted                       = true
+  kms_key_id                      = var.network_config.general_shared_kms_key_arn
+  throughput_mode                 = var.ldap_config.efs_throughput_mode
+  provisioned_throughput_in_mibps = var.ldap_config.efs_provisioned_throughput
   tags = merge(
     local.tags,
     {

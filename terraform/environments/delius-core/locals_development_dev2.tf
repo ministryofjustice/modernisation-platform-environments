@@ -7,6 +7,8 @@ locals {
     name                        = "ldap"
     migration_source_account_id = local.ldap_config_lower_environments.migration_source_account_id
     migration_lambda_role       = local.ldap_config_lower_environments.migration_lambda_role
+    efs_throughput_mode         = local.ldap_config_lower_environments.efs_throughput_mode
+    efs_provisioned_throughput  = local.ldap_config_lower_environments.efs_provisioned_throughput
     some_other_attribute        = "some_other_attribute_for_ldap_in_dev2"
   }
 

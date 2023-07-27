@@ -1,7 +1,9 @@
 locals {
   ldap_config_higher_environments = {
-    name                 = "ldap_for_higher_environments"
-    some_other_attribute = "some_other_attribute_for_ldap_from_higher_environment_config"
+    name                       = "ldap_for_higher_environments"
+    efs_throughput_mode        = "provisioned"
+    efs_provisioned_throughput = 64 # MiB/s
+    some_other_attribute       = "some_other_attribute_for_ldap_from_higher_environment_config"
   }
 
   db_config_higher_environments = {
