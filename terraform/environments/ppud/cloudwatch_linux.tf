@@ -11,7 +11,7 @@ data "aws_instances" "linux_tagged_instances" {
 }
 
 # Disk Free Alarm
-resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
+resource "aws_cloudwatch_metric_alarm" "linux_high_disk_usage" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
   alarm_name          = "high-disk-usage-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
 # CPU Utilization Alarm
 #======================
 
-resource "aws_cloudwatch_metric_alarm" "cpu" {
+resource "aws_cloudwatch_metric_alarm" "linux_cpu" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
   alarm_name          = "CPU-High-${each.key}"    # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold"   # threshold to trigger the alarm state
@@ -55,7 +55,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
 }
 
 # High CPU IOwait Alarm
-resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
+resource "aws_cloudwatch_metric_alarm" "linux_cpu_usage_iowait" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
   alarm_name          = "cpu-usage-iowait-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -80,7 +80,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
 # Low Available Memory Alarm
 # ===========================
 
-resource "aws_cloudwatch_metric_alarm" "ec2_high_memory_usage" {
+resource "aws_cloudwatch_metric_alarm" "linux_ec2_high_memory_usage" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
   alarm_name          = "high-memory-usage-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
@@ -100,7 +100,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_high_memory_usage" {
 }
 
 
-resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
+resource "aws_cloudwatch_metric_alarm" "linux_low_available_memory" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
   alarm_name          = "low-available-memory-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
@@ -125,7 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
 # ======================
 
 # Instance Health Alarm
-resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
+resource "aws_cloudwatch_metric_alarm" "linux_instance_health_check" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
   alarm_name          = "instance-health-check-failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -145,7 +145,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
 }
 
 # Status Check Alarm
-resource "aws_cloudwatch_metric_alarm" "system_health_check" {
+resource "aws_cloudwatch_metric_alarm" "linux_system_health_check" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
   alarm_name          = "system-health-check-failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
