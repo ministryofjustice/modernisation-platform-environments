@@ -88,7 +88,8 @@
       ],
       "db_performance_insights_enabled": "false",
       "db_deletion_protection": "false",
-      "db_skip_final_snapshot": "true"
+      "db_skip_final_snapshot": "true",
+      "db_snapshot_identifier": "jitbit-preproduction-migration-trial-mp-copy"
     },
     "production": {
       "db_instance_class": "db.t3.xlarge",
