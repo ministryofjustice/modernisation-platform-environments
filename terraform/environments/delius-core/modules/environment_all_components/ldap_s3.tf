@@ -3,10 +3,10 @@ module "s3_bucket_migration" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   providers = {
-    aws.bucket-replication = aws
+    aws.bucket-replication = aws.bucket-replication
   }
 
-  bucket_prefix      = "${local.application_name}-${local.environment}-ldap-"
+  bucket_prefix      = "${var.app_name}-${var.env_name}-ldap-"
   versioning_enabled = true
   sse_algorithm      = "AES256"
   # Useful guide - https://aws.amazon.com/blogs/storage/how-to-use-aws-datasync-to-migrate-data-between-amazon-s3-buckets/
@@ -27,7 +27,7 @@ module "s3_bucket_migration" {
     principals = {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/ldap-data-migration-lambda-role"
+        "arn:aws:iam::${var.ldap_config.migration_source_account_id}:role/${var.ldap_config.migration_lambda_role}"
       ]
     }
     },
@@ -37,7 +37,7 @@ module "s3_bucket_migration" {
       principals = {
         type = "AWS"
         identifiers = [
-          "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/terraform"
+          "arn:aws:iam::${var.ldap_config.migration_source_account_id}:role/terraform"
         ]
       }
     },
@@ -47,7 +47,7 @@ module "s3_bucket_migration" {
       principals = {
         type = "AWS"
         identifiers = [
-          "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
+          "arn:aws:iam::${var.ldap_config.migration_source_account_id}:role/admin"
         ]
       }
     }
@@ -82,5 +82,10 @@ module "s3_bucket_migration" {
     }
   ]
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.env_name}-ldap-migration-s3-bucket"
+    },
+  )
 }

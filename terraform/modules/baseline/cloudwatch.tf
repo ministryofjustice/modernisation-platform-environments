@@ -1,6 +1,6 @@
 locals {
   cloudwatch_metric_alarms_list_by_dimension_list = flatten([
-    for alarm_key, alarm_value in var.cloudwatch_metric_alarms : [
+    for alarm_key, alarm_value in merge(var.cloudwatch_metric_alarms, var.cloudwatch_metric_alarms_database) : [
       for dimension_value in alarm_value.split_by_dimension.dimension_values : [{
         key = "${alarm_key}-${dimension_value}"
         value = merge(alarm_value, {
@@ -21,7 +21,7 @@ locals {
   }
   cloudwatch_metric_alarms = merge(
     local.cloudwatch_metric_alarms_list_by_dimension,
-    local.cloudwatch_metric_alarms_list_without_dimension
+    local.cloudwatch_metric_alarms_list_without_dimension,
   )
 }
 
