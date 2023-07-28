@@ -76,13 +76,13 @@ resource "aws_security_group" "sqlserver_db_sc" {
     description     = "Allows Administrative Appeals ECS service to access RDS"
     security_groups = [aws_security_group.appeals_ecs_service.id]
   }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Transport ECS service to access RDS"
-    security_groups = [aws_security_group.transport_ecs_service.id]
-  }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Transport ECS service to access RDS"
+  #   security_groups = [aws_security_group.transport_ecs_service.id]
+  # }
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
