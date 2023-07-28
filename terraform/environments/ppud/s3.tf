@@ -28,7 +28,7 @@ resource "aws_s3_bucket_acl" "PPUD_ACL" {
 
 resource "aws_s3_bucket_versioning" "PPUD" {
   count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.PPUD.id
+  bucket = aws_s3_bucket.PPUD[0].id
   versioning_configuration {
     status = "Enabled"
   }
@@ -171,7 +171,7 @@ resource "aws_s3_bucket" "moj-scripts" {
 
 resource "aws_s3_bucket_versioning" "moj-scripts" {
   count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-scripts.id
+  bucket = aws_s3_bucket.moj-scripts[0].id
   versioning_configuration {
     status = "Enabled"
   }
@@ -236,7 +236,7 @@ resource "aws_s3_bucket" "MoJ-Release-Management" {
 
 resource "aws_s3_bucket_versioning" "MoJ-Release-Management" {
   count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.MoJ-Release-Management.id
+  bucket = aws_s3_bucket.MoJ-Release-Management[0].id
   versioning_configuration {
     status = "Enabled"
   }

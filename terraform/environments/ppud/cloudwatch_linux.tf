@@ -93,7 +93,7 @@ resource "aws_cloudwatch_metric_alarm" "linux_ec2_high_memory_usage" {
   threshold           = "90"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
     dimensions = {
     InstanceId = each.key
   }
