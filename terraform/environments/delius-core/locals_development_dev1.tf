@@ -8,7 +8,7 @@ locals {
     private_subnet_ids             = data.aws_subnets.shared-private.ids
     route53_inner_zone_info        = data.aws_route53_zone.inner
     migration_environment_vpc_cidr = "10.161.20.0/22"
-    general_shared_kms_key_arn      = data.aws_kms_key.general_shared.arn
+    general_shared_kms_key_arn     = data.aws_kms_key.general_shared.arn
   }
 
   ldap_config_dev = {
@@ -22,8 +22,17 @@ locals {
   }
 
   db_config_dev = {
-    name                 = try(local.db_config_lower_environments.name, "db")
-    ami_name             = local.db_config_lower_environments.ami_name
+    name     = try(local.db_config_lower_environments.name, "db")
+    ami_name = local.db_config_lower_environments.ami_name
   }
 
+  weblogic_config_dev = {
+    name                          = try(local.weblogic_config_lower_environments.name, "weblogic")
+    frontend_service_name         = try(local.weblogic_config_lower_environments.frontend_service_name, "weblogic")
+    frontend_fully_qualified_name = try(local.weblogic_config_lower_environments.frontend_fully_qualified_name, "${local.application_name}-${local.frontend_service_name}")
+    frontend_image_tag            = try(local.weblogic_config_lower_environments.frontend_image_tag, "5.7.6")
+    frontend_container_port       = try(local.weblogic_config_lower_environments.frontend_container_port, 8080)
+    frontend_url_suffix           = try(local.weblogic_config_lower_environments.frontend_url_suffix, "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk")
+
+  }
 }
