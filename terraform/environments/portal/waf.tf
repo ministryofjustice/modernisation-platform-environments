@@ -1,3 +1,44 @@
+resource "aws_waf_ipset" "allow" {
+  name = "${upper(var.application_name)} Manual Allow Set"
+
+  # Ranges from https://github.com/ministryofjustice/laa-aws-infrastructure/blob/master/waf/wafv2_whitelist.template
+  # disc_internet_pipeline, disc_dom1, moj_digital_wifi, petty_france_office365, petty_france_wifi, ark_internet, gateway_proxies
+
+  dynamic "ip_set_descriptors" {
+    for_each = local.ip_set_list
+    content {
+      type  = "IPV4"
+      value = ip_set_descriptors.value
+    }
+  }
+}
+
+resource "aws_waf_ipset" "block" {
+  name = "${upper(var.application_name)} Manual Block Set"
+}
+
+resource "aws_waf_rule" "allow" {
+  name        = "${upper(var.application_name)} Manual Allow Rule"
+  metric_name = "${upper(var.application_name)}ManualAllowRule"
+
+  predicates {
+    data_id = aws_waf_ipset.allow.id
+    negated = false
+    type    = "IPMatch"
+  }
+}
+
+resource "aws_waf_rule" "block" {
+  name        = "${upper(var.application_name)} Manual Block Rule"
+  metric_name = "${upper(var.application_name)}ManualBlockRule"
+
+  predicates {
+    data_id = aws_waf_ipset.block.id
+    negated = false
+    type    = "IPMatch"
+  }
+}
+
 resource "aws_wafv2_web_acl" "wafv2_acl" {
 name            = "${upper(var.application_name)} Whitelisting Requesters"
 metric_name     = "${upper(var.application_name)}WhitelistingRequesters"
@@ -5,6 +46,11 @@ scope           = "CLOUDFRONT"
 default_action {
     allow {}
 }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "PortalWebRequests"
+      sampled_requests_enabled   = true
+    }
 
 rule {
     name     = "AWSManagedRulesCommonRuleSet"
@@ -14,7 +60,7 @@ rule {
       None {}
     }
 
-     visibility_config {
+    visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "AWSManagedRulesCommonRuleMetric"
       sampled_requests_enabled   = true
@@ -83,7 +129,7 @@ rule {
 
       }
     }
- }
+}
 
 rule {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
@@ -93,7 +139,7 @@ rule {
       None {}
     }
 
-     visibility_config {
+    visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "AWSManagedRulesKnownBadInputsRuleMetric"
       sampled_requests_enabled   = true
@@ -113,7 +159,7 @@ rule {
         # }
       }
     }
- }
+}
 
 rule {
     name     = "AWSManagedRulesAmazonIpReputationList"
@@ -123,7 +169,7 @@ rule {
       None {}
     }
 
-     visibility_config {
+    visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "AWSManagedRulesAmazonIpReputationListMetric"
       sampled_requests_enabled   = true
@@ -143,7 +189,7 @@ rule {
         # }
       }
     }
- }
+}
 
 rule {
     name     = "AWSManagedRulesBotControl"
@@ -153,7 +199,7 @@ rule {
       None {}
     }
 
-     visibility_config {
+    visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "AWSManagedRulesBotControlMetric"
       sampled_requests_enabled   = true
@@ -173,7 +219,7 @@ rule {
         # }
       }
     }
- }
+}
 
 rule {
     name     = "WhitelistInternalMoJAndPingdom"
@@ -183,7 +229,7 @@ rule {
       Allow {}
     }
 
-     visibility_config {
+    visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "PortalManualAllowRuleMetric"
       sampled_requests_enabled   = true
@@ -195,7 +241,7 @@ rule {
         # https://github.com/ministryofjustice/laa-portal/blob/master/aws/wafv2/wafv2.template
       }
     }
- }
+}
 
 tags = merge(
     local.tags,
