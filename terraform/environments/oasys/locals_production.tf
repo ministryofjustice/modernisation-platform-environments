@@ -27,8 +27,7 @@ locals {
       # })
     }
 
-    baseline_acm_certificates = {
-    }
+    baseline_acm_certificates = {}
 
     baseline_lbs = {
       private = {
