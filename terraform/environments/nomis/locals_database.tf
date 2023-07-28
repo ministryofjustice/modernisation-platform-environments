@@ -166,7 +166,7 @@ locals {
       alarm_description   = "Triggers if there has been no successful rman backup"
       datapoints_to_alarm = 1
     }
-    /* misload-failed = {
+    misload-failed = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = 2
       metric_name         = "MisloadStatus"
@@ -176,7 +176,10 @@ locals {
       threshold           = "1"
       alarm_description   = "Triggers if misload failed"
       datapoints_to_alarm = 2
-    } */
+      /* dimensions = {
+        dbname = "T1MIS" # only one 
+      } */
+    }
   }
 
   database_cloudwatch_metric_alarms_lists = {
@@ -224,6 +227,12 @@ locals {
       parent_keys = []
       alarms_list = [
         { key = "database", name = "fixngo-connection" },
+      ]
+    }
+    misload = {
+      parent_keys = []
+      alarms_list = [
+        { key = "database", name = "misload-failed" },
       ]
     }
   }
