@@ -2,6 +2,7 @@
 resource "aws_sns_topic" "cw_alerts" {
   count         = local.is-production == true ? 1 : 0
   name          = "ppud-prod-cw-alerts"
+  kms_master_key_id = data.aws_kms_key.sns.id
 }
 resource "aws_sns_topic_policy" "sns_policy" {
   count  = local.is-production == true ? 1 : 0
