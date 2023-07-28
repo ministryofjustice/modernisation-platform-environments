@@ -13,7 +13,7 @@ locals {
 
     cloudwatch_metric_alarms_dbnames = []
 
-    cloudwatch_metric_alarms_misload = []
+    cloudwatch_metric_alarms_dbnames_misload = []
     
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
