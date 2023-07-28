@@ -78,6 +78,15 @@ locals {
     })
   }
 
+  baseline_cloudwatch_metric_alarms_database = {
+    for key, value in module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dba_pagerduty"].misload : key => merge(value, {
+      split_by_dimension = {
+        dimension_name   = "dbname"
+        dimension_values = local.baseline_environment_config.cloudwatch_metric_alarms_dbnames_misload
+      }
+    })
+  }
+
   baseline_cloudwatch_log_metric_filters = merge(
     local.database_cloudwatch_log_metric_filters,
   )

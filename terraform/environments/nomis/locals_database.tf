@@ -46,6 +46,18 @@ locals {
         }
       }
     }
+    misload-status = {
+      pattern = "[month, day, time, hostname, process, message1 = misload-status, dbname, value, message2 = \"last-triggered:\", yearmonthday, utctime]"
+      log_group_name = "cwagent-var-log-messages"
+      metric_transformation = {
+        name      = "MisloadStatus"
+        namespace = "Database" # custom namespace
+        value     = "$value"
+        dimensions = {
+          dbname = "$dbname"
+        }
+      }
+    }
   }
 
   database_cloudwatch_metric_alarms = {
@@ -154,6 +166,20 @@ locals {
       alarm_description   = "Triggers if there has been no successful rman backup"
       datapoints_to_alarm = 1
     }
+    misload-failed = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = 2
+      metric_name         = "MisloadStatus"
+      namespace           = "Database"
+      period              = "3600"
+      statistic           = "Maximum"
+      threshold           = "1"
+      alarm_description   = "Triggers if misload failed"
+      datapoints_to_alarm = 2
+      /* dimensions = {
+        dbname = "T1MIS" # only one 
+      } */
+    }
   }
 
   database_cloudwatch_metric_alarms_lists = {
@@ -201,6 +227,12 @@ locals {
       parent_keys = []
       alarms_list = [
         { key = "database", name = "fixngo-connection" },
+      ]
+    }
+    misload = {
+      parent_keys = []
+      alarms_list = [
+        { key = "database", name = "misload-failed" },
       ]
     }
   }
