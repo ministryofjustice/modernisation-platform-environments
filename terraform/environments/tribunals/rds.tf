@@ -55,6 +55,34 @@ resource "aws_security_group" "sqlserver_db_sc" {
     description     = "Allows DMS to access RDS"
     security_groups = [aws_security_group.vpc_dms_replication_instance_group.id]
   }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Care Standards ECS service to access RDS"
+    security_groups = [aws_security_group.cares_ecs_service.id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Lands Chamber ECS service to access RDS"
+    security_groups = [aws_security_group.lands_ecs_service.id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Administrative Appeals ECS service to access RDS"
+    security_groups = [aws_security_group.appeals_ecs_service.id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Transport ECS service to access RDS"
+    security_groups = [aws_security_group.transport_ecs_service.id]
+  }
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
