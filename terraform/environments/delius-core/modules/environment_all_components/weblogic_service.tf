@@ -1,5 +1,6 @@
 ##
 # Task definition and container
+# MOVE ALL THIS TO CLUSTER-ECS MODULE
 ##
 resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
   container_definitions = jsonencode(
