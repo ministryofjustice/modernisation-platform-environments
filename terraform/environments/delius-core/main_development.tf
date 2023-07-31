@@ -11,13 +11,13 @@ module "environment_dev" {
     aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
-
   }
 
   env_name = "dev"
   app_name = local.application_name
 
-  domain = local.domain
+  domain        = local.domain
+  platform_vars = local.platform_vars
 
   network_config  = local.network_config_dev
   ldap_config     = local.ldap_config_dev

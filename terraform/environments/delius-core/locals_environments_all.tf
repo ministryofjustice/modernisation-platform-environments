@@ -21,4 +21,7 @@ locals {
     domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
     domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
   }
+  platform_vars = {
+    environment_management = local.environment_management
+  }
 }

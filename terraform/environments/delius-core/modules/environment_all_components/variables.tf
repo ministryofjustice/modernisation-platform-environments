@@ -111,3 +111,9 @@ variable "domain" {
     domain_type_sub    = list(string)
   })
 }
+
+variable "platform_vars" {
+  type = object({
+    environment_management = any
+  })
+}

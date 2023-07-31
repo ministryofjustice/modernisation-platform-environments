@@ -40,7 +40,7 @@ resource "aws_lb" "delius_core_frontend" {
   # checkov:skip=CKV_AWS_91
   # checkov:skip=CKV2_AWS_28
 
-  name               = "${local.application_name}-alb"
+  name               = "${var.app_name}-${var.env_name}-weblogic-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
