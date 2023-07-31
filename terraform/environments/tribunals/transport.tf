@@ -63,7 +63,7 @@ resource "null_resource" "transport_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "transport_db_credentials" {
-  name = "${local.transport}-db-credentials"
+  name = "${local.transport}-db-credentials-2"
 }
 
 resource "aws_secretsmanager_secret_version" "transport_db_credentials_version" {
