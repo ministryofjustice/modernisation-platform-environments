@@ -155,3 +155,12 @@ resource "aws_iam_role_policy" "weblogic_ecs_exec" {
   policy = data.aws_iam_policy_document.weblogic_ecs_exec.json
   role   = aws_iam_role.weblogic_ecs_exec.id
 }
+
+
+# Pre-req - CloudWatch log group
+# By default, server-side-encryption is used
+resource "aws_cloudwatch_log_group" "delius_core_frontend_log_group" {
+  name              = local.frontend_fully_qualified_name
+  retention_in_days = 7
+  tags              = local.tags
+}
