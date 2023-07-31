@@ -27,14 +27,14 @@ variable "network_config" {
     private_subnet_ids             = list(string)
     route53_inner_zone_info        = any
     migration_environment_vpc_cidr = optional(string)
-    general_shared_kms_key_arn      = optional(string)
+    general_shared_kms_key_arn     = optional(string)
   })
   default = {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
     private_subnet_ids             = ["default_private_subnet_a_id"]
     route53_inner_zone_info        = {}
     migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
-    general_shared_kms_key_arn      = "default_general_shared_kms_key_arn"
+    general_shared_kms_key_arn     = "default_general_shared_kms_key_arn"
   }
 }
 
@@ -60,12 +60,34 @@ variable "ldap_config" {
   }
 }
 
-variable "db_config" {
+variable "weblogic_config" {
   type = object({
-    name                 = string
+    name                          = string
+    frontend_service_name         = string
+    frontend_fully_qualified_name = string
+    frontend_image_tag            = string
+    frontend_container_port       = number
+    frontend_url_suffix           = string
+    db_name                       = string
   })
   default = {
-    name                 = "default_name"
+    name                          = "default_name"
+    frontend_service_name         = "default_frontend_service_name"
+    frontend_fully_qualified_name = "default_frontend_fully_qualified_name"
+    frontend_image_tag            = "default_frontend_image_tag"
+    frontend_container_port       = 8080
+    frontend_url_suffix           = "default_frontend_url_suffix"
+    db_name                       = "default_db_name"
+  }
+
+}
+
+variable "db_config" {
+  type = object({
+    name = string
+  })
+  default = {
+    name = "default_name"
   }
 }
 

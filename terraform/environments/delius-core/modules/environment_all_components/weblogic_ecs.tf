@@ -21,8 +21,8 @@ resource "aws_security_group_rule" "weblogic_allow_all_egress" {
 resource "aws_security_group_rule" "weblogic_alb" {
   description       = "Allow inbound traffic from VPC"
   type              = "ingress"
-  from_port         = local.frontend_container_port
-  to_port           = local.frontend_container_port
+  from_port         = var.weblogic_config.frontend_container_port
+  to_port           = var.weblogic_config.frontend_container_port
   protocol          = "TCP"
   security_group_id = aws_security_group.ldap.id
   cidr_blocks       = [var.network_config.shared_vpc_cidr]
@@ -160,7 +160,7 @@ resource "aws_iam_role_policy" "weblogic_ecs_exec" {
 # Pre-req - CloudWatch log group
 # By default, server-side-encryption is used
 resource "aws_cloudwatch_log_group" "delius_core_frontend_log_group" {
-  name              = local.frontend_fully_qualified_name
+  name              = var.weblogic_config.frontend_fully_qualified_name
   retention_in_days = 7
   tags              = local.tags
 }

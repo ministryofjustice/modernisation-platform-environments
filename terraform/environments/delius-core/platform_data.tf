@@ -125,6 +125,7 @@ data "aws_route53_zone" "network-services" {
   private_zone = false
 }
 
+
 # Shared KMS keys (per business unit)
 data "aws_kms_key" "general_shared" {
   key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${var.networking[0].business-unit}"

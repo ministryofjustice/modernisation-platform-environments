@@ -7,6 +7,7 @@ locals {
     shared_vpc_cidr                = data.aws_vpc.shared.cidr_block
     private_subnet_ids             = data.aws_subnets.shared-private.ids
     route53_inner_zone_info        = data.aws_route53_zone.inner
+    route53_network_services_zone  = data.aws_route53_zone.network-services
     migration_environment_vpc_cidr = "10.161.20.0/22"
     general_shared_kms_key_arn     = data.aws_kms_key.general_shared.arn
   }

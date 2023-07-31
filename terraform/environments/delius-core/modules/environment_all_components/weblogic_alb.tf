@@ -137,7 +137,7 @@ resource "aws_route53_record" "external_validation" {
   records         = local.domain_record_main
   ttl             = 60
   type            = local.domain_type_main[0]
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  zone_id         = var.network_config.route53_network_services_zone.zone_id
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
