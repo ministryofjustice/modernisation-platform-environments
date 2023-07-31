@@ -63,7 +63,7 @@ resource "null_resource" "ftt_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "ftt_db_credentials" {
-  name = "${local.ftt}-credentials"
+  name = "${local.ftt}-db-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "ftt_db_credentials_version" {

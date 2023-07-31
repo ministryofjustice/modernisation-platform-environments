@@ -63,7 +63,7 @@ resource "null_resource" "eat_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "eat_db_credentials" {
-  name = "${local.eat}-credentials"
+  name = "${local.eat}-db-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "eat_db_credentials_version" {

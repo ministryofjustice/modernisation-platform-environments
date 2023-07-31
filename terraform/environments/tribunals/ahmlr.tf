@@ -63,7 +63,7 @@ resource "null_resource" "hmlands_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "hmlands_db_credentials" {
-  name = "${local.hmlands}-credentials"
+  name = "${local.hmlands}-db-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "hmlands_db_credentials_version" {

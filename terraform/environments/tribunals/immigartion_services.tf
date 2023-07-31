@@ -63,7 +63,7 @@ resource "null_resource" "imset_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "imset_db_credentials" {
-  name = "${local.imset}-credentials"
+  name = "${local.imset}-db-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "imset_db_credentials_version" {

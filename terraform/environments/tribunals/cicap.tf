@@ -63,7 +63,7 @@ resource "null_resource" "cicap_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "cicap_db_credentials" {
-  name = "${local.cicap}-credentials"
+  name = "${local.cicap}-db-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "cicap_db_credentials_version" {

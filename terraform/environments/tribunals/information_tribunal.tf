@@ -63,7 +63,7 @@ resource "null_resource" "it_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "it_db_credentials" {
-  name = "${local.it}-credentials"
+  name = "${local.it}-db-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "it_db_credentials_version" {

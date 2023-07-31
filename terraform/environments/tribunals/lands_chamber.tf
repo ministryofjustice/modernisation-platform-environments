@@ -63,7 +63,7 @@ resource "null_resource" "lands_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "lands_db_credentials" {
-  name = "${local.lands}-credentials"
+  name = "${local.lands}-db-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "lands_db_credentials_version" {
