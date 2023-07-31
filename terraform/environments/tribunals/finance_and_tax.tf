@@ -91,7 +91,7 @@ resource "aws_acm_certificate" "ftt_external" {
   }
 
   lifecycle {
-    crftte_before_destroy = true
+    create_before_destroy = true
   }
 }
 

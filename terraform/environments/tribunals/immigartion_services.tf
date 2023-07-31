@@ -91,7 +91,7 @@ resource "aws_acm_certificate" "imset_external" {
   }
 
   lifecycle {
-    crimsete_before_destroy = true
+    create_before_destroy = true
   }
 }
 

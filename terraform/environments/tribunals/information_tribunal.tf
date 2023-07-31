@@ -91,7 +91,7 @@ resource "aws_acm_certificate" "it_external" {
   }
 
   lifecycle {
-    crite_before_destroy = true
+    create_before_destroy = true
   }
 }
 
