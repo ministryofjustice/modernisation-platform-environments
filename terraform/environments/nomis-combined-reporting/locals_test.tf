@@ -51,7 +51,7 @@ locals {
     
     baseline_ec2_autoscaling_groups = {
 
-      t1-ncr-bitomcat = merge(local.tomcat_ec2_default, {
+      t1-ncr-tomcat = merge(local.tomcat_ec2_default, {
         autoscaling_group = {
           desired_capacity    = 1
           max_size            = 2
