@@ -114,7 +114,7 @@ module "domain_builder_cli_agent" {
   ebs_size                    = 20
   ebs_encrypted               = true
   ebs_delete_on_termination   = false
-  policies                    = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}" ,"arn:aws:iam::${local.account_id}:policy/${local.apigateway_get_policy}", ]
+  policies                    = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}", "arn:aws:iam::${local.account_id}:policy/${local.apigateway_get_policy}", ]
   region                      = local.account_region
   account                     = local.account_id
   env                         = local.env
