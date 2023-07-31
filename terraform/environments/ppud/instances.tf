@@ -433,8 +433,8 @@ resource "aws_instance" "docker-build-server" {
   key_name               = aws_key_pair.cjms_instance[0].key_name
   root_block_device {
     delete_on_termination = true
-    volume_size = "40"
-    volume_type = "gp2"
+    volume_size           = "40"
+    volume_type           = "gp2"
   }
   tags = {
     Name          = "docker-build-server"

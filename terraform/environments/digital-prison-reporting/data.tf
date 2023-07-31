@@ -39,7 +39,7 @@ data "aws_secretsmanager_secret" "slack_integration" {
 }
 
 data "aws_secretsmanager_secret_version" "slack_integration" {
-  count      = local.enable_slack_alerts ? 1 : 0
+  count     = local.enable_slack_alerts ? 1 : 0
   secret_id = data.aws_secretsmanager_secret.slack_integration[0].id
 }
 

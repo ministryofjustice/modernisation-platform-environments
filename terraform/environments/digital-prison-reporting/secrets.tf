@@ -49,14 +49,14 @@ resource "aws_secretsmanager_secret_version" "redshift" {
 
 # Slack Alerts URL
 module "slack_alerts_url" {
-  count                   = local.enable_slack_alerts ? 1 : 0
+  count = local.enable_slack_alerts ? 1 : 0
 
-  source                  = "./modules/secrets_manager"
-  name                    = "${local.project}-slack-alerts-url-${local.environment}"
-  description             = "DPR Slack Alerts URL"
-  type                    = "MONO"
-  secret_value            = "SLACK_ALERTS_URL_PLACEHOLDER"
-  ignore_secret_string    = true
+  source               = "./modules/secrets_manager"
+  name                 = "${local.project}-slack-alerts-url-${local.environment}"
+  description          = "DPR Slack Alerts URL"
+  type                 = "MONO"
+  secret_value         = "SLACK_ALERTS_URL_PLACEHOLDER"
+  ignore_secret_string = true
 
   tags = merge(
     local.all_tags,
@@ -64,21 +64,21 @@ module "slack_alerts_url" {
       Resource_Group = "monitoring"
       Jira           = "DPR-569"
       Resource_Type  = "Secret"
-      Name           = "${local.project}-slack-alerts-url-${local.environment}"      
+      Name           = "${local.project}-slack-alerts-url-${local.environment}"
     }
   )
 }
 
 # PagerDuty Integration Key
 module "pagerduty_integration_key" {
-  count                   = local.enable_pagerduty_alerts ? 1 : 0
+  count = local.enable_pagerduty_alerts ? 1 : 0
 
-  source                  = "./modules/secrets_manager"
-  name                    = "${local.project}-pagerduty-integration-key-${local.environment}"
-  description             = "DPR PagerDuty Integration Key"
-  type                    = "MONO"
-  secret_value            = "PLACEHOLDER@EMAIL.COM"
-  ignore_secret_string    = true
+  source               = "./modules/secrets_manager"
+  name                 = "${local.project}-pagerduty-integration-key-${local.environment}"
+  description          = "DPR PagerDuty Integration Key"
+  type                 = "MONO"
+  secret_value         = "PLACEHOLDER@EMAIL.COM"
+  ignore_secret_string = true
 
   tags = merge(
     local.all_tags,

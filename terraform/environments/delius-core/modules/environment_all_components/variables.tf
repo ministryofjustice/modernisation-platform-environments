@@ -27,14 +27,14 @@ variable "network_config" {
     private_subnet_ids             = list(string)
     route53_inner_zone_info        = any
     migration_environment_vpc_cidr = optional(string)
-    general_shared_kms_key_arn      = optional(string)
+    general_shared_kms_key_arn     = optional(string)
   })
   default = {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
     private_subnet_ids             = ["default_private_subnet_a_id"]
     route53_inner_zone_info        = {}
     migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
-    general_shared_kms_key_arn      = "default_general_shared_kms_key_arn"
+    general_shared_kms_key_arn     = "default_general_shared_kms_key_arn"
   }
 }
 
@@ -62,10 +62,10 @@ variable "ldap_config" {
 
 variable "db_config" {
   type = object({
-    name                 = string
+    name = string
   })
   default = {
-    name                 = "default_name"
+    name = "default_name"
   }
 }
 

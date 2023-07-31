@@ -3,10 +3,10 @@ locals {
   tomcat_ssm_parameters = {
     prefix = "/tomcat/"
     parameters = {
-      bobj_password     = { description = "bobj account password" }
-      oracle_password   = { description = "oracle account password" }
-      product_key       = { description = "BIP product key" }
-      cms_password      = { description = "CMS password for host machine" }
+      bobj_password   = { description = "bobj account password" }
+      oracle_password = { description = "oracle account password" }
+      product_key     = { description = "BIP product key" }
+      cms_password    = { description = "CMS password for host machine" }
     }
   }
 
@@ -97,7 +97,7 @@ locals {
   tomcat_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name          = "base_rhel_8_5_*"
+      ami_name                  = "base_rhel_8_5_*"
       ssm_parameters_prefix     = "tomcat/"
       iam_resource_names_prefix = "ec2-tomcat"
     })

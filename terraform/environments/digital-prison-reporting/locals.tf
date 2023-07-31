@@ -33,8 +33,8 @@ locals {
   enable_replication_task  = local.application_data.accounts[local.environment].enable_dms_replication_task
 
   # DPR Alerts
-  enable_slack_alerts      = local.application_data.accounts[local.environment].enable_slack_alerts
-  enable_pagerduty_alerts  = local.application_data.accounts[local.environment].enable_pagerduty_alerts
+  enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
+  enable_pagerduty_alerts = local.application_data.accounts[local.environment].enable_pagerduty_alerts
 
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
@@ -68,7 +68,7 @@ locals {
   flyway_dbuilder_policies       = [aws_iam_policy.s3_read_access_policy.arn, data.aws_iam_policy.rds_full_access.arn, ]
   flyway_dbuilder_tracing        = "Active"
   enable_dbuilder_serverless_gw  = local.application_data.accounts[local.environment].enable_dbuilder_serverless_gw
-  include_dbuilder_gw_vpclink    = local.application_data.accounts[local.environment].include_dbuilder_gw_vpclink        
+  include_dbuilder_gw_vpclink    = local.application_data.accounts[local.environment].include_dbuilder_gw_vpclink
   serverless_gw_dbuilder_name    = "${local.project}-serverless-lambda"
 
   nomis_secrets_placeholder = {

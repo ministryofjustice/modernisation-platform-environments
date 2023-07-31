@@ -66,7 +66,7 @@ resource "aws_lb_listener" "dacp_lb" {
   depends_on = [
     aws_acm_certificate.external
   ]
-#   certificate_arn   = local.is-production ? aws_acm_certificate.external_prod[0].arn : aws_acm_certificate.external.arn
+  #   certificate_arn   = local.is-production ? aws_acm_certificate.external_prod[0].arn : aws_acm_certificate.external.arn
   certificate_arn   = aws_acm_certificate.external.arn
   load_balancer_arn = aws_lb.dacp_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
