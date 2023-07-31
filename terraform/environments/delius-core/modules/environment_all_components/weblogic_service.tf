@@ -1,18 +1,18 @@
 # Create the ECS service
 resource "aws_ecs_service" "delius-frontend-service" {
-  cluster         = aws_ecs_cluster.aws_ecs_cluster.id
-  name            = local.frontend_fully_qualified_name
+  cluster         = module.ecs.cluster_id
+  name            = var.weblogic_config.frontend_fully_qualified_name
   task_definition = aws_ecs_task_definition.delius_core_frontend_task_definition.arn
   network_configuration {
     assign_public_ip = false
-    subnets          = data.aws_subnets.shared-private.ids
+    subnets          = var.network_config.private_subnet_ids
     security_groups  = [aws_security_group.delius_core_frontend_security_group.id]
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.delius_core_frontend_target_group.arn
-    container_name   = local.frontend_fully_qualified_name
-    container_port   = local.frontend_container_port
+    container_name   = var.weblogic_config.frontend_fully_qualified_name
+    container_port   = var.weblogic_config.frontend_container_port
   }
 
   desired_count                      = 1
@@ -26,4 +26,11 @@ resource "aws_ecs_service" "delius-frontend-service" {
   tags                               = local.tags
   triggers                           = {} # Change this for force redeployment
 
+}
+
+resource "aws_security_group" "delius_core_frontend_security_group" {
+  name        = "Delius Core Frontend Weblogic"
+  description = "Rules for the delius testing frontend ecs service"
+  vpc_id      = var.network_config.shared_vpc_id
+  tags        = local.tags
 }

@@ -17,10 +17,13 @@ module "environment_dev" {
   env_name = "dev"
   app_name = local.application_name
 
+  domain = local.domain
+
   network_config  = local.network_config_dev
   ldap_config     = local.ldap_config_dev
   db_config       = local.db_config_dev
   weblogic_config = local.weblogic_config_dev
+
 
   account_info = local.account_info
 

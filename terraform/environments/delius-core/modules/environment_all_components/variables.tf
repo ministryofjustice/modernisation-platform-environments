@@ -24,15 +24,21 @@ variable "account_info" {
 variable "network_config" {
   type = object({
     shared_vpc_cidr                = string
+    shared_vpc_id                  = string
     private_subnet_ids             = list(string)
     route53_inner_zone_info        = any
+    route53_network_services_zone  = any
+    route53_external_zone          = any
     migration_environment_vpc_cidr = optional(string)
     general_shared_kms_key_arn     = optional(string)
   })
   default = {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
+    shared_vpc_id                  = "default_shared_vpc_id"
     private_subnet_ids             = ["default_private_subnet_a_id"]
     route53_inner_zone_info        = {}
+    route53_network_services_zone  = {}
+    route53_external_zone          = {}
     migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
     general_shared_kms_key_arn     = "default_general_shared_kms_key_arn"
   }
@@ -93,4 +99,15 @@ variable "db_config" {
 
 variable "tags" {
   type = any
+}
+
+variable "domain" {
+  type = object({
+    domain_name_main   = list(string)
+    domain_name_sub    = list(string)
+    domain_record_main = list(string)
+    domain_record_sub  = list(string)
+    domain_type_main   = list(string)
+    domain_type_sub    = list(string)
+  })
 }

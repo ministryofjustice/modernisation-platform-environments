@@ -1,8 +1,10 @@
-
+locals {
+  frontend_url = "${var.app_name}.${var.env_name}.${var.weblogic_config.frontend_url_suffix}"
+}
 resource "aws_security_group" "delius_frontend_alb_security_group" {
   name        = "Delius Core Frontend Load Balancer"
   description = "controls access to and from delius front-end load balancer"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.network_config.shared_vpc_id
   tags        = local.tags
 }
 
@@ -26,8 +28,8 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_frontend_service" {
   security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
   description                  = "access from delius core frontend alb to ecs"
-  from_port                    = local.frontend_container_port
-  to_port                      = local.frontend_container_port
+  from_port                    = var.weblogic_config.frontend_container_port
+  to_port                      = var.weblogic_config.frontend_container_port
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
   tags                         = local.tags
@@ -42,7 +44,7 @@ resource "aws_lb" "delius_core_frontend" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
-  subnets            = data.aws_subnets.shared-public.ids
+  subnets            = var.network_config.private_subnet_ids
 
   enable_deletion_protection = false
   drop_invalid_header_fields = true
@@ -81,10 +83,10 @@ resource "aws_lb_listener" "listener_http" {
 resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   # checkov:skip=CKV_AWS_261
 
-  name                 = local.frontend_fully_qualified_name
-  port                 = local.frontend_container_port
+  name                 = var.weblogic_config.frontend_fully_qualified_name
+  port                 = var.weblogic_config.frontend_container_port
   protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
+  vpc_id               = var.network_config.shared_vpc_id
   target_type          = "ip"
   deregistration_delay = 30
   tags                 = local.tags
@@ -107,7 +109,7 @@ resource "aws_lb_target_group" "delius_core_frontend_target_group" {
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
-  zone_id = data.aws_route53_zone.external.zone_id
+  zone_id = var.network_config.route53_external_zone.zone_id
   name    = local.frontend_url
   type    = "A"
 
@@ -133,10 +135,10 @@ resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 
   allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
+  name            = var.domain.domain_name_main[0]
+  records         = var.domain.domain_record_main
   ttl             = 60
-  type            = local.domain_type_main[0]
+  type            = var.domain.domain_type_main[0]
   zone_id         = var.network_config.route53_network_services_zone.zone_id
 }
 
@@ -144,15 +146,15 @@ resource "aws_route53_record" "external_validation_subdomain" {
   provider = aws.core-vpc
 
   allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
+  name            = var.domain.domain_name_sub[0]
+  records         = var.domain.domain_record_sub
   ttl             = 60
-  type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.external.zone_id
+  type            = var.domain.domain_type_sub[0]
+  zone_id         = var.network_config.route53_external_zone.zone_id
 }
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = [var.domain.domain_name_main[0], var.domain.domain_name_sub[0]]
 }
 
