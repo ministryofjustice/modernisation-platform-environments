@@ -55,7 +55,7 @@ resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.delius_core_frontend.id
   port              = 443
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external.arn
+  certificate_arn   = var.domain.certificate_arn
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
@@ -120,17 +120,6 @@ resource "aws_route53_record" "external" {
   }
 }
 
-resource "aws_acm_certificate" "external" {
-  domain_name               = "modernisation-platform.service.justice.gov.uk"
-  validation_method         = "DNS"
-  subject_alternative_names = [local.frontend_url]
-  tags                      = local.tags
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 
@@ -152,9 +141,3 @@ resource "aws_route53_record" "external_validation_subdomain" {
   type            = var.domain.domain_type_sub[0]
   zone_id         = var.network_config.route53_external_zone.zone_id
 }
-
-resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [var.domain.domain_name_main[0], var.domain.domain_name_sub[0]]
-}
-

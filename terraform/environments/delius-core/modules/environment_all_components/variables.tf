@@ -109,6 +109,7 @@ variable "domain" {
     domain_record_sub  = list(string)
     domain_type_main   = list(string)
     domain_type_sub    = list(string)
+    certificate_arn    = string
   })
 }
 
