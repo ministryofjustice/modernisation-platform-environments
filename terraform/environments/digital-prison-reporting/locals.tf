@@ -32,6 +32,11 @@ locals {
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
   enable_replication_task  = local.application_data.accounts[local.environment].enable_dms_replication_task
 
+  # Common Policies
+  kms_read_access_policy   = "${local.project}_kms_read_policy"
+  s3_read_access_policy    = "${local.project}_s3_read_policy"
+  apigateway_get_policy    = "${local.project}_apigateway_get_policy"
+
   # DPR Alerts
   enable_slack_alerts      = local.application_data.accounts[local.environment].enable_slack_alerts
   enable_pagerduty_alerts  = local.application_data.accounts[local.environment].enable_pagerduty_alerts
