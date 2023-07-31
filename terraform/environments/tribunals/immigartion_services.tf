@@ -1,60 +1,60 @@
-#Administrative Appeals Tribunal
+#Immigration Services Tribunal
 locals {
-  appeals = "appeals" 
-  appeals_folder = "administrative_appeals"
-  appeals_db_name = "ossc" 
-  appeals_db_login_name = "ossc-app"
-  appeals_source_db_name = "Ossc"
-  appeals_rds_url               = "${aws_db_instance.rdsdb.address}"      
-  appeals_rds_user              = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-  appeals_rds_port              = "1433"
-  appeals_rds_password          = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-  appeals_source_db_url         = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
-  appeals_source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
-  appeals_source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
+  imset = "imset" 
+  imset_folder = "immigartion_services"
+  imset_db_name = "imset" 
+  imset_db_login_name = "imset-app"
+  imset_source_db_name = "IMSET"
+  imset_rds_url               = "${aws_db_instance.rdsdb.address}"      
+  imset_rds_user              = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+  imset_rds_port              = "1433"
+  imset_rds_password          = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+  imset_source_db_url         = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
+  imset_source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
+  imset_source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
 }
 
 ######################## DMS #############################################
 
-module "appeals_dms" {
+module "imset_dms" {
   source                      = "./modules/dms"
   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
-  replication_task_id         = "${local.appeals}-migration-task"
+  replication_task_id         = "${local.imset}-migration-task"
   #target_db_instance          = 0
-  target_endpoint_id          = "${local.appeals}-target"
-  target_database_name        = local.appeals_db_name
-  target_server_name          = local.appeals_rds_url
-  target_username             = local.appeals_rds_user
-  target_password             = local.appeals_rds_password
-  source_endpoint_id          = "${local.appeals}-source"
-  source_database_name        = local.appeals_source_db_name
-  source_server_name          = local.appeals_source_db_url
-  source_username             = local.appeals_source_db_user
-  source_password             = local.appeals_source_db_password
+  target_endpoint_id          = "${local.imset}-target"
+  target_database_name        = local.imset_db_name
+  target_server_name          = local.imset_rds_url
+  target_username             = local.imset_rds_user
+  target_password             = local.imset_rds_password
+  source_endpoint_id          = "${local.imset}-source"
+  source_database_name        = local.imset_source_db_name
+  source_server_name          = local.imset_source_db_url
+  source_username             = local.imset_source_db_user
+  source_password             = local.imset_source_db_password
  
 }
 
 ############################################################################
 
-resource "random_password" "appeals_new_password" {
+resource "random_password" "imset_new_password" {
   length  = 16
   special = false 
 }
 
-resource "null_resource" "appeals_setup_db" {
+resource "null_resource" "imset_setup_db" {
  
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
 
     environment = {
-      DB_URL = local.appeals_rds_url   
-      USER_NAME = local.appeals_rds_user
-      PASSWORD = local.appeals_rds_password
-      NEW_DB_NAME = local.appeals_db_name
-      NEW_USER_NAME = local.appeals_db_login_name
-      NEW_PASSWORD = random_password.appeals_new_password.result
-      APP_FOLDER = local.appeals_folder
+      DB_URL = local.imset_rds_url   
+      USER_NAME = local.imset_rds_user
+      PASSWORD = local.imset_rds_password
+      NEW_DB_NAME = local.imset_db_name
+      NEW_USER_NAME = local.imset_db_login_name
+      NEW_PASSWORD = random_password.imset_new_password.result
+      APP_FOLDER = local.imset_folder
     }
   }
   triggers = {
@@ -62,18 +62,18 @@ resource "null_resource" "appeals_setup_db" {
   }
 }
 
- resource "aws_secretsmanager_secret" "appeals_db_credentials" {
-  name = "${local.appeals}-credentials"
+ resource "aws_secretsmanager_secret" "imset_db_credentials" {
+  name = "${local.imset}-credentials"
 }
 
-resource "aws_secretsmanager_secret_version" "appeals_db_credentials_version" {
-  secret_id     = aws_secretsmanager_secret.appeals_db_credentials.id
+resource "aws_secretsmanager_secret_version" "imset_db_credentials_version" {
+  secret_id     = aws_secretsmanager_secret.imset_db_credentials.id
   secret_string = <<EOF
 {
-  "username": "${local.appeals_db_login_name}",
-  "password": "${random_password.appeals_new_password.result}",  
-  "host": "${local.appeals_rds_url}",  
-  "database_name": "${local.appeals_db_name}"
+  "username": "${local.imset_db_login_name}",
+  "password": "${random_password.imset_new_password.result}",  
+  "host": "${local.imset_rds_url}",  
+  "database_name": "${local.imset_db_name}"
 }
 EOF
 }
@@ -81,59 +81,59 @@ EOF
 ####################### DNS #########################################
 
 // ACM Public Certificate
-resource "aws_acm_certificate" "appeals_external" {
+resource "aws_acm_certificate" "imset_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.appeals}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["${local.imset}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
 
   lifecycle {
-    create_before_destroy = true
+    crimsete_before_destroy = true
   }
 }
 
-resource "aws_acm_certificate_validation" "appeals_external" {
-  certificate_arn         = aws_acm_certificate.appeals_external.arn
-  validation_record_fqdns = [local.appeals_domain_name_main[0], local.appeals_domain_name_sub[0]]
+resource "aws_acm_certificate_validation" "imset_external" {
+  certificate_arn         = aws_acm_certificate.imset_external.arn
+  validation_record_fqdns = [local.imset_domain_name_main[0], local.imset_domain_name_sub[0]]
 }
 
 // Route53 DNS records for certificate validation
-resource "aws_route53_record" "appeals_external_validation" {
+resource "aws_route53_record" "imset_external_validation" {
   provider = aws.core-network-services
 
   allow_overwrite = true
-  name            = local.appeals_domain_name_main[0]
-  records         = local.appeals_domain_record_main
+  name            = local.imset_domain_name_main[0]
+  records         = local.imset_domain_record_main
   ttl             = 60
-  type            = local.appeals_domain_type_main[0]
+  type            = local.imset_domain_type_main[0]
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
-resource "aws_route53_record" "appeals_external_validation_subdomain" {
+resource "aws_route53_record" "imset_external_validation_subdomain" {
   provider = aws.core-vpc
 
   allow_overwrite = true
-  name            = local.appeals_domain_name_sub[0]
-  records         = local.appeals_domain_record_sub
+  name            = local.imset_domain_name_sub[0]
+  records         = local.imset_domain_record_sub
   ttl             = 60
-  type            = local.appeals_domain_type_sub[0]
+  type            = local.imset_domain_type_sub[0]
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 // Route53 DNS record for directing traffic to the service
-resource "aws_route53_record" "appeals_external" {
+resource "aws_route53_record" "imset_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.appeals}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${local.imset}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
-    name                   = aws_lb.appeals_lb.dns_name
-    zone_id                = aws_lb.appeals_lb.zone_id
+    name                   = aws_lb.imset_lb.dns_name
+    zone_id                = aws_lb.imset_lb.zone_id
     evaluate_target_health = true
   }
 }
@@ -141,80 +141,80 @@ resource "aws_route53_record" "appeals_external" {
 // PRODUCTION DNS CONFIGURATION
 
 // ACM Public Certificate
-# resource "aws_acm_certificate" "appeals_external_prod" {
+# resource "aws_acm_certificate" "imset_external_prod" {
 #   count = local.is-production ? 1 : 0
 
-#   domain_name       = "${local.appeals}.service.justice.gov.uk"
+#   domain_name       = "${local.imset}.service.justice.gov.uk"
 #   validation_method = "DNS"
 #   lifecycle {
-#     create_before_destroy = true
+#     crimsete_before_destroy = true
 #   }
 # }
 
-# resource "aws_acm_certificate_validation" "appeals_external_prod" {
+# resource "aws_acm_certificate_validation" "imset_external_prod" {
 #   count = local.is-production ? 1 : 0
 
-#   certificate_arn         = aws_acm_certificate.appeals_external_prod[0].arn
-#   validation_record_fqdns = [aws_route53_record.appeals_external_validation_prod[0].fqdn]
+#   certificate_arn         = aws_acm_certificate.imset_external_prod[0].arn
+#   validation_record_fqdns = [aws_route53_record.imset_external_validation_prod[0].fqdn]
 #   timeouts {
-#     create = "10m"
+#     crimsete = "10m"
 #   }
 # }
 
 // Route53 DNS record for certificate validation
-# resource "aws_route53_record" "appeals_external_validation_prod" {
+# resource "aws_route53_record" "imset_external_validation_prod" {
 #   count    = local.is-production ? 1 : 0
 #   provider = aws.core-network-services
 
 #   allow_overwrite = true
-#   name            = tolist(aws_acm_certificate.appeals_external_prod[0].domain_validation_options)[0].resource_record_name
-#   records         = [tolist(aws_acm_certificate.appeals_external_prod[0].domain_validation_options)[0].resource_record_value]
-#   type            = tolist(aws_acm_certificate.appeals_external_prod[0].domain_validation_options)[0].resource_record_type
+#   name            = tolist(aws_acm_certificate.imset_external_prod[0].domain_validation_options)[0].resource_record_name
+#   records         = [tolist(aws_acm_certificate.imset_external_prod[0].domain_validation_options)[0].resource_record_value]
+#   type            = tolist(aws_acm_certificate.imset_external_prod[0].domain_validation_options)[0].resource_record_type
 #   zone_id         = data.aws_route53_zone.application_zone.zone_id
 #   ttl             = 60
 # }
 
 // Route53 DNS record for directing traffic to the service
-# resource "aws_route53_record" "appeals_external_prod" {
+# resource "aws_route53_record" "imset_external_prod" {
 #   count    = local.is-production ? 1 : 0
 #   provider = aws.core-network-services
 
 #   zone_id = data.aws_route53_zone.application_zone.zone_id
-#   name    = "${local.appeals}.service.justice.gov.uk"
+#   name    = "${local.imset}.service.justice.gov.uk"
 #   type    = "A"
 
 #   alias {
-#     name                   = aws_lb.appeals_lb.dns_name
-#     zone_id                = aws_lb.appeals_lb.zone_id
+#     name                   = aws_lb.imset_lb.dns_name
+#     zone_id                = aws_lb.imset_lb.zone_id
 #     evaluate_target_health = true
 #   }
 # }
 
 ####################### ECS #########################################
 
-resource "aws_ecs_cluster" "appeals_cluster" {
-  name = "${local.appeals}_app_cluster"
+resource "aws_ecs_cluster" "imset_cluster" {
+  name = "${local.imset}_app_cluster"
   setting {
     name  = "containerInsights"
     value = "enabled"
   }
 }
 
-resource "aws_cloudwatch_log_group" "appealsFamily_logs" {
-  name = "/ecs/${local.appeals}Family"
+resource "aws_cloudwatch_log_group" "imsetFamily_logs" {
+  name = "/ecs/${local.imset}Family"
 }
 
-resource "aws_ecs_task_definition" "appeals_task_definition" {
-  family                   = "${local.appeals}Family"
+resource "aws_ecs_task_definition" "imset_task_definition" {
+  family                   = "${local.imset}Family"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  execution_role_arn       = aws_iam_role.appeals_execution.arn
-  task_role_arn            = aws_iam_role.appeals_task.arn
+  execution_role_arn       = aws_iam_role.imset_execution.arn
+  task_role_arn            = aws_iam_role.imset_task.arn
   cpu                      = 1024
   memory                   = 2048
   container_definitions = jsonencode([
     {
-      name      = "${local.appeals}-container"
+      name      = "${local.imset}-container"
       image     = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
       cpu       = 1024
       memory    = 2048
@@ -229,7 +229,7 @@ resource "aws_ecs_task_definition" "appeals_task_definition" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.appealsFamily_logs.name}"
+          awslogs-group         = "${aws_cloudwatch_log_group.imsetFamily_logs.name}"
           awslogs-region        = "eu-west-2"
           awslogs-stream-prefix = "ecs"
         }
@@ -237,23 +237,23 @@ resource "aws_ecs_task_definition" "appeals_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${local.appeals_rds_url}"
+          value = "${local.imset_rds_url}"
         },
         {
           name  = "RDS_PORT"
-          value = "${local.appeals_rds_port}"
+          value = "${local.imset_rds_port}"
         },
         {
           name  = "RDS_USERNAME"
-          value = "${local.appeals_rds_user}"
+          value = "${local.imset_rds_user}"
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${local.appeals_rds_password}"
+          value = "${local.imset_rds_password}"
         },
         {
           name  = "DB_NAME"
-          value = "${local.appeals_db_name}"
+          value = "${local.imset_db_name}"
         },
         {
           name  = "supportEmail"
@@ -280,14 +280,14 @@ resource "aws_ecs_task_definition" "appeals_task_definition" {
   }
 }
 
-resource "aws_ecs_service" "appeals_ecs_service" {
+resource "aws_ecs_service" "imset_ecs_service" {
   depends_on = [
-    aws_lb_listener.appeals_lb
+    aws_lb_listener.imset_lb
   ]
 
-  name                              = local.appeals
-  cluster                           = aws_ecs_cluster.appeals_cluster.id
-  task_definition                   = aws_ecs_task_definition.appeals_task_definition.arn
+  name                              = local.imset
+  cluster                           = aws_ecs_cluster.imset_cluster.id
+  task_definition                   = aws_ecs_task_definition.imset_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 1
@@ -295,13 +295,13 @@ resource "aws_ecs_service" "appeals_ecs_service" {
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
-    security_groups  = [aws_security_group.appeals_ecs_service.id]
+    security_groups  = [aws_security_group.imset_ecs_service.id]
     assign_public_ip = true
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.appeals_target_group.arn
-    container_name   = "${local.appeals}-container"
+    target_group_arn = aws_lb_target_group.imset_target_group.arn
+    container_name   = "${local.imset}-container"
     container_port   = 80
   }
 
@@ -310,8 +310,8 @@ resource "aws_ecs_service" "appeals_ecs_service" {
   }
 }
 
-resource "aws_iam_role" "appeals_execution" {
-  name = "execution-${local.appeals}"
+resource "aws_iam_role" "imset_execution" {
+  name = "execution-${local.imset}"
 
   assume_role_policy = <<EOF
 {
@@ -332,14 +332,14 @@ EOF
   tags = merge(
     local.tags,
     {
-      Name = "execution-${local.appeals}"
+      Name = "execution-${local.imset}"
     },
   )
 }
 
-resource "aws_iam_role_policy" "appeals_execution" {
-  name = "execution-${local.appeals}"
-  role = aws_iam_role.appeals_execution.id
+resource "aws_iam_role_policy" "imset_execution" {
+  name = "execution-${local.imset}"
+  role = aws_iam_role.imset_execution.id
 
   policy = <<-EOF
   {
@@ -348,7 +348,7 @@ resource "aws_iam_role_policy" "appeals_execution" {
       {
            "Action": [
               "ecr:*",
-              "logs:CreateLogStream",
+              "logs:CrimseteLogStream",
               "logs:PutLogEvents",
               "secretsmanager:GetSecretValue"
            ],
@@ -360,8 +360,8 @@ resource "aws_iam_role_policy" "appeals_execution" {
   EOF
 }
 
-resource "aws_iam_role" "appeals_task" {
-  name = "task-${local.appeals}"
+resource "aws_iam_role" "imset_task" {
+  name = "task-${local.imset}"
 
   assume_role_policy = <<EOF
 {
@@ -382,14 +382,14 @@ EOF
   tags = merge(
     local.tags,
     {
-      Name = "task-${local.appeals}"
+      Name = "task-${local.imset}"
     },
   )
 }
 
-resource "aws_iam_role_policy" "appeals_task" {
-  name = "task-${local.appeals}"
-  role = aws_iam_role.appeals_task.id
+resource "aws_iam_role_policy" "imset_task" {
+  name = "task-${local.imset}"
+  role = aws_iam_role.imset_task.id
 
   policy = <<-EOF
   {
@@ -398,7 +398,7 @@ resource "aws_iam_role_policy" "appeals_task" {
      {
        "Effect": "Allow",
         "Action": [
-          "logs:CreateLogStream",
+          "logs:CrimseteLogStream",
           "logs:PutLogEvents",
           "ecr:*",
           "iam:*",
@@ -411,7 +411,7 @@ resource "aws_iam_role_policy" "appeals_task" {
   EOF
 }
 
-resource "aws_security_group" "appeals_ecs_service" {
+resource "aws_security_group" "imset_ecs_service" {
   name_prefix = "ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -420,7 +420,7 @@ resource "aws_security_group" "appeals_ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.appeals_lb_sc.id]
+    security_groups = [aws_security_group.imset_lb_sc.id]
   }
 
   egress {
@@ -431,15 +431,15 @@ resource "aws_security_group" "appeals_ecs_service" {
   }
 }
 
-resource "aws_ecr_repository" "appeals-ecr-repo" {
-  name         = "${local.appeals}-ecr-repo"
+resource "aws_ecr_repository" "imset-ecr-repo" {
+  name         = "${local.imset}-ecr-repo"
   force_delete = true
 }
 
 ####################### LOAD BALANCER #########################################
-resource "aws_security_group" "appeals_lb_sc" {
-  name        = "${local.appeals} load balancer security group"
-  description = "control access to the ${local.appeals} load balancer"
+resource "aws_security_group" "imset_lb_sc" {
+  name        = "${local.imset} load balancer security group"
+  description = "control access to the ${local.imset} load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
@@ -474,18 +474,18 @@ resource "aws_security_group" "appeals_lb_sc" {
   }
 }
 
-resource "aws_lb" "appeals_lb" {
-  name                       = "${local.appeals}-load-balancer"
+resource "aws_lb" "imset_lb" {
+  name                       = "${local.imset}-load-balancer"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.appeals_lb_sc.id]
+  security_groups            = [aws_security_group.imset_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
-  depends_on                 = [aws_security_group.appeals_lb_sc]
+  depends_on                 = [aws_security_group.imset_lb_sc]
 }
 
-resource "aws_lb_target_group" "appeals_target_group" {
-  name                 = "${local.appeals}-target-group"
+resource "aws_lb_target_group" "imset_target_group" {
+  name                 = "${local.imset}-target-group"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -508,19 +508,19 @@ resource "aws_lb_target_group" "appeals_target_group" {
 
 }
 
-resource "aws_lb_listener" "appeals_lb" {
+resource "aws_lb_listener" "imset_lb" {
   depends_on = [
-    aws_acm_certificate.appeals_external
+    aws_acm_certificate.imset_external
   ]
-  certificate_arn   = aws_acm_certificate.appeals_external.arn
-  #certificate_arn   = local.is-production ? aws_acm_certificate.appeals_external_prod[0].arn : aws_acm_certificate.appeals_external.arn
-  load_balancer_arn = aws_lb.appeals_lb.arn
+  certificate_arn   = aws_acm_certificate.imset_external.arn
+  #certificate_arn   = local.is-production ? aws_acm_certificate.imset_external_prod[0].arn : aws_acm_certificate.imset_external.arn
+  load_balancer_arn = aws_lb.imset_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
   ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.appeals_target_group.arn
+    target_group_arn = aws_lb_target_group.imset_target_group.arn
   }
 }
