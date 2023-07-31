@@ -46,9 +46,5 @@ locals {
       create_internal_record = true
       create_external_record = false
     }
-    tags = merge(local.tags_all,
-      { Name = lower(format("ec2-%s-%s-base-ami-test-instance", local.application_name, local.environment)) },
-      { server-type = "delius_core_db" }
-    )
   }
 }

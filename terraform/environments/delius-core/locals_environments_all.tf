@@ -14,6 +14,8 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+    ebs_volumes = {}
+    ebs_volume_config = {}
   }
 
   # Merge tags from the environment json file with additional ones
