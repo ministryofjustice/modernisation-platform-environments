@@ -5,6 +5,21 @@ locals {
   dms_iam_role_permissions_boundary = null
 }
 
+# APIGateway Get Policy
+resource "aws_iam_policy" "apigateway_get" {
+  name = "${local.project}_apigateway_get_policy"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "APIGatewayGETPermissions",
+        "Action" : ["apigateway:GET"],
+        "Effect" : "Allow",
+        "Resource" : ["arn:aws:apigateway:${local.current_account_region}::/apis/*"]
+      }
+    ]
+  })
+}
 
 ## Glue DB Default Policy
 resource "aws_glue_resource_policy" "glue_policy" {
@@ -31,7 +46,7 @@ data "aws_iam_policy_document" "glue-policy-data" {
 # Resuse for all S3 read Only
 # S3 Read Only Policy
 resource "aws_iam_policy" "s3_read_access_policy" {
-  name = "dpr_s3_read_policy"
+  name = local.s3_read_access_policy
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -58,7 +73,7 @@ resource "aws_iam_policy" "s3_read_access_policy" {
 
 # KMS Read/Decrypt Policy
 resource "aws_iam_policy" "kms_read_access_policy" {
-  name = "dpr_kms_read_policy"
+  name = local.kms_read_access_policy
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [

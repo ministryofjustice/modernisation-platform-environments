@@ -7,8 +7,9 @@ locals {
     moj_digital_service_desk_vpn              = "81.134.202.29/32" # aka nurved, moj dsd
     moj_aws_digital_macos_globalprotect_alpha = "35.176.93.186/32"
 
-    # for MOJ Official devices on Global Protect VPN
+    # for MOJ Official devices
     mojo_aws_globalprotect_vpc = "10.184.0.0/16"
+    mojo_wifi                  = "10.154.0.0/15"
 
     # for MOJ Official devices internet access
     mojo_aws_preprod_byoip_cidr             = "51.149.251.0/24"
@@ -20,6 +21,9 @@ locals {
 
     # for devices connected to Prison Networks
     vodafone_wan_nicts_aggregate = "10.80.0.0/12"
+
+    # For users without an MOJ Official device, e.g. private prisons
+    mojo_azure_landing_zone = "10.192.0.0/16"
 
     # for DOM1 devices connected to Cisco RAS VPN
     atos_arkc_ras = "10.175.0.0/16"
@@ -42,7 +46,9 @@ locals {
       local.moj_cidr.mojo_aws_globalprotect_vpc,
       local.moj_cidr.atos_arkc_ras,
       local.moj_cidr.atos_arkf_ras,
-      local.moj_cidr.vodafone_wan_nicts_aggregate
+      local.moj_cidr.vodafone_wan_nicts_aggregate,
+      local.moj_cidr.mojo_wifi,
+      local.moj_cidr.mojo_azure_landing_zone,
     ]
 
     trusted_mojo_public = [

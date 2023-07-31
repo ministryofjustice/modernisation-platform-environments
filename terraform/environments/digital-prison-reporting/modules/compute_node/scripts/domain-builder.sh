@@ -5,6 +5,9 @@ exec > >(tee /tmp/userdata.log|logger -t user-data-extra -s 2>/dev/console) 2>&1
 
 echo "assumeyes=1" >> /etc/yum.conf
 
+# Pass Variables into a file
+echo "DOMAIN_API_KEY=${DOMAIN_API_KEY}" >> /etc/environment
+
 # Update all packages
 sudo yum -y update
 
@@ -36,31 +39,37 @@ sudo mkdir -p /home/ssm-user/domain-builder/jars
 sudo chown -R ssm-user /home/ssm-user
 chmod -R 0777 /home/ssm-user/domain-builder
 
+# Retrieve Env Variables
+environment="${ENV}"
+domain_builder_api_key="${DOMAIN_API_KEY}"
+
 # Sync S3 Domain Builder Artifacts
-aws s3 cp s3://dpr-artifact-store-development/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
+aws s3 cp s3://dpr-artifact-store-$environment/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
 
 # Location of script that will be used to launch the domain builder jar.
 launcher_script_location=/usr/bin/domain-builder
 
-# Get the configured API gateway for the domain builder backend API lambda
-domain_builder_url=$(aws apigatewayv2 get-apis --output json | jq -r  '.Items[] | select(.Name == "domain-builder-backend-api") | .ApiEndpoint')
-
-# TODO - remove this temporary fallback once we have permission to call get-apis in the command above.
-#        See DPR-584
-if [ -z "$domain_builder_url" ];
-then
-  domain_builder_url="https://3utboj866g.execute-api.eu-west-2.amazonaws.com"
-  echo "Unable to retrieve domain builder url from api gateway."
-  echo "Falling back to: $domain_builder_url"
-fi
+# Construct the default endpoint URL which follows a consistent pattern.
+domain_builder_url="https://${REST_API_ID}.execute-api.eu-west-2.amazonaws.com/default"
 
 # Generate a launcher script for the jar that starts domain-builder in interactive mode
-# and configured to use the function URL via the DOMAIN_API_URL environment variable.
+# and configured to use the function URL via the DOMAIN_API_URL environment variable
+# and the api-key passed via the DOMAIN_API_KEY environment variable.
 sudo cat <<EOF > $launcher_script_location
 #!/bin/bash
 
-DOMAIN_API_URL="$domain_builder_url" java -jar /home/ssm-user/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar -i --enable-ansi
+# If no args are specified launch interactive domain builder session otherwise
+# pass any args to the domain builder in batch mode.
+if [ \$# -eq 0 ]
+then
+  args="-i --enable-ansi"
+else
+  args=\$@
+fi
 
+    DOMAIN_API_URL="$domain_builder_url" \
+      DOMAIN_API_KEY="$domain_builder_api_key" \
+          java -jar /home/ssm-user/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar \$args
 EOF
 
 sudo chmod 0755 $launcher_script_location

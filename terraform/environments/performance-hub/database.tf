@@ -6,6 +6,7 @@ resource "aws_db_instance" "database" {
   #tfsec:ignore:AWS099
   #checkov:skip=CKV_AWS_118
   #checkov:skip=CKV_AWS_157
+  count                               = local.app_data.accounts[local.environment].db_enabled ? 1 : 0
   identifier                          = local.application_name
   allocated_storage                   = local.app_data.accounts[local.environment].db_allocated_storage
   storage_type                        = "gp2"

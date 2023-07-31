@@ -4,6 +4,10 @@ locals {
   # baseline config
   preproduction_config = {
 
+    cloudwatch_metric_alarms_dbnames = []
+
+    cloudwatch_metric_alarms_dbnames_misload = []
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -117,8 +121,8 @@ locals {
       "preproduction.nomis.service.justice.gov.uk" = {
         records = [
           { name = "ppnomis", type = "A", ttl = "300", records = ["10.40.37.132"] },
-          { name = "ppnomis-a", type = "A", ttl = "3600", records = ["10.40.37.132"] },
-          { name = "ppnomis-b", type = "A", ttl = "3600", records = ["10.40.37.132"] },
+          { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis-b", type = "A", ttl = "300", records = ["10.40.37.132"] },
         ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },

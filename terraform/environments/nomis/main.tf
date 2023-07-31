@@ -48,9 +48,34 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_acm_certificates", {})
   )
 
+  backups = {
+    "everything" = {
+      plans = merge(
+        module.baseline_presets.backup_plans,
+        local.baseline_backup_plans,
+        lookup(local.baseline_environment_config, "baseline_backup_plans", {})
+      )
+    }
+  }
+
   bastion_linux = merge(
     local.baseline_bastion_linux,
     lookup(local.baseline_environment_config, "baseline_bastion_linux", {})
+  )
+
+  cloudwatch_metric_alarms = merge(
+    local.baseline_cloudwatch_metric_alarms,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_metric_alarms", {})
+  )
+
+  cloudwatch_metric_alarms_database = merge(
+    local.baseline_cloudwatch_metric_alarms_database,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_metric_alarms_database", {})
+  )
+
+  cloudwatch_log_metric_filters = merge(
+    local.baseline_cloudwatch_log_metric_filters,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_log_metric_filters", {})
   )
 
   cloudwatch_log_groups = merge(

@@ -3,9 +3,18 @@
 # We're only showing an example AWS resources - doesn't really matter what we use
 ##
 
+<<<<<<< HEAD
 # Pre-req - security group
 resource "aws_security_group" "sg_ldap" {
   name        = format("%s-%s-sg", var.name, var.ldap_config.name)
   vpc_id      = var.account_info.vpc_id
   tags        = {}
 }
+=======
+resource "aws_security_group" "sg_db" {
+  name        = format("%s-%s-sg", var.env_name, var.db_config.name)
+  vpc_id      = var.account_info.vpc_id
+  tags        = {}
+}
+
+>>>>>>> main

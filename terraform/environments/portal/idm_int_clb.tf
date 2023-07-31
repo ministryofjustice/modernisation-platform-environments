@@ -1,19 +1,19 @@
 resource "aws_elb" "idm_lb" {
-name        = "${local.application_name}-internal-lb-idm"
-internal                   = true
-idle_timeout               = 3600
-security_groups            = [aws_security_group.internal_idm_sg.id]
-subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  name            = "${local.application_name}-internal-lb-idm"
+  internal        = true
+  idle_timeout    = 3600
+  security_groups = [aws_security_group.internal_idm_sg.id]
+  subnets         = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
 
 
 
- access_logs {
-    bucket          = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
-    bucket_prefix   = "${local.application_name}-internal-lb-idm"
-    enabled         = true
+  access_logs {
+    bucket        = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
+    bucket_prefix = "${local.application_name}-internal-lb-idm"
+    enabled       = true
   }
 
-listener {
+  listener {
     instance_port     = 1389
     instance_protocol = "TCP"
     lb_port           = 1389
@@ -21,7 +21,7 @@ listener {
   }
 
 
-listener {
+  listener {
     instance_port     = 1636
     instance_protocol = "TCP"
     lb_port           = 1636
@@ -29,7 +29,7 @@ listener {
   }
 
 
-    health_check {
+  health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 10
     timeout             = 5
@@ -53,9 +53,9 @@ resource "aws_elb_attachment" "idm_attachment1" {
 }
 
 resource "aws_elb_attachment" "idm_attachment2" {
-  count             = contains(["development", "testing"], local.environment) ? 0 : 1
-  elb               = aws_elb.idm_lb.id
-  instance          = aws_instance.idm_instance_2[0].id
+  count    = contains(["development", "testing"], local.environment) ? 0 : 1
+  elb      = aws_elb.idm_lb.id
+  instance = aws_instance.idm_instance_2[0].id
 }
 
 resource "aws_security_group" "internal_idm_sg" {

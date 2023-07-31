@@ -143,7 +143,7 @@ resource "aws_iam_role_policy_attachment" "policy_from_json" {
 resource "aws_lambda_function" "athena_load" {
   function_name                  = "data_product_athena_load_${local.environment}"
   description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
-  reserved_concurrent_executions = 10
+  reserved_concurrent_executions = 100
   image_uri                      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:1.0.0"
   package_type                   = "Image"
   role                           = aws_iam_role.athena_load_lambda_role.arn
@@ -158,7 +158,7 @@ resource "aws_lambda_function" "athena_load" {
 }
 
 resource "aws_cloudwatch_event_target" "athena_load_lambda_trigger" {
-  rule      = aws_cloudwatch_event_rule.put_to_data_directory.name
+  rule      = aws_cloudwatch_event_rule.object_created_raw_data.name
   target_id = "athena"
   arn       = aws_lambda_function.athena_load.arn
 }
@@ -168,5 +168,5 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_athena_load_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.athena_load.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.put_to_data_directory.arn
+  source_arn    = aws_cloudwatch_event_rule.object_created_raw_data.arn
 }

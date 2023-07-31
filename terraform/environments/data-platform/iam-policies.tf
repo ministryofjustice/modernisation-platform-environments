@@ -28,3 +28,15 @@ module "github_actions_iam_policy" {
 
   tags = local.tags
 }
+
+data "aws_iam_policy_document" "lambda_trust_policy_doc" {
+  statement {
+    sid     = "LambdaAssumeRole"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}

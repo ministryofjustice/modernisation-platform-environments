@@ -17,6 +17,7 @@ locals {
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
     enable_oracle_secure_web                     = true
+    enable_ec2_put_parameter                     = false
     cloudwatch_metric_alarms                     = {}
     cloudwatch_metric_alarms_lists               = {}
     cloudwatch_metric_alarms_lists_with_actions  = {}
@@ -50,6 +51,9 @@ locals {
 
   baseline_security_groups = {
     data-db = local.security_groups.data_db
+    migration-web-sg = local.security_groups.Web-SG-migration
+    migration-app-sg = local.security_groups.App-SG-migration
+    migration-db-sg = local.security_groups.DB-SG-migration
   }
 
   baseline_sns_topics = {}

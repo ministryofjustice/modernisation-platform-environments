@@ -1,0 +1,13 @@
+{
+  "accounts": {
+    "development": {
+      "example_var": "dev-data"
+    },
+    "preproduction": {
+      "example_var": "preproduction-data"
+    },
+    "production": {
+      "example_var": "production-data"
+    }
+  }
+}

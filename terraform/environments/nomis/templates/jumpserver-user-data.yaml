@@ -1,25 +1,40 @@
 # This is an EC2Launch V2 type user-data script
 # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
 # See C:\ProgramData\Amazon\EC2Launch\log for logs
-version: 1.0
+version: 1.1
 tasks:
   - task: executeScript
     inputs:
       - frequency: once
         type: powershell
         runAs: admin
-        #not actually a secret
-        #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+        # Set time to local and locale
         content: |
           # $ErrorActionPreference = "Stop" # set all errors to terminate script
 
           Set-TimeZone "GMT Standard Time"
           Set-WinSystemLocale "en-GB"
-
-          # Check CWAgent is installed, if it isn't then install it
+      - frequency: once
+        type: powershell
+        runAs: admin
+        #not actually a secret
+        #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+        # Install Cloudwatch agent if missing, otherwise update config and start it
+        content: |
+          # $ErrorActionPreference = "Stop" # set all errors to terminate script
           $timeout = New-TimeSpan -Seconds 600
           $endTime = (Get-Date).Add($timeout)
           $cwagent = Get-Service -Name "AmazonCloudWatchAgent"
+          
+          # Check if parameter doc exists before trying to use it
+          Get-SSMParameter -Name 'cloud-watch-config-windows' -Region 'eu-west-2'
+          if ($?) {
+            Write-Host "Parameter cloud-watch-config-windows found, continuing"
+          } else {
+            Write-Host "Parameter cloud-watch-config-windows not found, exiting"
+            exit 1
+          }
+
           if ($cwagent) {
             Do {
             & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
@@ -32,7 +47,12 @@ tasks:
             & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
             } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
           }
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Install Java from S3 Bucket
+        # Version is uploaded manually from Oracle User site by DBA's
+        content: |
           $S3_BUCKET = "ec2-image-builder-nomis20220314103938567000000001"
 
           # Download Java exe from S3 Bucket
@@ -63,9 +83,11 @@ tasks:
           if ($properties.PSObject.Properties.Name -contains $valueName) {
             Remove-ItemProperty -Path $javaPath -Name $valueName -Force
           }
-
-          ######## EDGE GLOBAL CHANGES ########
-          
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Edge Global Changes
+        content: |          
           $reg_path = "HKLM:\SOFTWARE\Policies\Microsoft\Edge"
           
           # Turn off Edge first run experience
@@ -79,9 +101,11 @@ tasks:
           $reg_path = "HKLM:\SOFTWARE\Policies\Microsoft\Edge\PopupsAllowedForUrls"
           New-Item -Path $reg_path -Force
           New-ItemProperty -Path $reg_path -Name 1 -Value "[*.]justice.gov.uk" -PropertyType String -Force
-
-          ######## IE COMPATIBILITY MODE SITE LIST ########
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # IE COMPATIBILITY MODE SITE LIST
+        content: |
           $ie_compatibility_mode_site_list = @(
               "t1-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
               "t1-nomis-web-a.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
@@ -160,14 +184,16 @@ tasks:
 
           # Add compatibility list to registry
           New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Edge" -Name InternetExplorerIntegrationSiteList -Value $compatibility_site_list_path -PropertyType String -Force
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Create domain allow list for Edge
 
-          ######## CREATE DOMAIN ALLOW LIST FOR EDGE ########
-
-          # The jumpserver is using IE Enhanced Security so each domain needs to be explicitly added to the following
-          # - Registry to allow certain domains to Bypass Enhanced Security (see below)  
-          # - Trusted Sites - HKCU, HKLM does not apply since the machine is not on the domain 
-          # NOTE: https:// traffic ONLY is allowed, these settings are external to this environment and are not managed by this script
-
+        # The jumpserver is using IE Enhanced Security so each domain needs to be explicitly added to the following
+        # - Registry to allow certain domains to Bypass Enhanced Security (see below)  
+        # - Trusted Sites - HKCU, HKLM does not apply since the machine is not on the domain 
+        # NOTE: https:// traffic ONLY is allowed, these settings are external to this environment and are not managed by this script
+        content: |
           $domains = @(
             "*.nomis.hmpps-development.modernisation-platform.justice.gov.uk"
             "*.nomis.hmpps-test.modernisation-platform.justice.gov.uk"
@@ -217,11 +243,14 @@ tasks:
           }
           
           New-ItemProperty -Path $reg_path -Name Security_HKLM_only -Value 1 -PropertyType DWORD -Force
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Install SQL Developer from hmpps common location
+        content: |
+          $S3_BUCKET = "mod-platform-image-artefact-bucket20230203091453221500000001"
 
-          ######## INSTALL SQL DEVELOPER ########
-
-          # Download SQL Developer
-          Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/sqldeveloper-22.2.1.234.1810-x64.zip -File C:\jumpserver-software\sqldeveloper-22.2.1.234.1810-x64.zip
+          Read-S3Object -BucketName $S3_BUCKET -Key "hmpps/sqldeveloper/sqldeveloper-22.2.1.234.1810-x64.zip" -File C:\jumpserver-software\sqldeveloper-22.2.1.234.1810-x64.zip
 
           # Extract SQL Developer - there is no installer for this application
           Expand-Archive -Path C:\jumpserver-software\sqldeveloper-22.2.1.234.1810-x64.zip -DestinationPath "C:\Program Files\Oracle"
@@ -231,13 +260,18 @@ tasks:
           $shortcut_link = $shortcut.CreateShortcut("C:\Users\Public\Desktop\SQL Developer.lnk")
           $shortcut_link.TargetPath = "C:\Program Files\Oracle\sqldeveloper\sqldeveloper.exe"
           $shortcut_link.Save()
-
-          ######## INSTALL LIBREOFFICE ########
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Install LibreOffice
+        content: |
           choco install -y libreoffice-still
 
-          ######## ADD DESKTOP SHORTCUTS FOR T1-3 ########
-
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Add desktop shortcuts for T1-3
+        content: |
           for ($i = 1; $i -le 3; $i++) {
 
             $url = "https://c-t$i.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"

@@ -28,6 +28,40 @@ variable "acm_certificates" {
   default = {}
 }
 
+variable "backups" {
+  description = "map of backup_vaults with associated backup plans to create, where the plan name is the backup_vault name and plan key combined.  Use  'everything' as the map key to use the modernisation platform managed vault"
+  type = map(object({
+    plans = map(object({
+      rule = object({
+        schedule                 = optional(string)
+        enable_continuous_backup = optional(bool)
+        start_window             = optional(number)
+        completion_window        = optional(number)
+        cold_storage_after       = optional(number)
+        delete_after             = number
+      })
+      advanced_backup_setting = optional(object({
+        backup_options = object({
+          WindowsVSS = string
+        })
+        resource_type = string
+      }))
+      selection = object({
+        resources     = optional(list(string))
+        not_resources = optional(list(string))
+        selection_tags = list(object({
+          type  = string
+          key   = string
+          value = string
+        }))
+      })
+      tags = optional(map(string), {})
+    }))
+    tags = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "bastion_linux" {
   description = "set this if you want a bastion linux created"
   type = object({
@@ -53,6 +87,71 @@ variable "cloudwatch_log_groups" {
     skip_destroy      = optional(bool)
     kms_key_id        = optional(string)
     tags              = optional(map(string), {})
+  }))
+  default = {}
+}
+
+variable "cloudwatch_log_metric_filters" {
+  description = "map of cloudwatch log metric filters where the filter name is the map key"
+  type = map(object({
+    pattern        = string
+    log_group_name = string
+    metric_transformation = object({
+      name          = string
+      namespace     = string
+      value         = string
+      default_value = optional(string)
+      dimensions    = optional(map(string))
+      unit          = optional(string)
+    })
+  }))
+  default = {}
+}
+
+variable "cloudwatch_metric_alarms" {
+  description = "map of cloudwatch metric alarms to create, where key is the name of the alarm.  Use split_by_dimension to create one alarm per given dimension value, e.g. one alarm per database"
+  type = map(object({
+    comparison_operator = string
+    evaluation_periods  = number
+    metric_name         = string
+    namespace           = string
+    period              = number
+    statistic           = string
+    threshold           = number
+    alarm_actions       = list(string)
+    actions_enabled     = optional(bool, false)
+    alarm_description   = optional(string)
+    datapoints_to_alarm = optional(number)
+    treat_missing_data  = optional(string, "missing")
+    dimensions          = optional(map(string), {})
+    split_by_dimension = optional(object({
+      dimension_name   = string
+      dimension_values = list(string)
+    }))
+  }))
+  default = {}
+}
+
+variable "cloudwatch_metric_alarms_database" {
+  description = "a second map of cloudwatch metric alarms to create, where key is the name of the alarm.  Use split_by_dimension to create one alarm per given dimension value, e.g. one alarm per database"
+  type = map(object({
+    comparison_operator = string
+    evaluation_periods  = number
+    metric_name         = string
+    namespace           = string
+    period              = number
+    statistic           = string
+    threshold           = number
+    alarm_actions       = list(string)
+    actions_enabled     = optional(bool, false)
+    alarm_description   = optional(string)
+    datapoints_to_alarm = optional(number)
+    treat_missing_data  = optional(string, "missing")
+    dimensions          = optional(map(string), {})
+    split_by_dimension = optional(object({
+      dimension_name   = string
+      dimension_values = list(string)
+    }))
   }))
   default = {}
 }
@@ -85,6 +184,7 @@ variable "ec2_autoscaling_groups" {
         enable_resource_name_dns_a_record    = optional(bool)
         hostname_type                        = string
       }))
+      tags = optional(map(string), {})
     })
     user_data_cloud_init = optional(object({
       args    = optional(map(string))
@@ -102,6 +202,7 @@ variable "ec2_autoscaling_groups" {
       type       = optional(string)
       kms_key_id = optional(string)
     })), {})
+    ebs_volume_tags = optional(map(string), {})
     ebs_volumes = optional(map(object({
       label       = optional(string)
       snapshot_id = optional(string)
@@ -226,6 +327,7 @@ variable "ec2_instances" {
         enable_resource_name_dns_a_record    = optional(bool)
         hostname_type                        = string
       }))
+      tags = optional(map(string), {})
     })
     user_data_cloud_init = optional(object({
       args    = optional(map(string))
@@ -243,6 +345,7 @@ variable "ec2_instances" {
       type       = optional(string)
       kms_key_id = optional(string)
     })), {})
+    ebs_volume_tags = optional(map(string), {})
     ebs_volumes = optional(map(object({
       label       = optional(string)
       snapshot_id = optional(string)

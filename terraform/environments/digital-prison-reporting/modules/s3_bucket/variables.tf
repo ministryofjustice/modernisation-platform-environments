@@ -67,3 +67,30 @@ variable "enable_s3_versioning" {
   description = "Enable Versioning for S3 Bucket, Default is false"
   default     = false
 }
+
+variable "enable_notification" {
+  description = "Enable S3 Bucket Notifications, Default is false"
+  default     = false
+}
+
+#variable "bucket_notifications" {
+#  type        = map(any)
+#  description = "AWS S3 Bucket Notifications"
+#  default     = null
+#}
+
+variable "bucket_notifications" {
+  type = any
+  description = "AWS S3 Bucket Notifications"
+  default = {
+    lambda_function_arn = null,
+    events = [],
+    filter_prefix = null,
+    filter_suffix = null
+   }
+}
+
+variable "dependency_lambda" {
+  type    = any
+  default = []
+}

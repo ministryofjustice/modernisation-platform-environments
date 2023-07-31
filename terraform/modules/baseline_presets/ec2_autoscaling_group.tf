@@ -9,6 +9,13 @@ locals {
       vpc_zone_identifier = var.environment.subnets["private"].ids
     }
 
+    cold_standby = {
+      desired_capacity    = 0
+      max_size            = 1
+      force_delete        = true
+      vpc_zone_identifier = var.environment.subnets["private"].ids
+    }
+
     default_with_ready_hook = {
       desired_capacity          = 1
       max_size                  = 1
