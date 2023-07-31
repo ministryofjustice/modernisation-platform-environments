@@ -1,5 +1,6 @@
 locals {
   cares = "carestandards" 
+  cares_url = "carestandards" 
   cares_folder = "care_standards"
   cares_db_name = "carestandards" 
   cares_db_login_name = "carestandards-app"
@@ -84,7 +85,7 @@ resource "aws_acm_certificate" "cares_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.cares}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["${local.cares_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -127,7 +128,7 @@ resource "aws_route53_record" "cares_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.cares}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${local.cares_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {

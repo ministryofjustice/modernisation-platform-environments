@@ -1,6 +1,7 @@
 #Criminal Injuries Compensation Tribunal
 locals {
   cicap = "cicap" 
+  cicap_url = "cicap" 
   cicap_folder = "cicap"
   cicap_db_name = "cicap" 
   cicap_db_login_name = "cicap-app"
@@ -85,7 +86,7 @@ resource "aws_acm_certificate" "cicap_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.cicap}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["${local.cicap_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -128,7 +129,7 @@ resource "aws_route53_record" "cicap_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.cicap}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${local.cicap_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {

@@ -1,6 +1,7 @@
 #Lands Chamber Tribunal
 locals {
   lands = "lands-chamber" 
+  lands_url = "landschamber"
   lands_folder = "lands_chamber"
   lands_db_name = "lands" 
   lands_db_login_name = "lands-app"
@@ -85,7 +86,7 @@ resource "aws_acm_certificate" "lands_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.lands}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["${local.lands_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -128,7 +129,7 @@ resource "aws_route53_record" "lands_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.lands}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${local.lands_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {

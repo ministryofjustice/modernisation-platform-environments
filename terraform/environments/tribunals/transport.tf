@@ -1,6 +1,7 @@
 #Transport Tribunal
 locals {
   transport = "transport" 
+  transport_url = "transportappeals" 
   transport_folder = "transport"
   transport_db_name = "transport" 
   transport_db_login_name = "transport-app"
@@ -85,7 +86,7 @@ resource "aws_acm_certificate" "transport_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.transport}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["${local.transport_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -128,7 +129,7 @@ resource "aws_route53_record" "transport_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.transport}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${local.transport_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {

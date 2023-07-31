@@ -1,6 +1,7 @@
 #Employment Appeal Tribunal
 locals {
   eat = "eat" 
+  eat_url = "employmentappeals" 
   eat_folder = "employment_appeals"
   eat_db_name = "eat" 
   eat_db_login_name = "eat-app"
@@ -85,7 +86,7 @@ resource "aws_acm_certificate" "eat_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.eat}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["${local.eat_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -128,7 +129,7 @@ resource "aws_route53_record" "eat_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.eat}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${local.eat_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {

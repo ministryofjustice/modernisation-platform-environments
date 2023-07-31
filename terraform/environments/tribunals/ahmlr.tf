@@ -1,6 +1,7 @@
 #Land Registration Division Tribunal (First Tier)
 locals {
   hmlands = "hmlands" 
+  hmlands_url = "landregistrationdivision"
   hmlands_folder = "ahmlr"
   hmlands_db_name = "hmlands" 
   hmlands_db_login_name = "hmlands-app"
@@ -85,7 +86,7 @@ resource "aws_acm_certificate" "hmlands_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.hmlands}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["${local.hmlands_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -128,7 +129,7 @@ resource "aws_route53_record" "hmlands_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.hmlands}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${local.hmlands_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {

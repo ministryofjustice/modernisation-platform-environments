@@ -1,6 +1,7 @@
 #Finance and Tax Tribunal (First Tier)
 locals {
   ftt = "ftt" 
+  ftt_url = "financeandtax"
   ftt_folder = "finance_and_tax"
   ftt_db_name = "ftt" 
   ftt_db_login_name = "ftt-app"
@@ -85,7 +86,7 @@ resource "aws_acm_certificate" "ftt_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.ftt}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["${local.ftt_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -128,7 +129,7 @@ resource "aws_route53_record" "ftt_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.ftt}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${local.ftt_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
