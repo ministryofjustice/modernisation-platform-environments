@@ -668,7 +668,7 @@ resource "aws_security_group_rule" "UAT-Bridge-Server-Ingress" {
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   security_group_id = aws_security_group.Bridge-Server[0].id
 }
 

@@ -83,7 +83,7 @@ resource "aws_cloudwatch_metric_alarm" "linux_cpu_usage_iowait" {
 resource "aws_cloudwatch_metric_alarm" "linux_ec2_high_memory_usage" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
   alarm_name          = "high-memory-usage-${each.key}"
-  comparison_operator = "LessThanOrEqualToThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   datapoints_to_alarm = "2"
   metric_name         = "mem_used_percent"
@@ -92,7 +92,7 @@ resource "aws_cloudwatch_metric_alarm" "linux_ec2_high_memory_usage" {
   statistic           = "Average"
   threshold           = "90"
   treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger"
+  alarm_description   = "This metric monitors the memory used percentage on the instance. If the memory used above 90% for 2 minutes, the alarm will trigger"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
     dimensions = {
     InstanceId = each.key
