@@ -52,7 +52,7 @@ locals {
         }
       }
     }
-    baseline_ec2_autoscaling_group = {
+    baseline_ec2_autoscaling_groups = {
       # Example ASG using base image with ansible provisioning
       # Include the autoscale-trigger-hook ansible role when using hooks
       # dev-base-rhel79 = {
