@@ -3,7 +3,7 @@
 ## AMI data blocks
 data "aws_ami" "oracle_base_prereqs" {
   most_recent = true
-#  owners      = [local.application_data.accounts[local.environment].ami_owner]
+  owners      = [local.application_data.accounts[local.environment].ami_owner]
 
   filter {
     name   = "name"
@@ -17,7 +17,7 @@ data "aws_ami" "oracle_base_prereqs" {
 
 data "aws_ami" "oracle_db" {
   most_recent = true
-#  owners      = [local.application_data.accounts[local.environment].ami_owner]
+  owners      = [local.application_data.accounts[local.environment].ami_owner]
 
   filter {
     name   = "name"
@@ -31,7 +31,7 @@ data "aws_ami" "oracle_db" {
 
 data "aws_ami" "webgate" {
   most_recent = true
-#  owners      = [local.application_data.accounts[local.environment].ami_owner]
+  owners      = [local.application_data.accounts[local.environment].ami_owner]
 
   filter {
     name   = "name"
@@ -45,7 +45,7 @@ data "aws_ami" "webgate" {
 
 data "aws_ami" "accessgate" {
   most_recent = true
-#  owners      = [local.application_data.accounts[local.environment].ami_owner]
+  owners      = [local.application_data.accounts[local.environment].ami_owner]
 
   filter {
     name   = "name"
