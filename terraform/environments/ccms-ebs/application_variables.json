@@ -97,7 +97,7 @@
       "orace_db_ami_name": "Oracle79-prereqs-v2_1",
       "orace_db_dr_ami_name": "EBSDB-DR-test",
       "webgate_ami_name": "ebs-webgate-v2_0",
-      "accessgate_ami_name": "ebs-accessgate-v2_0",
+      "accessgate_ami_name": "ebs-accessgate-v1_2",
       "ec2_instance_type_mailrelay": "c4.large",
       "mailrelay_ami_id": "ami-0a242269c4b530c5e",
       "key_name": "",
