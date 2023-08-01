@@ -108,6 +108,7 @@ locals {
     })
     ebs_volumes = {
       "/dev/sdb" = { type = "gp3", size = 100 }
+      "/dev/sdc" = { type = "gp3", size = 100 }
       "/dev/sds" = { type = "gp3", size = 100 }
     }
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
