@@ -53,4 +53,3 @@ data "aws_acm_certificate" "WAM_PROD_ALB" {
 
 # SNS IAM Policy Condition
 data "aws_caller_identity" "current" {}
-  count    = local.is-production == true ? 1 : 0

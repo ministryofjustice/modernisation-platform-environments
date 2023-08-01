@@ -209,7 +209,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceOwner"
-      values   = [data.aws_caller_identity.current[0].account_id]
+      values   = [data.aws_caller_identity.current.account_id]
     }
 
     resources = [
