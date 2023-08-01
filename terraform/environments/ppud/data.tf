@@ -50,6 +50,3 @@ data "aws_acm_certificate" "WAM_PROD_ALB" {
   domain   = "wam.ppud.justice.gov.uk"
   statuses = ["ISSUED"]
 }
-
-# SNS IAM Policy Condition
-data "aws_caller_identity" "current" {}
