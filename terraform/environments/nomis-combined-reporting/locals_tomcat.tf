@@ -6,6 +6,7 @@ locals {
       bobj_password     = { description = "bobj account password" }
       oracle_password   = { description = "oracle account password" }
       product_key       = { description = "BIP product key" }
+      cms_name          = { description = "Name of the BIP CMS machine" }
       cms_password      = { description = "CMS password for host machine" }
     }
   }
