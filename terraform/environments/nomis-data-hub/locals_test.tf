@@ -24,33 +24,33 @@ locals {
         }
       }
 
-      test-ndh-app-a = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
-        })
-        instance             = merge(module.baseline_presets.ec2_instance.instance.default, {})
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        tags = {
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
-          component   = "ndh"
-          server-type = "ndh-app"
-          monitored   = false
-        }
-      }
+      #      test-ndh-app-a = {
+      #        config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #          ami_name = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
+      #        })
+      #        instance             = merge(module.baseline_presets.ec2_instance.instance.default, {})
+      #        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      #        tags = {
+      #          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+      #          component   = "ndh"
+      #          server-type = "ndh-app"
+      #          monitored   = false
+      #        }
+      #      }
 
-      test-ndh-ems-a = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
-        })
-        instance             = merge(module.baseline_presets.ec2_instance.instance.default, {})
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        tags = {
-          description = "Standalone EC2 for testing RHEL7.9 NDH ems"
-          component   = "ndh"
-          server-type = "ndh-ems"
-          monitored   = false
-        }
-      }
+      #      test-ndh-ems-a = {
+      #        config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #          ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
+      #        })
+      #        instance             = merge(module.baseline_presets.ec2_instance.instance.default, {})
+      #        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      #        tags = {
+      #          description = "Standalone EC2 for testing RHEL7.9 NDH ems"
+      #          component   = "ndh"
+      #          server-type = "ndh-ems"
+      #          monitored   = false
+      #        }
+      #      }
     }
     baseline_ec2_autoscaling_group = {
       # Example ASG using base image with ansible provisioning
