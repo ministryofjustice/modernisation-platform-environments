@@ -58,6 +58,20 @@ visibility_config {
 }
 
 rule {
+    name     = "WhitelistInternalMoJAndPingdom"
+    priority = 4
+    action {
+      type = "ALLOW"
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "PortalManualAllowRuleMetric"
+      sampled_requests_enabled   = true
+    }
+    ip_set_reference_statement   =  aws_waf_ipset.arn
+}
+
+rule {
     name     = "AWSManagedRulesCommonRuleSet"
     priority = 0
 
@@ -226,35 +240,14 @@ rule {
     }
 }
 
-rule {
-    name     = "WhitelistInternalMoJAndPingdom"
-    priority = 4
-
-    action {
-      Allow {}
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "PortalManualAllowRuleMetric"
-      sampled_requests_enabled   = true
-    }
-
-    statement {
-      IPSetReferenceStatement {
-        # ???Arn: !ImportValue common-wafv2-ipset-whitelist Cloudformation code line 37
-        # https://github.com/ministryofjustice/laa-portal/blob/master/aws/wafv2/wafv2.template
-      }
-    }
-}
 }
 
-tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}"
-    }
-  )
+# tags = merge(
+#     local.tags,
+#     {
+#       Name = "${local.application_name}"
+#     }
+#   )
 
 
 
