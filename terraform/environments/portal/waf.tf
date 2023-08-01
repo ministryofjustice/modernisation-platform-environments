@@ -1,5 +1,6 @@
 resource "aws_waf_ipset" "allow" {
-  name = "${upper(var.application_name)} Manual Allow Set"
+  # name = "${upper(var.application_name)} Manual Allow Set"
+  name = "${upper(platform_locals.application_name)} Manual Allow Set"
 
   # Ranges from https://github.com/ministryofjustice/laa-aws-infrastructure/blob/master/waf/wafv2_whitelist.template
   # disc_internet_pipeline, disc_dom1, moj_digital_wifi, petty_france_office365, petty_france_wifi, ark_internet, gateway_proxies
@@ -14,12 +15,15 @@ resource "aws_waf_ipset" "allow" {
 }
 
 resource "aws_waf_ipset" "block" {
-  name = "${upper(var.application_name)} Manual Block Set"
+  # name = "${upper(var.application_name)} Manual Block Set"
+  name = "${upper(platform_locals.application_name)} Manual Block Set"
 }
 
 resource "aws_waf_rule" "allow" {
-  name        = "${upper(var.application_name)} Manual Allow Rule"
-  metric_name = "${upper(var.application_name)}ManualAllowRule"
+  # name        = "${upper(var.application_name)} Manual Allow Rule"
+  # metric_name = "${upper(var.application_name)}ManualAllowRule"
+  name        = "${upper(platform_locals.application_name)} Manual Allow Rule"
+  metric_name = "${upper(platform_locals.application_name)}ManualAllowRule"
 
   predicates {
     data_id = aws_waf_ipset.allow.id
@@ -29,8 +33,10 @@ resource "aws_waf_rule" "allow" {
 }
 
 resource "aws_waf_rule" "block" {
-  name        = "${upper(var.application_name)} Manual Block Rule"
-  metric_name = "${upper(var.application_name)}ManualBlockRule"
+  # name        = "${upper(var.application_name)} Manual Block Rule"
+  # metric_name = "${upper(var.application_name)}ManualBlockRule"
+  name        = "${upper(platform_locals.application_name)} Manual Block Rule"
+  metric_name = "${upper(platform_locals.application_name)} ManualBlockRule"
 
   predicates {
     data_id = aws_waf_ipset.block.id
@@ -40,8 +46,10 @@ resource "aws_waf_rule" "block" {
 }
 
 resource "aws_wafv2_web_acl" "wafv2_acl" {
-name            = "${upper(var.application_name)} Whitelisting Requesters"
-metric_name     = "${upper(var.application_name)}WhitelistingRequesters"
+# name            = "${upper(var.application_name)} Whitelisting Requesters"
+# metric_name     = "${upper(var.application_name)}WhitelistingRequesters"
+name            = "${upper(platform_locals.application_name)} Whitelisting Requesters"
+metric_name     = "${upper(platform_locals.application_name)} WhitelistingRequesters"
 scope           = "CLOUDFRONT"
 
 dynamic "default_action" {
