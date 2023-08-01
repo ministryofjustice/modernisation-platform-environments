@@ -43,14 +43,22 @@ resource "aws_wafv2_web_acl" "wafv2_acl" {
 name            = "${upper(var.application_name)} Whitelisting Requesters"
 metric_name     = "${upper(var.application_name)}WhitelistingRequesters"
 scope           = "CLOUDFRONT"
-default_action {
-    allow {}
-}
-    visibility_config {
+# count           = var.environment != "production" ? 1 : 0
+# default_action {
+#     allow {}
+# }
+visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "PortalWebRequests"
       sampled_requests_enabled   = true
     }
+dynamic default_action {
+  for_each = var.environment ? [] : [1]
+    # visibility_config {
+    #   cloudwatch_metrics_enabled = true
+    #   metric_name                = "PortalWebRequests"
+    #   sampled_requests_enabled   = true
+    # }
 
 rule {
     name     = "AWSManagedRulesCommonRuleSet"
@@ -241,6 +249,7 @@ rule {
         # https://github.com/ministryofjustice/laa-portal/blob/master/aws/wafv2/wafv2.template
       }
     }
+}
 }
 
 tags = merge(
