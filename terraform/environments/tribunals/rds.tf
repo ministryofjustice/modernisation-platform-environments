@@ -76,13 +76,55 @@ resource "aws_security_group" "sqlserver_db_sc" {
     description     = "Allows Administrative Appeals ECS service to access RDS"
     security_groups = [aws_security_group.appeals_ecs_service.id]
   }
-  # ingress {
-  #   from_port       = 1433
-  #   to_port         = 1433
-  #   protocol        = "tcp"
-  #   description     = "Allows Transport ECS service to access RDS"
-  #   security_groups = [aws_security_group.transport_ecs_service.id]
-  # }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Transport ECS service to access RDS"
+    security_groups = [aws_security_group.transport_ecs_service.id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Land Registration Division ECS service to access RDS"
+    security_groups = [aws_security_group.hmlands_ecs_service.id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Criminal Injuries ECS service to access RDS"
+    security_groups = [aws_security_group.cicap_ecs_service.id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Employment Appeals ECS service to access RDS"
+    security_groups = [aws_security_group.eat_ecs_service.id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Finance and Tax ECS service to access RDS"
+    security_groups = [aws_security_group.ftt_ecs_service.id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Immigration Services ECS service to access RDS"
+    security_groups = [aws_security_group.imset_ecs_service.id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Information Tribunal ECS service to access RDS"
+    security_groups = [aws_security_group.it_ecs_service.id]
+  }
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
