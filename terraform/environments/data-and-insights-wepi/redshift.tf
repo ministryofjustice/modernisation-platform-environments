@@ -136,3 +136,22 @@ resource "aws_redshift_cluster_iam_roles" "wepi_redshift_iam_roles" {
     aws_iam_role.wepi_iam_role_redshift_default.arn
   ]
 }
+
+data "aws_vpc_endpoint" "redshift-data" {
+  vpc_id       = data.aws_vpc.shared.id
+  service_name = "com.amazonaws.eu-west-2.redshift-data"
+}
+ 
+data "aws_network_interface" "redshift-data" {
+  for_each = data.aws_vpc_endpoint.redshift-data.network_interface_ids
+  id       = each.value
+}
+ 
+resource "aws_lb" "aws_lb_redshift" {}
+resource "aws_lb_target_group" "aws_lb_redshift_target_group" {}
+resource "aws_lb_target_group_attachment" "redshift data" {
+  for_each         = data.aws_network_interface.redshift-data
+  target_group_arn = aws_lb_target_group.aws_lb_redshift_target_group.arn
+  target_id        = each.value.private_ip
+  port             = 5439
+}
