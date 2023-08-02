@@ -5,14 +5,16 @@ data "local_file" "portal_whitelist" {
 resource "aws_wafv2_ip_set" "portal_whitelist" {
   name               = "portal_whitelist"
   description        = "List of Internal MOJ Addresses that are whitelisted. Comments above the relevant IPs shows where they arehttps://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml"
-  scope              = "CLOUDFRONT"
+  # scope            = "CLOUDFRONT"
+  scope              = "REGIONAL"
   ip_address_version = "IPV4"
   addresses          = [data.local_file.portal_whitelist.content]
 }
 
 resource "aws_wafv2_web_acl" "wafv2_acl" {
-name            = "${upper(local.application_name)}-WebAcl"
-scope           = "CLOUDFRONT"
+name              = "${upper(local.application_name)}-WebAcl"
+# scope           = "CLOUDFRONT"
+scope             = "REGIONAL"
 
 dynamic "default_action" {
   for_each = local.environment == "production" ? [1] : []
@@ -34,7 +36,6 @@ visibility_config {
   sampled_requests_enabled   = true
 }
 
-#This rule is NOT required in Production
 rule {
     name     = "WhitelistInternalMoJAndPingdom"
     priority = 4
