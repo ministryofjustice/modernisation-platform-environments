@@ -357,5 +357,5 @@ resource "aws_iam_policy" "domain_builder_preview_policy" {
 
 resource "aws_iam_role_policy_attachment" "domain_builder_preview_policy" {
   role = aws_iam_role.dpr-domain-builder-backend-api-role.name
-  policy_arn = aws_iam_policy.domain_builder_preview_policy.arn
+  policy_arn = aws_iam_policy.domain-builder-preview-policy.arn
 }
