@@ -355,7 +355,7 @@ resource "aws_iam_policy" "domain_builder_preview_policy" {
   policy      = data.aws_iam_policy_document.domain_builder_preview.json
 }
 
-resource "aws_iam_role_policy_attachment" "domain_builder_preview_policy" {
-  role = aws_iam_role.dpr-domain-builder-backend-api-role.name
-  policy_arn = aws_iam_policy.domain-builder-preview-policy.arn
-}
+#resource "aws_iam_role_policy_attachment" "domain_builder_preview_policy" {
+#  role = aws_iam_role.dpr-domain-builder-backend-api-role.name
+#  policy_arn = aws_iam_policy.domain-builder-preview-policy.arn
+#}
