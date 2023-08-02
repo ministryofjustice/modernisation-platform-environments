@@ -313,6 +313,7 @@ locals {
         random = {
           length  = 30
           special = false
+          numeric = false
         }
         description = "ASMSYS password"
       }
@@ -320,6 +321,7 @@ locals {
         random = {
           length  = 30
           special = false
+          numeric = false
         }
         description = "ASMSNMP password"
       }

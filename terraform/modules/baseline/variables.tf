@@ -884,6 +884,7 @@ variable "ssm_parameters" {
       random = optional(object({
         length  = number
         special = optional(bool)
+        numeric = optional(bool)
       }))
       value = optional(string)
     }))

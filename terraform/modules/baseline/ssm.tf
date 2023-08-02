@@ -46,6 +46,7 @@ resource "random_password" "this" {
 
   length  = each.value.length
   special = each.value.special
+  numeric = each.value.numeric
 }
 
 resource "aws_ssm_parameter" "fixed" {
