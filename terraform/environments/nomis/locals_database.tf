@@ -307,13 +307,12 @@ locals {
       create_external_record = true
     }
 
-    # See DSOS-1975: these random passwords cannot start with a digit
     ssm_parameters = {
       ASMSYS = {
         random = {
           length  = 30
           special = false
-          numeric = false
+          numeric = false # these db random passwords cannot start with a number
         }
         description = "ASMSYS password"
       }
@@ -321,7 +320,7 @@ locals {
         random = {
           length  = 30
           special = false
-          numeric = false
+          numeric = false # these db random passwords cannot start with a number
         }
         description = "ASMSNMP password"
       }
