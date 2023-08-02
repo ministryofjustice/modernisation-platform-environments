@@ -77,7 +77,7 @@ rule {
       sampled_requests_enabled   = true
     }
     ip_set_reference_statement   =  aws_waf_ipset.arn
-    }
+}
 
 rule {
     name     = "AWSManagedRulesCommonRuleSet"
