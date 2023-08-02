@@ -68,16 +68,16 @@ visibility_config {
 rule {
     name     = "WhitelistInternalMoJAndPingdom"
     priority = 4
-    action {
-      type = "ALLOW"
-    }
+    # action {
+    #   type = "ALLOW"
+    # }
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "PortalManualAllowRuleMetric"
       sampled_requests_enabled   = true
     }
     ip_set_reference_statement   =  aws_waf_ipset.arn
-}
+    }
 
 rule {
     name     = "AWSManagedRulesCommonRuleSet"
