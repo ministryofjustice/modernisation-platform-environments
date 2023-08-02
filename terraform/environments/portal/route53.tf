@@ -44,14 +44,14 @@ resource "aws_route53_record" "oam_admin" {
   records  = [aws_instance.oam_instance_1.private_ip]
 }
 
-resource "aws_route53_record" "oam1_nonprod" {
-  provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
-  name     = "${local.application_name}-oam1-ms.${data.aws_route53_zone.portal-dev-private.name}" # Correspond to portal-oam1-ms.aws.dev.legalservices.gov.uk
-  type     = "A"
-  ttl      = 60
-  records  = [aws_instance.oam_instance_1.private_ip]
-}
+# resource "aws_route53_record" "oam1_nonprod" {
+#   provider = aws.core-network-services
+#   zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
+#   name     = "${local.application_name}-oam1-ms.${data.aws_route53_zone.portal-dev-private.name}" # Correspond to portal-oam1-ms.aws.dev.legalservices.gov.uk
+#   type     = "A"
+#   ttl      = 60
+#   records  = [aws_instance.oam_instance_1.private_ip]
+# }
 
 resource "aws_route53_record" "oam2_prod" {
   count    = contains(["development", "testing"], local.environment) ? 0 : 1
