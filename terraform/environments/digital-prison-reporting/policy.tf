@@ -333,7 +333,7 @@ resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
 }
 
 # Additional policy to allow execution of preview queries.
-resource "aws_iam_policy_document" "domain_builder_preview" {
+data "aws_iam_policy_document" "domain_builder_preview" {
   statement {
     actions = [
       "athena:GetQueryExecution",

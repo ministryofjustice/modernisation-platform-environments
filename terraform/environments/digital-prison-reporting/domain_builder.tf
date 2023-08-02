@@ -46,7 +46,7 @@ module "domain_builder_backend_Lambda" {
     "POSTGRES_PASSWORD"   = module.domain_builder_backend_db.master_password
     "POSTGRES_PORT"       = local.rds_dbuilder_port
     "POSTGRES_USERNAME"   = local.rds_dbuilder_user
-    "PREVIEW_DB_NAME"     = local.domain_preview_name
+    "PREVIEW_DB_NAME"     = local.domain_preview_database
     "PREVIEW_S3_LOCATION" = local.domain_preview_s3_bucket
     "PREVIEW_WORKGROUP"   = local.domain_preview_workgroup
   }
