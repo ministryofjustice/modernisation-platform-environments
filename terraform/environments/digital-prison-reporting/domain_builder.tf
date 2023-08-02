@@ -206,7 +206,6 @@ module "domain_builder_gw_vpclink" {
   )
 }
 
-
 # Domain Builder API Gateway
 module "domain_builder_api_gateway" {
   count               = local.enable_dbuilder_serverless_gw == true ? 1 : 0
