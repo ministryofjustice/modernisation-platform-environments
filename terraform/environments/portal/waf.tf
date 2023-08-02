@@ -52,7 +52,7 @@ resource "aws_wafv2_ip_set" "portal_whitelist" {
 # }
 
 resource "aws_wafv2_web_acl" "wafv2_acl" {
-name            = "${upper(local.application_name)} WebAcl"
+name            = "${upper(local.application_name)}-WebAcl"
 scope           = "CLOUDFRONT"
 
 dynamic "default_action" {
