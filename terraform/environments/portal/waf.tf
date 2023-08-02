@@ -1,5 +1,16 @@
+data "local_file" "portal_whitelist" {
+  filename = aws_waf_ipset.txt
+}
+
+resource "aws_wafv2_ip_set" "portal_whitelist" {
+  name               = "portal_whitelist"
+  description        = "List of Internal MOJ Addresses that are whitelisted. Comments above the relevant IPs shows where they arehttps://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml"
+  scope              = "CLOUDFRONT"
+  ip_address_version = "IPV4"
+  addresses          = [data.local_file.portal_whitelist.content]
+}
+
 resource "aws_waf_ipset" "allow" {
-  # name = "${upper(var.application_name)} Manual Allow Set"
   name = "${upper(local.application_name)} Manual Allow Set"
 
   # Ranges from https://github.com/ministryofjustice/laa-aws-infrastructure/blob/master/waf/wafv2_whitelist.template
@@ -15,13 +26,10 @@ resource "aws_waf_ipset" "allow" {
 }
 
 resource "aws_waf_ipset" "block" {
-  # name = "${upper(var.application_name)} Manual Block Set"
   name = "${upper(local.application_name)} Manual Block Set"
 }
 
 resource "aws_waf_rule" "allow" {
-  # name        = "${upper(var.application_name)} Manual Allow Rule"
-  # metric_name = "${upper(var.application_name)}ManualAllowRule"
   name        = "${upper(local.application_name)} Manual Allow Rule"
   metric_name = "${upper(local.application_name)}ManualAllowRule"
 
@@ -33,8 +41,6 @@ resource "aws_waf_rule" "allow" {
 }
 
 resource "aws_waf_rule" "block" {
-  # name        = "${upper(var.application_name)} Manual Block Rule"
-  # metric_name = "${upper(var.application_name)}ManualBlockRule"
   name        = "${upper(local.application_name)} Manual Block Rule"
   metric_name = "${upper(local.application_name)}ManualBlockRule"
 
@@ -46,10 +52,7 @@ resource "aws_waf_rule" "block" {
 }
 
 resource "aws_wafv2_web_acl" "wafv2_acl" {
-# name            = "${upper(var.application_name)} Whitelisting Requesters"
-# metric_name     = "${upper(var.application_name)}WhitelistingRequesters"
-name            = "${upper(local.application_name)} Whitelisting Requesters"
-metric_name     = "${upper(local.application_name)}WhitelistingRequesters"
+name            = "${upper(local.application_name)} WebAcl"
 scope           = "CLOUDFRONT"
 
 dynamic "default_action" {
@@ -65,18 +68,28 @@ visibility_config {
   sampled_requests_enabled   = true
 }
 
+#This rule is NOT required in Production
 rule {
     name     = "WhitelistInternalMoJAndPingdom"
     priority = 4
-    # action {
-    #   type = "ALLOW"
-    # }
+    action {
+      type = "ALLOW"
+    }
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "PortalManualAllowRuleMetric"
       sampled_requests_enabled   = true
     }
-    ip_set_reference_statement   =  aws_waf_ipset.arn
+    statement {
+        ip_set_reference_statement {
+          arn = aws_wafv2_ip_set.ipset_allow.arn
+          ip_set_forwarded_ip_config {
+            header_name = "X-Forwarded-For"
+            fallback_behavior = "NO_MATCH"
+            position = "FIRST"
+          }
+        }
+      }
 }
 
 rule {
@@ -176,14 +189,6 @@ rule {
       managed_rule_group_statement {
         name        = "AWSManagedRulesKnownBadInputsRuleSet"
         vendor_name = "AWS"
-
-        # rule_action_override {
-        #   action_to_use {
-        #     count {}
-        #   }
-
-        #   name = ""
-        # }
       }
     }
 }
@@ -206,14 +211,6 @@ rule {
       managed_rule_group_statement {
         name        = "AWSManagedRulesAmazonIpReputationList"
         vendor_name = "AWS"
-
-        # rule_action_override {
-        #   action_to_use {
-        #     count {}
-        #   }
-
-        #   name = ""
-        # }
       }
     }
 }
@@ -247,15 +244,6 @@ rule {
       }
     }
 }
-
-}
-
-# tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name}"
-#     }
-#   )
 
 
 

@@ -1,10 +1,4 @@
-resource "aws_wafv2_ip_set" "aws_waf_ipset" {
-  name               = "aws_waf_ipset"
-  description        = "List of Internal MOJ Addresses that are whitelisted. Comments above the relevant IPs shows where they arehttps://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml"
-  scope              = "REGIONAL"
-  ip_address_version = "IPV4"
-  addresses          =
-[35.158.144.37/32,
+35.158.144.37/32,
 35.156.166.245/32,
 172.104.153.232/32,
 81.134.202.29/32,
@@ -471,5 +465,4 @@ resource "aws_wafv2_ip_set" "aws_waf_ipset" {
 51.149.249.32/29,
 194.33.248.0/29,
 20.49.214.199/32,
-20.49.214.228/32]
-}
+20.49.214.228/32
