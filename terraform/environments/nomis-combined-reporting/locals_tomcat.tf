@@ -6,6 +6,7 @@ locals {
       bobj_password     = { description = "bobj account password" }
       oracle_password   = { description = "oracle account password" }
       product_key       = { description = "BIP product key" }
+      cms_name          = { description = "Name of the BIP CMS machine" }
       cms_password      = { description = "CMS password for host machine" }
     }
   }
@@ -107,6 +108,7 @@ locals {
     })
     ebs_volumes = {
       "/dev/sdb" = { type = "gp3", size = 100 }
+      "/dev/sdc" = { type = "gp3", size = 100 }
       "/dev/sds" = { type = "gp3", size = 100 }
     }
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
