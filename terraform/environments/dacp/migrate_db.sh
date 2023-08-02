@@ -14,8 +14,8 @@ else
     pg_dump -U $SOURCE_DB_USERNAME -h $SOURCE_DB_HOSTNAME -d $SOURCE_DB_NAME --password $SOURCE_DB_PASSWORD -O --section=data > data.sql
     pg_dump -U $SOURCE_DB_USERNAME -h $SOURCE_DB_HOSTNAME -d $SOURCE_DB_NAME --password $SOURCE_DB_PASSWORD -O --section=post-data > post-data.sql
 
-    psql -U $DACP_DB_USERNAME -h $DB_HOSTNAME -d $DB_NAME --password $DACP_DB_PASSWORD -f pre-data.sql;
-    psql -U $DACP_DB_USERNAME -h $DB_HOSTNAME -d $DB_NAME --password $DACP_DB_PASSWORD -f sequences.sql;
-    psql -U $DACP_DB_USERNAME -h $DB_HOSTNAME -d $DB_NAME --password $DACP_DB_PASSWORD -f data.sql;
-    psql -U $DACP_DB_USERNAME -h $DB_HOSTNAME -d $DB_NAME --password $DACP_DB_PASSWORD -f post-data.sql;
+    psql -U $DACP_DB_USERNAME -h $DB_HOSTNAME -d $DB_NAME --password $DACP_DB_PASSWORD -c "\i pre-data.sql;";
+    psql -U $DACP_DB_USERNAME -h $DB_HOSTNAME -d $DB_NAME --password $DACP_DB_PASSWORD -c "\i sequences.sql;";
+    psql -U $DACP_DB_USERNAME -h $DB_HOSTNAME -d $DB_NAME --password $DACP_DB_PASSWORD -c "\i data.sql;";
+    psql -U $DACP_DB_USERNAME -h $DB_HOSTNAME -d $DB_NAME --password $DACP_DB_PASSWORD -c "\i post-data.sql;";
 fi
