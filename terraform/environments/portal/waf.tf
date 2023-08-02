@@ -73,8 +73,8 @@ rule {
     name     = "WhitelistInternalMoJAndPingdom"
     priority = 4
     action {
-      type = "ALLOW"
-    }
+      allow {}
+      }
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "PortalManualAllowRuleMetric"
