@@ -5,16 +5,16 @@
 resource "aws_wafv2_ip_set" "portal_whitelist" {
   name               = "portal_whitelist"
   description        = "List of Internal MOJ Addresses that are whitelisted. Comments above the relevant IPs shows where they arehttps://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml"
-  # scope            = "CLOUDFRONT"
-  scope              = "REGIONAL"
+  scope              = "CLOUDFRONT"
+  provider           = aws.us-east-1
   ip_address_version = "IPV4"
   addresses          = [for ip in split("\n", chomp(file("${path.module}/aws_waf_ipset.txt"))) : ip]
 }
 
 resource "aws_wafv2_web_acl" "wafv2_acl" {
-name              = "${upper(local.application_name)}-WebAcl"
-# scope           = "CLOUDFRONT"
-scope             = "REGIONAL"
+name                = "${upper(local.application_name)}-WebAcl"
+scope               = "CLOUDFRONT"
+provider            = aws.us-east-1
 
 dynamic "default_action" {
   for_each = local.environment == "production" ? [1] : []
