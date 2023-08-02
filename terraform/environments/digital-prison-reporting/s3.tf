@@ -37,3 +37,23 @@ module "s3_transfer_artifacts_bucket" {
     }
   )
 }
+
+# S3 Domain Preview Bucket, DPR-637
+module "s3_domain_preview_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-domain-preview-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+  cloudtrail_access_policy  = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-preview-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR-637"
+    }
+  )
+}

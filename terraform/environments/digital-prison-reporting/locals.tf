@@ -75,6 +75,9 @@ locals {
   enable_dbuilder_serverless_gw  = local.application_data.accounts[local.environment].enable_dbuilder_serverless_gw
   include_dbuilder_gw_vpclink    = local.application_data.accounts[local.environment].include_dbuilder_gw_vpclink        
   serverless_gw_dbuilder_name    = "${local.project}-serverless-lambda"
+  domain_preview_database        = "curated"
+  domain_preview_s3_bucket       = module.s3_domain_preview_bucket.bucket_id
+  domain_preview_workgroup       = "primary"
 
   nomis_secrets_placeholder = {
     db_name  = "nomis"
