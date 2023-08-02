@@ -487,15 +487,15 @@ resource "aws_iam_role_policy_attachment" "portal" {
 # OAM Route 53 records
 #####################################
 
-resource "aws_route53_record" "oam1_nonprod" {
-  count    = local.environment != "production" ? 1 : 0
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}" # Correspond to portal-oam1-ms.aws.dev.legalservices.gov.uk
-  type     = "A"
-  ttl      = 60
-  records  = [aws_instance.oam_instance_1.private_ip]
-}
+# resource "aws_route53_record" "oam1_nonprod" {
+#   count    = local.environment != "production" ? 1 : 0
+#   provider = aws.core-vpc
+#   zone_id  = data.aws_route53_zone.external.zone_id
+#   name     = "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}" # Correspond to portal-oam1-ms.aws.dev.legalservices.gov.uk
+#   type     = "A"
+#   ttl      = 60
+#   records  = [aws_instance.oam_instance_1.private_ip]
+# }
 
 # resource "aws_route53_record" "oam1_prod" {
 #   provider = aws.core-network-services
