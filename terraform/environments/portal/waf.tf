@@ -1,6 +1,6 @@
-data "local_file" "portal_whitelist" {
-  filename = "aws_waf_ipset.txt"
-}
+# data "local_file" "portal_whitelist" {
+#   filename = "aws_waf_ipset.txt"
+# }
 
 resource "aws_wafv2_ip_set" "portal_whitelist" {
   name               = "portal_whitelist"
@@ -8,7 +8,7 @@ resource "aws_wafv2_ip_set" "portal_whitelist" {
   # scope            = "CLOUDFRONT"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  addresses          = [data.local_file.portal_whitelist.content]
+  addresses          = [for ip in split("\n", chomp(file("${path.module}/aws_waf_ipset.txt"))) : ip]
 }
 
 resource "aws_wafv2_web_acl" "wafv2_acl" {
