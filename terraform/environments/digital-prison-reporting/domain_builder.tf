@@ -66,7 +66,7 @@ module "domain_builder_backend_Lambda" {
     }
   )
 
-  depends_on = [aws_iam_policy.s3_read_access_policy]
+  depends_on = [aws_iam_policy.s3_read_access_policy, aws_iam_policy.domain_builder_preview_policy]
 }
 
 # Domain Builder RDS Instance
