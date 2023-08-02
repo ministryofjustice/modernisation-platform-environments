@@ -108,11 +108,47 @@ resource "null_resource" "setup_db" {
 // executes a local script to set up the security group for the source RDS instance in the dev environment.
 resource "null_resource" "setup_source_rds_security_group_dev" {
   count = local.is-development ? 1 : 0
-  # depends_on = [aws_security_group.modernisation_dacp_access]
-
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command     = "chmod +x ./setup-security-group-dev.sh; ./setup-security-group-dev.sh"
+
+    environment = {
+      RDS_SECURITY_GROUP            = aws_security_group.modernisation_dacp_access.id
+      RDS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["ACCESS_KEY"]
+      RDS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SECRET_KEY"]
+      RDS_SOURCE_ACCOUNT_REGION     = "eu-west-2"
+    }
+  }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
+
+// executes a local script to set up the security group for the source RDS instance in the pre-production environment.
+resource "null_resource" "setup_source_rds_security_group_preproduction" {
+  count = local.is-preproduction ? 1 : 0
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command     = "chmod +x ./setup-security-group-preprod.sh; ./setup-security-group-preprod.sh"
+
+    environment = {
+      RDS_SECURITY_GROUP            = aws_security_group.modernisation_dacp_access.id
+      RDS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["ACCESS_KEY"]
+      RDS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SECRET_KEY"]
+      RDS_SOURCE_ACCOUNT_REGION     = "eu-west-2"
+    }
+  }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
+
+// executes a local script to set up the security group for the source RDS instance in the production environment.
+resource "null_resource" "setup_source_rds_security_group_prod" {
+  count = local.is-production ? 1 : 0
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command     = "chmod +x ./setup-security-group-prod.sh; ./setup-security-group-prod.sh"
 
     environment = {
       RDS_SECURITY_GROUP            = aws_security_group.modernisation_dacp_access.id
