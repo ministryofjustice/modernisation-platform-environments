@@ -23,7 +23,7 @@ resource "aws_waf_rule" "allow" {
   # name        = "${upper(var.application_name)} Manual Allow Rule"
   # metric_name = "${upper(var.application_name)}ManualAllowRule"
   name        = "${upper(local.application_name)} Manual Allow Rule"
-  metric_name = "${upper(local.application_name)} ManualAllowRule"
+  metric_name = "${upper(local.application_name)}ManualAllowRule"
 
   predicates {
     data_id = aws_waf_ipset.allow.id
@@ -36,7 +36,7 @@ resource "aws_waf_rule" "block" {
   # name        = "${upper(var.application_name)} Manual Block Rule"
   # metric_name = "${upper(var.application_name)}ManualBlockRule"
   name        = "${upper(local.application_name)} Manual Block Rule"
-  metric_name = "${upper(local.application_name)} ManualBlockRule"
+  metric_name = "${upper(local.application_name)}ManualBlockRule"
 
   predicates {
     data_id = aws_waf_ipset.block.id
@@ -49,7 +49,7 @@ resource "aws_wafv2_web_acl" "wafv2_acl" {
 # name            = "${upper(var.application_name)} Whitelisting Requesters"
 # metric_name     = "${upper(var.application_name)}WhitelistingRequesters"
 name            = "${upper(local.application_name)} Whitelisting Requesters"
-metric_name     = "${upper(local.application_name)} WhitelistingRequesters"
+metric_name     = "${upper(local.application_name)}WhitelistingRequesters"
 scope           = "CLOUDFRONT"
 
 dynamic "default_action" {
