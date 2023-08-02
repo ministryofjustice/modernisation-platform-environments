@@ -62,6 +62,13 @@ dynamic "default_action" {
   }
 }
 
+dynamic "default_action" {
+  for_each = local.environment != "production" ? [1] : []
+  content {
+    block {}
+  }
+}
+
 visibility_config {
   cloudwatch_metrics_enabled = true
   metric_name                = "PortalWebRequests"
