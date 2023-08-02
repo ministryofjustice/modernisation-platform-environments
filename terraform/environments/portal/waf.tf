@@ -1,5 +1,5 @@
 data "local_file" "portal_whitelist" {
-  filename = aws_waf_ipset.txt
+  filename = "aws_waf_ipset.txt"
 }
 
 resource "aws_wafv2_ip_set" "portal_whitelist" {
@@ -10,46 +10,46 @@ resource "aws_wafv2_ip_set" "portal_whitelist" {
   addresses          = [data.local_file.portal_whitelist.content]
 }
 
-resource "aws_waf_ipset" "allow" {
-  name = "${upper(local.application_name)} Manual Allow Set"
+# resource "aws_waf_ipset" "allow" {
+#   name = "${upper(local.application_name)} Manual Allow Set"
 
-  # Ranges from https://github.com/ministryofjustice/laa-aws-infrastructure/blob/master/waf/wafv2_whitelist.template
-  # disc_internet_pipeline, disc_dom1, moj_digital_wifi, petty_france_office365, petty_france_wifi, ark_internet, gateway_proxies
+#   # Ranges from https://github.com/ministryofjustice/laa-aws-infrastructure/blob/master/waf/wafv2_whitelist.template
+#   # disc_internet_pipeline, disc_dom1, moj_digital_wifi, petty_france_office365, petty_france_wifi, ark_internet, gateway_proxies
 
-  dynamic "ip_set_descriptors" {
-    for_each = local.ip_set_list
-    content {
-      type  = "IPV4"
-      value = ip_set_descriptors.value
-    }
-  }
-}
+#   dynamic "ip_set_descriptors" {
+#     for_each = local.ip_set_list
+#     content {
+#       type  = "IPV4"
+#       value = ip_set_descriptors.value
+#     }
+#   }
+# }
 
-resource "aws_waf_ipset" "block" {
-  name = "${upper(local.application_name)} Manual Block Set"
-}
+# resource "aws_waf_ipset" "block" {
+#   name = "${upper(local.application_name)} Manual Block Set"
+# }
 
-resource "aws_waf_rule" "allow" {
-  name        = "${upper(local.application_name)} Manual Allow Rule"
-  metric_name = "${upper(local.application_name)}ManualAllowRule"
+# resource "aws_waf_rule" "allow" {
+#   name        = "${upper(local.application_name)} Manual Allow Rule"
+#   metric_name = "${upper(local.application_name)}ManualAllowRule"
 
-  predicates {
-    data_id = aws_waf_ipset.allow.id
-    negated = false
-    type    = "IPMatch"
-  }
-}
+#   predicates {
+#     data_id = aws_waf_ipset.allow.id
+#     negated = false
+#     type    = "IPMatch"
+#   }
+# }
 
-resource "aws_waf_rule" "block" {
-  name        = "${upper(local.application_name)} Manual Block Rule"
-  metric_name = "${upper(local.application_name)}ManualBlockRule"
+# resource "aws_waf_rule" "block" {
+#   name        = "${upper(local.application_name)} Manual Block Rule"
+#   metric_name = "${upper(local.application_name)}ManualBlockRule"
 
-  predicates {
-    data_id = aws_waf_ipset.block.id
-    negated = false
-    type    = "IPMatch"
-  }
-}
+#   predicates {
+#     data_id = aws_waf_ipset.block.id
+#     negated = false
+#     type    = "IPMatch"
+#   }
+# }
 
 resource "aws_wafv2_web_acl" "wafv2_acl" {
 name            = "${upper(local.application_name)} WebAcl"
@@ -82,12 +82,12 @@ rule {
     }
     statement {
         ip_set_reference_statement {
-          arn = aws_wafv2_ip_set.ipset_allow.arn
-          ip_set_forwarded_ip_config {
-            header_name = "X-Forwarded-For"
-            fallback_behavior = "NO_MATCH"
-            position = "FIRST"
-          }
+          arn = aws_wafv2_ip_set.portal_whitelist.arn
+          # ip_set_forwarded_ip_config {
+          #   header_name = "X-Forwarded-For"
+          #   fallback_behavior = "NO_MATCH"
+          #   position = "FIRST"
+          # }
         }
       }
 }
