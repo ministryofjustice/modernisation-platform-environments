@@ -55,19 +55,19 @@ resource "aws_wafv2_web_acl" "wafv2_acl" {
 name            = "${upper(local.application_name)}-WebAcl"
 scope           = "CLOUDFRONT"
 
-dynamic "default_action" {
-  for_each = local.environment == "production" ? [1] : []
-  content {
-    allow {}
-  }
-}
+# dynamic "default_action" {
+#   for_each = local.environment == "production" ? [1] : []
+#   content {
+#     allow {}
+#   }
+# }
 
-dynamic "default_action" {
-  for_each = local.environment != "production" ? [1] : []
-  content {
-    block {}
-  }
-}
+# dynamic "default_action" {
+#   for_each = local.environment != "production" ? [1] : []
+#   content {
+#     block {}
+#   }
+# }
 
 visibility_config {
   cloudwatch_metrics_enabled = true
