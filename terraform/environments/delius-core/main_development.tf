@@ -13,10 +13,8 @@ module "environment_dev" {
     aws.core-network-services = aws.core-network-services
   }
 
-  env_name = "dev"
-  app_name = local.application_name
-
-  domain        = local.domain
+  env_name      = "dev"
+  app_name      = local.application_name
   platform_vars = local.platform_vars
 
   network_config  = local.network_config_dev
@@ -51,18 +49,3 @@ module "environment_dev" {
 #
 #  tags = local.tags
 #}
-resource "aws_acm_certificate" "external" {
-  domain_name               = "modernisation-platform.service.justice.gov.uk"
-  validation_method         = "DNS"
-  subject_alternative_names = [local.frontend_url]
-  tags                      = local.tags
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
-}
-

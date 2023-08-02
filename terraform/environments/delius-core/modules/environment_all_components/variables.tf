@@ -101,18 +101,6 @@ variable "tags" {
   type = any
 }
 
-variable "domain" {
-  type = object({
-    domain_name_main   = list(string)
-    domain_name_sub    = list(string)
-    domain_record_main = list(string)
-    domain_record_sub  = list(string)
-    domain_type_main   = list(string)
-    domain_type_sub    = list(string)
-    certificate_arn    = string
-  })
-}
-
 variable "platform_vars" {
   type = object({
     environment_management = any

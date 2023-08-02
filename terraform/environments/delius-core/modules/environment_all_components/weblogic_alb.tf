@@ -31,7 +31,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_f
   from_port                    = var.weblogic_config.frontend_container_port
   to_port                      = var.weblogic_config.frontend_container_port
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  referenced_security_group_id = aws_security_group.weblogic.id
   tags                         = local.tags
 }
 
@@ -55,7 +55,7 @@ resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.delius_core_frontend.id
   port              = 443
   protocol          = "HTTPS"
-  certificate_arn   = var.domain.certificate_arn
+  certificate_arn   = local.certificate_arn
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
@@ -124,10 +124,10 @@ resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 
   allow_overwrite = true
-  name            = var.domain.domain_name_main[0]
-  records         = var.domain.domain_record_main
+  name            = local.domain_name_main[0]
+  records         = local.domain_record_main
   ttl             = 60
-  type            = var.domain.domain_type_main[0]
+  type            = local.domain_type_main[0]
   zone_id         = var.network_config.route53_network_services_zone.zone_id
 }
 
@@ -135,9 +135,25 @@ resource "aws_route53_record" "external_validation_subdomain" {
   provider = aws.core-vpc
 
   allow_overwrite = true
-  name            = var.domain.domain_name_sub[0]
-  records         = var.domain.domain_record_sub
+  name            = local.domain_name_sub[0]
+  records         = local.domain_record_sub
   ttl             = 60
-  type            = var.domain.domain_type_sub[0]
+  type            = local.domain_type_sub[0]
   zone_id         = var.network_config.route53_external_zone.zone_id
+}
+
+resource "aws_acm_certificate" "external" {
+  domain_name               = "modernisation-platform.service.justice.gov.uk"
+  validation_method         = "DNS"
+  subject_alternative_names = [local.frontend_url]
+  tags                      = local.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "external" {
+  certificate_arn         = aws_acm_certificate.external.arn
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
