@@ -53,7 +53,7 @@ metric_name     = "${upper(local.application_name)} WhitelistingRequesters"
 scope           = "CLOUDFRONT"
 
 dynamic "default_action" {
-  for_each = var.environment == "production" ? [1] : []
+  for_each = local.environment == "production" ? [1] : []
   content {
     allow {}
   }
@@ -84,7 +84,7 @@ rule {
     priority = 0
 
     override_action {
-      None {}
+      none {}
     }
 
     visibility_config {
@@ -163,7 +163,7 @@ rule {
     priority = 1
 
     override_action {
-      None {}
+      none {}
     }
 
     visibility_config {
@@ -193,7 +193,7 @@ rule {
     priority = 2
 
     override_action {
-      None {}
+      none {}
     }
 
     visibility_config {
@@ -223,7 +223,7 @@ rule {
     priority = 3
 
     override_action {
-      None {}
+      none {}
     }
 
     visibility_config {
