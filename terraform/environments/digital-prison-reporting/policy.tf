@@ -343,6 +343,9 @@ data "aws_iam_policy_document" "domain_builder_preview" {
       "s3:GetObject",
       "s3:PutObject"
     ]
+    resources = [
+      "*"
+    ]
   }
 }
 
