@@ -90,7 +90,6 @@ resource "null_resource" "setup_db" {
     command     = "chmod +x ./migrate_db.sh; ./migrate_db.sh"
 
     environment = {
-      ENV              = local.application_data.accounts[local.environment]
       SOURCE_DB_HOSTNAME = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SOURCE_DB_HOSTNAME"]
       SOURCE_DB_NAME     = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SOURCE_DB_NAME"]
       SOURCE_DB_USERNAME = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SOURCE_DB_USERNAME"]
