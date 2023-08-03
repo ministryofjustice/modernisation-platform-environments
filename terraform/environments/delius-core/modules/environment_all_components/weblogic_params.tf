@@ -4,9 +4,9 @@
 ##
 
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
-  name  = format("/%s/%s/JCBC_URL", var.account_info.application_name)
+  name  = format("/%s/%s/JCBC_URL", var.account_info.application_name, var.env_name)
   type  = "SecureString"
-  value = format("jdbc:oracle:thin:@//INITIAL_HOSTNAME_OVERRIDEN:INITIAL_PORT_OVERRIDDEN/%s", var.weblogic_config.db_name, var.env_name)
+  value = format("jdbc:oracle:thin:@//INITIAL_HOSTNAME_OVERRIDEN:INITIAL_PORT_OVERRIDDEN/%s", var.weblogic_config.db_name)
   tags  = local.tags
   lifecycle {
     ignore_changes = [
