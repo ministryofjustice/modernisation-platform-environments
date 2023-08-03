@@ -99,7 +99,7 @@ module "s3_bucket_app_deployment" {
   versioning_enabled = true
 
   providers = {
-    aws.bucket-replication = aws
+    aws.bucket-replication = aws.bucket-replication
   }
 
   lifecycle_rule = [
