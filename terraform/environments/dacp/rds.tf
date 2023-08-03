@@ -23,7 +23,7 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
 //SG for accessing the tacticalproducts source DB:
 resource "aws_security_group" "modernisation_dacp_access" {
   provider    = aws.tacticalproducts
-  name        = "modernisation_dacp_access"
+  name        = "modernisation_dacp_access-${local.environment}"
   description = "Allow dacp on modernisation platform to access the source database"
 
   ingress {
