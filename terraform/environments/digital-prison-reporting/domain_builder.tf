@@ -39,13 +39,16 @@ module "domain_builder_backend_Lambda" {
   tracing       = local.lambda_dbuilder_tracing
   timeout       = 60
   env_vars = {
-    "JAVA_TOOL_OPTIONS" = "-XX:MetaspaceSize=32m"
-    "POSTGRES_HOST"     = module.domain_builder_backend_db.rds_host
-    "POSTGRES_DB_NAME"  = local.rds_dbuilder_db_identifier
-    "POSTGRES_USERNAME" = local.rds_dbuilder_user
-    "POSTGRES_PASSWORD" = module.domain_builder_backend_db.master_password
-    "POSTGRES_PORT"     = local.rds_dbuilder_port
-    "DOMAIN_API_KEY"    = module.domain_builder_api_key[0].secret
+    "DOMAIN_API_KEY"      = module.domain_builder_api_key[0].secret
+    "JAVA_TOOL_OPTIONS"   = "-XX:MetaspaceSize=32m"
+    "POSTGRES_DB_NAME"    = local.rds_dbuilder_db_identifier
+    "POSTGRES_HOST"       = module.domain_builder_backend_db.rds_host
+    "POSTGRES_PASSWORD"   = module.domain_builder_backend_db.master_password
+    "POSTGRES_PORT"       = local.rds_dbuilder_port
+    "POSTGRES_USERNAME"   = local.rds_dbuilder_user
+    "PREVIEW_DB_NAME"     = local.domain_preview_database
+    "PREVIEW_S3_LOCATION" = "s3://${local.domain_preview_s3_bucket}"
+    "PREVIEW_WORKGROUP"   = local.domain_preview_workgroup
   }
 
   vpc_settings = {
@@ -63,7 +66,7 @@ module "domain_builder_backend_Lambda" {
     }
   )
 
-  depends_on = [aws_iam_policy.s3_read_access_policy]
+  depends_on = [aws_iam_policy.s3_read_access_policy, aws_iam_policy.domain_builder_preview_policy]
 }
 
 # Domain Builder RDS Instance
@@ -202,7 +205,6 @@ module "domain_builder_gw_vpclink" {
     }
   )
 }
-
 
 # Domain Builder API Gateway
 module "domain_builder_api_gateway" {

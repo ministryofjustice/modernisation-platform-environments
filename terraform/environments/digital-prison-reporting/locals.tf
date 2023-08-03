@@ -62,7 +62,11 @@ locals {
   lambda_dbuilder_handler        = "io.micronaut.function.aws.proxy.MicronautLambdaHandler"
   lambda_dbuilder_code_s3_bucket = module.s3_artifacts_store.bucket_id
   lambda_dbuilder_code_s3_key    = "build-artifacts/domain-builder/jars/domain-builder-backend-api-vLatest-all.jar"
-  lambda_dbuilder_policies       = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", ]
+  lambda_dbuilder_policies       = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.project}-domain-builder-preview-policy"
+  ]
   enable_domain_builder_agent    = local.application_data.accounts[local.environment].enable_domain_builder_agent
   enable_dbuilder_flyway_lambda  = local.application_data.accounts[local.environment].enable_dbuilder_flyway_lambda
   flyway_dbuilder_name           = "${local.project}-domain-builder-flyway"
@@ -75,6 +79,9 @@ locals {
   enable_dbuilder_serverless_gw  = local.application_data.accounts[local.environment].enable_dbuilder_serverless_gw
   include_dbuilder_gw_vpclink    = local.application_data.accounts[local.environment].include_dbuilder_gw_vpclink        
   serverless_gw_dbuilder_name    = "${local.project}-serverless-lambda"
+  domain_preview_database        = "curated"
+  domain_preview_s3_bucket       = module.s3_domain_preview_bucket.bucket_id
+  domain_preview_workgroup       = "primary"
 
   nomis_secrets_placeholder = {
     db_name  = "nomis"

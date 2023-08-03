@@ -331,3 +331,26 @@ resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
   role       = aws_iam_role.redshift-spectrum-role.name
   policy_arn = each.value
 }
+
+# Additional policy to allow execution of preview queries.
+data "aws_iam_policy_document" "domain_builder_preview" {
+  statement {
+    actions = [
+      "athena:GetQueryExecution",
+      "athena:StartQueryExecution",
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "domain_builder_preview_policy" {
+  name        = "${local.project}-domain-builder-preview-policy"
+  description = "Additional policy to allow execution of query previews in Athena"
+  policy      = data.aws_iam_policy_document.domain_builder_preview.json
+}
