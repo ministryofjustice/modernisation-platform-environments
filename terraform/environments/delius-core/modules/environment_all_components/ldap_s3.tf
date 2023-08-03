@@ -98,6 +98,10 @@ module "s3_bucket_app_deployment" {
   bucket_name        = "${var.app_name}-${var.env_name}-openldap-deployment"
   versioning_enabled = true
 
+  providers = {
+    aws.bucket-replication = aws
+  }
+
   lifecycle_rule = [
     {
       id      = "main"
