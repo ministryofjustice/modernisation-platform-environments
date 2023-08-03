@@ -11,10 +11,6 @@ data "aws_secretsmanager_secret" "delius_core_ldap_credential" {
   name = aws_secretsmanager_secret.delius_core_ldap_credential.name
 }
 
-data "aws_ssm_parameter" "delius_core_ldap_principal" {
-  name = aws_ssm_parameter.delius_core_ldap_principal.name
-}
-
 resource "aws_ssm_parameter" "delius_core_ldap_host" {
   name  = format("/%s/%s/LDAP_HOST", var.account_info.application_name, var.env_name)
   type  = "SecureString"

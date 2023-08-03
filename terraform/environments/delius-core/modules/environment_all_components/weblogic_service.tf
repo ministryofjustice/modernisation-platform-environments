@@ -27,10 +27,10 @@ module "weblogic_container" {
     },
     {
       name      = "LDAP_PRINCIPAL"
-      valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_principal.arn
+      valueFrom = aws_secretsmanager_secret.delius_core_ldap_principal.arn
     },
     { name      = "LDAP_CREDENTIAL"
-      valueFrom = data.aws_secretsmanager_secret.ldap_credential.arn
+      valueFrom = aws_secretsmanager_secret.delius_core_ldap_credential.arn
     },
     {
       name      = "USER_CONTEXT"
