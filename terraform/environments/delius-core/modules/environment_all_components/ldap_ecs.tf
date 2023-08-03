@@ -1,3 +1,8 @@
+module "ldap_ecs_policies" {
+  source       = "../ecs_policies"
+  env_name     = var.env_name
+  service_name = "openldap"
+}
 
 # Create s3 bucket for deployment state
 module "s3_bucket_ldap_deployment" {
