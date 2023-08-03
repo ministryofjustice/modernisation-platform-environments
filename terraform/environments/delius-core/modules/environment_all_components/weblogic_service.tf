@@ -177,3 +177,33 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_gro
   from_port                    = var.delius_db_container_config.port
   referenced_security_group_id = aws_security_group.delius_db_security_group.id
 }
+
+resource "aws_security_group" "weblogic" {
+  name        = "${var.env_name}-weblogic-sg"
+  description = "Security group for the ${var.env_name} weblogic service"
+  vpc_id      = var.account_info.vpc_id
+  tags        = local.tags
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "weblogic_allow_all_egress" {
+  description       = "Allow all outbound traffic to any IPv4 address"
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.weblogic.id
+}
+
+resource "aws_security_group_rule" "weblogic_alb" {
+  description       = "Allow inbound traffic from VPC"
+  type              = "ingress"
+  from_port         = var.weblogic_config.frontend_container_port
+  to_port           = var.weblogic_config.frontend_container_port
+  protocol          = "TCP"
+  security_group_id = aws_security_group.ldap.id
+  cidr_blocks       = [var.network_config.shared_vpc_cidr]
+}
