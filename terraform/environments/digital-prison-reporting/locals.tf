@@ -31,8 +31,8 @@ locals {
   generic_lambda           = "${local.project}-generic-lambda"
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
   enable_replication_task  = local.application_data.accounts[local.environment].enable_dms_replication_task
-  datamart_endpoint        = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
-  datamart_port            = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
+  datamart_endpoint        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["endpoint"]
+  datamart_port            = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["port"]
   datamart_username        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["username"]
   datamart_password        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
 

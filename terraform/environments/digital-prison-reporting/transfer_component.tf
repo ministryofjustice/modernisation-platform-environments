@@ -28,7 +28,7 @@ module "transfer_comp_Lambda" {
   layers              = [ module.transfer_comp_lambda_layer.lambda_layer_arn, ]
 
   env_vars = {
-    "DB_CONNECTION_STRING"  = "jdbc:redshift://${local.datamart_endpoint}:${local.datamart_port}/datamart"
+    "DB_CONNECTION_STRING"  = "jdbc:redshift://${local.datamart_endpoint}/datamart"
     "DB_USERNAME"           = local.datamart_username
     "DB_PASSWORD"           = local.datamart_password
     "FLYWAY_METHOD"         = "migrate"
