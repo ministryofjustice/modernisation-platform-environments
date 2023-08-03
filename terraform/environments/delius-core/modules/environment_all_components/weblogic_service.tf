@@ -6,6 +6,12 @@ module "weblogic_container" {
   container_cpu            = 1024
   essential                = true
   readonly_root_filesystem = false
+  environment = [
+    {
+      name  = "LDAP_PORT"
+      value = local.ldap_port
+    }
+  ]
   secrets = [
     {
       name      = "JDBC_URL"
@@ -18,10 +24,6 @@ module "weblogic_container" {
     {
       name      = "TEST_MODE"
       valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_test_mode.arn
-    },
-    {
-      name      = "LDAP_PORT"
-      valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_port.arn
     },
     {
       name      = "LDAP_PRINCIPAL"

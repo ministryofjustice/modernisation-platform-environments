@@ -58,6 +58,30 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
   tags = local.tags
 }
 
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_eis_user_context" {
+  name  = format("/%s/%s/EIS_USER_CONTEXT", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_user_context" {
+  name  = format("/%s/%s/USER_CONTEXT", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
+}
+
 data "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
   name = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_url.name
 }
@@ -81,25 +105,13 @@ data "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
 
 ################
 data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_host" {
-  name = format("/%s/%s/LDAP_HOST", var.account_info.application_name, var.env_name)
-}
-
-data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_port" {
-  name = format("/%s/%s/LDAP_PORT", var.account_info.application_name, var.env_name)
-}
-
-data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_principal" {
-  name = format("/%s/%s/LDAP_PRINCIPAL", var.account_info.application_name, var.env_name)
+  name = aws_ssm_parameter.delius_core_ldap_host.name
 }
 
 data "aws_ssm_parameter" "delius_core_frontend_env_var_user_context" {
-  name = format("/%s/%s/USER_CONTEXT", var.account_info.application_name, var.env_name)
+  name = aws_ssm_parameter.delius_core_frontend_env_var_user_context.name
 }
 
 data "aws_ssm_parameter" "delius_core_frontend_env_var_eis_user_context" {
-  name = format("/%s/%s/EIS_USER_CONTEXT", var.account_info.application_name, var.env_name)
-}
-
-data "aws_secretsmanager_secret" "ldap_credential" {
-  name = "${var.account_info.application_name}-${var.env_name}-openldap-bind-password"
+  name = aws_ssm_parameter.delius_core_frontend_env_var_eis_user_context.name
 }
