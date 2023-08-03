@@ -100,21 +100,6 @@ data "aws_ssm_parameter" "delius_core_frontend_env_var_eis_user_context" {
   name = format("/%s/%s/EIS_USER_CONTEXT", var.account_info.application_name, var.env_name)
 }
 
-resource "aws_secretsmanager_secret" "ldap_credential" {
-  name = "${var.account_info.application_name}-${var.env_name}-openldap-bind-password"
-  tags = local.tags
-}
-
-resource "aws_secretsmanager_secret_version" "ldap_credential" {
-  secret_id     = aws_secretsmanager_secret.ldap_credential.id
-  secret_string = "INITIAL_VALUE_OVERRIDDEN"
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
-}
-
 data "aws_secretsmanager_secret" "ldap_credential" {
   name = "${var.account_info.application_name}-${var.env_name}-openldap-bind-password"
 }
