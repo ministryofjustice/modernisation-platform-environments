@@ -1,7 +1,7 @@
 # Domain Builder Flyway Lambda
 
 module "transfer_comp_lambda_layer" {
-  source                    = "./modules/lambdas/generic"
+  source                    = "./modules/lambdas/layer"
 
   create_layer              = local.create_transfercomp_lambda_layer
   layer_name                = local.lambda_transfercomp_layer_name
