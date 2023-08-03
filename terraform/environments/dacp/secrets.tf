@@ -30,7 +30,7 @@ data "aws_secretsmanager_secret_version" "get_rds_credentials" {
 
 // retrieve secrets for the tactical products database
 data "aws_secretsmanager_secret" "get_tactical_products_db_secrets" {
-  arn = "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:tactical-products-db-secrets-5fWKaj"
+  arn = "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:tactical-products-db-secrets-${local.application_data.accounts[local.environment].tactical_products_db_secrets_arn}"
 }
 
 data "aws_secretsmanager_secret_version" "get_tactical_products_rds_credentials" {
