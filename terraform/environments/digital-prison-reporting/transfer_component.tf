@@ -7,7 +7,7 @@ module "transfer_comp_lambda_layer" {
   layer_name                = local.lambda_transfercomp_layer_name
   description               = "Redshift JDBC Depedency Jar for Flyway Lambda"
   license_info              = "HMPPS, MOJ Reporting Team"
-  local_file                = "transfer-component/layer.zip"
+  local_file                = "transfer-component/redshift-jdbc42-2.1.0.17.jar"
   compatible_runtimes       = ["java11", "java17"]
   compatible_architectures  = ["arm64", "x86_64"]
 }
@@ -29,7 +29,7 @@ module "transfer_comp_Lambda" {
 
   env_vars = {
     "DB_CONNECTION_STRING"  = "jdbc:redshift://${jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]}/datamart"
-    "DB_USERNAME"           = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["user"]
+    "DB_USERNAME"           = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["username"]
     "DB_PASSWORD"           = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
     "FLYWAY_METHOD"         = "migrate"
     "GIT_BRANCH"            = "main"
