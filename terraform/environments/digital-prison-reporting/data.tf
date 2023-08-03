@@ -35,6 +35,11 @@ data "aws_iam_policy" "rds_full_access" {
   arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
+# AWS _IAM_ Policy for Redshift Spectrum
+data "aws_iam_policy" "redshift_spectrum_role" {
+  arn = "arn:aws:iam::771283872747:role/redshift-spectrum-role"
+}
+
 # Get APIGateway Endpoint ID
 data "aws_vpc_endpoint" "api" {
   provider     = aws.core-vpc

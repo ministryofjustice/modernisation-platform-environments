@@ -1,14 +1,24 @@
 # Domain Builder Flyway Lambda
 
 module "transfer_comp_lambda_layer" {
+<<<<<<< HEAD
   source                    = "./modules/lambdas/layer"
+=======
+  source                    = "./modules/lambdas/generic"
+>>>>>>> 24a8a50fd (Terraform Transfer Component)
 
   create_layer              = local.create_transfercomp_lambda_layer
   layer_name                = local.lambda_transfercomp_layer_name
   description               = "Redshift JDBC Depedency Jar for Flyway Lambda"
   license_info              = "HMPPS, MOJ Reporting Team"
+<<<<<<< HEAD
   local_file                = "transfer-component/redshift_dependency.zip"
   compatible_runtimes       = ["java11"]
+=======
+  local_file                = "transfer-component/layer.zip"
+  compatible_runtimes       = ["java11", "java17"]
+  compatible_architectures  = ["arm64", "x86_64"]
+>>>>>>> 24a8a50fd (Terraform Transfer Component)
 }
 
 module "transfer_comp_Lambda" {
@@ -24,6 +34,7 @@ module "transfer_comp_Lambda" {
   tracing             = local.lambda_transfercomp_tracing
   timeout             = 60
   lambda_trigger      = false
+<<<<<<< HEAD
   layers              = [ module.transfer_comp_lambda_layer.lambda_layer_arn, ]
 
   env_vars = {
@@ -31,6 +42,16 @@ module "transfer_comp_Lambda" {
     "DB_USERNAME"           = local.datamart_username
     "DB_PASSWORD"           = local.datamart_password
     "FLYWAY_METHOD"         = "check"
+=======
+  layer               = [ module.transfer_comp_lambda_layer.lambda_layer_arn, ]
+
+  env_vars = {
+    "DB_CONNECTION_STRING"  = "jdbc:redshift://${jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]}/datamart"
+    "DB_USERNAME"           = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["user"]
+    "DB_PASSWORD"           = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
+    "FLYWAY_METHOD"         = "migrate"
+    "GIT_BRANCH"            = "main"
+>>>>>>> 24a8a50fd (Terraform Transfer Component)
     "GIT_FOLDERS"           = "migrations/development/redshift/sql" # Comma Seperated
     "GIT_REPOSITORY"        = "https://github.com/ministryofjustice/digital-prison-reporting-transfer-component"
   }
@@ -43,7 +64,11 @@ module "transfer_comp_Lambda" {
   tags = merge(
     local.all_tags,
     {
+<<<<<<< HEAD
       Name = local.lambda_transfercomp_name
+=======
+      Name = 
+>>>>>>> 24a8a50fd (Terraform Transfer Component)
       Jira = "DPR-504"
       Resource_Group = "transfer-component"
       Resource_Type  = "lambda"

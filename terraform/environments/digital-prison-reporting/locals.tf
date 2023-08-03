@@ -89,13 +89,21 @@ locals {
 
   # Transfer Component
   enable_transfercomp_lambda         = local.application_data.accounts[local.environment].enable_transfer_component_lambda
+<<<<<<< HEAD
   lambda_transfercomp_name           = "${local.project}-transfer-component"
+=======
+  lambda_transfercomp_name           = "${local.project}-transfer-component-function"
+>>>>>>> 24a8a50fd (Terraform Transfer Component)
   lambda_transfercomp_runtime        = "java11"
   lambda_transfercomp_tracing        = "Active"
   lambda_transfercomp_handler        = "com.geekoosh.flyway.FlywayHandler"
   lambda_transfercomp_code_s3_bucket = module.s3_artifacts_store.bucket_id
   lambda_transfercomp_code_s3_key    = "third-party/flyway-generic/flyway-lambda-0.9.jar"
+<<<<<<< HEAD
   lambda_transfercomp_policies       = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", ]
+=======
+  lambda_transfercomp_policies       = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.redshift_spectrum_policy.name}"]
+>>>>>>> 24a8a50fd (Terraform Transfer Component)
   create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
