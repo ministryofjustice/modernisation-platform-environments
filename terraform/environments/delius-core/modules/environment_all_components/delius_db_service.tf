@@ -108,3 +108,9 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_i
   from_port         = 443
   cidr_ipv4         = "0.0.0.0/0"
 }
+
+resource "aws_cloudwatch_log_group" "delius_core_frontend_log_group" {
+  name              = var.delius_db_container_config.fully_qualified_name
+  retention_in_days = 7
+  tags              = local.tags
+}
