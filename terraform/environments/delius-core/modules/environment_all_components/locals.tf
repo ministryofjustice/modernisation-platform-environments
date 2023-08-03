@@ -22,4 +22,26 @@ locals {
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
   certificate_arn = aws_acm_certificate.external.arn
+
+  context = jsonencode({
+    "additional_tag_map" : {},
+    "attributes" : [],
+    "delimiter" : null,
+    "descriptor_formats" : {},
+    "enabled" : true,
+    "environment" : null,
+    "id_length_limit" : null,
+    "label_key_case" : null,
+    "label_order" : [],
+    "label_value_case" : null,
+    "labels_as_tags" : [
+      "unset"
+    ],
+    "name" : null,
+    "namespace" : "${var.app_name}-${var.env_name}",
+    "regex_replace_chars" : null,
+    "stage" : null,
+    "tags" : {},
+    "tenant" : null
+  })
 }
