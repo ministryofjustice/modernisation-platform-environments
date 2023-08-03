@@ -11,7 +11,7 @@ To ensure that people looking at your runbook can get the information they need 
 
 ### **Description:**
 
-Terraform Infrastructure as code that creates 3 AWS environments for the Tipstaff application: Development, PreProduction, and Production, including a RDS Postgresql database, and a DMS Database Migration Service.
+Terraform Infrastructure as code that creates 3 AWS environments for the Tipstaff application: Development, PreProduction, and Production, including a RDS Postgresql database.
 
 ### **Service URLs:**
 
