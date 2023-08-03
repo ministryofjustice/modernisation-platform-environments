@@ -96,7 +96,7 @@ module "s3_bucket_app_deployment" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
   providers = {
-    aws.bucket-replication = aws
+    aws.bucket-replication = aws.bucket-replication
   }
   bucket_name        = "${var.app_name}-${var.env_name}-openldap-deployment"
   versioning_enabled = true
