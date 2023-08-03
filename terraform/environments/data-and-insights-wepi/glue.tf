@@ -19,5 +19,3 @@ resource "aws_glue_connection" "wepi_glue_conn_redshift" {
 
   tags = local.tags
 }
-
-

@@ -138,20 +138,52 @@ resource "aws_redshift_cluster_iam_roles" "wepi_redshift_iam_roles" {
 }
 
 data "aws_vpc_endpoint" "redshift-data" {
+  provider     = aws.core-vpc
   vpc_id       = data.aws_vpc.shared.id
   service_name = "com.amazonaws.eu-west-2.redshift-data"
 }
- 
+
 data "aws_network_interface" "redshift-data" {
+  provider = aws.core-vpc
   for_each = data.aws_vpc_endpoint.redshift-data.network_interface_ids
   id       = each.value
 }
- 
-resource "aws_lb" "aws_lb_redshift" {}
-resource "aws_lb_target_group" "aws_lb_redshift_target_group" {}
-resource "aws_lb_target_group_attachment" "redshift data" {
+
+resource "aws_security_group" "redshift-data-lb" {
+  name   = format("%s-%s-redshift-lb-sg", local.environment, local.application_name)
+  vpc_id = data.aws_vpc.shared.id
+  tags   = local.tags
+}
+
+resource "aws_security_group_rule" "tcp-5439" {
+  cidr_blocks       = ["0.0.0.0/0"]
+  from_port         = 5439
+  protocol          = "tcp"
+  security_group_id = aws_security_group.redshift-data-lb.id
+  to_port           = 5439
+  type              = "ingress"
+}
+
+resource "aws_lb" "redshift-data" {
+  name               = format("%s-redshift-lb", local.environment)
+  internal           = true
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.redshift-data-lb.id] #extra line added late at night
+  subnets            = data.aws_subnets.shared-private.ids
+  tags               = local.tags
+}
+
+resource "aws_lb_target_group" "redshift-data" {
+  name        = "redshift-lb-tg-5439"
+  port        = 5439
+  protocol    = "tcp"
+  target_type = "ip"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_lb_target_group_attachment" "redshift-data" {
   for_each         = data.aws_network_interface.redshift-data
-  target_group_arn = aws_lb_target_group.aws_lb_redshift_target_group.arn
+  target_group_arn = aws_lb_target_group.redshift-data.arn
   target_id        = each.value.private_ip
   port             = 5439
 }
