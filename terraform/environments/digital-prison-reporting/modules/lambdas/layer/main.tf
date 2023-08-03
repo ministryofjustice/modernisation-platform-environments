@@ -11,7 +11,7 @@ resource "aws_lambda_layer_version" "this" {
   description  = var.description
   license_info = var.license_info
 
-  compatible_runtimes      = length(var.compatible_runtimes) > 0 ? var.compatible_runtimes : [var.runtime]
+  compatible_runtimes      = var.compatible_runtimes
   compatible_architectures = var.compatible_architectures
   skip_destroy             = var.layer_skip_destroy
 
