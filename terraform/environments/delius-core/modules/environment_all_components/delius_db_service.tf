@@ -34,13 +34,11 @@ module "db_ecs_policies" {
 
 module "testing_db_service" {
   count                     = var.env_name == "dev" ? 1 : 0
-  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=5f488ac0de669f53e8283fff5bcedf5635034fe1"
+  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
   container_definition_json = module.weblogic_container.json_map_encoded_list
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
-  name                      = "${var.env_name}-testing-db"
+  name                      = "testing-db"
   vpc_id                    = var.network_config.shared_vpc_id
-
-  context = local.context
 
   launch_type  = "FARGATE"
   network_mode = "awsvpc"
@@ -54,6 +52,7 @@ module "testing_db_service" {
   task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.db_ecs_policies[0].task_exec_role.name}"
 
   environment = var.env_name
+  namespace   = var.app_name
 
   security_group_ids = [aws_security_group.weblogic.id]
 

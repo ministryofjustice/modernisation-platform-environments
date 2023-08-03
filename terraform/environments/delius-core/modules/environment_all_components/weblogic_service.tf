@@ -66,13 +66,11 @@ module "weblogic_ecs_policies" {
 }
 
 module "weblogic_service" {
-  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=5f488ac0de669f53e8283fff5bcedf5635034fe1"
+  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
   container_definition_json = module.weblogic_container.json_map_encoded_list
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
-  name                      = "${var.env_name}-weblogic"
+  name                      = "weblogic"
   vpc_id                    = var.network_config.shared_vpc_id
-
-  context = local.context
 
   launch_type  = "FARGATE"
   network_mode = "awsvpc"
@@ -86,6 +84,7 @@ module "weblogic_service" {
   task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.weblogic_ecs_policies.task_exec_role.name}"
 
   environment = var.env_name
+  namespace   = var.app_name
 
   health_check_grace_period_seconds = 0
 
