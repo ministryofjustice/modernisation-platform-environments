@@ -13,7 +13,8 @@ variable "account_info" {
     region           = string,
     vpc_id           = string,
     application_name = string,
-    mp_environment   = string
+    mp_environment   = string,
+    id               = string
   })
 }
 
