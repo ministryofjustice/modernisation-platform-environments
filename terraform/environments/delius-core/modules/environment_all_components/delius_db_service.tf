@@ -35,7 +35,7 @@ module "db_ecs_policies" {
 module "testing_db_service" {
   count                     = var.env_name == "dev" ? 1 : 0
   source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
-  container_definition_json = module.testing_db_container.json_map_encoded_list
+  container_definition_json = module.testing_db_container[0].json_map_encoded_list
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
   name                      = "testing-db"
   vpc_id                    = var.network_config.shared_vpc_id
