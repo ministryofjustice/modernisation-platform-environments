@@ -1,7 +1,7 @@
 locals {
-  s3_bucket         = var.s3_existing_package != null ? try(var.s3_existing_package.bucket, null)
-  s3_key            = var.s3_existing_package != null ? try(var.s3_existing_package.key, null)
-  s3_object_version = var.s3_existing_package != null ? try(var.s3_existing_package.version_id, null)
+  s3_bucket         = var.s3_existing_package != null ? try(var.s3_existing_package.bucket, null) : null
+  s3_key            = var.s3_existing_package != null ? try(var.s3_existing_package.key, null) : null
+  s3_object_version = var.s3_existing_package != null ? try(var.s3_existing_package.version_id, null) : null
 }
 
 resource "aws_lambda_layer_version" "this" {
