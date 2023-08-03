@@ -1,7 +1,3 @@
-# data "local_file" "portal_whitelist" {
-#   filename = "aws_waf_ipset.txt"
-## }
-
 resource "aws_wafv2_ip_set" "portal_whitelist" {
   name               = "portal_whitelist"
   description        = "List of Internal MOJ Addresses that are whitelisted. Comments above the relevant IPs shows where they arehttps://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml"
