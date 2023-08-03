@@ -81,27 +81,27 @@ data "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
 
 ################
 data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_host" {
-  name = format("/%s/LDAP_HOST", var.account_info.application_name)
+  name = format("/%s/%s/LDAP_HOST", var.account_info.application_name, var.env_name)
 }
 
 data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_port" {
-  name = format("/%s/LDAP_PORT", var.account_info.application_name)
+  name = format("/%s/%s/LDAP_PORT", var.account_info.application_name, var.env_name)
 }
 
 data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_principal" {
-  name = format("/%s/LDAP_PRINCIPAL", var.account_info.application_name)
+  name = format("/%s/%s/LDAP_PRINCIPAL", var.account_info.application_name, var.env_name)
 }
 
 data "aws_ssm_parameter" "delius_core_frontend_env_var_user_context" {
-  name = format("/%s/USER_CONTEXT", var.account_info.application_name)
+  name = format("/%s/%s/USER_CONTEXT", var.account_info.application_name, var.env_name)
 }
 
 data "aws_ssm_parameter" "delius_core_frontend_env_var_eis_user_context" {
-  name = format("/%s/EIS_USER_CONTEXT", var.account_info.application_name)
+  name = format("/%s/%s/EIS_USER_CONTEXT", var.account_info.application_name, var.env_name)
 }
 
 resource "aws_secretsmanager_secret" "ldap_credential" {
-  name = "${var.account_info.application_name}-openldap-bind-password"
+  name = "${var.account_info.application_name}-${var.env_name}-openldap-bind-password"
   tags = local.tags
 }
 
@@ -116,5 +116,5 @@ resource "aws_secretsmanager_secret_version" "ldap_credential" {
 }
 
 data "aws_secretsmanager_secret" "ldap_credential" {
-  name = "${var.account_info.application_name}-openldap-bind-password"
+  name = "${var.account_info.application_name}-${var.env_name}-openldap-bind-password"
 }
