@@ -9,7 +9,8 @@ output "secret_arn" {
   value       = aws_secretsmanager_secret.secret.arn
 }
 
-output "version_id" {
-  description = "The unique identifier of the version of the secret."
-  value       = aws_secretsmanager_secret_version.secret_val.version_id
+output "secret_id" {
+  description = "Generated secret"
+  value       = aws_secretsmanager_secret.secret.id
+  sensitive   = true
 }

@@ -28,6 +28,16 @@ output "cloudwatch_log_groups" {
   value       = aws_cloudwatch_log_group.this
 }
 
+output "cloudwatch_log_metric_filters" {
+  description = "map of aws_cloudwatch_log_metric_filter resources"
+  value       = aws_cloudwatch_log_metric_filter.this
+}
+
+output "cloudwatch_metric_alarms" {
+  description = "map of aws_cloudwatch_metric_alarm resources"
+  value       = aws_cloudwatch_metric_alarm.this
+}
+
 output "ec2_autoscaling_groups" {
   description = "map of ec2_autoscaling_group module outputs corresponding to var.ec2_autoscaling_groups"
   value       = module.ec2_autoscaling_group

@@ -33,6 +33,33 @@ locals {
     }
   }
 
+  database_cloudwatch_log_metric_filters = {
+    rman-backup-status = {
+      pattern        = "[month, day, time, hostname, process, message = rman-backup-result, dbname, value]"
+      log_group_name = "cwagent-var-log-messages"
+      metric_transformation = {
+        name      = "RmanBackupStatus"
+        namespace = "Database" # custom namespace
+        value     = "$value"
+        dimensions = {
+          dbname = "$dbname"
+        }
+      }
+    }
+    misload-status = {
+      pattern = "[month, day, time, hostname, process, message1 = misload-status, dbname, value, message2 = \"last-triggered:\", yearmonthday, utctime]"
+      log_group_name = "cwagent-var-log-messages"
+      metric_transformation = {
+        name      = "MisloadStatus"
+        namespace = "Database" # custom namespace
+        value     = "$value"
+        dimensions = {
+          dbname = "$dbname"
+        }
+      }
+    }
+  }
+
   database_cloudwatch_metric_alarms = {
     oracle-db-disconnected = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -128,6 +155,31 @@ locals {
       threshold           = "95"
       alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on a nomis-db instance"
     }
+    rman-backup-failed = {
+      comparison_operator = "LessThanOrEqualToThreshold"
+      evaluation_periods  = 2
+      metric_name         = "RmanBackupStatus"
+      namespace           = "Database"
+      period              = "3600"
+      statistic           = "Maximum"
+      threshold           = "0"
+      alarm_description   = "Triggers if there has been no successful rman backup"
+      datapoints_to_alarm = 1
+    }
+    misload-failed = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = 2
+      metric_name         = "MisloadStatus"
+      namespace           = "Database"
+      period              = "3600"
+      statistic           = "Maximum"
+      threshold           = "1"
+      alarm_description   = "Triggers if misload failed"
+      datapoints_to_alarm = 2
+      /* dimensions = {
+        dbname = "T1MIS" # only one 
+      } */
+    }
   }
 
   database_cloudwatch_metric_alarms_lists = {
@@ -159,6 +211,12 @@ locals {
         { key = "database", name = "cpu-utilization-high-db-2hrs" },
       ]
     }
+    database_dba_by_dbname = {
+      parent_keys = []
+      alarms_list = [
+        { key = "database", name = "rman-backup-failed" },
+      ]
+    }
     database_dba_high_priority = {
       parent_keys = []
       alarms_list = [
@@ -169,6 +227,12 @@ locals {
       parent_keys = []
       alarms_list = [
         { key = "database", name = "fixngo-connection" },
+      ]
+    }
+    misload = {
+      parent_keys = []
+      alarms_list = [
+        { key = "database", name = "misload-failed" },
       ]
     }
   }

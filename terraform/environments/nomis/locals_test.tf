@@ -4,7 +4,20 @@ locals {
   # baseline config
   test_config = {
 
-    rman_database_backups = ["T1CNOM", "T1NDH", "T1TRDAT", "T1ORSYS", "T1MIS", "T1CNMAUD", "T2CNOM", "T2NDH", "T2TRDAT", "T3CNOM"]
+    cloudwatch_metric_alarms_dbnames = [
+      "T1CNOM",
+      "T1NDH",
+      "T1MIS",
+      "T1CNMAUD",
+      "T2CNOM",
+      "T2NDH",
+      "T3CNOM"
+    ]
+
+    cloudwatch_metric_alarms_dbnames_misload = [
+      "T1MIS"
+    ]
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -165,7 +178,7 @@ locals {
       test-jumpserver-2022 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
+          ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))

@@ -4,6 +4,10 @@ locals {
   # baseline config
   production_config = {
 
+    cloudwatch_metric_alarms_dbnames = []
+
+    cloudwatch_metric_alarms_dbnames_misload = []
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this

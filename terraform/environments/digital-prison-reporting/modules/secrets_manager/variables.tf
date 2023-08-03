@@ -80,6 +80,7 @@ variable "secret_access_notification_arn" {
 variable "length" {
   description = "Length of string"
   type        = number
+  default     = 10
 }
 
 variable "min_lower" {
@@ -138,5 +139,22 @@ variable "use_upper" {
 variable "secrets" {
   type        = map(string)
   default     = {}
-  description = "(Optional) Map of Key Value Secrets"
+  description = "(Optional) Map of Key Value Secrets, if Type set to KEY_VALUE"
+}
+
+variable "type" {
+  type    = string
+  default = "MONO"
+}
+
+variable "secret_value" {
+  type    = string
+  default = ""
+  description = "(Optional) Value if the type is set to MONO"
+}
+
+variable "ignore_secret_string" {
+  description = "If to Ignore Local Secret Value changes"
+  type        = bool
+  default     = false
 }

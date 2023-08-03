@@ -63,6 +63,21 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_bastion_linux", {})
   )
 
+  cloudwatch_metric_alarms = merge(
+    local.baseline_cloudwatch_metric_alarms,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_metric_alarms", {})
+  )
+
+  cloudwatch_metric_alarms_database = merge(
+    local.baseline_cloudwatch_metric_alarms_database,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_metric_alarms_database", {})
+  )
+
+  cloudwatch_log_metric_filters = merge(
+    local.baseline_cloudwatch_log_metric_filters,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_log_metric_filters", {})
+  )
+
   cloudwatch_log_groups = merge(
     module.baseline_presets.cloudwatch_log_groups,
     local.baseline_cloudwatch_log_groups,

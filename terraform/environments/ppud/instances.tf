@@ -10,6 +10,12 @@ resource "aws_instance" "s609693lo6vw109" {
   source_dest_check      = false
   subnet_id              = data.aws_subnet.private_subnets_a.id
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s609693lo6vw109"
     patch_group = "dev_win_patch"
@@ -25,6 +31,12 @@ resource "aws_instance" "s609693lo6vw105" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s609693lo6vw105"
     patch_group = "dev_win_patch"
@@ -40,6 +52,12 @@ resource "aws_instance" "s609693lo6vw104" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s609693lo6vw104"
     patch_group = "dev_win_patch"
@@ -55,6 +73,12 @@ resource "aws_instance" "s609693lo6vw100" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s609693lo6vw100"
     patch_group = "dev_win_patch"
@@ -70,6 +94,12 @@ resource "aws_instance" "s609693lo6vw101" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s609693lo6vw101"
     patch_group = "dev_win_patch"
@@ -85,6 +115,12 @@ resource "aws_instance" "s609693lo6vw103" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s609693lo6vw103"
     patch_group = "dev_win_patch"
@@ -100,6 +136,12 @@ resource "aws_instance" "s609693lo6vw106" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Box-VW106[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s609693lo6vw106"
     patch_group = "dev_win_patch"
@@ -115,6 +157,12 @@ resource "aws_instance" "s609693lo6vw107" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Box-VW107[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s609693lo6vw107"
     patch_group = "dev_win_patch"
@@ -130,6 +178,12 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "PPUDWEBSERVER2"
     patch_group = "dev_win_patch"
@@ -145,6 +199,12 @@ resource "aws_instance" "s609693lo6vw102" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Secondary-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s609693lo6vw102"
     patch_group = "dev_win_patch"
@@ -160,6 +220,12 @@ resource "aws_instance" "s609693lo6vw108" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Box-VW108[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s609693lo6vw108"
     patch_group = "dev_win_patch"
@@ -285,7 +351,7 @@ resource "aws_instance" "s618358rgvw020" {
 
 resource "aws_instance" "s618358rgvw021" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-031ef868c45661b8e"
+  ami                    = "ami-05ddec53aa481cbc3"
   instance_type          = "m5.2xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -300,7 +366,7 @@ resource "aws_instance" "s618358rgvw021" {
 
 resource "aws_instance" "s618358rgvw022" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0ea8a11d51f242c52"
+  ami                    = "ami-02f8251c8cdf2464f"
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -315,7 +381,7 @@ resource "aws_instance" "s618358rgvw022" {
 
 resource "aws_instance" "s618358rgvw027" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0280b58742d303104"
+  ami                    = "ami-0e203fec985af6465"
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id

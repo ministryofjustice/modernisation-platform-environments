@@ -31,8 +31,11 @@ module "baseline_presets" {
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
-    iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+    db_backup_s3                                 = true # adds db backup buckets
+    enable_oracle_secure_web                     = true # allows db to list all buckets
+    iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+    iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
 
     cloudwatch_metric_alarms_lists_with_actions = {
       dso_pagerduty = ["dso_pagerduty"]
@@ -86,38 +89,3 @@ module "baseline" {
   s3_buckets             = merge(local.baseline_s3_buckets, module.baseline_presets.s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
   security_groups        = local.baseline_security_groups
 }
-
-# data "aws_lb" "private" {
-#   count = local.environment == "test" ? 1 : 0
-#   name  = "private-lb"
-# }
-# data "aws_lb" "private2" {
-#   count = local.environment == "test" ? 1 : 0
-#   name  = "private2-lb"
-# }
-# resource "aws_lb_target_group" "private-lb-https-443" {
-#   count       = local.environment == "test" ? 1 : 0
-#   name        = "private-lb-https-443"
-#   target_type = "alb"
-#   port        = 443
-#   protocol    = "TCP"
-#   vpc_id      = module.environment.vpc.id
-#   health_check {
-#     enabled             = true
-#     interval            = 30
-#     healthy_threshold   = 3
-#     matcher             = "200-399"
-#     path                = "/"
-#     protocol            = "HTTPS"
-#     port                = 443
-#     timeout             = 5
-#     unhealthy_threshold = 5
-#   }
-# }
-# resource "aws_lb_target_group_attachment" "test" {
-#   count            = local.environment == "test" ? 1 : 0
-#   target_group_arn = aws_lb_target_group.private-lb-https-443[0].arn
-#   target_id        = data.aws_lb.private[0].arn
-#   port             = 443
-# }
-

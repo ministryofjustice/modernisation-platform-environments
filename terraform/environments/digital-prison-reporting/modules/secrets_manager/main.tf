@@ -25,7 +25,40 @@ resource "aws_secretsmanager_secret" "secret" {
   tags                    = var.tags
 }
 
+# value managed on ui/console
+resource "aws_secretsmanager_secret_version" "secret_val_remote" {
+  count         = var.type == "MONO" && var.ignore_secret_string == true ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.secret.id
+  secret_string = var.generate_random ? random_password.random_string[0].result : var.secret_value
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
 resource "aws_secretsmanager_secret_version" "secret_val" {
+  count         = var.type == "MONO" && var.ignore_secret_string == false ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.secret.id
+  secret_string = var.generate_random ? random_password.random_string[0].result : var.secret_value
+}
+
+# value managed on ui/console
+resource "aws_secretsmanager_secret_version" "secret_key_val_remote" {
+  count         = var.type == "KEY_VALUE" && var.ignore_secret_string == true ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.secret.id
+  secret_string = var.generate_random ? random_password.random_string[0].result : jsonencode("${var.secrets}")
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "secret_key_val" {
+  count         = var.type == "KEY_VALUE" && var.ignore_secret_string == false ? 1 : 0
+
   secret_id     = aws_secretsmanager_secret.secret.id
   secret_string = var.generate_random ? random_password.random_string[0].result : jsonencode("${var.secrets}")
 }
