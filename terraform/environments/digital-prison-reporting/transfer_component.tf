@@ -25,7 +25,7 @@ module "transfer_comp_Lambda" {
   tracing             = local.lambda_transfercomp_tracing
   timeout             = 60
   lambda_trigger      = false
-  layer               = [ module.transfer_comp_lambda_layer.lambda_layer_arn, ]
+  layers              = [ module.transfer_comp_lambda_layer.lambda_layer_arn, ]
 
   env_vars = {
     "DB_CONNECTION_STRING"  = "jdbc:redshift://${jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]}/datamart"
