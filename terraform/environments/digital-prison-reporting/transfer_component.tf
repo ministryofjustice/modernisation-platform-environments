@@ -28,11 +28,10 @@ module "transfer_comp_Lambda" {
   layers              = [ module.transfer_comp_lambda_layer.lambda_layer_arn, ]
 
   env_vars = {
-    "DB_CONNECTION_STRING"  = "jdbc:redshift://${jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]}/datamart"
-    "DB_USERNAME"           = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["username"]
-    "DB_PASSWORD"           = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
+    "DB_CONNECTION_STRING"  = "jdbc:redshift://${local.datamart_endpoint}:${local.datamart_port}/datamart"
+    "DB_USERNAME"           = local.datamart_username
+    "DB_PASSWORD"           = local.datamart_password
     "FLYWAY_METHOD"         = "migrate"
-    "GIT_BRANCH"            = "main"
     "GIT_FOLDERS"           = "migrations/development/redshift/sql" # Comma Seperated
     "GIT_REPOSITORY"        = "https://github.com/ministryofjustice/digital-prison-reporting-transfer-component"
   }
