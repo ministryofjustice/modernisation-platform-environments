@@ -1,7 +1,7 @@
 locals {
-  s3_bucket         = var.s3_existing_package != null ? try(var.s3_existing_package.bucket, null) : (var.store_on_s3 ? var.s3_bucket : null)
-  s3_key            = var.s3_existing_package != null ? try(var.s3_existing_package.key, null) : (var.store_on_s3 ? var.s3_prefix != null ? format("%s%s", var.s3_prefix, replace(local.archive_filename_string, "/^.*//", "")) : replace(local.archive_filename_string, "/^\\.//", "") : null)
-  s3_object_version = var.s3_existing_package != null ? try(var.s3_existing_package.version_id, null) : (var.store_on_s3 ? try(aws_s3_object.lambda_package[0].version_id, null) : null)
+  s3_bucket         = var.s3_existing_package != null ? try(var.s3_existing_package.bucket, null)
+  s3_key            = var.s3_existing_package != null ? try(var.s3_existing_package.key, null)
+  s3_object_version = var.s3_existing_package != null ? try(var.s3_existing_package.version_id, null)
 }
 
 resource "aws_lambda_layer_version" "this" {
