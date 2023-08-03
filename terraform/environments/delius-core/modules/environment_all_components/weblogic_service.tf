@@ -207,3 +207,9 @@ resource "aws_security_group_rule" "weblogic_alb" {
   security_group_id = aws_security_group.ldap.id
   cidr_blocks       = [var.network_config.shared_vpc_cidr]
 }
+
+resource "aws_cloudwatch_log_group" "delius_core_frontend_log_group" {
+  name              = var.weblogic_config.frontend_fully_qualified_name
+  retention_in_days = 7
+  tags              = local.tags
+}
