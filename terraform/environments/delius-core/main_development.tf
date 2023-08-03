@@ -21,6 +21,7 @@ module "environment_dev" {
   ldap_config     = local.ldap_config_dev
   db_config       = local.db_config_dev
   weblogic_config = local.weblogic_config_dev
+  bastion         = local.bastion
 
 
   account_info = local.account_info
