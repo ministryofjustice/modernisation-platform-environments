@@ -24,15 +24,15 @@ resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
    cidr_blocks = [
-    #  "10.182.60.51/32",  # NLE CGI proxy 
-    #  "195.59.75.151/32", # New proxy IPs from Prashanth for testing ingestion NLE DEV
-    #  "195.59.75.152/32", # New proxy IPs from Prashanth for testing ingestion NLE DEV
-    #  "194.33.192.0/24",  # New proxy IPs from Prashanth for testing ingestion LE PROD
-    #  "194.33.196.0/24",  # New proxy IPs from Prashanth for testing ingestion LE PROD
-    #  "194.33.248.0/24",  # New proxy IPs from Prashanth for testing ingestion LE PROD
-    #  "194.33.249.0/24",  # New proxy IPs from Prashanth for testing ingestion LE PROD
-    "195.206.176.96/27", # New proxy IPs from Prashanth for testing ingestion LE PRE-
-    "195.206.178.96/27"  # New proxy IPs from Prashanth for testing ingestion LE PRE-
+    "10.182.60.51/32",  # NLE CGI proxy 
+    # "195.59.75.151/32", # New proxy IPs from Prashanth for testing ingestion NLE DEV
+    # "195.59.75.152/32", # New proxy IPs from Prashanth for testing ingestion NLE DEV
+    # "194.33.192.0/24",  # New proxy IPs from Prashanth for testing ingestion LE PROD
+    # "194.33.196.0/24",  # New proxy IPs from Prashanth for testing ingestion LE PROD
+    # "194.33.248.0/24",  # New proxy IPs from Prashanth for testing ingestion LE PROD
+    # "194.33.249.0/24",  # New proxy IPs from Prashanth for testing ingestion LE PROD
+    "195.206.176.96/27", # New proxy IPs from Prashanth for testing ingestion LE PRE
+    "195.206.178.96/27"  # New proxy IPs from Prashanth for testing ingestion LE PRE
   ]
   ipv6_cidr_blocks = [
     "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
