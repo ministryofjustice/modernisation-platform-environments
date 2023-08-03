@@ -115,3 +115,7 @@ data "aws_ssm_parameter" "delius_core_frontend_env_var_user_context" {
 data "aws_ssm_parameter" "delius_core_frontend_env_var_eis_user_context" {
   name = aws_ssm_parameter.delius_core_frontend_env_var_eis_user_context.name
 }
+
+data "aws_ssm_parameter" "delius_core_ldap_principal" {
+  name = aws_ssm_parameter.delius_core_ldap_principal.name
+}
