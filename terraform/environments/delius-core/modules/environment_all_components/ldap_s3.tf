@@ -93,7 +93,7 @@ module "s3_bucket_migration" {
 # Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_name        = "${var.app_name}-${var.env_name}-openldap-deployment"
   versioning_enabled = true
