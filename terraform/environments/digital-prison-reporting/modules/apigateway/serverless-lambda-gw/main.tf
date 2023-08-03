@@ -12,10 +12,26 @@ resource "aws_api_gateway_resource" "this" {
   rest_api_id = aws_api_gateway_rest_api.this.id
 }
 
-resource "aws_api_gateway_resource" "this" {
+resource "aws_api_gateway_resource" "preview" {
   parent_id   = aws_api_gateway_rest_api.this.root_resource_id
   path_part   = "preview"
   rest_api_id = aws_api_gateway_rest_api.this.id
+}
+
+resource "aws_api_gateway_method" "preview" {
+  authorization = "NONE"
+  http_method   = "ANY"
+  resource_id   = aws_api_gateway_resource.preview.id
+  rest_api_id   = aws_api_gateway_rest_api.this.id
+}
+
+resource "aws_api_gateway_integration" "preview" {
+  http_method             = aws_api_gateway_method.this.http_method
+  resource_id             = aws_api_gateway_resource.preview.id
+  rest_api_id             = aws_api_gateway_rest_api.this.id
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = var.lambda_arn
 }
 
 resource "aws_api_gateway_method" "this" {
