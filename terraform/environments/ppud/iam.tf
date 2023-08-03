@@ -205,6 +205,13 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
       "SNS:Publish",
       "SNS:Receive"
     ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceOwner"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+
     resources = [
       aws_sns_topic.cw_alerts[0].arn
     ]

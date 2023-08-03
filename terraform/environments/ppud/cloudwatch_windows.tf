@@ -3,17 +3,16 @@
 # =====================
 
 # Create a data source to fetch the tags of each instance
-data "aws_instances" "tagged_instances" {
+data "aws_instances" "windows_tagged_instances" {
   filter {
      name = "tag:patch_group"
-     values = ["prod_win_patch", "prod_lin_patch"]
+     values = ["prod_win_patch"]
   }
 }
 
-
 # Disk Free Alarm
 resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
-  for_each            = toset(data.aws_instances.tagged_instances.ids)
+  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "high-disk-usage-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -32,28 +31,30 @@ resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
 }
 
 # Low Available Memory Alarm
-resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
-  for_each            = toset(data.aws_instances.tagged_instances.ids)
-  alarm_name          = "low-available-memory-${each.key}"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  period              = "60"
-  threshold           = "10"
-  evaluation_periods  = "3"
-  datapoints_to_alarm = "2"
-  metric_name         = "mem_available_percent"
-  treat_missing_data  = "notBreaching"
+
+resource "aws_cloudwatch_metric_alarm" "Memory_percentage_Committed_Bytes_In_Use" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
+  alarm_name          = "Memory-percentage-Committed-Bytes-In-Use-${each.key}"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "15"
+  datapoints_to_alarm = "15"
+  metric_name         = "Memory % Committed Bytes In Use"
   namespace           = "CWAgent"
-  statistic           = "Average"
-  alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is less than 10% for 2 minutes, the alarm will trigger."
+  period              = "60"
+  statistic           = "Maximum"
+  threshold           = "90"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "Triggers if memory usage is continually high for 15 minutes"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = { 
+    dimensions = {
     InstanceId = each.key
   }
 }
 
+
 # High CPU IOwait Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
-  for_each            = toset(data.aws_instances.tagged_instances.ids)
+  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "cpu-usage-iowait-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "6"
@@ -73,7 +74,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
 
 # CPU Utilization Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu" {
-  for_each            = toset(data.aws_instances.tagged_instances.ids)
+  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "CPU-High-${each.key}"    # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold"   # threshold to trigger the alarm state
   period              = "60"                              # period in seconds over which the specified statistic is applied
@@ -97,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
 
 # Instance Health Alarm
 resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
-  for_each            = toset(data.aws_instances.tagged_instances.ids)
+  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "instance-health-check-failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -117,7 +118,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
 
 # Status Check Alarm
 resource "aws_cloudwatch_metric_alarm" "system_health_check" {
-  for_each            = toset(data.aws_instances.tagged_instances.ids)
+  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "system-health-check-failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -142,7 +143,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
 
 # Status Check Alarm
 resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
-  for_each            = toset(data.aws_instances.tagged_instances.ids)
+  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "IIS-failure-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"

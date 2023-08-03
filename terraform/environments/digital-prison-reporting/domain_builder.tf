@@ -62,6 +62,8 @@ module "domain_builder_backend_Lambda" {
       Name           = local.lambda_dbuilder_name      
     }
   )
+
+  depends_on = [aws_iam_policy.s3_read_access_policy]
 }
 
 # Domain Builder RDS Instance
@@ -112,7 +114,7 @@ module "domain_builder_cli_agent" {
   ebs_size                    = 20
   ebs_encrypted               = true
   ebs_delete_on_termination   = false
-  policies                    = [aws_iam_policy.s3_read_access_policy.arn, aws_iam_policy.kms_read_access_policy.arn, "arn:aws:iam::${local.account_id}:policy/${local.project}_apigateway_get_policy", ]
+  policies                    = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}", "arn:aws:iam::${local.account_id}:policy/${local.apigateway_get_policy}", ]
   region                      = local.account_region
   account                     = local.account_id
   env                         = local.env
@@ -135,7 +137,7 @@ module "domain_builder_cli_agent" {
     }
   )
 
-  depends_on = [aws_iam_policy.apigateway_get]
+  depends_on = [aws_iam_policy.apigateway_get, aws_iam_policy.kms_read_access_policy, aws_iam_policy.s3_read_access_policy]
 }
 
 # Domain Builder Flyway Lambda 
@@ -178,6 +180,7 @@ module "domain_builder_flyway_Lambda" {
       Resource_Type  = "lambda"
     }
   )
+
 }
 
 # Deploy API GW VPC Link

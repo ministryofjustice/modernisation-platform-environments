@@ -52,3 +52,8 @@ output "azure_studio_hosting_cidrs" {
   value       = local.azure_studio_hosting_cidrs
   description = "Azure Studio Hosting AKS aggregate cidrs: map(list(string))"
 }
+
+output "external_cidrs" {
+  value       = local.external_cidrs
+  description = "External cidrs: map(list(string))"
+}

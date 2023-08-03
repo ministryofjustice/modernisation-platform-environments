@@ -40,7 +40,7 @@ locals {
     }
 
     baseline_ec2_instances = {
-      t1-ncr-biplatform-cmc = merge(local.bi-platform_ec2_default, {
+      t1-ncr-bip-cmc = merge(local.bi-platform_ec2_default, {
         tags = merge(local.bi-platform_ec2_default.tags, {
           description = "For testing SAP BI CMC installation and configurations"
           server-type = "ncr-bip-cmc"
@@ -51,7 +51,7 @@ locals {
     
     baseline_ec2_autoscaling_groups = {
 
-      t1-ncr-bitomcat = merge(local.tomcat_ec2_default, {
+      t1-ncr-tomcat = merge(local.tomcat_ec2_default, {
         autoscaling_group = {
           desired_capacity    = 1
           max_size            = 2

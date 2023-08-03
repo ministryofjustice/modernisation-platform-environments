@@ -82,7 +82,31 @@
       "enable_pagerduty_alerts": true
     },
     "production": {
-      "example_var": "production-data"
+      "project_short_id": "dpr",
+      "create_database": true,
+      "db_description": "DPR Data Catalog",
+      "create_job": true,
+      "glue_job_name": "glue-job-ingester",
+      "create_security_conf": true,
+      "setup_buckets": true,
+      "create_kinesis_streams": true,
+      "create_glue_registries": false,
+      "setup_s3_buckets": true,
+      "create_glue_connections": false,
+      "ec2_instance_type": "t3.small",
+      "ami_image_id": "ami-00cc4c3fee6bb6c22",
+      "setup_redshift": true,
+      "enable_dms_replication_task": true,
+      "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
+      "enable_domain_builder_rds": true,
+      "enable_domain_builder_agent": true,
+      "enable_cloud_trail": false,
+      "include_dbuilder_gw_vpclink": false,
+      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": false,
+      "enable_pagerduty_alerts": false
     }
   }
 }
