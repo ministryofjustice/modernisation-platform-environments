@@ -23,6 +23,12 @@ variable "license_info" {
   default     = ""
 }
 
+variable "description" {
+  description = "Description for your Lambda Layer"
+  type        = string
+  default     = ""
+}
+
 variable "compatible_runtimes" {
   description = "A list of Runtimes this layer is compatible with. Up to 5 runtimes can be specified."
   type        = list(string)
@@ -45,4 +51,10 @@ variable "layers" {
   description = "List of Lambda Layer Version ARNs (maximum of 5) to attach to your Lambda Function."
   type        = list(string)
   default     = null
+}
+
+variable "create_layer" {
+  type        = bool
+  default     = false
+  description = "(Optional) Create Lambda Layer, Yes Or NO" 
 }
