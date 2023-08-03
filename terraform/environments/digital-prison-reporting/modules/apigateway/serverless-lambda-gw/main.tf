@@ -26,7 +26,7 @@ resource "aws_api_gateway_method" "preview" {
 }
 
 resource "aws_api_gateway_integration" "preview" {
-  http_method             = aws_api_gateway_method.this.http_method
+  http_method             = aws_api_gateway_method.preview.http_method
   resource_id             = aws_api_gateway_resource.preview.id
   rest_api_id             = aws_api_gateway_rest_api.this.id
   type                    = "AWS_PROXY"
