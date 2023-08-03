@@ -19,10 +19,19 @@ resource "aws_s3_bucket" "PPUD" {
   )
 }
 
+
 resource "aws_s3_bucket_acl" "PPUD_ACL" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.PPUD[0].id
   acl    = "private"
+}
+
+resource "aws_s3_bucket_versioning" "PPUD" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.PPUD[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "PPUD" {
@@ -95,11 +104,20 @@ resource "aws_s3_bucket_policy" "PPUD" {
 
 resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
   bucket = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
-  tags = {
-    Name = "moj-health-check-reports"
-  }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-health-check-reports"
+    }
+  )
 }
 
+resource "aws_s3_bucket_versioning" "MoJ-Health-Check-Reports" {
+  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 
 # S3 Bucket Lifecycle Configuration for SSM Health Check Reports
 
@@ -143,11 +161,21 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
 resource "aws_s3_bucket" "moj-scripts" {
   count  = local.is-production == true ? 1 : 0
   bucket = "moj-scripts"
-  tags = {
-    Name = "moj-scripts"
-  }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-scripts"
+    }
+  )
 }
 
+resource "aws_s3_bucket_versioning" "moj-scripts" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-scripts[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 
 resource "aws_s3_bucket_public_access_block" "moj-scripts" {
   count                   = local.is-production == true ? 1 : 0
@@ -198,8 +226,19 @@ resource "aws_s3_bucket_policy" "moj-scripts" {
 resource "aws_s3_bucket" "MoJ-Release-Management" {
   count  = local.is-production == true ? 1 : 0
   bucket = "moj-release-management"
-  tags = {
-    Name = "moj-release-management"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-release-management"
+    }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "MoJ-Release-Management" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.MoJ-Release-Management[0].id
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 

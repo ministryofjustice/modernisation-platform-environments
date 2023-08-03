@@ -3,7 +3,7 @@ locals {
 
     baseline_ec2_instances = {
 
-      test-managementserver-2022 = {
+      test-management-server-2022 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
@@ -24,7 +24,7 @@ locals {
         }
       }
 
-      test-ndh-app-a = {
+      t2-ndh-app-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
         })
@@ -38,7 +38,7 @@ locals {
         }
       }
 
-      test-ndh-ems-a = {
+      t2-ndh-ems-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
         })
@@ -52,7 +52,7 @@ locals {
         }
       }
     }
-    baseline_ec2_autoscaling_group = {
+    baseline_ec2_autoscaling_groups = {
       # Example ASG using base image with ansible provisioning
       # Include the autoscale-trigger-hook ansible role when using hooks
       # dev-base-rhel79 = {

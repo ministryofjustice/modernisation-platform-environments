@@ -12,7 +12,7 @@ locals {
   frontend_image_tag            = "5.7.6"
   frontend_container_port       = 8080
 
-  openldap_port = 389
+  ldap_port = 389
 
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
@@ -26,5 +26,4 @@ locals {
   domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
-
 }

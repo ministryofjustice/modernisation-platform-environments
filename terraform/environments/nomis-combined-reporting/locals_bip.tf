@@ -110,6 +110,7 @@ locals {
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
     ebs_volumes = {
       "/dev/sdb" = { type = "gp3", size = 100 }
+      "/dev/sdc" = { type = "gp3", size = 100 }
       "/dev/sds" = { type = "gp3", size = 100 }
     }
 
