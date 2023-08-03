@@ -177,8 +177,10 @@ rule {
     name     = "AWSManagedRulesBotControl"
     priority = 3
 
+#the Cloudformation code has the OverrideAction: None: {} in https://github.com/ministryofjustice/laa-portal/blob/master/aws/wafv2/wafv2.template
+#however the LZ Development (and Production) console has the Action set to Override rule group action to count - so Action has been set to count
     override_action {
-      none {}
+      count {}
     }
 
     visibility_config {
