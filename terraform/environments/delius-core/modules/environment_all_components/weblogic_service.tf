@@ -92,7 +92,7 @@ module "weblogic_service" {
     {
       target_group_arn = aws_lb_target_group.delius_core_frontend_target_group.id
       container_name   = "${var.env_name}-weblogic"
-      container_port   = 389
+      container_port   = var.weblogic_config.frontend_container_port
     }
   ]
 
