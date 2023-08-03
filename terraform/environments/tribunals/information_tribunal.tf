@@ -148,7 +148,7 @@ resource "aws_route53_record" "it_external" {
 #   domain_name       = "${local.it}.service.justice.gov.uk"
 #   validation_method = "DNS"
 #   lifecycle {
-#     crite_before_destroy = true
+#     create_before_destroy = true
 #   }
 # }
 
@@ -158,7 +158,7 @@ resource "aws_route53_record" "it_external" {
 #   certificate_arn         = aws_acm_certificate.it_external_prod[0].arn
 #   validation_record_fqdns = [aws_route53_record.it_external_validation_prod[0].fqdn]
 #   timeouts {
-#     crite = "10m"
+#     create = "10m"
 #   }
 # }
 
@@ -349,7 +349,7 @@ resource "aws_iam_role_policy" "it_execution" {
       {
            "Action": [
               "ecr:*",
-              "logs:CriteLogStream",
+              "logs:CreateLogStream",
               "logs:PutLogEvents",
               "secretsmanager:GetSecretValue"
            ],
@@ -399,7 +399,7 @@ resource "aws_iam_role_policy" "it_task" {
      {
        "Effect": "Allow",
         "Action": [
-          "logs:CriteLogStream",
+          "logs:CreateLogStream",
           "logs:PutLogEvents",
           "ecr:*",
           "iam:*",

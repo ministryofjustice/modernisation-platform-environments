@@ -148,7 +148,7 @@ resource "aws_route53_record" "imset_external" {
 #   domain_name       = "${local.imset}.service.justice.gov.uk"
 #   validation_method = "DNS"
 #   lifecycle {
-#     crimsete_before_destroy = true
+#     create_before_destroy = true
 #   }
 # }
 
@@ -158,7 +158,7 @@ resource "aws_route53_record" "imset_external" {
 #   certificate_arn         = aws_acm_certificate.imset_external_prod[0].arn
 #   validation_record_fqdns = [aws_route53_record.imset_external_validation_prod[0].fqdn]
 #   timeouts {
-#     crimsete = "10m"
+#     create = "10m"
 #   }
 # }
 
@@ -349,7 +349,7 @@ resource "aws_iam_role_policy" "imset_execution" {
       {
            "Action": [
               "ecr:*",
-              "logs:CrimseteLogStream",
+              "logs:CreateLogStream",
               "logs:PutLogEvents",
               "secretsmanager:GetSecretValue"
            ],
@@ -399,7 +399,7 @@ resource "aws_iam_role_policy" "imset_task" {
      {
        "Effect": "Allow",
         "Action": [
-          "logs:CrimseteLogStream",
+          "logs:CreateLogStream",
           "logs:PutLogEvents",
           "ecr:*",
           "iam:*",

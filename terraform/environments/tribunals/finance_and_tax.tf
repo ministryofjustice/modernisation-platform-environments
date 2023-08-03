@@ -5,7 +5,7 @@ locals {
   ftt_folder = "finance_and_tax"
   ftt_db_name = "ftt" 
   ftt_db_login_name = "ftt-app"
-  ftt_source_db_name = "ftt"
+  ftt_source_db_name = "Ftt"
   ftt_rds_url               = "${aws_db_instance.rdsdb.address}"      
   ftt_rds_user              = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
   ftt_rds_port              = "1433"
@@ -148,7 +148,7 @@ resource "aws_route53_record" "ftt_external" {
 #   domain_name       = "${local.ftt}.service.justice.gov.uk"
 #   validation_method = "DNS"
 #   lifecycle {
-#     crftte_before_destroy = true
+#     create_before_destroy = true
 #   }
 # }
 
@@ -158,7 +158,7 @@ resource "aws_route53_record" "ftt_external" {
 #   certificate_arn         = aws_acm_certificate.ftt_external_prod[0].arn
 #   validation_record_fqdns = [aws_route53_record.ftt_external_validation_prod[0].fqdn]
 #   timeouts {
-#     crftte = "10m"
+#     create = "10m"
 #   }
 # }
 
@@ -349,7 +349,7 @@ resource "aws_iam_role_policy" "ftt_execution" {
       {
            "Action": [
               "ecr:*",
-              "logs:CrftteLogStream",
+              "logs:CreateLogStream",
               "logs:PutLogEvents",
               "secretsmanager:GetSecretValue"
            ],
@@ -399,7 +399,7 @@ resource "aws_iam_role_policy" "ftt_task" {
      {
        "Effect": "Allow",
         "Action": [
-          "logs:CrftteLogStream",
+          "logs:CreateLogStream",
           "logs:PutLogEvents",
           "ecr:*",
           "iam:*",
