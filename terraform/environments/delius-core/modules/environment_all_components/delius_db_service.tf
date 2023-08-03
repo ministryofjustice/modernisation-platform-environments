@@ -37,7 +37,7 @@ module "testing_db_service" {
   source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=5f488ac0de669f53e8283fff5bcedf5635034fe1"
   container_definition_json = module.weblogic_container.json_map_encoded_list
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
-  name                      = "${var.env_name}-weblogic"
+  name                      = "${var.env_name}-testing-db"
   vpc_id                    = var.network_config.shared_vpc_id
 
   launch_type  = "FARGATE"
