@@ -4,9 +4,9 @@
 ##
 
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
-  name  = format("/%s/JCBC_URL", var.account_info.application_name)
+  name  = format("/%s/%s/JCBC_URL", var.account_info.application_name, var.env_name)
   type  = "SecureString"
-  value = format("jdbc:oracle:thin:@//INITIAL_HOSTNAME_OVERRIDEN:INITIAL_PORT_OVERRIDDEN/%s", var.weblogic_config.db_name)
+  value = format("jdbc:oracle:thin:@//INITIAL_HOSTNAME_OVERRIDEN:INITIAL_PORT_OVERRIDDEN/%s", var.weblogic_config.db_name, var.env_name)
   tags  = local.tags
   lifecycle {
     ignore_changes = [
@@ -16,7 +16,7 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
 }
 
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {
-  name  = format("/%s/JCBC_PASSWORD", var.account_info.application_name)
+  name  = format("/%s/%s/JCBC_PASSWORD", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   tags  = local.tags
@@ -28,14 +28,14 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_test_mode" {
-  name  = format("/%s/TEST_MODE", var.account_info.application_name)
+  name  = format("/%s/%s/TEST_MODE", var.account_info.application_name, var.env_name)
   type  = "String"
   value = "true"
   tags  = local.tags
 }
 
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
-  name  = format("/%s/DEV_USERNAME", var.account_info.application_name)
+  name  = format("/%s/%s/DEV_USERNAME", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
@@ -47,7 +47,7 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
 }
 
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
-  name  = format("/%s/DEV_PASSWORD", var.account_info.application_name)
+  name  = format("/%s/%s/DEV_PASSWORD", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
