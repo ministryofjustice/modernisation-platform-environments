@@ -42,4 +42,12 @@ locals {
     db_port                       = 1521
     db_name                       = "MODNDA"
   }
+
+  delius_db_container_config = {
+    image_tag            = "5.7.4"
+    image_name           = "delius-core-testing-db"
+    fully_qualified_name = "${local.application_name}-${local.db_service_name}"
+    db_port              = 1521
+    db_name              = "MODNDA"
+  }
 }

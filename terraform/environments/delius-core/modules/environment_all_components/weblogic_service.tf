@@ -63,7 +63,7 @@ module "weblogic_ecs_policies" {
   tags         = local.tags
 }
 
-module "deploy" {
+module "weblogic_service" {
   source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=5f488ac0de669f53e8283fff5bcedf5635034fe1"
   container_definition_json = module.weblogic_container.json_map_encoded_list
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
@@ -103,4 +103,75 @@ module "deploy" {
   ignore_changes_task_definition = false
   redeploy_on_apply              = false
   force_new_deployment           = false
+}
+
+
+resource "aws_security_group" "delius_core_frontend_security_group" {
+  name        = "Delius Core Frontend Weblogic"
+  description = "Rules for the delius testing frontend ecs service"
+  vpc_id      = var.network_config.shared_vpc_id
+  tags        = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_group_ingress_private_subnets" {
+  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
+  description                  = "load balancer to weblogic frontend"
+  from_port                    = var.weblogic_config.frontend_container_port
+  to_port                      = var.weblogic_config.frontend_container_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_tcp" {
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "ingress from ldap server tcp"
+  from_port         = local.ldap_port
+  to_port           = local.ldap_port
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.network_config.shared_vpc_cidr
+}
+
+resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_udp" {
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "ingress from ldap server"
+  from_port         = local.ldap_port
+  to_port           = local.ldap_port
+  ip_protocol       = "udp"
+  cidr_ipv4         = var.network_config.shared_vpc_cidr
+}
+
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "outbound from weblogic to any secure endpoint"
+  ip_protocol       = "tcp"
+  to_port           = 443
+  from_port         = 443
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_ldap_tcp" {
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "outbound from weblogic to any secure endpoint"
+  ip_protocol       = "tcp"
+  to_port           = local.ldap_port
+  from_port         = local.ldap_port
+  cidr_ipv4         = var.network_config.shared_vpc_cidr
+}
+
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_ldap_udp" {
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "outbound from weblogic to any secure endpoint"
+  ip_protocol       = "udp"
+  to_port           = local.ldap_port
+  from_port         = local.ldap_port
+  cidr_ipv4         = var.network_config.shared_vpc_cidr
+}
+
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_db" {
+  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
+  description                  = "outbound from the testing frontend ecs service"
+  ip_protocol                  = "tcp"
+  to_port                      = var.delius_db_container_config.port
+  from_port                    = var.delius_db_container_config.port
+  referenced_security_group_id = aws_security_group.delius_db_security_group.id
 }

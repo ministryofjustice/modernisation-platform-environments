@@ -11,4 +11,7 @@ locals {
   platform_vars = {
     environment_management = local.environment_management
   }
+  bastion = {
+    security_group_id = module.bastion_linux.bastion_security_group
+  }
 }

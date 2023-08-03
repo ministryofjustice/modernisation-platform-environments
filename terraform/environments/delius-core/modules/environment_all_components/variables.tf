@@ -107,3 +107,31 @@ variable "platform_vars" {
     environment_management = any
   })
 }
+
+
+variable "delius_db_container_config" {
+  type = object({
+    image_tag            = string
+    image_name           = string
+    fully_qualified_name = string
+    port                 = number
+    name                 = string
+  })
+  default = {
+    image_tag            = "5.7.4"
+    image_name           = "delius-core-testing-db"
+    fully_qualified_name = "testing-db"
+    port                 = 1521
+    name                 = "MODNDA"
+  }
+
+}
+
+variable "bastion" {
+  type = object({
+    security_group_id = string
+  })
+  default = {
+    security_group_id = "default_security_group_id"
+  }
+}
