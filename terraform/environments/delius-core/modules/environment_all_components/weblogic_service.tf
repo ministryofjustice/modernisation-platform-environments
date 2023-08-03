@@ -72,12 +72,13 @@ module "weblogic_service" {
   name                      = "${var.env_name}-weblogic"
   vpc_id                    = var.network_config.shared_vpc_id
 
+  context = local.context
+
   launch_type  = "FARGATE"
   network_mode = "awsvpc"
 
   task_cpu    = "1024"
   task_memory = "4096"
-
 
   # terraform will not let you use module.weblogic_ecs_policies.service_role.arn as it is not created yet and can't evaluate the count in this module
   service_role_arn   = "arn:aws:iam::${var.account_info.id}:role/${module.weblogic_ecs_policies.service_role.name}"
