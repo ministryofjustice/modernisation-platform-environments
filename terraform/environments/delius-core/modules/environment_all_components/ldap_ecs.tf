@@ -86,6 +86,15 @@ resource "aws_security_group_rule" "allow_ldap_from_legacy_env" {
   cidr_blocks       = [var.network_config.migration_environment_vpc_cidr]
 }
 
+resource "aws_security_group_rule" "efs_ingress_ldap" {
+  type                     = "ingress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.ldap_efs.id
+  security_group_id        = aws_security_group.ldap.id
+}
+
 resource "aws_cloudwatch_log_group" "ldap" {
   name              = "${var.env_name}-ldap-ecs"
   retention_in_days = 30
