@@ -32,24 +32,28 @@
       "idm_instances_snapshot": "snap-058ee73f8e4a01b75",
       "lb_access_logs_existing_bucket_name": "",
       "url": "s3://laa-portal-development-archive-mp",
-      "maintenance_window_name": "diagnostics-log-archive-poc"
+      "maintenance_window_name": "diagnostics-log-archive-poc",
+      "hosted_zone": "aws.dev.legalservices.gov.uk"
 
 
     },
     "test": {
-      "example_var": "test-data"
+      "example_var": "test-data",
+      "hosted_zone": "aws.tst.legalservices.gov.uk"
     },
     "preproduction": {
       "example_var": "preproduction-data",
       "url": "s3://laa-portal-preproduction-archive-mp",
-      "maintenance_window_name": "diagnostics-log-archive-preproduction"
+      "maintenance_window_name": "diagnostics-log-archive-preproduction",
+      "hosted_zone": "aws.pre.legalservices.gov.uk"
     },
     "production": {
       "example_var": "production-data",
       "existing_archive_bucket_name": "",
       "ohs_instance_type": "m5.xlarge",
       "url": "s3://laa-portal-production-archive-mp",
-      "maintenance_window_name": "diagnostics-log-archive-production"
+      "maintenance_window_name": "diagnostics-log-archive-production",
+      "hosted_zone": "aws.prd.legalservices.gov.uk"
     }
   }
 }
