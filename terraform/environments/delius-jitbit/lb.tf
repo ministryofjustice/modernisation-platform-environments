@@ -84,7 +84,7 @@ resource "aws_lb_target_group" "target_group_fargate" {
 
   name                 = local.application_name
   port                 = local.application_data.accounts[local.environment].server_port
-  protocol             = "HTTPS"
+  protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
   deregistration_delay = 30
