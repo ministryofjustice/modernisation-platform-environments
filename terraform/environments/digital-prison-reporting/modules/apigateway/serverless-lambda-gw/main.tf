@@ -65,6 +65,9 @@ resource "aws_api_gateway_deployment" "default_deployment" {
       aws_api_gateway_resource.this.id,
       aws_api_gateway_method.this.id,
       aws_api_gateway_integration.this.id,
+      aws_api_gateway_resource.preview.id,
+      aws_api_gateway_method.preview.id,
+      aws_api_gateway_integration.preview.id,
     ]))
   }
   lifecycle {
@@ -74,7 +77,9 @@ resource "aws_api_gateway_deployment" "default_deployment" {
   depends_on = [
     aws_api_gateway_method.this,
     aws_api_gateway_integration.this,
-    aws_api_gateway_rest_api_policy.this
+    aws_api_gateway_rest_api_policy.this,
+    aws_api_gateway_method.preview,
+    aws_api_gateway_integration.preview,
   ]
 }
 
