@@ -3,6 +3,11 @@ module "ldap_ecs_policies" {
   env_name     = var.env_name
   service_name = "openldap"
   tags         = local.tags
+  extra_exec_role_allow_statements = [
+    "elasticfilesystem:ClientRootAccess",
+    "elasticfilesystem:ClientWrite",
+    "elasticfilesystem:ClientMount"
+  ]
 }
 
 # Create s3 bucket for deployment state
