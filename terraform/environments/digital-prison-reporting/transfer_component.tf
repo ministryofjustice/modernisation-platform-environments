@@ -31,7 +31,7 @@ module "transfer_comp_Lambda" {
     "DB_CONNECTION_STRING"  = "jdbc:redshift://${local.datamart_endpoint}/datamart"
     "DB_USERNAME"           = local.datamart_username
     "DB_PASSWORD"           = local.datamart_password
-    "FLYWAY_METHOD"         = "migrate"
+    "FLYWAY_METHOD"         = "check"
     "GIT_FOLDERS"           = "migrations/development/redshift/sql" # Comma Seperated
     "GIT_BRANCH"            = "develop"
     "GIT_REPOSITORY"        = "https://github.com/ministryofjustice/digital-prison-reporting-transfer-component"
