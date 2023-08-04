@@ -20,6 +20,7 @@ resource "aws_lambda_function" "this" {
   memory_size = var.memory_size
   publish     = var.publish
   timeout     = var.timeout
+  layers      = var.layers
 
   tracing_config {
     mode = var.tracing

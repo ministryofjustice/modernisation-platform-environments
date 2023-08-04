@@ -16,6 +16,20 @@ data "aws_secretsmanager_secret_version" "nomis" {
   depends_on = [aws_secretsmanager_secret.nomis]
 }
 
+# Source DataMart Secrets
+data "aws_secretsmanager_secret" "datamart" {
+  name = aws_secretsmanager_secret.redshift.id
+
+  depends_on = [aws_secretsmanager_secret_version.redshift]
+}
+
+data "aws_secretsmanager_secret_version" "datamart" {
+  secret_id = data.aws_secretsmanager_secret.datamart.id
+
+  depends_on = [aws_secretsmanager_secret.redshift]
+}
+
+
 # AWS _IAM_ Policy
 data "aws_iam_policy" "rds_full_access" {
   arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"

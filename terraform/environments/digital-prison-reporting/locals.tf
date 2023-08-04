@@ -31,6 +31,10 @@ locals {
   generic_lambda           = "${local.project}-generic-lambda"
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
   enable_replication_task  = local.application_data.accounts[local.environment].enable_dms_replication_task
+  datamart_endpoint        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["host"]
+  datamart_port            = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["port"]
+  datamart_username        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["username"]
+  datamart_password        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
 
   # Common Policies
   kms_read_access_policy   = "${local.project}_kms_read_policy"
@@ -82,6 +86,18 @@ locals {
   domain_preview_database        = "curated"
   domain_preview_s3_bucket       = module.s3_domain_preview_bucket.bucket_id
   domain_preview_workgroup       = "primary"
+
+  # Transfer Component
+  enable_transfercomp_lambda         = local.application_data.accounts[local.environment].enable_transfer_component_lambda
+  lambda_transfercomp_name           = "${local.project}-transfer-component"
+  lambda_transfercomp_runtime        = "java11"
+  lambda_transfercomp_tracing        = "Active"
+  lambda_transfercomp_handler        = "com.geekoosh.flyway.FlywayHandler"
+  lambda_transfercomp_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  lambda_transfercomp_code_s3_key    = "third-party/flyway-generic/flyway-lambda-0.9.jar"
+  lambda_transfercomp_policies       = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", ]
+  create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
+  lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
   nomis_secrets_placeholder = {
     db_name  = "nomis"
