@@ -1,3 +1,14 @@
+module "ldap_ecs_policies" {
+  source       = "../ecs_policies"
+  env_name     = var.env_name
+  service_name = "openldap"
+  tags         = local.tags
+  extra_exec_role_allow_statements = [
+    "elasticfilesystem:ClientRootAccess",
+    "elasticfilesystem:ClientWrite",
+    "elasticfilesystem:ClientMount"
+  ]
+}
 
 # Create s3 bucket for deployment state
 module "s3_bucket_ldap_deployment" {
@@ -78,6 +89,15 @@ resource "aws_security_group_rule" "allow_ldap_from_legacy_env" {
   protocol          = "TCP"
   security_group_id = aws_security_group.ldap.id
   cidr_blocks       = [var.network_config.migration_environment_vpc_cidr]
+}
+
+resource "aws_security_group_rule" "efs_ingress_ldap" {
+  type                     = "ingress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.ldap_efs.id
+  security_group_id        = aws_security_group.ldap.id
 }
 
 resource "aws_cloudwatch_log_group" "ldap" {

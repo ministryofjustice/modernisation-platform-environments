@@ -13,7 +13,8 @@ variable "account_info" {
     region           = string,
     vpc_id           = string,
     application_name = string,
-    mp_environment   = string
+    mp_environment   = string,
+    id               = string
   })
 }
 
@@ -24,17 +25,23 @@ variable "account_info" {
 variable "network_config" {
   type = object({
     shared_vpc_cidr                = string
+    shared_vpc_id                  = string
     private_subnet_ids             = list(string)
     route53_inner_zone_info        = any
+    route53_network_services_zone  = any
+    route53_external_zone          = any
     migration_environment_vpc_cidr = optional(string)
-    general_shared_kms_key_arn      = optional(string)
+    general_shared_kms_key_arn     = optional(string)
   })
   default = {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
+    shared_vpc_id                  = "default_shared_vpc_id"
     private_subnet_ids             = ["default_private_subnet_a_id"]
     route53_inner_zone_info        = {}
+    route53_network_services_zone  = {}
+    route53_external_zone          = {}
     migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
-    general_shared_kms_key_arn      = "default_general_shared_kms_key_arn"
+    general_shared_kms_key_arn     = "default_general_shared_kms_key_arn"
   }
 }
 
@@ -60,15 +67,71 @@ variable "ldap_config" {
   }
 }
 
-variable "db_config" {
+variable "weblogic_config" {
   type = object({
-    name                 = string
+    name                          = string
+    frontend_service_name         = string
+    frontend_fully_qualified_name = string
+    frontend_image_tag            = string
+    frontend_container_port       = number
+    frontend_url_suffix           = string
+    db_name                       = string
   })
   default = {
-    name                 = "default_name"
+    name                          = "default_name"
+    frontend_service_name         = "default_frontend_service_name"
+    frontend_fully_qualified_name = "default_frontend_fully_qualified_name"
+    frontend_image_tag            = "default_frontend_image_tag"
+    frontend_container_port       = 8080
+    frontend_url_suffix           = "default_frontend_url_suffix"
+    db_name                       = "default_db_name"
+  }
+
+}
+
+variable "db_config" {
+  type = object({
+    name = string
+  })
+  default = {
+    name = "default_name"
   }
 }
 
 variable "tags" {
   type = any
+}
+
+variable "platform_vars" {
+  type = object({
+    environment_management = any
+  })
+}
+
+
+variable "delius_db_container_config" {
+  type = object({
+    image_tag            = string
+    image_name           = string
+    fully_qualified_name = string
+    port                 = number
+    name                 = string
+  })
+  default = {
+    image_tag            = "5.7.4"
+    image_name           = "delius-core-testing-db"
+    fully_qualified_name = "testing-db"
+    port                 = 1521
+    name                 = "MODNDA"
+  }
+
+}
+
+variable "bastion" {
+  type = object({
+    security_group_id = string
+  })
+  default = {
+    security_group_id = "default_security_group_id"
+  }
 }

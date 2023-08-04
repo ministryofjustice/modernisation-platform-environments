@@ -1,11 +1,10 @@
-# checkov:skip=CKV_AWS_226
-# checkov:skip=CKV2_AWS_28
-
-# Create security group and rules for load balancer
+locals {
+  frontend_url = "${var.app_name}.${var.env_name}.${var.weblogic_config.frontend_url_suffix}"
+}
 resource "aws_security_group" "delius_frontend_alb_security_group" {
   name        = "Delius Core Frontend Load Balancer"
   description = "controls access to and from delius front-end load balancer"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.network_config.shared_vpc_id
   tags        = local.tags
 }
 
@@ -26,14 +25,13 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   ip_protocol       = "tcp"
   cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
 }
-
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_frontend_service" {
   security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
   description                  = "access from delius core frontend alb to ecs"
-  from_port                    = local.frontend_container_port
-  to_port                      = local.frontend_container_port
+  from_port                    = var.weblogic_config.frontend_container_port
+  to_port                      = var.weblogic_config.frontend_container_port
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  referenced_security_group_id = aws_security_group.weblogic.id
   tags                         = local.tags
 }
 
@@ -42,21 +40,22 @@ resource "aws_lb" "delius_core_frontend" {
   # checkov:skip=CKV_AWS_91
   # checkov:skip=CKV2_AWS_28
 
-  name               = "${local.application_name}-alb"
+  name               = "${var.app_name}-${var.env_name}-weblogic-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
-  subnets            = data.aws_subnets.shared-public.ids
+  subnets            = var.network_config.private_subnet_ids
 
   enable_deletion_protection = false
   drop_invalid_header_fields = true
 }
 
+
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.delius_core_frontend.id
   port              = 443
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external.arn
+  certificate_arn   = local.certificate_arn
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
@@ -84,10 +83,10 @@ resource "aws_lb_listener" "listener_http" {
 resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   # checkov:skip=CKV_AWS_261
 
-  name                 = local.frontend_fully_qualified_name
-  port                 = local.frontend_container_port
+  name                 = var.weblogic_config.frontend_fully_qualified_name
+  port                 = var.weblogic_config.frontend_container_port
   protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
+  vpc_id               = var.network_config.shared_vpc_id
   target_type          = "ip"
   deregistration_delay = 30
   tags                 = local.tags
@@ -110,7 +109,7 @@ resource "aws_lb_target_group" "delius_core_frontend_target_group" {
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
-  zone_id = data.aws_route53_zone.external.zone_id
+  zone_id = var.network_config.route53_external_zone.zone_id
   name    = local.frontend_url
   type    = "A"
 
@@ -118,17 +117,6 @@ resource "aws_route53_record" "external" {
     name                   = aws_lb.delius_core_frontend.dns_name
     zone_id                = aws_lb.delius_core_frontend.zone_id
     evaluate_target_health = true
-  }
-}
-
-resource "aws_acm_certificate" "external" {
-  domain_name               = "modernisation-platform.service.justice.gov.uk"
-  validation_method         = "DNS"
-  subject_alternative_names = [local.frontend_url]
-  tags                      = local.tags
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -140,7 +128,7 @@ resource "aws_route53_record" "external_validation" {
   records         = local.domain_record_main
   ttl             = 60
   type            = local.domain_type_main[0]
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  zone_id         = var.network_config.route53_network_services_zone.zone_id
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
@@ -151,7 +139,18 @@ resource "aws_route53_record" "external_validation_subdomain" {
   records         = local.domain_record_sub
   ttl             = 60
   type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = var.network_config.route53_external_zone.zone_id
+}
+
+resource "aws_acm_certificate" "external" {
+  domain_name               = "modernisation-platform.service.justice.gov.uk"
+  validation_method         = "DNS"
+  subject_alternative_names = [local.frontend_url]
+  tags                      = local.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_acm_certificate_validation" "external" {

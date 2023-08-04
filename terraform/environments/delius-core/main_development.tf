@@ -8,16 +8,21 @@ module "environment_dev" {
   count  = local.environment == "development" ? 1 : 0
 
   providers = {
-    aws.bucket-replication = aws
-    aws.core-vpc           = aws.core-vpc
+    aws.bucket-replication    = aws
+    aws.core-vpc              = aws.core-vpc
+    aws.core-network-services = aws.core-network-services
   }
 
-  env_name = "dev"
-  app_name = local.application_name
+  env_name      = "dev"
+  app_name      = local.application_name
+  platform_vars = local.platform_vars
 
-  network_config = local.network_config_dev
-  ldap_config    = local.ldap_config_dev
-  db_config      = local.db_config_dev
+  network_config  = local.network_config_dev
+  ldap_config     = local.ldap_config_dev
+  db_config       = local.db_config_dev
+  weblogic_config = local.weblogic_config_dev
+  bastion         = local.bastion
+
 
   account_info = local.account_info
 
