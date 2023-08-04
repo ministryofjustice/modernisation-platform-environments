@@ -80,7 +80,6 @@ resource "aws_api_gateway_deployment" "default_deployment" {
     aws_api_gateway_rest_api_policy.this,
     aws_api_gateway_method.preview,
     aws_api_gateway_integration.preview,
-    aws_api_gateway_rest_api_policy.preview,
   ]
 }
 
