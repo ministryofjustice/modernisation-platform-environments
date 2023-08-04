@@ -67,7 +67,7 @@ resource "aws_api_gateway_deployment" "default_deployment" {
       aws_api_gateway_integration.this.id,
       aws_api_gateway_resource.preview.id,
       aws_api_gateway_method.preview.id,
-      aws_api_gateway_integration.preivew.id,
+      aws_api_gateway_integration.preview.id,
     ]))
   }
   lifecycle {
