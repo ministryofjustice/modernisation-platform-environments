@@ -7,9 +7,8 @@ module "transfer_comp_lambda_layer" {
   layer_name                = local.lambda_transfercomp_layer_name
   description               = "Redshift JDBC Depedency Jar for Flyway Lambda"
   license_info              = "HMPPS, MOJ Reporting Team"
-  local_file                = "transfer-component/redshift-jdbc42-2.1.0.17.jar"
-  compatible_runtimes       = ["java11", "java17"]
-  compatible_architectures  = ["arm64", "x86_64"]
+  local_file                = "transfer-component/redshift-jdbc42-2.1.0.18.jar"
+  compatible_runtimes       = ["java11"]
 }
 
 module "transfer_comp_Lambda" {
