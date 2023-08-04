@@ -13,7 +13,7 @@ resource "aws_efs_file_system" "ldap" {
 }
 
 resource "aws_efs_mount_target" "ldap" {
-  for_each       = var.network_config.private_subnet_ids
+  for_each       = toset(var.network_config.private_subnet_ids)
   file_system_id = aws_efs_file_system.ldap.id
   subnet_id      = each.value
   security_groups = [
