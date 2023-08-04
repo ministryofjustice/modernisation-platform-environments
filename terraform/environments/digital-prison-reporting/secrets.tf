@@ -55,7 +55,7 @@ module "slack_alerts_url" {
   name                    = "${local.project}-slack-alerts-url-${local.environment}"
   description             = "DPR Slack Alerts URL"
   type                    = "MONO"
-  secret_value            = "SLACK_ALERTS_URL_PLACEHOLDER"
+  secret_value            = "PLACEHOLDER@EMAIL.COM"
   ignore_secret_string    = true
 
   tags = merge(
