@@ -247,7 +247,13 @@ resource "aws_instance" "s618358rgvw201" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
-  tags = {
+
+metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+tags = {
     Name        = "s618358rgvw201"
     patch_group = "uat_win_patch"
     backup      = true
@@ -262,6 +268,12 @@ resource "aws_instance" "S618358RGVW202" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "S618358RGVW202"
     patch_group = "uat_win_patch"
@@ -277,6 +289,12 @@ resource "aws_instance" "s618358rgsw025" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s618358rgsw025"
     patch_group = "uat_win_patch"
@@ -292,6 +310,12 @@ resource "aws_instance" "s618358rgvw024" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
   subnet_id              = data.aws_subnet.data_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s618358rgvw024"
     patch_group = "uat_win_patch"
@@ -307,6 +331,12 @@ resource "aws_instance" "s618358rgvw023" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s618358rgvw023"
     patch_group = "uat_win_patch"

@@ -10,6 +10,7 @@ resource "aws_lb" "PPUD-ALB" {
   subnets            = [data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
 
   enable_deletion_protection = true
+  drop_invalid_header_fields = true
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
