@@ -8,7 +8,7 @@ locals {
     private_subnet_ids             = data.aws_subnets.shared-private.ids
     route53_inner_zone_info        = data.aws_route53_zone.inner
     migration_environment_vpc_cidr = "10.161.20.0/22"
-    general_shared_kms_key_arn      = data.aws_kms_key.general_shared.arn
+    general_shared_kms_key_arn     = data.aws_kms_key.general_shared.arn
   }
 
   ldap_config_dev2 = {
@@ -22,7 +22,29 @@ locals {
   }
 
   db_config_dev2 = {
-    name                 = try(local.db_config_lower_environments.name, "db")
-    ami_name             = local.db_config_lower_environments.ami_name
+    name      = try(local.db_config_lower_environments.name, "db")
+    ami_name  = local.db_config_lower_environments.ami_name
+    ami_owner = local.environment_management.account_ids["core-shared-services-production"]
+    user_data_raw = base64encode(
+      templatefile(
+        "${path.module}/templates/userdata.sh.tftpl",
+        {
+          branch               = local.db_config.user_data_param.branch
+          ansible_repo         = local.db_config.user_data_param.ansible_repo
+          ansible_repo_basedir = local.db_config.user_data_param.ansible_repo_basedir
+          ansible_args         = local.db_config.user_data_param.ansible_args
+        }
+      )
+    )
+    instance = merge(local.db_config_lower_environments.instance, {
+      instance_type = "r6i.large"
+      monitoring    = false
+    })
+    ebs_volume_config = {}
+    ebs_volumes       = {}
+    route53_records = {
+      create_internal_record = true
+      create_external_record = false
+    }
   }
 }

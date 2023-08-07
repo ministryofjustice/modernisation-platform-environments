@@ -6,6 +6,7 @@ locals {
   network_config_dev = {
     shared_vpc_cidr                = data.aws_vpc.shared.cidr_block
     private_subnet_ids             = data.aws_subnets.shared-private.ids
+    private_subnet_a_id            = data.aws_subnet.private_subnets_a.id
     route53_inner_zone_info        = data.aws_route53_zone.inner
     route53_network_services_zone  = data.aws_route53_zone.network-services
     route53_external_zone          = data.aws_route53_zone.external
@@ -25,8 +26,97 @@ locals {
   }
 
   db_config_dev = {
-    name     = try(local.db_config_lower_environments.name, "db")
-    ami_name = local.db_config_lower_environments.ami_name
+    name      = try(local.db_config_lower_environments.name, "db")
+    ami_name  = local.db_config_lower_environments.ami_name
+    ami_owner = local.environment_management.account_ids["core-shared-services-production"]
+
+    user_data_raw = base64encode(
+      templatefile(
+        "${path.module}/templates/userdata.sh.tftpl",
+        {
+          branch               = local.db_config.user_data_param.branch
+          ansible_repo         = local.db_config.user_data_param.ansible_repo
+          ansible_repo_basedir = local.db_config.user_data_param.ansible_repo_basedir
+          ansible_args         = local.db_config.user_data_param.ansible_args
+        }
+      )
+    )
+    instance = merge(local.db_config_lower_environments.instance, {
+      instance_type = "r6i.xlarge"
+      monitoring    = false
+    })
+    ebs_volumes = {}
+    ebs_volumes = merge(local.db_config.ebs_volumes, {
+      "/dev/sda1" = { # root volume
+        label = "app",
+        size  = 30,
+        type  = "gp3"
+      },
+      "/dev/sdb" = { # /u01 oracle app disk
+        label = "app",
+        size  = 200,
+        type  = "gp3"
+      },
+      "/dev/sdc" = { # /u02 oracle app disk
+        label = "app",
+        size  = 100,
+        type  = "gp3"
+      },
+      "/dev/sds" = { # swap disk
+        label = "app",
+        size  = 4,
+        type  = "gp3"
+      },
+      "/dev/sde" = { # oracle asm disk DATA01
+        label = "app",
+        size  = 1,
+        type  = "gp3"
+      },
+      "/dev/sdf" = { # oracle asm disk DATA02
+        label = "app",
+        size  = 1,
+        type  = "gp3"
+      },
+      "/dev/sdg" = { # oracle asm disk DATA03
+        label = "app",
+        size  = 1,
+        type  = "gp3"
+      },
+      "/dev/sdh" = { # oracle asm disk DATA04
+        label = "app",
+        size  = 1,
+        type  = "gp3"
+      },
+      "/dev/sdi" = { # oracle asm disk DATA05
+        label = "app",
+        size  = 1,
+        type  = "gp3"
+      },
+      "/dev/sdj" = { # oracle asm disk FLASH01
+        label = "app",
+        size  = 1,
+        type  = "gp3"
+      },
+      "/dev/sdk" = { # oracle asm disk FLASH02
+        label = "app",
+        size  = 1,
+        type  = "gp3"
+      },
+    })
+    ebs_volume_config = {}
+    #ebs_volume_config = merge(local.db_config.ebs_volume_config, {
+    #  data  = 
+    #  {
+    #    total_size = 500 
+    #  }
+    #  flash = { 
+    #    total_size = 50 
+    #  }
+    #})
+    route53_records = {
+      create_internal_record = true
+      create_external_record = false
+    }
   }
 
   weblogic_config_dev = {
