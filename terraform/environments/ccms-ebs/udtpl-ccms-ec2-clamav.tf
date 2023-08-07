@@ -16,7 +16,7 @@ resource "aws_instance" "ec2_clamav-udtpl" {
   }
   user_data_replace_on_change = false
   user_data = base64encode(templatefile("./templates/ec2_user_data_clamav.sh", {
-    hostname = "accessgate"
+    hostname = "clamav"
   }))
 
   metadata_options {

@@ -23,7 +23,8 @@ resource "aws_instance" "ec2_oracle_ebs-udtpl" {
   }
   user_data_replace_on_change = false
   user_data = base64encode(templatefile("./templates/ec2_user_data_ebs.sh", {
-    hostname = "accessgate"
+    environment = "${local.environment}"
+    hostname = "ebs"
   }))
 
   metadata_options {
