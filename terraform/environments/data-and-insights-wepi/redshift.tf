@@ -57,8 +57,6 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
 
   cluster_parameter_group_name = aws_redshift_parameter_group.wepi_redshift_param_group.name
 
-  aqua_configuration_status = "enabled"
-
   automated_snapshot_retention_period = local.application_data.accounts[local.environment].redshift_auto_snapshot_retention
   manual_snapshot_retention_period    = local.application_data.accounts[local.environment].redshift_manual_snapshot_retention
   skip_final_snapshot                 = true
