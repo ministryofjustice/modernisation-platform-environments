@@ -276,7 +276,7 @@ resource "aws_route53_record" "ohs1_nonprod" {
   records  = [aws_instance.ohs_instance_1.private_ip]
 }
 
-resource "aws_route53_record" "ods2_prod" {
+resource "aws_route53_record" "ohs2_prod" {
   count    = contains(["development", "testing"], local.environment) ? 0 : 1
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
