@@ -116,7 +116,7 @@ resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_wind
 
   targets {
     key    = "WindowTargetIds"
-    values = aws_ssm_maintenance_window_target.patch_maintenance_window_target[0].*.id
+    values = aws_ssm_maintenance_window_target.prod_lin_maintenance_window_target[0].*.id
   }
 
   task_invocation_parameters {
