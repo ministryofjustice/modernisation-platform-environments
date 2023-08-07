@@ -16,7 +16,7 @@ module "ecs-cluster" {
   ]
   environment = local.environment
   name        = local.ecs_application_name
-  namespace   = "hmpps"
+  namespace   = "platforms"
 
   tags = local.tags
 }
@@ -27,7 +27,7 @@ module "service" {
   container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
   ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
   name                      = "${local.ecs_application_name}-task_definition_volume"
-  namespace                 = "hmpps"
+  namespace                 = "platforms"
   vpc_id                    = local.vpc_all
 
   launch_type  = local.application_data.accounts[local.environment].launch_type
