@@ -6,7 +6,8 @@ locals {
   network_config_dev = {
     shared_vpc_cidr                = data.aws_vpc.shared.cidr_block
     private_subnet_ids             = data.aws_subnets.shared-private.ids
-    private_subnet_a_id            = data.aws_subnet.private_subnets_a.id
+    data_subnet_ids                = data.aws_subnets.shared-data.ids
+    data_subnet_a_id               = data.aws_subnet.data_subnets_a.id
     route53_inner_zone_info        = data.aws_route53_zone.inner
     route53_network_services_zone  = data.aws_route53_zone.network-services
     route53_external_zone          = data.aws_route53_zone.external
@@ -48,57 +49,57 @@ locals {
     ebs_volumes = {}
     ebs_volumes = merge(local.db_config.ebs_volumes, {
       "/dev/sda1" = { # root volume
-        label = "app",
+        label = "root",
         size  = 30,
         type  = "gp3"
       },
       "/dev/sdb" = { # /u01 oracle app disk
-        label = "app",
+        label = "u01",
         size  = 200,
         type  = "gp3"
       },
       "/dev/sdc" = { # /u02 oracle app disk
-        label = "app",
+        label = "u02",
         size  = 100,
         type  = "gp3"
       },
       "/dev/sds" = { # swap disk
-        label = "app",
+        label = "swap",
         size  = 4,
         type  = "gp3"
       },
       "/dev/sde" = { # oracle asm disk DATA01
-        label = "app",
+        label = "asm_data01",
+        size  = 500,
+        type  = "gp3"
+      },
+      "/dev/sdf" = { # oracle asm disk DATA02 -- need to set to no_device to ensure terraform doesn't create
+        label = "asm_data02",
         size  = 1,
         type  = "gp3"
       },
-      "/dev/sdf" = { # oracle asm disk DATA02
-        label = "app",
+      "/dev/sdg" = { # oracle asm disk DATA03 -- need to set to no_device to ensure terraform doesn't create
+        label = "asm_data03",
         size  = 1,
         type  = "gp3"
       },
-      "/dev/sdg" = { # oracle asm disk DATA03
-        label = "app",
+      "/dev/sdh" = { # oracle asm disk DATA04 -- need to set to no_device to ensure terraform doesn't create
+        label = "asm_data04",
         size  = 1,
         type  = "gp3"
       },
-      "/dev/sdh" = { # oracle asm disk DATA04
-        label = "app",
-        size  = 1,
-        type  = "gp3"
-      },
-      "/dev/sdi" = { # oracle asm disk DATA05
-        label = "app",
+      "/dev/sdi" = { # oracle asm disk DATA05 -- need to set to no_device to ensure terraform doesn't create
+        label = "asm_data05",
         size  = 1,
         type  = "gp3"
       },
       "/dev/sdj" = { # oracle asm disk FLASH01
-        label = "app",
-        size  = 1,
+        label = "asm_flash01",
+        size  = 500,
         type  = "gp3"
       },
-      "/dev/sdk" = { # oracle asm disk FLASH02
-        label = "app",
+      "/dev/sdk" = { # oracle asm disk FLASH02 -- need to set to no_device to ensure terraform doesn't create
+        label = "asm_flash02",
         size  = 1,
         type  = "gp3"
       },

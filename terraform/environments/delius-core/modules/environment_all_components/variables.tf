@@ -23,7 +23,8 @@ variable "network_config" {
     shared_vpc_cidr                = string
     shared_vpc_id                  = string
     private_subnet_ids             = list(string)
-    private_subnet_a_id            = string
+    data_subnet_ids                = list(string)
+    data_subnet_a_id               = string
     route53_inner_zone_info        = any
     route53_network_services_zone  = any
     route53_external_zone          = any
@@ -34,7 +35,8 @@ variable "network_config" {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
     shared_vpc_id                  = "default_shared_vpc_id"
     private_subnet_ids             = ["default_private_subnet_ids"]
-    private_subnet_a_id            = "default_private_subnet_id"
+    data_subnet_ids                = ["default_data_subnet_ids"]
+    data_subnet_a_id               = "default_data_subnet_id"
     route53_inner_zone_info        = {}
     route53_network_services_zone  = {}
     route53_external_zone          = {}

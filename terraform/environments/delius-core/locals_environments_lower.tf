@@ -8,7 +8,7 @@ locals {
   }
 
   db_config_lower_environments = {
-    name     = "core-db"
+    name     = "delius-db"
     ami_name = "delius_core_ol_8_5_oracle_db_19c_patch_2023-06-12T12-32-07.259Z"
     instance = {
       disable_api_termination      = true
