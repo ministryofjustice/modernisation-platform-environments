@@ -1,4 +1,4 @@
-resource "aws_instance" "ec2_accessgate" {
+resource "aws_instance" "ec2_accessgate-udtpl" {
   # count                  = local.application_data.accounts[local.environment].accessgate_no_instances
   count                  = local.is-development ? 1 : 0
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
@@ -84,7 +84,7 @@ resource "aws_instance" "ec2_accessgate" {
   depends_on = [aws_security_group.ec2_sg_accessgate]
 }
 
-module "cw-accgate-ec2" {
+module "cw-accgate-ec2-udtpl" {
   source = "./modules/cw-ec2"
   # count  = local.application_data.accounts[local.environment].accessgate_no_instances
   count = local.is-development ? 1 : 0

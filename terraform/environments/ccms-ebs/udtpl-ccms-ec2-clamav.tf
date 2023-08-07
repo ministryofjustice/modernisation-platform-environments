@@ -1,4 +1,4 @@
-resource "aws_instance" "ec2_clamav" {
+resource "aws_instance" "ec2_clamav-udtpl" {
   count                       = local.is-development ? 1 : 0
   instance_type               = local.application_data.accounts[local.environment].ec2_instance_type_clamav
   ami                         = local.application_data.accounts[local.environment].clamav_ami_id
@@ -56,7 +56,7 @@ resource "aws_instance" "ec2_clamav" {
   depends_on = [aws_security_group.ec2_sg_clamav]
 }
 
-module "cw-clamav-ec2" {
+module "cw-clamav-ec2-udtpl" {
   source = "./modules/cw-ec2"
   count  = local.is-development ? 1 : 0
 

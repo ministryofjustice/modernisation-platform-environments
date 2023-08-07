@@ -1,4 +1,4 @@
-resource "aws_instance" "ec2_ebsapps" {
+resource "aws_instance" "ec2_ebsapps-udtpl" {
   # count                  = local.application_data.accounts[local.environment].ebsapps_no_instances
   count                  = local.is-development ? 1 : 0
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
@@ -97,7 +97,7 @@ resource "aws_instance" "ec2_ebsapps" {
   depends_on = [aws_security_group.ec2_sg_ebsapps]
 }
 
-resource "aws_ebs_volume" "stage" {
+resource "aws_ebs_volume" "stage-udtpl" {
   # count = local.application_data.accounts[local.environment].ebsapps_no_instances
   count = local.is-development ? 1 : 0
   lifecycle {
@@ -114,7 +114,7 @@ resource "aws_ebs_volume" "stage" {
   )
 }
 
-resource "aws_volume_attachment" "stage_att" {
+resource "aws_volume_attachment" "stage_att-udtpl" {
   # count       = local.application_data.accounts[local.environment].ebsapps_no_instances
   count       = local.is-development ? 1 : 0
   depends_on  = [aws_ebs_volume.stage]
@@ -123,7 +123,7 @@ resource "aws_volume_attachment" "stage_att" {
   instance_id = aws_instance.ec2_ebsapps[count.index].id
 }
 
-module "cw-ebsapps-ec2" {
+module "cw-ebsapps-ec2-udtpl" {
   source = "./modules/cw-ec2"
   # count  = local.application_data.accounts[local.environment].ebsapps_no_instances
   count = local.is-development ? 1 : 0

@@ -1,4 +1,4 @@
-resource "aws_instance" "ec2_ftp" {
+resource "aws_instance" "ec2_ftp-udtpl" {
   count                       = local.is-development ? 1 : 0
   instance_type               = local.application_data.accounts[local.environment].ec2_instance_type_ftp
   ami                         = local.application_data.accounts[local.environment].ftp_ami_id
@@ -56,7 +56,7 @@ resource "aws_instance" "ec2_ftp" {
   depends_on = [aws_security_group.ec2_sg_ftp]
 }
 
-module "cw-ftp-ec2" {
+module "cw-ftp-ec2-udtpl" {
   source = "./modules/cw-ec2"
   count  = local.is-development ? 1 : 0
 

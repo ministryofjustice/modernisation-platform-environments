@@ -1,4 +1,4 @@
-resource "aws_instance" "ec2_webgate" {
+resource "aws_instance" "ec2_webgate-udtpl" {
   # count                  = local.application_data.accounts[local.environment].webgate_no_instances
   count                  = local.is-development ? 1 : 0
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
@@ -84,7 +84,7 @@ resource "aws_instance" "ec2_webgate" {
   depends_on = [aws_security_group.ec2_sg_webgate]
 }
 
-module "cw-webgate-ec2" {
+module "cw-webgate-ec2-udtpl" {
   source = "./modules/cw-ec2"
   # count  = local.application_data.accounts[local.environment].webgate_no_instances
   count = local.is-development ? 1 : 0

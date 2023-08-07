@@ -1,5 +1,4 @@
-# Build EC2 
-resource "aws_instance" "ec2_oracle_ebs" {
+resource "aws_instance" "ec2_oracle_ebs-udtpl" {
   count         = local.is-development ? 1 : 0
   instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
   #ami                         = data.aws_ami.oracle_db.id
@@ -60,7 +59,7 @@ resource "aws_instance" "ec2_oracle_ebs" {
   depends_on = [aws_security_group.ec2_sg_ebsdb]
 }
 
-resource "aws_ebs_volume" "export_home" {
+resource "aws_ebs_volume" "export_home-udtpl" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -76,14 +75,14 @@ resource "aws_ebs_volume" "export_home" {
   )
 }
 
-resource "aws_volume_attachment" "export_home_att" {
+resource "aws_volume_attachment" "export_home_att-udtpl" {
   count       = local.is-development ? 1 : 0
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.export_home.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "u01" {
+resource "aws_ebs_volume" "u01-udtpl" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -99,14 +98,14 @@ resource "aws_ebs_volume" "u01" {
   )
 }
 
-resource "aws_volume_attachment" "u01_att" {
+resource "aws_volume_attachment" "u01_att-udtpl" {
   count       = local.is-development ? 1 : 0
   device_name = "/dev/sdi"
   volume_id   = aws_ebs_volume.u01.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "arch" {
+resource "aws_ebs_volume" "arch-udtpl" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -122,14 +121,14 @@ resource "aws_ebs_volume" "arch" {
   )
 }
 
-resource "aws_volume_attachment" "arch_att" {
+resource "aws_volume_attachment" "arch_att-udtpl" {
   count       = local.is-development ? 1 : 0
   device_name = "/dev/sdj"
   volume_id   = aws_ebs_volume.arch.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "dbf" {
+resource "aws_ebs_volume" "dbf-udtpl" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -145,14 +144,14 @@ resource "aws_ebs_volume" "dbf" {
   )
 }
 
-resource "aws_volume_attachment" "dbf_att" {
+resource "aws_volume_attachment" "dbf_att-udtpl" {
   count       = local.is-development ? 1 : 0
   device_name = "/dev/sdk"
   volume_id   = aws_ebs_volume.dbf.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "redoA" {
+resource "aws_ebs_volume" "redoA-udtpl" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -168,14 +167,14 @@ resource "aws_ebs_volume" "redoA" {
   )
 }
 
-resource "aws_volume_attachment" "redoA_att" {
+resource "aws_volume_attachment" "redoA_att-udtpl" {
   count       = local.is-development ? 1 : 0
   device_name = "/dev/sdl"
   volume_id   = aws_ebs_volume.redoA.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "techst" {
+resource "aws_ebs_volume" "techst-udtpl" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -191,14 +190,14 @@ resource "aws_ebs_volume" "techst" {
   )
 }
 
-resource "aws_volume_attachment" "techst_att" {
+resource "aws_volume_attachment" "techst_att-udtpl" {
   count       = local.is-development ? 1 : 0
   device_name = "/dev/sdm"
   volume_id   = aws_ebs_volume.techst.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "backup" {
+resource "aws_ebs_volume" "backup-udtpl" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -214,14 +213,14 @@ resource "aws_ebs_volume" "backup" {
   )
 }
 
-resource "aws_volume_attachment" "backup_att" {
+resource "aws_volume_attachment" "backup_att-udtpl" {
   count       = local.is-development ? 1 : 0
   device_name = "/dev/sdn"
   volume_id   = aws_ebs_volume.backup.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "redoB" {
+resource "aws_ebs_volume" "redoB-udtpl" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -237,7 +236,7 @@ resource "aws_ebs_volume" "redoB" {
   )
 }
 
-resource "aws_volume_attachment" "redoB_att" {
+resource "aws_volume_attachment" "redoB_att-udtpl" {
   count = local.is-development ? 1 : 0
   depends_on = [
     aws_ebs_volume.redoB
@@ -247,7 +246,7 @@ resource "aws_volume_attachment" "redoB_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "diag" {
+resource "aws_ebs_volume" "diag-udtpl" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -263,7 +262,7 @@ resource "aws_ebs_volume" "diag" {
   )
 }
 
-resource "aws_volume_attachment" "diag_att" {
+resource "aws_volume_attachment" "diag_att-udtpl" {
   count = local.is-development ? 1 : 0
   depends_on = [
     aws_ebs_volume.diag
@@ -276,7 +275,7 @@ resource "aws_volume_attachment" "diag_att" {
 ####  This mount was required for golive incident
 ####  Just commenting out, rather than remove - just in case
 
-resource "aws_ebs_volume" "dbf2" {
+resource "aws_ebs_volume" "dbf2-udtpl" {
   count = local.is-production ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -292,7 +291,7 @@ resource "aws_ebs_volume" "dbf2" {
   )
 }
 
-resource "aws_volume_attachment" "dbf2_att" {
+resource "aws_volume_attachment" "dbf2_att-udtpl" {
   count = local.is-production ? 1 : 0
   device_name = "/dev/sdo"
   volume_id   = aws_ebs_volume.dbf2[0].id
@@ -300,7 +299,7 @@ resource "aws_volume_attachment" "dbf2_att" {
 }
 */
 
-module "cw-ebs-ec2" {
+module "cw-ebs-ec2-udtpl" {
   source = "./modules/cw-ec2"
   count  = local.is-development ? 1 : 0
 
@@ -338,7 +337,7 @@ module "cw-ebs-ec2" {
 }
 
 # Disk Free Alarm for EBSDB /dbf mount
-resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_dbf-udtpl" {
   count                     = local.is-development ? 1 : 0
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-EBSDB-disk_free_DBF"
   alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
