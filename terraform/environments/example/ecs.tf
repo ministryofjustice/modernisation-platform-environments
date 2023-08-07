@@ -3,7 +3,7 @@
 ###########################################################################################
 
 module "ecs-cluster" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v3.0.0"
 
   ec2_capacity_instance_type     = local.application_data.accounts[local.environment].container_instance_type
   ec2_capacity_max_size          = local.application_data.accounts[local.environment].ec2_max_size
