@@ -19,7 +19,7 @@ resource "aws_instance" "ec2_oracle_ebs-udtpl" {
   #  ignore_changes = [ebs_block_device]
   #}
   lifecycle {
-    ignore_changes = [ebs_block_device, user_data_replace_on_change, user_data, ebs_optimized, cpu_core_count]
+    ignore_changes = [ebs_block_device, user_data_replace_on_change, ebs_optimized, cpu_core_count]
   }
   user_data_replace_on_change = false
   user_data = base64encode(templatefile("./templates/ec2_user_data_ebs.sh", {
