@@ -248,12 +248,12 @@ resource "aws_instance" "s618358rgvw201" {
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
-metadata_options {
+  metadata_options {
     http_tokens   = "required"
     http_endpoint = "enabled"
   }
 
-tags = {
+  tags = {
     Name        = "s618358rgvw201"
     patch_group = "uat_win_patch"
     backup      = true
@@ -529,8 +529,8 @@ resource "aws_instance" "docker-build-server" {
   key_name               = aws_key_pair.cjms_instance[0].key_name
   root_block_device {
     delete_on_termination = true
-    volume_size = "40"
-    volume_type = "gp2"
+    volume_size           = "40"
+    volume_type           = "gp2"
   }
   tags = {
     Name          = "docker-build-server"

@@ -1,7 +1,7 @@
 #### Cloud Watch ####
 resource "aws_sns_topic" "cw_alerts" {
-  count         = local.is-production == true ? 1 : 0
-  name          = "ppud-prod-cw-alerts"
+  count = local.is-production == true ? 1 : 0
+  name  = "ppud-prod-cw-alerts"
 }
 
 resource "aws_sns_topic_policy" "sns_policy" {

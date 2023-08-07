@@ -84,7 +84,7 @@ locals {
         ]
       }
     }
-    
+
     PreprodReadOnlyAccessBucketPolicy = {
       effect = "Allow"
       actions = [

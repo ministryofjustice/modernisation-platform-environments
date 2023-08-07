@@ -6,6 +6,6 @@ locals {
   }
 
   db_config_higher_environments = {
-    name                 = "db_for_higher_environments"
+    name = "db_for_higher_environments"
   }
 }

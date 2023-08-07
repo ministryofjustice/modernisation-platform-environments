@@ -8,7 +8,7 @@ locals {
     private_subnet_ids             = data.aws_subnets.shared-private.ids
     route53_inner_zone_info        = data.aws_route53_zone.inner
     migration_environment_vpc_cidr = "10.161.20.0/22"
-    general_shared_kms_key_arn      = data.aws_kms_key.general_shared.arn
+    general_shared_kms_key_arn     = data.aws_kms_key.general_shared.arn
   }
 
   ldap_config_dev2 = {
@@ -22,7 +22,7 @@ locals {
   }
 
   db_config_dev2 = {
-    name                 = try(local.db_config_lower_environments.name, "db")
-    ami_name             = local.db_config_lower_environments.ami_name
+    name     = try(local.db_config_lower_environments.name, "db")
+    ami_name = local.db_config_lower_environments.ami_name
   }
 }
