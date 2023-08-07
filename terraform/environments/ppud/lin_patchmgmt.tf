@@ -102,7 +102,7 @@ resource "aws_ssm_maintenance_window_task" "prod_lin_patch_maintenance_window_ta
 
 # Maintenance Window Pre Health Check Task for Linux
 
-resource "aws_ssm_maintenance_window_task" "pre_healthcheck_maintenance_window_task" {
+resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_window_task" {
   count            = local.is-production == true ? 1 : 0
   window_id        = aws_ssm_maintenance_window.prod_lin_patch_maintenance_window[0].id
   name             = "Pre-Health-Check-Report-Instance-Patch"
@@ -116,7 +116,7 @@ resource "aws_ssm_maintenance_window_task" "pre_healthcheck_maintenance_window_t
 
   targets {
     key    = "WindowTargetIds"
-    values = aws_ssm_maintenance_window_target.patch_maintenance_window_target.*.id
+    values = aws_ssm_maintenance_window_target.patch_maintenance_window_target[0].*.id
   }
 
   task_invocation_parameters {
@@ -130,7 +130,7 @@ resource "aws_ssm_maintenance_window_task" "pre_healthcheck_maintenance_window_t
 
 # Maintenance Window Post Health Check Task for Linux
 
-resource "aws_ssm_maintenance_window_task" "post_healthcheck_maintenance_window_task" {
+resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_window_task" {
   count            = local.is-production == true ? 1 : 0
   window_id        = aws_ssm_maintenance_window.prod_lin_patch_maintenance_window[0].id
   name             = "Post-Health-Check-Report-Instance-Patch"
