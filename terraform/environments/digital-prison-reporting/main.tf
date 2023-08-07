@@ -57,7 +57,13 @@ module "glue_reporting_hub_job" {
     "--enable-auto-scaling"                     = true
     "--enable-job-insights"                     = true
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
+    "--dpr.aws.dynamodb.endpointUrl"            = "https://dynamodb.${local.account_region}.amazonaws.com"
     "--dpr.contract.registryName"               = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.domain.registry"                     = "${local.project}-domain-registry-${local.environment}"
+    "--dpr.domain.target.path"                  = "s3://${module.s3_domain_bucket.bucket_id}"
+    "--dpr.domain.catalog.db"                   = module.glue_data_domain_database.db_name
+    "--dpr.redshift.secrets.name"               = "${local.project}-redshift-secret-${local.environment}"
+    "--dpr.datamart.db.name"                    = "datamart"
   }
 }
 
