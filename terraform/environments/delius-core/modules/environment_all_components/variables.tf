@@ -18,15 +18,12 @@ variable "account_info" {
   })
 }
 
-#variable "ldap_migration_bucket_arn" {
-#  type = string
-#}
-
 variable "network_config" {
   type = object({
     shared_vpc_cidr                = string
     shared_vpc_id                  = string
     private_subnet_ids             = list(string)
+    private_subnet_a_id            = string
     route53_inner_zone_info        = any
     route53_network_services_zone  = any
     route53_external_zone          = any
@@ -36,7 +33,8 @@ variable "network_config" {
   default = {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
     shared_vpc_id                  = "default_shared_vpc_id"
-    private_subnet_ids             = ["default_private_subnet_a_id"]
+    private_subnet_ids             = ["default_private_subnet_ids"]
+    private_subnet_a_id            = "default_private_subnet_id"
     route53_inner_zone_info        = {}
     route53_network_services_zone  = {}
     route53_external_zone          = {}
@@ -67,6 +65,113 @@ variable "ldap_config" {
   }
 }
 
+variable "db_config" {
+  type = object({
+    name          = string
+    ami_name      = string
+    ami_owner     = string
+    user_data_raw = optional(string, null)
+    instance = object({
+      associate_public_ip_address  = optional(bool, false)
+      disable_api_termination      = bool
+      instance_type                = string
+      key_name                     = string
+      metadata_endpoint_enabled    = optional(string, "enabled")
+      metadata_options_http_tokens = optional(string, "required")
+      monitoring                   = optional(bool, true)
+      ebs_block_device_inline      = optional(bool, false)
+      vpc_security_group_ids       = list(string)
+      private_dns_name_options = optional(object({
+        enable_resource_name_dns_aaaa_record = optional(bool)
+        enable_resource_name_dns_a_record    = optional(bool)
+        hostname_type                        = string
+      }))
+    })
+    ebs_volume_config = map(object({
+      iops       = optional(number)
+      throughput = optional(number)
+      total_size = optional(number)
+      type       = optional(string)
+      kms_key_id = optional(string)
+    }))
+    ebs_volumes = map(object({
+      label       = optional(string)
+      snapshot_id = optional(string)
+      iops        = optional(number)
+      throughput  = optional(number)
+      size        = optional(number)
+      type        = optional(string)
+      kms_key_id  = optional(string)
+    }))
+    route53_records = object({
+      create_internal_record = bool
+      create_external_record = bool
+    })
+  })
+  default = {
+    name          = "name_example"
+    ami_name      = "ami_name_example"
+    ami_owner     = "ami_owner_example"
+    user_data_raw = "user_data_raw_example"
+    instance = {
+      associate_public_ip_address  = false
+      disable_api_termination      = false
+      instance_type                = "instance_type_example"
+      key_name                     = "key_name_example"
+      metadata_endpoint_enabled    = "enabled"
+      metadata_options_http_tokens = "required"
+      monitoring                   = true
+      ebs_block_device_inline      = false
+      vpc_security_group_ids       = []
+      private_dns_name_options = {
+        enable_resource_name_dns_aaaa_record = false
+        enable_resource_name_dns_a_record    = false
+        hostname_type                        = "hostname_type_example"
+      }
+    }
+    ebs_volume_config = {
+      "vol1" = {
+        iops       = 1000
+        throughput = 100
+        total_size = 100
+        type       = "type_example"
+        kms_key_id = "kms_key_id_example"
+      },
+      "vol2" = {
+        iops       = 1000
+        throughput = 100
+        total_size = 100
+        type       = "type_example"
+        kms_key_id = "kms_key_id_example"
+      },
+    }
+    ebs_volumes = {
+      "vol1" = {
+        label       = "label_example"
+        snapshot_id = "snapshot_id_example"
+        iops        = 1000
+        throughput  = 100
+        size        = 100
+        type        = "type_example"
+        kms_key_id  = "kms_key_id_example"
+      },
+      "vol2" = {
+        label       = "label_example"
+        snapshot_id = "snapshot_id_example"
+        iops        = 1000
+        throughput  = 100
+        size        = 100
+        type        = "type_example"
+        kms_key_id  = "kms_key_id_example"
+      },
+    }
+    route53_records = {
+      create_internal_record = false
+      create_external_record = false
+    }
+  }
+}
+
 variable "weblogic_config" {
   type = object({
     name                          = string
@@ -86,16 +191,6 @@ variable "weblogic_config" {
     frontend_url_suffix           = "default_frontend_url_suffix"
     db_name                       = "default_db_name"
   }
-
-}
-
-variable "db_config" {
-  type = object({
-    name = string
-  })
-  default = {
-    name = "default_name"
-  }
 }
 
 variable "tags" {
@@ -107,7 +202,6 @@ variable "platform_vars" {
     environment_management = any
   })
 }
-
 
 variable "delius_db_container_config" {
   type = object({
