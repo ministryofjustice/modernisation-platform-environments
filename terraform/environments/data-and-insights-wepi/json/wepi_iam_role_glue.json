@@ -2,19 +2,14 @@
   "Version": "2012-10-17",
   "Statement": [
       {
+          "Principal": {
+            "Service": "glue.amazonaws.com"
+          },
           "Effect": "Allow",
           "Action": [
               "s3:*",
               "s3-object-lambda:*",
               "glue:*",
-              "s3:GetBucketLocation",
-              "s3:CreateBucket",
-              "s3:ListBucket",
-              "s3:ListAllMyBuckets",
-              "s3:GetBucketAcl",
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:DeleteObject",
               "ec2:DescribeVpcEndpoints",
               "ec2:DescribeRouteTables",
               "ec2:CreateNetworkInterface",
@@ -31,6 +26,9 @@
           "Resource": "*"
       },
       {
+        "Principal": {
+            "Service": "glue.amazonaws.com"
+          },
         "Effect": "Allow",
         "Action": [
             "logs:CreateLogGroup",
