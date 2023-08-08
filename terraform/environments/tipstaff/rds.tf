@@ -98,6 +98,8 @@ resource "null_resource" "setup_db" {
       DB_NAME              = aws_db_instance.tipstaff_db.db_name
       TIPSTAFF_DB_USERNAME = local.application_data.accounts[local.environment].db_username
       TIPSTAFF_DB_PASSWORD = random_password.password.result
+      PROD_DB_HOSTNAME     = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["PROD_DB_HOSTNAME"]
+      PROD_DB_NAME         = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["PROD_DB_NAME"]
     }
   }
   triggers = {
