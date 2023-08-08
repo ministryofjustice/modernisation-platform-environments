@@ -1,4 +1,4 @@
-resource "aws_ssm_parameter" "ec2-user-ssh-public-key" {
+resource "aws_ssm_parameter" "ec2-user-ssh-key" {
   name        = format("%s/ec2-user-ssh-key", var.env_name)
   type        = "String"
   value       = "initial_value_to_be_changed"
