@@ -78,7 +78,7 @@ resource "aws_security_group_rule" "ldap_nlb" {
   to_port           = local.ldap_port
   protocol          = "TCP"
   security_group_id = aws_security_group.ldap.id
-  cidr_blocks       = [var.network_config.shared_vpc_cidr]
+  cidr_blocks       = [var.account_config.shared_vpc_cidr]
 }
 
 resource "aws_security_group_rule" "allow_ldap_from_legacy_env" {
@@ -88,7 +88,7 @@ resource "aws_security_group_rule" "allow_ldap_from_legacy_env" {
   to_port           = local.ldap_port
   protocol          = "TCP"
   security_group_id = aws_security_group.ldap.id
-  cidr_blocks       = [var.network_config.migration_environment_vpc_cidr]
+  cidr_blocks       = [var.environment_config.migration_environment_vpc_cidr]
 }
 
 resource "aws_security_group_rule" "efs_ingress_ldap" {

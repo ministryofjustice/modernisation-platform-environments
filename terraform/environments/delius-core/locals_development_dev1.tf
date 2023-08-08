@@ -3,17 +3,21 @@
 # Sample data
 # tags demonstrate inheritance due to merges in the module
 locals {
-  network_config_dev = {
-    shared_vpc_cidr                = data.aws_vpc.shared.cidr_block
-    private_subnet_ids             = data.aws_subnets.shared-private.ids
-    data_subnet_ids                = data.aws_subnets.shared-data.ids
-    data_subnet_a_id               = data.aws_subnet.data_subnets_a.id
-    route53_inner_zone_info        = data.aws_route53_zone.inner
-    route53_network_services_zone  = data.aws_route53_zone.network-services
-    route53_external_zone          = data.aws_route53_zone.external
+  account_config_dev = {
+    shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
+    private_subnet_ids            = data.aws_subnets.shared-private.ids
+    data_subnet_ids               = data.aws_subnets.shared-data.ids
+    data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
+    route53_inner_zone_info       = data.aws_route53_zone.inner
+    route53_network_services_zone = data.aws_route53_zone.network-services
+    route53_external_zone         = data.aws_route53_zone.external
+    general_shared_kms_key_arn    = data.aws_kms_key.general_shared.arn
+    shared_vpc_id                 = data.aws_vpc.shared.id
+  }
+
+  environment_config_dev = {
     migration_environment_vpc_cidr = "10.161.20.0/22"
-    general_shared_kms_key_arn     = data.aws_kms_key.general_shared.arn
-    shared_vpc_id                  = data.aws_vpc.shared.id
+    ec2_user_ssh_key               = file("${path.module}/files/.ssh/${terraform.workspace}-dev/ec2-user.pub")
   }
 
   ldap_config_dev = {
@@ -46,64 +50,72 @@ locals {
       instance_type = "r6i.xlarge"
       monitoring    = false
     })
-    ebs_volumes = {}
-    ebs_volumes = merge(local.db_config.ebs_volumes, {
+
+    ebs_volumes_copy_all_from_ami = false
+    ebs_volumes = {
       "/dev/sda1" = { # root volume
         label = "root",
         size  = 30,
         type  = "gp3"
-      },
-      "/dev/sdb" = { # /u01 oracle app disk
-        label = "u01",
-        size  = 200,
-        type  = "gp3"
-      },
-      "/dev/sdc" = { # /u02 oracle app disk
-        label = "u02",
-        size  = 100,
-        type  = "gp3"
-      },
-      "/dev/sds" = { # swap disk
-        label = "swap",
-        size  = 4,
-        type  = "gp3"
-      },
-      "/dev/sde" = { # oracle asm disk DATA01
-        label = "asm_data01",
-        size  = 500,
-        type  = "gp3"
-      },
-      "/dev/sdf" = { # oracle asm disk DATA02 -- need to set to no_device to ensure terraform doesn't create
-        label = "asm_data02",
-        size  = 1,
-        type  = "gp3"
-      },
-      "/dev/sdg" = { # oracle asm disk DATA03 -- need to set to no_device to ensure terraform doesn't create
-        label = "asm_data03",
-        size  = 1,
-        type  = "gp3"
-      },
-      "/dev/sdh" = { # oracle asm disk DATA04 -- need to set to no_device to ensure terraform doesn't create
-        label = "asm_data04",
-        size  = 1,
-        type  = "gp3"
-      },
-      "/dev/sdi" = { # oracle asm disk DATA05 -- need to set to no_device to ensure terraform doesn't create
-        label = "asm_data05",
-        size  = 1,
-        type  = "gp3"
-      },
-      "/dev/sdj" = { # oracle asm disk FLASH01
-        label = "asm_flash01",
-        size  = 500,
-        type  = "gp3"
-      },
-      "/dev/sdk" = { # oracle asm disk FLASH02 -- need to set to no_device to ensure terraform doesn't create
-        label = "asm_flash02",
-        size  = 1,
-        type  = "gp3"
-      },
-    })
+      }
+    }
+    # ebs_volumes = merge(local.db_config.ebs_volumes, {
+    #   "/dev/sda1" = { # root volume
+    #     label = "root",
+    #     size  = 30,
+    #     type  = "gp3"
+    #   },
+    #   "/dev/sdb" = { # /u01 oracle app disk
+    #     label = "u01",
+    #     size  = 200,
+    #     type  = "gp3"
+    #   },
+    #   "/dev/sdc" = { # /u02 oracle app disk
+    #     label = "u02",
+    #     size  = 100,
+    #     type  = "gp3"
+    #   },
+    #   "/dev/sds" = { # swap disk
+    #     label = "swap",
+    #     size  = 4,
+    #     type  = "gp3"
+    #   },
+    #   "/dev/sde" = { # oracle asm disk DATA01
+    #     label = "asm_data01",
+    #     size  = 500,
+    #     type  = "gp3"
+    #   },
+    #   "/dev/sdf" = { # oracle asm disk DATA02 -- need to set to no_device to ensure terraform doesn't create
+    #     label = "asm_data02",
+    #     size  = 1,
+    #     type  = "gp3"
+    #   },
+    #   "/dev/sdg" = { # oracle asm disk DATA03 -- need to set to no_device to ensure terraform doesn't create
+    #     label = "asm_data03",
+    #     size  = 1,
+    #     type  = "gp3"
+    #   },
+    #   "/dev/sdh" = { # oracle asm disk DATA04 -- need to set to no_device to ensure terraform doesn't create
+    #     label = "asm_data04",
+    #     size  = 1,
+    #     type  = "gp3"
+    #   },
+    #   "/dev/sdi" = { # oracle asm disk DATA05 -- need to set to no_device to ensure terraform doesn't create
+    #     label = "asm_data05",
+    #     size  = 1,
+    #     type  = "gp3"
+    #   },
+    #   "/dev/sdj" = { # oracle asm disk FLASH01
+    #     label = "asm_flash01",
+    #     size  = 500,
+    #     type  = "gp3"
+    #   },
+    #   "/dev/sdk" = { # oracle asm disk FLASH02 -- need to set to no_device to ensure terraform doesn't create
+    #     label = "asm_flash02",
+    #     size  = 1,
+    #     type  = "gp3"
+    #   },
+    # })
     ebs_volume_config = {}
     #ebs_volume_config = merge(local.db_config.ebs_volume_config, {
     #  data  = 

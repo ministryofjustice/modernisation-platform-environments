@@ -17,12 +17,12 @@ module "environment_dev" {
   app_name      = local.application_name
   platform_vars = local.platform_vars
 
-  network_config  = local.network_config_dev
-  ldap_config     = local.ldap_config_dev
-  db_config       = local.db_config_dev
-  weblogic_config = local.weblogic_config_dev
-  bastion         = local.bastion
-
+  account_config     = local.account_config_dev
+  environment_config = local.environment_config_dev
+  ldap_config        = local.ldap_config_dev
+  db_config          = local.db_config_dev
+  weblogic_config    = local.weblogic_config_dev
+  bastion            = local.bastion
 
   account_info = local.account_info
 

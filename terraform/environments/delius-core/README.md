@@ -74,3 +74,18 @@ Modernisation Platform
 ### **How to resolve specific issues:**
 
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
+
+## Design decisions
+
+### Naming conventions
+
+The infrastructure code supports multiple environments per Modernisation Platform account.
+As such, we've adopted some naming conventions to allow easy, consistent and predictable naming for resources.
+
+For example, resource name takes the form
+`environmentname-resourceidentifier`
+- where environmentname is the name for the delius environment, NOT the Modernisation Platform account name, e.g. `dev`, `stage`, `preprod`
+- resourceidentifier is an identifier for the resource that together with the environmentname gives full clarity about what the resource represents, e.g. `ldap-efs` or `delius-db-1`
+e.g.
+`dev-ldap-efs` 
+`preprod-delius-db-1` 

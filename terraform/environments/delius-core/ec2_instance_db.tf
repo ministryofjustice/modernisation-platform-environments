@@ -165,7 +165,8 @@ resource "aws_instance" "base_ami_test_instance" {
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-base-ami-test-instance", local.application_name, local.environment)) },
     { server-type = "delius_core_db" },
-    { delius-environment-name = "core-dev-delius-primarydb" }
+    { delius-environment-name = "dev" },
+    { database = "delius-db-1" }
   )
 }
 

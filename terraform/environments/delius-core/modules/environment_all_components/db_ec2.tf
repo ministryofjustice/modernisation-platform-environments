@@ -11,23 +11,28 @@ module "db_ec2_primary_instance" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  name             = format("%s-%s-1", var.env_name, var.db_config.name) # delius-core-db-dev
-  business_unit    = var.account_info.business_unit                      # hmpps
-  application_name = var.account_info.application_name                   # delius-core
-  region           = var.account_info.region                             # eu-west-2
-  environment      = var.account_info.mp_environment                     # equates to one of the 4 MP environment names, e.g. development
-  subnet_id        = var.network_config.data_subnet_a_id
+  name              = format("%s-%s-1", var.env_name, var.db_config.name) # delius-core-db-dev
+  business_unit     = var.account_info.business_unit                      # hmpps
+  application_name  = var.account_info.application_name                   # delius-core
+  region            = var.account_info.region                             # eu-west-2
+  environment       = var.account_info.mp_environment                     # equates to one of the 4 MP environment names, e.g. development
+  availability_zone = "eu-west-2a"
+  subnet_id         = var.account_config.data_subnet_a_id
 
   ami_name  = var.db_config.ami_name  # delius_core_ol_8_5_oracle_db_19c_patch_2023-06-12T12-32-07.259Z
   ami_owner = var.db_config.ami_owner # 
   instance = merge(var.db_config.instance, {
     vpc_security_group_ids = [aws_security_group.db_ec2_instance_sg.id]
+    key_name               = aws_key_pair.environment_ec2_user_key_pair.key_name
   })
 
-  user_data_raw     = var.db_config.user_data_raw
-  ebs_volume_config = var.db_config.ebs_volume_config
-  ebs_volumes       = var.db_config.ebs_volumes
-  route53_records   = var.db_config.route53_records
+  user_data_raw = var.db_config.user_data_raw
+
+  ebs_volumes_copy_all_from_ami = true
+  ebs_volumes                   = var.db_config.ebs_volumes
+  ebs_volume_config             = var.db_config.ebs_volume_config
+
+  route53_records = var.db_config.route53_records
 
   instance_profile_policies = [
     # aws_iam_policy.db_ec2_instance_iam_assume_policy.arn,
@@ -108,7 +113,7 @@ data "aws_iam_policy_document" "business_unit_kms_key_access" {
       "kms:RevokeGrant"
     ]
     resources = [
-      var.network_config.general_shared_kms_key_arn
+      var.account_config.general_shared_kms_key_arn
     ]
   }
 }

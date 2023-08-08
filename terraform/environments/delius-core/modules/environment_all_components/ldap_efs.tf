@@ -1,7 +1,7 @@
 resource "aws_efs_file_system" "ldap" {
   creation_token                  = "${var.env_name}-ldap"
   encrypted                       = true
-  kms_key_id                      = var.network_config.general_shared_kms_key_arn
+  kms_key_id                      = var.account_config.general_shared_kms_key_arn
   throughput_mode                 = var.ldap_config.efs_throughput_mode
   provisioned_throughput_in_mibps = var.ldap_config.efs_provisioned_throughput
   tags = merge(
@@ -13,7 +13,7 @@ resource "aws_efs_file_system" "ldap" {
 }
 
 resource "aws_efs_mount_target" "ldap" {
-  for_each       = toset(var.network_config.private_subnet_ids)
+  for_each       = toset(var.account_config.private_subnet_ids)
   file_system_id = aws_efs_file_system.ldap.id
   subnet_id      = each.value
   security_groups = [
@@ -42,6 +42,6 @@ resource "aws_security_group_rule" "efs_egress" {
   from_port         = 0
   to_port           = 0
   protocol          = "all"
-  cidr_blocks       = [var.network_config.shared_vpc_cidr]
+  cidr_blocks       = [var.account_config.shared_vpc_cidr]
   security_group_id = aws_security_group.ldap_efs.id
 }

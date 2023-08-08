@@ -4,7 +4,7 @@ locals {
 resource "aws_security_group" "delius_frontend_alb_security_group" {
   name        = "Delius Core Frontend Load Balancer"
   description = "controls access to and from delius front-end load balancer"
-  vpc_id      = var.network_config.shared_vpc_id
+  vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
 }
 
@@ -44,7 +44,7 @@ resource "aws_lb" "delius_core_frontend" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
-  subnets            = var.network_config.private_subnet_ids
+  subnets            = var.account_config.private_subnet_ids
 
   enable_deletion_protection = false
   drop_invalid_header_fields = true
@@ -86,7 +86,7 @@ resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   name                 = var.weblogic_config.frontend_fully_qualified_name
   port                 = var.weblogic_config.frontend_container_port
   protocol             = "HTTP"
-  vpc_id               = var.network_config.shared_vpc_id
+  vpc_id               = var.account_config.shared_vpc_id
   target_type          = "ip"
   deregistration_delay = 30
   tags                 = local.tags
@@ -109,7 +109,7 @@ resource "aws_lb_target_group" "delius_core_frontend_target_group" {
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
-  zone_id = var.network_config.route53_external_zone.zone_id
+  zone_id = var.account_config.route53_external_zone.zone_id
   name    = local.frontend_url
   type    = "A"
 
@@ -128,7 +128,7 @@ resource "aws_route53_record" "external_validation" {
   records         = local.domain_record_main
   ttl             = 60
   type            = local.domain_type_main[0]
-  zone_id         = var.network_config.route53_network_services_zone.zone_id
+  zone_id         = var.account_config.route53_network_services_zone.zone_id
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
@@ -139,7 +139,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
   records         = local.domain_record_sub
   ttl             = 60
   type            = local.domain_type_sub[0]
-  zone_id         = var.network_config.route53_external_zone.zone_id
+  zone_id         = var.account_config.route53_external_zone.zone_id
 }
 
 resource "aws_acm_certificate" "external" {

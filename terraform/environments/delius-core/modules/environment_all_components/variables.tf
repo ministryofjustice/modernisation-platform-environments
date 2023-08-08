@@ -18,18 +18,18 @@ variable "account_info" {
   })
 }
 
-variable "network_config" {
+variable "account_config" {
   type = object({
-    shared_vpc_cidr                = string
-    shared_vpc_id                  = string
-    private_subnet_ids             = list(string)
-    data_subnet_ids                = list(string)
-    data_subnet_a_id               = string
-    route53_inner_zone_info        = any
-    route53_network_services_zone  = any
-    route53_external_zone          = any
-    migration_environment_vpc_cidr = optional(string)
-    general_shared_kms_key_arn     = optional(string)
+    shared_vpc_cidr               = string
+    shared_vpc_id                 = string
+    private_subnet_ids            = list(string)
+    data_subnet_ids               = list(string)
+    data_subnet_a_id              = string
+    route53_inner_zone_info       = any
+    route53_network_services_zone = any
+    route53_external_zone         = any
+
+    general_shared_kms_key_arn = optional(string)
   })
   default = {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
@@ -43,6 +43,13 @@ variable "network_config" {
     migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
     general_shared_kms_key_arn     = "default_general_shared_kms_key_arn"
   }
+}
+
+variable "environment_config" {
+  type = object({
+    migration_environment_vpc_cidr = optional(string),
+    ec2_user_ssh_key               = string
+  })
 }
 
 variable "ldap_config" {
@@ -77,7 +84,6 @@ variable "db_config" {
       associate_public_ip_address  = optional(bool, false)
       disable_api_termination      = bool
       instance_type                = string
-      key_name                     = string
       metadata_endpoint_enabled    = optional(string, "enabled")
       metadata_options_http_tokens = optional(string, "required")
       monitoring                   = optional(bool, true)
@@ -89,6 +95,7 @@ variable "db_config" {
         hostname_type                        = string
       }))
     })
+    ebs_volumes_copy_all_from_ami = optional(bool, false)
     ebs_volume_config = map(object({
       iops       = optional(number)
       throughput = optional(number)
@@ -119,7 +126,6 @@ variable "db_config" {
       associate_public_ip_address  = false
       disable_api_termination      = false
       instance_type                = "instance_type_example"
-      key_name                     = "key_name_example"
       metadata_endpoint_enabled    = "enabled"
       metadata_options_http_tokens = "required"
       monitoring                   = true
@@ -131,6 +137,7 @@ variable "db_config" {
         hostname_type                        = "hostname_type_example"
       }
     }
+    ebs_volumes_copy_all_from_amis = false
     ebs_volume_config = {
       "vol1" = {
         iops       = 1000

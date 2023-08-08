@@ -38,7 +38,7 @@ module "testing_db_service" {
   container_definition_json = module.testing_db_container[0].json_map_encoded_list
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
   name                      = "testing-db"
-  vpc_id                    = var.network_config.shared_vpc_id
+  vpc_id                    = var.account_config.shared_vpc_id
 
   launch_type  = "FARGATE"
   network_mode = "awsvpc"
@@ -58,7 +58,7 @@ module "testing_db_service" {
 
   security_group_ids = [aws_security_group.weblogic.id]
 
-  subnet_ids = var.network_config.private_subnet_ids
+  subnet_ids = var.account_config.private_subnet_ids
 
   exec_enabled = true
 
@@ -70,8 +70,8 @@ module "testing_db_service" {
 resource "aws_route53_record" "delius-core-db" {
   count    = var.env_name == "dev" ? 1 : 0
   provider = aws.core-vpc
-  zone_id  = var.network_config.route53_inner_zone_info.zone_id
-  name     = "${var.app_name}-${var.env_name}-${var.delius_db_container_config.fully_qualified_name}.${var.network_config.route53_inner_zone_info.name}"
+  zone_id  = var.account_config.route53_inner_zone_info.zone_id
+  name     = "${var.app_name}-${var.env_name}-${var.delius_db_container_config.fully_qualified_name}.${var.account_config.route53_inner_zone_info.name}"
   type     = "A"
   ttl      = 300
   records  = ["10.26.25.202"]
@@ -80,7 +80,7 @@ resource "aws_route53_record" "delius-core-db" {
 resource "aws_security_group" "delius_db_security_group" {
   name        = "Delius Core DB"
   description = "Rules for the delius testing db ecs service"
-  vpc_id      = var.network_config.shared_vpc_id
+  vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
 }
 

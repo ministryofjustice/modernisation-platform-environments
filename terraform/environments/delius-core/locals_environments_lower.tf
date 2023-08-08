@@ -13,7 +13,6 @@ locals {
     instance = {
       disable_api_termination      = true
       instance_type                = "r6i.xlarge"
-      key_name                     = "key_name_here"
       metadata_endpoint_enabled    = "enabled"
       metadata_options_http_tokens = "required"
       associate_public_ip_address  = false
