@@ -186,8 +186,8 @@ resource "aws_route53_record" "oid_internal" {
   type     = "A"
 
   alias {
-    name                   = aws_lb.internal.dns_name
-    zone_id                = aws_lb.internal.zone_id
+    name                   = aws_elb.idm_lb.dns_name
+    zone_id                = aws_elb.idm_lb.zone_id
     evaluate_target_health = true
   }
 }
