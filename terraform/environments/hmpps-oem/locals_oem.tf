@@ -5,7 +5,7 @@ locals {
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
 
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name = "base_ol_8_5_*"
+      ami_name = "hmpps_ol_8_5_oracledb_19c_release_2023-08-07T16-14-04.275Z"
     })
 
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
@@ -16,17 +16,7 @@ locals {
       vpc_security_group_ids       = ["data-oem"]
     })
 
-    user_data_cloud_init = {
-      args = {
-        branch               = "main"
-        ansible_repo         = "modernisation-platform-configuration-management"
-        ansible_repo_basedir = "ansible"
-        ansible_args         = "--tags ec2provision,oracle_19c_download,oracle_19c_install"
-      }
-      scripts = [
-        "ansible-ec2provision.sh.tftpl",
-      ]
-    }
+    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
     ebs_volumes = {
       "/dev/sdb" = { type = "gp3", label = "app", size = 100 } # /u01
@@ -42,16 +32,8 @@ locals {
     }
 
     ebs_volume_config = {
-      data = {
-        iops       = 3000
-        throughput = 125
-        total_size = 100
-      }
-      flash = {
-        iops       = 3000
-        throughput = 125
-        total_size = 50
-      }
+      data  = { total_size = 100 }
+      flash = { total_size = 50 }
     }
 
     route53_records = {
@@ -77,7 +59,7 @@ locals {
     }
 
     tags = {
-      # ami                = "base_ol_8_5"  # not including as hardening role seems to cause an issue
+      ami                  = "hmpps_ol_8_5_oracledb_19c" # not including as hardening role seems to cause an issue
       component            = "data"
       server-type          = "hmpps-oem"
       os-type              = "Linux"
