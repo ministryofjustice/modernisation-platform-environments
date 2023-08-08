@@ -45,11 +45,11 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   cluster_type    = local.application_data.accounts[local.environment].redshift_cluster_node_count > 1 ? "multi-node" : "single-node"
   number_of_nodes = local.application_data.accounts[local.environment].redshift_cluster_node_count
 
-  encrypted  = true
+  encrypted  = false
   kms_key_id = aws_kms_key.wepi_kms_cmk.arn
 
-  publicly_accessible  = false
-  enhanced_vpc_routing = true
+  publicly_accessible = true
+  enhanced_vpc_routing = false
   vpc_security_group_ids = [
     aws_security_group.wepi_sg_allow_redshift.id
   ]
