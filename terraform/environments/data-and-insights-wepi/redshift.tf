@@ -162,26 +162,26 @@ resource "aws_security_group_rule" "tcp-5439" {
   type              = "ingress"
 }
 
-resource "aws_lb" "redshift-data" {
-  name               = format("%s-redshift-lb", local.environment)
-  internal           = true
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.redshift-data-lb.id] #extra line added late at night
-  subnets            = data.aws_subnets.shared-private.ids
-  tags               = local.tags
-}
+# resource "aws_lb" "redshift-data" {
+#   name               = format("%s-redshift-lb", local.environment)
+#   internal           = true
+#   load_balancer_type = "application"
+#   security_groups    = [aws_security_group.redshift-data-lb.id] #extra line added late at night
+#   subnets            = data.aws_subnets.shared-private.ids
+#   tags               = local.tags
+# }
 
-resource "aws_lb_target_group" "redshift-data" {
-  name        = "redshift-lb-tg-5439"
-  port        = 5439
-  protocol    = "TCP"
-  target_type = "ip"
-  vpc_id      = data.aws_vpc.shared.id
-}
+# resource "aws_lb_target_group" "redshift-data" {
+#   name        = "redshift-lb-tg-5439"
+#   port        = 5439
+#   protocol    = "TCP"
+#   target_type = "ip"
+#   vpc_id      = data.aws_vpc.shared.id
+# }
 
-resource "aws_lb_target_group_attachment" "redshift-data" {
-  for_each         = data.aws_network_interface.redshift-data
-  target_group_arn = aws_lb_target_group.redshift-data.arn
-  target_id        = each.value.private_ip
-  port             = 5439
-}
+# resource "aws_lb_target_group_attachment" "redshift-data" {
+#   for_each         = data.aws_network_interface.redshift-data
+#   target_group_arn = aws_lb_target_group.redshift-data.arn
+#   target_id        = each.value.private_ip
+#   port             = 5439
+# }

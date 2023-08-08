@@ -2,31 +2,12 @@
     "Version": "2012-10-17",
     "Statement": [
       {
-        "Action": [
-            "s3:*",
-            "s3-object-lambda:*",
-            "glue:*",
-            "ec2:DescribeVpcEndpoints",
-            "ec2:DescribeRouteTables",
-            "ec2:CreateNetworkInterface",
-            "ec2:DeleteNetworkInterface",
-            "ec2:DescribeNetworkInterfaces",
-            "ec2:DescribeSecurityGroups",
-            "ec2:DescribeSubnets",
-            "ec2:DescribeVpcAttribute",
-            "iam:ListRolePolicies",
-            "iam:GetRole",
-            "iam:GetRolePolicy",
-            "cloudwatch:PutMetricData",
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"],
+        "Action": "sts:AssumeRole",
         "Principal": {
-          "Service": ["glue.amazonaws.com"]
+          "Service": "glue.amazonaws.com"
         },
         "Effect": "Allow",
-        "Sid": "",
-        "Resource": "*"
+        "Sid": ""
       }
     ]
   }
