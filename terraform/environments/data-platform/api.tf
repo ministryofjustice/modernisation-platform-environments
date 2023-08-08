@@ -1,41 +1,6 @@
+
 resource "aws_api_gateway_rest_api" "data_platform" {
   name = "data_platform"
-}
-
-resource "aws_api_gateway_resource" "upload_data" {
-  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
-  path_part   = "upload_data"
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
-}
-
-resource "aws_api_gateway_method" "upload_data_get" {
-  authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.authorizer.id
-  http_method   = "GET"
-  resource_id   = aws_api_gateway_resource.upload_data.id
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
-
-  request_parameters = {
-    "method.request.header.Authorization"   = true
-    "method.request.querystring.database"   = true,
-    "method.request.querystring.table"      = true,
-    "method.request.querystring.contentMD5" = true,
-  }
-}
-
-resource "aws_api_gateway_integration" "upload_data_to_lambda" {
-  http_method             = aws_api_gateway_method.upload_data_get.http_method
-  resource_id             = aws_api_gateway_resource.upload_data.id
-  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = module.data_product_presigned_url_lambda.lambda_function_invoke_arn
-
-  request_parameters = {
-    "integration.request.querystring.database"   = "method.request.querystring.database",
-    "integration.request.querystring.table"      = "method.request.querystring.table",
-    "integration.request.querystring.contentMD5" = "method.request.querystring.contentMD5"
-  }
 }
 
 resource "aws_api_gateway_deployment" "deployment" {
@@ -79,6 +44,46 @@ resource "aws_api_gateway_authorizer" "authorizer" {
   authorizer_credentials = aws_iam_role.authoriser_role.arn
   identity_source        = "method.request.header.authorizationToken"
 }
+
+# presigned url API endpoint
+
+resource "aws_api_gateway_resource" "upload_data" {
+  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
+  path_part   = "upload_data"
+  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+}
+
+resource "aws_api_gateway_method" "upload_data_get" {
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.authorizer.id
+  http_method   = "GET"
+  resource_id   = aws_api_gateway_resource.upload_data.id
+  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+
+  request_parameters = {
+    "method.request.header.Authorization"   = true
+    "method.request.querystring.database"   = true,
+    "method.request.querystring.table"      = true,
+    "method.request.querystring.contentMD5" = true,
+  }
+}
+
+resource "aws_api_gateway_integration" "upload_data_to_lambda" {
+  http_method             = aws_api_gateway_method.upload_data_get.http_method
+  resource_id             = aws_api_gateway_resource.upload_data.id
+  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.data_product_presigned_url_lambda.lambda_function_invoke_arn
+
+  request_parameters = {
+    "integration.request.querystring.database"   = "method.request.querystring.database",
+    "integration.request.querystring.table"      = "method.request.querystring.table",
+    "integration.request.querystring.contentMD5" = "method.request.querystring.contentMD5"
+  }
+}
+
+# API docs endpoint
 
 resource "aws_api_gateway_resource" "docs" {
   rest_api_id = aws_api_gateway_rest_api.data_platform.id
@@ -146,6 +151,8 @@ resource "aws_api_gateway_integration" "docs_lambda_root" {
     ignore_changes = all
   }
 }
+
+# get_glue_metadata endpoint
 
 resource "aws_api_gateway_resource" "get_glue_metadata" {
   parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id

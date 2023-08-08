@@ -1,3 +1,6 @@
+
+# github actions
+
 data "aws_iam_policy_document" "github_actions" {
   statement {
     sid    = "AllowECR"
@@ -44,17 +47,7 @@ module "github_actions_iam_role" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "lambda_trust_policy_doc" {
-  statement {
-    sid     = "LambdaAssumeRole"
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}
+# IAM policy documents for lambda functions
 
 data "aws_iam_policy_document" "iam_policy_document_for_docs_lambda" {
   statement {
@@ -155,54 +148,12 @@ data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
   }
 }
 
-data "aws_iam_policy_document" "assume_role" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "athena_load_lambda_role" {
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-  name               = "athena_load_lambda_role_${local.environment}"
-  tags               = local.tags
-}
-
-resource "aws_iam_policy" "athena_load_lambda_function_policy" {
-  name   = "athena_load_lambda_function_policy"
-  policy = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
-  tags   = local.tags
-}
-
-resource "aws_iam_role_policy_attachment" "policy_from_json" {
-  role       = aws_iam_role.athena_load_lambda_role.name
-  policy_arn = aws_iam_policy.athena_load_lambda_function_policy.arn
-}
-
 data "aws_iam_policy_document" "iam_policy_document_for_authorizer_lambda" {
   statement {
     sid       = "LambdaLogGroup"
     effect    = "Allow"
     actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
     resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
-  }
-}
-
-data "aws_iam_policy_document" "apigateway_trust_policy" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["apigateway.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
   }
 }
 
@@ -258,4 +209,104 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
     actions   = ["s3:GetObject", "s3:PutObject"]
     resources = ["${module.s3-bucket.bucket.arn}/raw_data/*"]
   }
+}
+
+# S3 policy
+
+data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
+  statement {
+    sid    = "AllowPutFromCiUser"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
+    }
+
+    actions = ["s3:PutObject", "s3:ListBucket"]
+
+    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
+  }
+
+  statement {
+    sid       = "DenyNonFullControlObjects"
+    effect    = "Deny"
+    actions   = ["s3:PutObject"]
+    resources = ["${module.s3-bucket.bucket.arn}/*"]
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-acl"
+
+      values = [
+        "bucket-owner-full-control"
+      ]
+    }
+  }
+
+}
+
+# Lambda trust policies
+# TODO: remove duplicate and unused resources
+
+data "aws_iam_policy_document" "lambda_trust_policy_doc" {
+  statement {
+    sid     = "LambdaAssumeRole"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "apigateway_trust_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["apigateway.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+# IAM resources for athena load lambda function
+# TODO: move the lambda function to using the lambda module and remove the resources below
+
+resource "aws_iam_role" "athena_load_lambda_role" {
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  name               = "athena_load_lambda_role_${local.environment}"
+  tags               = local.tags
+}
+
+resource "aws_iam_policy" "athena_load_lambda_function_policy" {
+  name   = "athena_load_lambda_function_policy"
+  policy = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
+  tags   = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "policy_from_json" {
+  role       = aws_iam_role.athena_load_lambda_role.name
+  policy_arn = aws_iam_policy.athena_load_lambda_function_policy.arn
 }

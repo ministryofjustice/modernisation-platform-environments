@@ -20,9 +20,3 @@ resource "aws_athena_workgroup" "data_product_athena_workgroup" {
     }
   }
 }
-
-resource "aws_cloudwatch_event_target" "athena_load_lambda_trigger" {
-  rule      = aws_cloudwatch_event_rule.object_created_raw_data.name
-  target_id = "athena"
-  arn       = aws_lambda_function.athena_load.arn
-}
