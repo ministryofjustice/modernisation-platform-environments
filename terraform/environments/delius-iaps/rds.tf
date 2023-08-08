@@ -5,12 +5,10 @@ resource "aws_db_instance" "iaps" {
   instance_class = local.application_data.accounts[local.environment].db_instance_class
   db_name        = "IAPS"
   identifier     = "iaps"
-  
-  username = local.application_data.accounts[local.environment].db_user
-  password = aws_secretsmanager_secret_version.db_password.secret_string
 
-  
-  snapshot_identifier = length(data.aws_ssm_parameter.iaps_snapshot_data_refresh_id.value) > 1 ? data.aws_ssm_parameter.iaps_snapshot_data_refresh_id.value : null
+  username                    = local.application_data.accounts[local.environment].db_user
+  manage_master_user_password = true
+  snapshot_identifier         = length(data.aws_ssm_parameter.iaps_snapshot_data_refresh_id.value) > 0 ? data.aws_ssm_parameter.iaps_snapshot_data_refresh_id.value : null
   db_subnet_group_name        = aws_db_subnet_group.iaps.id
   vpc_security_group_ids      = [aws_security_group.iaps_db.id]
 
@@ -48,7 +46,7 @@ resource "aws_ssm_parameter" "iaps_snapshot_data_refresh_id" {
   name        = "/iaps/snapshot_id"
   description = "The ID of the RDS snapshot used for the IAPS database data refresh"
   type        = "String"
-  value = try(local.application_data.accounts[local.environment].db_snapshot_identifier, "x")
+  value       = try(local.application_data.accounts[local.environment].db_snapshot_identifier, "")
 
   tags = {
     environment = "production"
