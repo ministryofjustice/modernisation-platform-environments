@@ -1,19 +1,41 @@
 locals {
 
+  oem_database_instance_ssm_parameters = {
+    prefix = "/database/"
+    parameters = {
+      rcvcatownerpassword = {}
+      syspassword         = {}
+      systempassword      = {}
+    }
+  }
+  oem_emrep_ssm_parameters = {
+    prefix = "/oem/"
+    parameters = {
+      sysmanpassword = {}
+      syspassword    = {}
+      systempassword = {}
+    }
+  }
+  oem_ssm_parameters = {
+    prefix = "/oem/"
+    parameters = {
+      agentregpassword    = {}
+      nodemanagerpassword = {}
+      weblogicpassword    = {}
+    }
+  }
+
   oem_ec2_default = {
 
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
 
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name = "hmpps_ol_8_5_oracledb_19c_release_2023-08-07T16-14-04.275Z"
+      ami_name  = "hmpps_ol_8_5_oracledb_19c_release_2023-08-07T16-14-04.275Z"
+      ami_owner = "self"
     })
 
-    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      instance_type                = "r6i.xlarge"
-      disable_api_termination      = true
-      metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-      monitoring                   = true
-      vpc_security_group_ids       = ["data-oem"]
+    instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
+      vpc_security_group_ids = ["data-oem"]
     })
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible

@@ -4,6 +4,15 @@ locals {
   # baseline config
   test_config = {
 
+    baseline_ssm_parameters = {
+      "test-oem/TRCVCAT" = local.oem_database_instance_ssm_parameters
+      "test-oem/EMREP"   = local.oem_emrep_ssm_parameters
+      "test-oem/OEM"     = local.oem_ssm_parameters
+      "oem-a/TRCVCAT"    = local.oem_database_instance_ssm_parameters
+      "oem-a/EMREP"      = local.oem_emrep_ssm_parameters
+      "oem-a/OEM"        = local.oem_ssm_parameters
+    }
+
     baseline_ec2_autoscaling_groups = {
       test-oem = merge(local.oem_ec2_default, {
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
@@ -15,16 +24,16 @@ locals {
     }
 
     baseline_ec2_instances = {
-      oem-a = merge(local.oem_ec2_default, {
-        config = merge(local.oem_ec2_default.config, {
-          availability_zone = "eu-west-2a"
-        })
-        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
-          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-      })
+      #      oem-a = merge(local.oem_ec2_default, {
+      #        config = merge(local.oem_ec2_default.config, {
+      #          availability_zone = "eu-west-2a"
+      #        })
+      #        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
+      #          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
+      #            branch = "main"
+      #          })
+      #        })
+      #      })
     }
 
     baseline_s3_buckets = {
