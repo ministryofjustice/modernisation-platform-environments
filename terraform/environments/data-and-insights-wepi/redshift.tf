@@ -168,7 +168,6 @@ resource "aws_lb" "redshift-data" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.redshift-data-lb.id] #extra line added late at night
   subnets            = data.aws_subnets.shared-private.ids
-  protocol = "tcp"
   tags               = local.tags
 }
 
