@@ -1,4 +1,5 @@
 # custom_header   = "X-Custom-Header-LAA-${upper(var.application_name)}"
+custom_header     = "X-Custom-Header-LAA-${upper(local.application_name)}"
 # fqdn            == "production" ? local.application_data.accounts[local.environment].acm_cert_domain_name : "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].acm_cert_domain_name}"
 
 # data "aws_ec2_managed_prefix_list" "cloudfront" {
@@ -51,6 +52,24 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
   }
 }
 
+resource "aws_s3_bucket" "portalerrorpagebucket" {
+  # bucket = "laa-${var.application_name}-errorpagebucket-${var.environment}"
+  bucket = "laa-${local.application_name}-errorpagebucket-${local.environment}"
+  # force_destroy = true # Enable to recreate bucket deleting everything inside
+  tags = merge(
+    # var.tags,
+    local.tags,
+    {
+      # Name = "laa-${var.application_name}-errorpagebucket-${var.environment}"
+      Name = "laa-${local.application_name}-errorpagebucket-${local.environment}"
+    }
+  )
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
 resource "aws_s3_bucket_ownership_controls" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
   rule {
@@ -58,8 +77,28 @@ resource "aws_s3_bucket_ownership_controls" "cloudfront" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "portalerrorpagebucket" {
+  bucket = aws_s3_bucket.portalerrorpagebucket.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "portalerrorpagebucket" {
+  bucket = aws_s3_bucket.portalerrorpagebucket.id
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
@@ -84,12 +123,32 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "portalerrorpagebucket" {
+  bucket = aws_s3_bucket.portalerrorpagebucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+resource "aws_cloudfront_origin_access_identity" "portalerrorpagebucket" {
+  comment = "portalerrorpagebucket"
+}
+
 resource "aws_cloudfront_distribution" "external" {
 #   http_version = var.cloudfront_http_version
   http_version  = "http2"
   origin {
     domain_name = aws_lb.loadbalancer.dns_name
     origin_id   = aws_lb.loadbalancer.id
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.portalerrorpagebucket.cloudfront_access_identity_path
+    }
     custom_origin_config {
       http_port                = 80 # This port was not defined in CloudFormation, but should not be used anyways, only required by Terraform
       https_port               = 443
@@ -136,7 +195,7 @@ resource "aws_cloudfront_distribution" "external" {
   }
 
    ordered_cache_behavior_PortalErrorPageBucket {
-      target_origin_id = aws_lb.loadbalancer.id
+      target_origin_id = portalerrorpagebucket
       smooth_streaming = false
       path_pattern     = "/error-pages/*"
       min_ttl          = 0
