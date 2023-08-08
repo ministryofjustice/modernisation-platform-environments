@@ -19,8 +19,8 @@ locals {
     enable_oracle_secure_web                     = true
     enable_ec2_put_parameter                     = true
     enable_shared_s3                             = false # adds permissions to ec2s to interact with devtest or prodpreprod buckets
-    db_backup_s3                                 = true # adds db backup buckets
-    enable_oracle_secure_web                     = true # allows db to list all buckets
+    db_backup_s3                                 = true  # adds db backup buckets
+    enable_oracle_secure_web                     = true  # allows db to list all buckets
     cloudwatch_metric_alarms                     = {}
     cloudwatch_metric_alarms_lists               = {}
     cloudwatch_metric_alarms_lists_with_actions  = {}
