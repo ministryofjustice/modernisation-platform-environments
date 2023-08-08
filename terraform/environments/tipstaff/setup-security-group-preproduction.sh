@@ -9,4 +9,6 @@ aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY" --profile dts-l
 aws configure set region "$AWS_DEFAULT_REGION" --profile dts-legacy-apps-user &&
 aws configure set output "json" --profile dts-legacy-apps-user
 
+aws rds modify-db-instance --db-instance-identifier postgresql-staging --vpc-security-group-ids sg-04e9fe073afcc6b65 sg-0e0f5cf0883f81945 sg-08244ba362f922899 ${RDS_SECURITY_GROUP} --profile dts-legacy-apps-user
+
 aws rds modify-db-instance --db-instance-identifier tipstaff --vpc-security-group-ids sg-08244ba362f922899 sg-06f29e836693c21dd ${RDS_SECURITY_GROUP} --profile dts-legacy-apps-user
