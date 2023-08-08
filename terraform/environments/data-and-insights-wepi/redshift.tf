@@ -171,17 +171,17 @@ resource "aws_lb" "redshift-data" {
   tags               = local.tags
 }
 
-# resource "aws_lb_target_group" "redshift-data" {
-#   name        = "redshift-lb-tg-5439"
-#   port        = 5439
-#   protocol    = "tcp"
-#   target_type = "ip"
-#   vpc_id      = data.aws_vpc.shared.id
-# }
+resource "aws_lb_target_group" "redshift-data" {
+  name        = "redshift-lb-tg-5439"
+  port        = 5439
+  protocol    = "TCP"
+  target_type = "ip"
+  vpc_id      = data.aws_vpc.shared.id
+}
 
-# resource "aws_lb_target_group_attachment" "redshift-data" {
-#   for_each         = data.aws_network_interface.redshift-data
-#   target_group_arn = aws_lb_target_group.redshift-data.arn
-#   target_id        = each.value.private_ip
-#   port             = 5439
-# }
+resource "aws_lb_target_group_attachment" "redshift-data" {
+  for_each         = data.aws_network_interface.redshift-data
+  target_group_arn = aws_lb_target_group.redshift-data.arn
+  target_id        = each.value.private_ip
+  port             = 5439
+}
