@@ -20,6 +20,7 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
   subnet_ids = data.aws_subnets.shared-public.ids
 }
 
+//TODO: Uncomment the following:
 //SG for accessing the tacticalproducts source DB:
 # resource "aws_security_group" "modernisation_pra_access" {
 #   provider    = aws.tacticalproducts
@@ -81,6 +82,8 @@ resource "aws_security_group" "postgresql_db_sc" {
 data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
+
+//TODO: uncomment the null resources after adding the secrets
 
 # resource "null_resource" "setup_db" {
 #   depends_on = [aws_db_instance.pra_db]

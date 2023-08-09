@@ -57,14 +57,14 @@ resource "aws_route53_record" "external" {
     evaluate_target_health = true
   }
 }
-
+//TODO: uncomment all the prod code
 // PRODUCTION DNS CONFIGURATION
 
 // ACM Public Certificate
 # resource "aws_acm_certificate" "external_prod" {
 #   count = local.is-production ? 1 : 0
 
-//SET THE PROD DOMAIN NAME BELOW:
+//TODO: SET THE PROD DOMAIN NAME BELOW:
 #   domain_name       = ""
 #   validation_method = "DNS"
 #   lifecycle {
