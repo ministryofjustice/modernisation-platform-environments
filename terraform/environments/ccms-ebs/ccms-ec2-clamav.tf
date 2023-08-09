@@ -1,5 +1,3 @@
-# Build EC2 for ClamAV
-
 resource "aws_instance" "ec2_clamav" {
   instance_type               = local.application_data.accounts[local.environment].ec2_instance_type_clamav
   ami                         = local.application_data.accounts[local.environment].clamav_ami_id
@@ -11,7 +9,7 @@ resource "aws_instance" "ec2_clamav" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
-  # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
+  # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below.
   lifecycle {
     ignore_changes = [
       ebs_block_device,
@@ -21,35 +19,10 @@ resource "aws_instance" "ec2_clamav" {
     ]
   }
   user_data_replace_on_change = false
-  user_data                   = <<EOF
-#!/bin/bash
+  user_data = base64encode(templatefile("./templates/ec2_user_data_clamav.sh", {
+    hostname = "clamav"
+  }))
 
-exec > /tmp/userdata.log 2>&1
-
-yum install -y wget unzip vsftpd jq s3fs-fuse
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-./aws/install
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-rpm -U ./amazon-cloudwatch-agent.rpm
-amazon-linux-extras install -y epel
-
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
-
-systemctl stop amazon-ssm-agent
-rm -rf /var/lib/amazon/ssm/ipc/
-systemctl start amazon-ssm-agent
-
-yum install -y clamav clamav-update clamd
-
-freshclam
-
-systemctl enable clamd@scan.service
-
-systemctl start clamd@scan.service
-
-EOF
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
