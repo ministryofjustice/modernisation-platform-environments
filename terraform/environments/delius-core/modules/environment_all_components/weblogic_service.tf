@@ -209,7 +209,7 @@ resource "aws_security_group_rule" "weblogic_alb" {
 }
 
 resource "aws_cloudwatch_log_group" "delius_core_frontend_log_group" {
-  name              = var.weblogic_config.frontend_fully_qualified_name
+  name              = format("%s-%s", var.env_name, var.weblogic_config.frontend_fully_qualified_name)
   retention_in_days = 7
   tags              = local.tags
 }

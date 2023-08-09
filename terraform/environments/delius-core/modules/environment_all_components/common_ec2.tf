@@ -6,6 +6,10 @@ resource "aws_ssm_parameter" "ec2-user-ssh-key" {
   key_id      = var.account_config.general_shared_kms_key_arn
   description = format("ssh private key for ec2-user used for the %s environment", var.env_name)
   tags        = local.tags
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_key_pair" "environment_ec2_user_key_pair" {

@@ -112,7 +112,8 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_i
 }
 
 resource "aws_cloudwatch_log_group" "delius_core_testing_db_log_group" {
-  name              = var.delius_db_container_config.fully_qualified_name
+  name              = format("%s-%s", var.env_name, var.delius_db_container_config.fully_qualified_name)
   retention_in_days = 7
   tags              = local.tags
 }
+
