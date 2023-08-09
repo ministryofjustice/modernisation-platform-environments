@@ -103,7 +103,7 @@
       "key_name": "",
       "docker_image_tag": "production",
       "maat_api_end_point": "http://maat-cd-api.aws.prd.legalservices.gov.uk/maatApi/laaStatus",
-      "maat_db_url": "donotworkrds.maat.aws.prd.legalservices.gov.uk:1521:MAATDB",
+      "maat_db_url": "rds.maat.aws.prd.legalservices.gov.uk:1521:MAATDB",
       "maat_db_password": "APP_MAATDB_DBPASSWORD_MLA1",
       "maat_libra_wsdl_url": "http://infox.aws.prd.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
