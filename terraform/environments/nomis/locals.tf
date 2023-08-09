@@ -22,10 +22,12 @@ locals {
     cloudwatch_metric_alarms = {
       weblogic = local.weblogic_cloudwatch_metric_alarms
       database = local.database_cloudwatch_metric_alarms
+      xtag = local.xtag_cloudwatch_metric_alarms
     }
     cloudwatch_metric_alarms_lists = merge(
       local.weblogic_cloudwatch_metric_alarms_lists,
-      local.database_cloudwatch_metric_alarms_lists
+      local.database_cloudwatch_metric_alarms_lists,
+      local.xtag_cloudwatch_metric_alarms_lists
     )
     cloudwatch_metric_alarms_lists_with_actions = {
       dso_pagerduty               = ["dso_pagerduty"]
