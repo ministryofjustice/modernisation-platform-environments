@@ -77,12 +77,12 @@ resource "aws_s3_bucket_ownership_controls" "cloudfront" {
   }
 }
 
-resource "aws_s3_bucket_ownership_controls" "portalerrorpagebucket" {
-  bucket = aws_s3_bucket.portalerrorpagebucket.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-}
+# resource "aws_s3_bucket_ownership_controls" "portalerrorpagebucket" {
+#   bucket = aws_s3_bucket.portalerrorpagebucket.id
+#   rule {
+#     object_ownership = "BucketOwnerPreferred"
+#   }
+# }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
@@ -97,18 +97,18 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "portalerrorpagebucket" {
-  bucket = aws_s3_bucket.portalerrorpagebucket.id
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
-  lifecycle {
-    prevent_destroy = false
-  }
-}
+# resource "aws_s3_bucket_server_side_encryption_configuration" "portalerrorpagebucket" {
+#   bucket = aws_s3_bucket.portalerrorpagebucket.id
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       sse_algorithm = "AES256"
+#     }
+#   }
+#   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+#   lifecycle {
+#     prevent_destroy = false
+#   }
+# }
 
 resource "aws_s3_bucket_public_access_block" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
@@ -123,18 +123,18 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "portalerrorpagebucket" {
-  bucket = aws_s3_bucket.portalerrorpagebucket.id
+# resource "aws_s3_bucket_public_access_block" "portalerrorpagebucket" {
+#   bucket = aws_s3_bucket.portalerrorpagebucket.id
 
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
-  lifecycle {
-    prevent_destroy = false
-  }
-}
+#   block_public_acls       = true
+#   block_public_policy     = true
+#   ignore_public_acls      = true
+#   restrict_public_buckets = true
+#   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+#   lifecycle {
+#     prevent_destroy = false
+#   }
+# }
 
 resource "aws_cloudfront_origin_access_identity" "portalerrorpagebucket" {
   comment = "portalerrorpagebucket"
@@ -209,7 +209,7 @@ resource "aws_cloudfront_distribution" "external" {
   }
 
    ordered_cache_behavior_PortalErrorPageBucket {
-      target_origin_id = portalerrorpagebucket
+      target_origin_id = aws_s3_bucket.portalerrorpagebucket.id
       smooth_streaming = false
       path_pattern     = "/error-pages/*"
       min_ttl          = 0
@@ -226,7 +226,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
 
     ordered_cache_behavior_LoadBalancer {
-      target_origin_id = aws_lb.loadbalancer.id
+      target_origin_id = aws_lb.external.id
       smooth_streaming = false
       path_pattern     = "*.png"
       min_ttl          = 0
@@ -244,7 +244,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
 
     ordered_cache_behavior_LoadBalancer {
-      target_origin_id = aws_lb.loadbalancer.id
+      target_origin_id = aws_lb.external.id
       smooth_streaming = false
       path_pattern     = "*.jpg"
       min_ttl          = 0
@@ -262,7 +262,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
 
     ordered_cache_behavior_LoadBalancer {
-      target_origin_id = aws_lb.loadbalancer.id
+      target_origin_id = aws_lb.external.id
       smooth_streaming = false
       path_pattern     = "*.gif"
       min_ttl          = 0
@@ -280,7 +280,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
 
     ordered_cache_behavior_LoadBalancer {
-      target_origin_id = aws_lb.loadbalancer.id
+      target_origin_id = aws_lb.external.id
       smooth_streaming = false
       path_pattern     = "*.css"
       min_ttl          = 0
@@ -298,7 +298,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
 
     ordered_cache_behavior_LoadBalancer {
-      target_origin_id = aws_lb.loadbalancer.id
+      target_origin_id = aws_lb.external.id
       smooth_streaming = false
       path_pattern     = "*.js"
       min_ttl          = 0
@@ -349,7 +349,34 @@ resource "aws_cloudfront_distribution" "external" {
 
 }
 
-######## Cloudfront Cert
+###### Cloudfront Route53 Records
+###### zones being created by Vlad for Portal
+resource "aws_route53_record" "portal_dns_record" {
+  # zone_id = aws_route53_zone.primary.zone_id
+  name    = "portal.dev.legalservices.gov.uk"
+  type    = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.external.id
+    zone_id                = "Z2FDTNDATAQYW2"
+    evaluate_target_health = true
+  }
+}
+
+
+###### Cloudfront Cert
+resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
+  # count           = (length(local.validation_records_cloudfront) == 0 || var.external_validation_records_created) ? 1 : 0
+  provider        = aws.us-east-1
+  certificate_arn = aws_acm_certificate.cloudfront.arn
+  validation_record_fqdns = [
+    for key, value in local.validation_records_cloudfront : replace(value.name, "/\\.$/", "")
+  ]
+  depends_on = [
+    aws_route53_record.cloudfront_validation_core_network_services,
+    aws_route53_record.cloudfront_validation_core_vpc,
+    aws_route53_record.cloudfront_validation_self
+  ]
+}
 
 # resource "aws_acm_certificate" "cloudfront" {
 #   domain_name               = var.acm_cert_domain_name
@@ -448,19 +475,7 @@ resource "aws_cloudfront_distribution" "external" {
 #   ]
 # }
 
-# resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
-#   count           = (length(local.validation_records_cloudfront) == 0 || var.external_validation_records_created) ? 1 : 0
-#   provider        = aws.us-east-1
-#   certificate_arn = aws_acm_certificate.cloudfront.arn
-#   validation_record_fqdns = [
-#     for key, value in local.validation_records_cloudfront : replace(value.name, "/\\.$/", "")
-#   ]
-#   depends_on = [
-#     aws_route53_record.cloudfront_validation_core_network_services,
-#     aws_route53_record.cloudfront_validation_core_vpc,
-#     aws_route53_record.cloudfront_validation_self
-#   ]
-# }
+
 
 
 
