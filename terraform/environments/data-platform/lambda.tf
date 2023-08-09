@@ -120,27 +120,34 @@ module "data_product_presigned_url_lambda" {
 
 }
 
-resource "aws_lambda_function" "athena_load" {
+module "data_product_athena_load_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
+  application_name               = "data_product_athena_load"
+  tags                           = local.tags
+  description                    = "Lambda to generate a presigned url for uploading data"
+  role_name                      = "athena_load_lambda_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
   function_name                  = "data_product_athena_load_${local.environment}"
-  description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
-  reserved_concurrent_executions = 100
-  image_uri                      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:1.0.0"
-  package_type                   = "Image"
-  role                           = aws_iam_role.athena_load_lambda_role.arn
-  timeout                        = 600
-  memory_size                    = 512
+  create_role                    = true
+  reserved_concurrent_executions = 1
 
-  environment {
-    variables = {
-      ENVIRONMENT = local.environment
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:1.0.5"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 512
+
+  environment_variables = {
+    ENVIRONMENT = local.environment
+  }
+
+  allowed_triggers = {
+
+    AllowExecutionFromCloudWatch = {
+      action        = "lambda:InvokeFunction"
+      function_name = "data_product_athena_load_${local.environment}"
+      principal     = "events.amazonaws.com"
+      source_arn    = aws_cloudwatch_event_rule.object_created_raw_data.arn
     }
   }
-}
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_athena_load_lambda" {
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.athena_load.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.object_created_raw_data.arn
 }
