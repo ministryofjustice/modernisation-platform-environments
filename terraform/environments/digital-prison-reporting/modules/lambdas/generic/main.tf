@@ -38,6 +38,12 @@ resource "aws_lambda_function" "this" {
     variables = var.env_vars
   }
 
+  lifecycle {
+    ignore_changes = [
+      s3_key,
+    ]
+  }
+
   tags = var.tags
 }
 
