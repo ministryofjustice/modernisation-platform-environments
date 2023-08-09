@@ -15,7 +15,7 @@ resource "aws_lb" "ldap" {
   name                       = local.ldap_nlb_name
   internal                   = true
   load_balancer_type         = "network"
-  subnets                    = var.network_config.private_subnet_ids
+  subnets                    = var.account_config.private_subnet_ids
   drop_invalid_header_fields = true
   enable_deletion_protection = false
 
@@ -54,7 +54,7 @@ resource "aws_lb_target_group" "ldap" {
 # Internal DNS name for LDAP load balancer - Internal LDAP consumers will use this
 resource "aws_route53_record" "ldap_dns_internal" {
   provider = aws.core-vpc
-  zone_id  = var.network_config.route53_inner_zone_info.zone_id
+  zone_id  = var.account_config.route53_inner_zone_info.zone_id
   name     = "${var.env_name}.ldap.${var.account_info.application_name}"
   type     = "A"
 
