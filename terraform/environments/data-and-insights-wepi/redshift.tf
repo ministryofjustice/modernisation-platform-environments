@@ -165,7 +165,7 @@ resource "aws_security_group_rule" "tcp-5439" {
 resource "aws_lb" "redshift-data" {
   name               = format("%s-redshift-lb", local.environment)
   internal           = true
-  load_balancer_type = "application"
+  load_balancer_type = "network"
   security_groups    = [aws_security_group.redshift-data-lb.id] #extra line added late at night
   subnets            = data.aws_subnets.shared-private.ids
   tags               = local.tags
