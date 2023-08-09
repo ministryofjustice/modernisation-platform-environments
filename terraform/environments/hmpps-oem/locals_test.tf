@@ -24,16 +24,16 @@ locals {
     }
 
     baseline_ec2_instances = {
-      oem-a = merge(local.oem_ec2_default, {
-        config = merge(local.oem_ec2_default.config, {
-          availability_zone = "eu-west-2a"
-        })
-        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
-          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-      })
+      #      oem-a = merge(local.oem_ec2_default, {
+      #        config = merge(local.oem_ec2_default.config, {
+      #          availability_zone = "eu-west-2a"
+      #        })
+      #        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
+      #          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
+      #            branch = "main"
+      #          })
+      #        })
+      #      })
     }
 
     baseline_s3_buckets = {
