@@ -359,7 +359,9 @@ resource "aws_iam_policy" "domain_builder_preview_policy" {
 data "aws_iam_policy_document" "domain_builder_publish" {
   statement {
     actions = [
-      "dynamodb:Query"
+      "dynamodb:Query",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem"
     ]
     resources = [
       "*"
