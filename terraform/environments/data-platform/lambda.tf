@@ -131,7 +131,7 @@ module "data_product_athena_load_lambda" {
   create_role                    = true
   reserved_concurrent_executions = 1
 
-  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:1.0.0"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:1.0.5"
   timeout      = 600
   tracing_mode = "Active"
   memory_size  = 512
