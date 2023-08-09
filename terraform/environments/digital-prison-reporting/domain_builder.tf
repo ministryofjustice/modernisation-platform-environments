@@ -39,16 +39,17 @@ module "domain_builder_backend_Lambda" {
   tracing       = local.lambda_dbuilder_tracing
   timeout       = 60
   env_vars = {
-    "DOMAIN_API_KEY"      = module.domain_builder_api_key[0].secret
-    "JAVA_TOOL_OPTIONS"   = "-XX:MetaspaceSize=32m"
-    "POSTGRES_DB_NAME"    = local.rds_dbuilder_db_identifier
-    "POSTGRES_HOST"       = module.domain_builder_backend_db.rds_host
-    "POSTGRES_PASSWORD"   = module.domain_builder_backend_db.master_password
-    "POSTGRES_PORT"       = local.rds_dbuilder_port
-    "POSTGRES_USERNAME"   = local.rds_dbuilder_user
-    "PREVIEW_DB_NAME"     = local.domain_preview_database
-    "PREVIEW_S3_LOCATION" = "s3://${local.domain_preview_s3_bucket}"
-    "PREVIEW_WORKGROUP"   = local.domain_preview_workgroup
+    "DOMAIN_API_KEY"       = module.domain_builder_api_key[0].secret
+    "DOMAIN_REGISTRY_NAME" = local.domain_registry
+    "JAVA_TOOL_OPTIONS"    = "-XX:MetaspaceSize=32m"
+    "POSTGRES_DB_NAME"     = local.rds_dbuilder_db_identifier
+    "POSTGRES_HOST"        = module.domain_builder_backend_db.rds_host
+    "POSTGRES_PASSWORD"    = module.domain_builder_backend_db.master_password
+    "POSTGRES_PORT"        = local.rds_dbuilder_port
+    "POSTGRES_USERNAME"    = local.rds_dbuilder_user
+    "PREVIEW_DB_NAME"      = local.domain_preview_database
+    "PREVIEW_S3_LOCATION"  = "s3://${local.domain_preview_s3_bucket}"
+    "PREVIEW_WORKGROUP"    = local.domain_preview_workgroup
   }
 
   vpc_settings = {
