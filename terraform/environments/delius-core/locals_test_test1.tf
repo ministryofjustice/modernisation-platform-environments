@@ -9,9 +9,8 @@ locals {
   }
 
   db_config_test1 = {
-    name      = "db"
-    ami_name  = local.db_config_lower_environments.ami_name
-    ami_owner = local.environment_management.account_ids["core-shared-services-production"]
+    name           = try(local.db_config_lower_environments.name, "db")
+    ami_name_regex = local.db_config_lower_environments.ami_name_regex
     user_data_raw = base64encode(
       templatefile(
         "${path.module}/templates/userdata.sh.tftpl",

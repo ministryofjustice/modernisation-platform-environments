@@ -8,8 +8,8 @@ locals {
   }
 
   db_config_lower_environments = {
-    name     = "delius-db"
-    ami_name = "delius_core_ol_8_5_oracle_db_19c_patch_2023-06-12T12-32-07.259Z"
+    name           = "delius-db"
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_" # "ami-00ff0aa4caa43bd97" 
     instance = {
       disable_api_termination      = true
       instance_type                = "r6i.xlarge"

@@ -76,10 +76,9 @@ variable "ldap_config" {
 
 variable "db_config" {
   type = object({
-    name          = string
-    ami_name      = string
-    ami_owner     = string
-    user_data_raw = optional(string, null)
+    name           = string
+    ami_name_regex = string
+    user_data_raw  = optional(string, null)
     instance = object({
       associate_public_ip_address  = optional(bool, false)
       disable_api_termination      = bool
@@ -118,10 +117,9 @@ variable "db_config" {
     })
   })
   default = {
-    name          = "name_example"
-    ami_name      = "ami_name_example"
-    ami_owner     = "ami_owner_example"
-    user_data_raw = "user_data_raw_example"
+    name           = "name_example"
+    ami_name_regex = "ami_name_example"
+    user_data_raw  = "user_data_raw_example"
     instance = {
       associate_public_ip_address  = false
       disable_api_termination      = false

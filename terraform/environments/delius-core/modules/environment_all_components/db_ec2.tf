@@ -1,7 +1,13 @@
+data "aws_ami" "oracle_db_ami" {
+  owners      = [var.platform_vars.environment_management.account_ids["core-shared-services-production"]]
+  name_regex  = var.db_config.ami_name_regex
+  most_recent = true
+}
+
 resource "aws_instance" "db_ec2_primary_instance" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   instance_type               = "r6i.xlarge"
-  ami                         = var.db_config.ami_name
+  ami                         = data.aws_ami.oracle_db_ami.id
   vpc_security_group_ids      = [aws_security_group.db_ec2_instance_sg.id]
   subnet_id                   = var.account_config.data_subnet_a_id
   iam_instance_profile        = aws_iam_instance_profile.db_ec2_instanceprofile.name
