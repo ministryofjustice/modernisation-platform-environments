@@ -140,6 +140,20 @@ resource "aws_cloudfront_origin_access_identity" "portalerrorpagebucket" {
   comment = "portalerrorpagebucket"
 }
 
+data "aws_iam_policy_document" "portal_error_page_bucket_policy" {
+  statement {
+    sid = "1"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      aws_s3_bucket.portalerrorpagebucket.id,
+    ]
+  }
+}
+
 resource "aws_cloudfront_distribution" "external" {
 #   http_version = var.cloudfront_http_version
   http_version  = "http2"
