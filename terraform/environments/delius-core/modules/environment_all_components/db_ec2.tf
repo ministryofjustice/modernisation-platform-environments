@@ -1,40 +1,4 @@
-data "aws_ami" "oracle_db_ami" {
-  owners      = [var.platform_vars.environment_management.account_ids["core-shared-services-production"]]
-  name_regex  = var.db_config.ami_name_regex
-  most_recent = true
-}
-
-resource "aws_instance" "db_ec2_primary_instance" {
-  #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
-  instance_type               = "r6i.xlarge"
-  ami                         = data.aws_ami.oracle_db_ami.id
-  vpc_security_group_ids      = [aws_security_group.db_ec2_instance_sg.id]
-  subnet_id                   = var.account_config.data_subnet_a_id
-  iam_instance_profile        = aws_iam_instance_profile.db_ec2_instanceprofile.name
-  associate_public_ip_address = false
-  monitoring                  = false
-  ebs_optimized               = true
-  key_name                    = aws_key_pair.environment_ec2_user_key_pair.key_name
-  user_data_base64            = var.db_config.user_data_raw
-
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
-  # Increase the volume size of the root volume
-  # root_block_device {
-  #   volume_type = "gp3"
-  #   volume_size = 30
-  #   encrypted   = true
-  # }
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-1", var.env_name, var.db_config.name)) },
-    { server-type = "delius_core_db" },
-    { database = format("%s-1", var.db_config.name) }
-  )
-}
-
-# Pre-req - security group
+# Pre-reqs - security groups
 resource "aws_security_group" "db_ec2_instance_sg" {
   name        = format("%s-sg-%s-ec2-instance", var.env_name, var.db_config.name)
   description = "Controls access to db ec2 instance"
@@ -56,7 +20,7 @@ resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_https_out" {
   )
 }
 
-# Pre-req - IAM role, attachment for SSM usage and instance profile
+# Pre-reqs - IAM role, attachment for SSM usage and instance profile
 data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
   statement {
     effect = "Allow"
@@ -70,14 +34,6 @@ data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
   }
 }
 
-# resource "aws_iam_policy" "db_ec2_instance_iam_assume_policy" {
-#   name   = format("%s-%s-ec2_instance_iam_assume_policy", var.env_name, var.db_config.name)
-#   path   = "/"
-#   policy = data.aws_iam_policy_document.db_ec2_instance_iam_assume_policy.json
-#   tags = merge(local.tags,
-#     { Name = format("%s-%s-ec2_instance_iam_assume_policy", var.env_name, var.db_config.name) }
-#   )
-# }
 
 resource "aws_iam_role" "db_ec2_instance_iam_role" {
   name               = lower(format("%s-%s-ec2_instance", var.env_name, var.db_config.name))
@@ -186,3 +142,42 @@ resource "aws_iam_instance_profile" "db_ec2_instanceprofile" {
   name = format("%s-%s-ec2_instance_iam_role", var.env_name, var.db_config.name)
   role = aws_iam_role.db_ec2_instance_iam_role.name
 }
+
+
+# Resources associated to the instance
+data "aws_ami" "oracle_db_ami" {
+  owners      = [var.platform_vars.environment_management.account_ids["core-shared-services-production"]]
+  name_regex  = var.db_config.ami_name_regex
+  most_recent = true
+}
+
+resource "aws_instance" "db_ec2_primary_instance" {
+  #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
+  instance_type               = "r6i.xlarge"
+  ami                         = data.aws_ami.oracle_db_ami.id
+  vpc_security_group_ids      = [aws_security_group.db_ec2_instance_sg.id]
+  subnet_id                   = var.account_config.data_subnet_a_id
+  iam_instance_profile        = aws_iam_instance_profile.db_ec2_instanceprofile.name
+  associate_public_ip_address = false
+  monitoring                  = false
+  ebs_optimized               = true
+  key_name                    = aws_key_pair.environment_ec2_user_key_pair.key_name
+  user_data_base64            = var.db_config.user_data_raw
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+  # Increase the volume size of the root volume
+  # root_block_device {
+  #   volume_type = "gp3"
+  #   volume_size = 30
+  #   encrypted   = true
+  # }
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-1", var.env_name, var.db_config.name)) },
+    { server-type = "delius_core_db" },
+    { database = format("%s-1", var.db_config.name) }
+  )
+}
+
