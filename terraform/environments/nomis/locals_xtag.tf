@@ -74,40 +74,31 @@ locals {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
       namespace           = "CWAgent"
-      metric_name         = "collectd_exec_value"
+      metric_name         = "collectd_wlsnodemanager_value"
       period              = "60"
       statistic           = "Average"
       threshold           = "1"
       alarm_description   = "wls_nodemanager.service has stopped"
-      dimensions = {
-        instance = "wls_nodemanager"
-      }
     }
     xtag-wls-adminserver-service = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
       namespace           = "CWAgent"
-      metric_name         = "collectd_exec_value"
+      metric_name         = "collectd_wlsadminserver_value"
       period              = "60"
       statistic           = "Average"
       threshold           = "1"
       alarm_description   = "wls_adminserver.service has stopped"
-      dimensions = {
-        instance = "wls_adminserver"
-      }
     }
     xtag-wls-managedserver-service = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
       namespace           = "CWAgent"
-      metric_name         = "collectd_exec_value"
+      metric_name         = "collectd_wlsmanagedserve_value"
       period              = "60"
       statistic           = "Average"
       threshold           = "1"
       alarm_description   = "wls_managedserver.service has stopped"
-      dimensions = {
-        instance = "wls_managedserver"
-      }
     } 
   }
 
