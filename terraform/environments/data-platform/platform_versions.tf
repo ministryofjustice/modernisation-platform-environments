@@ -8,7 +8,6 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
-    archive = {}
   }
   required_version = "~> 1.0"
 }
