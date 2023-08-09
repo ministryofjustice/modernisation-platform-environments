@@ -19,7 +19,7 @@
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
       "domain_name": "modernisation-platform.service.justice.gov.uk",
-      "tactical_products_db_secrets_arn": ""
+      "tactical_products_db_secrets_arn": "KUzdEy"
     },
     "test": {
       "example_var": "test-data"
