@@ -12,7 +12,12 @@ resource "aws_instance" "ec2_ftp" {
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
   lifecycle {
-    ignore_changes = [ebs_block_device, root_block_device]
+    ignore_changes = [
+      ebs_block_device,
+      root_block_device,
+      user_data,
+      user_data_replace_on_change
+    ]
   }
   user_data_replace_on_change = false
   user_data                   = <<EOF
