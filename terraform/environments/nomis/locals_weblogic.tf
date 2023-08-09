@@ -200,7 +200,7 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "nomis/tag-release-DB_V11.2.1.1.214"
+        branch = "main"
       })
     })
     # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {}) 
