@@ -1,12 +1,12 @@
-locals {
+#locals {
 # custom_header   = "X-Custom-Header-LAA-${upper(var.application_name)}"
-custom_header     = "X-Custom-Header-LAA-${upper(local.application_name)}"
+#custom_header     = "X-Custom-Header-LAA-${upper(local.application_name)}"
 # fqdn            == "production" ? local.application_data.accounts[local.environment].acm_cert_domain_name : "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].acm_cert_domain_name}"
 
 # data "aws_ec2_managed_prefix_list" "cloudfront" {
 #   name = "com.amazonaws.global.cloudfront.origin-facing"
 # }
-}
+#}
 
 ### Cloudfront Secret Creation
 resource "random_password" "cloudfront" {
