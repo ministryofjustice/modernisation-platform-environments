@@ -170,9 +170,10 @@ resource "aws_instance" "db_ec2_primary_instance" {
   }
   # Increase the volume size of the root volume
   root_block_device {
-    volume_type = "gp3"
-    volume_size = 30
+    volume_type = var.db_config.ebs_volumes.root_volume.volume_type
+    volume_size = var.db_config.ebs_volumes.root_volume.volume_size
     encrypted   = true
+    kms_key_id  = var.db_config.ebs_volumes.kms_key_id
     tags        = local.tags
   }
   ebs_block_device {

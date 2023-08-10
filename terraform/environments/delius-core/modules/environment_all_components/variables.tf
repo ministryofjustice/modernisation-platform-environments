@@ -94,23 +94,36 @@ variable "db_config" {
         hostname_type                        = string
       }))
     })
-    ebs_volumes_copy_all_from_ami = optional(bool, false)
-    ebs_volume_config = map(object({
-      iops       = optional(number)
-      throughput = optional(number)
-      total_size = optional(number)
-      type       = optional(string)
-      kms_key_id = optional(string)
+    ebs_volumes = optional(object({
+      kms_key_id = string
+      tags       = map(string)
+      root_volume = object({
+        volume_type = string
+        volume_size = number
+      })
+      ebs_non_root_volumes = map(object({
+        volume_type = optional(string)
+        volume_size = optional(string)
+        no_device   = optional(bool, false)
+      }))
     }))
-    ebs_volumes = map(object({
-      label       = optional(string)
-      snapshot_id = optional(string)
-      iops        = optional(number)
-      throughput  = optional(number)
-      size        = optional(number)
-      type        = optional(string)
-      kms_key_id  = optional(string)
-    }))
+    # ebs_volumes_copy_all_from_ami = optional(bool, false)
+    # ebs_volume_config = map(object({
+    #   iops       = optional(number)
+    #   throughput = optional(number)
+    #   total_size = optional(number)
+    #   type       = optional(string)
+    #   kms_key_id = optional(string)
+    # }))
+    # ebs_volumes = map(object({
+    #   label       = optional(string)
+    #   snapshot_id = optional(string)
+    #   iops        = optional(number)
+    #   throughput  = optional(number)
+    #   size        = optional(number)
+    #   type        = optional(string)
+    #   kms_key_id  = optional(string)
+    # }))
     route53_records = object({
       create_internal_record = bool
       create_external_record = bool
@@ -135,43 +148,44 @@ variable "db_config" {
         hostname_type                        = "hostname_type_example"
       }
     }
-    ebs_volumes_copy_all_from_amis = false
-    ebs_volume_config = {
-      "vol1" = {
-        iops       = 1000
-        throughput = 100
-        total_size = 100
-        type       = "type_example"
-        kms_key_id = "kms_key_id_example"
-      },
-      "vol2" = {
-        iops       = 1000
-        throughput = 100
-        total_size = 100
-        type       = "type_example"
-        kms_key_id = "kms_key_id_example"
-      },
-    }
-    ebs_volumes = {
-      "vol1" = {
-        label       = "label_example"
-        snapshot_id = "snapshot_id_example"
-        iops        = 1000
-        throughput  = 100
-        size        = 100
-        type        = "type_example"
-        kms_key_id  = "kms_key_id_example"
-      },
-      "vol2" = {
-        label       = "label_example"
-        snapshot_id = "snapshot_id_example"
-        iops        = 1000
-        throughput  = 100
-        size        = 100
-        type        = "type_example"
-        kms_key_id  = "kms_key_id_example"
-      },
-    }
+
+    # ebs_volumes_copy_all_from_amis = false
+    # ebs_volume_config = {
+    #   "vol1" = {
+    #     iops       = 1000
+    #     throughput = 100
+    #     total_size = 100
+    #     type       = "type_example"
+    #     kms_key_id = "kms_key_id_example"
+    #   },
+    #   "vol2" = {
+    #     iops       = 1000
+    #     throughput = 100
+    #     total_size = 100
+    #     type       = "type_example"
+    #     kms_key_id = "kms_key_id_example"
+    #   },
+    # }
+    # ebs_volumes = {
+    #   "vol1" = {
+    #     label       = "label_example"
+    #     snapshot_id = "snapshot_id_example"
+    #     iops        = 1000
+    #     throughput  = 100
+    #     size        = 100
+    #     type        = "type_example"
+    #     kms_key_id  = "kms_key_id_example"
+    #   },
+    #   "vol2" = {
+    #     label       = "label_example"
+    #     snapshot_id = "snapshot_id_example"
+    #     iops        = 1000
+    #     throughput  = 100
+    #     size        = 100
+    #     type        = "type_example"
+    #     kms_key_id  = "kms_key_id_example"
+    #   },
+    # }
     route53_records = {
       create_internal_record = false
       create_external_record = false

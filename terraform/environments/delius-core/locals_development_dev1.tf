@@ -49,14 +49,37 @@ locals {
       monitoring    = false
     })
 
-    ebs_volumes_copy_all_from_ami = false
+    # ebs_volumes_copy_all_from_ami = false
     ebs_volumes = {
-      "/dev/sda1" = { # root volume
-        label = "root",
-        size  = 30,
-        type  = "gp3"
+      kms_key_id = data.aws_kms_key.ebs_shared.id
+      tags       = local.tags
+      root_volume = {
+        volume_type = "gp3"
+        volume_size = 30
+      }
+      ebs_non_root_volumes = {
+        "/dev/sdb" = {
+          volume_type = "gp3"
+          volume_size = 200
+        }
+        "/dev/sdc" = {
+          no_device = true
+        }
       }
     }
+    # ebs_root_volume {
+    #   volume_type = "gp3"
+    #   volume_size = 30
+    #   encrypted   = true
+    #   tags        = local.tags
+    # }
+    # ebs_volumes = {
+    #   "/dev/sda1" = { # root volume
+    #     label = "root",
+    #     size  = 30,
+    #     type  = "gp3"
+    #   }
+    # }
     # ebs_volumes = merge(local.db_config.ebs_volumes, {
     #   "/dev/sda1" = { # root volume
     #     label = "root",
