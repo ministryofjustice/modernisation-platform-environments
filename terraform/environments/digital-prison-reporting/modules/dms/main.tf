@@ -1,5 +1,7 @@
 # Create a new DMS replication instance
 resource "aws_dms_replication_instance" "dms" {
+  count                        = var.setup_dms_instance ? 1 : 0
+
   allocated_storage            = var.replication_instance_storage
   apply_immediately            = true
   auto_minor_version_upgrade   = false
@@ -10,8 +12,8 @@ resource "aws_dms_replication_instance" "dms" {
   publicly_accessible          = false
   replication_instance_class   = var.replication_instance_class
   replication_instance_id      = var.name
-  replication_subnet_group_id  = aws_dms_replication_subnet_group.dms.id
-  vpc_security_group_ids       = [aws_security_group.dms_sec_group.id]
+  replication_subnet_group_id  = aws_dms_replication_subnet_group.dms[0].id
+  vpc_security_group_ids       = aws_security_group.dms_sec_group[*].id
 
   tags = var.tags
 
@@ -34,12 +36,13 @@ data "template_file" "table-mappings" {
 }
 
 resource "aws_dms_replication_task" "dms-replication" {
-  count                     = var.enable_replication_task ? 1 : 0
+  count                     = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
+
   migration_type            = var.migration_type
-  replication_instance_arn  = aws_dms_replication_instance.dms.replication_instance_arn
+  replication_instance_arn  = aws_dms_replication_instance.dms[0].replication_instance_arn
   replication_task_id       = "${var.project_id}-dms-task-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
-  source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
-  target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
+  source_endpoint_arn       = aws_dms_endpoint.source[0].endpoint_arn
+  target_endpoint_arn       = aws_dms_endpoint.target[0].endpoint_arn
   table_mappings            = data.template_file.table-mappings.rendered
   replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings.json")
 
@@ -50,6 +53,8 @@ resource "aws_dms_replication_task" "dms-replication" {
 
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "source" {
+  count         = var.setup_dms_instance ? 1 : 0
+
   database_name = var.source_db_name
   endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-source"
   endpoint_type = "source"
@@ -67,6 +72,8 @@ resource "aws_dms_endpoint" "source" {
 
 # Create an endpoint for the target Kinesis
 resource "aws_dms_endpoint" "target" {
+  count         = var.setup_dms_instance ? 1 : 0
+
   endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_target_name}-target"
   endpoint_type = "target"
   engine_name   = var.target_engine
@@ -96,25 +103,10 @@ resource "aws_dms_endpoint" "target" {
   tags = var.tags
 }
 
-# Use below to setup Subnet ID's Dynamically
-# Create a subnet in each availability zone
-#resource "aws_subnet" "database" {
-#  count  = length(var.availability_zones)
-#  vpc_id = var.vpc
-
-#  cidr_block        = element(var.database_subnet_cidr, count.index)
-#  availability_zone = lookup(var.availability_zones, count.index)
-
-#  tags = merge(
-#    var.tags,
-#    {
-#      subnet_index = "dms-pri-subnet-${count.index + 1}"
-#    }
-#  )
-#}
-
 # Create a subnet group using existing VPC subnets
 resource "aws_dms_replication_subnet_group" "dms" {
+  count                                = var.setup_dms_instance ? 1 : 0
+
   replication_subnet_group_description = "DMS replication subnet group"
   replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-subnet-group"
   subnet_ids                           = var.subnet_ids
