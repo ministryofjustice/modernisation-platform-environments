@@ -37,16 +37,16 @@ locals {
       #          })
       #        })
       #      })
-      #      oem-b = merge(local.oem_ec2_default, {
-      #        config = merge(local.oem_ec2_default.config, {
-      #          availability_zone = "eu-west-2a"
-      #        })
-      #        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
-      #          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-      #            branch = "nomis/DSOS-2088/standalone-ec2-instance-for-oem"
-      #          })
-      #        })
-      #      })
+      oem-b = merge(local.oem_ec2_default, {
+        config = merge(local.oem_ec2_default.config, {
+          availability_zone = "eu-west-2a"
+        })
+        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
+          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
+            branch = "nomis/DSOS-2088/standalone-ec2-instance-for-oem"
+          })
+        })
+      })
     }
 
     baseline_s3_buckets = {
