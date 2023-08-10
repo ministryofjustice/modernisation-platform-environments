@@ -64,7 +64,7 @@ resource "null_resource" "transport_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "transport_db_credentials" {
-  name = "${local.transport}-db-credentials-2"
+  name = "${local.transport}-db-credentials-3"
 }
 
 resource "aws_secretsmanager_secret_version" "transport_db_credentials_version" {
@@ -208,7 +208,7 @@ resource "aws_cloudwatch_log_group" "transportFamily_logs" {
 resource "aws_ecs_task_definition" "transport_task_definition" {
   family                   = "${local.transport}Family"
   requires_compatibilities = ["EC2"]
-  network_mode             = "awsvpc"
+  #network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.transport_execution.arn
   task_role_arn            = aws_iam_role.transport_task.arn
   cpu                      = 1024
