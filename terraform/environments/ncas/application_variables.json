@@ -60,7 +60,7 @@
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
-      "domain_name": "neutral-citation-allocation-system.service.justice.gov.uk",
+      "domain_name": "neutral-citation-allocation.service.justice.gov.uk",
       "tactical_products_db_secrets_arn": "hEsVWJ"
     }
   }
