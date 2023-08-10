@@ -94,7 +94,7 @@ locals {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
       namespace           = "CWAgent"
-      metric_name         = "collectd_wlsmanagedserve_value"
+      metric_name         = "collectd_wlsmanagedserver_value"
       period              = "60"
       statistic           = "Average"
       threshold           = "1"
