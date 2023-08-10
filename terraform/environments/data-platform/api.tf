@@ -31,10 +31,10 @@ resource "aws_api_gateway_deployment" "deployment" {
   }
 }
 
-resource "aws_api_gateway_stage" "sandbox" {
+resource "aws_api_gateway_stage" "default_stage" {
   deployment_id = aws_api_gateway_deployment.deployment.id
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
-  stage_name    = "sandbox"
+  stage_name    = local.environment
 }
 
 resource "aws_api_gateway_authorizer" "authorizer" {
