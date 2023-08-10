@@ -41,7 +41,7 @@ resource "aws_dms_replication_task" "dms-replication" {
   count                     = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
 
   migration_type            = var.migration_type
-  replication_instance_arn  = aws_dms_replication_instance.dms
+  replication_instance_arn  = aws_dms_replication_instance.dms[0].replication_instance_arn
   replication_task_id       = "${var.project_id}-dms-task-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
   source_endpoint_arn       = aws_dms_endpoint.source[0].endpoint_arn
   target_endpoint_arn       = aws_dms_endpoint.target[0].endpoint_arn
