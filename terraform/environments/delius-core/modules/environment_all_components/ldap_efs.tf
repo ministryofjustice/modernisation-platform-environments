@@ -19,6 +19,25 @@ resource "aws_efs_mount_target" "ldap" {
   security_groups = [
     aws_security_group.ldap_efs.id,
   ]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.env_name}-ldap-efs-mount-target"
+    }
+  )
+}
+
+resource "aws_efs_access_point" "ldap" {
+  file_system_id = aws_efs_file_system.ldap.id
+  root_directory {
+    path = "/"
+  }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.env_name}-ldap-efs-access-point"
+    }
+  )
 }
 
 resource "aws_security_group" "ldap_efs" {
