@@ -14,7 +14,7 @@
       "lb_listener_protocol_1": "HTTP",
       "server_port_2": "443",
       "lb_listener_protocol_2": "HTTPS",
-      "client_id": "",
+      "client_id": "f5aca82a-ad2e-47c3-a1b5-36f10e4d7340",
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
@@ -25,10 +25,46 @@
       "example_var": "test-data"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "moj_ip": "81.134.202.29/32",
+      "db_name": "pra_db_pre_prod",
+      "identifier": "pra-db-pre-prod",
+      "db_username": "dbadmin",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "engine": "postgres",
+      "engine_version": "14.7",
+      "instance_class": "db.t3.micro",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "client_id": "",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432",
+      "domain_name": "modernisation-platform.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": ""
     },
     "production": {
-      "example_var": "production-data"
+      "moj_ip": "81.134.202.29/32",
+      "db_name": "pra_db_prod",
+      "identifier": "pra-db-prod",
+      "db_username": "dbadmin",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "engine": "postgres",
+      "engine_version": "14.7",
+      "instance_class": "db.t3.micro",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "client_id": "",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432",
+      "domain_name": "modernisation-platform.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": ""
     }
   }
 }
