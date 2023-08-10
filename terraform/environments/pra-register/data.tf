@@ -1,1 +1,8 @@
 #### This file can be used to store data specific to the member account ####
+//TODO: uncomment this
+# data "aws_route53_zone" "application_zone" {
+#   provider     = aws.core-network-services
+//TODO: Change the DNS name here:
+#   name         = "divorce-section-search.service.justice.gov.uk."
+#   private_zone = false
+# }
