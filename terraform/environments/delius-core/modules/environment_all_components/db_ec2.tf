@@ -182,6 +182,10 @@ resource "aws_instance" "db_ec2_primary_instance" {
     encrypted   = false
     tags        = local.tags
   }
+  ephemeral_block_device {
+    device_name = "/dev/sdc"
+    no_device   = true
+  }
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-1", var.env_name, var.db_config.name)) },
     { server-type = "delius_core_db" },
