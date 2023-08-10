@@ -11,6 +11,7 @@ data "aws_iam_policy_document" "task" {
 }
 
 data "aws_iam_policy_document" "task_actions" {
+  count = length(var.extra_task_role_allow_statements) > 0 ? 1 : 0
   statement {
     sid     = "CustomPolicyActions"
     effect  = "Allow"
