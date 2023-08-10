@@ -6,7 +6,9 @@ module "ldap_ecs_policies" {
   extra_exec_role_allow_statements = [
     "elasticfilesystem:ClientRootAccess",
     "elasticfilesystem:ClientWrite",
-    "elasticfilesystem:ClientMount",
+    "elasticfilesystem:ClientMount"
+  ]
+  extra_task_role_allow_statements = [
     "s3:GetObject",
     "s3:ListBucket",
     "s3:HeadBucket",
