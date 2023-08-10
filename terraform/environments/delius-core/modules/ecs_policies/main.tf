@@ -22,13 +22,13 @@ data "aws_iam_policy_document" "task_actions" {
 }
 
 resource "aws_iam_role" "task" {
-  count              = length(var.extra_task_role_allow_statements) > 0 ? 1 : 0
   name               = "${var.env_name}-${var.service_name}-ecs-task"
   assume_role_policy = data.aws_iam_policy_document.task.json
   tags               = var.tags
 }
 
 resource "aws_iam_role_policy" "task_actions" {
+  count  = length(var.extra_task_role_allow_statements) > 0 ? 1 : 0
   name   = "${var.env_name}-${var.service_name}-ecs-task-actions"
   policy = data.aws_iam_policy_document.task_actions.json
   role   = aws_iam_role.task.id
