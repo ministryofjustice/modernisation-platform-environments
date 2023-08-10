@@ -8,6 +8,9 @@ data "aws_iam_policy_document" "task" {
       identifiers = ["ecs-tasks.amazonaws.com"]
     }
   }
+}
+
+data "aws_iam_policy_document" "task_actions" {
   statement {
     sid     = "CustomPolicyActions"
     effect  = "Allow"
@@ -22,6 +25,12 @@ resource "aws_iam_role" "task" {
   name               = "${var.env_name}-${var.service_name}-ecs-task"
   assume_role_policy = data.aws_iam_policy_document.task.json
   tags               = var.tags
+}
+
+resource "aws_iam_policy" "task_actions" {
+  name   = "${var.env_name}-${var.service_name}-ecs-task-actions"
+  policy = data.aws_iam_policy_document.task_actions.json
+  role   = aws_iam_role.task.id
 }
 
 data "aws_iam_policy_document" "ecs_service" {
