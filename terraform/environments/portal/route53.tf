@@ -300,7 +300,7 @@ resource "aws_route53_record" "iadb" {
   name     = "db-portal-iadb.aws.${data.aws_route53_zone.portal-dev-private.name}" # db-portal-iadb.aws.[env].legalservices.gov.uk
   type     = "CNAME"
   ttl      = 300
-  records  = [aws_db_instance.appdb2.endpoint]
+  records  = [aws_db_instance.appdb2.address]
 }
 
 resource "aws_route53_record" "igdb" {
@@ -309,5 +309,5 @@ resource "aws_route53_record" "igdb" {
   name     = "db-portal-igdb.aws.${data.aws_route53_zone.portal-dev-private.name}" # db-portal-igdb.aws.dev.legalservices.gov.uk
   type     = "CNAME"
   ttl      = 300
-  records  = [aws_db_instance.appdb1.endpoint]
+  records  = [aws_db_instance.appdb1.address]
 }
