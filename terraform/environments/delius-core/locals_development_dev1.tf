@@ -60,9 +60,13 @@ locals {
       ebs_non_root_volumes = {
         "/dev/sdb" = {
           volume_type = "gp3"
-          volume_size = 200
+          volume_size = 190
         }
         "/dev/sdc" = {
+          volume_type = "gp3"
+          volume_size = 190
+        }
+        "/dev/sde" = {
           no_device = true
         }
       }

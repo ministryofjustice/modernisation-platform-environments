@@ -176,17 +176,34 @@ resource "aws_instance" "db_ec2_primary_instance" {
     #kms_key_id  = var.db_config.ebs_volumes.kms_key_id
     tags = local.tags
   }
-  ebs_block_device {
-    device_name = "/dev/sdb"
-    volume_type = "gp3"
-    volume_size = 200
-    encrypted   = false
-    tags        = local.tags
+  dynamic "ebs_block_device" {
+    for_each = { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false }
+    content {
+      device_name = ebs_block_device.key
+      volume_type = ebs_block_device.value.volume_type
+      volume_size = ebs_block_device.value.volume_size
+      encrypted   = true
+      tags        = local.tags
+    }
   }
-  ephemeral_block_device {
-    device_name = "/dev/sdc"
-    no_device   = true
+  dynamic "ephemeral_block_device" {
+    for_each = { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == true }
+    content {
+      device_name = ephemeral_block_device.key
+      no_device   = true
+    }
   }
+  # ebs_block_device {
+  #   device_name = "/dev/sdb"
+  #   volume_type = "gp3"
+  #   volume_size = 200
+  #   encrypted   = false
+  #   tags        = local.tags
+  # }
+  # ephemeral_block_device {
+  #   device_name = "/dev/sdc"
+  #   no_device   = true
+  # }
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-1", var.env_name, var.db_config.name)) },
     { server-type = "delius_core_db" },
