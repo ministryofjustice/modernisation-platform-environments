@@ -27,7 +27,7 @@ resource "aws_iam_role" "task" {
   tags               = var.tags
 }
 
-resource "aws_iam_policy" "task_actions" {
+resource "aws_iam_role_policy" "task_actions" {
   name   = "${var.env_name}-${var.service_name}-ecs-task-actions"
   policy = data.aws_iam_policy_document.task_actions.json
   role   = aws_iam_role.task.id
