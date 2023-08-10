@@ -49,6 +49,10 @@ resource "aws_dms_replication_task" "dms-replication" {
   lifecycle {
     ignore_changes = [replication_task_settings]
   }
+
+  depends_on = [
+    aws_dms_replication_instance.dms[0].replication_instance_arn
+  ]
 }
 
 # Create an endpoint for the source database
@@ -68,6 +72,10 @@ resource "aws_dms_endpoint" "source" {
   extra_connection_attributes = var.extra_attributes
 
   tags = var.tags
+
+  depends_on = [
+    aws_dms_replication_instance.dms[0].replication_instance_arn
+  ]
 }
 
 # Create an endpoint for the target Kinesis
@@ -77,13 +85,6 @@ resource "aws_dms_endpoint" "target" {
   endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_target_name}-target"
   endpoint_type = "target"
   engine_name   = var.target_engine
-
-  #kinesis_settings {
-  #  service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
-  #  stream_arn                     = var.kinesis_target_stream
-  #  partition_include_schema_table = true
-  #  include_partition_value        = true
-  #}
 
   dynamic "kinesis_settings" {
     for_each = var.kinesis_settings != null ? [true] : []
@@ -101,6 +102,10 @@ resource "aws_dms_endpoint" "target" {
   }
 
   tags = var.tags
+
+  depends_on = [
+    aws_dms_replication_instance.dms[0].replication_instance_arn
+  ]
 }
 
 # Create a subnet group using existing VPC subnets
