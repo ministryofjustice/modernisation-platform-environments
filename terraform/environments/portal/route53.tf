@@ -285,3 +285,29 @@ resource "aws_route53_record" "ohs2_prod" {
   ttl      = 60
   records  = [aws_instance.ohs_instance_2[0].private_ip]
 }
+
+###############################################################################################################
+############################         IADB & IGDB Route 53 records               ###############################
+###############################################################################################################
+
+### db-portal-iadb.aws.dev.legalservices.gov.uk
+### db-portal-igdb.aws.dev.legalservices.gov.uk
+
+
+resource "aws_route53_record" "iadb" {
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
+  name     = "db-portal-iadb.aws.${data.aws_route53_zone.portal-dev-private.name}" # db-portal-iadb.aws.[env].legalservices.gov.uk
+  type     = "CNAME"
+  ttl      = 300
+  records  = [aws_db_instance.appdb2.endpoint]
+}
+
+resource "aws_route53_record" "igdb" {
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
+  name     = "db-portal-igdb.aws.${data.aws_route53_zone.portal-dev-private.name}" # db-portal-igdb.aws.dev.legalservices.gov.uk
+  type     = "CNAME"
+  ttl      = 300
+  records  = [aws_db_instance.appdb1.endpoint]
+}
