@@ -58,54 +58,54 @@ resource "aws_route53_record" "external" {
   }
 }
 
-# // PRODUCTION DNS CONFIGURATION
+// PRODUCTION DNS CONFIGURATION
 
-# // ACM Public Certificate
-# resource "aws_acm_certificate" "external_prod" {
-#   count = local.is-production ? 1 : 0
+// ACM Public Certificate
+resource "aws_acm_certificate" "external_prod" {
+  count = local.is-production ? 1 : 0
 
-#   domain_name       = local.application_data.accounts[local.environment].domain_name
-#   validation_method = "DNS"
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  domain_name       = local.application_data.accounts[local.environment].domain_name
+  validation_method = "DNS"
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
-# resource "aws_acm_certificate_validation" "external_prod" {
-#   count = local.is-production ? 1 : 0
+resource "aws_acm_certificate_validation" "external_prod" {
+  count = local.is-production ? 1 : 0
 
-#   certificate_arn         = aws_acm_certificate.external_prod[0].arn
-#   validation_record_fqdns = [aws_route53_record.external_validation_prod[0].fqdn]
-#   timeouts {
-#     create = "10m"
-#   }
-# }
+  certificate_arn         = aws_acm_certificate.external_prod[0].arn
+  validation_record_fqdns = [aws_route53_record.external_validation_prod[0].fqdn]
+  timeouts {
+    create = "10m"
+  }
+}
 
-# // Route53 DNS record for certificate validation
-# resource "aws_route53_record" "external_validation_prod" {
-#   count    = local.is-production ? 1 : 0
-#   provider = aws.core-network-services
+// Route53 DNS record for certificate validation
+resource "aws_route53_record" "external_validation_prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
 
-#   allow_overwrite = true
-#   name            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name
-#   records         = [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value]
-#   type            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type
-#   zone_id         = data.aws_route53_zone.application_zone.zone_id
-#   ttl             = 60
-# }
+  allow_overwrite = true
+  name            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name
+  records         = [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value]
+  type            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type
+  zone_id         = data.aws_route53_zone.application_zone.zone_id
+  ttl             = 60
+}
 
-# // Route53 DNS record for directing traffic to the service
-# resource "aws_route53_record" "external_prod" {
-#   count    = local.is-production ? 1 : 0
-#   provider = aws.core-network-services
+// Route53 DNS record for directing traffic to the service
+resource "aws_route53_record" "external_prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
 
-#   zone_id = data.aws_route53_zone.application_zone.zone_id
-#   name    = local.application_data.accounts[local.environment].domain_name
-#   type    = "A"
+  zone_id = data.aws_route53_zone.application_zone.zone_id
+  name    = local.application_data.accounts[local.environment].domain_name
+  type    = "A"
 
-#   alias {
-#     name                   = aws_lb.ncas_lb.dns_name
-#     zone_id                = aws_lb.ncas_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = aws_lb.ncas_lb.dns_name
+    zone_id                = aws_lb.ncas_lb.zone_id
+    evaluate_target_health = true
+  }
+}
