@@ -57,7 +57,7 @@ module "s3_bucket_migration" {
       principals = {
         type = "AWS"
         identifiers = [
-          ecs_policies.task_exec_role.arn
+          module.ecs_policies.task_exec_role.arn
         ]
       }
     }
