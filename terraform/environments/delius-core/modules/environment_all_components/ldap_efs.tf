@@ -21,6 +21,19 @@ resource "aws_efs_mount_target" "ldap" {
   ]
 }
 
+resource "aws_efs_access_point" "ldap" {
+  file_system_id = aws_efs_file_system.ldap.id
+  root_directory {
+    path = "/"
+  }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.env_name}-ldap-efs-access-point"
+    }
+  )
+}
+
 resource "aws_security_group" "ldap_efs" {
   name        = "${var.env_name}-ldap-efs"
   description = "Allow traffic between ldap service and efs in ${var.env_name}"
