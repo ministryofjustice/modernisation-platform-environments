@@ -9,7 +9,8 @@ module "ldap_ecs_policies" {
     "elasticfilesystem:ClientMount",
     "s3:GetObject",
     "s3:ListBucket",
-    "s3:HeadBucket"
+    "s3:HeadBucket",
+    "s3:HeadObject"
   ]
 }
 
