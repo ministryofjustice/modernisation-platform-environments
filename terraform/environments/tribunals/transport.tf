@@ -64,7 +64,7 @@ resource "null_resource" "transport_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "transport_db_credentials" {
-  name = "${local.transport}-credentials"
+  name = "${local.transport}-db-credentials-2"
 }
 
 resource "aws_secretsmanager_secret_version" "transport_db_credentials_version" {
@@ -270,10 +270,9 @@ resource "aws_ecs_service" "transport_ecs_service" {
   desired_count                     = 1
   health_check_grace_period_seconds = 90
 
-  network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
-    security_groups  = [aws_security_group.transport_ecs_service.id]
-    assign_public_ip = true
+  ordered_placement_strategy {
+    field = "attribute:ecs.availability-zone"
+    type  = "spread"
   }
 
   load_balancer {
