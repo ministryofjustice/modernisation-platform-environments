@@ -68,7 +68,7 @@ else
 fi
 
 # Get Latest Artifact Version, for everyrun
-aws s3 cp s3://dpr-artifact-store-$environment/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars
+aws s3 cp s3://dpr-artifact-store-$environment/build-artifacts/domain-builder/jars/domain-builder-cli-frontend-vLatest-all.jar /home/ssm-user/domain-builder/jars &> /dev/null
 
     DOMAIN_API_URL="$domain_builder_url" \
       DOMAIN_API_KEY="$domain_builder_api_key" \
