@@ -37,7 +37,7 @@ locals {
       #          })
       #        })
       #      })
-      oem-b = merge(local.oem_ec2_default, {
+      oem-a = merge(local.oem_ec2_default, {
         config = merge(local.oem_ec2_default.config, {
           availability_zone = "eu-west-2a"
         })
