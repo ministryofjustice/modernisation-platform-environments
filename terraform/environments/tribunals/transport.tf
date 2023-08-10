@@ -1,7 +1,7 @@
-#Transport Tribunal
+#Administrative transport Tribunal
 locals {
   transport = "transport" 
-  transport_url = "transportappeals" 
+  transport_url = "transportappeals"
   transport_folder = "transport"
   transport_db_name = "transport" 
   transport_db_login_name = "transport-app"
@@ -64,7 +64,7 @@ resource "null_resource" "transport_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "transport_db_credentials" {
-  name = "${local.transport}-db-credentials-2"
+  name = "${local.transport}-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "transport_db_credentials_version" {
@@ -207,7 +207,7 @@ resource "aws_cloudwatch_log_group" "transportFamily_logs" {
 
 resource "aws_ecs_task_definition" "transport_task_definition" {
   family                   = "${local.transport}Family"
-  requires_compatibilities = ["FARGATE"]
+  requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.transport_execution.arn
   task_role_arn            = aws_iam_role.transport_task.arn
@@ -237,26 +237,6 @@ resource "aws_ecs_task_definition" "transport_task_definition" {
       }
       environment = [
         {
-          name  = "RDS_HOSTNAME"
-          value = "${local.transport_rds_url}"
-        },
-        {
-          name  = "RDS_PORT"
-          value = "${local.transport_rds_port}"
-        },
-        {
-          name  = "RDS_USERNAME"
-          value = "${local.transport_rds_user}"
-        },
-        {
-          name  = "RDS_PASSWORD"
-          value = "${local.transport_rds_password}"
-        },
-        {
-          name  = "DB_NAME"
-          value = "${local.transport_db_name}"
-        },
-        {
           name  = "supportEmail"
           value = "${local.application_data.accounts[local.environment].support_email}"
         },
@@ -267,11 +247,7 @@ resource "aws_ecs_task_definition" "transport_task_definition" {
         {
           name  = "CurServer"
           value = "${local.application_data.accounts[local.environment].curserver}"
-        }#,
-        # {
-        #   name  = "ida:ClientId"
-        #   value = "${local.application_data.accounts[local.environment].client_id}"
-        # }
+        }
       ]
     }
   ])
@@ -289,7 +265,7 @@ resource "aws_ecs_service" "transport_ecs_service" {
   name                              = local.transport
   cluster                           = aws_ecs_cluster.transport_cluster.id
   task_definition                   = aws_ecs_task_definition.transport_task_definition.arn
-  launch_type                       = "FARGATE"
+  launch_type                       = "EC2"
   enable_execute_command            = true
   desired_count                     = 1
   health_check_grace_period_seconds = 90
@@ -525,3 +501,54 @@ resource "aws_lb_listener" "transport_lb" {
     target_group_arn = aws_lb_target_group.transport_target_group.arn
   }
 }
+
+##### EFS #####
+# resource "aws_efs_file_system" "transport_app_efs" {
+#   encrypted        = true
+#   kms_key_id       = data.aws_kms_key.ebs_shared.arn
+#   performance_mode = "generalPurpose"
+#   tags = merge(tomap({
+#     "Name"                 = "${local.transport}-app-efs"
+#     "volume-attach-host"   = "app",
+#     "volume-attach-device" = "efs://",
+#     "volume-mount-path"    = "/opt/oem/backups"
+#   }), local.tags)
+# }
+
+# resource "aws_efs_mount_target" "transport_app_efs" {
+#   file_system_id = aws_efs_file_system.transport_app_efs.id
+#   subnet_id      = data.aws_subnet.data_subnets_a.id
+#   security_groups = [
+#     aws_security_group.transport_app_efs_sg.id
+#   ]
+# }
+
+# resource "aws_security_group" "transport_app_efs_sg" {
+#   name_prefix = "${local.transport}-app-efs-sg-"
+#   description = "Allow inbound access from instances"
+#   vpc_id      = data.aws_vpc.shared.id
+
+#   tags = merge(tomap(
+#     { "Name" = "${local.transport}-app-efs-sg" }
+#   ), local.tags)
+
+#   ingress {
+#     protocol    = "tcp"
+#     from_port   = 2049
+#     to_port     = 2049
+#     cidr_blocks = [data.aws_vpc.shared.cidr_block]
+#   }
+
+#   egress {
+#     protocol  = "-1"
+#     from_port = 0
+#     to_port   = 0
+#     cidr_blocks = [
+#       "0.0.0.0/0",
+#     ]
+#   }
+
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
