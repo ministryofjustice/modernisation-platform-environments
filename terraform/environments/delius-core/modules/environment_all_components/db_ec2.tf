@@ -173,8 +173,8 @@ resource "aws_instance" "db_ec2_primary_instance" {
     volume_type = var.db_config.ebs_volumes.root_volume.volume_type
     volume_size = var.db_config.ebs_volumes.root_volume.volume_size
     encrypted   = true
-    kms_key_id  = var.db_config.ebs_volumes.kms_key_id
-    tags        = local.tags
+    #kms_key_id  = var.db_config.ebs_volumes.kms_key_id
+    tags = local.tags
   }
   ebs_block_device {
     device_name = "/dev/sdb"
