@@ -9,8 +9,12 @@ data "aws_iam_policy_document" "task" {
     }
   }
   statement {
+    sid     = "CustomPolicyActions"
     effect  = "Allow"
     actions = var.extra_task_role_allow_statements
+    resources = [
+      "*"
+    ]
   }
 }
 
