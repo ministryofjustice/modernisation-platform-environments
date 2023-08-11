@@ -37,6 +37,9 @@ resource "aws_db_instance" "iaps" {
   performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
 
+  deletion_protection      = true
+  delete_automated_backups = false
+
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database", local.application_name, local.environment)) }
   )
