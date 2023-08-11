@@ -357,6 +357,12 @@ resource "aws_instance" "s618358rgvw019" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "s618358rgvw019"
     patch_group   = "prod_win_patch"
@@ -372,6 +378,12 @@ resource "aws_instance" "s618358rgvw020" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "s618358rgvw020"
     patch_group   = "prod_win_patch"
@@ -387,6 +399,12 @@ resource "aws_instance" "s618358rgvw021" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-PROD-Database[0].id]
   subnet_id              = data.aws_subnet.data_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "s618358rgvw021"
     patch_group   = "prod_win_patch"
@@ -402,6 +420,12 @@ resource "aws_instance" "s618358rgvw022" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "s618358rgvw022"
     patch_group   = "prod_win_patch"
@@ -417,6 +441,12 @@ resource "aws_instance" "s618358rgvw027" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Secondary-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "s618358rgvw027"
     patch_group   = "prod_win_patch"
@@ -432,6 +462,12 @@ resource "aws_instance" "s618358rgvw204" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "s618358rgvw204"
     patch_group   = "prod_win_patch"
@@ -447,6 +483,12 @@ resource "aws_instance" "s618358rgvw205" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "s618358rgvw205"
     patch_group   = "prod_win_patch"
@@ -462,6 +504,12 @@ resource "aws_instance" "s618358rgsw025p" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name        = "s618358rgsw025"
     patch_group = "prod_win_patch"
@@ -478,6 +526,12 @@ resource "aws_instance" "s266316rgsl200" {
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "s266316rgsl200"
     is-production = true
@@ -495,6 +549,12 @@ resource "aws_instance" "s265903rgsl400-non-cjsm" {
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
   subnet_id              = data.aws_subnet.public_subnets_b.id
   key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "s265903rgsl400-non-cjsm"
     is-production = true
@@ -511,6 +571,12 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
   subnet_id              = data.aws_subnet.public_subnets_c.id
   key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "s265903rgsl401-cjsm"
     is-production = true
@@ -532,6 +598,12 @@ resource "aws_instance" "docker-build-server" {
     volume_size = "40"
     volume_type = "gp2"
   }
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name          = "docker-build-server"
     is-production = true
