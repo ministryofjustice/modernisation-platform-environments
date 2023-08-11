@@ -48,7 +48,7 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   encrypted  = false
   kms_key_id = aws_kms_key.wepi_kms_cmk.arn
 
-  publicly_accessible = true
+  publicly_accessible = false
   enhanced_vpc_routing = false
   vpc_security_group_ids = [
     aws_security_group.wepi_sg_allow_redshift.id
