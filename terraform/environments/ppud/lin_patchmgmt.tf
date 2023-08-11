@@ -160,6 +160,7 @@ resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_win
 # Create perform_healthcheck_S3 document
 
 resource "aws_ssm_document" "linux_health_check_s3" {
+  count         = local.is-production == true ? 1 : 0
   name          = "linux_health_check"
   document_type = "Command"
   content = jsonencode(

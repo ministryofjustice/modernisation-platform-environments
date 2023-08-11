@@ -84,6 +84,7 @@ resource "aws_lb" "WAM-ALB" {
   subnets            = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
 
   enable_deletion_protection = true
+  drop_invalid_header_fields = true
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
