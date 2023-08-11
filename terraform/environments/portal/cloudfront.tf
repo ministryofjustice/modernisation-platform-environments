@@ -333,7 +333,7 @@ resource "aws_cloudfront_distribution" "external" {
     # prefix          = var.application_name
     prefix          = local.application_name
   }
-  web_acl_id = aws_waf_web_acl.waf_acl.id
+  web_acl_id = aws_waf_web_acl.wafv2_acl.id
 
   restrictions {
     geo_restriction {
