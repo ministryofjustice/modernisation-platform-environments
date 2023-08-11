@@ -19,3 +19,21 @@ resource "aws_glue_connection" "wepi_glue_conn_redshift" {
 
   tags = local.tags
 }
+
+# resource "aws_glue_job" "absence_glue_job" {
+#   name     = "absence-sop-glue-job"
+#   role_arn = aws_iam_role.wepi_iam_role_glue.arn
+
+#   command {
+#     script_location = "s3://mojap-sop-data-glue-job-scripts/absence-glue-job.py"
+#   }
+# }
+
+# resource "aws_glue_job" "leavers_glue_job" {
+#   name     = "leavers-sop-glue-job"
+#   role_arn = aws_iam_role.wepi_iam_role_glue.arn
+
+#   command {
+#     script_location = "s3://mojap-sop-data-glue-job-scripts/leavers-glue-job.py"
+#   }
+# }
