@@ -45,6 +45,22 @@ resource "aws_security_group" "tipstaff_lb_sc" {
     ]
   }
 
+  // Allow all IP addresses provided by the users
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    cidr_blocks = [
+      "194.33.196.47/32",
+      "194.33.192.6/32",
+      "194.33.192.47/32",
+      "194.33.192.6/32",
+      "194.33.192.2/32",
+      "194.33.196.46/32",
+      "194.33.192.5/32"
+    ]
+  }
+
   egress {
     description = "allow all outbound traffic for port 80"
     from_port   = 80

@@ -40,7 +40,8 @@ resource "aws_db_instance" "jitbit" {
   instance_class = local.application_data.accounts[local.environment].db_instance_class
   identifier     = "${local.application_name}-${local.environment}-database"
   username       = local.application_data.accounts[local.environment].db_user
-  password       = aws_secretsmanager_secret_version.db_admin_password.secret_string
+
+  manage_master_user_password = true
 
   snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
 

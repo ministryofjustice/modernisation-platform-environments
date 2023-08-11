@@ -70,7 +70,7 @@ module "weblogic_service" {
   container_definition_json = module.weblogic_container.json_map_encoded_list
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
   name                      = "weblogic"
-  vpc_id                    = var.network_config.shared_vpc_id
+  vpc_id                    = var.account_config.shared_vpc_id
 
   launch_type  = "FARGATE"
   network_mode = "awsvpc"
@@ -98,7 +98,7 @@ module "weblogic_service" {
 
   security_group_ids = [aws_security_group.weblogic.id]
 
-  subnet_ids = var.network_config.private_subnet_ids
+  subnet_ids = var.account_config.private_subnet_ids
 
   exec_enabled = true
 
@@ -111,7 +111,7 @@ module "weblogic_service" {
 resource "aws_security_group" "delius_core_frontend_security_group" {
   name        = "Delius Core Frontend Weblogic"
   description = "Rules for the delius testing frontend ecs service"
-  vpc_id      = var.network_config.shared_vpc_id
+  vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
 }
 
@@ -130,7 +130,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_tcp" {
   from_port         = local.ldap_port
   to_port           = local.ldap_port
   ip_protocol       = "tcp"
-  cidr_ipv4         = var.network_config.shared_vpc_cidr
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_udp" {
@@ -139,7 +139,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_udp" {
   from_port         = local.ldap_port
   to_port           = local.ldap_port
   ip_protocol       = "udp"
-  cidr_ipv4         = var.network_config.shared_vpc_cidr
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
@@ -157,7 +157,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_gro
   ip_protocol       = "tcp"
   to_port           = local.ldap_port
   from_port         = local.ldap_port
-  cidr_ipv4         = var.network_config.shared_vpc_cidr
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_ldap_udp" {
@@ -166,7 +166,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_gro
   ip_protocol       = "udp"
   to_port           = local.ldap_port
   from_port         = local.ldap_port
-  cidr_ipv4         = var.network_config.shared_vpc_cidr
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_db" {
@@ -205,11 +205,11 @@ resource "aws_security_group_rule" "weblogic_alb" {
   to_port           = var.weblogic_config.frontend_container_port
   protocol          = "TCP"
   security_group_id = aws_security_group.ldap.id
-  cidr_blocks       = [var.network_config.shared_vpc_cidr]
+  cidr_blocks       = [var.account_config.shared_vpc_cidr]
 }
 
 resource "aws_cloudwatch_log_group" "delius_core_frontend_log_group" {
-  name              = var.weblogic_config.frontend_fully_qualified_name
+  name              = format("%s-%s", var.env_name, var.weblogic_config.frontend_fully_qualified_name)
   retention_in_days = 7
   tags              = local.tags
 }

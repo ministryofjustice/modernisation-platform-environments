@@ -354,3 +354,23 @@ resource "aws_iam_policy" "domain_builder_preview_policy" {
   description = "Additional policy to allow execution of query previews in Athena"
   policy      = data.aws_iam_policy_document.domain_builder_preview.json
 }
+
+# Additional policy to allow execution of publish requests.
+data "aws_iam_policy_document" "domain_builder_publish" {
+  statement {
+    actions = [
+      "dynamodb:Query",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "domain_builder_publish_policy" {
+  name        = "${local.project}-domain-builder-publish-policy"
+  description = "Additional policy to allow execution of query publish in Athena"
+  policy      = data.aws_iam_policy_document.domain_builder_publish.json
+}
