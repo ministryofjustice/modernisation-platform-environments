@@ -14,5 +14,6 @@ locals {
 
   # Temp local variable for environments where we wish to build out the EBS to be transfered to EFS
   ebs_conditional = ["testing", "preproduction", "production"]
+  fqdn                    = local.application_data.accounts[local.environment].hosted_zone
 
 }
