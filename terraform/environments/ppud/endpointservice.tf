@@ -1,7 +1,7 @@
 resource "aws_vpc_endpoint_service" "HomeOffice" {
   count                      = local.is-production == true ? 1 : 0
   acceptance_required        = false
-  network_load_balancer_arns = [aws_lb.ppud_internal_nlb.arn]
+  network_load_balancer_arns = [aws_lb.ppud_internal_nlb[0].arn]
   tags = {
     Name = "HomeOffice-Endpoint"
   }
@@ -29,13 +29,13 @@ resource "aws_lb" "ppud_internal_nlb" {
 
 resource "aws_lb_listener" "nlb_forward_rule" {
   count             = local.is-production == true ? 1 : 0
-  load_balancer_arn = aws_lb.ppud_internal_nlb.arn
+  load_balancer_arn = aws_lb.ppud_internal_nlb[0].arn
   port              = "443"
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.nlb_target_group.arn
+    target_group_arn = aws_lb_target_group.nlb_target_group[0].arn
   }
 }
 

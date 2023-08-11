@@ -108,7 +108,7 @@ resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_wind
   name             = "Pre-Health-Check-Report-Instance-Patch"
   description      = "Export Health Check Report to S3"
   task_type        = "RUN_COMMAND"
-  task_arn         = aws_ssm_document.linux_health_check_s3.arn
+  task_arn         = aws_ssm_document.linux_health_check_s3[0].arn
   priority         = local.application_data.accounts[local.environment].pre_healthcheck_Priority
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "100%"
@@ -136,7 +136,7 @@ resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_win
   name             = "Post-Health-Check-Report-Instance-Patch"
   description      = "Export Health Check Report to S3"
   task_type        = "RUN_COMMAND"
-  task_arn         = aws_ssm_document.linux_health_check_s3.arn
+  task_arn         = aws_ssm_document.linux_health_check_s3[0].arn
   priority         = local.application_data.accounts[local.environment].post_healthcheck_Priority
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "100%"
