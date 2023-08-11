@@ -201,7 +201,7 @@ resource "aws_cloudfront_distribution" "external" {
     #   headers        = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
       cookies {
         # forward           = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
-        forward      = all
+        forward      = "all"
         headers      = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
         # whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
         # not sure if this is needed for Portal
@@ -417,6 +417,25 @@ resource "aws_route53_record" "cloudfront_validation_core_network_services" {
     aws_acm_certificate.cloudfront
   ]
 }
+
+cloudfront_validation_records = {
+    for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+      zone = lookup(
+        local.route53_zones,
+        dvo.domain_name,
+        lookup(
+          local.route53_zones,
+          replace(dvo.domain_name, "/^[^.]*./", ""),
+          lookup(
+            local.route53_zones,
+            replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
+            { provider = "external" }
+      )))
+    }
+  }
 
 # # use core-vpc provider to validate business-unit domain
 # resource "aws_route53_record" "cloudfront_validation_core_vpc" {
