@@ -57,40 +57,9 @@ locals {
     local.database_cloudwatch_log_groups,
   )
 
-  baseline_cloudwatch_metric_alarms = {
-    rman-backup-failed = {
-      comparison_operator = "LessThanOrEqualToThreshold"
-      evaluation_periods  = 2
-      metric_name         = "RmanBackupStatus"
-      namespace           = "Database"
-      period              = "3600"
-      statistic           = "Maximum"
-      threshold           = "0"
-      alarm_description   = "Triggers if there has been no successful rman backup"
-      alarm_actions       = ["dba_pagerduty"]
-      datapoints_to_alarm = 1
-      split_by_dimension = {
-        dimension_name   = "dbname"
-        dimension_values = local.baseline_environment_config.cloudwatch_metric_alarms_dbnames
-      }
-    }
-    misload-failed = {
-      comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = 2
-      metric_name         = "MisloadStatus"
-      namespace           = "Database"
-      period              = "3600"
-      statistic           = "Maximum"
-      threshold           = "1"
-      alarm_description   = "Triggers if misload failed"
-      alarm_actions       = ["dba_pagerduty"]
-      datapoints_to_alarm = 2
-      split_by_dimension = {
-        dimension_name   = "dbname"
-        dimension_values = local.baseline_environment_config.cloudwatch_metric_alarms_dbname_misloads
-      }
-    }
-  }
+  baseline_cloudwatch_metric_alarms = merge(
+    local.database_cloudwatch_metric_alarms,
+  )
 
   baseline_cloudwatch_log_metric_filters = merge(
     local.database_cloudwatch_log_metric_filters,

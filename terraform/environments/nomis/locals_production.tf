@@ -122,7 +122,7 @@ locals {
           flash = { total_size = 1000 }
         })
         cloudwatch_metric_alarms = merge(local.database_ec2_a.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].fixngo_connection
+          local.fixngo_connection_cloudwatch_metric_alarms
         )
       })
 
@@ -144,8 +144,9 @@ locals {
           data  = { total_size = 3000, iops = 3750, throughput = 750 }
           flash = { total_size = 500 }
         })
-        cloudwatch_metric_alarms = merge(local.database_ec2_a.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dba_high_priority_pagerduty"].database_dba_high_priority
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_a.cloudwatch_metric_alarms,
+          local.database_ec2_cloudwatch_metric_alarms_high_priority
         )
       })
     }

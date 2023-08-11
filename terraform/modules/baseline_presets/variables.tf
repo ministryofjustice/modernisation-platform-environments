@@ -9,14 +9,10 @@ variable "ip_addresses" {
 variable "options" {
   description = "Map of options controlling what resources to return"
   type = object({
-    backup_plan_daily_delete_after           = optional(number, 7)
-    backup_plan_weekly_delete_after          = optional(number, 28)
-    cloudwatch_log_groups                    = optional(list(string))
-    cloudwatch_metric_alarms_default_actions = optional(list(string))
-    baseline_acm_certificates_alarm_configuration = optional(object({
-      alarms_list_key = optional(string, "acm_default")
-      actions_key     = string
-    }))
+    backup_plan_daily_delete_after               = optional(number, 7)
+    backup_plan_weekly_delete_after              = optional(number, 28)
+    cloudwatch_log_groups                        = optional(list(string))
+    cloudwatch_metric_alarms_default_actions     = optional(list(string))
     enable_application_environment_wildcard_cert = optional(bool, false)
     enable_backup_plan_daily_and_weekly          = optional(bool, false)
     enable_business_unit_kms_cmks                = optional(bool, false)

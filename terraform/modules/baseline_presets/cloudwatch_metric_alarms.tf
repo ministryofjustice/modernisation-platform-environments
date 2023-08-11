@@ -22,7 +22,7 @@ locals {
   cloudwatch_metric_alarms = {
 
     acm = {
-      cert-expires-in-less-than-14-days = {
+      cert-expires-soon = {
         comparison_operator = "LessThanThreshold"
         evaluation_periods  = "1"
         datapoints_to_alarm = "1"
@@ -37,7 +37,7 @@ locals {
     }
 
     ec2 = {
-      cpu-utilization-high-15mins = {
+      cpu-utilization-high = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "15"
         datapoints_to_alarm = "15"
@@ -49,7 +49,7 @@ locals {
         alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 15 minutes"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      instance-status-check-failed-in-last-hour = {
+      instance-status-check-failed = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "60"
         datapoints_to_alarm = "1"
@@ -61,7 +61,7 @@ locals {
         alarm_description   = "Triggers if there has been an instance status check failure within last hour. This monitors the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      system-status-check-failed-in-last-hour = {
+      system-status-check-failed = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "60"
         datapoints_to_alarm = "1"
@@ -76,7 +76,7 @@ locals {
     }
 
     ec2_cwagent_windows = {
-      free-disk-space-low-1hour = {
+      free-disk-space-low = {
         comparison_operator = "LessThanOrEqualToThreshold"
         evaluation_periods  = "60"
         datapoints_to_alarm = "60"
@@ -88,22 +88,22 @@ locals {
         alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4305453159/Disk+Free+alarm+-+Windows"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      high-memory-usage-15mins = {
+      high-memory-usage = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "15"
-        datapoints_to_alarm = "15"
+        evaluation_periods  = "60"
+        datapoints_to_alarm = "60"
         metric_name         = "Memory % Committed Bytes In Use"
         namespace           = "CWAgent"
         period              = "60"
         statistic           = "Maximum"
-        threshold           = "90"
-        alarm_description   = "Triggers if memory usage is continually high for 15 minutes."
+        threshold           = "95"
+        alarm_description   = "Triggers if memory usage is continually high for one hour"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
 
     ec2_cwagent_linux = {
-      free-disk-space-low-1hour = {
+      free-disk-space-low = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "60"
         datapoints_to_alarm = "60"
@@ -115,19 +115,19 @@ locals {
         alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      high-memory-usage-15mins = {
+      high-memory-usage = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "15"
-        datapoints_to_alarm = "15"
+        evaluation_periods  = "60"
+        datapoints_to_alarm = "60"
         metric_name         = "mem_used_percent"
         namespace           = "CWAgent"
         period              = "60"
         statistic           = "Average"
-        threshold           = "90"
-        alarm_description   = "Triggers if memory usage is continually high for 15 minutes."
+        threshold           = "95"
+        alarm_description   = "Triggers if memory usage is continually high for one hour"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      cpu-iowait-high-3hour = {
+      cpu-iowait-high = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "180"
         datapoints_to_alarm = "180"
@@ -204,7 +204,7 @@ locals {
       }
     }
     ec2_asg_cwagent_collectd = {
-      asg-collectd-services = {
+      stopped-linux-service = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         namespace           = "CWAgent"
@@ -217,7 +217,7 @@ locals {
       }
     }
     lb = {
-      unhealthy-hosts-atleast-one = {
+      unhealthy-load-balancer-host = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
@@ -227,18 +227,6 @@ locals {
         statistic           = "Average"
         threshold           = "1"
         alarm_description   = "Triggers if the number of unhealthy hosts in the target table group is at least one for 3 minutes"
-        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
-      }
-      unhealthy-hosts-atleast-two = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        datapoints_to_alarm = "3"
-        metric_name         = "UnHealthyHostCount"
-        namespace           = "AWS/ApplicationELB"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "2"
-        alarm_description   = "Triggers if the number of unhealthy hosts in the target table group is at least two for 3 minutes"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
