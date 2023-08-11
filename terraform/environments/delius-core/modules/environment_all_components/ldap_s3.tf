@@ -50,16 +50,6 @@ module "s3_bucket_migration" {
           "arn:aws:iam::${var.ldap_config.migration_source_account_id}:role/admin"
         ]
       }
-    },
-    {
-      effect  = "Allow"
-      actions = ["s3:*"]
-      principals = {
-        type = "AWS"
-        identifiers = [
-          module.ldap_ecs_policies.task_role.arn
-        ]
-      }
     }
   ]
 
