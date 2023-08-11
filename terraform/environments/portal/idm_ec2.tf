@@ -19,7 +19,7 @@ do
   mount_status=$?
 done
 
-hostnamectl set-hostname ${local.application_name}-idm1-ms.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-ods1-ms.${local.portal_hosted_zone}
 
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent
@@ -33,7 +33,7 @@ EOF
 
   idm_2_userdata = <<EOF
 #!/bin/bash
-hostnamectl set-hostname ${local.application_name}-idm2-ms.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-ods2-ms.${local.portal_hosted_zone}
 EOF
 }
 
