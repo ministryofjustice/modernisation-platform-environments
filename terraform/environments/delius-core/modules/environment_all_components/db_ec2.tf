@@ -168,12 +168,13 @@ resource "aws_instance" "db_ec2_primary_instance" {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
-  # Increase the volume size of the root volume
   root_block_device {
     volume_type = var.db_config.ebs_volumes.root_volume.volume_type
     volume_size = var.db_config.ebs_volumes.root_volume.volume_size
+    iops        = var.db_config.ebs_volumes.iops
+    throughput  = var.db_config.ebs_volumes.throughput
     encrypted   = true
-    #kms_key_id  = var.db_config.ebs_volumes.kms_key_id
+    # We want to include kms_key_id here
     tags = local.tags
   }
   dynamic "ebs_block_device" {
@@ -182,8 +183,11 @@ resource "aws_instance" "db_ec2_primary_instance" {
       device_name = ebs_block_device.key
       volume_type = ebs_block_device.value.volume_type
       volume_size = ebs_block_device.value.volume_size
+      iops        = var.db_config.ebs_volumes.iops
+      throughput  = var.db_config.ebs_volumes.throughput
       encrypted   = true
-      tags        = local.tags
+      # We want to include kms_key_id here
+      tags = local.tags
     }
   }
   dynamic "ephemeral_block_device" {
@@ -193,21 +197,16 @@ resource "aws_instance" "db_ec2_primary_instance" {
       no_device   = true
     }
   }
-  # ebs_block_device {
-  #   device_name = "/dev/sdb"
-  #   volume_type = "gp3"
-  #   volume_size = 200
-  #   encrypted   = false
-  #   tags        = local.tags
-  # }
-  # ephemeral_block_device {
-  #   device_name = "/dev/sdc"
-  #   no_device   = true
-  # }
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-1", var.env_name, var.db_config.name)) },
     { server-type = "delius_core_db" },
     { database = format("%s-1", var.db_config.name) }
   )
+
+  lifecycle {
+    ignore_changes = [
+      ebs_block_device # We'd like to remove this and create ebs volumes as managed resources in order for terraform to manage changes such as volume type/size
+    ]
+  }
 }
 
