@@ -160,8 +160,8 @@ resource "aws_cloudfront_distribution" "external" {
 #   http_version = var.cloudfront_http_version
   http_version  = "http2"
   origin {
-    domain_name = aws_lb.loadbalancer.dns_name
-    origin_id   = aws_lb.loadbalancer.id
+    domain_name = aws_lb.external.dns_name
+    origin_id   = aws_lb.external.id
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.portalerrorpagebucket.cloudfront_access_identity_path
     }
@@ -186,7 +186,7 @@ resource "aws_cloudfront_distribution" "external" {
 #   aliases = [var.fqdn]
   aliases = local.fqdn
   default_cache_behavior {
-    target_origin_id = aws_lb.loadbalancer.id
+    target_origin_id = aws_lb.external.id
     # smooth_streaming = lookup(var.cloudfront_default_cache_behavior, "smooth_streaming", null)
     smooth_streaming = false
     default_ttl      = 0
@@ -198,16 +198,17 @@ resource "aws_cloudfront_distribution" "external" {
     #   query_string = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_query_string", null)
       query_string = true
     #   headers      = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_headers", null)
-      headers        = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
+    #   headers        = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
       cookies {
         # forward           = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
-        forward           = all
+        forward      = all
+        headers      = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
         # whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
         # not sure if this is needed for Portal
       }
     }
     # viewer_protocol_policy = lookup(var.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
-    viewer_protocol_policy = "https-only"
+    viewer_protocol_policy = "redirect-to-https"
   }
 
    ordered_cache_behavior_PortalErrorPageBucket {
