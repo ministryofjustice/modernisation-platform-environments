@@ -27,6 +27,30 @@ cloudfront_validation_records = {
       )))
     }
   }
+
+  core_network_services_domains = {
+    for domain, value in var.validation : domain => value if value.account == "core-network-services"
+  }
+  core_vpc_domains = {
+    for domain, value in var.validation : domain => value if value.account == "core-vpc"
+  }
+  self_domains = {
+    for domain, value in var.validation : domain => value if value.account == "self"
+  }
+
+  route53_zones = merge({
+    for key, value in data.aws_route53_zone.core_network_services : key => merge(value, {
+      provider = "core-network-services"
+    })
+    }, {
+    for key, value in data.aws_route53_zone.core_vpc : key => merge(value, {
+      provider = "core-vpc"
+    })
+    }, {
+    for key, value in data.aws_route53_zone.self : key => merge(value, {
+      provider = "self"
+    })
+  })
 }
 
 ### Cloudfront Secret Creation
