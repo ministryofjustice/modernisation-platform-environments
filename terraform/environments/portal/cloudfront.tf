@@ -28,15 +28,15 @@ cloudfront_validation_records = {
     }
   }
 
-  core_network_services_domains = {
-    for domain, value in var.validation : domain => value if value.account == "core-network-services"
-  }
-  core_vpc_domains = {
-    for domain, value in var.validation : domain => value if value.account == "core-vpc"
-  }
-  self_domains = {
-    for domain, value in var.validation : domain => value if value.account == "self"
-  }
+  # core_network_services_domains = {
+  #   for domain, value in var.validation : domain => value if value.account == "core-network-services"
+  # }
+  # core_vpc_domains = {
+  #   for domain, value in var.validation : domain => value if value.account == "core-vpc"
+  # }
+  # self_domains = {
+  #   for domain, value in var.validation : domain => value if value.account == "self"
+  # }
 
   route53_zones = merge({
     for key, value in data.aws_route53_zone.core_network_services : key => merge(value, {
@@ -229,7 +229,7 @@ resource "aws_cloudfront_distribution" "external" {
 #   enabled = var.cloudfront_enabled
   enabled = true
 #   aliases = [var.fqdn]
-  aliases = local.fqdn
+  aliases = local.application_data.accounts[local.environment].fqdn
   default_cache_behavior {
     target_origin_id = aws_lb.external.id
     # smooth_streaming = lookup(var.cloudfront_default_cache_behavior, "smooth_streaming", null)
