@@ -1,4 +1,4 @@
-#Administrative transport Tribunal
+#Transport Tribunal
 locals {
   transport = "transport" 
   transport_url = "transportappeals"
@@ -13,6 +13,35 @@ locals {
   transport_source_db_url         = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
   transport_source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   transport_source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
+  transport_user_data = base64encode(templatefile("user_data.sh", {
+    app_name = "transport"
+  }))
+  task_definition = templatefile("task_definition.json", {
+    app_name            = "transport"
+    ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
+    docker_image_tag    = "latest" 
+    sentry_env          = local.environment
+  })
+  transport_ec2_ingress_rules = {
+    "cluster_ec2_lb_ingress_3" = {
+      description     = "Cluster EC2 ingress rule 3"
+      from_port       = 32768
+      to_port         = 61000
+      protocol        = "tcp"
+      cidr_blocks     = []
+      security_groups = [aws_security_group.transport_lb_sc.id]
+    }
+  }
+  transport_ec2_egress_rules = {
+    "cluster_ec2_lb_egress" = {
+      description     = "Cluster EC2 loadbalancer egress rule"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = []
+    }
+  }
 }
 
 ######################## DMS #############################################
@@ -201,210 +230,37 @@ resource "aws_ecs_cluster" "transport_cluster" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "transportFamily_logs" {
-  name = "/ecs/${local.transport}Family"
-}
+module "transport-ecs" {
 
-resource "aws_ecs_task_definition" "transport_task_definition" {
-  family                   = "${local.transport}Family"
-  requires_compatibilities = ["EC2"]
-  #network_mode             = "awsvpc"
-  execution_role_arn       = aws_iam_role.transport_execution.arn
-  task_role_arn            = aws_iam_role.transport_task.arn
-  cpu                      = 1024
-  memory                   = 2048
-  container_definitions = jsonencode([
-    {
-      name      = "${local.transport}-container"
-      image     = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
-      cpu       = 1024
-      memory    = 2048
-      essential = true
-      portMappings = [
-        {
-          containerPort = 80
-          protocol      = "tcp"
-          hostPort      = 80
-        }
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.transportFamily_logs.name}"
-          awslogs-region        = "eu-west-2"
-          awslogs-stream-prefix = "ecs"
-        }
-      }
-      environment = [
-        {
-          name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
-        },
-        {
-          name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
-        },
-        {
-          name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].curserver}"
-        }
-      ]
-    }
-  ])
-  runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
-    cpu_architecture        = "X86_64"
-  }
-}
+  source = "./modules/ecs"
 
-resource "aws_ecs_service" "transport_ecs_service" {
-  depends_on = [
-    aws_lb_listener.transport_lb
-  ]
+  subnet_set_name           = local.subnet_set_name
+  vpc_all                   = local.vpc_all
+  app_name                  = local.transport
+  container_instance_type   = "windows"
+  ami_image_id              = local.application_data.accounts[local.environment].ami_image_id
+  instance_type             = "windows"
+  user_data                 = ""
+  key_name                  = ""
+  task_definition           = local.task_definition
+  ec2_desired_capacity      = local.application_data.accounts[local.environment].ec2_desired_capacity
+  ec2_max_size              = local.application_data.accounts[local.environment].ec2_max_size
+  ec2_min_size              = local.application_data.accounts[local.environment].ec2_min_size
+  task_definition_volume    = local.application_data.accounts[local.environment].task_definition_volume
+  network_mode              = local.application_data.accounts[local.environment].network_mode
+  server_port               = local.application_data.accounts[local.environment].server_port
+  app_count                 = local.application_data.accounts[local.environment].app_count
+  ec2_ingress_rules         = local.ec2_ingress_rules
+  ec2_egress_rules          = local.ec2_egress_rules
+  lb_tg_arn                 = aws_lb_target_group.transport_target_group.arn
+  tags_common               = local.tags
+  appscaling_min_capacity   = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity   = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ec2_scaling_cpu_threshold = local.application_data.accounts[local.environment].ec2_scaling_cpu_threshold
+  ec2_scaling_mem_threshold = local.application_data.accounts[local.environment].ec2_scaling_mem_threshold
+  ecs_scaling_cpu_threshold = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
 
-  name                              = local.transport
-  cluster                           = aws_ecs_cluster.transport_cluster.id
-  task_definition                   = aws_ecs_task_definition.transport_task_definition.arn
-  launch_type                       = "EC2"
-  enable_execute_command            = true
-  desired_count                     = 1
-  health_check_grace_period_seconds = 90
-
-  ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
-    type  = "spread"
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.transport_target_group.arn
-    container_name   = "${local.transport}-container"
-    container_port   = 80
-  }
-
-  deployment_controller {
-    type = "ECS"
-  }
-}
-
-resource "aws_iam_role" "transport_execution" {
-  name = "execution-${local.transport}"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "execution-${local.transport}"
-    },
-  )
-}
-
-resource "aws_iam_role_policy" "transport_execution" {
-  name = "execution-${local.transport}"
-  role = aws_iam_role.transport_execution.id
-
-  policy = <<-EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-           "Action": [
-              "ecr:*",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "secretsmanager:GetSecretValue"
-           ],
-           "Resource": "*",
-           "Effect": "Allow"
-      }
-    ]
-  }
-  EOF
-}
-
-resource "aws_iam_role" "transport_task" {
-  name = "task-${local.transport}"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "task-${local.transport}"
-    },
-  )
-}
-
-resource "aws_iam_role_policy" "transport_task" {
-  name = "task-${local.transport}"
-  role = aws_iam_role.transport_task.id
-
-  policy = <<-EOF
-  {
-   "Version": "2012-10-17",
-   "Statement": [
-     {
-       "Effect": "Allow",
-        "Action": [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "ecr:*",
-          "iam:*",
-          "ec2:*"
-        ],
-       "Resource": "*"
-     }
-   ]
-  }
-  EOF
-}
-
-resource "aws_security_group" "transport_ecs_service" {
-  name_prefix = "ecs-service-sg-"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.transport_lb_sc.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
 resource "aws_ecr_repository" "transport-ecr-repo" {

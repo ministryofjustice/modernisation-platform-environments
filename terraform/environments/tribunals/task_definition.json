@@ -1,0 +1,67 @@
+[
+  {
+    "name": "xray-daemon",
+    "image": "${ecr_url}:xray-daemon",
+    "essential": false,
+    "cpu": 32,
+    "portMappings": [
+      {
+        "containerPort": 2000,
+        "protocol": "udp"
+      }
+    ],
+    "memory": 256,
+    "environment": [{ "name": "AWS_REGION", "value": "eu-west-2" }],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-region": "eu-west-2",
+        "awslogs-stream-prefix": "${app_name}-app",
+        "awslogs-group": "${app_name}-ecs-log-group"
+      }
+    }
+  },
+  {
+    "name": "${app_name}",
+    "image": "${ecr_url}:${docker_image_tag}",
+    "essential": true,
+    "cpu": 992,
+    "portMappings": [
+      {
+        "containerPort": 8080
+      }
+    ],
+    "links": ["xray-daemon"],
+    "memory": 2000,
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-region": "eu-west-2",
+        "awslogs-stream-prefix": "${app_name}-app",
+        "awslogs-group": "${app_name}-ecs-log-group"
+      }
+    },
+    "environment": [
+      {
+        "name": "AWS_REGION",
+        "value": "eu-west-2"
+      },      
+      {
+        "name": "APP_DB_POOL_MAX_CONNECTION",
+        "value": "130"
+      },
+      {
+        "name": "APP_LOG_LEVEL",
+        "value": "debug"
+      }
+      {
+        "name": "AWS_XRAY_DAEMON_ADDRESS",
+        "value": "xray-daemon:2000"
+      },
+      {
+        "name": "SENTRY_ENVIRONMENT",
+        "value": "${sentry_env}"
+      }
+    ]
+  }
+]
