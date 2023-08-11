@@ -171,7 +171,7 @@ locals {
           oracle-db-name       = "T3CNOM"
         })
         autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
       })
 

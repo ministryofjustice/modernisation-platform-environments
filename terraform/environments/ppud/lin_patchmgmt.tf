@@ -77,7 +77,7 @@ resource "aws_ssm_maintenance_window_task" "prod_lin_patch_maintenance_window_ta
   description      = "Apply patch management"
   task_type        = "RUN_COMMAND"
   task_arn         = "AWS-RunPatchBaseline" # linux_os_baseline
-  priority         = 1
+  priority         = 10
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "15"
   max_errors       = "1"
@@ -98,4 +98,84 @@ resource "aws_ssm_maintenance_window_task" "prod_lin_patch_maintenance_window_ta
       }
     }
   }
+}
+
+# Maintenance Window Pre Health Check Task for Linux
+
+resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_window_task" {
+  count            = local.is-production == true ? 1 : 0
+  window_id        = aws_ssm_maintenance_window.prod_lin_patch_maintenance_window[0].id
+  name             = "Pre-Health-Check-Report-Instance-Patch"
+  description      = "Export Health Check Report to S3"
+  task_type        = "RUN_COMMAND"
+  task_arn         = aws_ssm_document.linux_health_check_s3[0].arn
+  priority         = local.application_data.accounts[local.environment].pre_healthcheck_Priority
+  service_role_arn = aws_iam_role.patching_role.arn
+  max_concurrency  = "100%"
+  max_errors       = 0
+
+  targets {
+    key    = "WindowTargetIds"
+    values = aws_ssm_maintenance_window_target.prod_lin_maintenance_window_target[0].*.id
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+      output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
+      output_s3_key_prefix = "ssm_output/"
+      timeout_seconds      = 600
+    }
+  }
+}
+
+# Maintenance Window Post Health Check Task for Linux
+
+resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_window_task" {
+  count            = local.is-production == true ? 1 : 0
+  window_id        = aws_ssm_maintenance_window.prod_lin_patch_maintenance_window[0].id
+  name             = "Post-Health-Check-Report-Instance-Patch"
+  description      = "Export Health Check Report to S3"
+  task_type        = "RUN_COMMAND"
+  task_arn         = aws_ssm_document.linux_health_check_s3[0].arn
+  priority         = local.application_data.accounts[local.environment].post_healthcheck_Priority
+  service_role_arn = aws_iam_role.patching_role.arn
+  max_concurrency  = "100%"
+  max_errors       = 0
+
+  targets {
+    key    = "WindowTargetIds"
+    values = aws_ssm_maintenance_window_target.prod_lin_maintenance_window_target[0].*.id
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+      output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
+      output_s3_key_prefix = "ssm_output/"
+      timeout_seconds      = 600
+    }
+  }
+}
+
+
+# Create perform_healthcheck_S3 document
+
+resource "aws_ssm_document" "linux_health_check_s3" {
+  count         = local.is-production == true ? 1 : 0
+  name          = "linux_health_check"
+  document_type = "Command"
+  content = jsonencode(
+    {
+      "schemaVersion" = "2.2",
+      "description"   = "Execute Shell Command",
+      "mainSteps" = [
+        {
+          "action" = "aws:runShellScript",
+          "name"   = "linux_health_check",
+          "inputs" = {
+            "runCommand" = ["/usr/local/bin/Linux_Health_Check.sh"]
+          }
+        }
+      ]
+    }
+  )
 }

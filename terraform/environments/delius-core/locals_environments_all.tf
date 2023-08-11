@@ -14,4 +14,23 @@ locals {
   bastion = {
     security_group_id = module.bastion_linux.bastion_security_group
   }
+
+  db_config = {
+    user_data_param = {
+      branch               = "main"
+      ansible_repo         = "modernisation-platform-configuration-management"
+      ansible_repo_basedir = "ansible"
+      ansible_args         = "oracle_19c_install"
+    }
+    ebs_volumes       = {}
+    ebs_volume_config = {}
+  }
+
+  # Merge tags from the environment json file with additional ones
+  tags_all = merge(
+    jsondecode(data.http.environments_file.response_body).tags,
+    { "is-production" = local.is-production },
+    { "environment-name" = terraform.workspace },
+    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
+  )
 }
