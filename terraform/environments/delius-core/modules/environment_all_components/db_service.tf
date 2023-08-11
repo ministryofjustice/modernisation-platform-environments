@@ -17,7 +17,7 @@ module "testing_db_container" {
   log_configuration = {
     logDriver = "awslogs"
     options = {
-      "awslogs-group"         = var.delius_db_container_config.fully_qualified_name
+      "awslogs-group"         = aws_cloudwatch_log_group.delius_core_testing_db_log_group.name
       "awslogs-region"        = "eu-west-2"
       "awslogs-stream-prefix" = var.delius_db_container_config.fully_qualified_name
     }
