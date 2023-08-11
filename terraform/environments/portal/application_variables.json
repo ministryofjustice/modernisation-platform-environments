@@ -33,9 +33,7 @@
       "lb_access_logs_existing_bucket_name": "",
       "url": "s3://laa-portal-development-archive-mp",
       "maintenance_window_name": "diagnostics-log-archive-poc",
-      "hosted_zone": "aws.dev.legalservices.gov.uk"
-
-
+      "hosted_zone": "dev.legalservices.gov.uk"
     },
     "test": {
       "example_var": "test-data",
