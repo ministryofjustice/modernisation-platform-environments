@@ -133,6 +133,15 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = [
+      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*"
+    ]
+  }
+  statement {
+    actions = [
       "kms:Encrypt*",
       "kms:Decrypt*",
       "kms:ReEncrypt*",

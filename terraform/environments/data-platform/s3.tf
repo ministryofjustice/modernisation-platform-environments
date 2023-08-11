@@ -1,3 +1,4 @@
+
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
@@ -55,49 +56,6 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   ]
 
   tags = local.tags
-}
-
-resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket      = module.s3-bucket.bucket.id
-  eventbridge = true
-}
-
-data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
-  statement {
-    sid    = "AllowPutFromCiUser"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
-    }
-
-    actions = ["s3:PutObject", "s3:ListBucket"]
-
-    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
-  }
-
-  statement {
-    sid       = "DenyNonFullControlObjects"
-    effect    = "Deny"
-    actions   = ["s3:PutObject"]
-    resources = ["${module.s3-bucket.bucket.arn}/*"]
-
-    principals {
-      identifiers = ["*"]
-      type        = "AWS"
-    }
-
-    condition {
-      test     = "StringNotEquals"
-      variable = "s3:x-amz-acl"
-
-      values = [
-        "bucket-owner-full-control"
-      ]
-    }
-  }
-
 }
 
 module "s3_athena_query_results_bucket" { #tfsec:ignore:aws-s3-enable-versioning
@@ -158,4 +116,9 @@ module "s3_athena_query_results_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   ]
 
   tags = local.tags
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket      = module.s3-bucket.bucket.id
+  eventbridge = true
 }

@@ -626,26 +626,6 @@ resource "aws_db_instance" "appdb2" {
 
 }
 
-#TODO add correct entry for DNS
-# resource "aws_route53_record" "igdb_rds" {
-#   provider = aws.core-vpc
-#   zone_id  = data.aws_route53_zone.external.zone_id
-#   name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
-#   type     = "CNAME"
-#   ttl      = 60
-#   records  = [aws_db_instance.appdb1.address]
-# }
-
-#TODO add correct entry for DNS
-# resource "aws_route53_record" "iadb_rds" {
-#   provider = aws.core-vpc
-#   zone_id  = data.aws_route53_zone.external.zone_id
-#   name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
-#   type     = "CNAME"
-#   ttl      = 60
-#   records  = [aws_db_instance.appdb2.address]
-# }
-
 #IGDB alarms
 resource "aws_cloudwatch_metric_alarm" "igdb_rds_cpu" {
   alarm_name         = "${local.application_name}-${local.environment}-${lower(local.igdb_dbname)}-CPU-utilization"

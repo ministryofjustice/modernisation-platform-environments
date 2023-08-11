@@ -57,7 +57,13 @@ module "glue_reporting_hub_job" {
     "--enable-auto-scaling"                     = true
     "--enable-job-insights"                     = true
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
+    "--dpr.aws.dynamodb.endpointUrl"            = "https://dynamodb.${local.account_region}.amazonaws.com"
     "--dpr.contract.registryName"               = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.domain.registry"                     = "${local.project}-domain-registry-${local.environment}"
+    "--dpr.domain.target.path"                  = "s3://${module.s3_domain_bucket.bucket_id}"
+    "--dpr.domain.catalog.db"                   = module.glue_data_domain_database.db_name
+    "--dpr.redshift.secrets.name"               = "${local.project}-redshift-secret-${local.environment}"
+    "--dpr.datamart.db.name"                    = "datamart"
   }
 }
 
@@ -559,7 +565,8 @@ module "datamart" {
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
   source                       = "./modules/dms"
-  enable_replication_task      = local.enable_replication_task
+  setup_dms_instance           = local.setup_dms_instance # Disable all DMS Resources
+  enable_replication_task      = local.enable_replication_task # Disable Replication Task
   name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
   vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
   source_engine_name           = "oracle"
@@ -576,7 +583,7 @@ module "dms_nomis_ingestor" {
   dms_target_name              = "kinesis"
   short_name                   = "nomis"
   migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.6"
+  replication_instance_version = "3.4.6" # Rollback
   replication_instance_class   = "dms.t3.medium"
   subnet_ids                   = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 

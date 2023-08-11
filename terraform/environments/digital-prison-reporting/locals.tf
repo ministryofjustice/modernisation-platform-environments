@@ -30,7 +30,10 @@ locals {
   enable_dpr_cloudtrail    = local.application_data.accounts[local.environment].enable_cloud_trail
   generic_lambda           = "${local.project}-generic-lambda"
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
+  # DMS Specific
+  setup_dms_instance       = local.application_data.accounts[local.environment].setup_dms_instance
   enable_replication_task  = local.application_data.accounts[local.environment].enable_dms_replication_task
+  # DataMart Specific
   datamart_endpoint        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["host"]
   datamart_port            = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["port"]
   datamart_username        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["username"]
@@ -48,6 +51,7 @@ locals {
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
   dpr_subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  domain_registry                = "${local.project}-domain-registry-${local.environment}"
   rds_kms_arn                    = aws_kms_key.rds.arn
   enable_domain_builder_rds      = local.application_data.accounts[local.environment].enable_domain_builder_rds
   rds_dbuilder_name              = "${local.project}-backend-rds"
@@ -69,7 +73,8 @@ locals {
   lambda_dbuilder_policies       = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
-    "arn:aws:iam::${local.account_id}:policy/${local.project}-domain-builder-preview-policy"
+    "arn:aws:iam::${local.account_id}:policy/${local.project}-domain-builder-preview-policy",
+    "arn:aws:iam::${local.account_id}:policy/${local.project}-domain-builder-publish-policy"
   ]
   enable_domain_builder_agent    = local.application_data.accounts[local.environment].enable_domain_builder_agent
   enable_dbuilder_flyway_lambda  = local.application_data.accounts[local.environment].enable_dbuilder_flyway_lambda
