@@ -250,8 +250,8 @@ module "transport-ecs" {
   network_mode              = local.application_data.accounts[local.environment].network_mode
   server_port               = local.application_data.accounts[local.environment].server_port
   app_count                 = local.application_data.accounts[local.environment].app_count
-  ec2_ingress_rules         = local.ec2_ingress_rules
-  ec2_egress_rules          = local.ec2_egress_rules
+  ec2_ingress_rules         = local.transport_ec2_ingress_rules
+  ec2_egress_rules          = local.transport_ec2_egress_rules
   lb_tg_arn                 = aws_lb_target_group.transport_target_group.arn
   tags_common               = local.tags
   appscaling_min_capacity   = local.application_data.accounts[local.environment].appscaling_min_capacity

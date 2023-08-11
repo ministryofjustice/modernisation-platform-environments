@@ -67,7 +67,7 @@
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80
     },
-    "production": 
+    "production": {
       "moj_ip": "81.134.202.29/32",
       "allocated_storage": "20",
       "storage_type": "gp2",
