@@ -53,7 +53,7 @@
       {
         "name": "APP_LOG_LEVEL",
         "value": "debug"
-      }
+      },
       {
         "name": "AWS_XRAY_DAEMON_ADDRESS",
         "value": "xray-daemon:2000"
