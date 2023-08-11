@@ -11,10 +11,9 @@ locals {
   # baseline config
   development_config = {
 
-    cloudwatch_metric_alarms_dbnames = []
-
+    cloudwatch_metric_alarms_dbnames         = []
     cloudwatch_metric_alarms_dbnames_misload = []
-    
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -24,7 +23,7 @@ locals {
           "*.${module.environment.domains.public.application_environment}",
           "*.${local.environment}.nomis.az.justice.gov.uk",
         ]
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
         }

@@ -19,21 +19,7 @@ locals {
     enable_ec2_self_provision                    = true
     enable_oracle_secure_web                     = true
     enable_ec2_put_parameter                     = false
-    cloudwatch_metric_alarms = {
-      weblogic = local.weblogic_cloudwatch_metric_alarms
-      database = local.database_cloudwatch_metric_alarms
-      xtag = local.xtag_cloudwatch_metric_alarms
-    }
-    cloudwatch_metric_alarms_lists = merge(
-      local.weblogic_cloudwatch_metric_alarms_lists,
-      local.database_cloudwatch_metric_alarms_lists,
-      local.xtag_cloudwatch_metric_alarms_lists
-    )
-    cloudwatch_metric_alarms_lists_with_actions = {
-      dso_pagerduty               = ["dso_pagerduty"]
-      dba_pagerduty               = ["dba_pagerduty"]
-      dba_high_priority_pagerduty = ["dba_high_priority_pagerduty"]
-    }
+    cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
     }
@@ -72,21 +58,38 @@ locals {
   )
 
   baseline_cloudwatch_metric_alarms = {
-    for key, value in module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dba_pagerduty"].database_dba_by_dbname : key => merge(value, {
+    rman-backup-failed = {
+      comparison_operator = "LessThanOrEqualToThreshold"
+      evaluation_periods  = 2
+      metric_name         = "RmanBackupStatus"
+      namespace           = "Database"
+      period              = "3600"
+      statistic           = "Maximum"
+      threshold           = "0"
+      alarm_description   = "Triggers if there has been no successful rman backup"
+      alarm_actions       = ["dba_pagerduty"]
+      datapoints_to_alarm = 1
       split_by_dimension = {
         dimension_name   = "dbname"
         dimension_values = local.baseline_environment_config.cloudwatch_metric_alarms_dbnames
       }
-    })
-  }
-
-  baseline_cloudwatch_metric_alarms_database = {
-    for key, value in module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dba_pagerduty"].misload : key => merge(value, {
+    }
+    misload-failed = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = 2
+      metric_name         = "MisloadStatus"
+      namespace           = "Database"
+      period              = "3600"
+      statistic           = "Maximum"
+      threshold           = "1"
+      alarm_description   = "Triggers if misload failed"
+      alarm_actions       = ["dba_pagerduty"]
+      datapoints_to_alarm = 2
       split_by_dimension = {
         dimension_name   = "dbname"
-        dimension_values = local.baseline_environment_config.cloudwatch_metric_alarms_dbnames_misload
+        dimension_values = local.baseline_environment_config.cloudwatch_metric_alarms_dbname_misloads
       }
-    })
+    }
   }
 
   baseline_cloudwatch_log_metric_filters = merge(
