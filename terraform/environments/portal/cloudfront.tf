@@ -8,6 +8,27 @@
 # }
 #}
 
+locals {
+cloudfront_validation_records = {
+    for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+      zone = lookup(
+        local.route53_zones,
+        dvo.domain_name,
+        lookup(
+          local.route53_zones,
+          replace(dvo.domain_name, "/^[^.]*./", ""),
+          lookup(
+            local.route53_zones,
+            replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
+            { provider = "external" }
+      )))
+    }
+  }
+}
+
 ### Cloudfront Secret Creation
 resource "random_password" "cloudfront" {
   length  = 16
@@ -417,25 +438,6 @@ resource "aws_route53_record" "cloudfront_validation_core_network_services" {
     aws_acm_certificate.cloudfront
   ]
 }
-
-cloudfront_validation_records = {
-    for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-      zone = lookup(
-        local.route53_zones,
-        dvo.domain_name,
-        lookup(
-          local.route53_zones,
-          replace(dvo.domain_name, "/^[^.]*./", ""),
-          lookup(
-            local.route53_zones,
-            replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
-            { provider = "external" }
-      )))
-    }
-  }
 
 # # use core-vpc provider to validate business-unit domain
 # resource "aws_route53_record" "cloudfront_validation_core_vpc" {
