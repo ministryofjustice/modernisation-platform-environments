@@ -35,7 +35,7 @@
       "maintenance_window_name": "diagnostics-log-archive-poc",
       "hosted_zone": "aws.dev.legalservices.gov.uk",
       "acm_domain_name": "dev.legalservices.gov.uk,",
-      "acm_alt_domain_name": ["*.dev.legalservices.gov.uk"]
+      "acm_alt_domain_name": "*.dev.legalservices.gov.uk"
 
     },
     "test": {
