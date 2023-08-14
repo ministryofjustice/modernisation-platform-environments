@@ -12,6 +12,7 @@ locals {
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
+    enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true

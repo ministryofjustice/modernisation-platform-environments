@@ -5,15 +5,15 @@ locals {
   test_config = {
 
     baseline_ssm_parameters = {
-      "test-oem/TRCVCAT" = local.oem_database_instance_ssm_parameters
-      "test-oem/EMREP"   = local.oem_emrep_ssm_parameters
-      "test-oem/OEM"     = local.oem_ssm_parameters
-      "oem-a/TRCVCAT"    = local.oem_database_instance_ssm_parameters
-      "oem-a/EMREP"      = local.oem_emrep_ssm_parameters
-      "oem-a/OEM"        = local.oem_ssm_parameters
-      "oem-b/TRCVCAT"    = local.oem_database_instance_ssm_parameters
-      "oem-b/EMREP"      = local.oem_emrep_ssm_parameters
-      "oem-b/OEM"        = local.oem_ssm_parameters
+      "test-oem/TRCVCAT"   = local.oem_database_instance_ssm_parameters
+      "test-oem/EMREP"     = local.oem_emrep_ssm_parameters
+      "test-oem/OEM"       = local.oem_ssm_parameters
+      "test-oem-a/TRCVCAT" = local.oem_database_instance_ssm_parameters
+      "test-oem-a/EMREP"   = local.oem_emrep_ssm_parameters
+      "test-oem-a/OEM"     = local.oem_ssm_parameters
+      "test-oem-b/TRCVCAT" = local.oem_database_instance_ssm_parameters
+      "test-oem-b/EMREP"   = local.oem_emrep_ssm_parameters
+      "test-oem-b/OEM"     = local.oem_ssm_parameters
     }
 
     baseline_ec2_autoscaling_groups = {

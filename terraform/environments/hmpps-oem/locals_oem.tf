@@ -36,6 +36,9 @@ locals {
 
     instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
       vpc_security_group_ids = ["data-oem"]
+      tags = {
+        backup-plan = "daily-and-weekly"
+      }
     })
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
@@ -83,6 +86,7 @@ locals {
     tags = {
       ami                  = "hmpps_ol_8_5_oracledb_19c" # not including as hardening role seems to cause an issue
       component            = "data"
+      instance-scheduling  = "skip-scheduling"
       server-type          = "hmpps-oem"
       os-type              = "Linux"
       os-major-version     = 8
