@@ -64,7 +64,7 @@ locals {
     baseline_route53_zones = {
       "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
         records = [
-          { name = "oem.hmpps-oem", type = "CNAME", ttl = "300", records = ["oem-a.hmpps-oem.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "oem.hmpps-oem", type = "CNAME", ttl = "300", records = ["test-oem-a.hmpps-oem.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
     }
