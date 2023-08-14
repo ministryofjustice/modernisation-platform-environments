@@ -27,7 +27,7 @@ locals {
     }
 
     baseline_ec2_instances = {
-      oem-a = merge(local.oem_ec2_default, {
+      test-oem-a = merge(local.oem_ec2_default, {
         config = merge(local.oem_ec2_default.config, {
           availability_zone = "eu-west-2a"
         })
@@ -37,15 +37,15 @@ locals {
           })
         })
       })
-      # oem-b = merge(local.oem_ec2_default, {
+      # test-oem-b = merge(local.oem_ec2_default, {
       #   config = merge(local.oem_ec2_default.config, {
-      #     availability_zone = "eu-west-2b"
-      #   })
-      #   user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
+      #     availability_zone = "eu-west-2b"
+      #   })
+      #   user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
       #     args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-      #       branch = "main"
-      #     })
-      #   })
+      #       branch = "main"
+      #     })
+      #   })
       # })
     }
 
