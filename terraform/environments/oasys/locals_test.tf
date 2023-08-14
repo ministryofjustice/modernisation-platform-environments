@@ -35,12 +35,12 @@ locals {
       ##
       ## T1
       ##
-      # "t1-${local.application_name}-db-a" = merge(local.database_a, {
-      #   tags = merge(local.database_a.tags, {
-      #     description                             = "t1 ${local.application_name} database"
-      #     "${local.application_name}-environment" = "t1"
-      #   })
-      # })
+      "t1-${local.application_name}-db-a" = merge(local.database_a, {
+        tags = merge(local.database_a.tags, {
+          description                             = "t1 ${local.application_name} database"
+          "${local.application_name}-environment" = "t1"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
