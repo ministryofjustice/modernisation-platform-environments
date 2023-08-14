@@ -163,22 +163,3 @@ resource "aws_db_instance" "iaps_test" {
     { Name = lower(format("%s-%s-database", local.application_name, local.environment)) }
   )
 }
-
-resource "aws_ssm_parameter" "iaps_snapshot_data_refresh_id_test" {
-  name        = "/iaps/snapshot_id_test"
-  description = "The ID of the RDS snapshot used for the IAPS database data refresh"
-  type        = "String"
-  value       = try(local.application_data.accounts[local.environment].db_snapshot_identifier, "")
-
-  tags = {
-    environment = "production"
-  }
-
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "iaps_snapshot_data_refresh_id_test" {
-  name = aws_ssm_parameter.iaps_snapshot_data_refresh_id_test.name
-}
