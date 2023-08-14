@@ -311,3 +311,20 @@ resource "aws_route53_record" "igdb" {
   ttl      = 300
   records  = [aws_db_instance.appdb1.address]
 }
+
+###############################################################################################################
+########################         OHS External DUMMY Route 53 records               ############################
+###############################################################################################################
+
+resource "aws_route53_record" "ohs_external" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "portal-ohs-external.${data.aws_route53_zone.external.name}" # portal-ohs-external.laa-development.modernisation-platform.service.justice.gov.uk
+  type     = "A"
+
+  alias {
+    name                   = aws_lb.external.dns_name
+    zone_id                = aws_lb.external.zone_id
+    evaluate_target_health = true
+  }
+}
