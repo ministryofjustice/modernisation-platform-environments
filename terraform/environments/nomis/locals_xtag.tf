@@ -58,7 +58,7 @@ locals {
     })
     user_data_cloud_init = merge(local.xtag_ec2_default.user_data_cloud_init, {
       args = merge(local.xtag_ec2_default.user_data_cloud_init.args, {
-        branch = "c7714b7441eed36c343989d75a4c2bf331a5f69c" # from AMI setup, config-management repo 09-07-23
+        branch = "96770af14211519830613a93eb8faf2b7ef1ebcb" # from AMI setup, config-management repo 11-08-23
       })
     })
     autoscaling_group = merge(local.xtag_ec2_default.autoscaling_group, {
