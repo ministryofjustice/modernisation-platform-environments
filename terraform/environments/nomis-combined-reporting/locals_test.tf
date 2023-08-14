@@ -35,20 +35,20 @@ locals {
 
     baseline_ssm_parameters = {
       # T1
-      "t1-ncr-tomcat"          = local.tomcat_ssm_parameters
-      "t1-ncr-bip"             = local.bip_ssm_parameters
+      "t1-ncr-tomcat" = local.tomcat_ssm_parameters
+      "t1-ncr-bip"    = local.bip_ssm_parameters
     }
 
     baseline_ec2_instances = {
       t1-ncr-bip-cmc = merge(local.bi-platform_ec2_default, {
         tags = merge(local.bi-platform_ec2_default.tags, {
-          description = "For testing SAP BI CMC installation and configurations"
-          server-type = "ncr-bip-cmc"
+          description                          = "For testing SAP BI CMC installation and configurations"
+          server-type                          = "ncr-bip-cmc"
           nomis-combined-reporting-environment = "t1"
         })
       })
     }
-    
+
     baseline_ec2_autoscaling_groups = {
 
       t1-ncr-tomcat = merge(local.tomcat_ec2_default, {
@@ -58,7 +58,7 @@ locals {
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
         tags = merge(local.tomcat_ec2_default.tags, {
-          description = "For testing SAP tomcat installation and configurations"
+          description                          = "For testing SAP tomcat installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })
@@ -70,7 +70,7 @@ locals {
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
         tags = merge(local.bi-platform_ec2_default.tags, {
-          description = "For testing BIP 4.3 installation and configurations"
+          description                          = "For testing BIP 4.3 installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })

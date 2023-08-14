@@ -44,7 +44,7 @@ variable "subnet_ids" {
 variable "security_group_ids" {
   description = "An List of VPC SGroups"
   type        = list(string)
-  default     = []  
+  default     = []
 }
 
 variable "endpoint_ids" {

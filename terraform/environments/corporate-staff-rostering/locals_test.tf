@@ -19,81 +19,81 @@ locals {
           vpc_security_group_ids       = ["data-db"]
         })
 
-      user_data_cloud_init = {
-        args = {
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision"
-        }
-        scripts = [
-          "ansible-ec2provision.sh.tftpl",
-        ]
-    }
-
-    ebs_volumes = {
-      "/dev/sdb" = { type = "gp3", label = "app", size = 100 } # /u01
-      "/dev/sdc" = { type = "gp3", label = "app", size = 100 } # /u02
-      "/dev/sde" = { type = "gp3", label = "data" }            # DATA01
-      "/dev/sdf" = { type = "gp3", label = "data" }            # DATA02
-      "/dev/sdg" = { type = "gp3", label = "data" }            # DATA03
-      "/dev/sdh" = { type = "gp3", label = "data" }            # DATA04
-      "/dev/sdi" = { type = "gp3", label = "data" }            # DATA05
-      "/dev/sdj" = { type = "gp3", label = "flash" }           # FLASH01
-      "/dev/sdk" = { type = "gp3", label = "flash" }           # FLASH02
-      "/dev/sds" = { type = "gp3", label = "swap" }
-    }
-
-    ebs_volume_config = {
-      data = {
-        iops       = 3000
-        throughput = 125
-        total_size = 500
-      }
-      flash = {
-        iops       = 3000
-        throughput = 125
-        total_size = 50
-      }
-    }
-
-    route53_records = {
-      create_internal_record = true
-      create_external_record = true
-    }
-
-    ssm_parameters = {
-      ASMSYS = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSYS password"
-      }
-      ASMSNMP = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSNMP password"
-      }
-    }
-
-    tags = {
-      description = "Test CSR DB server"
-      ami         = "base_ol_8_5"
-      os-type     = "Linux"
-      component   = "test"
-      server-type = "csr-db"
-    }
-      }
-    }
-      baseline_route53_zones = {
-        "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
-          records = [
-            { name = "t3-csr-db-a", type = "CNAME", ttl = "300", records = ["t3-csr-db-a.corporate-staff-rostering.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
+        user_data_cloud_init = {
+          args = {
+            branch               = "main"
+            ansible_repo         = "modernisation-platform-configuration-management"
+            ansible_repo_basedir = "ansible"
+            ansible_args         = "--tags ec2provision"
+          }
+          scripts = [
+            "ansible-ec2provision.sh.tftpl",
           ]
         }
+
+        ebs_volumes = {
+          "/dev/sdb" = { type = "gp3", label = "app", size = 100 } # /u01
+          "/dev/sdc" = { type = "gp3", label = "app", size = 100 } # /u02
+          "/dev/sde" = { type = "gp3", label = "data" }            # DATA01
+          "/dev/sdf" = { type = "gp3", label = "data" }            # DATA02
+          "/dev/sdg" = { type = "gp3", label = "data" }            # DATA03
+          "/dev/sdh" = { type = "gp3", label = "data" }            # DATA04
+          "/dev/sdi" = { type = "gp3", label = "data" }            # DATA05
+          "/dev/sdj" = { type = "gp3", label = "flash" }           # FLASH01
+          "/dev/sdk" = { type = "gp3", label = "flash" }           # FLASH02
+          "/dev/sds" = { type = "gp3", label = "swap" }
+        }
+
+        ebs_volume_config = {
+          data = {
+            iops       = 3000
+            throughput = 125
+            total_size = 500
+          }
+          flash = {
+            iops       = 3000
+            throughput = 125
+            total_size = 50
+          }
+        }
+
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+
+        ssm_parameters = {
+          ASMSYS = {
+            random = {
+              length  = 30
+              special = false
+            }
+            description = "ASMSYS password"
+          }
+          ASMSNMP = {
+            random = {
+              length  = 30
+              special = false
+            }
+            description = "ASMSNMP password"
+          }
+        }
+
+        tags = {
+          description = "Test CSR DB server"
+          ami         = "base_ol_8_5"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "csr-db"
+        }
+      }
+    }
+    baseline_route53_zones = {
+      "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
+        records = [
+          { name = "t3-csr-db-a", type = "CNAME", ttl = "300", records = ["t3-csr-db-a.corporate-staff-rostering.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
+        ]
+      }
     }
 
 

@@ -34,39 +34,39 @@ module "s3_bucket_archive" {
 
 resource "aws_s3_object" "object_oam" {
   bucket = "laa-${local.application_name}-${local.environment}-archive-mp"
-  key = "oam1/"
+  key    = "oam1/"
 }
 resource "aws_s3_object" "object_oam2" {
   count  = contains(["development", "testing"], local.environment) ? 0 : 1
   bucket = "laa-${local.application_name}-${local.environment}-archive-mp"
-  key = "oam2/"
+  key    = "oam2/"
 }
 resource "aws_s3_object" "object_idm" {
   bucket = "laa-${local.application_name}-${local.environment}-archive-mp"
-  key = "idm1/"
+  key    = "idm1/"
 }
 resource "aws_s3_object" "object_idm2" {
   count  = contains(["development", "testing"], local.environment) ? 0 : 1
   bucket = "laa-${local.application_name}-${local.environment}-archive-mp"
-  key = "idm2/"
+  key    = "idm2/"
 }
 resource "aws_s3_object" "object_oim" {
   bucket = "laa-${local.application_name}-${local.environment}-archive-mp"
-  key = "oim1/"
+  key    = "oim1/"
 }
 resource "aws_s3_object" "object_oim2" {
   count  = contains(["development", "testing"], local.environment) ? 0 : 1
   bucket = "laa-${local.application_name}-${local.environment}-archive-mp"
-  key = "oim2/"
+  key    = "oim2/"
 }
 
 resource "aws_s3_object" "object_ohs" {
   bucket = "laa-${local.application_name}-${local.environment}-archive-mp"
-  key = "ohs1/"
+  key    = "ohs1/"
 }
 
 resource "aws_s3_object" "object_ohs2" {
   count  = contains(["development", "testing"], local.environment) ? 0 : 1
   bucket = "laa-${local.application_name}-${local.environment}-archive-mp"
-  key = "ohs2/"
+  key    = "ohs2/"
 }

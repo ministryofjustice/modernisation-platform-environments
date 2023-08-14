@@ -56,5 +56,5 @@ variable "layers" {
 variable "create_layer" {
   type        = bool
   default     = false
-  description = "(Optional) Create Lambda Layer, Yes Or NO" 
+  description = "(Optional) Create Lambda Layer, Yes Or NO"
 }

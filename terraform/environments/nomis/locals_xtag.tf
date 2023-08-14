@@ -99,12 +99,12 @@ locals {
       statistic           = "Average"
       threshold           = "1"
       alarm_description   = "wls_managedserver.service has stopped"
-    } 
+    }
   }
 
   xtag_cloudwatch_metric_alarms_lists = {
     xtag = {
-      parent_keys = [        
+      parent_keys = [
         "ec2_default",
         "ec2_linux_default"
       ]

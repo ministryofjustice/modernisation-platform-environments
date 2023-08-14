@@ -4,7 +4,7 @@ variable "rule_name" {
 }
 
 variable "event_pattern" {
-  type = string
+  type        = string
   description = "(Required) Digital Prison Reporting rule event pattern."
 }
 

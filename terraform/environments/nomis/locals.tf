@@ -22,7 +22,7 @@ locals {
     cloudwatch_metric_alarms = {
       weblogic = local.weblogic_cloudwatch_metric_alarms
       database = local.database_cloudwatch_metric_alarms
-      xtag = local.xtag_cloudwatch_metric_alarms
+      xtag     = local.xtag_cloudwatch_metric_alarms
     }
     cloudwatch_metric_alarms_lists = merge(
       local.weblogic_cloudwatch_metric_alarms_lists,

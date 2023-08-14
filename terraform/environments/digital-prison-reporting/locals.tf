@@ -31,22 +31,22 @@ locals {
   generic_lambda           = "${local.project}-generic-lambda"
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
   # DMS Specific
-  setup_dms_instance       = local.application_data.accounts[local.environment].setup_dms_instance
-  enable_replication_task  = local.application_data.accounts[local.environment].enable_dms_replication_task
+  setup_dms_instance      = local.application_data.accounts[local.environment].setup_dms_instance
+  enable_replication_task = local.application_data.accounts[local.environment].enable_dms_replication_task
   # DataMart Specific
-  datamart_endpoint        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["host"]
-  datamart_port            = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["port"]
-  datamart_username        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["username"]
-  datamart_password        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
+  datamart_endpoint = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["host"]
+  datamart_port     = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["port"]
+  datamart_username = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["username"]
+  datamart_password = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
 
   # Common Policies
-  kms_read_access_policy   = "${local.project}_kms_read_policy"
-  s3_read_access_policy    = "${local.project}_s3_read_policy"
-  apigateway_get_policy    = "${local.project}_apigateway_get_policy"
+  kms_read_access_policy = "${local.project}_kms_read_policy"
+  s3_read_access_policy  = "${local.project}_s3_read_policy"
+  apigateway_get_policy  = "${local.project}_apigateway_get_policy"
 
   # DPR Alerts
-  enable_slack_alerts      = local.application_data.accounts[local.environment].enable_slack_alerts
-  enable_pagerduty_alerts  = local.application_data.accounts[local.environment].enable_pagerduty_alerts
+  enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
+  enable_pagerduty_alerts = local.application_data.accounts[local.environment].enable_pagerduty_alerts
 
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
@@ -70,7 +70,7 @@ locals {
   lambda_dbuilder_handler        = "io.micronaut.function.aws.proxy.MicronautLambdaHandler"
   lambda_dbuilder_code_s3_bucket = module.s3_artifacts_store.bucket_id
   lambda_dbuilder_code_s3_key    = "build-artifacts/domain-builder/jars/domain-builder-backend-api-vLatest-all.jar"
-  lambda_dbuilder_policies       = [
+  lambda_dbuilder_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.project}-domain-builder-preview-policy",
@@ -86,7 +86,7 @@ locals {
   flyway_dbuilder_policies       = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", data.aws_iam_policy.rds_full_access.arn, ]
   flyway_dbuilder_tracing        = "Active"
   enable_dbuilder_serverless_gw  = local.application_data.accounts[local.environment].enable_dbuilder_serverless_gw
-  include_dbuilder_gw_vpclink    = local.application_data.accounts[local.environment].include_dbuilder_gw_vpclink        
+  include_dbuilder_gw_vpclink    = local.application_data.accounts[local.environment].include_dbuilder_gw_vpclink
   serverless_gw_dbuilder_name    = "${local.project}-serverless-lambda"
   domain_preview_database        = "curated"
   domain_preview_s3_bucket       = module.s3_domain_preview_bucket.bucket_id

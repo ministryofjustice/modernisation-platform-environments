@@ -10,7 +10,7 @@ locals {
     production    = local.production_config
   }
   baseline_environment_config = local.environment_configs[local.environment]
-  environment_config = local.environment_configs[local.environment]
+  environment_config          = local.environment_configs[local.environment]
   ndh_secrets = [
     "ndh_admin_user",
     "ndh_admin_pass",
@@ -38,7 +38,7 @@ locals {
       }
     }
   }
-  
+
   baseline_s3_buckets = {
     s3-bucket = {
       iam_policies = module.baseline_presets.s3_iam_policies

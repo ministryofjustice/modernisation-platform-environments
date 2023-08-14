@@ -14,13 +14,13 @@ resource "aws_vpc_endpoint_service_allowed_principal" "HomeOffice" {
 }
 
 resource "aws_lb" "ppud_internal_nlb" {
-  count              = local.is-production == true ? 1 : 0
-  name               = "ppud-internal-nlb"
-  internal           = true
-  load_balancer_type = "network"
-  subnets            = [data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
-  security_groups    = [aws_security_group.PPUD-ALB.id]
-  enable_deletion_protection = false    # change it to true
+  count                      = local.is-production == true ? 1 : 0
+  name                       = "ppud-internal-nlb"
+  internal                   = true
+  load_balancer_type         = "network"
+  subnets                    = [data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  security_groups            = [aws_security_group.PPUD-ALB.id]
+  enable_deletion_protection = false # change it to true
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
@@ -40,11 +40,11 @@ resource "aws_lb_listener" "nlb_forward_rule" {
 }
 
 resource "aws_lb_target_group" "nlb_target_group" {
- count     = local.is-production == true ? 1 : 0
+  count       = local.is-production == true ? 1 : 0
   name        = "nlb-target-group"
   port        = "443"
   protocol    = "TCP"
-  target_type = "alb"   # As type is ALB, you can't modify the target group attributes and will use their default values.
+  target_type = "alb" # As type is ALB, you can't modify the target group attributes and will use their default values.
   vpc_id      = data.aws_vpc.shared.id
   health_check {
     port     = "443"
@@ -53,7 +53,7 @@ resource "aws_lb_target_group" "nlb_target_group" {
 }
 
 resource "aws_lb_target_group_attachment" "alb_attachment" {
-  count     = local.is-production == true ? 1 : 0
+  count            = local.is-production == true ? 1 : 0
   target_group_arn = aws_lb_target_group.nlb_target_group[0].arn
   target_id        = aws_lb.PPUD-internal-ALB[0].id
   port             = "443"
