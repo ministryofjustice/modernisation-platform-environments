@@ -178,3 +178,7 @@ resource "aws_ssm_parameter" "iaps_snapshot_data_refresh_id_test" {
     ignore_changes = [value]
   }
 }
+
+data "aws_ssm_parameter" "iaps_snapshot_data_refresh_id_test" {
+  name = aws_ssm_parameter.iaps_snapshot_data_refresh_id_test.name
+}
