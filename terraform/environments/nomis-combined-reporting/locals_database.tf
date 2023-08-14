@@ -1,42 +1,13 @@
 locals {
 
-  oem_database_instance_ssm_parameters = {
-    prefix = "/database/"
-    parameters = {
-      rcvcatownerpassword = {}
-      syspassword         = {}
-      systempassword      = {}
-    }
-  }
-  oem_emrep_ssm_parameters = {
-    prefix = "/oem/"
-    parameters = {
-      sysmanpassword = {}
-      syspassword    = {}
-      systempassword = {}
-    }
-  }
-  oem_ssm_parameters = {
-    prefix = "/oem/"
-    parameters = {
-      agentregpassword    = {}
-      nodemanagerpassword = {}
-      weblogicpassword    = {}
-    }
-  }
-
-  oem_ec2_default = {
-
-    autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
+  oracle_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name  = "hmpps_ol_8_5_oracledb_19c_release_2023-08-07T16-14-04.275Z"
+      ami_name  = "hmpps_ol_8_5_oracledb_19c_release_2023-08-08T13-49-56.195Z"
       ami_owner = "self"
     })
 
-    instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
-      vpc_security_group_ids = ["data-oem"]
-    })
+    instance = module.baseline_presets.ec2_instance.instance.default_db
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
@@ -58,10 +29,7 @@ locals {
       flash = { total_size = 50 }
     }
 
-    route53_records = {
-      create_internal_record = true
-      create_external_record = true
-    }
+    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
     ssm_parameters = {
       ASMSYS = {
@@ -81,13 +49,13 @@ locals {
     }
 
     tags = {
-      ami                  = "hmpps_ol_8_5_oracledb_19c" # not including as hardening role seems to cause an issue
+      ami                  = "hmpps_ol_8_5_oracledb_19c"
       component            = "data"
-      server-type          = "hmpps-oem"
+      server-type          = "ncr-db"
       os-type              = "Linux"
-      os-major-version     = 8
-      os-version           = "OL 8.5"
-      licence-requirements = "Oracle Enterprise Management"
+      os-version           = "RHEL 8.5"
+      licence-requirements = "Oracle Database"
     }
   }
+
 }

@@ -49,81 +49,57 @@ locals {
       monitoring    = false
     })
 
-    ebs_volumes_copy_all_from_ami = false
     ebs_volumes = {
-      "/dev/sda1" = { # root volume
-        label = "root",
-        size  = 30,
-        type  = "gp3"
+      kms_key_id = data.aws_kms_key.ebs_shared.id
+      tags       = local.tags
+      iops       = 3000
+      throughput = 125
+      root_volume = {
+        volume_type = "gp3"
+        volume_size = 30
+      }
+      ebs_non_root_volumes = {
+        "/dev/sdb" = {
+          volume_type = "gp3"
+          volume_size = 200
+        }
+        "/dev/sdc" = {
+          volume_type = "gp3"
+          volume_size = 100
+        }
+        "/dev/sdc" = {
+          volume_type = "gp3"
+          volume_size = 100
+        }
+        "/dev/sds" = {
+          volume_type = "gp3"
+          volume_size = 4
+        }
+        "/dev/sde" = {
+          volume_type = "gp3"
+          volume_size = 500
+        }
+        "/dev/sdf" = {
+          no_device = true
+        }
+        "/dev/sdg" = {
+          no_device = true
+        }
+        "/dev/sdh" = {
+          no_device = true
+        }
+        "/dev/sdi" = {
+          no_device = true
+        }
+        "/dev/sdj" = {
+          volume_type = "gp3"
+          volume_size = 500
+        }
+        "/dev/sdk" = {
+          no_device = true
+        }
       }
     }
-    # ebs_volumes = merge(local.db_config.ebs_volumes, {
-    #   "/dev/sda1" = { # root volume
-    #     label = "root",
-    #     size  = 30,
-    #     type  = "gp3"
-    #   },
-    #   "/dev/sdb" = { # /u01 oracle app disk
-    #     label = "u01",
-    #     size  = 200,
-    #     type  = "gp3"
-    #   },
-    #   "/dev/sdc" = { # /u02 oracle app disk
-    #     label = "u02",
-    #     size  = 100,
-    #     type  = "gp3"
-    #   },
-    #   "/dev/sds" = { # swap disk
-    #     label = "swap",
-    #     size  = 4,
-    #     type  = "gp3"
-    #   },
-    #   "/dev/sde" = { # oracle asm disk DATA01
-    #     label = "asm_data01",
-    #     size  = 500,
-    #     type  = "gp3"
-    #   },
-    #   "/dev/sdf" = { # oracle asm disk DATA02 -- need to set to no_device to ensure terraform doesn't create
-    #     label = "asm_data02",
-    #     size  = 1,
-    #     type  = "gp3"
-    #   },
-    #   "/dev/sdg" = { # oracle asm disk DATA03 -- need to set to no_device to ensure terraform doesn't create
-    #     label = "asm_data03",
-    #     size  = 1,
-    #     type  = "gp3"
-    #   },
-    #   "/dev/sdh" = { # oracle asm disk DATA04 -- need to set to no_device to ensure terraform doesn't create
-    #     label = "asm_data04",
-    #     size  = 1,
-    #     type  = "gp3"
-    #   },
-    #   "/dev/sdi" = { # oracle asm disk DATA05 -- need to set to no_device to ensure terraform doesn't create
-    #     label = "asm_data05",
-    #     size  = 1,
-    #     type  = "gp3"
-    #   },
-    #   "/dev/sdj" = { # oracle asm disk FLASH01
-    #     label = "asm_flash01",
-    #     size  = 500,
-    #     type  = "gp3"
-    #   },
-    #   "/dev/sdk" = { # oracle asm disk FLASH02 -- need to set to no_device to ensure terraform doesn't create
-    #     label = "asm_flash02",
-    #     size  = 1,
-    #     type  = "gp3"
-    #   },
-    # })
-    ebs_volume_config = {}
-    #ebs_volume_config = merge(local.db_config.ebs_volume_config, {
-    #  data  = 
-    #  {
-    #    total_size = 500 
-    #  }
-    #  flash = { 
-    #    total_size = 50 
-    #  }
-    #})
     route53_records = {
       create_internal_record = true
       create_external_record = false
@@ -144,11 +120,11 @@ locals {
     db_name                       = "MODNDA"
   }
 
-  delius_db_container_config = {
+  delius_db_container_config_dev = {
     image_tag            = "5.7.4"
     image_name           = "delius-core-testing-db"
-    fully_qualified_name = "${local.application_name}-${local.db_service_name}"
-    db_port              = 1521
-    db_name              = "MODNDA"
+    fully_qualified_name = "testing-db"
+    port                 = 1521
+    name                 = "MODNDA"
   }
 }

@@ -102,7 +102,7 @@ module "weblogic_service" {
 
   exec_enabled = true
 
-  ignore_changes_task_definition = false
+  ignore_changes_task_definition = true
   redeploy_on_apply              = false
   force_new_deployment           = false
 }

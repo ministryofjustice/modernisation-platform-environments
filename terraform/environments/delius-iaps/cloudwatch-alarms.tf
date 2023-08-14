@@ -155,6 +155,24 @@ resource "aws_cloudwatch_metric_alarm" "rds_free_storage_space" {
   }
 }
 
+resource "aws_cloudwatch_metric_alarm" "rds_metrics_missing" {
+  alarm_name          = "${local.application_name}-rds-missing-metrics"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/RDS"
+  period              = "60"
+  statistic           = "Average"
+  treat_missing_data  = "breaching"
+  threshold           = "0" # CPU will never go to 0 in normal operation, so only missing metrics will trigger this alarm
+  alarm_description   = "This metric monitors missing RDS metrics to prompt for an investigation for why metrics are missing"
+  alarm_actions       = [aws_sns_topic.iaps_alerting.arn]
+  ok_actions          = [aws_sns_topic.iaps_alerting.arn]
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.iaps.identifier
+  }
+}
+
 # Pager duty integration
 
 # Get the map of pagerduty integration keys from the modernisation platform account

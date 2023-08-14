@@ -153,13 +153,13 @@ data "aws_ami" "oracle_db_ami" {
 
 resource "aws_instance" "db_ec2_primary_instance" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
-  instance_type               = "r6i.xlarge"
+  instance_type               = var.db_config.instance.instance_type
   ami                         = data.aws_ami.oracle_db_ami.id
   vpc_security_group_ids      = [aws_security_group.db_ec2_instance_sg.id]
   subnet_id                   = var.account_config.data_subnet_a_id
   iam_instance_profile        = aws_iam_instance_profile.db_ec2_instanceprofile.name
   associate_public_ip_address = false
-  monitoring                  = false
+  monitoring                  = var.db_config.instance.monitoring
   ebs_optimized               = true
   key_name                    = aws_key_pair.environment_ec2_user_key_pair.key_name
   user_data_base64            = var.db_config.user_data_raw
@@ -168,16 +168,45 @@ resource "aws_instance" "db_ec2_primary_instance" {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
-  # Increase the volume size of the root volume
-  # root_block_device {
-  #   volume_type = "gp3"
-  #   volume_size = 30
-  #   encrypted   = true
-  # }
+  root_block_device {
+    volume_type = var.db_config.ebs_volumes.root_volume.volume_type
+    volume_size = var.db_config.ebs_volumes.root_volume.volume_size
+    iops        = var.db_config.ebs_volumes.iops
+    throughput  = var.db_config.ebs_volumes.throughput
+    encrypted   = true
+    # We want to include kms_key_id here
+    tags = local.tags
+  }
+  dynamic "ebs_block_device" {
+    for_each = { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false }
+    content {
+      device_name = ebs_block_device.key
+      volume_type = ebs_block_device.value.volume_type
+      volume_size = ebs_block_device.value.volume_size
+      iops        = var.db_config.ebs_volumes.iops
+      throughput  = var.db_config.ebs_volumes.throughput
+      encrypted   = true
+      # We want to include kms_key_id here
+      tags = local.tags
+    }
+  }
+  dynamic "ephemeral_block_device" {
+    for_each = { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == true }
+    content {
+      device_name = ephemeral_block_device.key
+      no_device   = true
+    }
+  }
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-1", var.env_name, var.db_config.name)) },
     { server-type = "delius_core_db" },
     { database = format("%s-1", var.db_config.name) }
   )
+
+  lifecycle {
+    ignore_changes = [
+      ebs_block_device # We'd like to remove this and create ebs volumes as managed resources in order for terraform to manage changes such as volume type/size
+    ]
+  }
 }
 

@@ -4,6 +4,18 @@ locals {
   # baseline config
   test_config = {
 
+    baseline_ssm_parameters = {
+      "test-oem/TRCVCAT" = local.oem_database_instance_ssm_parameters
+      "test-oem/EMREP"   = local.oem_emrep_ssm_parameters
+      "test-oem/OEM"     = local.oem_ssm_parameters
+      "oem-a/TRCVCAT"    = local.oem_database_instance_ssm_parameters
+      "oem-a/EMREP"      = local.oem_emrep_ssm_parameters
+      "oem-a/OEM"        = local.oem_ssm_parameters
+      "oem-b/TRCVCAT"    = local.oem_database_instance_ssm_parameters
+      "oem-b/EMREP"      = local.oem_emrep_ssm_parameters
+      "oem-b/OEM"        = local.oem_ssm_parameters
+    }
+
     baseline_ec2_autoscaling_groups = {
       test-oem = merge(local.oem_ec2_default, {
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
@@ -12,6 +24,29 @@ locals {
           })
         })
       })
+    }
+
+    baseline_ec2_instances = {
+      oem-a = merge(local.oem_ec2_default, {
+        config = merge(local.oem_ec2_default.config, {
+          availability_zone = "eu-west-2a"
+        })
+        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
+          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
+            branch = "45027fb7482eb7fb601c9493513bb73658780dda" # 2023-08-11
+          })
+        })
+      })
+      # oem-b = merge(local.oem_ec2_default, {
+      #   config = merge(local.oem_ec2_default.config, {
+      #     availability_zone = "eu-west-2b"
+      #   })
+      #   user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
+      #     args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
+      #       branch = "main"
+      #     })
+      #   })
+      # })
     }
 
     baseline_s3_buckets = {
@@ -26,5 +61,12 @@ locals {
       }
     }
 
+    baseline_route53_zones = {
+      "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
+        records = [
+          { name = "oem.hmpps-oem", type = "CNAME", ttl = "300", records = ["oem-a.hmpps-oem.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+        ]
+      }
+    }
   }
 }
