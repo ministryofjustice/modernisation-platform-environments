@@ -9,18 +9,6 @@ data "aws_iam_policy_document" "task" {
     }
   }
 }
-
-data "aws_iam_policy_document" "task_actions" {
-  statement {
-    sid     = "CustomPolicyActions"
-    effect  = "Allow"
-    actions = var.extra_task_role_allow_statements
-    resources = [
-      "*"
-    ]
-  }
-}
-
 resource "aws_iam_role" "task" {
   name               = "${var.env_name}-${var.service_name}-ecs-task"
   assume_role_policy = data.aws_iam_policy_document.task.json
@@ -28,10 +16,11 @@ resource "aws_iam_role" "task" {
 }
 
 resource "aws_iam_role_policy" "task_actions" {
-  count  = length(var.extra_task_role_allow_statements) > 0 ? 1 : 0
-  name   = "${var.env_name}-${var.service_name}-ecs-task-actions"
-  policy = data.aws_iam_policy_document.task_actions.json
-  role   = aws_iam_role.task.id
+  # for_each = { for policy in var.extra_task_role_policies : random_id.string.hex => policy }
+  for_each = var.extra_task_role_policies
+  name     = "${var.env_name}-${var.service_name}-ecs-task-actions-${each.key}"
+  policy   = each.value.json
+  role     = aws_iam_role.task.id
 }
 
 data "aws_iam_policy_document" "ecs_service" {

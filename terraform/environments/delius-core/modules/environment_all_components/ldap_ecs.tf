@@ -8,12 +8,25 @@ module "ldap_ecs_policies" {
     "elasticfilesystem:ClientWrite",
     "elasticfilesystem:ClientMount"
   ]
-  extra_task_role_allow_statements = [
-    "s3:GetObject",
-    "s3:ListBucket",
-    "s3:HeadBucket",
-    "s3:HeadObject"
-  ]
+  extra_task_role_policies = {
+    migration_s3 = data.aws_iam_policy_document.migration_s3
+  }
+}
+
+data "aws_iam_policy_document" "migration_s3" {
+  statement {
+    sid    = "CustomPolicyActions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:HeadBucket",
+      "s3:HeadObject"
+    ]
+    resources = [
+      module.s3_bucket_migration.bucket.arn
+    ]
+  }
 }
 
 # Create s3 bucket for deployment state
