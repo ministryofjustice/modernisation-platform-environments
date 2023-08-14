@@ -47,6 +47,12 @@ locals {
           nomis-combined-reporting-environment = "t1"
         })
       })
+      t1-ncr-bip-db = merge(local.oracle_ec2_default, {
+        tags = merge(local.oracle_ec2_default.tags, {
+          description = "For testing SAP BI repository and auditing"
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
     }
     
     baseline_ec2_autoscaling_groups = {
