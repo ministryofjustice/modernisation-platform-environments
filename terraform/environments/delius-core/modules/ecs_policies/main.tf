@@ -16,7 +16,6 @@ resource "aws_iam_role" "task" {
 }
 
 resource "aws_iam_role_policy" "task_actions" {
-  # for_each = { for policy in var.extra_task_role_policies : random_id.string.hex => policy }
   for_each = var.extra_task_role_policies
   name     = "${var.env_name}-${var.service_name}-ecs-task-actions-${each.key}"
   policy   = each.value.json
