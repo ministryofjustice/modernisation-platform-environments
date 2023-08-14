@@ -239,7 +239,7 @@ module "transport-ecs" {
   app_name                  = local.transport
   container_instance_type   = "windows"
   ami_image_id              = local.application_data.accounts[local.environment].ami_image_id
-  instance_type             = "windows"
+  instance_type             = local.application_data.accounts[local.environment].instance_type
   user_data                 = ""
   key_name                  = ""
   task_definition           = local.task_definition
