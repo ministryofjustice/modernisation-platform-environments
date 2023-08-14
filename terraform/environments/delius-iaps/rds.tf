@@ -167,7 +167,7 @@ resource "aws_db_instance" "iaps_test" {
 resource "aws_ssm_parameter" "iaps_snapshot_data_refresh_id_test" {
   name        = "/iaps/snapshot_id_test"
   description = "The ID of the RDS snapshot used for the IAPS database data refresh"
-  type        = "SecureString"
+  type        = "String"
   value       = try(local.application_data.accounts[local.environment].db_snapshot_identifier, "")
 
   tags = {
