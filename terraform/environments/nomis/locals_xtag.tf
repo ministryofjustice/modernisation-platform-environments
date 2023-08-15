@@ -13,7 +13,9 @@ locals {
   # TODO - change alarm actions to dba_pagerduty once alarms proven out
   xtag_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
-    module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux, {
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_asg_cwagent_collectd,
+    {
       xtag-wls-nodemanager-service = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"

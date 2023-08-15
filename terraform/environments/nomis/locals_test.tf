@@ -484,8 +484,7 @@ locals {
       "test.nomis.service.justice.gov.uk" = {
         records = [
           # OEM (IP hardcoded while we are testing under an ASG)
-          { name = "oem", type = "A", ttl = "300", records = ["10.26.12.163"] }, #
-          # { name = "oem", type = "CNAME", ttl = "300", records = ["oem.hmpps-oem.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "oem", type = "A", ttl = "300", records = ["10.26.12.163"] },
 
           # T1 [1-a: T1CNOM, T1NDH, T1TRDAT, T1ORSYS] [2-a: T1MIS, T1CNMAUD]
           { name = "t1nomis", type = "CNAME", ttl = "300", records = ["t1nomis-a.test.nomis.service.justice.gov.uk"] },

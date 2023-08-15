@@ -121,7 +121,8 @@ locals {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
-        cloudwatch_metric_alarms = merge(local.database_ec2_a.cloudwatch_metric_alarms,
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_a.cloudwatch_metric_alarms,
           local.fixngo_connection_cloudwatch_metric_alarms
         )
       })
