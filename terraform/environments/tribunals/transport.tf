@@ -317,7 +317,7 @@ resource "aws_lb" "transport_lb" {
 }
 
 resource "aws_lb_target_group" "transport_target_group" {
-  name                 = "${local.transport}-target-group"
+  name                 = "${local.transport}-target-group-2"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
