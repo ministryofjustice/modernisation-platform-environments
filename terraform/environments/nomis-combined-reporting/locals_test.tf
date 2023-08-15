@@ -127,6 +127,14 @@ locals {
           { name = "web.test.${local.application_name}", type = "A", lbs_map_key = "private" }
         ]
       }
+      "test.nomis-combined-reporting.service.justice.gov.uk" = {
+        records = [
+          # T1 [1-a: T1CNOM, T1NDH, T1TRDAT, T1ORSYS] [2-a: T1MIS, T1CNMAUD]
+          { name = "t1ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.nomis-combined-reporting.service.justice.gov.uk"] },
+          { name = "t1ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+        ]
+      }
     }
   }
 }
