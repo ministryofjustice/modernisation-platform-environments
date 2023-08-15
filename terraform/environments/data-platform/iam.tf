@@ -183,6 +183,12 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
     actions   = ["s3:GetObject", "s3:PutObject"]
     resources = ["${module.s3-bucket.bucket.arn}/raw_data/*"]
   }
+  statement {
+    sid       = "ListExistingDataProducts"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = ["${module.s3-bucket.bucket.arn}/code/*"]
+  }
 }
 
 # API Gateway authoriser IAM permissions
