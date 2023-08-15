@@ -109,19 +109,7 @@ locals {
   weblogic_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-    {
-      weblogic-asg-collectd-services = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        namespace           = "CWAgent"
-        metric_name         = "collectd_exec_value"
-        period              = "60"
-        statistic           = "Maximum"
-        threshold           = "1"
-        alarm_description   = "A weblogic service or metric that's being supplied by collectd has stopped"
-        alarm_actions       = ["dso_pagerduty"]
-      }
-    }
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_asg_cwagent_collectd,
   )
 
   weblogic_cloudwatch_log_groups = {

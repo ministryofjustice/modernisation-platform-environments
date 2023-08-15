@@ -101,6 +101,7 @@ locals {
   database_ec2_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd,
     {
       oracle-db-disconnected = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
