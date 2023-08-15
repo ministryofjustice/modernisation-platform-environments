@@ -10,8 +10,50 @@ locals {
     }
   }
 
+  # TODO - change alarm actions to dba_pagerduty once alarms proven out
+  xtag_cloudwatch_metric_alarms = merge(
+    module.baseline_presets.cloudwatch_metric_alarms.ec2,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_asg_cwagent_collectd,
+    {
+      xtag-wls-nodemanager-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_wlsnodemanager_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "wls_nodemanager.service has stopped"
+        alarm_actions       = ["dso_pagerduty"]
+      }
+      xtag-wls-adminserver-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_wlsadminserver_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "wls_adminserver.service has stopped"
+        alarm_actions       = ["dso_pagerduty"]
+      }
+      xtag-wls-managedserver-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_wlsmanagedserver_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "wls_managedserver.service has stopped"
+        alarm_actions       = ["dso_pagerduty"]
+      }
+    }
+  )
+
   xtag_ec2_default = {
-    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].xtag
+    cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
@@ -68,52 +110,4 @@ locals {
       ami = "nomis_rhel_7_9_weblogic_xtag_10_3"
     })
   })
-
-  xtag_cloudwatch_metric_alarms = {
-    xtag-wls-nodemanager-service = {
-      comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "3"
-      namespace           = "CWAgent"
-      metric_name         = "collectd_wlsnodemanager_value"
-      period              = "60"
-      statistic           = "Average"
-      threshold           = "1"
-      alarm_description   = "wls_nodemanager.service has stopped"
-    }
-    xtag-wls-adminserver-service = {
-      comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "3"
-      namespace           = "CWAgent"
-      metric_name         = "collectd_wlsadminserver_value"
-      period              = "60"
-      statistic           = "Average"
-      threshold           = "1"
-      alarm_description   = "wls_adminserver.service has stopped"
-    }
-    xtag-wls-managedserver-service = {
-      comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "3"
-      namespace           = "CWAgent"
-      metric_name         = "collectd_wlsmanagedserver_value"
-      period              = "60"
-      statistic           = "Average"
-      threshold           = "1"
-      alarm_description   = "wls_managedserver.service has stopped"
-    } 
-  }
-
-  xtag_cloudwatch_metric_alarms_lists = {
-    xtag = {
-      parent_keys = [        
-        "ec2_default",
-        "ec2_linux_default"
-      ]
-      alarms_list = [
-        { key = "xtag", name = "xtag-wls-nodemanager-service" },
-        { key = "xtag", name = "xtag-wls-adminserver-service" },
-        { key = "xtag", name = "xtag-wls-managedserver-service" },
-      ]
-    }
-  }
-
 }
