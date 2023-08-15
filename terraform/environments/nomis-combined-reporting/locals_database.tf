@@ -12,15 +12,15 @@ locals {
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
     ebs_volumes = {
-      "/dev/sdb" = { type = "gp3", label = "app", size = 100 } # /u01
-      "/dev/sdc" = { type = "gp3", label = "app", size = 100 } # /u02
-      "/dev/sde" = { type = "gp3", label = "data" }            # DATA01
-      "/dev/sdf" = { type = "gp3", label = "data" }            # DATA02
-      "/dev/sdg" = { type = "gp3", label = "data" }            # DATA03
-      "/dev/sdh" = { type = "gp3", label = "data" }            # DATA04
-      "/dev/sdi" = { type = "gp3", label = "data" }            # DATA05
-      "/dev/sdj" = { type = "gp3", label = "flash" }           # FLASH01
-      "/dev/sdk" = { type = "gp3", label = "flash" }           # FLASH02
+      "/dev/sdb" = { type = "gp3", label = "app", size = 100 }              # /u01
+      "/dev/sdc" = { type = "gp3", label = "app", size = 100 }              # /u02
+      "/dev/sde" = { type = "gp3", label = "data", size = 100  }            # DATA01
+      "/dev/sdf" = { type = "gp3", label = "data", size = 100  }            # DATA02
+      "/dev/sdg" = { type = "gp3", label = "data", size = 100  }            # DATA03
+      "/dev/sdh" = { type = "gp3", label = "data", size = 100  }            # DATA04
+      "/dev/sdi" = { type = "gp3", label = "data", size = 100  }            # DATA05
+      "/dev/sdj" = { type = "gp3", label = "flash" }                        # FLASH01
+      "/dev/sdk" = { type = "gp3", label = "flash" }                        # FLASH02
       "/dev/sds" = { type = "gp3", label = "swap" }
     }
 
