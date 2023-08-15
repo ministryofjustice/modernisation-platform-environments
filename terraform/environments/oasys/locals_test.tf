@@ -35,12 +35,12 @@ locals {
       ##
       ## T1
       ##
-      # "t1-${local.application_name}-db-a" = merge(local.database_a, {
-      #   tags = merge(local.database_a.tags, {
-      #     description                             = "t1 ${local.application_name} database"
-      #     "${local.application_name}-environment" = "t1"
-      #   })
-      # })
+      "t1-${local.application_name}-db-a" = merge(local.database_a, {
+        tags = merge(local.database_a.tags, {
+          description                             = "t1 ${local.application_name} database"
+          "${local.application_name}-environment" = "t1"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -352,7 +352,7 @@ locals {
       (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
         records = [
           { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "300", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # { name = "db.t1.${local.application_name}", type = "CNAME", ttl = "300", records = ["t1-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.t1.${local.application_name}", type = "CNAME", ttl = "300", records = ["t1-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         # lb_alias_records = [
         #   { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
@@ -370,7 +370,7 @@ locals {
         }
         records = [
           { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "300", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
-          # { name = "db.t1.${local.application_name}", type = "CNAME", ttl = "300", records = ["t1-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
+          { name = "db.t1.${local.application_name}", type = "CNAME", ttl = "300", records = ["t1-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
         ]
         lb_alias_records = [
           # { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },
