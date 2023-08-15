@@ -28,7 +28,7 @@ resource "aws_security_group" "ncas_lb_sc" {
   }
 }
 
-resource "aws_security_group" "tipstaff_lb_sc_pingdom" {
+resource "aws_security_group" "lb_sc_pingdom" {
   name        = "load balancer Pingdom security group"
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -85,11 +85,11 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom" {
 resource "aws_lb" "ncas_lb" {
   name                       = "ncas-load-balancer"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.ncas_lb_sc.id, aws_security_group.tipstaff_lb_sc_pingdom.id]
+  security_groups            = [aws_security_group.ncas_lb_sc.id, aws_security_group.lb_sc_pingdom.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
-  depends_on                 = [aws_security_group.ncas_lb_sc, aws_security_group.tipstaff_lb_sc_pingdom]
+  depends_on                 = [aws_security_group.ncas_lb_sc, aws_security_group.lb_sc_pingdom]
 }
 
 resource "aws_lb_target_group" "ncas_target_group" {
