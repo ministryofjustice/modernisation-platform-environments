@@ -7,16 +7,7 @@ locals {
       ami_owner = "self"
     })
 
-    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      instance_type                = "r6i.xlarge"
-      disable_api_termination      = true
-      metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-      monitoring                   = true
-      vpc_security_group_ids       = ["data"]
-      tags = {
-        backup-plan = "daily-and-weekly"
-      }
-    })
+    instance = module.baseline_presets.ec2_instance.instance.default_db
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 

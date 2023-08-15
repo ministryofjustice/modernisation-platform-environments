@@ -47,7 +47,7 @@ locals {
           nomis-combined-reporting-environment = "t1"
         })
       })
-      t1-ncr-bip-db-1-a = merge(local.database_ec2_default, {
+      t1-ncr-db-1-a = merge(local.database_ec2_default, {
         tags = merge(local.database_ec2_default.tags, {
           description = "T1 NCR DATABASE"
           nomis-combined-reporting-environment = "t1"
