@@ -222,26 +222,18 @@ resource "aws_route53_record" "transport_external" {
 
 ####################### ECS #########################################
 
-resource "aws_fsx_windows_file_system" "transport_fsx" {
+# resource "aws_fsx_windows_file_system" "transport_fsx" {
 
-  storage_capacity    = 300
-  subnet_ids          = data.aws_subnets.shared-public.ids  
-  security_group_ids  = [aws_security_group.transport_lb_sc.id]
-  throughput_capacity = 8
+#   storage_capacity    = 300
+#   subnet_ids          = data.aws_subnets.shared-public.ids  
+#   security_group_ids  = [aws_security_group.transport_lb_sc.id]
+#   throughput_capacity = 8
 
-  tags = {
-    Project     = "${local.transport}"
-    Environment = "${local.environment}"
-  }
-}
-
-resource "aws_ecs_cluster" "transport_cluster" {
-  name = "${local.transport}_app_cluster"
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
-}
+#   tags = {
+#     Project     = "${local.transport}"
+#     Environment = "${local.environment}"
+#   }
+# }
 
 module "transport-ecs" {
 

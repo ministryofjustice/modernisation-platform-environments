@@ -302,7 +302,7 @@ resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
 //ECS cluster
 
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name = var.app_name
+  name = "${var.app_name}_app_cluster"
   setting {
     name  = "containerInsights"
     value = "enabled"
