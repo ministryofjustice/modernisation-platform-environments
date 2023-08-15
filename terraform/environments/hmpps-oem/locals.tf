@@ -34,18 +34,21 @@ locals {
     sns_topics               = {}
   }
 
-  baseline_acm_certificates         = {}
-  baseline_cloudwatch_log_groups    = {}
-  baseline_ec2_autoscaling_groups   = {}
-  baseline_ec2_instances            = {}
-  baseline_iam_policies             = {}
-  baseline_iam_roles                = {}
-  baseline_iam_service_linked_roles = {}
-  baseline_key_pairs                = {}
-  baseline_kms_grants               = {}
-  baseline_lbs                      = {}
-  baseline_route53_resolvers        = {}
-  baseline_route53_zones            = {}
+  baseline_acm_certificates              = {}
+  baseline_backup_plans                  = {}
+  baseline_cloudwatch_log_groups         = {}
+  baseline_cloudwatch_log_metric_filters = {}
+  baseline_cloudwatch_metric_alarms      = {}
+  baseline_ec2_autoscaling_groups        = {}
+  baseline_ec2_instances                 = {}
+  baseline_iam_policies                  = {}
+  baseline_iam_roles                     = {}
+  baseline_iam_service_linked_roles      = {}
+  baseline_key_pairs                     = {}
+  baseline_kms_grants                    = {}
+  baseline_lbs                           = {}
+  baseline_route53_resolvers             = {}
+  baseline_route53_zones                 = {}
 
   baseline_s3_buckets = {
     s3-bucket = {
