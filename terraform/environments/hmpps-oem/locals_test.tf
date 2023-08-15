@@ -5,15 +5,15 @@ locals {
   test_config = {
 
     baseline_ssm_parameters = {
-      "test-oem/TRCVCAT" = local.oem_database_instance_ssm_parameters
-      "test-oem/EMREP"   = local.oem_emrep_ssm_parameters
-      "test-oem/OEM"     = local.oem_ssm_parameters
-      "oem-a/TRCVCAT"    = local.oem_database_instance_ssm_parameters
-      "oem-a/EMREP"      = local.oem_emrep_ssm_parameters
-      "oem-a/OEM"        = local.oem_ssm_parameters
-      "oem-b/TRCVCAT"    = local.oem_database_instance_ssm_parameters
-      "oem-b/EMREP"      = local.oem_emrep_ssm_parameters
-      "oem-b/OEM"        = local.oem_ssm_parameters
+      "test-oem/TRCVCAT"   = local.oem_database_instance_ssm_parameters
+      "test-oem/EMREP"     = local.oem_emrep_ssm_parameters
+      "test-oem/OEM"       = local.oem_ssm_parameters
+      "test-oem-a/TRCVCAT" = local.oem_database_instance_ssm_parameters
+      "test-oem-a/EMREP"   = local.oem_emrep_ssm_parameters
+      "test-oem-a/OEM"     = local.oem_ssm_parameters
+      "test-oem-b/TRCVCAT" = local.oem_database_instance_ssm_parameters
+      "test-oem-b/EMREP"   = local.oem_emrep_ssm_parameters
+      "test-oem-b/OEM"     = local.oem_ssm_parameters
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -27,7 +27,7 @@ locals {
     }
 
     baseline_ec2_instances = {
-      oem-a = merge(local.oem_ec2_default, {
+      test-oem-a = merge(local.oem_ec2_default, {
         config = merge(local.oem_ec2_default.config, {
           availability_zone = "eu-west-2a"
         })
@@ -37,15 +37,15 @@ locals {
           })
         })
       })
-      # oem-b = merge(local.oem_ec2_default, {
+      # test-oem-b = merge(local.oem_ec2_default, {
       #   config = merge(local.oem_ec2_default.config, {
-      #     availability_zone = "eu-west-2b"
-      #   })
-      #   user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
+      #     availability_zone = "eu-west-2b"
+      #   })
+      #   user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
       #     args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-      #       branch = "main"
-      #     })
-      #   })
+      #       branch = "main"
+      #     })
+      #   })
       # })
     }
 
@@ -64,7 +64,7 @@ locals {
     baseline_route53_zones = {
       "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
         records = [
-          { name = "oem.hmpps-oem", type = "CNAME", ttl = "300", records = ["oem-a.hmpps-oem.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "oem.hmpps-oem", type = "CNAME", ttl = "300", records = ["test-oem-a.hmpps-oem.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
     }
