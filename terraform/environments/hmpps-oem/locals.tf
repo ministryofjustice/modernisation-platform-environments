@@ -23,8 +23,6 @@ locals {
     db_backup_s3                                 = true # adds db backup buckets
     enable_oracle_secure_web                     = true # allows db to list all buckets
     cloudwatch_metric_alarms                     = {}
-    cloudwatch_metric_alarms_lists               = {}
-    cloudwatch_metric_alarms_lists_with_actions  = {}
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }
