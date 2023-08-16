@@ -18,9 +18,14 @@ locals {
   }))
   task_definition = templatefile("task_definition.json", {
     app_name            = "transport"
-    ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
-    docker_image_tag    = "latest" 
-    sentry_env          = local.environment
+    #ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
+    #docker_image_tag    = "latest" 
+    #sentry_env          = local.environment
+    awslogs-group       = "${local.transport}-ecs-log-group"
+    supportEmail        = "${local.application_data.accounts[local.environment].support_email}"
+    supportTeam         = "${local.application_data.accounts[local.environment].support_team}"
+    CurServer           = "${local.application_data.accounts[local.environment].curserver}"
+
   })
   transport_ec2_ingress_rules = {
     "cluster_ec2_lb_ingress_3" = {

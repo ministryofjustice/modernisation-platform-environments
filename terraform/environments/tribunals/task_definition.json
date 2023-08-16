@@ -15,7 +15,7 @@
     "logConfiguration" : {
       "logDriver" : "awslogs",
       "options" : {
-        "awslogs-group"         : "${aws_cloudwatch_log_group.landsFamily_logs.name}",
+        "awslogs-group"         : "${awslogs-group}",
         "awslogs-region"        : "eu-west-2",
         "awslogs-stream-prefix" : "ecs"
       }
@@ -23,15 +23,15 @@
     "environment" : [      
       {
         "name"  : "supportEmail",
-        "value" : "${local.application_data.accounts[local.environment].support_email}"
+        "value" : "${supportEmail}"
       },
       {
         "name"  : "supportTeam",
-        "value" : "${local.application_data.accounts[local.environment].support_team}"
+        "value" : "${supportTeam}"
       },
       {
         "name"  : "CurServer",
-        "value" : "${local.application_data.accounts[local.environment].curserver}"
+        "value" : "${CurServer}"
       }
     ]
   }
