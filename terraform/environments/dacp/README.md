@@ -9,27 +9,31 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 ### **Last review date:**
 
-<!-- Adding the last date this page was reviewed, with any accompanying information -->
+15/08/23
 
 ### **Description:**
 
-<!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+The Divorce Section Search Service (DACP) application is a business critical application that allows HMCTS Central Family court staff to maintain an internal searchable register of all decree absolutes applications, dissolutions of civil partnerships and same sex marriages applications Records searched for are for divorce decree absolutes (DA) only.
 
 ### **Service URLs:**
 
-<!--  The URL(s) of the service’s production environment, and test environments if possible-->
+Dev: https://dacp.hmcts-development.modernisation-platform.service.justice.gov.uk
+
+Preproduction: https://dacp.hmcts-preproduction.modernisation-platform.service.justice.gov.uk
+
+Prod: https://divorce-section-search.service.justice.gov.uk
 
 ### **Incident response hours:**
 
-<!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+9am-5:30pm Mon-Fri
 
 ### **Incident contact details:**
 
-<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
+<dts-legacy-apps-support-team@hmcts.net>
 
 ### **Service team contact:**
 
-<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
+<dts-legacy-apps-support-team@hmcts.net>
 
 ### **Hosting environment:**
 
@@ -41,7 +45,7 @@ Modernisation Platform
 
 ### **Other URLs:**
 
-<!--  If you can, provide links to the service’s monitoring dashboard(s), health checks, documentation (ideally describing how to run/work with the service), and main GitHub repository. -->
+The service's GitHub repository can be found at: https://github.com/ministryofjustice/Dacp
 
 ### **Expected speed and frequency of releases:**
 

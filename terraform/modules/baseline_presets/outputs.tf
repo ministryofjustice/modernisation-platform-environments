@@ -23,18 +23,8 @@ output "cloudwatch_log_groups" {
 }
 
 output "cloudwatch_metric_alarms" {
-  description = "Map of common cloudwatch metric alarms grouped by namespace deep merged with var.options.cloudwatch_metric_alarms.  See cloudwatch_metric_alarms.tf for more detail"
+  description = "Map of common cloudwatch metric alarms grouped by namespace with default action specified by var.options.cloudwatch_metric_alarms_default_actions.  See cloudwatch_metric_alarms.tf for more detail"
   value       = local.cloudwatch_metric_alarms
-}
-
-output "cloudwatch_metric_alarms_lists" {
-  description = "Map of cloudwatch metric alarms for use in AWS resources.  See cloudwatch_metric_alarms_lists.tf for more detail"
-  value       = local.cloudwatch_metric_alarms_lists
-}
-
-output "cloudwatch_metric_alarms_lists_with_actions" {
-  description = "A map of the cloudwatch_metric_alarms_lists output merged with the given alarm_actions list defined in var.options.cloudwatch_metric_alarms_lists_with_actions"
-  value       = local.cloudwatch_metric_alarms_lists_with_actions
 }
 
 output "ec2_autoscaling_group" {

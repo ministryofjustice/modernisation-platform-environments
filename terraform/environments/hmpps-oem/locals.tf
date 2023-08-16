@@ -12,6 +12,7 @@ locals {
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
+    enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
@@ -22,8 +23,6 @@ locals {
     db_backup_s3                                 = true # adds db backup buckets
     enable_oracle_secure_web                     = true # allows db to list all buckets
     cloudwatch_metric_alarms                     = {}
-    cloudwatch_metric_alarms_lists               = {}
-    cloudwatch_metric_alarms_lists_with_actions  = {}
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }
@@ -33,18 +32,21 @@ locals {
     sns_topics               = {}
   }
 
-  baseline_acm_certificates         = {}
-  baseline_cloudwatch_log_groups    = {}
-  baseline_ec2_autoscaling_groups   = {}
-  baseline_ec2_instances            = {}
-  baseline_iam_policies             = {}
-  baseline_iam_roles                = {}
-  baseline_iam_service_linked_roles = {}
-  baseline_key_pairs                = {}
-  baseline_kms_grants               = {}
-  baseline_lbs                      = {}
-  baseline_route53_resolvers        = {}
-  baseline_route53_zones            = {}
+  baseline_acm_certificates              = {}
+  baseline_backup_plans                  = {}
+  baseline_cloudwatch_log_groups         = {}
+  baseline_cloudwatch_log_metric_filters = {}
+  baseline_cloudwatch_metric_alarms      = {}
+  baseline_ec2_autoscaling_groups        = {}
+  baseline_ec2_instances                 = {}
+  baseline_iam_policies                  = {}
+  baseline_iam_roles                     = {}
+  baseline_iam_service_linked_roles      = {}
+  baseline_key_pairs                     = {}
+  baseline_kms_grants                    = {}
+  baseline_lbs                           = {}
+  baseline_route53_resolvers             = {}
+  baseline_route53_zones                 = {}
 
   baseline_s3_buckets = {
     s3-bucket = {

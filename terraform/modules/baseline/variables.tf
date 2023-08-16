@@ -132,30 +132,6 @@ variable "cloudwatch_metric_alarms" {
   default = {}
 }
 
-variable "cloudwatch_metric_alarms_database" {
-  description = "a second map of cloudwatch metric alarms to create, where key is the name of the alarm.  Use split_by_dimension to create one alarm per given dimension value, e.g. one alarm per database"
-  type = map(object({
-    comparison_operator = string
-    evaluation_periods  = number
-    metric_name         = string
-    namespace           = string
-    period              = number
-    statistic           = string
-    threshold           = number
-    alarm_actions       = list(string)
-    actions_enabled     = optional(bool, false)
-    alarm_description   = optional(string)
-    datapoints_to_alarm = optional(number)
-    treat_missing_data  = optional(string, "missing")
-    dimensions          = optional(map(string), {})
-    split_by_dimension = optional(object({
-      dimension_name   = string
-      dimension_values = list(string)
-    }))
-  }))
-  default = {}
-}
-
 variable "ec2_autoscaling_groups" {
   description = "map of ec2 autoscaling groups to create where the map key is the tags.Name.  See ec2_autoscaling_group module for more variable details"
   type = map(object({

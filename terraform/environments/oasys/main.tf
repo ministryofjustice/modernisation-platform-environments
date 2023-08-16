@@ -25,6 +25,7 @@ module "baseline_presets" {
 
   options = {
     cloudwatch_log_groups                        = null
+    cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
     enable_application_environment_wildcard_cert = true
     enable_business_unit_kms_cmks                = true
     enable_image_builder                         = true
@@ -37,20 +38,11 @@ module "baseline_presets" {
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
 
-    cloudwatch_metric_alarms_lists_with_actions = {
-      dso_pagerduty = ["dso_pagerduty"]
-    }
-
     sns_topics = {
       pagerduty_integrations = {
         dso_pagerduty = contains(["development", "test"], local.environment) ? "oasys_nonprod_alarms" : "oasys_alarms"
       }
     }
-
-    # comment this in if you need to resolve FixNGo hostnames
-    # route53_resolver_rules = {
-    #   outbound-data-and-private-subnets = ["azure-fixngo-domain"]
-    # }
   }
 }
 

@@ -34,11 +34,18 @@ locals {
   baseline_lbs                      = {}
   baseline_rds_instances            = {}
   baseline_route53_resolvers        = {}
-  baseline_route53_zones            = {}
+  baseline_route53_zones = {
+    "${local.environment}.nomis-combined-reporting.az.justice.gov.uk"      = {}
+    "${local.environment}.nomis-combined-reporting.service.justice.gov.uk" = {}
+  }
   baseline_ssm_parameters           = {}
   baseline_s3_buckets = {
     s3-bucket = {
       iam_policies = module.baseline_presets.s3_iam_policies
+    }
+    ncr-db-backup-bucket = {
+      custom_kms_key = module.environment.kms_keys["general"].arn
+      iam_policies   = module.baseline_presets.s3_iam_policies
     }
   }
   environment_config = local.environment_configs[local.environment]

@@ -44,7 +44,7 @@ locals {
       #     "dev-oasys.hmpp-azdt.justice.gov.uk",
       #   ]
       #   external_validation_records_created = true
-      #   cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
+      #   cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
       #   tags = {
       #     description = "cert for ${local.application_name} ${local.environment} domains"
       #   }
