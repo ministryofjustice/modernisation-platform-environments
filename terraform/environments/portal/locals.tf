@@ -47,7 +47,14 @@ locals {
     for key, value in data.aws_route53_zone.self : key => merge(value, {
       provider = "self"
     })
-  })
+
+  
+    
+  },{
+    for key, value in data.aws_route53_zone.portal-dev-private : key => merge(value, {
+      provider = "core-network-services"
+    })
+    } )
 
    validation_records_external_lb = {
     for key, value in local.external_lb_validation_records : key => {
