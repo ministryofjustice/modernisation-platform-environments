@@ -83,7 +83,7 @@ resource "aws_lb_target_group" "target_group_fargate" {
   # checkov:skip=CKV_AWS_261
 
   name                 = local.application_name
-  port                 = local.application_data.accounts[local.environment].server_port
+  port                 = local.app_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"

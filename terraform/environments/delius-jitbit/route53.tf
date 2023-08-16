@@ -13,11 +13,11 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_acm_certificate" "external" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = local.domain
   validation_method = "DNS"
 
   subject_alternative_names = [
-    "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+    local.app_url
   ]
   tags = {
     Environment = local.environment
