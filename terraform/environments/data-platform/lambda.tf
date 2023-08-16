@@ -124,14 +124,14 @@ module "data_product_athena_load_lambda" {
   source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
   application_name               = "data_product_athena_load"
   tags                           = local.tags
-  description                    = "Lambda to generate a presigned url for uploading data"
+  description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
   role_name                      = "athena_load_lambda_role_${local.environment}"
   policy_json                    = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
   function_name                  = "data_product_athena_load_${local.environment}"
   create_role                    = true
   reserved_concurrent_executions = 1
 
-  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:1.0.5"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:1.1.0"
   timeout      = 600
   tracing_mode = "Active"
   memory_size  = 512
