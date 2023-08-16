@@ -82,8 +82,30 @@
       "db_snapshot_identifier": "jitbit-preproduction-migration-trial-mp-copy"
     },
     "production": {
+      "migration_source_account_id": "097456858629",
+      "migration_source_account_name": "cr-jitbit-production",
+      "server_port": "5000",
+      "db_engine_version": "15.00.4073.23.v1",
+      "db_auto_minor_version_upgrade": "true",
+      "db_allow_major_version_upgrade": "false",
+      "db_backup_window": "03:00-06:00",
+      "db_retention_period": "15",
+      "db_maintenance_window": "mon:00:00-mon:03:00",
       "db_instance_class": "db.t3.xlarge",
-      "db_storage_type": "gp3"
+      "db_user": "admin",
+      "db_allocated_storage": "100",
+      "db_max_allocated_storage": "200",
+      "db_storage_type": "gp3",
+      "db_multi_az": "true",
+      "db_iam_database_authentication_enabled": "false",
+      "db_monitoring_interval": "5",
+      "db_enabled_cloudwatch_logs_exports": [
+        "agent",
+        "error"
+      ],
+      "db_performance_insights_enabled": "true",
+      "db_deletion_protection": "true",
+      "db_skip_final_snapshot": "true"
     }
   }
 }
