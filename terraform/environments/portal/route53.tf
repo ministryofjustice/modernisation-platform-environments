@@ -192,6 +192,19 @@ resource "aws_route53_record" "oid_internal" {
   }
 }
 
+resource "aws_route53_record" "oid_lb" {
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
+  name     = "mp-${local.application_name}-oid.aws.${data.aws_route53_zone.portal-dev-private.name}"
+  type     = "A"
+
+  alias {
+    name                   = aws_elb.idm_lb.dns_name
+    zone_id                = aws_elb.idm_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
 
 ###############################################################################################################
 #########################              IDM / ODS Route 53 records               ###############################
@@ -224,6 +237,8 @@ resource "aws_route53_record" "idm_admin" {
   ttl      = 60
   records  = [aws_instance.idm_instance_1.private_ip]
 }
+
+
 
 resource "aws_route53_record" "ods1_nonprod" {
   provider = aws.core-network-services
