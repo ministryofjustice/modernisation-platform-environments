@@ -60,13 +60,38 @@ locals {
     external_validation_records_created = false
 
    core_network_services_domains = {
-    for domain, value in var.validation : domain => value if value.account == "core-network-services"
+    for domain, value in local.validation : domain => value if value.account == "core-network-services"
   }
   core_vpc_domains = {
-    for domain, value in var.validation : domain => value if value.account == "core-vpc"
+    for domain, value in local.validation : domain => value if value.account == "core-vpc"
   }
   self_domains = {
-    for domain, value in var.validation : domain => value if value.account == "self"
+    for domain, value in local.validation : domain => value if value.account == "self"
   }
+
+    non_prod_validation = {
+    "modernisation-platform.service.justice.gov.uk" = {
+      account   = "core-network-services"
+      zone_name = "modernisation-platform.service.justice.gov.uk."
+    }
+    "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].acm_domain_name}" = {
+      account   = "core-vpc"
+      zone_name = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+    }
+   "${local.application_data.accounts[local.environment].acm_domain_name}" = {
+      account   = "core-network-services"
+      zone_name = "${local.application_data.accounts[local.environment].acm_domain_name}"
+    }
+
+  }
+
+  prod_validation = {
+    "${local.application_data.accounts[local.environment].acm_domain_name}" = {
+      account   = "core-network-services"
+      zone_name = "${local.application_data.accounts[local.environment].acm_domain_name}"
+    }
+  }
+
+validation = local.environment == "production" ? local.prod_validation : local.non_prod_validation
 
 }
