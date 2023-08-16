@@ -205,15 +205,6 @@ resource "aws_route53_record" "oid_lb" {
   }
 }
 
-resource "aws_route53_record" "oid_admin" {
-  provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
-  name     = "mp-${local.application_name}-idm-admin.aws.${data.aws_route53_zone.portal-dev-private.name}"
-  type     = "A"
-  ttl      = 60
-  records  = [aws_instance.idm_instance_1.private_ip]
-}
-
 
 ###############################################################################################################
 #########################              IDM / ODS Route 53 records               ###############################
@@ -242,6 +233,15 @@ resource "aws_route53_record" "idm_admin" {
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
   name     = "${local.application_name}-idm-admin.aws.${data.aws_route53_zone.portal-dev-private.name}"
+  type     = "A"
+  ttl      = 60
+  records  = [aws_instance.idm_instance_1.private_ip]
+}
+
+resource "aws_route53_record" "idm_admin_mp" {
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
+  name     = "mp-${local.application_name}-idm-admin.aws.${data.aws_route53_zone.portal-dev-private.name}"
   type     = "A"
   ttl      = 60
   records  = [aws_instance.idm_instance_1.private_ip]
