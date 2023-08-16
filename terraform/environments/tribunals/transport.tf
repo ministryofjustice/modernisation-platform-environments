@@ -227,18 +227,18 @@ resource "aws_route53_record" "transport_external" {
 
 ####################### ECS #########################################
 
-# resource "aws_fsx_windows_file_system" "transport_fsx" {
+resource "aws_fsx_windows_file_system" "transport_fsx" {
 
-#   storage_capacity    = 300
-#   subnet_ids          = data.aws_subnets.shared-public.ids  
-#   security_group_ids  = [aws_security_group.transport_lb_sc.id]
-#   throughput_capacity = 8
+  storage_capacity    = 300
+  subnet_ids          = data.aws_subnets.shared-public.ids  
+  security_group_ids  = [aws_security_group.transport_lb_sc.id]
+  throughput_capacity = 8
 
-#   tags = {
-#     Project     = "${local.transport}"
-#     Environment = "${local.environment}"
-#   }
-# }
+  tags = {
+    Project     = "${local.transport}"
+    Environment = "${local.environment}"
+  }
+}
 
 module "transport-ecs" {
 
@@ -327,7 +327,7 @@ resource "aws_lb" "transport_lb" {
 }
 
 resource "aws_lb_target_group" "transport_target_group" {
-  name                 = "${local.transport}-target-group-2"
+  name                 = "${local.transport}-target-group"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
