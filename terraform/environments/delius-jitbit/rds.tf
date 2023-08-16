@@ -48,6 +48,7 @@ resource "aws_db_instance" "jitbit" {
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.sqlserver-se-15.0"
   deletion_protection         = local.application_data.accounts[local.environment].db_deletion_protection
+  delete_automated_backups    = local.application_data.accounts[local.environment].db_delete_automated_backups
   skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
   allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
