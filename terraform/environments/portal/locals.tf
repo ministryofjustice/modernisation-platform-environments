@@ -86,7 +86,7 @@ locals {
       zone_name = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
     }
    "${local.application_data.accounts[local.environment].acm_domain_name}" = {
-      account   = "core-network-services"
+      account   = "core-network-services-private"
       zone_name = "${local.application_data.accounts[local.environment].acm_domain_name}"
     }
 
