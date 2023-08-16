@@ -257,7 +257,7 @@ resource "aws_cloudfront_distribution" "external" {
   }
 
   #  ordered_cache_behavior_PortalErrorPageBucket {
-  ordered_cache_behavior_1 {
+  ordered_cache_behavior {
       target_origin_id = aws_s3_bucket.portalerrorpagebucket.id
       smooth_streaming = false
       path_pattern     = "/error-pages/*"
@@ -275,7 +275,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
 
     # ordered_cache_behavior_LoadBalancer {
-    ordered_cache_behavior_2 {
+    ordered_cache_behavior {
       target_origin_id = aws_lb.external.id
       smooth_streaming = false
       path_pattern     = "*.png"
@@ -294,7 +294,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
 
     ordered_cache_behavior_LoadBalancer {
-    ordered_cache_behavior_3 {
+    ordered_cache_behavior {
       target_origin_id = aws_lb.external.id
       smooth_streaming = false
       path_pattern     = "*.jpg"
@@ -313,7 +313,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
 
     # ordered_cache_behavior_LoadBalancer {
-    ordered_cache_behavior_4 {
+    ordered_cache_behavior {
       target_origin_id = aws_lb.external.id
       smooth_streaming = false
       path_pattern     = "*.gif"
@@ -332,7 +332,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
 
     # ordered_cache_behavior_LoadBalancer {
-    ordered_cache_behavior_5 {
+    ordered_cache_behavior {
       target_origin_id = aws_lb.external.id
       smooth_streaming = false
       path_pattern     = "*.css"
@@ -351,7 +351,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
 
     # ordered_cache_behavior_LoadBalancer {
-    ordered_cache_behavior_6 {
+    ordered_cache_behavior {
       target_origin_id = aws_lb.external.id
       smooth_streaming = false
       path_pattern     = "*.js"
