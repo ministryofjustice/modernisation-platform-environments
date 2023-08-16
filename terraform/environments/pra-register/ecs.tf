@@ -92,7 +92,7 @@ resource "aws_ecs_service" "pra_ecs_service" {
   task_definition                   = aws_ecs_task_definition.pra_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
-  desired_count                     = 1
+  desired_count                     = 0
   health_check_grace_period_seconds = 90
 
   network_configuration {
