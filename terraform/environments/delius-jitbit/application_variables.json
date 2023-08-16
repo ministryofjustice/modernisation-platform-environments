@@ -23,7 +23,8 @@
         "error"
       ],
       "db_performance_insights_enabled": "false",
-      "db_deletion_protection": "false",
+      "db_deletion_protection": "true",
+      "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "cr-jitbit-dev-db-snapshot-for-testing-migration-to-mp-copy"
     },
@@ -50,7 +51,8 @@
         "error"
       ],
       "db_performance_insights_enabled": "false",
-      "db_deletion_protection": "false",
+      "db_deletion_protection": "true",
+      "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "copied-jitbit-training-migration-mp"
     },
@@ -77,7 +79,8 @@
         "error"
       ],
       "db_performance_insights_enabled": "false",
-      "db_deletion_protection": "false",
+      "db_deletion_protection": "true",
+      "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "jitbit-preproduction-migration-trial-mp-copy"
     },
@@ -105,7 +108,8 @@
       ],
       "db_performance_insights_enabled": "true",
       "db_deletion_protection": "true",
-      "db_skip_final_snapshot": "true"
+      "db_skip_final_snapshot": "false",
+      "db_delete_automated_backups": "false"
     }
   }
 }
