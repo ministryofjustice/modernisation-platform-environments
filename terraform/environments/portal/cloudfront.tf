@@ -247,7 +247,7 @@ resource "aws_cloudfront_distribution" "external" {
       cookies {
         # forward           = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
         forward      = "all"
-        headers      = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
+        # headers      = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
         # whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
         # not sure if this is needed for Portal
       }
