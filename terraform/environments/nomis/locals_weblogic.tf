@@ -182,7 +182,7 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "main"
+        branch = "f855376d147bf6d0f2e035150585cd7de50f6d67" # 2023-08-15 weblogic deployments
       })
     })
     # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {}) 
