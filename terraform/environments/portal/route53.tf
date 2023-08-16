@@ -108,7 +108,7 @@ resource "aws_route53_record" "oim_console" {
 resource "aws_route53_record" "oim_admin" {
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
-  name     = "${local.application_name}-oim-admin.aws.${data.aws_route53_zone.portal-dev-private.name}" 
+  name     = "${local.application_name}-oim-admin.aws.${data.aws_route53_zone.portal-dev-private.name}"
   type     = "A"
   ttl      = 60
   records  = [aws_instance.oim_instance_1.private_ip]
@@ -192,6 +192,28 @@ resource "aws_route53_record" "oid_internal" {
   }
 }
 
+resource "aws_route53_record" "oid_lb" {
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
+  name     = "mp-${local.application_name}-oid.aws.${data.aws_route53_zone.portal-dev-private.name}"
+  type     = "A"
+
+  alias {
+    name                   = aws_elb.idm_lb.dns_name
+    zone_id                = aws_elb.idm_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "oid_admin" {
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
+  name     = "mp-${local.application_name}-idm-admin.aws.${data.aws_route53_zone.portal-dev-private.name}"
+  type     = "A"
+  ttl      = 60
+  records  = [aws_instance.idm_instance_1.private_ip]
+}
+
 
 ###############################################################################################################
 #########################              IDM / ODS Route 53 records               ###############################
@@ -219,7 +241,7 @@ resource "aws_route53_record" "idm_console" {
 resource "aws_route53_record" "idm_admin" {
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.portal-dev-private.zone_id
-  name     = "${local.application_name}-idm-admin.aws.${data.aws_route53_zone.portal-dev-private.name}" 
+  name     = "${local.application_name}-idm-admin.aws.${data.aws_route53_zone.portal-dev-private.name}"
   type     = "A"
   ttl      = 60
   records  = [aws_instance.idm_instance_1.private_ip]
