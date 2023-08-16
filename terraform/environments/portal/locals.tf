@@ -47,14 +47,11 @@ locals {
     for key, value in data.aws_route53_zone.self : key => merge(value, {
       provider = "self"
     })
-
-  
-    
-  },{
+    }, {
     for key, value in data.aws_route53_zone.portal-dev-private : key => merge(value, {
       provider = "core-network-services"
     })
-    } )
+    })
 
    validation_records_external_lb = {
     for key, value in local.external_lb_validation_records : key => {
@@ -69,6 +66,9 @@ locals {
    core_network_services_domains = {
     for domain, value in local.validation : domain => value if value.account == "core-network-services"
   }
+  core_network_services_domains_private = {
+   for domain, value in local.validation : domain => value if value.account == "core-network-services-private"
+ }
   core_vpc_domains = {
     for domain, value in local.validation : domain => value if value.account == "core-vpc"
   }

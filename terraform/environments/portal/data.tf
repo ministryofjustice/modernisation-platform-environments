@@ -1,4 +1,5 @@
 data "aws_route53_zone" "portal-dev-private" {
+  for_each = local.core_network_services_domains_private
   provider = aws.core-network-services
 
   name         = "dev.legalservices.gov.uk."
@@ -29,4 +30,3 @@ data "aws_route53_zone" "self" {
   name         = each.value.zone_name
   private_zone = false
 }
-
