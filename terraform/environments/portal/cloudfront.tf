@@ -293,7 +293,7 @@ resource "aws_cloudfront_distribution" "external" {
       viewer_protocol_policy = "redirect-to-https"
     }
 
-    ordered_cache_behavior_LoadBalancer {
+    # ordered_cache_behavior_LoadBalancer {
     ordered_cache_behavior {
       target_origin_id = aws_lb.external.id
       smooth_streaming = false
