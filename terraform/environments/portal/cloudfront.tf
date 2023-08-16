@@ -400,8 +400,6 @@ resource "aws_cloudfront_distribution" "external" {
 
   # tags = var.tags
   tags = local.tags
-
-}
 }
 
 ###### Cloudfront Route53 Records
