@@ -23,7 +23,8 @@
         "error"
       ],
       "db_performance_insights_enabled": "false",
-      "db_deletion_protection": "false",
+      "db_deletion_protection": "true",
+      "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "cr-jitbit-dev-db-snapshot-for-testing-migration-to-mp-copy"
     },
@@ -50,7 +51,8 @@
         "error"
       ],
       "db_performance_insights_enabled": "false",
-      "db_deletion_protection": "false",
+      "db_deletion_protection": "true",
+      "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "copied-jitbit-training-migration-mp"
     },
@@ -87,13 +89,16 @@
         "error"
       ],
       "db_performance_insights_enabled": "false",
-      "db_deletion_protection": "false",
+      "db_deletion_protection": "true",
+      "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "jitbit-preproduction-migration-trial-mp-copy"
     },
     "production": {
       "db_instance_class": "db.t3.xlarge",
-      "db_storage_type": "gp3"
+      "db_storage_type": "gp3",
+      "db_deletion_protection": "true",
+      "db_delete_automated_backups": "false"
     }
   }
 }
