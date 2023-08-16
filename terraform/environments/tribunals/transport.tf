@@ -230,7 +230,7 @@ resource "aws_route53_record" "transport_external" {
 resource "aws_fsx_windows_file_system" "transport_fsx" {
 
   storage_capacity    = 300
-  subnet_ids          = data.aws_subnets.shared-public.ids  
+  subnet_ids          = data.aws_subnets.shared-public.ids[0]
   security_group_ids  = [aws_security_group.transport_lb_sc.id]
   throughput_capacity = 8
 
