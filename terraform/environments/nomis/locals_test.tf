@@ -164,6 +164,9 @@ locals {
 
       # green deployment
       t3-nomis-web-b = merge(local.weblogic_ec2_b, {
+        instance = merge(local.weblogic_ec2_b.instance, {
+          instance_type = "t2.xlarge"
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t3"
           oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
@@ -171,7 +174,7 @@ locals {
           oracle-db-name       = "T3CNOM"
         })
         autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
       })
 

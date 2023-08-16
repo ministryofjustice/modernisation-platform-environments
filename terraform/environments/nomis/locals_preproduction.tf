@@ -45,11 +45,17 @@ locals {
 
       # green deployment
       preprod-nomis-web-b = merge(local.weblogic_ec2_b, {
+        instance = merge(local.weblogic_ec2_b.instance, {
+          instance_type = "t2.xlarge"
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "preprod"
           oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
           oracle-db-name       = "PPCNOM"
+        })
+        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
+          desired_capacity = 2
         })
       })
     }
