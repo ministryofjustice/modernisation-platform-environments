@@ -2,9 +2,13 @@ locals {
   ##
   # Variables used across multiple areas
   ##
-  app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 
-  app_port = 5000
+  domain           = local.is-production ? "probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  non_prod_app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
+  prod_app_url     = "helpdesk.jitbit.cr.${local.domain}"
+  app_url          = local.is-production ? local.prod_app_url : local.non_prod_app_url
+
+  app_port = local.application_data.accounts[local.environment].server_port
 
   ##
   # Variables used by certificate validation, as part of the load balancer listener, cert and route 53 record configuration
@@ -16,10 +20,10 @@ locals {
     }
   }
 
-  domain_name_main   = [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  domain_name_main   = [for k, v in local.domain_types : v.name if k == local.domain]
   domain_name_sub    = [for k, v in local.domain_types : v.name if k == local.app_url]
-  domain_record_main = [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  domain_record_main = [for k, v in local.domain_types : v.record if k == local.domain]
   domain_record_sub  = [for k, v in local.domain_types : v.record if k == local.app_url]
-  domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  domain_type_main   = [for k, v in local.domain_types : v.type if k == local.domain]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k == local.app_url]
 }
