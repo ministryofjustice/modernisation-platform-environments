@@ -402,6 +402,7 @@ resource "aws_cloudfront_distribution" "external" {
   tags = local.tags
 
 }
+}
 
 ###### Cloudfront Route53 Records
 ###### zones being created by Vlad for Portal
