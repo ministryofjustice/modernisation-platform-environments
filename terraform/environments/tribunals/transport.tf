@@ -248,7 +248,7 @@ resource "aws_secretsmanager_secret_version" "sversion" {
 }
 
 resource "aws_directory_service_directory" "transport_ad" {
-  name     = "${local.transport}-AD"
+  name     = "${local.transport}.AD"
   password = aws_secretsmanager_secret_version.sversion.secret_string
   edition  = "Standard"
   type     = "MicrosoftAD"
