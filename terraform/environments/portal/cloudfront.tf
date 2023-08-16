@@ -268,7 +268,7 @@ resource "aws_cloudfront_distribution" "external" {
       forwarded_values {
         query_string   = false
         cookies {
-          forward      = all
+          forward      = "all"
         }
       }
       viewer_protocol_policy = "redirect-to-https"
@@ -287,7 +287,7 @@ resource "aws_cloudfront_distribution" "external" {
         query_string   = false
         headers        = ["Host", "User-Agent"]
         cookies {
-          forward      = all
+          forward      = "all"
         }
       }
       viewer_protocol_policy = "redirect-to-https"
@@ -306,7 +306,7 @@ resource "aws_cloudfront_distribution" "external" {
         query_string   = false
         headers        = ["Host", "User-Agent"]
         cookies {
-          forward      = all
+          forward      = "all"
         }
       }
       viewer_protocol_policy = "redirect-to-https"
@@ -325,7 +325,7 @@ resource "aws_cloudfront_distribution" "external" {
         query_string   = false
         headers        = ["Host", "User-Agent"]
         cookies {
-          forward      = all
+          forward      = "all"
         }
       }
       viewer_protocol_policy = "redirect-to-https"
@@ -344,7 +344,7 @@ resource "aws_cloudfront_distribution" "external" {
         query_string   = false
         headers        = ["Host", "User-Agent"]
         cookies {
-          forward      = all
+          forward      = "all"
         }
       }
       viewer_protocol_policy = "redirect-to-https"
@@ -363,7 +363,7 @@ resource "aws_cloudfront_distribution" "external" {
         query_string   = false
         headers        = ["Host", "User-Agent"]
         cookies {
-          forward      = all
+          forward      = "all"
         }
       }
       viewer_protocol_policy = "redirect-to-https"
