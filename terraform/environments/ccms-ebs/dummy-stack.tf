@@ -9,7 +9,6 @@ resource "aws_instance" "ec2_instance_dummy_app" {
   key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  vpc_id                      = data.aws_vpc.shared.id
   vpc_security_group_ids      = [aws_security_group.sg_dummy_app.id]
 
   root_block_device {
@@ -40,7 +39,6 @@ resource "aws_instance" "ec2_instance_dummy_db" {
   key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  vpc_id                      = data.aws_vpc.shared.id
   vpc_security_group_ids      = [aws_security_group.sg_dummy_db.id]
 
   root_block_device {
