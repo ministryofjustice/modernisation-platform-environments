@@ -38,7 +38,7 @@ module "data_product_authorizer_lambda" {
   create_role                    = true
   reserved_concurrent_executions = 1
 
-  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-authorizer-lambda-ecr-repo:1.0.0"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-authorizer-lambda-ecr-repo:${local.authorizer_version}"
   timeout      = 600
   tracing_mode = "Active"
   memory_size  = 512
@@ -71,7 +71,7 @@ module "data_product_get_glue_metadata_lambda" {
   create_role                    = true
   reserved_concurrent_executions = 1
 
-  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-get-glue-metadata-lambda-ecr-repo:1.0.0"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-get-glue-metadata-lambda-ecr-repo:${local.get_glue_metadata_version}"
   timeout      = 600
   tracing_mode = "Active"
   memory_size  = 512
@@ -99,7 +99,7 @@ module "data_product_presigned_url_lambda" {
   create_role                    = true
   reserved_concurrent_executions = 1
 
-  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-presigned-url-lambda-ecr-repo:1.1.0"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-presigned-url-lambda-ecr-repo:${local.presigned_url_version}"
   timeout      = 600
   tracing_mode = "Active"
   memory_size  = 512
@@ -131,7 +131,7 @@ module "data_product_athena_load_lambda" {
   create_role                    = true
   reserved_concurrent_executions = 1
 
-  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:1.1.0"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:${local.athena_load_version}"
   timeout      = 600
   tracing_mode = "Active"
   memory_size  = 512
