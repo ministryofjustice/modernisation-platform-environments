@@ -11,6 +11,9 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
     ])
+    oracle_oem_agent = flatten([
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+    ])
   }
 
   security_group_cidrs_preprod_prod = {
@@ -23,6 +26,9 @@ locals {
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+    ])
+    oracle_oem_agent = flatten([
+      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
   }
 
@@ -110,6 +116,13 @@ locals {
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.oracle_db
           security_groups = ["private"]
+        }
+        oracle3872 = {
+          description = "Allow oem agent ingress"
+          from_port   = "3872"
+          to_port     = "3872"
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
         }
       }
       egress = {
