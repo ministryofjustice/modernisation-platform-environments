@@ -1,19 +1,19 @@
-resource "aws_db_instance" "wardship_db" {
-  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
-  db_name                     = local.application_data.accounts[local.environment].db_name
-  storage_type                = local.application_data.accounts[local.environment].storage_type
-  engine                      = local.application_data.accounts[local.environment].engine
-  identifier                  = local.application_data.accounts[local.environment].identifier
-  engine_version              = local.application_data.accounts[local.environment].engine_version
-  instance_class              = local.application_data.accounts[local.environment].instance_class
-  username                    = local.application_data.accounts[local.environment].db_username
-  password                    = random_password.password.result
-  skip_final_snapshot         = true
-  publicly_accessible         = true
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc.id]
-  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade = true
-}
+# resource "aws_db_instance" "wardship_db" {
+#   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
+#   db_name                     = local.application_data.accounts[local.environment].db_name
+#   storage_type                = local.application_data.accounts[local.environment].storage_type
+#   engine                      = local.application_data.accounts[local.environment].engine
+#   identifier                  = local.application_data.accounts[local.environment].identifier
+#   engine_version              = local.application_data.accounts[local.environment].engine_version
+#   instance_class              = local.application_data.accounts[local.environment].instance_class
+#   username                    = local.application_data.accounts[local.environment].db_username
+#   password                    = random_password.password.result
+#   skip_final_snapshot         = true
+#   publicly_accessible         = true
+#   vpc_security_group_ids      = [aws_security_group.postgresql_db_sc.id]
+#   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
+#   allow_major_version_upgrade = true
+# }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
   name       = "dbsubnetgroup"

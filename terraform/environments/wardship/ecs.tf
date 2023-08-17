@@ -40,44 +40,44 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
           awslogs-stream-prefix = "ecs"
         }
       }
-      environment = [
-        {
-          name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.wardship_db.address}"
-        },
-        {
-          name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
-        },
-        {
-          name  = "RDS_USERNAME"
-          value = "${aws_db_instance.wardship_db.username}"
-        },
-        {
-          name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.wardship_db.password}"
-        },
-        {
-          name  = "DB_NAME"
-          value = "${aws_db_instance.wardship_db.db_name}"
-        },
-        {
-          name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
-        },
-        {
-          name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
-        },
-        {
-          name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].curserver}"
-        },
-        {
-          name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
-        }
-      ]
+    #   environment = [
+    #     {
+    #       name  = "RDS_HOSTNAME"
+    #       value = "${aws_db_instance.wardship_db.address}"
+    #     },
+    #     {
+    #       name  = "RDS_PORT"
+    #       value = "${local.application_data.accounts[local.environment].rds_port}"
+    #     },
+    #     {
+    #       name  = "RDS_USERNAME"
+    #       value = "${aws_db_instance.wardship_db.username}"
+    #     },
+    #     {
+    #       name  = "RDS_PASSWORD"
+    #       value = "${aws_db_instance.wardship_db.password}"
+    #     },
+    #     {
+    #       name  = "DB_NAME"
+    #       value = "${aws_db_instance.wardship_db.db_name}"
+    #     },
+    #     {
+    #       name  = "supportEmail"
+    #       value = "${local.application_data.accounts[local.environment].support_email}"
+    #     },
+    #     {
+    #       name  = "supportTeam"
+    #       value = "${local.application_data.accounts[local.environment].support_team}"
+    #     },
+    #     {
+    #       name  = "CurServer"
+    #       value = "${local.application_data.accounts[local.environment].curserver}"
+    #     },
+    #     {
+    #       name  = "ida:ClientId"
+    #       value = "${local.application_data.accounts[local.environment].client_id}"
+    #     }
+    #   ]
     }
   ])
   runtime_platform {
