@@ -153,3 +153,8 @@ variable "ecs_scaling_mem_threshold" {
   type        = string
   description = "The utilised memory threshold for ec2 cluster scaling"
 }
+
+variable "fsx_subnet_ids" {  
+}
+
+

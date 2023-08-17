@@ -45,7 +45,7 @@ resource "aws_fsx_windows_file_system" "app_fsx" {
 
   #active_directory_id = "${aws_directory_service_directory.transport_ad.id}"
   storage_capacity    = 300
-  subnet_ids          = [data.aws_subnets.shared-public.ids[0]]
+  subnet_ids          = var.fsx_subnet_ids
   security_group_ids  = [aws_security_group.cluster_ec2.id]
   throughput_capacity = 8
 
