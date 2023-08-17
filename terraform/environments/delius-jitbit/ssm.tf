@@ -2,5 +2,5 @@
 resource "aws_ssm_parameter" "app_url" {
   name  = "/${var.networking[0].application}/environment/app-url"
   type  = "String"
-  value = local.app_url
+  value = "https://${local.app_url}/"
 }
