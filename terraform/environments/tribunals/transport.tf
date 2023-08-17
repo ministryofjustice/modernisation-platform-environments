@@ -258,6 +258,7 @@ module "transport-ecs" {
   ecs_scaling_cpu_threshold = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
   fsx_subnet_ids            = [data.aws_subnets.shared-public.ids[0]]
+  environment               = local.environment
 }
 
 resource "aws_ecr_repository" "transport-ecr-repo" {

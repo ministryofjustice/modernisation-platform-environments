@@ -57,7 +57,7 @@ resource "aws_fsx_windows_file_system" "app_fsx" {
   }
 
   tags = {
-    Project     = "${local.transport}"
-    Environment = "${local.environment}"
+    Project     = "${var.app_name}"
+    Environment = "${var.environment}"
   }
 }

@@ -157,4 +157,6 @@ variable "ecs_scaling_mem_threshold" {
 variable "fsx_subnet_ids" {  
 }
 
+variable "environment" {  
+}
 
