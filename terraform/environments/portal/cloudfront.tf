@@ -404,16 +404,17 @@ resource "aws_cloudfront_distribution" "external" {
 
 ###### Cloudfront Route53 Records
 ###### zones being created by Vlad for Portal
-resource "aws_route53_record" "portal_dns_record" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "portal.dev.legalservices.gov.uk"
-  type    = "A"
-  alias {
-    name                   = aws_cloudfront_distribution.external.id
-    zone_id                = "Z2FDTNDATAQYW2"
-    evaluate_target_health = true
-  }
-}
+# resource "aws_route53_record" "portal_dns_record" {
+#   # zone_id = aws_route53_zone.portal-dev-private.private.zone_id
+#   zone_id  = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
+#   name    = "portal.dev.legalservices.gov.uk"
+#   type    = "A"
+#   alias {
+#     name                   = aws_cloudfront_distribution.external.id
+#     zone_id                = "Z2FDTNDATAQYW2"
+#     evaluate_target_health = true
+#   }
+# }
 
 
 ###### Cloudfront Cert
@@ -425,9 +426,9 @@ resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
     for key, value in local.validation_records_cloudfront : replace(value.name, "/\\.$/", "")
   ]
   depends_on = [
-    aws_route53_record.cloudfront_validation_core_network_services,
-    aws_route53_record.cloudfront_validation_core_vpc,
-    aws_route53_record.cloudfront_validation_self
+    aws_route53_record.cloudfront_validation_core_network_services
+    # aws_route53_record.cloudfront_validation_core_vpc,
+    # aws_route53_record.cloudfront_validation_self
   ]
 }
 
