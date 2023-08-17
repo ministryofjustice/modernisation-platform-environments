@@ -349,18 +349,6 @@ resource "aws_route53_record" "ohs_external" {
 ########################         Cloudfront Route 53 records               ############################
 ###############################################################################################################
 
-resource "aws_route53_record" "portal_dns_record" {
-  # zone_id = aws_route53_zone.portal-dev-private.private.zone_id
-  zone_id  = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
-  name    = "portal.dev.legalservices.gov.uk"
-  type    = "A"
-  alias {
-    name                   = aws_cloudfront_distribution.external.id
-    zone_id                = "Z2FDTNDATAQYW2"
-    evaluate_target_health = true
-  }
-}
-
 resource "aws_route53_record" "cloudfront-non-prod" {
   count    = local.environment != "production" ? 1 : 0
   provider = aws.core-network-services
