@@ -109,7 +109,7 @@ locals {
   weblogic_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-    module.baseline_presets.cloudwatch_metric_alarms.ec2_asg_cwagent_collectd,
+    # module.baseline_presets.cloudwatch_metric_alarms.ec2_asg_cwagent_collectd,
   )
 
   weblogic_cloudwatch_log_groups = {
