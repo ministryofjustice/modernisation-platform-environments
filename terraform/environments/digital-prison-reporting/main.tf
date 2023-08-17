@@ -64,6 +64,8 @@ module "glue_reporting_hub_job" {
     "--dpr.domain.catalog.db"                   = module.glue_data_domain_database.db_name
     "--dpr.redshift.secrets.name"               = "${local.project}-redshift-secret-${local.environment}"
     "--dpr.datamart.db.name"                    = "datamart"
+    "--spark.driver.memory"                     = local.reporting_hub_driver_mem
+    "--spark.executor.memory"                   = local.reporting_hub_executor_mem 
   }
 }
 
