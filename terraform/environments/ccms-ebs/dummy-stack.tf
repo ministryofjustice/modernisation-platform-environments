@@ -11,6 +11,10 @@ resource "aws_instance" "ec2_instance_dummy_app" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.sg_dummy_app.id]
 
+  user_data = base64encode(templatefile("./templates/ec2_user_data_app.sh", {
+    hostname = "dummy-app"
+  }))
+
   root_block_device {
     volume_type = "gp3"
     volume_size = 50
@@ -41,6 +45,10 @@ resource "aws_instance" "ec2_instance_dummy_db" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.sg_dummy_db.id]
 
+  user_data = base64encode(templatefile("./templates/ec2_user_data_db.sh", {
+    hostname = "dummy-db"
+  }))
+
   root_block_device {
     volume_type = "gp3"
     volume_size = 50
@@ -63,11 +71,11 @@ resource "aws_instance" "ec2_instance_dummy_db" {
 ### Load Balancer
 
 resource "aws_lb" "ec2_lb_dummy_alb" {
-  name                   = lower(format("alb-%s-%s-dummy", local.application_name, local.environment))
-  internal               = false
-  load_balancer_type     = "application"
-  security_groups        = [aws_security_group.sg_dummy_alb.id]
-  subnets                = data.aws_subnets.shared-public.ids
+  name               = lower(format("alb-%s-%s-dummy", local.application_name, local.environment))
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.sg_dummy_alb.id]
+  subnets            = data.aws_subnets.shared-public.ids
 
   tags = merge(local.tags,
     { Name = lower(format("alb-%s-%s-dummy", local.application_name, local.environment)) }
