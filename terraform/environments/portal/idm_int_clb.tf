@@ -89,3 +89,22 @@ resource "aws_vpc_security_group_egress_rule" "internal_idm_lb_outbound" {
   ip_protocol       = "-1"
 }
 
+################################################
+# Landing Zone Inbound for Integration
+################################################
+
+resource "aws_vpc_security_group_ingress_rule" "internal_lz" {
+  security_group_id = aws_security_group.internal_idm_sg.id
+  cidr_ipv4         = local.application_data.accounts[local.environment].landing_zone_vpc_cidr
+  from_port         = 1389
+  ip_protocol       = "tcp"
+  to_port           = 1389
+}
+
+resource "aws_vpc_security_group_ingress_rule" "internal_lz1" {
+  security_group_id = aws_security_group.internal_idm_sg.id
+  cidr_ipv4         = local.application_data.accounts[local.environment].landing_zone_vpc_cidr
+  from_port         = 1636
+  ip_protocol       = "tcp"
+  to_port           = 1636
+}
