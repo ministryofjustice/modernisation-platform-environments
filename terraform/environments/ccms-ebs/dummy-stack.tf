@@ -282,7 +282,7 @@ resource "aws_vpc_security_group_ingress_rule" "sr_dummy_app_alb2app_in_443" {
 
 ## Internet <-> App
 # Internet <-> Internet_2_App : 443
-resource "aws_vpc_security_group_egress_rule" "sr_dummy_internet2app_app_out_443" {
+resource "aws_vpc_security_group_egress_rule" "sr_dummy_internet_internet2app_out_443" {
   security_group_id            = aws_security_group.sg_dummy_internet.id
   description                  = "Internet_2_App - Internet: 443"
   ip_protocol                  = "TCP"
@@ -291,7 +291,7 @@ resource "aws_vpc_security_group_egress_rule" "sr_dummy_internet2app_app_out_443
   referenced_security_group_id = aws_security_group.sg_dummy_internet2app.id # source
 }
 
-resource "aws_vpc_security_group_ingress_rule" "sr_dummy_app_internet2app_in_443" {
+resource "aws_vpc_security_group_ingress_rule" "sr_dummy_internet_internet2app_in_443" {
   security_group_id            = aws_security_group.sg_dummy_internet.id
   description                  = "Internet - Internet_2_App : 443"
   ip_protocol                  = "TCP"
@@ -321,7 +321,7 @@ resource "aws_vpc_security_group_ingress_rule" "sr_dummy_app_internet2app_in_443
 
 ## Internet <-> DB
 # Internet <-> Internet_2_Db : 443
-resource "aws_vpc_security_group_egress_rule" "sr_dummy_internet2db_db_out_443" {
+resource "aws_vpc_security_group_egress_rule" "sr_dummy_internet_internet2db_out_443" {
   security_group_id            = aws_security_group.sg_dummy_internet.id
   description                  = "Internet_2_DB - Internet: 443"
   ip_protocol                  = "TCP"
@@ -330,7 +330,7 @@ resource "aws_vpc_security_group_egress_rule" "sr_dummy_internet2db_db_out_443" 
   referenced_security_group_id = aws_security_group.sg_dummy_internet2db.id # source
 }
 
-resource "aws_vpc_security_group_ingress_rule" "sr_dummy_db_internet2db_in_443" {
+resource "aws_vpc_security_group_ingress_rule" "sr_dummy_internet_internet2db_in_443" {
   security_group_id            = aws_security_group.sg_dummy_internet.id
   description                  = "Internet - Internet_2_DB : 443"
   ip_protocol                  = "TCP"
@@ -351,7 +351,7 @@ resource "aws_vpc_security_group_egress_rule" "sr_dummy_internet2db_db_out_443" 
 
 resource "aws_vpc_security_group_ingress_rule" "sr_dummy_db_internet2db_in_443" {
   security_group_id            = aws_security_group.sg_dummy_internet2db.id
-  description                  = "Internet_2_DB -db : 443"
+  description                  = "Internet_2_DB - DB : 443"
   ip_protocol                  = "TCP"
   from_port                    = 443
   to_port                      = 443
