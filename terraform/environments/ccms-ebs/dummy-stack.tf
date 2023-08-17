@@ -11,7 +11,7 @@ resource "aws_instance" "ec2_instance_dummy_app" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.sg_dummy_app.id]
 
-  user_data = base64encode(templatefile("./templates/ec2_user_data_app.sh", {
+  user_data = base64encode(templatefile("./templates/ec2_user_data_dummy_app.sh", {
     hostname = "dummy-app"
   }))
 
@@ -45,7 +45,7 @@ resource "aws_instance" "ec2_instance_dummy_db" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.sg_dummy_db.id]
 
-  user_data = base64encode(templatefile("./templates/ec2_user_data_db.sh", {
+  user_data = base64encode(templatefile("./templates/ec2_user_data_dummy_db.sh", {
     hostname = "dummy-db"
   }))
 
