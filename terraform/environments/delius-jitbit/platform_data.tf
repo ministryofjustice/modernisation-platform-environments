@@ -121,7 +121,7 @@ data "aws_route53_zone" "inner" {
 data "aws_route53_zone" "network-services" {
   provider = aws.core-network-services
 
-  name         = "modernisation-platform.service.justice.gov.uk."
+  name         = "${local.domain}."
   private_zone = false
 }
 
