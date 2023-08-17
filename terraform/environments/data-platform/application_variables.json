@@ -1,16 +1,8 @@
 {
-  "accounts": {
-    "development": {
-      "example_var": "dev-data"
-    },
-    "test": {
-      "example_var": "test-data"
-    },
-    "preproduction": {
-      "example_var": "preproduction-data"
-    },
-    "production": {
-      "example_var": "production-data"
-    }
+  "docs_versions": {
+    "development": "1.0.1",
+    "test": "1.0.1",
+    "preproduction": "1.0.1",
+    "production": "1.0.1"
   }
 }

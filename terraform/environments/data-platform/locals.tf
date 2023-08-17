@@ -23,4 +23,6 @@ locals {
   execution_class                  = "STANDARD"
   max_concurrent                   = 5
   glue_log_group_retention_in_days = 7
+
+  docs_version = lookup(var.docs_versions, local.environment)
 }

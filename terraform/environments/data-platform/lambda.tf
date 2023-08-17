@@ -10,7 +10,7 @@ module "data_product_docs_lambda" {
   create_role                    = true
   reserved_concurrent_executions = 1
 
-  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-docs-lambda-ecr-repo:1.0.1"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-docs-lambda-ecr-repo:${local.docs_version}"
   timeout      = 600
   tracing_mode = "Active"
   memory_size  = 512
