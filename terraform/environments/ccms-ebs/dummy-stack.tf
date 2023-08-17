@@ -68,7 +68,6 @@ resource "aws_lb" "ec2_lb_dummy_alb" {
   load_balancer_type     = "application"
   security_groups        = [aws_security_group.sg_dummy_alb.id]
   subnets                = data.aws_subnets.shared-public.ids
-  vpc_id                 = data.aws_vpc.shared.id
 
   tags = merge(local.tags,
     { Name = lower(format("alb-%s-%s-dummy", local.application_name, local.environment)) }
