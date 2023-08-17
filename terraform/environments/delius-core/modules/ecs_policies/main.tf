@@ -1,7 +1,7 @@
 data "aws_iam_policy_document" "task" {
   statement {
     effect  = "Allow"
-    actions = concat(["sts:AssumeRole"], var.extra_task_role_allow_statements)
+    actions = ["sts:AssumeRole"]
 
     principals {
       type        = "Service"
@@ -9,11 +9,17 @@ data "aws_iam_policy_document" "task" {
     }
   }
 }
-
 resource "aws_iam_role" "task" {
   name               = "${var.env_name}-${var.service_name}-ecs-task"
   assume_role_policy = data.aws_iam_policy_document.task.json
   tags               = var.tags
+}
+
+resource "aws_iam_role_policy" "task_actions" {
+  for_each = var.extra_task_role_policies
+  name     = "${var.env_name}-${var.service_name}-ecs-task-actions-${each.key}"
+  policy   = each.value.json
+  role     = aws_iam_role.task.id
 }
 
 data "aws_iam_policy_document" "ecs_service" {
