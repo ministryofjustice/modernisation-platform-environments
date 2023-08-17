@@ -72,6 +72,7 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
     local.tags,
     {
       Name = "wepi-redshift-${local.environment}-cluster"
+      Timestamp = format("%s", timestamp())
     }
   )
 
@@ -165,8 +166,8 @@ resource "aws_security_group" "redshift-data-lb" {
 resource "aws_lb" "redshift-data" {
   name               = format("%s-redshift-lb", local.environment)
   internal           = true
-  load_balancer_type = "network"
-  security_groups    = [aws_security_group.redshift-data-lb.id] #extra line added late at night
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.redshift-data-lb.id]
   subnets            = data.aws_subnets.shared-private.ids
   tags               = local.tags
 }
