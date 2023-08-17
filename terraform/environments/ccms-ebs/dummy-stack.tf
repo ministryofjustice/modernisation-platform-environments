@@ -19,7 +19,7 @@ resource "aws_instance" "ec2_instance_dummy_app" {
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(
       { Name = "device-root-dummy-app" },
-      { host-attachement = lower(format("ec2-%s-%s-dummy-app", local.application_name, local.environment)) }
+      { host-attachment = lower(format("ec2-%s-%s-dummy-app", local.application_name, local.environment)) }
     )
   }
 
@@ -49,7 +49,7 @@ resource "aws_instance" "ec2_instance_dummy_db" {
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(
       { Name = "device-root-dummy-db" },
-      { host-attachement = lower(format("ec2-%s-%s-dummy-db", local.application_name, local.environment)) }
+      { host-attachment = lower(format("ec2-%s-%s-dummy-db", local.application_name, local.environment)) }
     )
   }
 
@@ -99,7 +99,7 @@ resource "aws_lb_target_group" "ec2_lb_dummy_tg" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "ec2_lb_dummy_tg_attachement" {
+resource "aws_lb_target_group_attachment" "ec2_lb_dummy_tg_attachment" {
   target_group_arn = aws_lb_target_group.ec2_lb_dummy_tg.arn
   target_id        = aws_instance.ec2_instance_dummy_app.id
   port             = "443"
