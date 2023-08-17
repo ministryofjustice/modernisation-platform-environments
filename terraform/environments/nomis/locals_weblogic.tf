@@ -109,7 +109,7 @@ locals {
   weblogic_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-    module.baseline_presets.cloudwatch_metric_alarms.ec2_asg_cwagent_collectd,
+    # module.baseline_presets.cloudwatch_metric_alarms.ec2_asg_cwagent_collectd,
   )
 
   weblogic_cloudwatch_log_groups = {
@@ -182,7 +182,7 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "f855376d147bf6d0f2e035150585cd7de50f6d67" # 2023-08-15 weblogic deployments
+        branch = "nomis/DSOS-2050/split-collectd-cloudwatch-roles" # 2023-08-15 weblogic deployments + updated monitoring
       })
     })
     # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {}) 

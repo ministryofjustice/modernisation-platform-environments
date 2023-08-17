@@ -56,6 +56,7 @@ locals {
         })
         autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
           desired_capacity = 2
+          max_size         = 2
         })
       })
     }
