@@ -51,7 +51,7 @@ cloudfront_validation_records = {
 #       provider = "self"
 #     })
 #   })
-# }
+}
 
 ### Cloudfront Secret Creation
 resource "random_password" "cloudfront" {
