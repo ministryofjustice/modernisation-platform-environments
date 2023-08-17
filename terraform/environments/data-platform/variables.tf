@@ -1,3 +1,3 @@
 variable "docs_versions" {
-  type = map()
+  type = map(any)
 }
