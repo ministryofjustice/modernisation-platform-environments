@@ -51,6 +51,14 @@ cloudfront_validation_records = {
 #       provider = "self"
 #     })
 #   })
+validation_records_cloudfront = {
+    for key, value in local.cloudfront_validation_records : key => {
+      name   = value.name
+      record = value.record
+      type   = value.type
+    } if value.zone.provider == "external"
+  }
+
 }
 
 ### Cloudfront Secret Creation
@@ -419,7 +427,7 @@ resource "aws_cloudfront_distribution" "external" {
 
 ###### Cloudfront Cert
 resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
-  # count           = (length(local.validation_records_cloudfront) == 0 || var.external_validation_records_created) ? 1 : 0
+  count           = (length(local.validation_records_cloudfront) == 0 || local.external_validation_records_created) ? 1 : 0
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.cloudfront.arn
   validation_record_fqdns = [

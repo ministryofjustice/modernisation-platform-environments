@@ -375,7 +375,7 @@ resource "aws_route53_record" "cloudfront-non-prod" {
 }
 
 resource "aws_route53_record" "cloudfront-prod" {
-  count    = var.environment == "production" ? 1 : 0
+  count    = local.environment == "production" ? 1 : 0
   provider = aws.core-network-services
   # zone_id  = var.production_zone_id
   zone_id  = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
