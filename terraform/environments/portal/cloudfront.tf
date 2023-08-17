@@ -38,20 +38,20 @@ cloudfront_validation_records = {
   #   for domain, value in var.validation : domain => value if value.account == "self"
   # }
 
-  route53_zones = merge({
-    for key, value in data.aws_route53_zone.core_network_services : key => merge(value, {
-      provider = "core-network-services"
-    })
-    }, {
-    for key, value in data.aws_route53_zone.core_vpc : key => merge(value, {
-      provider = "core-vpc"
-    })
-    }, {
-    for key, value in data.aws_route53_zone.self : key => merge(value, {
-      provider = "self"
-    })
-  })
-}
+#   route53_zones = merge({
+#     for key, value in data.aws_route53_zone.core_network_services : key => merge(value, {
+#       provider = "core-network-services"
+#     })
+#     }, {
+#     for key, value in data.aws_route53_zone.core_vpc : key => merge(value, {
+#       provider = "core-vpc"
+#     })
+#     }, {
+#     for key, value in data.aws_route53_zone.self : key => merge(value, {
+#       provider = "self"
+#     })
+#   })
+# }
 
 ### Cloudfront Secret Creation
 resource "random_password" "cloudfront" {
