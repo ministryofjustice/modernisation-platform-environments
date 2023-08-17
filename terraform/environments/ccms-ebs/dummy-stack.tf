@@ -5,9 +5,9 @@ resource "aws_instance" "ec2_instance_dummy_app" {
   associate_public_ip_address = false
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
-  instance_type               = "t2.micro"
+  instance_type               = "t3.nano"
   key_name                    = local.application_data.accounts[local.environment].key_name
-  monitoring                  = true
+  monitoring                  = false
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.sg_dummy_app.id]
 
@@ -35,9 +35,9 @@ resource "aws_instance" "ec2_instance_dummy_db" {
   associate_public_ip_address = false
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
-  instance_type               = "t2.micro"
+  instance_type               = "t3.nano"
   key_name                    = local.application_data.accounts[local.environment].key_name
-  monitoring                  = true
+  monitoring                  = false
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.sg_dummy_db.id]
 
@@ -195,7 +195,7 @@ resource "aws_security_group" "sg_dummy_app2db" {
 # Internet <-> Internet_2_ALB
 resource "aws_vpc_security_group_egress_rule" "sr_dummy_internet_alb_out" {
   security_group_id            = aws_security_group.sg_dummy_alb.id
-  description                  = "ALB -> Internet : 443"
+  description                  = "ALB - Internet : 443"
   ip_protocol                  = "TCP"
   from_port                    = 443
   to_port                      = 443
@@ -204,7 +204,7 @@ resource "aws_vpc_security_group_egress_rule" "sr_dummy_internet_alb_out" {
 
 resource "aws_vpc_security_group_ingress_rule" "sr_dummy_internet_alb_in" {
   security_group_id            = aws_security_group.sg_dummy_alb.id
-  description                  = "Internet -> ALB : 443"
+  description                  = "Internet - ALB : 443"
   ip_protocol                  = "TCP"
   from_port                    = 443
   to_port                      = 443
@@ -215,7 +215,7 @@ resource "aws_vpc_security_group_ingress_rule" "sr_dummy_internet_alb_in" {
 # ALB <-> ALB_2_App : 443
 resource "aws_vpc_security_group_egress_rule" "sr_dummy_alb2app_alb_out_443" {
   security_group_id            = aws_security_group.sg_dummy_alb.id
-  description                  = "ALB_2_App -> ALB : 443"
+  description                  = "ALB_2_App - ALB : 443"
   ip_protocol                  = "TCP"
   from_port                    = 443
   to_port                      = 443
@@ -224,7 +224,7 @@ resource "aws_vpc_security_group_egress_rule" "sr_dummy_alb2app_alb_out_443" {
 
 resource "aws_vpc_security_group_ingress_rule" "sr_dummy_alb_alb2app_in_443" {
   security_group_id            = aws_security_group.sg_dummy_alb.id
-  description                  = "ALB -> ALB_2_App : 443"
+  description                  = "ALB - ALB_2_App : 443"
   ip_protocol                  = "TCP"
   from_port                    = 443
   to_port                      = 443
@@ -234,7 +234,7 @@ resource "aws_vpc_security_group_ingress_rule" "sr_dummy_alb_alb2app_in_443" {
 # ALB_2_App <-> App : 443
 resource "aws_vpc_security_group_egress_rule" "sr_dummy_alb2app_app_out_443" {
   security_group_id            = aws_security_group.sg_dummy_alb2app.id
-  description                  = "ALB_2_App -> App : 443"
+  description                  = "ALB_2_App - App : 443"
   ip_protocol                  = "TCP"
   from_port                    = 443
   to_port                      = 443
@@ -243,7 +243,7 @@ resource "aws_vpc_security_group_egress_rule" "sr_dummy_alb2app_app_out_443" {
 
 resource "aws_vpc_security_group_ingress_rule" "sr_dummy_app_alb2app_in_443" {
   security_group_id            = aws_security_group.sg_dummy_alb2app.id
-  description                  = "ALB -> ALB_2_App : 443"
+  description                  = "ALB - ALB_2_App : 443"
   ip_protocol                  = "TCP"
   from_port                    = 443
   to_port                      = 443
@@ -254,7 +254,7 @@ resource "aws_vpc_security_group_ingress_rule" "sr_dummy_app_alb2app_in_443" {
 # ALB <-> ALB_2_App : 22
 resource "aws_vpc_security_group_egress_rule" "sr_dummy_app2db_app_out_443" {
   security_group_id            = aws_security_group.sg_dummy_app.id
-  description                  = "ALB_2_App -> App : 22"
+  description                  = "ALB_2_App - App : 22"
   ip_protocol                  = "TCP"
   from_port                    = 22
   to_port                      = 22
@@ -263,7 +263,7 @@ resource "aws_vpc_security_group_egress_rule" "sr_dummy_app2db_app_out_443" {
 
 resource "aws_vpc_security_group_ingress_rule" "sr_dummy_app_app2db_in_443" {
   security_group_id            = aws_security_group.sg_dummy_app.id
-  description                  = "App -> ALB_2_App : 22"
+  description                  = "App - ALB_2_App : 22"
   ip_protocol                  = "TCP"
   from_port                    = 22
   to_port                      = 22
@@ -273,7 +273,7 @@ resource "aws_vpc_security_group_ingress_rule" "sr_dummy_app_app2db_in_443" {
 # ALB_2_App <-> App : 22
 resource "aws_vpc_security_group_egress_rule" "sr_dummy_app2db_db_out_443" {
   security_group_id            = aws_security_group.sg_dummy_app2db.id
-  description                  = "App_2_DB -> DB : 22"
+  description                  = "App_2_DB - DB : 22"
   ip_protocol                  = "TCP"
   from_port                    = 22
   to_port                      = 22
@@ -282,7 +282,7 @@ resource "aws_vpc_security_group_egress_rule" "sr_dummy_app2db_db_out_443" {
 
 resource "aws_vpc_security_group_ingress_rule" "sr_dummy_db_app2db_in_443" {
   security_group_id            = aws_security_group.sg_dummy_app2db.id
-  description                  = "DB -> App_2_DB : 22"
+  description                  = "DB - App_2_DB : 22"
   ip_protocol                  = "TCP"
   from_port                    = 22
   to_port                      = 22
