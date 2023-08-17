@@ -9,7 +9,7 @@ resource "random_password" "ad_password" {
 
 # Creating a AWS secret for AWS managed AD
 resource "aws_secretsmanager_secret" "secretdirectoryservice" {
-  name                    = "${var.app_name}-AWSADPASS"
+  name                    = "${var.app_name}-FSX"
   recovery_window_in_days = 0
 }
 
