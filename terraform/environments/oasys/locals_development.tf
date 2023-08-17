@@ -18,7 +18,12 @@ locals {
     }
 
     baseline_ec2_instances = {
-      "dev-${local.application_name}-db-a" = local.database_a
+      # "dev-${local.application_name}-db-a" = local.database_a
+      "dev-${local.application_name}-db-a" = merge(local.database_a, {
+        tags = merge(local.database_a.tags, {
+          description                             = "dev ${local.application_name} database"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
