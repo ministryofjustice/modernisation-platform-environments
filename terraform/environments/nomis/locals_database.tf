@@ -97,11 +97,10 @@ locals {
   }
 
   # Alarms created directly by ec2-instance module
-  # TODO - change alarm actions to dba_pagerduty once alarms proven out
+  # TODO: - change alarm actions to dba_pagerduty once alarms proven out
   database_ec2_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-    # module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd,
     {
       # oracle-db-disconnected = {
       #   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -150,34 +149,28 @@ locals {
       #     instance = "nomis_long_running_batch"
       #   }
       # }
-      # oracleasm-service = {
-      #   comparison_operator = "GreaterThanOrEqualToThreshold"
-      #   evaluation_periods  = "3"
-      #   namespace      #      = "CWAgent"
-      #   metric_name      #    = "collectd_exec_value"
-      #   period      #       #   = "60"
-      #   statistic      #      = "Average"
-      #   threshold      #      = "1"
-      #   alarm_description   = "oracleasm service has stopped"
-      #   alarm_actions      #  = ["dba_pagerduty"]
-      #   dimensions = {
-      #     instance = "oracleasm"
-      #   }
-      # }
-      # oracle-ohasd-service = {
-      #   comparison_operator = "GreaterThanOrEqualToThreshold"
-      #   evaluation_periods  = "3"
-      #   namespace      #      = "CWAgent"
-      #   metric_name      #    = "collectd_exec_value"
-      #   period      #       #   = "60"
-      #   statistic      #      = "Average"
-      #   threshold      #      = "1"
-      #   alarm_description   = "oracle ohasd service has stopped"
-      #   alarm_actions      #  = ["dba_pagerduty"]
-      #   dimensions = {
-      #     instance = "oracle_ohasd"
-      #   }
-      # }
+      oracleasm-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_oracleasm_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "oracleasm service has stopped"
+        alarm_actions       = ["dba_pagerduty"]
+      }
+      oracle-ohasd-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_oracleohasd_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "oracle ohasd service has stopped"
+        alarm_actions       = ["dba_pagerduty"]
+      }
       cpu-utilization-high = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "120"
