@@ -103,53 +103,56 @@ locals {
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd,
     {
-      # oracle-db-disconnected = {
-      #   comparison_operator = "GreaterThanOrEqualToThreshold"
-      #   evaluation_periods  = "5"
-      #   datapoints_to_alarm = "5"
-      #   metric_name      #    = "collectd_exec_value"
-      #   namespace      #      = "CWAgent"
-      #   period      #       #   = "60"
-      #   statistic      #      = "Average"
-      #   threshold      #      = "1"
-      #   alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
-      #   alarm_actions      #  = ["dba_pagerduty"]
-      #   dimensions = {
-      #     instance = "db_connected"
-      #   }
-      # }
-      # oracle-batch-failure = {
-      #   comparison_operator = "GreaterThanOrEqualToThreshold"
-      #   evaluation_periods  = "5"
-      #   datapoints_to_alarm = "5"
-      #   metric_name      #    = "collectd_exec_value"
-      #   namespace      #      = "CWAgent"
-      #   period      #       #   = "60"
-      #   statistic      #      = "Average"
-      #   threshold      #      = "1"
-      #   treat_missing_data  = "notBreaching"
-      #   alarm_description   = "Oracle db has recorded a failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Batch+Failure for remediation steps."
-      #   alarm_actions      #  = ["dba_pagerduty"]
-      #   dimensions = {
-      #     instance = "nomis_batch_failure_status"
-      #   }
-      # }
-      # oracle-long-running-batch = {
-      #   comparison_operator = "GreaterThanOrEqualToThreshold"
-      #   evaluation_periods  = "5"
-      #   datapoints_to_alarm = "5"
-      #   metric_name      #    = "collectd_exec_value"
-      #   namespace      #      = "CWAgent"
-      #   period      #       #   = "60"
-      #   statistic      #      = "Average"
-      #   threshold      #      = "1"
-      #   treat_missing_data  = "notBreaching"
-      #   alarm_description   = "Oracle db has recorded a long-running batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325966186/Long+Running+Batch for remediation steps."
-      #   alarm_actions      #  = ["dba_pagerduty"]
-      #   dimensions = {
-      #     instance = "nomis_long_running_batch"
-      #   }
-      # }
+      # FIXME: metric name needs changing to collectd_dbconnected_value as part of DSOS-2092, remove dimensions
+      oracle-db-disconnected = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "collectd_exec_value"
+        namespace           = "CWAgent"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
+        alarm_actions       = ["dba_pagerduty"]
+        dimensions = {
+          instance = "db_connected"
+        }
+      }
+      # FIXME: metric name needs changing to collectd_nomisbatchfailure_value as part of DSOS-2092, remove dimensions
+      oracle-batch-failure = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "collectd_exec_value"
+        namespace           = "CWAgent"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        treat_missing_data  = "notBreaching"
+        alarm_description   = "Oracle db has recorded a failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Batch+Failure for remediation steps."
+        alarm_actions       = ["dba_pagerduty"]
+        dimensions = {
+          instance = "nomis_batch_failure_status"
+        }
+      }
+      # FIXME: metric name needs changing to collectd_nomislongrunningbatch_value as part of DSOS-2092, remove dimensions
+      oracle-long-running-batch = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "collectd_exec_value"
+        namespace           = "CWAgent"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        treat_missing_data  = "notBreaching"
+        alarm_description   = "Oracle db has recorded a long-running batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325966186/Long+Running+Batch for remediation steps."
+        alarm_actions       = ["dba_pagerduty"]
+        dimensions = {
+          instance = "nomis_long_running_batch"
+        }
+      }
       oracleasm-service = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
@@ -186,37 +189,39 @@ locals {
       }
   })
   database_ec2_cloudwatch_metric_alarms_high_priority = {
-    # oracle-db-disconnected = {
-    #   comparison_operator = "GreaterThanOrEqualToThreshold"
-    #   evaluation_periods  = "5"
-    #   datapoints_to_alarm = "5"
-    #   metric_name         = "collectd_exec_value"
-    #   namespace           = "CWAgent"
-    #   period              = "60"
-    #   statistic           = "Average"
-    #   threshold           = "1"
-    #   alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
-    #   alarm_actions       = ["dba_high_priority_pagerduty"]
-    #   dimensions = {
-    #     instance = "db_connected"
-    #   }
-    # }
+    # FIXME: metric name needs changing to collectd_dbconnected_value as part of DSOS-2092, remove dimensions
+    oracle-db-disconnected = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "5"
+      datapoints_to_alarm = "5"
+      metric_name         = "collectd_exec_value"
+      namespace           = "CWAgent"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
+      alarm_actions       = ["dba_high_priority_pagerduty"]
+      dimensions = {
+        instance = "db_connected"
+      }
+    }
   }
+  # FIXME: metric name needs changing to collectd_fixngoconnected_value as part of DSOS-2093, remove dimensions
   fixngo_connection_cloudwatch_metric_alarms = {
-    # fixngo-connection = {
-    #   comparison_operator = "GreaterThanOrEqualToThreshold"
-    #   evaluation_periods  = "3"
-    #   namespace           = "CWAgent"
-    #   metric_name         = "collectd_exec_value"
-    #   period              = "60"
-    #   statistic           = "Average"
-    #   threshold           = "1"
-    #   alarm_description   = "this EC2 instance no longer has a connection to the Oracle Enterprise Manager in FixNGo of the connection-target machine"
-    #   alarm_actions       = ["dso_pagerduty"]
-    #   dimensions = {
-    #     instance = "fixngo_connected" # required dimension value for this metric
-    #   }
-    # }
+    fixngo-connection = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "3"
+      namespace           = "CWAgent"
+      metric_name         = "collectd_exec_value"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "this EC2 instance no longer has a connection to the Oracle Enterprise Manager in FixNGo of the connection-target machine"
+      alarm_actions       = ["dso_pagerduty"]
+      dimensions = {
+        instance = "fixngo_connected" # required dimension value for this metric
+      }
+    }
   }
 
   database_cloudwatch_log_groups = {
