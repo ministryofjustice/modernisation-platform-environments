@@ -39,6 +39,11 @@ locals {
   datamart_username        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["username"]
   datamart_password        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
 
+  # Glue Job parameters
+  reporting_hub_driver_mem    = local.application_data.accounts[local.environment].reporting_hub_spark_driver_mem
+  reporting_hub_executor_mem  = local.application_data.accounts[local.environment].reporting_hub_spark_executor_mem
+  reporting_hub_log_level     = local.application_data.accounts[local.environment].reporting_hub_spark_log_level
+
   # Common Policies
   kms_read_access_policy   = "${local.project}_kms_read_policy"
   s3_read_access_policy    = "${local.project}_s3_read_policy"
