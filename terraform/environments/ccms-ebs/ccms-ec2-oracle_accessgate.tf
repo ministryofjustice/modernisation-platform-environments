@@ -1,7 +1,7 @@
 resource "aws_instance" "ec2_accessgate" {
   count                  = local.application_data.accounts[local.environment].accessgate_no_instances
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
-  ami                    = data.aws_ami.accessgate.id
+  ami                    = local.application_data.accounts[local.environment]["accessgate_ami_id-${count.index + 1}"]
   key_name               = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg_accessgate.id]
   subnet_id              = local.private_subnets[count.index]
