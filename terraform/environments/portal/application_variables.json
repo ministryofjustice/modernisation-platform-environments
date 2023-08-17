@@ -33,8 +33,9 @@
       "lb_access_logs_existing_bucket_name": "",
       "url": "s3://laa-portal-development-archive-mp",
       "maintenance_window_name": "diagnostics-log-archive-poc",
-      "hosted_zone": "aws.dev.legalservices.gov.uk"
-
+      "hosted_zone": "aws.dev.legalservices.gov.uk",
+      "acm_domain_name": "dev.legalservices.gov.uk",
+      "acm_alt_domain_name": "*.dev.legalservices.gov.uk"
 
     },
     "test": {
@@ -53,7 +54,8 @@
       "ohs_instance_type": "m5.xlarge",
       "url": "s3://laa-portal-production-archive-mp",
       "maintenance_window_name": "diagnostics-log-archive-production",
-      "hosted_zone": "aws.prd.legalservices.gov.uk"
+      "hosted_zone": "aws.prd.legalservices.gov.uk",
+      "acm_domain_name": "legalservices.gov.uk"
     }
   }
 }
