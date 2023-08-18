@@ -3,9 +3,9 @@ locals {
   # Variables used across multiple areas
   ##
 
-  domain           = local.is-production ? "probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain           = local.is-production ? "jitbit.cr.probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   non_prod_app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
-  prod_app_url     = "helpdesk.jitbit.cr.${local.domain}"
+  prod_app_url     = "helpdesk.${local.domain}"
   app_url          = local.is-production ? local.prod_app_url : local.non_prod_app_url
 
   app_port = local.application_data.accounts[local.environment].server_port
