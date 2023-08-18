@@ -178,3 +178,9 @@ count  = local.is-production == true ? 1 : 0
   name = "Application-Event-Logs"
   retention_in_days = 365
 }
+
+resource "aws_cloudwatch_log_group" "Windows-Services-Logs" {
+count  = local.is-production == true ? 1 : 0
+  name = "Windows-Services-Logs"
+  retention_in_days = 365
+}
