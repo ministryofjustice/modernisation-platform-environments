@@ -113,7 +113,7 @@
       "reporting_hub_spark_log_level": "WARN",
       "create_security_conf": true,
       "setup_buckets": true,
-      "create_kinesis_streams": true,
+      "create_kinesis_streams": false,
       "kinesis_retention_hours": 72,
       "create_glue_registries": false,
       "setup_s3_buckets": true,

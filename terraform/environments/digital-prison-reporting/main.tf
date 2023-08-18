@@ -23,7 +23,7 @@ module "glue_reporting_hub_job" {
   enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
-  additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  additional_policies          = try(module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn, "")
   execution_class              = "STANDARD"
   worker_type                  = "G.1X"
   number_of_workers            = 4
@@ -48,7 +48,7 @@ module "glue_reporting_hub_job" {
     "--dpr.aws.region"                          = local.account_region
     "--dpr.curated.s3.path"                     = "s3://${module.s3_curated_bucket.bucket_id}/"
     "--dpr.kinesis.reader.batchDurationSeconds" = 60
-    "--dpr.kinesis.reader.streamName"           = local.kinesis_stream_ingestor
+    "--dpr.kinesis.reader.streamName"           = try(local.kinesis_stream_ingestor, "")
     "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/"
     "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/"
@@ -579,7 +579,7 @@ module "dms_nomis_ingestor" {
   source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
   source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
   vpc                          = data.aws_vpc.shared.id
-  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  kinesis_stream_policy        = try(module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn, "")
   project_id                   = local.project
   env                          = local.environment
   dms_source_name              = "oracle"
