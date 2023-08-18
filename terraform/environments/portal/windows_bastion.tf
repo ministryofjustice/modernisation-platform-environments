@@ -7,11 +7,17 @@ resource "aws_instance" "windows_bastion" {
   subnet_id                   = data.aws_subnet.public_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   associate_public_ip_address = true
+  key_name                    = aws_key_pair.bastion.key_name
 
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} Windows Bastion" }
   )
+}
+
+resource "aws_key_pair" "bastion" {
+  key_name   = "windows-bastion-key"
+  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFryxed9OdpeCoCPcZY1vAlQlVcsx83tw+oBZrACGMKJ vincent.cheung@MJ003362"
 }
 
 
