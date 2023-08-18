@@ -31,20 +31,14 @@ locals {
       })
 
       "dev-${local.application_name}-db-2-a" = merge(local.database_a, {
-        config = {
-          availability_zone             = "eu-west-2a"
-          subnet_name                   = "data"
+        config = merge(module.baseline_presets.ec2_instance.config.db, {
+          ami_name          = "oasys_oracle_db_release_2023-06-26T10-16-03.670Z"
+          ami_owner         = "self"
+          availability_zone = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
           ami_name          = "oasys_oracle_db_release_2023-08-17T15-48-10.393Z"
           ami_owner         = "374269020027"
-          user_data_raw                 = null
-          ssm_parameters_prefix         = "database/"
-          iam_resource_names_prefix     = "ec2-database"
-          instance_profile_policies = flatten([
-            "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            local.iam_policies_ec2_default,
-          ])
-        }
+        })
         tags = merge(local.database_a.tags, {
           description                             = "dev ${local.application_name} database"
         })
