@@ -29,6 +29,17 @@ locals {
           description                             = "dev ${local.application_name} database"
         })
       })
+
+      "dev-${local.application_name}-db-2-a" = merge(local.database_a, {
+        config = merge(module.baseline_presets.ec2_instance.config.db, {
+          ami_name          = "oasys_oracle_db_release_2023-08-17T15-48-10.393Z"
+          ami_owner         = "374269020027"
+          availability_zone = "${local.region}a"
+        })
+        tags = merge(local.database_a.tags, {
+          description                             = "dev ${local.application_name} database"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {

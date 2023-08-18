@@ -150,11 +150,11 @@ locals {
       #   label = "flash"
       #   type = null
       # }
-      "/dev/sds" = {
-        label = "swap"
-        type  = "gp3"
-        size  = 2
-      }
+      # "/dev/sds" = {
+      #   label = "swap"
+      #   type  = "gp3"
+      #   size  = 2
+      # }
     }
     ebs_volume_config = {
       data = {
