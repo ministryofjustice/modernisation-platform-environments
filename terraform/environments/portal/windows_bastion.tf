@@ -10,6 +10,7 @@ resource "aws_instance" "windows_bastion" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} Windows Bastion" }
+  )
 }
 
 
