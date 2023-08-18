@@ -110,6 +110,11 @@ locals {
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     ebs_volumes = {
+      "/dev/sda1" = { # boot volume
+        size  = 30
+        label = "app"
+        type  = "gp3"
+      }
       "/dev/sdb" = { # /u01
         size  = 100
         label = "app"
@@ -150,11 +155,11 @@ locals {
       #   label = "flash"
       #   type = null
       # }
-      # "/dev/sds" = {
-      #   label = "swap"
-      #   type  = "gp3"
-      #   size  = 2
-      # }
+      "/dev/sds" = {
+        label = "swap"
+        type  = "gp3"
+        size  = 2
+      }
     }
     ebs_volume_config = {
       data = {
