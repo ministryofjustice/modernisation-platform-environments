@@ -1,3 +1,11 @@
+data "aws_route53_zone" "network-services-production" {
+  count   = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  name         = "jitbit.cr.probation.service.justice.gov.uk."
+  private_zone = false
+}
+
 resource "aws_route53_record" "external" {
   count    = local.is-production ? 0 : 1
   provider = aws.core-vpc
@@ -17,7 +25,7 @@ resource "aws_route53_record" "external-prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
-  zone_id = data.aws_route53_zone.network-services.zone_id
+  zone_id = data.aws_route53_zone.network-services-production[0].zone_id
   name    = local.app_url
   type    = "A"
 
