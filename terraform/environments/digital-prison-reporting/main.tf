@@ -125,7 +125,7 @@ module "kinesis_stream_ingestor" {
   create_kinesis_stream     = local.create_kinesis
   name                      = local.kinesis_stream_ingestor
   shard_count               = 1 # Not Valid when ON-DEMAND Mode
-  retention_period          = 24
+  retention_period          = local.kinesis_retention_hours
   shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
   enforce_consumer_deletion = false
   encryption_type           = "KMS"

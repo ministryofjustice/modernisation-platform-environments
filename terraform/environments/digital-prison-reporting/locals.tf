@@ -17,6 +17,7 @@ locals {
   account_id               = data.aws_caller_identity.current.account_id
   account_region           = data.aws_region.current.name
   create_kinesis           = local.application_data.accounts[local.environment].create_kinesis_streams
+  kinesis_retention_hours  = local.application_data.accounts[local.environment].kinesis_retention_hours
   enable_glue_registry     = local.application_data.accounts[local.environment].create_glue_registries
   setup_buckets            = local.application_data.accounts[local.environment].setup_s3_buckets
   create_glue_connection   = local.application_data.accounts[local.environment].create_glue_connections
