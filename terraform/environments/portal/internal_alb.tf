@@ -52,14 +52,14 @@ resource "aws_lb_listener" "http_internal" {
   # }
 
   # TODO This needs removing once HTTPS is set up
-  # default_action {
-  #   type = "fixed-response"
-  #   fixed_response {
-  #     content_type = "text/plain"
-  #     message_body = "HTTPS is not set up yet"
-  #     status_code  = 403
-  #   }
-  # }
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access Denied - must access via CloudFront"
+      status_code  = 403
+    }
+  }
 
   tags = local.tags
 
