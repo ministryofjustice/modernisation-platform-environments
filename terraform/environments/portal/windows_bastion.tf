@@ -6,6 +6,7 @@ resource "aws_instance" "windows_bastion" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.public_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
+  associate_public_ip_address = true
 
   tags = merge(
     local.tags,
