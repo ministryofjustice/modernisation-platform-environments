@@ -49,7 +49,7 @@ resource "aws_acm_certificate" "cloudfront" {
   # domain_name               = var.hosted_zone
   domain_name               = local.application_data.accounts[local.environment].acm_domain_name
   validation_method         = "DNS"
-  # provider                  = aws.us-east-1
+  provider                  = aws.us-east-1
   # subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.hosted_zone}"]
   # subject_alternative_names = local.environment == "production" ? null : ["${local.application_name}.${local.networking[0].local.networking[0].business-unit}-${local.environment}.${local.portal_hosted_zone}"]
   # subject_alternative_names = local.environment == "production" ? null : [local.application_data.accounts[local.environment].fqdn]
