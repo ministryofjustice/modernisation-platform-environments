@@ -41,3 +41,12 @@ resource "aws_vpc_security_group_ingress_rule" "bastion_rdp" {
   ip_protocol       = "tcp"
   to_port           = 3389
 }
+
+resource "aws_vpc_security_group_ingress_rule" "bastion_rdp" {
+  security_group_id = aws_security_group.bastion.id
+  description       = "Bastion RDP Inbound from WorkSpaces"
+  cidr_ipv4         = local.nonprod_workspaces_cidr
+  from_port         = 3389
+  ip_protocol       = "tcp"
+  to_port           = 3389
+}
