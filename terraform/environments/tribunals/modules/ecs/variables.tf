@@ -160,3 +160,8 @@ variable "fsx_subnet_ids" {
 variable "environment" {  
 }
 
+variable "fsx_vpc_id" {  
+}
+
+
+
