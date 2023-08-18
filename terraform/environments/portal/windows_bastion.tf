@@ -29,7 +29,7 @@ resource "aws_vpc_security_group_egress_rule" "bastion_outbound" {
 resource "aws_vpc_security_group_ingress_rule" "bastion_rdp" {
   security_group_id = aws_security_group.bastion.id
   description       = "Bastion RDP Inbound"
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  cidr_ipv4         = "81.134.202.29/32"
   from_port         = 3389
   ip_protocol       = "tcp"
   to_port           = 3389
