@@ -20,6 +20,11 @@ locals {
     baseline_ec2_instances = {
       # "dev-${local.application_name}-db-a" = local.database_a
       "dev-${local.application_name}-db-a" = merge(local.database_a, {
+        config = merge(module.baseline_presets.ec2_instance.config.db, {
+          ami_name          = "oasys_oracle_db_release_2023-08-17T15-48-10.393Z"
+          ami_owner         = "self"
+          availability_zone = "${local.region}a"
+        })
         tags = merge(local.database_a.tags, {
           description                             = "dev ${local.application_name} database"
         })
