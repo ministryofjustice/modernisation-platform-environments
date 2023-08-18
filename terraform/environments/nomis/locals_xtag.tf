@@ -14,42 +14,42 @@ locals {
   xtag_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-    # module.baseline_presets.cloudwatch_metric_alarms.ec2_asg_cwagent_collectd,
-    # {
-    #   xtag-wls-nodemanager-service = {
-    #     comparison_operator = "GreaterThanOrEqualToThreshold"
-    #     evaluation_periods  = "3"
-    #     namespace           = "CWAgent"
-    #     metric_name         = "collectd_wlsnodemanager_value"
-    #     period              = "60"
-    #     statistic           = "Average"
-    #     threshold           = "1"
-    #     alarm_description   = "wls_nodemanager.service has stopped"
-    #     alarm_actions       = ["dso_pagerduty"]
-    #   }
-    #  xtag-wls-adminserver-service = {
-    #    comparison_operator = "GreaterThanOrEqualToThreshold"
-    #    evaluation_periods  = "3"
-    #    namespace           = "CWAgent"
-    #    metric_name         = "collectd_wlsadminserver_value"
-    #    period              = "60"
-    #    statistic           = "Average"
-    #    threshold           = "1"
-    #    alarm_description   = "wls_adminserver.service has stopped"
-    #    alarm_actions       = ["dso_pagerduty"]
-    #  }
-    #  xtag-wls-managedserver-service = {
-    #    comparison_operator = "GreaterThanOrEqualToThreshold"
-    #    evaluation_periods  = "3"
-    #    namespace           = "CWAgent"
-    #    metric_name         = "collectd_wlsmanagedserver_value"
-    #    period              = "60"
-    #    statistic           = "Average"
-    #    threshold           = "1"
-    #    alarm_description   = "wls_managedserver.service has stopped"
-    #    alarm_actions       = ["dso_pagerduty"]
-    #  }
-    # }
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd,
+    {
+      xtag-wls-nodemanager-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_wlsnodemanager_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "wls_nodemanager.service has stopped"
+        alarm_actions       = ["dso_pagerduty"]
+      }
+      xtag-wls-adminserver-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_wlsadminserver_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "wls_adminserver.service has stopped"
+        alarm_actions       = ["dso_pagerduty"]
+      }
+      xtag-wls-managedserver-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_wlsmanagedserver_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "wls_managedserver.service has stopped"
+        alarm_actions       = ["dso_pagerduty"]
+      }
+    }
   )
 
   xtag_ec2_default = {

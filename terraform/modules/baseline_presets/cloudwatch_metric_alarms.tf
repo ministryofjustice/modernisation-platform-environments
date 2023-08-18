@@ -147,72 +147,35 @@ locals {
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "collectd_exec_value"
+        metric_name         = "collectd_chronyd_value"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
         alarm_description   = "Triggers if the chronyd service has stopped"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
-        dimensions = {
-          instance = "chronyd"
-        }
-      }
-      sshd-stopped = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        datapoints_to_alarm = "3"
-        namespace           = "CWAgent"
-        metric_name         = "collectd_exec_value"
-        period              = "60"
-        statistic           = "Maximum"
-        threshold           = "1"
-        alarm_description   = "Triggers if the sshd service has stopped"
-        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
-        dimensions = {
-          instance = "sshd"
-        }
       }
       cloudwatch-agent-stopped = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "collectd_exec_value"
+        metric_name         = "collectd_amazoncloudwatchagent_value"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
         alarm_description   = "Triggers if the cloudwatch agent service has stopped"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
-        dimensions = {
-          instance = "cloudwatch_agent_status"
-        }
       }
       ssm-agent-stopped = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "collectd_exec_value"
+        metric_name         = "collectd_amazonssmagent_value"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
         alarm_description   = "Triggers if the ssm agent service has stopped"
-        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
-        dimensions = {
-          instance = "ssm_agent_status"
-        }
-      }
-    }
-    ec2_asg_cwagent_collectd = {
-      stopped-linux-service = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        namespace           = "CWAgent"
-        metric_name         = "collectd_exec_value"
-        period              = "60"
-        statistic           = "Maximum"
-        threshold           = "1"
-        alarm_description   = "A service or metric that's being monitored by collectd has stopped"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }

@@ -109,7 +109,20 @@ locals {
   weblogic_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-    # module.baseline_presets.cloudwatch_metric_alarms.ec2_asg_cwagent_collectd,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd,
+    {
+      weblogic-healthcheck = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_weblogichealthcheck_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "weblogic-healthcheck has found an unhealthy service"
+        alarm_actions       = ["dso_pagerduty"]
+      }
+    }
   )
 
   weblogic_cloudwatch_log_groups = {
