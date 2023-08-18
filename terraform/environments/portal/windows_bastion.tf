@@ -4,7 +4,7 @@ resource "aws_instance" "windows_bastion" {
   instance_type               = "t2.small"
   vpc_security_group_ids      = [aws_security_group.bastion.id]
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  subnet_id                   = data.aws_subnet.public_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
 
   tags = merge(
