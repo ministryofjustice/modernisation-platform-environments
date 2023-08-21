@@ -407,7 +407,28 @@ resource "aws_cloudfront_distribution" "external" {
     prefix          = local.application_name
   }
   # web_acl_id = aws_wafv2_web_acl.wafv2_acl.id
-  web_acl_id = aws_wafv2_web_acl.wafv2_acl.arn
+  web_acl_id        = aws_wafv2_web_acl.wafv2_acl.arn
+
+  custom_error_response = [
+    {
+      error_code            = 404
+      response_code         = 404
+      response_page_path    = "/error-pages/not_found.html"
+      error_caching_min_ttl = 5
+    },
+    {
+      error_code            = 502
+      response_code         = 502
+      response_page_path    = "/error-pages/error.html"
+      error_caching_min_ttl = 5
+    },
+    {
+      error_code            = 503
+      response_code         = 503
+      response_page_path    = "/error-pages/error.html"
+      error_caching_min_ttl = 5
+    }
+  ]
 
   restrictions {
     geo_restriction {
