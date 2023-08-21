@@ -116,7 +116,7 @@ resource "aws_instance" "ohs_instance_1" {
   user_data_replace_on_change = true
 
   tags = merge(
-    {"instance-scheduling" = "skip-scheduling"},
+    { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${local.application_name} OHS Instance 1" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
@@ -146,7 +146,7 @@ resource "aws_instance" "ohs_instance_2" {
 
 
   tags = merge(
-    {"instance-scheduling" = "skip-scheduling"},
+    { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${local.application_name} OHS Instance 2" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }

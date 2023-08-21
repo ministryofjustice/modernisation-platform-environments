@@ -1,5 +1,5 @@
 data "aws_route53_zone" "network-services-production" {
-  count   = local.is-production ? 1 : 0
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   name         = "jitbit.cr.probation.service.justice.gov.uk."

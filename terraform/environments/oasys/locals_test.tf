@@ -31,7 +31,7 @@ locals {
       #     "${local.application_name}-environment" = "t2"
       #   })
       # })
-      
+
       ##
       ## T1
       ##
@@ -65,12 +65,12 @@ locals {
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
         })
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
             branch = "oasys/web-index-html-updation"
           })
         })
-        autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
+        autoscaling_group = module.baseline_presets.ec2_autoscaling_group.cold_standby
         tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
           "${local.application_name}-environment" = "t2"
@@ -161,10 +161,10 @@ locals {
         enable_delete_protection = false
         existing_target_groups = {
         }
-        idle_timeout             = 60 # 60 is default
-        security_groups          = ["public_lb"]
-        public_subnets           = module.environment.subnets["public"].ids
-        tags                     = local.tags
+        idle_timeout    = 60 # 60 is default
+        security_groups = ["public_lb"]
+        public_subnets  = module.environment.subnets["public"].ids
+        tags            = local.tags
 
         listeners = {
           https = {
@@ -242,8 +242,8 @@ locals {
         }
       }
       private = {
-        internal_lb              = true
-        access_logs              = false
+        internal_lb = true
+        access_logs = false
         # s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
@@ -339,8 +339,8 @@ locals {
       #
       # "${local.application_name}.service.justice.gov.uk" = {
       #   lb_alias_records = [
-          # { name = "t2", type = "A", lbs_map_key = "public" }, # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
-          # { name = "db.t2", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+      # { name = "t2", type = "A", lbs_map_key = "public" }, # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
+      # { name = "db.t2", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
       #   ]
       # }
       # "t1.${local.application_name}.service.justice.gov.uk" = {

@@ -18,10 +18,7 @@
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
-      "db_enabled_cloudwatch_logs_exports": [
-        "agent",
-        "error"
-      ],
+      "db_enabled_cloudwatch_logs_exports": ["agent", "error"],
       "db_performance_insights_enabled": "false",
       "db_deletion_protection": "true",
       "db_delete_automated_backups": "false",
@@ -46,10 +43,7 @@
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
-      "db_enabled_cloudwatch_logs_exports": [
-        "agent",
-        "error"
-      ],
+      "db_enabled_cloudwatch_logs_exports": ["agent", "error"],
       "db_performance_insights_enabled": "false",
       "db_deletion_protection": "true",
       "db_delete_automated_backups": "false",
@@ -74,10 +68,7 @@
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
-      "db_enabled_cloudwatch_logs_exports": [
-        "agent",
-        "error"
-      ],
+      "db_enabled_cloudwatch_logs_exports": ["agent", "error"],
       "db_performance_insights_enabled": "false",
       "db_deletion_protection": "true",
       "db_delete_automated_backups": "false",
@@ -102,10 +93,7 @@
       "db_multi_az": "true",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
-      "db_enabled_cloudwatch_logs_exports": [
-        "agent",
-        "error"
-      ],
+      "db_enabled_cloudwatch_logs_exports": ["agent", "error"],
       "db_performance_insights_enabled": "true",
       "db_deletion_protection": "true",
       "db_skip_final_snapshot": "false",

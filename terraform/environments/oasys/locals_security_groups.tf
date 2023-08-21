@@ -179,7 +179,7 @@ locals {
             local.security_group_cidrs.https_internal,
             local.security_group_cidrs.https_external,
           ]))
-          security_groups = ["private_lb","public_lb"]
+          security_groups = ["private_lb", "public_lb"]
         }
         http8080 = {
           description = "Allow http8080 ingress"
@@ -190,7 +190,7 @@ locals {
             local.security_group_cidrs.https_internal,
             local.security_group_cidrs.https_external,
           ]))
-          security_groups = ["private_lb","public_lb"]
+          security_groups = ["private_lb", "public_lb"]
         }
       }
       egress = {

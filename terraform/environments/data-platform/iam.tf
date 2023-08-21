@@ -189,9 +189,9 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
     actions   = ["s3:ListBucket"]
     resources = [module.s3-bucket.bucket.arn]
     condition {
-      test = "StringLike"
+      test     = "StringLike"
       variable = "s3:prefix"
-      values = ["code/*"]
+      values   = ["code/*"]
     }
   }
 }

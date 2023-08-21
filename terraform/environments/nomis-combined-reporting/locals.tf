@@ -39,7 +39,7 @@ locals {
     "${local.environment}.nomis-combined-reporting.az.justice.gov.uk"      = {}
     "${local.environment}.nomis-combined-reporting.service.justice.gov.uk" = {}
   }
-  baseline_ssm_parameters           = {}
+  baseline_ssm_parameters = {}
   baseline_s3_buckets = {
     s3-bucket = {
       iam_policies = module.baseline_presets.s3_iam_policies
