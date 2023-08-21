@@ -24,7 +24,19 @@ resource "aws_vpc_security_group_egress_rule" "base_ami_test_instance_https_out"
   )
 }
 
-resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman_in" {
+resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_rman" {
+  security_group_id = aws_security_group.base_ami_test_instance_sg.id
+  cidr_ipv4         = local.environment_config_dev.legacy_engineering_vpc_cidr
+  from_port         = 1521
+  to_port           = 1521
+  ip_protocol       = "tcp"
+  description       = "Allow communication in out port 1521 to legacy rman"
+  tags = merge(local.tags,
+    { Name = "legacy-rman-out" }
+  )
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
   security_group_id = aws_security_group.base_ami_test_instance_sg.id
   cidr_ipv4         = local.environment_config_dev.legacy_engineering_vpc_cidr
   from_port         = 1521
