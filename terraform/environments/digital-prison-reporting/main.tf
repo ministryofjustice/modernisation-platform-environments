@@ -25,8 +25,8 @@ module "glue_reporting_hub_job" {
   aws_kms_key                  = local.s3_kms_arn
   additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   execution_class              = "STANDARD"
-  worker_type                  = "G.1X"
-  number_of_workers            = 4
+  worker_type                  = local.reporting_hub_worker_type
+  number_of_workers            = local.reporting_hub_num_workers
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
@@ -47,7 +47,7 @@ module "glue_reporting_hub_job" {
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
     "--dpr.aws.region"                          = local.account_region
     "--dpr.curated.s3.path"                     = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.kinesis.reader.batchDurationSeconds" = 60
+    "--dpr.kinesis.reader.batchDurationSeconds" = local.reporting_hub_kinesis_reader_batch_duration_seconds
     "--dpr.kinesis.reader.streamName"           = local.kinesis_stream_ingestor
     "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/"
     "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/"
@@ -64,8 +64,6 @@ module "glue_reporting_hub_job" {
     "--dpr.domain.catalog.db"                   = module.glue_data_domain_database.db_name
     "--dpr.redshift.secrets.name"               = "${local.project}-redshift-secret-${local.environment}"
     "--dpr.datamart.db.name"                    = "datamart"
-    "--spark.driver.memory"                     = local.reporting_hub_driver_mem
-    "--spark.executor.memory"                   = local.reporting_hub_executor_mem
     "--dpr.log.level"                           = local.reporting_hub_log_level
   }
 }
@@ -90,8 +88,8 @@ module "glue_domain_refresh_job" {
   additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   # timeout                       = 1440
   execution_class   = "FLEX"
-  worker_type       = "G.1X"
-  number_of_workers = 2
+  worker_type       = local.refresh_job_worker_type
+  number_of_workers = local.refresh_job_num_workers
   max_concurrent    = 1
   region            = local.account_region
   account           = local.account_id
@@ -116,6 +114,7 @@ module "glue_domain_refresh_job" {
     "--dpr.domain.registry"          = "${local.project}-domain-registry-${local.environment}"
     "--dpr.domain.target.path"       = "s3://${module.s3_domain_bucket.bucket_id}"
     "--dpr.domain.catalog.db"        = module.glue_data_domain_database.db_name
+    "--dpr.log.level"                = local.refresh_job_log_level
   }
 }
 

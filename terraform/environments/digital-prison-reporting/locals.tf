@@ -41,9 +41,19 @@ locals {
   datamart_password        = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
 
   # Glue Job parameters
+  # Reporting Hub Job
   reporting_hub_driver_mem    = local.application_data.accounts[local.environment].reporting_hub_spark_driver_mem
   reporting_hub_executor_mem  = local.application_data.accounts[local.environment].reporting_hub_spark_executor_mem
+  reporting_hub_worker_type   = local.application_data.accounts[local.environment].reporting_hub_worker_type
+  reporting_hub_num_workers   = local.application_data.accounts[local.environment].reporting_hub_num_workers
   reporting_hub_log_level     = local.application_data.accounts[local.environment].reporting_hub_spark_log_level
+
+  reporting_hub_kinesis_reader_batch_duration_seconds = local.application_data.accounts[local.environment].reporting_hub_kinesis_reader_batch_duration_seconds
+
+  # Refresh Job
+  refresh_job_worker_type   = local.application_data.accounts[local.environment].refresh_job_worker_type
+  refresh_job_num_workers   = local.application_data.accounts[local.environment].refresh_job_num_workers
+  refresh_job_log_level     = local.application_data.accounts[local.environment].refresh_job_log_level
 
   # Common Policies
   kms_read_access_policy   = "${local.project}_kms_read_policy"
