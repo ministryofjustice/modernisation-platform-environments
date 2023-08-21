@@ -153,14 +153,14 @@ resource "aws_security_group" "redshift-data-lb" {
   tags   = local.tags
 }
 
-# resource "aws_security_group_rule" "tcp-5439" {
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   from_port         = 5439
-#   protocol          = "tcp"
-#   security_group_id = aws_security_group.redshift-data-lb.id
-#   to_port           = 5439
-#   type              = "ingress"
-# }
+ resource "aws_security_group_rule" "tcp-5439" {
+   cidr_blocks       = ["0.0.0.0/0"]
+   from_port         = 5439
+   protocol          = "tcp"
+   security_group_id = aws_security_group.redshift-data-lb.id
+   to_port           = 5439
+   type              = "ingress"
+ }
 
 resource "aws_lb" "redshift-data" {
   name               = format("%s-redshift-lb", local.environment)
@@ -184,4 +184,11 @@ resource "aws_lb_target_group_attachment" "redshift-data" {
   target_group_arn = aws_lb_target_group.redshift-data.arn
   target_id        = each.value.private_ip
   port             = 5439
+}
+
+resource "aws_route53_record" "redshift-lb-dns" {
+  name    = format("redshift.%s", data.aws_route53_zone.inner.name)
+  records = [aws_lb.redshift-data.dns_name]
+  type    = "CNAME"
+  zone_id = data.aws_route53_zone.inner.zone_id
 }
