@@ -47,15 +47,15 @@ locals {
     }
     db-backup = {
       custom_kms_key = module.environment.kms_keys["general"].arn
-      iam_policies = module.baseline_presets.s3_iam_policies
+      iam_policies   = module.baseline_presets.s3_iam_policies
     }
   }
 
   baseline_security_groups = {
-    data-db = local.security_groups.data_db
+    data-db          = local.security_groups.data_db
     migration-web-sg = local.security_groups.Web-SG-migration
     migration-app-sg = local.security_groups.App-SG-migration
-    migration-db-sg = local.security_groups.DB-SG-migration
+    migration-db-sg  = local.security_groups.DB-SG-migration
   }
 
   baseline_sns_topics = {}
