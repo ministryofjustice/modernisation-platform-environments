@@ -48,7 +48,7 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   encrypted  = true
   kms_key_id = aws_kms_key.wepi_kms_cmk.arn
 
-  publicly_accessible = false
+  publicly_accessible  = false
   enhanced_vpc_routing = false
   vpc_security_group_ids = [
     aws_security_group.wepi_sg_allow_redshift.id
@@ -153,22 +153,37 @@ resource "aws_security_group" "redshift-data-lb" {
   tags   = local.tags
 }
 
- resource "aws_security_group_rule" "tcp-5439" {
-   cidr_blocks       = ["0.0.0.0/0"]
-   from_port         = 5439
-   protocol          = "tcp"
-   security_group_id = aws_security_group.redshift-data-lb.id
-   to_port           = 5439
-   type              = "ingress"
- }
+resource "aws_security_group_rule" "tcp-5439" {
+  cidr_blocks       = ["0.0.0.0/0"]
+  from_port         = 5439
+  protocol          = "tcp"
+  security_group_id = aws_security_group.redshift-data-lb.id
+  to_port           = 5439
+  type              = "ingress"
+}
 
 resource "aws_lb" "redshift-data" {
   name               = format("%s-redshift-lb", local.environment)
   internal           = true
-  load_balancer_type = "application"
+  load_balancer_type = "network"
   security_groups    = [aws_security_group.redshift-data-lb.id]
   subnets            = data.aws_subnets.shared-private.ids
-  tags               = local.tags
+  tags = merge(
+    local.tags,
+    { "Name" = format("%s-redshift-lb", local.environment) }
+  )
+}
+
+resource "aws_lb_listener" "redshift-data" {
+  load_balancer_arn = aws_lb.redshift-data.arn
+  port              = "5439"
+  protocol          = "TCP"
+  tags              = local.tags
+
+  default_action {
+    type             = "FORWARD"
+    target_group_arn = aws_lb_target_group.redshift-data.arn
+  }
 }
 
 resource "aws_lb_target_group" "redshift-data" {
@@ -177,6 +192,12 @@ resource "aws_lb_target_group" "redshift-data" {
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = data.aws_vpc.shared.id
+
+  health_check {
+    enabled  = true
+    port     = "5439"
+    protocol = "TCP"
+  }
 }
 
 resource "aws_lb_target_group_attachment" "redshift-data" {

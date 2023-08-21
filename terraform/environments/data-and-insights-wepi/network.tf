@@ -27,14 +27,14 @@ resource "aws_security_group" "wepi_sg_allow_redshift" {
   #   ]
   # }
   ingress {
-      description = "Redshift ingress from bastion"
-      from_port   = 5439
-      to_port     = 5439
-      protocol    = "tcp"
-      security_groups = [
-        module.wepi_bastion.bastion_security_group
-      ]
-    }
+    description = "Redshift ingress from bastion"
+    from_port   = 5439
+    to_port     = 5439
+    protocol    = "tcp"
+    security_groups = [
+      module.wepi_bastion.bastion_security_group
+    ]
+  }
 
   egress {
     description = "Redshift egress to S3 endpoint"
