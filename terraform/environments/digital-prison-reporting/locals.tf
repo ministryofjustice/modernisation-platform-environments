@@ -56,6 +56,36 @@ locals {
   refresh_job_num_workers = local.application_data.accounts[local.environment].refresh_job_num_workers
   refresh_job_log_level   = local.application_data.accounts[local.environment].refresh_job_log_level
 
+  # Compact Raw Job
+  compact_raw_job_worker_type   = local.application_data.accounts[local.environment].compact_raw_job_worker_type
+  compact_raw_job_num_workers   = local.application_data.accounts[local.environment].compact_raw_job_num_workers
+  compact_raw_job_log_level     = local.application_data.accounts[local.environment].compact_raw_job_log_level
+
+  # Compact Structured Job
+  compact_structured_job_worker_type   = local.application_data.accounts[local.environment].compact_structured_job_worker_type
+  compact_structured_job_num_workers   = local.application_data.accounts[local.environment].compact_structured_job_num_workers
+  compact_structured_job_log_level     = local.application_data.accounts[local.environment].compact_structured_job_log_level
+
+  # Compact Curated Job
+  compact_curated_job_worker_type   = local.application_data.accounts[local.environment].compact_curated_job_worker_type
+  compact_curated_job_num_workers   = local.application_data.accounts[local.environment].compact_curated_job_num_workers
+  compact_curated_job_log_level     = local.application_data.accounts[local.environment].compact_curated_job_log_level
+
+  # Vacuum Raw Job
+  vacuum_raw_job_worker_type   = local.application_data.accounts[local.environment].vacuum_raw_job_worker_type
+  vacuum_raw_job_num_workers   = local.application_data.accounts[local.environment].vacuum_raw_job_num_workers
+  vacuum_raw_job_log_level     = local.application_data.accounts[local.environment].vacuum_raw_job_log_level
+
+  # Vacuum Structured Job
+  vacuum_structured_job_worker_type   = local.application_data.accounts[local.environment].vacuum_structured_job_worker_type
+  vacuum_structured_job_num_workers   = local.application_data.accounts[local.environment].vacuum_structured_job_num_workers
+  vacuum_structured_job_log_level     = local.application_data.accounts[local.environment].vacuum_structured_job_log_level
+
+  # Vacuum Curated Job
+  vacuum_curated_job_worker_type   = local.application_data.accounts[local.environment].vacuum_curated_job_worker_type
+  vacuum_curated_job_num_workers   = local.application_data.accounts[local.environment].vacuum_curated_job_num_workers
+  vacuum_curated_job_log_level     = local.application_data.accounts[local.environment].vacuum_curated_job_log_level
+
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
   s3_read_access_policy  = "${local.project}_s3_read_policy"
