@@ -423,12 +423,12 @@ resource "aws_cloudfront_distribution" "external" {
           error_caching_min_ttl = 5
     }
 
-    # {
-    #   "error_code"            = 503,
-    #   "response_code"         = 503,
-    #   "response_page_path"    = "/error-pages/error.html",
-    #   "error_caching_min_ttl" = 5,
-    # }
+    custom_error_response {
+          error_code            = 503
+          response_code         = 503
+          response_page_path    = "/error-pages/error.html"
+          error_caching_min_ttl = 5
+    }
 
   restrictions {
     geo_restriction {
