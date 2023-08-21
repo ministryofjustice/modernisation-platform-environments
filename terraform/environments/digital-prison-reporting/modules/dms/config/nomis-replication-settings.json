@@ -1,6 +1,6 @@
 {
   "Logging": {
-    "EnableLogging": false,
+    "EnableLogging": true,
     "EnableLogContext": false,
     "LogComponents": [
       {
