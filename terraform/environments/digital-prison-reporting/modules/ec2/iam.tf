@@ -303,15 +303,13 @@ resource "aws_iam_role_policy_attachment" "redshift-admin" {
   policy_arn = data.aws_iam_policy.AmazonRedshiftFullAccess.arn
 }
 
-resource "aws_iam_policy_attachment" "this" {
-  name       = "ssm_managed_instance_core"
-  roles      = [aws_iam_role.kinesis-agent-instance-role.name]
+resource "aws_iam_role_policy_attachment" "instance-core-for-ssm" {
+  role       = aws_iam_role.kinesis-agent-instance-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_policy_attachment" "ec2-role-for-ssm" {
-  name       = "ssm_managed_instance_ec2_role"
-  roles      = [aws_iam_role.kinesis-agent-instance-role.name]
+resource "aws_iam_role_policy_attachment" "ec2-role-for-ssm" {
+  role       = aws_iam_role.kinesis-agent-instance-role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }
 
