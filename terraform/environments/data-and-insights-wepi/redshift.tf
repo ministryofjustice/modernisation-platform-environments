@@ -48,16 +48,14 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   encrypted  = true
   kms_key_id = aws_kms_key.wepi_kms_cmk.arn
 
-  publicly_accessible  = false
-  enhanced_vpc_routing = true
+  publicly_accessible = false
+  enhanced_vpc_routing = false
   vpc_security_group_ids = [
     aws_security_group.wepi_sg_allow_redshift.id
   ]
   cluster_subnet_group_name = aws_redshift_subnet_group.wepi_redhsift_subnet_group.name
 
   cluster_parameter_group_name = aws_redshift_parameter_group.wepi_redshift_param_group.name
-
-  aqua_configuration_status = "enabled"
 
   automated_snapshot_retention_period = local.application_data.accounts[local.environment].redshift_auto_snapshot_retention
   manual_snapshot_retention_period    = local.application_data.accounts[local.environment].redshift_manual_snapshot_retention
@@ -155,20 +153,20 @@ resource "aws_security_group" "redshift-data-lb" {
   tags   = local.tags
 }
 
-resource "aws_security_group_rule" "tcp-5439" {
-  cidr_blocks       = ["0.0.0.0/0"]
-  from_port         = 5439
-  protocol          = "tcp"
-  security_group_id = aws_security_group.redshift-data-lb.id
-  to_port           = 5439
-  type              = "ingress"
-}
+# resource "aws_security_group_rule" "tcp-5439" {
+#   cidr_blocks       = ["0.0.0.0/0"]
+#   from_port         = 5439
+#   protocol          = "tcp"
+#   security_group_id = aws_security_group.redshift-data-lb.id
+#   to_port           = 5439
+#   type              = "ingress"
+# }
 
 resource "aws_lb" "redshift-data" {
   name               = format("%s-redshift-lb", local.environment)
   internal           = true
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.redshift-data-lb.id] #extra line added late at night
+  security_groups    = [aws_security_group.redshift-data-lb.id]
   subnets            = data.aws_subnets.shared-private.ids
   tags               = local.tags
 }
@@ -176,7 +174,7 @@ resource "aws_lb" "redshift-data" {
 resource "aws_lb_target_group" "redshift-data" {
   name        = "redshift-lb-tg-5439"
   port        = 5439
-  protocol    = "tcp"
+  protocol    = "TCP"
   target_type = "ip"
   vpc_id      = data.aws_vpc.shared.id
 }
