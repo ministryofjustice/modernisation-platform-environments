@@ -469,7 +469,6 @@ resource "aws_route53_record" "cloudfront_validation_core_network_services" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-
   # NOTE: value.zone is null indicates the validation zone could not be found
   # Ensure route53_zones variable contains the given validation zone or
   # explicitly provide the zone details in the validation variable.
