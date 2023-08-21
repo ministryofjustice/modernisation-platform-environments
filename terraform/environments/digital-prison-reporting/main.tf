@@ -479,7 +479,7 @@ module "ec2_kinesis_agent" {
   name                        = "${local.project}-ec2-kinesis-agent-${local.env}"
   description                 = "EC2 instance for kinesis agent"
   vpc                         = data.aws_vpc.shared.id
-  cidr                        = [data.aws_vpc.shared.cidr_block, "0.0.0.0"]
+  cidr                        = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
   subnet_ids                  = data.aws_subnet.private_subnets_a.id
   ec2_instance_type           = local.instance_type
   ami_image_id                = local.image_id
