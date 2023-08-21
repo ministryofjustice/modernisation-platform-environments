@@ -24,6 +24,18 @@ resource "aws_vpc_security_group_egress_rule" "base_ami_test_instance_https_out"
   )
 }
 
+resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman_in" {
+  security_group_id = aws_security_group.base_ami_test_instance_sg.id
+  cidr_ipv4         = local.environment_config_dev.legacy_engineering_vpc_cidr
+  from_port         = 1521
+  to_port           = 1521
+  ip_protocol       = "tcp"
+  description       = "Allow communication in on port 1521 from legacy rman"
+  tags = merge(local.tags,
+    { Name = "legacy-rman-in" }
+  )
+}
+
 # Pre-req - IAM role, attachment for SSM usage and instance profile
 data "aws_iam_policy_document" "base_ami_test_instance_iam_assume_policy" {
   statement {
@@ -170,4 +182,3 @@ resource "aws_instance" "base_ami_test_instance" {
     { database = "delius-db-1" }
   )
 }
-
