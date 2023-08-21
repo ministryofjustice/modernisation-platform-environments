@@ -13,6 +13,7 @@ resource "aws_glue_connection" "wepi_glue_conn_redshift" {
 
   name = "wepi-redshift-${local.environment}-conn"
   physical_connection_requirements {
+    availability_zone      = data.aws_subnet.data_subnets_a.availability_zone
     security_group_id_list = ["${aws_security_group.wepi_sg_allow_redshift.id}"]
     subnet_id              = data.aws_subnet.data_subnets_a.id
   }
