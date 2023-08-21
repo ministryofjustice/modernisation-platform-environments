@@ -7,7 +7,7 @@ output "aws_ssm_document_cloud_watch_agent_description" {
 
 output "aws_cloudwatch_log_group_groups_arn" {
   description = "aws_cloudwatch_log_group groups arn"
-  value       = aws_cloudwatch_log_group.groups.arn
+  value       = aws_cloudwatch_log_group.groups[each.key].arn
 }
 
 #
