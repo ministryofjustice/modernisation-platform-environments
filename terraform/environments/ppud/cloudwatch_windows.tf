@@ -184,3 +184,40 @@ count  = local.is-production == true ? 1 : 0
   name = "Windows-Services-Logs"
   retention_in_days = 365
 }
+
+resource "aws_cloudwatch_log_group" "Network-Connectivity-Logs" {
+count  = local.is-production == true ? 1 : 0
+  name = "Windows-Services-Logs"
+  retention_in_days = 365
+}
+
+
+resource "aws_cloudwatch_log_metric_filter" "ServiceStatus-Running" {
+  name           = "ServiceStatus-Running"
+  log_group_name = aws_cloudwatch_log_group.Windows-Services-Logs.name
+  pattern        = "[date, time, Instance, Service, status=Running]"
+  metric_transformation {
+    name      = "IsRunning"
+    namespace = "ServiceStatus"
+    value     = "1"
+    dimensions = {
+      Instance = "$Instance"
+      Service = "$Service"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "ServiceStatus-NotRunning" {
+  name           = "ServiceStatus-NotRunning"
+  log_group_name = aws_cloudwatch_log_group.Windows-Services-Logs.name
+  pattern        = "[date, time, Instance, Service, status!=Running]"
+  metric_transformation {
+    name      = "IsRunning"
+    namespace = "ServiceStatus"
+    value     = "0"
+    dimensions = {
+      Instance = "$Instance"
+      Service = "$Service"
+    }
+  }
+}
