@@ -249,7 +249,8 @@ resource "aws_cloudfront_distribution" "external" {
 #   enabled = var.cloudfront_enabled
   enabled = true
 #   aliases = [var.fqdn]
-  aliases = [local.application_data.accounts[local.environment].fqdn]
+  # aliases = [local.application_data.accounts[local.environment].fqdn]
+  aliases = aws_route53_record.cloudfront-non-prod[0].fqdn
   default_cache_behavior {
     target_origin_id = aws_lb.external.id
     # smooth_streaming = lookup(var.cloudfront_default_cache_behavior, "smooth_streaming", null)
