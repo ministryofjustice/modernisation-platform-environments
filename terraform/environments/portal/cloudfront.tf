@@ -450,7 +450,6 @@ resource "aws_acm_certificate" "cloudfront" {
   # subject_alternative_names = local.environment == "production" ? null : [local.application_data.accounts[local.environment].fqdn]
   # subject_alternative_names = local.environment == "production" ? null : ["*.${local.application_data.accounts[local.environment].fqdn}"]
   subject_alternative_names = local.environment == "production" ? null : [local.application_data.accounts[local.environment].acm_alt_domain_name]
-
   # tags                      = var.tags
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
