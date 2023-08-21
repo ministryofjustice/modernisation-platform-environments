@@ -17,6 +17,7 @@ locals {
 
   environment_config_dev = {
     migration_environment_vpc_cidr = "10.161.20.0/22"
+    legacy_engineering_vpc_cidr    = "10.161.98.0/25"
     ec2_user_ssh_key               = file("${path.module}/files/.ssh/${terraform.workspace}-dev/ec2-user.pub")
   }
 
