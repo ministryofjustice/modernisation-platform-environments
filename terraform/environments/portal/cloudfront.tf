@@ -59,6 +59,8 @@ validation_records_cloudfront = {
     } if value.zone.provider == "external"
   }
 
+  s3_origin_id = "portalerrorpagebucketorigin"
+
 }
 
 ### Cloudfront Secret Creation
@@ -215,9 +217,9 @@ resource "aws_cloudfront_distribution" "external" {
   origin {
     domain_name = aws_lb.external.dns_name
     origin_id   = aws_lb.external.id
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.portalerrorpagebucket.cloudfront_access_identity_path
-    }
+    # s3_origin_config {
+    #   origin_access_identity = aws_cloudfront_origin_access_identity.portalerrorpagebucket.cloudfront_access_identity_path
+    # }
     custom_origin_config {
       http_port                = 80 # This port was not defined in CloudFormation, but should not be used anyways, only required by Terraform
       https_port               = 443
@@ -232,6 +234,16 @@ resource "aws_cloudfront_distribution" "external" {
     custom_header {
       name  = local.custom_header
       value = data.aws_secretsmanager_secret_version.cloudfront.secret_string
+    }
+  }
+  origin {
+    # domain_name              = aws_s3_bucket.b.bucket_regional_domain_name
+    # origin_access_control_id = aws_cloudfront_origin_access_control.default.id
+    # origin_id                = local.s3_origin_id
+    domain_name                = aws_s3_bucket.portalerrorpagebucket.bucket_regional_domain_name
+    origin_id                  = local.s3_origin_id
+    s3_origin_config {
+      origin_access_identity   = aws_cloudfront_origin_access_identity.portalerrorpagebucket.cloudfront_access_identity_path
     }
   }
 #   enabled = var.cloudfront_enabled
@@ -266,7 +278,8 @@ resource "aws_cloudfront_distribution" "external" {
 
   #  ordered_cache_behavior_PortalErrorPageBucket {
   ordered_cache_behavior {
-      target_origin_id = aws_s3_bucket.portalerrorpagebucket.id
+      # target_origin_id = aws_s3_bucket.portalerrorpagebucket.id
+      target_origin_id = local.s3_origin_id
       smooth_streaming = false
       path_pattern     = "/error-pages/*"
       min_ttl          = 0
