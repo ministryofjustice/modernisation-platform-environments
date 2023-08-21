@@ -181,7 +181,7 @@ resource "aws_lb_listener" "redshift-data" {
   tags              = local.tags
 
   default_action {
-    type             = "FORWARD"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.redshift-data.arn
   }
 }
