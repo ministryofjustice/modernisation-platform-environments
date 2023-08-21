@@ -45,17 +45,19 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   cluster_type    = local.application_data.accounts[local.environment].redshift_cluster_node_count > 1 ? "multi-node" : "single-node"
   number_of_nodes = local.application_data.accounts[local.environment].redshift_cluster_node_count
 
-  encrypted  = false
+  encrypted  = true
   kms_key_id = aws_kms_key.wepi_kms_cmk.arn
 
   publicly_accessible = false
-  enhanced_vpc_routing = false
+  enhanced_vpc_routing = true
   vpc_security_group_ids = [
     aws_security_group.wepi_sg_allow_redshift.id
   ]
   cluster_subnet_group_name = aws_redshift_subnet_group.wepi_redhsift_subnet_group.name
 
   cluster_parameter_group_name = aws_redshift_parameter_group.wepi_redshift_param_group.name
+
+  aqua_configuration_status = "enabled"
 
   automated_snapshot_retention_period = local.application_data.accounts[local.environment].redshift_auto_snapshot_retention
   manual_snapshot_retention_period    = local.application_data.accounts[local.environment].redshift_manual_snapshot_retention
@@ -72,7 +74,6 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
     local.tags,
     {
       Name = "wepi-redshift-${local.environment}-cluster"
-      Timestamp = format("%s", timestamp())
     }
   )
 
