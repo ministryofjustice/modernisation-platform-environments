@@ -250,7 +250,7 @@ resource "aws_cloudfront_distribution" "external" {
   enabled = true
 #   aliases = [var.fqdn]
   # aliases = [local.application_data.accounts[local.environment].fqdn]
-  aliases = "mp-portal.dev.legalservices.gov.uk"
+  aliases = ["mp-portal.dev.legalservices.gov.uk"]
   default_cache_behavior {
     target_origin_id = aws_lb.external.id
     # smooth_streaming = lookup(var.cloudfront_default_cache_behavior, "smooth_streaming", null)
