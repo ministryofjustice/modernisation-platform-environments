@@ -353,7 +353,8 @@ resource "aws_route53_record" "cloudfront-non-prod" {
   count    = local.environment != "production" ? 1 : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
-  name    = local.application_data.accounts[local.environment].fqdn
+  # name    = local.application_data.accounts[local.environment].fqdn
+  name      = "mp-portal.dev.legalservices.gov.uk"
   type     = "A"
   alias {
     name                   = aws_cloudfront_distribution.external.domain_name
