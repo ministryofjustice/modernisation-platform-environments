@@ -12,7 +12,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
     rdp = {
-      inbound = ["10.40.165.0/26","10.112.3.0/26","10.102.3.0/26"]
+      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.3.0/26"]
     }
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -55,13 +55,13 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod,
       "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
-    
+
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
-    test = local.security_group_cidrs_devtest
+    test          = local.security_group_cidrs_devtest
     preproduction = local.security_group_cidrs_preprod_prod
-    production = local.security_group_cidrs_preprod_prod
+    production    = local.security_group_cidrs_preprod_prod
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
@@ -103,7 +103,7 @@ locals {
           security_groups = []
         }
       }
-    
+
     }
 
     Web-SG-migration = {
@@ -133,7 +133,7 @@ locals {
         #   security_groups = []
         # }
         https = {
-          description = "Allow ingress from port 443"
+          description     = "Allow ingress from port 443"
           from_port       = 443
           to_port         = 443
           protocol        = "TCP"
@@ -141,8 +141,8 @@ locals {
           security_groups = []
         }
 
-         http = {
-          description = "Allow ingress from port 80"
+        http = {
+          description     = "Allow ingress from port 80"
           from_port       = 80
           to_port         = 80
           protocol        = "TCP"
@@ -158,7 +158,7 @@ locals {
         #   security_groups = []
         # }
         rdp = {
-          description = "Allow ingress from port 3389"
+          description     = "Allow ingress from port 3389"
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
@@ -238,7 +238,7 @@ locals {
           self        = true
         }
         http = {
-          description = "Allow ingress from port 80"
+          description     = "Allow ingress from port 80"
           from_port       = 80
           to_port         = 80
           protocol        = "TCP"
@@ -246,15 +246,15 @@ locals {
           security_groups = []
         }
         ssh = {
-          description = "Allow SSH ingress"
-          from_port = 22
-          to_port = 22
-          protocol = "tcp"
-          cidr_blocks = local.security_group_cidrs.ssh
+          description     = "Allow SSH ingress"
+          from_port       = 22
+          to_port         = 22
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.ssh
           security_groups = []
         }
         rdp = {
-          description = "Allow ingress from port 3389"
+          description     = "Allow ingress from port 3389"
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
@@ -372,11 +372,11 @@ locals {
           self        = true
         }
         ssh = {
-          description = "Allow SSH ingress"
-          from_port = 22
-          to_port = 22
-          protocol = "tcp"
-          cidr_blocks = local.security_group_cidrs.ssh
+          description     = "Allow SSH ingress"
+          from_port       = 22
+          to_port         = 22
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.ssh
           security_groups = []
         }
         # http49152_65535 = {
