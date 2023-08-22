@@ -180,7 +180,7 @@ locals {
                         "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
                         "c.production.nomis.az.justice.gov.uk",
-                        "c.production.nomis.service.justice.gov.uk",
+                        "c.nomis.service.justice.gov.uk",
                         "c.nomis.az.justice.gov.uk",
                       ]
                     }
@@ -215,6 +215,11 @@ locals {
         ]
       }
       "nomis.service.justice.gov.uk" = {
+        # NOTE this top level zone is currently hosted in Azure but
+        # will be moved here at some point
+        lb_alias_records = [
+          { name = "c", type = "A", lbs_map_key = "private" },
+        ]
       }
       "production.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
@@ -232,7 +237,6 @@ locals {
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-b", type = "A", lbs_map_key = "private" },
-          { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
     }
