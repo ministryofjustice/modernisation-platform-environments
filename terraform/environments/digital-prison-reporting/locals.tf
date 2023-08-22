@@ -59,34 +59,40 @@ locals {
   refresh_job_log_level   = local.application_data.accounts[local.environment].refresh_job_log_level
 
   # Compact Raw Job
-  compact_raw_job_worker_type   = local.application_data.accounts[local.environment].compact_raw_job_worker_type
-  compact_raw_job_num_workers   = local.application_data.accounts[local.environment].compact_raw_job_num_workers
-  compact_raw_job_log_level     = local.application_data.accounts[local.environment].compact_raw_job_log_level
+  compact_raw_job_worker_type = local.application_data.accounts[local.environment].compact_raw_job_worker_type
+  compact_raw_job_num_workers = local.application_data.accounts[local.environment].compact_raw_job_num_workers
+  compact_raw_job_log_level   = local.application_data.accounts[local.environment].compact_raw_job_log_level
+  compact_raw_job_schedule    = local.application_data.accounts[local.environment].compact_raw_job_schedule
 
   # Compact Structured Job
-  compact_structured_job_worker_type   = local.application_data.accounts[local.environment].compact_structured_job_worker_type
-  compact_structured_job_num_workers   = local.application_data.accounts[local.environment].compact_structured_job_num_workers
-  compact_structured_job_log_level     = local.application_data.accounts[local.environment].compact_structured_job_log_level
+  compact_structured_job_worker_type = local.application_data.accounts[local.environment].compact_structured_job_worker_type
+  compact_structured_job_num_workers = local.application_data.accounts[local.environment].compact_structured_job_num_workers
+  compact_structured_job_log_level   = local.application_data.accounts[local.environment].compact_structured_job_log_level
+  compact_structured_job_schedule    = local.application_data.accounts[local.environment].compact_structured_job_schedule
 
   # Compact Curated Job
-  compact_curated_job_worker_type   = local.application_data.accounts[local.environment].compact_curated_job_worker_type
-  compact_curated_job_num_workers   = local.application_data.accounts[local.environment].compact_curated_job_num_workers
-  compact_curated_job_log_level     = local.application_data.accounts[local.environment].compact_curated_job_log_level
+  compact_curated_job_worker_type = local.application_data.accounts[local.environment].compact_curated_job_worker_type
+  compact_curated_job_num_workers = local.application_data.accounts[local.environment].compact_curated_job_num_workers
+  compact_curated_job_log_level   = local.application_data.accounts[local.environment].compact_curated_job_log_level
+  compact_curated_job_schedule    = local.application_data.accounts[local.environment].compact_curated_job_schedule
 
   # Retention (vacuum) Raw Job
-  retention_raw_job_worker_type   = local.application_data.accounts[local.environment].retention_raw_job_worker_type
-  retention_raw_job_num_workers   = local.application_data.accounts[local.environment].retention_raw_job_num_workers
-  retention_raw_job_log_level     = local.application_data.accounts[local.environment].retention_raw_job_log_level
+  retention_raw_job_worker_type = local.application_data.accounts[local.environment].retention_raw_job_worker_type
+  retention_raw_job_num_workers = local.application_data.accounts[local.environment].retention_raw_job_num_workers
+  retention_raw_job_log_level   = local.application_data.accounts[local.environment].retention_raw_job_log_level
+  retention_raw_job_schedule    = local.application_data.accounts[local.environment].retention_raw_job_schedule
 
   # Retention (vacuum) Structured Job
-  retention_structured_job_worker_type   = local.application_data.accounts[local.environment].retention_structured_job_worker_type
-  retention_structured_job_num_workers   = local.application_data.accounts[local.environment].retention_structured_job_num_workers
-  retention_structured_job_log_level     = local.application_data.accounts[local.environment].retention_structured_job_log_level
+  retention_structured_job_worker_type = local.application_data.accounts[local.environment].retention_structured_job_worker_type
+  retention_structured_job_num_workers = local.application_data.accounts[local.environment].retention_structured_job_num_workers
+  retention_structured_job_log_level   = local.application_data.accounts[local.environment].retention_structured_job_log_level
+  retention_structured_job_schedule    = local.application_data.accounts[local.environment].retention_structured_job_schedule
 
   # Retention (vacuum) Curated Job
-  retention_curated_job_worker_type   = local.application_data.accounts[local.environment].retention_curated_job_worker_type
-  retention_curated_job_num_workers   = local.application_data.accounts[local.environment].retention_curated_job_num_workers
-  retention_curated_job_log_level     = local.application_data.accounts[local.environment].retention_curated_job_log_level
+  retention_curated_job_worker_type = local.application_data.accounts[local.environment].retention_curated_job_worker_type
+  retention_curated_job_num_workers = local.application_data.accounts[local.environment].retention_curated_job_num_workers
+  retention_curated_job_log_level   = local.application_data.accounts[local.environment].retention_curated_job_log_level
+  retention_curated_job_schedule    = local.application_data.accounts[local.environment].retention_curated_job_schedule
 
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"

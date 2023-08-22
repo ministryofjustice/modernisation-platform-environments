@@ -260,7 +260,7 @@ module "glue_retention_curated_job" {
 # Maintenance Job Schedules (triggers)
 resource "aws_glue_trigger" "compact_raw_job" {
   name     = "${local.compact_raw_job_name}-trigger"
-  schedule = "cron(30 15 * * * *)"
+  schedule = local.compact_raw_job_schedule
   type     = "SCHEDULED"
 
   actions {
@@ -270,7 +270,7 @@ resource "aws_glue_trigger" "compact_raw_job" {
 
 resource "aws_glue_trigger" "compact_structured_job" {
   name     = "${local.compact_structured_job_name}-trigger"
-  schedule = "cron(30 15 * * * *)"
+  schedule = local.compact_structured_job_schedule
   type     = "SCHEDULED"
 
   actions {
@@ -280,7 +280,7 @@ resource "aws_glue_trigger" "compact_structured_job" {
 
 resource "aws_glue_trigger" "compact_curated_job" {
   name     = "${local.compact_curated_job_name}-trigger"
-  schedule = "cron(30 15 * * * *)"
+  schedule = local.compact_curated_job_schedule
   type     = "SCHEDULED"
 
   actions {
@@ -290,7 +290,7 @@ resource "aws_glue_trigger" "compact_curated_job" {
 
 resource "aws_glue_trigger" "retention_raw_job" {
   name     = "${local.retention_raw_job_name}-trigger"
-  schedule = "cron(0 16 * * * *)"
+  schedule = local.retention_raw_job_schedule
   type     = "SCHEDULED"
 
   actions {
@@ -300,7 +300,7 @@ resource "aws_glue_trigger" "retention_raw_job" {
 
 resource "aws_glue_trigger" "retention_structured_job" {
   name     = "${local.retention_structured_job_name}-trigger"
-  schedule = "cron(0 16 * * * *)"
+  schedule = local.retention_structured_job_schedule
   type     = "SCHEDULED"
 
   actions {
@@ -310,7 +310,7 @@ resource "aws_glue_trigger" "retention_structured_job" {
 
 resource "aws_glue_trigger" "retention_curated_job" {
   name     = "${local.retention_curated_job_name}-trigger"
-  schedule = "cron(0 16 * * * *)"
+  schedule = local.retention_curated_job_schedule
   type     = "SCHEDULED"
 
   actions {
