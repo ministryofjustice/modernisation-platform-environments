@@ -148,6 +148,10 @@ resource "aws_cloudfront_distribution" "external" {
       origin_read_timeout      = 60
       origin_keepalive_timeout = 60
     }
+    origin_shield {
+      enabled              = false
+      origin_shield_region = "eu-west-2"
+    }
     custom_header {
       name  = local.custom_header
       value = data.aws_secretsmanager_secret_version.cloudfront.secret_string
@@ -159,11 +163,11 @@ resource "aws_cloudfront_distribution" "external" {
     s3_origin_config {
       origin_access_identity   = aws_cloudfront_origin_access_identity.portalerrorpagebucket.cloudfront_access_identity_path
     }
-  }
-  origin_shield {
+    origin_shield {
       enabled              = false
       origin_shield_region = "eu-west-2"
     }
+  }
   enabled = true
   aliases = ["mp-portal.dev.legalservices.gov.uk"]
   default_cache_behavior {
