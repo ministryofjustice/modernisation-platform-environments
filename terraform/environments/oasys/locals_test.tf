@@ -81,18 +81,18 @@ locals {
       ##
       ## T1
       ##
-      # "t1-${local.application_name}-web-a" = merge(local.webserver_a, {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name                  = "oasys_webserver_release_*"
-      #     ssm_parameters_prefix     = "ec2-web-t1/"
-      #     iam_resource_names_prefix = "ec2-web-t1"
-      #   })
-      #   tags = merge(local.webserver_a.tags, {
-      #     description                             = "t1 ${local.application_name} web"
-      #     "${local.application_name}-environment" = "t1"
-      #     oracle-db-hostname                      = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
-      #   })
-      # })
+      "t1-${local.application_name}-web-a" = merge(local.webserver_a, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "oasys_webserver_release_*"
+          ssm_parameters_prefix     = "ec2-web-t1/"
+          iam_resource_names_prefix = "ec2-web-t1"
+        })
+        tags = merge(local.webserver_a.tags, {
+          description                             = "t1 ${local.application_name} web"
+          "${local.application_name}-environment" = "t1"
+          oracle-db-hostname                      = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
+        })
+      })
 
       ##
       ## test
