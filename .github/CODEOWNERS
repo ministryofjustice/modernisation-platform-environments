@@ -16,6 +16,7 @@
 /terraform/environments/digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting-non-cleared-team @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
+/terraform/environments/hmpps-domain-services @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-intelligence-management @ministryofjustice/dps-ims-tech @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-oem @ministryofjustice/hmpps-migration @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-infra-azure-ad-sso @ministryofjustice/laa-ccms-webops @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
