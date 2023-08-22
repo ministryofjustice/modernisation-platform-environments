@@ -1,15 +1,20 @@
-locals {
+# This file is pretty much the same as secretsmanager.tf, to make it easy to switch
+# between SSM parameters and SecretManager Secrets
+# Use Secrets if you need to share a parameter across accounts.
 
+locals {
   ssm_parameters_list = flatten([
     for sp_key, sp_value in var.ssm_parameters : [
       for param_name, param_value in sp_value.parameters : {
-        key   = "${sp_value.prefix}${sp_key}${sp_value.postfix}${param_name}"
-        value = param_value
+        key = "${sp_value.prefix}${sp_key}${sp_value.postfix}${param_name}"
+        value = merge(param_value,
+          param_value.kms_key_id == null ? { kms_key_id = sp_value.kms_key_id } : {}
+        )
       }
     ]
   ])
 
-  random_passwords = {
+  ssm_random_passwords = {
     for item in local.ssm_parameters_list :
     item.key => item.value.random if item.value.random != null
   }
@@ -42,7 +47,7 @@ locals {
 }
 
 resource "random_password" "this" {
-  for_each = local.random_passwords
+  for_each = local.ssm_random_passwords
 
   length  = each.value.length
   special = each.value.special
@@ -58,7 +63,7 @@ resource "aws_ssm_parameter" "fixed" {
   name        = each.key
   description = each.value.description
   type        = each.value.type
-  key_id      = each.value.key_id != null ? try(var.environment.kms_keys[each.value.key_id].arn, each.value.key_id) : null
+  key_id      = each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
   value       = each.value.value
 
   tags = merge(local.tags, {
@@ -72,7 +77,7 @@ resource "aws_ssm_parameter" "placeholder" {
   name        = each.key
   description = each.value.description
   type        = each.value.type
-  key_id      = each.value.key_id != null ? try(var.environment.kms_keys[each.value.key_id].arn, each.value.key_id) : null
+  key_id      = each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
   value       = each.value.value
 
   tags = merge(local.tags, {
