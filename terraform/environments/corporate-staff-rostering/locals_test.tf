@@ -82,7 +82,7 @@ locals {
           vpc_security_group_ids = ["data-db"]
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
+          "/dev/sda1" = { type = "gp3", size = 256 }
         }
         tags = {
           description = "Test Restore Windows Server 2012 R2"
