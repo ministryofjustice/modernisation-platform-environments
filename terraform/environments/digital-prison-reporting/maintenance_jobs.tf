@@ -1,240 +1,254 @@
+locals {
+  compact_raw_name        = "${local.project}-maintenance-compact-raw-${local.env}"
+  compact_structured_name = "${local.project}-maintenance-compact-structured-${local.env}"
+  compact_curated_name    = "${local.project}-maintenance-compact-curated-${local.env}"
+
+  retention_raw_name        = "${local.project}-maintenance-retention-raw-${local.env}"
+  retention_structured_name = "${local.project}-maintenance-retention-structured-${local.env}"
+  retention_curated_name    = "${local.project}-maintenance-retention-curated-${local.env}"
+
+
+  compact_job_class   = "uk.gov.justice.digital.job.CompactionJob"
+  retention_job_class = "uk.gov.justice.digital.job.VacuumJob"
+}
+
 # Glue Job, Compact Raw zone
 module "glue_compact_raw_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-maintenance-compact-raw-${local.env}"
+  name                          = local.compact_raw_name
   command_type                  = "glueetl"
   description                   = "Runs compaction on tables in the raw layer"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-maintenance-compact-raw-${local.env}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-maintenance-compact-raw-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-maintenance-compact-raw-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.compact_raw_name}/"
+  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.compact_raw_name}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.compact_raw_name}/"
   # Placeholder Script Location
-  script_location              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  execution_class   = "FLEX"
-  worker_type       = local.compact_raw_job_worker_type
-  number_of_workers = local.compact_raw_job_num_workers
-  max_concurrent    = 1
-  region            = local.account_region
-  account           = local.account_id
+  script_location               = local.glue_placeholder_script_location
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  execution_class               = "FLEX"
+  worker_type                   = local.compact_raw_job_worker_type
+  number_of_workers             = local.compact_raw_job_num_workers
+  max_concurrent                = 1
+  region                        = local.account_region
+  account                       = local.account_id
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-maintenance-compact-raw-${local.env}"
+      Name          = local.compact_raw_name
       Resource_Type = "Glue Job"
     }
   )
 
   arguments = {
-    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
-    "--class"                        = "uk.gov.justice.digital.job.CompactionJob"
-    "--dpr.maintenance.root.path"    = "s3://${module.s3_raw_bucket.bucket_id}"
-    "--datalake-formats"             = "delta"
-    "--dpr.log.level"                = local.compact_raw_job_log_level
+    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--class"                     = local.compact_job_class
+    "--dpr.maintenance.root.path" = "s3://${module.s3_raw_bucket.bucket_id}"
+    "--datalake-formats"          = "delta"
+    "--dpr.log.level"             = local.compact_raw_job_log_level
   }
 }
 # Glue Job, Compact Structured zone
 module "glue_compact_structured_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-maintenance-compact-structured-${local.env}"
+  name                          = local.compact_structured_name
   command_type                  = "glueetl"
   description                   = "Runs compaction on tables in the structured layer"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-maintenance-compact-structured-${local.env}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-maintenance-compact-structured-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-maintenance-compact-structured-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.compact_structured_name}/"
+  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.compact_structured_name}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.compact_structured_name}/"
   # Placeholder Script Location
-  script_location              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  execution_class   = "FLEX"
-  worker_type       = local.compact_structured_job_worker_type
-  number_of_workers = local.compact_structured_job_num_workers
-  max_concurrent    = 1
-  region            = local.account_region
-  account           = local.account_id
+  script_location               = local.glue_placeholder_script_location
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  execution_class               = "FLEX"
+  worker_type                   = local.compact_structured_job_worker_type
+  number_of_workers             = local.compact_structured_job_num_workers
+  max_concurrent                = 1
+  region                        = local.account_region
+  account                       = local.account_id
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-maintenance-compact-structured-${local.env}"
+      Name          = local.compact_structured_name
       Resource_Type = "Glue Job"
     }
   )
 
   arguments = {
-    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
-    "--class"                        = "uk.gov.justice.digital.job.CompactionJob"
-    "--dpr.maintenance.root.path"    = "s3://${module.s3_structured_bucket.bucket_id}"
-    "--datalake-formats"             = "delta"
-    "--dpr.log.level"                = local.compact_structured_job_log_level
+    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--class"                     = local.compact_job_class
+    "--dpr.maintenance.root.path" = "s3://${module.s3_structured_bucket.bucket_id}"
+    "--datalake-formats"          = "delta"
+    "--dpr.log.level"             = local.compact_structured_job_log_level
   }
 }
 # Glue Job, Compact Curated zone
 module "glue_compact_curated_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-maintenance-compact-curated-${local.env}"
+  name                          = local.compact_curated_name
   command_type                  = "glueetl"
   description                   = "Runs compaction on tables in the curated layer"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-maintenance-compact-curated-${local.env}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-maintenance-compact-curated-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-maintenance-compact-curated-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.compact_curated_name}/"
+  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.compact_curated_name}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.compact_curated_name}/"
   # Placeholder Script Location
-  script_location              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  execution_class   = "FLEX"
-  worker_type       = local.compact_curated_job_worker_type
-  number_of_workers = local.compact_curated_job_num_workers
-  max_concurrent    = 1
-  region            = local.account_region
-  account           = local.account_id
+  script_location               = local.glue_placeholder_script_location
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  execution_class               = "FLEX"
+  worker_type                   = local.compact_curated_job_worker_type
+  number_of_workers             = local.compact_curated_job_num_workers
+  max_concurrent                = 1
+  region                        = local.account_region
+  account                       = local.account_id
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-maintenance-compact-curated-${local.env}"
+      Name          = local.compact_curated_name
       Resource_Type = "Glue Job"
     }
   )
 
   arguments = {
-    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
-    "--class"                        = "uk.gov.justice.digital.job.CompactionJob"
-    "--dpr.maintenance.root.path"    = "s3://${module.s3_curated_bucket.bucket_id}"
-    "--datalake-formats"             = "delta"
-    "--dpr.log.level"                = local.compact_curated_job_log_level
+    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--class"                     = local.compact_job_class
+    "--dpr.maintenance.root.path" = "s3://${module.s3_curated_bucket.bucket_id}"
+    "--datalake-formats"          = "delta"
+    "--dpr.log.level"             = local.compact_curated_job_log_level
   }
 }
-# Glue Job, Vacuum Raw zone
-module "glue_vacuum_raw_job" {
+# Glue Job, Retention (vacuum) Raw zone
+module "glue_retention_raw_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-maintenance-vacuum-raw-${local.env}"
+  name                          = local.retention_raw_name
   command_type                  = "glueetl"
-  description                   = "Runs vacuum on tables in the raw layer"
+  description                   = "Runs the vacuum retention job on tables in the raw layer"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-maintenance-vacuum-raw-${local.env}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-maintenance-vacuum-raw-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-maintenance-vacuum-raw-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.retention_raw_name}/"
+  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.retention_raw_name}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.retention_raw_name}/"
   # Placeholder Script Location
-  script_location              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  execution_class   = "FLEX"
-  worker_type       = local.vacuum_raw_job_worker_type
-  number_of_workers = local.vacuum_raw_job_num_workers
-  max_concurrent    = 1
-  region            = local.account_region
-  account           = local.account_id
+  script_location               = local.glue_placeholder_script_location
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  execution_class               = "FLEX"
+  worker_type                   = local.retention_raw_job_worker_type
+  number_of_workers             = local.retention_raw_job_num_workers
+  max_concurrent                = 1
+  region                        = local.account_region
+  account                       = local.account_id
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-maintenance-vacuum-raw-${local.env}"
+      Name          = local.retention_raw_name
       Resource_Type = "Glue Job"
     }
   )
 
   arguments = {
-    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
-    "--class"                        = "uk.gov.justice.digital.job.VacuumJob"
-    "--dpr.maintenance.root.path"    = "s3://${module.s3_raw_bucket.bucket_id}"
-    "--datalake-formats"             = "delta"
-    "--dpr.log.level"                = local.vacuum_raw_job_log_level
+    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--class"                     = local.retention_curated_name
+    "--dpr.maintenance.root.path" = "s3://${module.s3_raw_bucket.bucket_id}"
+    "--datalake-formats"          = "delta"
+    "--dpr.log.level"             = local.retention_raw_job_log_level
   }
 }
-# Glue Job, Vacuum Structured zone
-module "glue_vacuum_structured_job" {
+# Glue Job, Retention (vacuum) Structured zone
+module "glue_retention_structured_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-maintenance-vacuum-structured-${local.env}"
+  name                          = local.retention_structured_name
   command_type                  = "glueetl"
-  description                   = "Runs vacuum on tables in the structured layer"
+  description                   = "Runs the vacuum retention job on tables in the structured layer"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-maintenance-vacuum-structured-${local.env}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-maintenance-vacuum-structured-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-maintenance-vacuum-structured-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.retention_structured_name}/"
+  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.retention_structured_name}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.retention_structured_name}/"
   # Placeholder Script Location
-  script_location              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  execution_class   = "FLEX"
-  worker_type       = local.vacuum_structured_job_worker_type
-  number_of_workers = local.vacuum_structured_job_num_workers
-  max_concurrent    = 1
-  region            = local.account_region
-  account           = local.account_id
+  script_location               = local.glue_placeholder_script_location
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  execution_class               = "FLEX"
+  worker_type                   = local.retention_structured_job_worker_type
+  number_of_workers             = local.retention_structured_job_num_workers
+  max_concurrent                = 1
+  region                        = local.account_region
+  account                       = local.account_id
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-maintenance-vacuum-structured-${local.env}"
+      Name          = local.retention_structured_name
       Resource_Type = "Glue Job"
     }
   )
 
   arguments = {
-    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
-    "--class"                        = "uk.gov.justice.digital.job.VacuumJob"
-    "--dpr.maintenance.root.path"    = "s3://${module.s3_structured_bucket.bucket_id}"
-    "--datalake-formats"             = "delta"
-    "--dpr.log.level"                = local.vacuum_structured_job_log_level
+    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--class"                     = local.retention_curated_name
+    "--dpr.maintenance.root.path" = "s3://${module.s3_structured_bucket.bucket_id}"
+    "--datalake-formats"          = "delta"
+    "--dpr.log.level"             = local.retention_structured_job_log_level
   }
 }
-# Glue Job, Vacuum Curated zone
-module "glue_vacuum_curated_job" {
+# Glue Job, Retention (vacuum) Curated zone
+module "glue_retention_curated_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-maintenance-vacuum-curated-${local.env}"
+  name                          = local.retention_curated_name
   command_type                  = "glueetl"
-  description                   = "Runs vacuum on tables in the curated layer"
+  description                   = "Runs the vacuum retention job on tables in the curated layer"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-maintenance-vacuum-curated-${local.env}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-maintenance-vacuum-curated-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-maintenance-vacuum-curated-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.retention_curated_name}/"
+  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.retention_curated_name}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.retention_curated_name}/"
   # Placeholder Script Location
-  script_location              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  execution_class   = "FLEX"
-  worker_type       = local.vacuum_curated_job_worker_type
-  number_of_workers = local.vacuum_curated_job_num_workers
-  max_concurrent    = 1
-  region            = local.account_region
-  account           = local.account_id
+  script_location               = local.glue_placeholder_script_location
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  execution_class               = "FLEX"
+  worker_type                   = local.retention_curated_job_worker_type
+  number_of_workers             = local.retention_curated_job_num_workers
+  max_concurrent                = 1
+  region                        = local.account_region
+  account                       = local.account_id
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-maintenance-vacuum-curated-${local.env}"
+      Name          = local.retention_curated_name
       Resource_Type = "Glue Job"
     }
   )
 
   arguments = {
-    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
-    "--class"                        = "uk.gov.justice.digital.job.VacuumJob"
-    "--dpr.maintenance.root.path"    = "s3://${module.s3_curated_bucket.bucket_id}"
-    "--datalake-formats"             = "delta"
-    "--dpr.log.level"                = local.vacuum_curated_job_log_level
+    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--class"                     = local.retention_curated_name
+    "--dpr.maintenance.root.path" = "s3://${module.s3_curated_bucket.bucket_id}"
+    "--datalake-formats"          = "delta"
+    "--dpr.log.level"             = local.retention_curated_job_log_level
   }
 }

@@ -42,6 +42,8 @@ locals {
   datamart_password = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
 
   # Glue Job parameters
+  glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
+  glue_jobs_latest_jar_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
   # Reporting Hub Job
   reporting_hub_driver_mem   = local.application_data.accounts[local.environment].reporting_hub_spark_driver_mem
   reporting_hub_executor_mem = local.application_data.accounts[local.environment].reporting_hub_spark_executor_mem
@@ -71,20 +73,20 @@ locals {
   compact_curated_job_num_workers   = local.application_data.accounts[local.environment].compact_curated_job_num_workers
   compact_curated_job_log_level     = local.application_data.accounts[local.environment].compact_curated_job_log_level
 
-  # Vacuum Raw Job
-  vacuum_raw_job_worker_type   = local.application_data.accounts[local.environment].vacuum_raw_job_worker_type
-  vacuum_raw_job_num_workers   = local.application_data.accounts[local.environment].vacuum_raw_job_num_workers
-  vacuum_raw_job_log_level     = local.application_data.accounts[local.environment].vacuum_raw_job_log_level
+  # Retention (vacuum) Raw Job
+  retention_raw_job_worker_type   = local.application_data.accounts[local.environment].retention_raw_job_worker_type
+  retention_raw_job_num_workers   = local.application_data.accounts[local.environment].retention_raw_job_num_workers
+  retention_raw_job_log_level     = local.application_data.accounts[local.environment].retention_raw_job_log_level
 
-  # Vacuum Structured Job
-  vacuum_structured_job_worker_type   = local.application_data.accounts[local.environment].vacuum_structured_job_worker_type
-  vacuum_structured_job_num_workers   = local.application_data.accounts[local.environment].vacuum_structured_job_num_workers
-  vacuum_structured_job_log_level     = local.application_data.accounts[local.environment].vacuum_structured_job_log_level
+  # Retention (vacuum) Structured Job
+  retention_structured_job_worker_type   = local.application_data.accounts[local.environment].retention_structured_job_worker_type
+  retention_structured_job_num_workers   = local.application_data.accounts[local.environment].retention_structured_job_num_workers
+  retention_structured_job_log_level     = local.application_data.accounts[local.environment].retention_structured_job_log_level
 
-  # Vacuum Curated Job
-  vacuum_curated_job_worker_type   = local.application_data.accounts[local.environment].vacuum_curated_job_worker_type
-  vacuum_curated_job_num_workers   = local.application_data.accounts[local.environment].vacuum_curated_job_num_workers
-  vacuum_curated_job_log_level     = local.application_data.accounts[local.environment].vacuum_curated_job_log_level
+  # Retention (vacuum) Curated Job
+  retention_curated_job_worker_type   = local.application_data.accounts[local.environment].retention_curated_job_worker_type
+  retention_curated_job_num_workers   = local.application_data.accounts[local.environment].retention_curated_job_num_workers
+  retention_curated_job_log_level     = local.application_data.accounts[local.environment].retention_curated_job_log_level
 
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
