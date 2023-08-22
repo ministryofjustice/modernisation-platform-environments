@@ -70,7 +70,7 @@ locals {
       oasys-environment = local.environment
       environment-name  = terraform.workspace
       #oracle-db-hostname = "T2ODL0009.azure.noms.root"
-      oracle-db-sid = "T2OASYS" # for each env using azure DB will need to be OASPROD
+      oracle-db-sid = "OASPROD" # for each env using azure DB will need to be OASPROD
     }
   }
   webserver_b = merge(local.webserver_a, {
