@@ -209,7 +209,7 @@ resource "aws_lb_target_group_attachment" "redshift-data" {
 
 resource "aws_route53_record" "redshift-lb-dns" {
   provider = aws.core-vpc
-  name    = format("redshift.%s", data.aws_route53_zone.inner.name)
+  name    = format("redshift.%s.%s", local.application_name, data.aws_route53_zone.inner.name)
   type    = "A"
   zone_id = data.aws_route53_zone.inner.zone_id
 
