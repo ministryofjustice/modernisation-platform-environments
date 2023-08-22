@@ -160,6 +160,10 @@ resource "aws_cloudfront_distribution" "external" {
       origin_access_identity   = aws_cloudfront_origin_access_identity.portalerrorpagebucket.cloudfront_access_identity_path
     }
   }
+  origin_shield {
+      enabled              = false
+      origin_shield_region = "eu-west-2"
+    }
   enabled = true
   aliases = ["mp-portal.dev.legalservices.gov.uk"]
   default_cache_behavior {
