@@ -59,24 +59,24 @@ locals {
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
         })
       })
-      "t2-${local.application_name}-web-b" = merge(local.webserver_b, {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "oasys_webserver_release_*"
-          ssm_parameters_prefix     = "ec2-web-t2/"
-          iam_resource_names_prefix = "ec2-web-t2"
-        })
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "oasys/web-index-html-updation"
-          })
-        })
-        autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
-        tags = merge(local.webserver_a.tags, {
-          description                             = "t2 ${local.application_name} web"
-          "${local.application_name}-environment" = "t2"
-          oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
-        })
-      })
+      # "t2-${local.application_name}-web-b" = merge(local.webserver_b, {
+      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #     ami_name                  = "oasys_webserver_release_*"
+      #     ssm_parameters_prefix     = "ec2-web-t2/"
+      #     iam_resource_names_prefix = "ec2-web-t2"
+      #   })
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "oasys/web-index-html-updation"
+      #     })
+      #   })
+      #   autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
+      #   tags = merge(local.webserver_a.tags, {
+      #     description                             = "t2 ${local.application_name} web"
+      #     "${local.application_name}-environment" = "t2"
+      #     oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+      #   })
+      # })
 
       ##
       ## T1
@@ -219,24 +219,24 @@ locals {
               #     }
               #   ]
               # }
-              # t1-web-http-8080 = {
-              #   priority = 300
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "t1-${local.application_name}-web-a-pb-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "t1.oasys.service.justice.gov.uk",
-              #           "t1-a.oasys.service.justice.gov.uk",
-              #           "ords.t1.oasys.service.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
+              t1-web-http-8080 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-${local.application_name}-web-a-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t1.oasys.service.justice.gov.uk",
+                        "t1-a.oasys.service.justice.gov.uk",
+                        "ords.t1.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         }
@@ -305,24 +305,24 @@ locals {
               #     }
               #   ]
               # }
-              # t1-web-http-8080 = {
-              #   priority = 300
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "t1-${local.application_name}-web-a-pv-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "t1-int.oasys.service.justice.gov.uk",
-              #           "t1-a-int.oasys.service.justice.gov.uk",
-              #           "t1-oasys.hmpp-azdt.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
+              t1-web-http-8080 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-${local.application_name}-web-a-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t1-int.oasys.service.justice.gov.uk",
+                        "t1-a-int.oasys.service.justice.gov.uk",
+                        "t1-oasys.hmpp-azdt.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         }
