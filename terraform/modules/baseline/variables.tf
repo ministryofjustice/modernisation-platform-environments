@@ -822,7 +822,7 @@ variable "secretsmanager_secrets" {
         variable = string
         values   = list(string)
       })), [])
-    })), [])
+    })))
     secrets = map(object({
       description = optional(string)
       type        = optional(string, "SecureString")

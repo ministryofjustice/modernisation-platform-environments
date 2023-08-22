@@ -8,6 +8,7 @@ locals {
       for secret_name, secret_value in sm_value.secrets : {
         key = "${sm_value.prefix}${sm_key}${sm_value.postfix}${secret_name}"
         value = merge(secret_value,
+          { policy = sm_value.policy },
           { policy_key = sm_key },
           secret_value.kms_key_id == null ? { kms_key_id = sm_value.kms_key_id } : {}
         )
@@ -56,7 +57,9 @@ resource "random_password" "secrets" {
 }
 
 data "aws_iam_policy_document" "secretsmanager_secret_policy" {
-  for_each = var.secretsmanager_secrets
+  for_each = {
+    for key, value in var.secretsmanager_secrets : key => value if value.policy != null
+  }
 
   dynamic "statement" {
     for_each = each.value.policy
@@ -94,7 +97,7 @@ resource "aws_secretsmanager_secret" "this" {
   name        = each.key
   description = each.value.description
   kms_key_id  = each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
-  policy      = data.aws_iam_policy_document.secretsmanager_secret_policy[each.value.policy_key].json
+  policy      = each.value.policy != null ? data.aws_iam_policy_document.secretsmanager_secret_policy[each.value.policy_key].json : null
 
   tags = merge(local.tags, {
     Name = each.key
