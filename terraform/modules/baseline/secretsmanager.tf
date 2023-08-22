@@ -7,9 +7,13 @@ locals {
     for sm_key, sm_value in var.secretsmanager_secrets : [
       for secret_name, secret_value in sm_value.secrets : {
         key = "${sm_value.prefix}${sm_key}${sm_value.postfix}${secret_name}"
-        value = merge(secret_value,
-          { policy = sm_value.policy },
-          { policy_key = sm_key },
+        value = merge(
+          {
+            policy_key              = sm_key,
+            policy                  = sm_value.policy,
+            recovery_window_in_days = sm_value.recovery_window_in_days
+          },
+          secret_value,
           secret_value.kms_key_id == null ? { kms_key_id = sm_value.kms_key_id } : {}
         )
       }
@@ -94,10 +98,11 @@ resource "aws_secretsmanager_secret" "this" {
     local.secretsmanager_secrets_default
   )
 
-  name        = each.key
-  description = each.value.description
-  kms_key_id  = each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
-  policy      = each.value.policy != null ? data.aws_iam_policy_document.secretsmanager_secret_policy[each.value.policy_key].json : null
+  name                    = each.key
+  description             = each.value.description
+  kms_key_id              = each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
+  policy                  = each.value.policy != null ? data.aws_iam_policy_document.secretsmanager_secret_policy[each.value.policy_key].json : null
+  recovery_window_in_days = each.value.recovery_window_in_days
 
   tags = merge(local.tags, {
     Name = each.key

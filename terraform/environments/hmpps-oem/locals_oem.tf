@@ -26,7 +26,7 @@ locals {
   }
 
   oem_database_instance_secretsmanager_secrets = {
-    prefix = "/database/"
+    prefix = "/oracle/database/"
     secrets = {
       rcvcatownerpassword = {}
       syspassword         = {}
@@ -34,7 +34,7 @@ locals {
     }
   }
   oem_emrep_secretsmanager_secrets = {
-    prefix = "/oem/"
+    prefix = "/oracle/oem/"
     secrets = {
       sysmanpassword = {}
       syspassword    = {}
@@ -42,14 +42,13 @@ locals {
     }
   }
   oem_secretsmanager_secrets = {
-    prefix = "/oem/"
+    prefix = "/oracle/oem/"
     secrets = {
       agentregpassword    = {}
       nodemanagerpassword = {}
       weblogicpassword    = {}
     }
   }
-
 
   oem_ec2_default = {
 

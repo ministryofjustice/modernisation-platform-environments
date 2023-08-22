@@ -17,8 +17,8 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "TRCVCAT" = local.oem_database_instance_secretsmanager_secrets
-      "EMREP"   = local.oem_emrep_secretsmanager_secrets
+      # "TRCVCAT" = local.oem_database_instance_secretsmanager_secrets
+      # "EMREP"   = local.oem_emrep_secretsmanager_secrets
       "OEM"     = local.oem_secretsmanager_secrets
     }
 
