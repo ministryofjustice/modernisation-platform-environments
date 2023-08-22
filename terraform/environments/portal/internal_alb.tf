@@ -39,25 +39,15 @@ resource "aws_lb_listener" "http_internal" {
   protocol          = "HTTP"
 
   # TODO This needs using once Cert and CloudFront has been set up
-  # default_action {
-  #   type = "redirect"
-  #   redirect {
-  #     port        = "443"
-  #     protocol    = "HTTPS"
-  #     status_code = "HTTP_301"
-  #     host        = "#{host}"
-  #     path        = "/#{path}"
-  #     query       = "#{query}"
-  #   }
-  # }
-
-  # TODO This needs removing once HTTPS is set up
   default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "HTTPS is not set up yet"
-      status_code  = 403
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+      host        = "#{host}"
+      path        = "/#{path}"
+      query       = "#{query}"
     }
   }
 
@@ -66,22 +56,22 @@ resource "aws_lb_listener" "http_internal" {
 }
 
 # TODO This needs uncommenting once Cert has been set up
-# resource "aws_lb_listener" "https_internal" {
-#
-#   load_balancer_arn = aws_lb.internal.arn
-#   port              = local.internal_lb_https_port
-#   protocol        = "HTTPS"
-#   ssl_policy      = null # TODO This needs updating once Cert and CloudFront has been set up
-#   certificate_arn = null # TODO This needs updating once Cert and CloudFront has been set up
-#
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.internal.arn
-#   }
-#
-#   tags = local.tags
-#
-# }
+resource "aws_lb_listener" "https_internal" {
+
+  load_balancer_arn = aws_lb.internal.arn
+  port              = local.internal_lb_https_port
+  protocol        = "HTTPS"
+  ssl_policy      = "ELBSecurityPolicy-2016-08"
+  certificate_arn = aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.internal.arn
+  }
+
+  tags = local.tags
+
+}
 
 resource "aws_lb_listener_rule" "host_based_internal" {
   listener_arn = aws_lb_listener.http_internal.arn
@@ -101,22 +91,22 @@ resource "aws_lb_listener_rule" "host_based_internal" {
 }
 
 # TODO This needs uncommenting once Cert has been set up
-# resource "aws_lb_listener_rule" "https_internal" {
-#   listener_arn = aws_lb_listener.https_internal.arn
-#   priority     = 100
-#
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.internal.arn
-#   }
-#
-#   condition {
-#     path_pattern {
-#       values = ["/"]
-#     }
-#   }
-#
-# }
+resource "aws_lb_listener_rule" "https_internal" {
+  listener_arn = aws_lb_listener.https_internal.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.internal.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
+
+}
 
 resource "aws_lb_target_group" "internal" {
   name                 = "${local.application_name}-internal-ohs-target-group"
