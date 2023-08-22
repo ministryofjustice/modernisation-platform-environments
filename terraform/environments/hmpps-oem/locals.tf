@@ -54,6 +54,8 @@ locals {
     }
   }
 
+  baseline_secretsmanager_secrets = {}
+
   baseline_security_groups = {
     data-oem = local.security_groups.data_oem
   }

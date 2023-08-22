@@ -25,6 +25,32 @@ locals {
     }
   }
 
+  oem_database_instance_secretsmanager_secrets = {
+    prefix = "/database/"
+    secrets = {
+      rcvcatownerpassword = {}
+      syspassword         = {}
+      systempassword      = {}
+    }
+  }
+  oem_emrep_secretsmanager_secrets = {
+    prefix = "/oem/"
+    secrets = {
+      sysmanpassword = {}
+      syspassword    = {}
+      systempassword = {}
+    }
+  }
+  oem_secretsmanager_secrets = {
+    prefix = "/oem/"
+    secrets = {
+      agentregpassword    = {}
+      nodemanagerpassword = {}
+      weblogicpassword    = {}
+    }
+  }
+
+
   oem_ec2_default = {
 
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default

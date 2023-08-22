@@ -16,6 +16,12 @@ locals {
       "test-oem-b/OEM"     = local.oem_ssm_parameters
     }
 
+    baseline_secretsmanager_secrets = {
+      "TRCVCAT" = local.oem_database_instance_secretsmanager_secrets
+      "EMREP"   = local.oem_emrep_secretsmanager_secrets
+      "OEM"     = local.oem_secretsmanager_secrets
+    }
+
     baseline_ec2_autoscaling_groups = {
       test-oem = merge(local.oem_ec2_default, {
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
