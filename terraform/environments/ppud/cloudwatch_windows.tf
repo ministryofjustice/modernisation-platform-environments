@@ -189,7 +189,7 @@ count  = local.is-production == true ? 1 : 0
 
 resource "aws_cloudwatch_log_group" "Network-Connectivity-Logs" {
 count  = local.is-production == true ? 1 : 0
-  name = "Windows-Services-Logs"
+  name = "Network-Connectivity-Logs"
   retention_in_days = 365
 }
 
