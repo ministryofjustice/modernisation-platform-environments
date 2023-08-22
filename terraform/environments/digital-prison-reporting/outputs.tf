@@ -142,11 +142,11 @@ output "ec2_private_key" {
   #  sensitive = true 
 }
 
-# DMS Subnet ids
-#output "dms_subnets" {
-#  description = "DMS Subnet IDs"
-#  value       = module.dms_nomis_ingestor.dms_subnet_ids
-#}
+## DMS Subnet ids
+output "dms_subnets" {
+  description = "DMS Subnet IDs"
+  value       = module.dms_nomis_ingestor.dms_subnet_ids
+}
 
 ## Dynamo Domain Registry DB table
 output "dynamodb_table_arn" {
