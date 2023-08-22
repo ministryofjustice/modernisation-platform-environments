@@ -62,23 +62,6 @@ locals {
           create_external_record = true
         }
 
-        ssm_parameters = {
-          ASMSYS = {
-            random = {
-              length  = 30
-              special = false
-            }
-            description = "ASMSYS password"
-          }
-          ASMSNMP = {
-            random = {
-              length  = 30
-              special = false
-            }
-            description = "ASMSNMP password"
-          }
-        }
-
         tags = {
           description = "Test CSR DB server"
           ami         = "base_ol_8_5"
@@ -91,7 +74,6 @@ locals {
     baseline_route53_zones = {
       "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
         records = [
-          { name = "t3-csr-db-a", type = "CNAME", ttl = "300", records = ["t3-csr-db-a.corporate-staff-rostering.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
         ]
       }
     }
