@@ -57,6 +57,7 @@ locals {
           description                             = "t2 ${local.application_name} web"
           "${local.application_name}-environment" = "t2"
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+          oracle-db-sid                           = "T2OASYS" # for each env using azure DB will need to be OASPROD
         })
       })
       # "t2-${local.application_name}-web-b" = merge(local.webserver_b, {
@@ -91,6 +92,7 @@ locals {
           description                             = "t1 ${local.application_name} web"
           "${local.application_name}-environment" = "t1"
           oracle-db-hostname                      = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
+          oracle-db-sid                           = "T1OASYS" # for each env using azure DB will need to be OASPROD
         })
       })
 
