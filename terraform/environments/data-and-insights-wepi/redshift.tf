@@ -175,7 +175,6 @@ resource "aws_lb" "redshift-data" {
   name               = format("%s-redshift-lb", local.environment)
   internal           = true
   load_balancer_type = "network"
-  security_groups    = [aws_security_group.redshift-data-lb.id]
   subnets            = data.aws_subnets.shared-private.ids
   tags = merge(
     local.tags,
