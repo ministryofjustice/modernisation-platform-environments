@@ -10,7 +10,7 @@ locals {
   prod_workspaces_cidr    = "10.200.16.0/20"
   redc_cidr               = "172.16.0.0/20"
   atos_cidr               = "10.0.0.0/8"
-  portal_hosted_zone      = local.application_data.accounts[local.environment].hosted_zone
+  portal_hosted_zone      = local.application_data.accounts[local.environment].acm_domain_name
 
   # Temp local variable for environments where we wish to build out the EBS to be transfered to EFS
   ebs_conditional = ["testing", "preproduction", "production"]
