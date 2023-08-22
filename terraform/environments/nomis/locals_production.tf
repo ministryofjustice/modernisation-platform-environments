@@ -237,6 +237,7 @@ locals {
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-b", type = "A", lbs_map_key = "private" },
+          { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
     }
