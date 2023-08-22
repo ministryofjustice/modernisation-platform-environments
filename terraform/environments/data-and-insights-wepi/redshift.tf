@@ -153,13 +153,22 @@ resource "aws_security_group" "redshift-data-lb" {
   tags   = local.tags
 }
 
-resource "aws_security_group_rule" "tcp-5439" {
+resource "aws_security_group_rule" "tcp-5439-in" {
   cidr_blocks       = ["0.0.0.0/0"]
   from_port         = 5439
   protocol          = "tcp"
   security_group_id = aws_security_group.redshift-data-lb.id
   to_port           = 5439
   type              = "ingress"
+}
+
+resource "aws_security_group_rule" "tcp-5439-out" {
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  from_port         = 5439
+  protocol          = "tcp"
+  security_group_id = aws_security_group.redshift-data-lb.id
+  to_port           = 5439
+  type              = "egress"
 }
 
 resource "aws_lb" "redshift-data" {
