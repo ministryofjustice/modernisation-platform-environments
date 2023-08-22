@@ -256,3 +256,64 @@ module "glue_retention_curated_job" {
     "--dpr.log.level"             = local.retention_curated_job_log_level
   }
 }
+
+# Maintenance Job Schedules (triggers)
+resource "aws_glue_trigger" "compact_raw_job" {
+  name     = "${local.compact_raw_job_name}-trigger"
+  schedule = "cron(0 15 * * * *)"
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.glue_compact_raw_job.name
+  }
+}
+
+resource "aws_glue_trigger" "compact_structured_job" {
+  name     = "${local.compact_structured_job_name}-trigger"
+  schedule = "cron(15 15 * * * *)"
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.glue_compact_structured_job.name
+  }
+}
+
+resource "aws_glue_trigger" "compact_curated_job" {
+  name     = "${local.compact_curated_job_name}-trigger"
+  schedule = "cron(30 15 * * * *)"
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.glue_compact_curated_job.name
+  }
+}
+
+resource "aws_glue_trigger" "retention_raw_job" {
+  name     = "${local.retention_raw_job_name}-trigger"
+  schedule = "cron(0 16 * * * *)"
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.glue_retention_raw_job.name
+  }
+}
+
+resource "aws_glue_trigger" "retention_structured_job" {
+  name     = "${local.retention_structured_job_name}-trigger"
+  schedule = "cron(15 16 * * * *)"
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.glue_retention_structured_job.name
+  }
+}
+
+resource "aws_glue_trigger" "retention_curated_job" {
+  name     = "${local.retention_curated_job_name}-trigger"
+  schedule = "cron(30 16 * * * *)"
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.glue_retention_curated_job.name
+  }
+}
