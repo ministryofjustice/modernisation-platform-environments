@@ -354,6 +354,7 @@ resource "aws_route53_record" "cloudfront-non-prod" {
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
   # name    = local.application_data.accounts[local.environment].fqdn
+  # this will need moving to a public hosted in future
   name      = "mp-portal.dev.legalservices.gov.uk"
   type     = "A"
   alias {
