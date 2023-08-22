@@ -70,6 +70,27 @@ locals {
           server-type = "csr-db"
         }
       }
+      web-server-1 = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "web-test-server-ami"
+          ami_owner                     = "self"
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/web-server-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["data-db"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description = "Test Restore Windows Server 2012 R2"
+          os-type     = "Windows"
+          component   = "webserver"
+          server-type = "csr-web-server"
+        }
+      }
     }
     baseline_route53_zones = {
       "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
