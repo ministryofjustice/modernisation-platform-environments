@@ -61,7 +61,7 @@ resource "aws_lb_listener" "https_internal" {
   load_balancer_arn = aws_lb.internal.arn
   port              = local.internal_lb_https_port
   protocol        = "HTTPS"
-  ssl_policy      = "ELBSecurityPolicy-2016-08-01"
+  ssl_policy      = "ELBSecurityPolicy-2016-08"
   certificate_arn = aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
 
   default_action {
