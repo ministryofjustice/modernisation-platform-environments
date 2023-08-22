@@ -62,23 +62,6 @@ locals {
           create_external_record = true
         }
 
-        ssm_parameters = {
-          ASMSYS = {
-            random = {
-              length  = 30
-              special = false
-            }
-            description = "ASMSYS password"
-          }
-          ASMSNMP = {
-            random = {
-              length  = 30
-              special = false
-            }
-            description = "ASMSNMP password"
-          }
-        }
-
         tags = {
           description = "Test CSR DB server"
           ami         = "base_ol_8_5"
