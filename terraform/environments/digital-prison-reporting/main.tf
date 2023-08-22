@@ -565,55 +565,55 @@ module "datamart" {
 }
 
 # DMS Nomis Data Collector
-module "dms_nomis_ingestor" {
-  source                       = "./modules/dms"
-  setup_dms_instance           = local.setup_dms_instance # Disable all DMS Resources
-  enable_replication_task      = local.enable_replication_task # Disable Replication Task
-  name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
-  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
-  source_engine_name           = "oracle"
-  source_db_name               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
-  source_app_username          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["user"]
-  source_app_password          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["password"]
-  source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
-  source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
-  vpc                          = data.aws_vpc.shared.id
-  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  project_id                   = local.project
-  env                          = local.environment
-  dms_source_name              = "oracle"
-  dms_target_name              = "kinesis"
-  short_name                   = "nomis"
-  migration_type               = "full-load"
-  replication_instance_version = "3.4.6" # Rollback
-  replication_instance_class   = "dms.t3.medium"
-  subnet_ids                   = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
-
-  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
-  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
-
-  extra_attributes           = "supportResetlog=TRUE"
-
-  kinesis_settings = {
-    "include_null_and_empty"         = "true"
-    "partition_include_schema_table" = "true"
-    "include_partition_value"        = "true"
-    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
-  }
-
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-dms-t3nomis-ingestor-${local.env}"
-      Resource_Type = "DMS Replication"
-      Nomis_Source  = "T3"
-    }
-  )
-}
+#module "dms_nomis_ingestor" {
+#  source                       = "./modules/dms"
+#  setup_dms_instance           = local.setup_dms_instance # Disable all DMS Resources
+#  enable_replication_task      = local.enable_replication_task # Disable Replication Task
+#  name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
+#  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
+#  source_engine_name           = "oracle"
+#  source_db_name               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
+#  source_app_username          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["user"]
+#  source_app_password          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["password"]
+#  source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
+#  source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
+#  vpc                          = data.aws_vpc.shared.id
+#  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+#  project_id                   = local.project
+#  env                          = local.environment
+#  dms_source_name              = "oracle"
+#  dms_target_name              = "kinesis"
+#  short_name                   = "nomis"
+#  migration_type               = "full-load"
+#  replication_instance_version = "3.4.6" # Rollback
+#  replication_instance_class   = "dms.t3.medium"
+#  subnet_ids                   = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+#
+#  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
+#  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
+#
+#  extra_attributes           = "supportResetlog=TRUE"
+#
+#  kinesis_settings = {
+#    "include_null_and_empty"         = "true"
+#    "partition_include_schema_table" = "true"
+#    "include_partition_value"        = "true"
+#    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
+#  }
+#
+#  availability_zones = {
+#    0 = "eu-west-2a"
+#  }
+#
+#  tags = merge(
+#    local.all_tags,
+#    {
+#      Name          = "${local.project}-dms-t3nomis-ingestor-${local.env}"
+#      Resource_Type = "DMS Replication"
+#      Nomis_Source  = "T3"
+#    }
+#  )
+#}
 
 # Dynamo DB Tables
 # Dynamo DB for DomainRegistry, DPR-306/DPR-218
