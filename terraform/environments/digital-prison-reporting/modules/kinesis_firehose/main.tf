@@ -8,10 +8,12 @@ resource "aws_kinesis_firehose_delivery_stream" "extended_s3_stream" {
   }
 
   extended_s3_configuration {
-    role_arn       = aws_iam_role.firehose_role.arn
-    bucket_arn     = var.target_s3_arn
-    kms_key_arn    = var.target_s3_kms
-    s3_backup_mode = "Disabled"
+    role_arn           = aws_iam_role.firehose_role.arn
+    bucket_arn         = var.target_s3_arn
+    kms_key_arn        = var.target_s3_kms
+    s3_backup_mode     = "Disabled"
+    buffering_size     = var.buffering_size
+    buffering_interval = var.buffering_interval
 
     prefix              = var.target_s3_prefix
     error_output_prefix = var.target_s3_error_prefix
