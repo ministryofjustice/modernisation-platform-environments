@@ -59,7 +59,29 @@ resource "aws_security_group" "load_balancer_security_group" {
   )
 }
 
+# Temporary until we can validate ACM cert during migration of production
+# The LB SG will block inbound on HTTP 80 but this is to get the apply to work
+resource "aws_lb_listener" "listener-prod" {
+  count            = local.is-production ? 1 : 0
+  load_balancer_arn = aws_lb.external.id
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.target_group_fargate.id
+    type             = "forward"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = local.application_name
+    }
+  )
+}
+
 resource "aws_lb_listener" "listener" {
+  count            = local.is-production ? 0 : 1
   load_balancer_arn = aws_lb.external.id
   port              = 443
   protocol          = "HTTPS"
