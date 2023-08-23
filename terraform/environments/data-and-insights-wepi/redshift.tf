@@ -150,6 +150,7 @@ data "aws_network_interface" "redshift-data" {
 resource "aws_lb" "redshift-data" {
   #checkov:skip=CKV_AWS_91:  "Logging not required"
   #checkov:skip=CKV_AWS_150: "Deletion protection not required"
+  #checkov:skip=CKV_AWS_152: "Cross-zone load balancing not appropriate with current Redshift configuration"
   enable_cross_zone_load_balancing = false
   internal                         = true
   load_balancer_type               = "network"
