@@ -18,15 +18,29 @@ tasks:
         type: powershell
         runAs: admin
         content: |
-           [System.Net.ServicePointManager]::SecurityProtocol = 'TLS12'
-            $progressPreference = 'silentlyContinue'
-            Invoke-WebRequest https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe -OutFile $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+          [System.Net.ServicePointManager]::SecurityProtocol = 'TLS12'
+          $Url = "https://s3.amazonaws.com/ec2-downloads-windows/EC2Config/EC2Install.zip"
+          $DownloadZipFile = "$env:USERPROFILE\Desktop\" + $(Split-Path -Path $Url -Leaf)
+          $ExtractPath = "$env:USERPROFILE\Desktop\"
+          Invoke-WebRequest -Uri $Url -OutFile $DownloadZipFile
+          $ExtractShell = New-Object -ComObject Shell.Application 
+          $ExtractFiles = $ExtractShell.Namespace($DownloadZipFile).Items() 
+          $ExtractShell.NameSpace($ExtractPath).CopyHere($ExtractFiles) 
+          Start-Process $ExtractPath
+          Start-Process -FilePath $env:USERPROFILE\Desktop\EC2Install.exe -ArgumentList "/S"
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
+          [System.Net.ServicePointManager]::SecurityProtocol = 'TLS12'
+          $progressPreference = 'silentlyContinue'
+          Invoke-WebRequest https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe -OutFile $env:USERPROFILE\Desktop\SSMAgent_latest.exe
 
-            Start-Process -FilePath $env:USERPROFILE\Desktop\SSMAgent_latest.exe -ArgumentList "/S"
+          Start-Process -FilePath $env:USERPROFILE\Desktop\SSMAgent_latest.exe -ArgumentList "/S"
 
-            # rm -Force $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+          # rm -Force $env:USERPROFILE\Desktop\SSMAgent_latest.exe
 
-            Restart-Service -Name "AmazonSSMAgent" -Force
+          Restart-Service -Name "AmazonSSMAgent" -Force
       # - frequency: once
       #   type: powershell
       #   runAs: admin
