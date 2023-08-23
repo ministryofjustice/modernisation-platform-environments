@@ -150,11 +150,11 @@ data "aws_network_interface" "redshift-data" {
 resource "aws_lb" "redshift-data" {
   #checkov:skip=CKV_AWS_91:  "Logging not required"
   #checkov:skip=CKV_AWS_150: "Deletion protection not required"
-  #checkov:skip=CKV_AWS_152: "Cross-zone load balancing not necessary"
-  name               = format("%s-redshift-lb", local.environment)
-  internal           = true
-  load_balancer_type = "network"
-  subnets            = data.aws_subnets.shared-private.ids
+  enable_cross_zone_load_balancing = false
+  internal                         = true
+  load_balancer_type               = "network"
+  name                             = format("%s-redshift-lb", local.environment)
+  subnets                          = data.aws_subnets.shared-private.ids
   tags = merge(
     local.tags,
     { "Name" = format("%s-redshift-lb", local.environment) }
