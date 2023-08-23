@@ -29,17 +29,13 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
+        # use latest EC2 Launch which should support everything
         content: |
-          [System.Net.ServicePointManager]::SecurityProtocol = 'TLS12'
-          $Url = "https://s3.amazonaws.com/ec2-downloads-windows/EC2Config/EC2Install.zip"
-          $DownloadZipFile = "$env:USERPROFILE\Desktop\" + $(Split-Path -Path $Url -Leaf)
-          $ExtractPath = "$env:USERPROFILE\Desktop\"
-          Invoke-WebRequest -Uri $Url -OutFile $DownloadZipFile
-          $ExtractShell = New-Object -ComObject Shell.Application 
-          $ExtractFiles = $ExtractShell.Namespace($DownloadZipFile).Items() 
-          $ExtractShell.NameSpace($ExtractPath).CopyHere($ExtractFiles) 
-          Start-Process $ExtractPath
-          Start-Process -FilePath $env:USERPROFILE\Desktop\EC2Install.exe -ArgumentList "/S"
+          New-Item -Path "$env:USERPROFILE\Desktop\EC2Launchv2" -ItemType Director
+          $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
+          $DownloadFile = "$env:USERPROFILE\Desktop\EC2Launchv2\" + $(Split-Path -Path $Url -Leaf)
+          Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
+          msiexec /i "$DownloadFile" ADDLOCAL="Basic,Clean,Telemetry" /q       
       - frequency: once
         type: powershell
         runAs: admin
@@ -50,9 +46,9 @@ tasks:
 
           Start-Process -FilePath $env:USERPROFILE\Desktop\SSMAgent_latest.exe -ArgumentList "/S"
 
-          # rm -Force $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+          rm -Force $env:USERPROFILE\Desktop\SSMAgent_latest.exe
 
-          Restart-Service -Name "AmazonSSMAgent" -Force
+          Start-Service -Name "AmazonSSMAgent"
       # - frequency: once
       #   type: powershell
       #   runAs: admin
