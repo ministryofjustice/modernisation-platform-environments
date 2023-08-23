@@ -172,8 +172,10 @@ module "kinesis_stream_reconciliation_firehose_s3" {
   cloudwatch_logging_enabled = true
   kinesis_source_stream_arn  = module.kinesis_stream_ingestor_full_load.kinesis_stream_arn
   kinesis_source_stream_name = module.kinesis_stream_ingestor_full_load.kinesis_stream_name
-  target_s3_arn              = module.s3_reconciliation_bucket.bucket_arn
-  target_s3_id               = module.s3_reconciliation_bucket.bucket_id
+  target_s3_arn              = module.s3_working_bucket.bucket_arn
+  target_s3_id               = module.s3_working_bucket.bucket_id
+  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor_full_load.kinesis_stream_name}/"
+  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor_full_load.kinesis_stream_name}-error/"
   target_s3_kms              = local.s3_kms_arn
 }
 
@@ -298,25 +300,6 @@ module "s3_landing_bucket" {
     }
   )
 }
-
-# S3 RECONCILIATION
-module "s3_reconciliation_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-reconciliation-${local.env}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false # For SQS Queue
-  enable_lifecycle          = true
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-reconciliation-${local.env}"
-      Resource_Type = "S3 Bucket"
-    }
-  )
-}
-
 # S3 RAW
 module "s3_raw_bucket" {
   source                    = "./modules/s3_bucket"
