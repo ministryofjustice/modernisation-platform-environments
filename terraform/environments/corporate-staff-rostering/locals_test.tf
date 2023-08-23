@@ -72,7 +72,7 @@ locals {
       }
     }
     baseline_ec2_autoscaling_groups = {
-      web-srv-1 = {
+      /* web-srv-1 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "web-test-server-ami"
@@ -96,14 +96,14 @@ locals {
           component   = "webserver"
           server-type = "csr-web-server"
         }
-      }
+      } */
       app-srv-1 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "app-test-server-ami"
           ami_owner                     = "self"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/app-server-user-data.yaml"))
-          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
+          # instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["sg-0f692e412a94bbe9c"]
