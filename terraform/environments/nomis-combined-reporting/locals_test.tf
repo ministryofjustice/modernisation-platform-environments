@@ -26,7 +26,6 @@ locals {
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
           "*.${module.environment.domains.public.application_environment}",
-          "${local.environment}.reporting.nomis.service.justice.gov.uk",
         ]
         tags = {
           description = "Wildcard certificate for the ${local.environment} environment"
