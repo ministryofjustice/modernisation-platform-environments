@@ -81,7 +81,7 @@ locals {
           user_data_raw                 = base64encode(file("./templates/web-server-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["Web-SG-migration"]
+          vpc_security_group_ids = ["sg-0f692e412a94bbe9c"]
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 256 }
