@@ -785,6 +785,60 @@ variable "s3_buckets" {
   default = {}
 }
 
+variable "secretsmanager_secrets" {
+  # Example usage:
+  # my_database_secrets = {
+  #   prefix = "/database"
+  #   postfix = "/"
+  #   parameters = {
+  #     asm_password = { random = { length = 16 } }
+  #     sys_password = { description = "placeholder for password" }
+  #   }
+  # }
+  # secret_manager_secrets = {
+  #   my_db1_1 = local.my_database_secrets
+  #   my_db2_2 = local.my_database_secrets
+  # }
+  # Will create SSM params as follows
+  # /database/my_db1_1/asm_password
+  # /database/my_db1_1/sys_password
+  # /database/my_db2_2/asm_password
+  # /database/my_db2_2/sys_password
+  #
+  description = "Create a placeholder SecretManager secret, or a secret with a given value (randomly generated, from file, or value set directly).  Use this instead of SSM Parameters secure strings if you need to share the secret across accounts.  The top-level key is used as a prefix for the secret name, e.g. /database/db1.  Then define a map of secrets to create underneath that prefix.  Secret name is {prefix}{top-level-map-key}{postfix}{secrets-map-key}"
+  type = map(object({
+    prefix     = optional(string, "")
+    postfix    = optional(string, "/")
+    kms_key_id = optional(string, "general")
+    policy = optional(list(object({
+      effect  = string
+      actions = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    })))
+    recovery_window_in_days = optional(number, 0)
+    secrets = map(object({
+      description = optional(string)
+      type        = optional(string, "SecureString")
+      file        = optional(string)
+      kms_key_id  = optional(string)
+      random = optional(object({
+        length  = number
+        special = optional(bool)
+      }))
+      value = optional(string)
+    }))
+  }))
+  default = {}
+}
+
 variable "security_groups" {
   description = "map of security groups and associated rules to create where key is the name of the group"
   type = map(object({
@@ -850,12 +904,13 @@ variable "ssm_parameters" {
   #
   description = "Create a placeholder SSM parameter, or a SSM parameter with a given value (randomly generated, from file, or value set directly).  The top-level key is used as a prefix for the SSM parameters, e.g. /ec2/myec2name.  Then define a map of parameters to create underneath that prefix.  SSM parameter name is {prefix}{top-level-map-key}{postfix}{parameters-map-key}"
   type = map(object({
-    prefix  = optional(string, "")
-    postfix = optional(string, "/")
+    prefix     = optional(string, "")
+    postfix    = optional(string, "/")
+    kms_key_id = optional(string)
     parameters = map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
-      key_id      = optional(string, null)
+      kms_key_id  = optional(string)
       file        = optional(string)
       random = optional(object({
         length  = number
