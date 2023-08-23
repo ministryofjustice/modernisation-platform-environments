@@ -169,7 +169,7 @@ module "kinesis_stream_reconciliation_firehose_s3" {
   aws_region                 = local.account_region
   cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}"
   cloudwatch_log_stream_name = "DestinationDelivery"
-  cloudwatch_logging_enabled = true
+  cloudwatch_logging_enabled = false
   kinesis_source_stream_arn  = module.kinesis_stream_ingestor_experimental.kinesis_stream_arn
   kinesis_source_stream_name = module.kinesis_stream_ingestor_experimental.kinesis_stream_name
   target_s3_arn              = module.s3_working_bucket.bucket_arn
