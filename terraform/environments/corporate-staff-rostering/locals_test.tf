@@ -72,7 +72,7 @@ locals {
       }
     }
     baseline_ec2_autoscaling_groups = {
-      web-server-1 = {
+      web-srv-1 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "web-test-server-ami"
