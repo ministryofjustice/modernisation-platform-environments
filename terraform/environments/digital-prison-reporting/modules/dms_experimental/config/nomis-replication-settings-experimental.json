@@ -174,22 +174,5 @@
     "HandleSourceTableTruncated": true,
     "HandleSourceTableAltered": true
   },
-  "PostProcessingRules": null,
-  "ValidationSettings": {
-    "EnableValidation": true,
-    "ValidationMode": "ROW_LEVEL",
-    "ThreadCount": 5,
-    "PartitionSize": 10000,
-    "FailureMaxCount": 1000,
-    "RecordFailureDelayInMinutes": 5,
-    "RecordSuspendDelayInMinutes": 30,
-    "MaxKeyColumnSize": 8096,
-    "TableFailureMaxCount": 10000,
-    "ValidationOnly": false,
-    "HandleCollationDiff": false,
-    "RecordFailureDelayLimitInMinutes": 1,
-    "SkipLobColumns": false,
-    "ValidationPartialLobSize": 0,
-    "ValidationQueryCdcDelaySeconds": 0
-  }
+  "PostProcessingRules": null
 }

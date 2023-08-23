@@ -48,6 +48,7 @@ resource "aws_dms_replication_task" "dms-replication-experimental" {
   table_mappings            = data.template_file.table-mappings_experimental.rendered
   replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings-experimental.json")
 
+
   #lifecycle {
   #  ignore_changes = [replication_task_settings]
   #}
