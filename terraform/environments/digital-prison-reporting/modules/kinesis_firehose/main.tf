@@ -12,6 +12,7 @@ resource "aws_kinesis_firehose_delivery_stream" "extended_s3_stream" {
     bucket_arn     = var.target_s3_arn
     kms_key_arn    = var.target_s3_kms
     s3_backup_mode = "Disabled"
+    buffering_size = var.buffering_size
 
     prefix              = var.target_s3_prefix
     error_output_prefix = var.target_s3_error_prefix

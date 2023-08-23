@@ -31,3 +31,7 @@ variable "target_s3_prefix" {
   description = "S3 Prefix Key"
   default     = null
 }
+
+variable "buffering_size" {
+  description = "Buffer incoming data to the specified size, in MBs, before delivering it to S3."
+}
