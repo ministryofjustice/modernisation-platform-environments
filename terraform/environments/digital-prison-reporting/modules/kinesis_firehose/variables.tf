@@ -35,3 +35,7 @@ variable "target_s3_prefix" {
 variable "buffering_size" {
   description = "Buffer incoming data to the specified size, in MBs, before delivering it to S3."
 }
+
+variable "buffering_interval" {
+  description = "Buffer incoming data for the specified period of time, in seconds between 60 to 900, before delivering it to S3."
+}

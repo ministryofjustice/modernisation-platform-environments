@@ -178,6 +178,7 @@ module "kinesis_stream_reconciliation_firehose_s3" {
   target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}-error/"
   target_s3_kms              = local.s3_kms_arn
   buffering_size             = 128
+  buffering_interval         = 900
 }
 
 # Glue Registry
