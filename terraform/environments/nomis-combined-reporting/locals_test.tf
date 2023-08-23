@@ -122,16 +122,16 @@ locals {
       }
     }
     baseline_route53_zones = {
-      (module.environment.domains.public.modernisation_platform) = {
-        lb_alias_records = [
-          { name = "web.test.${local.application_name}", type = "A", lbs_map_key = "private" }
-        ]
-      }
-      "test.nomis-combined-reporting.service.justice.gov.uk" = {
+      "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
-          { name = "t1ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.nomis-combined-reporting.service.justice.gov.uk"] },
+          # T1 BIP
+
+          # T1 Tomcat
+
+          # Oracle database
+          { name = "t1ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.reporting.nomis.service.justice.gov.uk"] },
           { name = "t1ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
     }
