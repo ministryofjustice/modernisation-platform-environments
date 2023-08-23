@@ -70,6 +70,8 @@ locals {
           server-type = "csr-db"
         }
       }
+    }
+    baseline_ec2_autoscaling_groups = {
       web-server-1 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -84,6 +86,9 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 256 }
         }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0 # set to 0 while testing
+        })
         tags = {
           description = "Test Restore Windows Server 2012 R2"
           os-type     = "Windows"
