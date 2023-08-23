@@ -79,6 +79,7 @@ locals {
           ami_owner                     = "self"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/web-server-user-data.yaml"))
+          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["sg-0f692e412a94bbe9c"]
