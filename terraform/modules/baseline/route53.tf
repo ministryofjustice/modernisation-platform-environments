@@ -26,7 +26,7 @@ locals {
   route53_ns_records_list = flatten([
     for zone_name, zone_value in var.route53_zones : [
       for record in zone_value.ns_records : [{
-        key = "${record.name}.${zone_name}-${record.type}"
+        key = "${record.name}.${zone_name}-NS"
         value = merge(record, {
           zone_key = zone_name
           provider = local.route53_zones[zone_name].provider
