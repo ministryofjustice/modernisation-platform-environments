@@ -34,7 +34,7 @@ locals {
   baseline_ec2_instances            = {}
   baseline_iam_policies             = {
     CSRWebServerPolicy = {
-      description = "Policy allowing access to image builder launch templates"
+      description = "Policy allowing access to instances via the Serial Console"
       statements = [{
         effect = "Allow"
         actions = [
