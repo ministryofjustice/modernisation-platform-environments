@@ -1,10 +1,10 @@
-# data "aws_route53_zone" "network-services-production" {
-#   count   = local.is-production ? 1 : 0
-#   provider = aws.core-network-services
+data "aws_route53_zone" "network-services-production" {
+  count   = local.is-production ? 1 : 0
+  provider = aws.core-network-services
 
-#   name         = "jitbit.cr.probation.service.justice.gov.uk."
-#   private_zone = false
-# }
+  name         = "jitbit.cr.probation.service.justice.gov.uk."
+  private_zone = false
+}
 
 resource "aws_route53_record" "external" {
   count    = local.is-production ? 0 : 1
@@ -21,20 +21,20 @@ resource "aws_route53_record" "external" {
   }
 }
 
-# resource "aws_route53_record" "external-prod" {
-#   count    = local.is-production ? 1 : 0
-#   provider = aws.core-network-services
+resource "aws_route53_record" "external-prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
 
-#   zone_id = data.aws_route53_zone.network-services-production[0].zone_id
-#   name    = local.app_url
-#   type    = "A"
+  zone_id = data.aws_route53_zone.network-services-production[0].zone_id
+  name    = local.app_url
+  type    = "A"
 
-#   alias {
-#     name                   = aws_lb.external.dns_name
-#     zone_id                = aws_lb.external.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = aws_lb.external.dns_name
+    zone_id                = aws_lb.external.zone_id
+    evaluate_target_health = true
+  }
+}
 
 resource "aws_acm_certificate" "external" {
   domain_name       = local.domain
@@ -53,7 +53,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_route53_record" "external_validation" {
-  count   = local.is-production ? 0 : 1 # Temporary until we have a production dns delegation in place
+  count    = local.is-production ? 0 : 1 # Temporary until we have a production dns delegation in place
   provider = aws.core-network-services
 
   allow_overwrite = true

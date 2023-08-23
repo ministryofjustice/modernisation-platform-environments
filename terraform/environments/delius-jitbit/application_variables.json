@@ -86,7 +86,7 @@
     },
     "production": {
       "migration_source_account_id": "097456858629",
-      "migration_source_account_name": "cr-jitbit-production",
+      "migration_source_account_name": "cr-jitbit-prod",
       "server_port": "5000",
       "db_engine_version": "15.00.4073.23.v1",
       "db_auto_minor_version_upgrade": "true",
