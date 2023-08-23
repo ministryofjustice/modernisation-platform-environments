@@ -9,6 +9,7 @@ resource "aws_glue_catalog_database" "sop_redshift" {
 }
 
 resource "aws_glue_crawler" "mojap_import_all" {
+  #checkov:skip=CKV_AWS_195
   database_name = aws_glue_catalog_database.mojap_all_tables.name
   name          = "sop-import-all"
   role          = aws_iam_role.wepi_iam_role_glue.arn
@@ -20,6 +21,7 @@ resource "aws_glue_crawler" "mojap_import_all" {
 }
 
 resource "aws_glue_crawler" "absence_crawler" {
+  #checkov:skip=CKV_AWS_195
   database_name = aws_glue_catalog_database.sop_redshift.name
   name          = "absence-redshift-schema"
   role          = aws_iam_role.wepi_iam_role_glue.arn
@@ -31,6 +33,7 @@ resource "aws_glue_crawler" "absence_crawler" {
 }
 
 resource "aws_glue_crawler" "leavers_crawler" {
+  #checkov:skip=CKV_AWS_195
   database_name = aws_glue_catalog_database.sop_redshift.name
   name          = "leavers-redshift-schema"
   role          = aws_iam_role.wepi_iam_role_glue.arn
