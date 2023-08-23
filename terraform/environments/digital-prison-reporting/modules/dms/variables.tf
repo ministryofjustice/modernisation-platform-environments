@@ -8,6 +8,13 @@ variable "enable_replication_task" {
   default     = false
 }
 
+# TODO: DPR-622: Delete when done
+variable "enable_experimental_task" {
+  description = "Enable Experimental DMS Replication Task, True or False"
+  type        = bool
+  default     = false
+}
+
 variable "setup_dms_instance" {
   description = "Enable DMS Instance, True or False"
   type        = bool

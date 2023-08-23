@@ -38,7 +38,7 @@ data "template_file" "table-mappings" {
 }
 
 resource "aws_dms_replication_task" "dms-replication" {
-  count                     = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
+  count                     = var.setup_dms_instance && var.enable_replication_task && !var.enable_experimental_task ? 1 : 0
 
   migration_type            = var.migration_type
   replication_instance_arn  = aws_dms_replication_instance.dms[0].replication_instance_arn
@@ -61,7 +61,7 @@ resource "aws_dms_replication_task" "dms-replication" {
 
 # TODO: DPR-622: Delete when done
 resource "aws_dms_replication_task" "dms-replication-experimental" {
-  count                     = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
+  count                     = var.setup_dms_instance && var.enable_replication_task && var.enable_experimental_task ? 1 : 0
 
   migration_type            = var.migration_type
   replication_instance_arn  = aws_dms_replication_instance.dms[0].replication_instance_arn
