@@ -1,19 +1,5 @@
 locals {
 
-  oem_secret_policy = {
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-    ]
-    principals = {
-      type = "AWS"
-      identifiers = [
-        "hmpps-oem-test",
-        "nomis-test",
-      ]
-    }
-  }
-
   oem_database_instance_ssm_parameters = {
     prefix = "/database/"
     parameters = {
@@ -33,34 +19,6 @@ locals {
   oem_ssm_parameters = {
     prefix = "/oem/"
     parameters = {
-      agentregpassword    = {}
-      nodemanagerpassword = {}
-      weblogicpassword    = {}
-    }
-  }
-
-  oem_database_instance_secretsmanager_secrets = {
-    prefix = "/oracle/database/"
-    policy = [local.oem_secret_policy]
-    secrets = {
-      rcvcatownerpassword = {}
-      syspassword         = {}
-      systempassword      = {}
-    }
-  }
-  oem_emrep_secretsmanager_secrets = {
-    prefix = "/oracle/oem/"
-    policy = [local.oem_secret_policy]
-    secrets = {
-      sysmanpassword = {}
-      syspassword    = {}
-      systempassword = {}
-    }
-  }
-  oem_secretsmanager_secrets = {
-    prefix = "/oracle/oem/"
-    policy = [local.oem_secret_policy]
-    secrets = {
       agentregpassword    = {}
       nodemanagerpassword = {}
       weblogicpassword    = {}
