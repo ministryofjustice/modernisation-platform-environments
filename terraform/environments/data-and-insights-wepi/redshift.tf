@@ -135,15 +135,15 @@ resource "aws_redshift_cluster_iam_roles" "wepi_redshift_iam_roles" {
   ]
 }
 
-data "aws_vpc_endpoint" "redshift-data" {
+data "aws_vpc_endpoint" "redshift" {
   provider     = aws.core-vpc
   vpc_id       = data.aws_vpc.shared.id
-  service_name = "com.amazonaws.eu-west-2.redshift-data"
+  service_name = "com.amazonaws.eu-west-2.redshift"
 }
 
 data "aws_network_interface" "redshift-data" {
   provider = aws.core-vpc
-  for_each = data.aws_vpc_endpoint.redshift-data.network_interface_ids
+  for_each = data.aws_vpc_endpoint.redshift.network_interface_ids
   id       = each.value
 }
 
