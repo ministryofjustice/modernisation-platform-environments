@@ -1,5 +1,5 @@
 # Create a new DMS replication instance
-resource "aws_dms_replication_instance" "dms" {
+resource "aws_dms_replication_instance" "dms-experimental" {
   count                        = var.setup_dms_instance ? 1 : 0
 
   allocated_storage            = var.replication_instance_storage
@@ -12,8 +12,8 @@ resource "aws_dms_replication_instance" "dms" {
   publicly_accessible          = false
   replication_instance_class   = var.replication_instance_class
   replication_instance_id      = var.name
-  replication_subnet_group_id  = aws_dms_replication_subnet_group.dms[0].id
-  vpc_security_group_ids       = aws_security_group.dms_sec_group[*].id
+  replication_subnet_group_id  = aws_dms_replication_subnet_group.dms-experimental[0].id
+  vpc_security_group_ids       = aws_security_group.dms_sec_group_experimental[*].id
 
   tags = var.tags
 
@@ -24,47 +24,47 @@ resource "aws_dms_replication_instance" "dms" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.dms-operator-kinesis-attachment,
-    aws_iam_role_policy_attachment.dms-kinesis-attachment,
+    aws_iam_role_policy_attachment.dms-operator-kinesis-attachment-experimental,
+    aws_iam_role_policy_attachment.dms-kinesis-attachment-experimental,
     var.cloudwatch_role_dependency,
     var.vpc_role_dependency,
-    aws_dms_replication_subnet_group.dms,
-    aws_security_group.dms_sec_group
+    aws_dms_replication_subnet_group.dms-experimental,
+    aws_security_group.dms_sec_group_experimental
   ]
 }
 
-data "template_file" "table-mappings" {
+data "template_file" "table-mappings_experimental" {
   template = file("${path.module}/config/${var.short_name}-table-mappings.json.tpl")
 }
 
-resource "aws_dms_replication_task" "dms-replication" {
+resource "aws_dms_replication_task" "dms-replication-experimental" {
   count                     = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
 
   migration_type            = var.migration_type
-  replication_instance_arn  = aws_dms_replication_instance.dms[0].replication_instance_arn
-  replication_task_id       = "${var.project_id}-dms-task-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
-  source_endpoint_arn       = aws_dms_endpoint.source[0].endpoint_arn
-  target_endpoint_arn       = aws_dms_endpoint.target[0].endpoint_arn
-  table_mappings            = data.template_file.table-mappings.rendered
-  replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings.json")
+  replication_instance_arn  = aws_dms_replication_instance.dms-experimental[0].replication_instance_arn
+  replication_task_id       = "${var.project_id}-dms-task-experimental-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
+  source_endpoint_arn       = aws_dms_endpoint.source-experimental[0].endpoint_arn
+  target_endpoint_arn       = aws_dms_endpoint.target-experimental[0].endpoint_arn
+  table_mappings            = data.template_file.table-mappings_experimental.rendered
+  replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings-experimental.json")
 
   #lifecycle {
   #  ignore_changes = [replication_task_settings]
   #}
 
   depends_on = [
-    aws_dms_replication_instance.dms,
-    aws_dms_endpoint.source,
-    aws_dms_endpoint.target
+    aws_dms_replication_instance.dms-experimental,
+    aws_dms_endpoint.source-experimental,
+    aws_dms_endpoint.target-experimental
   ]
 }
 
 # Create an endpoint for the source database
-resource "aws_dms_endpoint" "source" {
+resource "aws_dms_endpoint" "source-experimental" {
   count         = var.setup_dms_instance ? 1 : 0
 
   database_name = var.source_db_name
-  endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-source"
+  endpoint_id   = "${var.project_id}-dms-experimental-${var.short_name}-${var.dms_source_name}-source"
   endpoint_type = "source"
   engine_name   = var.source_engine_name
   password      = var.source_app_password
@@ -78,15 +78,14 @@ resource "aws_dms_endpoint" "source" {
   tags = var.tags
 
   depends_on = [
-    aws_dms_replication_instance.dms
+    aws_dms_replication_instance.dms-experimental
   ]
 }
 
-# Create an endpoint for the target Kinesis
-resource "aws_dms_endpoint" "target" {
+resource "aws_dms_endpoint" "target-experimental" {
   count         = var.setup_dms_instance ? 1 : 0
 
-  endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_target_name}-target"
+  endpoint_id   = "${var.project_id}-dms-experimental-${var.short_name}-${var.dms_target_name}-target"
   endpoint_type = "target"
   engine_name   = var.target_engine
 
@@ -100,7 +99,7 @@ resource "aws_dms_endpoint" "target" {
       include_transaction_details    = lookup(var.kinesis_settings, "include_transaction_details", null)
       message_format                 = lookup(var.kinesis_settings, "message_format", null)
       partition_include_schema_table = lookup(var.kinesis_settings, "partition_include_schema_table", null)
-      service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
+      service_access_role_arn        = aws_iam_role.dms-kinesis-role-experimental.arn
       stream_arn                     = lookup(var.kinesis_settings, "kinesis_target_stream", null)
     }
   }
@@ -108,24 +107,24 @@ resource "aws_dms_endpoint" "target" {
   tags = var.tags
 
   depends_on = [
-    aws_dms_replication_instance.dms
+    aws_dms_replication_instance.dms-experimental
   ]
 }
 
 # Create a subnet group using existing VPC subnets
-resource "aws_dms_replication_subnet_group" "dms" {
+resource "aws_dms_replication_subnet_group" "dms-experimental" {
   count                                = var.setup_dms_instance ? 1 : 0
 
-  replication_subnet_group_description = "DMS replication subnet group"
-  replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-subnet-group"
+  replication_subnet_group_description = "DMS experimental replication subnet group"
+  replication_subnet_group_id          = "${var.project_id}-dms-experimental-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-subnet-group"
   subnet_ids                           = var.subnet_ids
 }
 
 # Security Groups
-resource "aws_security_group" "dms_sec_group" {
+resource "aws_security_group" "dms_sec_group_experimental" {
   count         = var.setup_dms_instance ? 1 : 0
 
-  name          = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"
+  name          = "${var.project_id}-dms-experimental-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"
   vpc_id        = var.vpc
 
   ingress {

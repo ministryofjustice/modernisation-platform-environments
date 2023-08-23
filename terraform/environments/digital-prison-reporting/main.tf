@@ -655,7 +655,7 @@ module "dms_nomis_ingestor" {
 
 # TODO: DPR-622: Delete when done
 module "dms_nomis_ingestor_full_load" {
-  source                       = "./modules/dms"
+  source                       = "./modules/dms_experimental"
   setup_dms_instance           = local.setup_dms_instance # Disable all DMS Resources
   enable_replication_task      = local.enable_replication_task # Disable Replication Task
   name                         = "${local.project}-dms-nomis-ingestor-full-load-${local.env}"
@@ -667,7 +667,7 @@ module "dms_nomis_ingestor_full_load" {
   source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
   source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
   vpc                          = data.aws_vpc.shared.id
-  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  kinesis_stream_policy        = module.kinesis_stream_ingestor_experimental.kinesis_stream_iam_policy_admin_arn
   project_id                   = local.project
   env                          = local.environment
   dms_source_name              = "oracle"
@@ -677,8 +677,6 @@ module "dms_nomis_ingestor_full_load" {
   replication_instance_version = "3.4.6" # Rollback
   replication_instance_class   = "dms.t3.medium"
   subnet_ids                   = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
-
-  enable_experimental_task     = true
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
