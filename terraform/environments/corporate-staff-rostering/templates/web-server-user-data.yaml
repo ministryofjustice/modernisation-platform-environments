@@ -8,6 +8,18 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
+        # disable local firewall completely
+        content: |
+          Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # turn off Azure related services
+        content: |
+          Stop-Service -Name 'WindowsAzureGuestAgent' -Force
+      - frequency: once
+        type: powershell
+        runAs: admin
         # Set time to local and locale
         content: |
           # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script 
