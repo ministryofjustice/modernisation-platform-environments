@@ -49,6 +49,21 @@ tasks:
           rm -Force $env:USERPROFILE\Desktop\SSMAgent_latest.exe
 
           Start-Service -Name "AmazonSSMAgent"
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # add session manager to path
+        content: |
+          # Get the current system PATH
+          $currentPath = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
+
+          # Append the Session Manager path to the current PATH
+          $newPath = $currentPath + ";C:\Program Files\Amazon\SessionManagerPlugin\bin\"
+
+          # Set the new PATH
+          [System.Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
+
+          Restart-Service -Name "AmazonSSMAgent"
       # - frequency: once
       #   type: powershell
       #   runAs: admin

@@ -32,7 +32,18 @@ locals {
   baseline_cloudwatch_log_groups    = {}
   baseline_ec2_autoscaling_groups   = {}
   baseline_ec2_instances            = {}
-  baseline_iam_policies             = {}
+  baseline_iam_policies             = {
+    CSRWebServerPolicy = {
+      description = "Policy allowing access to image builder launch templates"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "ec2-instance-connect:SendSerialConsoleSSHPublicKey",
+        ]
+        resources = ["*"]
+        }]
+    }
+  }
   baseline_iam_roles                = {}
   baseline_iam_service_linked_roles = {}
   baseline_key_pairs                = {}
