@@ -162,6 +162,21 @@ module "kinesis_stream_ingestor_full_load" {
   )
 }
 
+module "kinesis_stream_reconciliation_firehose_s3" {
+  source                     = "./modules/kinesis_firehose"
+  name                       = "reconciliation-${module.kinesis_stream_ingestor_full_load.kinesis_stream_name}"
+  aws_account_id             = local.account_id
+  aws_region                 = local.account_region
+  cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor_full_load.kinesis_stream_name}"
+  cloudwatch_log_stream_name = "DestinationDelivery"
+  cloudwatch_logging_enabled = true
+  kinesis_source_stream_arn  = module.kinesis_stream_ingestor_full_load.kinesis_stream_arn
+  kinesis_source_stream_name = module.kinesis_stream_ingestor_full_load.kinesis_stream_name
+  target_s3_arn              = module.s3_reconciliation_bucket.bucket_arn
+  target_s3_id               = module.s3_reconciliation_bucket.bucket_id
+  target_s3_kms              = local.s3_kms_arn
+}
+
 # Glue Registry
 module "glue_registry_avro" {
   source               = "./modules/glue_registry"
@@ -279,6 +294,24 @@ module "s3_landing_bucket" {
     local.all_tags,
     {
       Name          = "${local.project}-landing-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# S3 RECONCILIATION
+module "s3_reconciliation_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-reconciliation-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-reconciliation-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
