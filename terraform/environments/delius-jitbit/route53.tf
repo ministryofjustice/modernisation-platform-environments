@@ -76,20 +76,20 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-resource "aws_route53_record" "external_validation_subdomain_prod" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
+# resource "aws_route53_record" "external_validation_subdomain_prod" {
+#   count    = local.is-production ? 1 : 0
+#   provider = aws.core-network-services
 
-  allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
-  ttl             = 60
-  type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.external.zone_id
-}
+#   allow_overwrite = true
+#   name            = local.domain_name_sub[0]
+#   records         = local.domain_record_sub
+#   ttl             = 60
+#   type            = local.domain_type_sub[0]
+#   zone_id         = data.aws_route53_zone.external.zone_id
+# }
 
 resource "aws_acm_certificate_validation" "external" {
-  count                   = local.is-production ? 0 : 1 # Temporary until we have a production dns delegation in place
+  count = local.is-production ? 0 : 1 # Temporary until we have a production dns delegation in place
   certificate_arn         = aws_acm_certificate.external.arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }

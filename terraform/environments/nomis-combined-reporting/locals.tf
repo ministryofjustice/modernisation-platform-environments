@@ -35,10 +35,7 @@ locals {
   baseline_lbs                      = {}
   baseline_rds_instances            = {}
   baseline_route53_resolvers        = {}
-  baseline_route53_zones = {
-    "${local.environment}.nomis-combined-reporting.az.justice.gov.uk"      = {}
-    "${local.environment}.nomis-combined-reporting.service.justice.gov.uk" = {}
-  }
+  baseline_route53_zones            = {}
   baseline_ssm_parameters           = {}
   baseline_s3_buckets = {
     s3-bucket = {

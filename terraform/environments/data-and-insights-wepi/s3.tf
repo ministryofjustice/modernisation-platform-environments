@@ -1,3 +1,4 @@
+#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "wepi_redshift_logging_bucket" {
   #checkov:skip=CKV_AWS_144: "Cross-region replication is not required"
   #checkov:skip=CKV_AWS_18:  "Bucket access logging is not required"
@@ -19,7 +20,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "wepi_redshift_logging_bucket_l
     expiration {
       days = local.application_data.accounts[local.environment].redshift_log_retention
     }
-
+    abort_incomplete_multipart_upload {
+      days_after_initiation = "7"
+    }
     status = "Enabled"
   }
 }
