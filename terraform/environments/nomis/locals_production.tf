@@ -220,6 +220,15 @@ locals {
         lb_alias_records = [
           { name = "c", type = "A", lbs_map_key = "private" },
         ]
+        ns_records = [
+          # use this if NS records can be pulled from terrafrom, otherwise use records variable
+          { name = "production", ttl = "86400", zone_name = "production.nomis.service.justice.gov.uk" }
+        ]
+        records = [
+          { name = "development", type = "NS", ttl = "86400", records = ["ns-1427.awsdns-50.org", "ns-1956.awsdns-52.co.uk", "ns-294.awsdns-36.com", "ns-788.awsdns-34.net"] },
+          { name = "test", type = "NS", ttl = "86400", records = ["ns-1423.awsdns-49.org", "ns-1921.awsdns-48.co.uk", "ns-304.awsdns-38.com", "ns-747.awsdns-29.net"] },
+          { name = "preproduction", type = "ns", ttl = "86400", records = ["ns-1200.awsdns-22.org", "ns-1958.awsdns-52.co.uk", "ns-44.awsdns-05.com", "ns-759.awsdns-30.net"] },
+        ]
       }
       "production.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
