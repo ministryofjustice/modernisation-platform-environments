@@ -97,6 +97,8 @@ locals {
     }
   }
 
+  baseline_secretsmanager_secrets = {}
+
   baseline_security_groups = {
     private-lb         = local.security_groups.private_lb
     private-web        = local.security_groups.private_web
