@@ -28,7 +28,7 @@ locals {
   kinesis_stream_ingestor  = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-ingestor-${local.environment}"
 
   # TODO: DPR-622: Delete when done
-  kinesis_stream_ingestor_full_load  = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-ingestor-full-load-${local.environment}"
+  kinesis_stream_ingestor_experimental  = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-ingestor-experimental-${local.environment}"
 
   kinesis_endpoint         = "https://kinesis.eu-west-2.amazonaws.com"
   cloud_platform_cidr      = "172.20.0.0/16"

@@ -67,7 +67,7 @@ resource "aws_dms_replication_task" "dms-replication-experimental" {
   replication_instance_arn  = aws_dms_replication_instance.dms[0].replication_instance_arn
   replication_task_id       = "${var.project_id}-dms-task-experimental-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
   source_endpoint_arn       = aws_dms_endpoint.source[0].endpoint_arn
-  target_endpoint_arn       = aws_dms_endpoint.target[0].endpoint_arn
+  target_endpoint_arn       = aws_dms_endpoint.target_experimental[0].endpoint_arn
   table_mappings            = data.template_file.table-mappings.rendered
   replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings-experimental.json")
 
@@ -78,13 +78,13 @@ resource "aws_dms_replication_task" "dms-replication-experimental" {
   depends_on = [
     aws_dms_replication_instance.dms,
     aws_dms_endpoint.source,
-    aws_dms_endpoint.target
+    aws_dms_endpoint.target_experimental
   ]
 }
 
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "source" {
-  count         = var.setup_dms_instance ? 1 : 0
+  count         = var.setup_dms_instance && !var.enable_experimental_task ? 1 : 0
 
   database_name = var.source_db_name
   endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-source"
@@ -107,7 +107,7 @@ resource "aws_dms_endpoint" "source" {
 
 # Create an endpoint for the target Kinesis
 resource "aws_dms_endpoint" "target" {
-  count         = var.setup_dms_instance ? 1 : 0
+  count         = var.setup_dms_instance && !var.enable_experimental_task ? 1 : 0
 
   endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_target_name}-target"
   endpoint_type = "target"
@@ -135,9 +135,39 @@ resource "aws_dms_endpoint" "target" {
   ]
 }
 
+# TODO: DPR-622: Delete when done
+resource "aws_dms_endpoint" "target_experimental" {
+  count         = var.setup_dms_instance && var.enable_experimental_task ? 1 : 0
+
+  endpoint_id   = "${var.project_id}-dms-experimental-${var.short_name}-${var.dms_target_name}-target"
+  endpoint_type = "target"
+  engine_name   = var.target_engine
+
+  dynamic "kinesis_settings" {
+    for_each = var.kinesis_settings != null ? [true] : []
+    content {
+      include_control_details        = lookup(var.kinesis_settings, "include_control_details", null)
+      include_null_and_empty         = lookup(var.kinesis_settings, "include_null_and_empty", null)
+      include_partition_value        = lookup(var.kinesis_settings, "include_partition_value", null)
+      include_table_alter_operations = lookup(var.kinesis_settings, "include_table_alter_operations", null)
+      include_transaction_details    = lookup(var.kinesis_settings, "include_transaction_details", null)
+      message_format                 = lookup(var.kinesis_settings, "message_format", null)
+      partition_include_schema_table = lookup(var.kinesis_settings, "partition_include_schema_table", null)
+      service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
+      stream_arn                     = lookup(var.kinesis_settings, "kinesis_target_stream", null)
+    }
+  }
+
+  tags = var.tags
+
+  depends_on = [
+    aws_dms_replication_instance.dms
+  ]
+}
+
 # Create a subnet group using existing VPC subnets
 resource "aws_dms_replication_subnet_group" "dms" {
-  count                                = var.setup_dms_instance ? 1 : 0
+  count                                = var.setup_dms_instance && !var.enable_experimental_task ? 1 : 0
 
   replication_subnet_group_description = "DMS replication subnet group"
   replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-subnet-group"
@@ -146,7 +176,7 @@ resource "aws_dms_replication_subnet_group" "dms" {
 
 # Security Groups
 resource "aws_security_group" "dms_sec_group" {
-  count         = var.setup_dms_instance ? 1 : 0
+  count         = var.setup_dms_instance && !var.enable_experimental_task ? 1 : 0
 
   name          = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"
   vpc_id        = var.vpc

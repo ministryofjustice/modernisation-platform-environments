@@ -141,10 +141,10 @@ module "kinesis_stream_ingestor" {
 }
 
 # TODO: DPR-622: Delete when done
-module "kinesis_stream_ingestor_full_load" {
+module "kinesis_stream_ingestor_experimental" {
   source                    = "./modules/kinesis_stream"
   create_kinesis_stream     = local.create_kinesis
-  name                      = local.kinesis_stream_ingestor_full_load
+  name                      = local.kinesis_stream_ingestor_experimental
   shard_count               = 1 # Not Valid when ON-DEMAND Mode
   retention_period          = 24
   shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
@@ -156,7 +156,7 @@ module "kinesis_stream_ingestor_full_load" {
   tags = merge(
     local.all_tags,
     {
-      Name          = local.kinesis_stream_ingestor_full_load
+      Name          = local.kinesis_stream_ingestor_experimental
       Resource_Type = "Kinesis Data Stream"
     }
   )
@@ -164,18 +164,18 @@ module "kinesis_stream_ingestor_full_load" {
 
 module "kinesis_stream_reconciliation_firehose_s3" {
   source                     = "./modules/kinesis_firehose"
-  name                       = "reconciliation-${module.kinesis_stream_ingestor_full_load.kinesis_stream_name}"
+  name                       = "reconciliation-${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}"
   aws_account_id             = local.account_id
   aws_region                 = local.account_region
-  cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor_full_load.kinesis_stream_name}"
+  cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}"
   cloudwatch_log_stream_name = "DestinationDelivery"
   cloudwatch_logging_enabled = true
-  kinesis_source_stream_arn  = module.kinesis_stream_ingestor_full_load.kinesis_stream_arn
-  kinesis_source_stream_name = module.kinesis_stream_ingestor_full_load.kinesis_stream_name
+  kinesis_source_stream_arn  = module.kinesis_stream_ingestor_experimental.kinesis_stream_arn
+  kinesis_source_stream_name = module.kinesis_stream_ingestor_experimental.kinesis_stream_name
   target_s3_arn              = module.s3_working_bucket.bucket_arn
   target_s3_id               = module.s3_working_bucket.bucket_id
-  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor_full_load.kinesis_stream_name}/"
-  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor_full_load.kinesis_stream_name}-error/"
+  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}/"
+  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}-error/"
   target_s3_kms              = local.s3_kms_arn
 }
 
@@ -689,7 +689,7 @@ module "dms_nomis_ingestor_full_load" {
     "include_null_and_empty"         = "true"
     "partition_include_schema_table" = "true"
     "include_partition_value"        = "true"
-    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor_full_load}"
+    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor_experimental}"
   }
 
   availability_zones = {
