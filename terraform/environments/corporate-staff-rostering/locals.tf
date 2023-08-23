@@ -28,11 +28,11 @@ locals {
     sns_topics               = {}
   }
 
-  baseline_acm_certificates         = {}
-  baseline_cloudwatch_log_groups    = {}
-  baseline_ec2_autoscaling_groups   = {}
-  baseline_ec2_instances            = {}
-  baseline_iam_policies             = {
+  baseline_acm_certificates       = {}
+  baseline_cloudwatch_log_groups  = {}
+  baseline_ec2_autoscaling_groups = {}
+  baseline_ec2_instances          = {}
+  baseline_iam_policies = {
     CSRWebServerPolicy = {
       description = "Policy allowing access to instances via the Serial Console"
       statements = [{
@@ -41,7 +41,7 @@ locals {
           "ec2-instance-connect:SendSerialConsoleSSHPublicKey",
         ]
         resources = ["*"]
-        }]
+      }]
     }
   }
   baseline_iam_roles                = {}
