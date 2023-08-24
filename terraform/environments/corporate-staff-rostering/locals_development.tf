@@ -50,7 +50,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 256 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0 # set to 0 while testing
+          desired_capacity = 1 # set to 0 while testing
         })
 
         tags = {
