@@ -180,7 +180,7 @@ module "kinesis_stream_reconciliation_firehose_s3" {
   buffering_size             = 128
   buffering_interval         = 900
   database_name              = module.glue_reconciliation_database.db_name
-  table_name                 = module.kinesis_stream_ingestor.kinesis_stream_name
+  table_name                 = module.glue_reconciliation_table.table_name
 }
 
 # Glue Registry
@@ -298,6 +298,29 @@ module "glue_reconciliation_table" {
         columns_type    = "string"
 #        columns_type    = "struct<`timestamp`: timestamp, `record-type`: string, `operation`: string, `partition-key-type`: string, `partition-key-value`: string, `schema-name`: string, `table-name`: string>"
         columns_comment = "Common metadata"
+      }
+    ]
+
+    partition_keys = [
+      {
+        name = "year",
+        type = "string",
+        comment = ""
+      },
+      {
+        name = "month",
+        type = "string",
+        comment = ""
+      },
+      {
+        name = "day",
+        type = "string",
+        comment = ""
+      },
+      {
+        name = "hour",
+        type = "string",
+        comment = ""
       }
     ]
 
