@@ -172,11 +172,6 @@ resource "aws_lb_listener" "external" {
   certificate_arn   = aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.external.arn
-  }
-
-  default_action {
     type = "fixed-response"
     fixed_response {
       content_type = "text/plain"
