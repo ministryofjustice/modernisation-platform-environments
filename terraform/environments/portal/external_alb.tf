@@ -163,26 +163,26 @@ resource "aws_lb" "external" {
   )
 }
 
-resource "aws_lb_listener" "external" {
+# resource "aws_lb_listener" "external" {
 
-  load_balancer_arn = aws_lb.external.arn
-  port              = local.external_lb_port
-  protocol          = "HTTPS" 
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
+#   load_balancer_arn = aws_lb.external.arn
+#   port              = local.external_lb_port
+#   protocol          = "HTTPS" 
+#   ssl_policy        = "ELBSecurityPolicy-2016-08"
+#   certificate_arn   = aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
 
-  default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Access Denied - must access via CloudFront"
-      status_code  = 403
-    }
-  }
+#   default_action {
+#     type = "fixed-response"
+#     fixed_response {
+#       content_type = "text/plain"
+#       message_body = "Access Denied - must access via CloudFront"
+#       status_code  = 403
+#     }
+#   }
 
-  tags = local.tags
+#   tags = local.tags
 
-}
+# }
 
 # resource "aws_lb_listener_rule" "external" {
 #   listener_arn = aws_lb_listener.external.arn
