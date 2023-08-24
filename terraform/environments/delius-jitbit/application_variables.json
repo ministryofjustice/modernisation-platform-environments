@@ -109,7 +109,8 @@
       "db_performance_insights_enabled": "true",
       "db_deletion_protection": "true",
       "db_skip_final_snapshot": "false",
-      "db_delete_automated_backups": "false"
+      "db_delete_automated_backups": "false",
+      "db_snapshot_identifier": "cr-jitbit-prod-migration-copy"
     }
   }
 }
