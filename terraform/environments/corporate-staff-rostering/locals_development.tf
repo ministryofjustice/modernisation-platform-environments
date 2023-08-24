@@ -30,7 +30,7 @@ locals {
           server-type = "base-ol-8-5"
         }
       }
-         baseline_ec2_instances = {
+    
       web-dev-server-ami	 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "web-dev-server-ami"
@@ -61,7 +61,7 @@ locals {
         }
 
   }
-}
+
     }
 
     baseline_ec2_instances = {
