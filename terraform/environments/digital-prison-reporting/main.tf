@@ -164,18 +164,18 @@ module "kinesis_stream_ingestor_experimental" {
 
 module "kinesis_stream_reconciliation_firehose_s3" {
   source                     = "./modules/kinesis_firehose"
-  name                       = "reconciliation-${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}"
+  name                       = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
   aws_account_id             = local.account_id
   aws_region                 = local.account_region
-  cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}"
+  cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
   cloudwatch_log_stream_name = "DestinationDelivery"
   cloudwatch_logging_enabled = false
-  kinesis_source_stream_arn  = module.kinesis_stream_ingestor_experimental.kinesis_stream_arn
-  kinesis_source_stream_name = module.kinesis_stream_ingestor_experimental.kinesis_stream_name
+  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn
+  kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name
   target_s3_arn              = module.s3_working_bucket.bucket_arn
   target_s3_id               = module.s3_working_bucket.bucket_id
-  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}/"
-  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}-error/"
+  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/"
+  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}-error/"
   target_s3_kms              = local.s3_kms_arn
   buffering_size             = 128
   buffering_interval         = 900
