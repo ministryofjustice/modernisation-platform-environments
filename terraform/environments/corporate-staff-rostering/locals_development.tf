@@ -30,6 +30,37 @@ locals {
           server-type = "base-ol-8-5"
         }
       }
+         baseline_ec2_instances = {
+      web-dev-server-ami	 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "web-dev-server-ami"
+          ami_owner         = "self"
+          availability_zone = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type                = "m5.4xlarge"
+          disable_api_termination      = true
+          metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+          monitoring                   = true
+          vpc_security_group_ids       = ["migration-web-sg"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 256 }
+        }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0 # set to 0 while testing
+        })
+
+        tags = {
+          description = "Test Restore Windows Server 2012 R2"
+          os-type     = "Windows"
+          component   = "webserver"
+          server-type = "csr-web-server"
+        }
+
+  }
+}
     }
 
     baseline_ec2_instances = {
