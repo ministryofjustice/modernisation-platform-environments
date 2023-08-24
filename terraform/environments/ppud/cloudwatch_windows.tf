@@ -264,3 +264,27 @@ count  = local.is-production == true ? 1 : 0
     }
   }
 }
+
+resource "aws_cloudwatch_log_metric_filter" "SQL-Backup-Failure" {
+count  = local.is-production == true ? 1 : 0
+  name           = "SQL-Backup-Failure"
+  log_group_name = aws_cloudwatch_log_group.SQL-Error-Logs[count.index].name
+  pattern        = "Backup failed"
+  metric_transformation {
+    name      = "Failure"
+    namespace = "SQLBackup"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "SQL-Backup-Success" {
+count  = local.is-production == true ? 1 : 0
+  name           = "SQL-Backup-Success"
+  log_group_name = aws_cloudwatch_log_group.SQL-Error-Logs[count.index].name
+  pattern        = "Database backed up. Database: PPUD_LIVE"
+  metric_transformation {
+    name      = "Success"
+    namespace = "SQLBackup"
+    value     = "1"
+  }
+}
