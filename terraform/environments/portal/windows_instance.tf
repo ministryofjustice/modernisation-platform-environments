@@ -1,7 +1,7 @@
 resource "aws_instance" "windows_bastion" {
   ami                         = "ami-070c9a4ee0e5d83d5"
   availability_zone           = "eu-west-2a"
-  instance_type               = "t2.small"
+  instance_type               = "t2.large"
   vpc_security_group_ids      = [aws_security_group.bastion.id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.public_subnets_a.id
