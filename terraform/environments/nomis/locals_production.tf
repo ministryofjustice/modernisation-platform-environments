@@ -225,7 +225,7 @@ locals {
           { name = "production", ttl = "86400", zone_name = "production.nomis.service.justice.gov.uk" }
         ]
         records = [
-          { name = "development", type = "NS", ttl = "86400", records = ["ns-1427.awsdns-50.org", "ns-1956.awsdns-52.co.uk", "ns-294.awsdns-36.com", "ns-788.awsdns-34.net"] },
+          { name = "development", type = "NS", ttl = "86400", records = ["ns-1010.awsdns-62.net", "ns-1353.awsdns-41.org", "ns-1693.awsdns-19.co.uk", "ns-393.awsdns-49.com"] },
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1423.awsdns-49.org", "ns-1921.awsdns-48.co.uk", "ns-304.awsdns-38.com", "ns-747.awsdns-29.net"] },
           { name = "preproduction", type = "NS", ttl = "86400", records = ["ns-1200.awsdns-22.org", "ns-1958.awsdns-52.co.uk", "ns-44.awsdns-05.com", "ns-759.awsdns-30.net"] },
           { name = "reporting", type = "NS", ttl = "86400", records = ["ns-1122.awsdns-12.org", "ns-1844.awsdns-38.co.uk", "ns-388.awsdns-48.com", "ns-887.awsdns-46.net"] },
