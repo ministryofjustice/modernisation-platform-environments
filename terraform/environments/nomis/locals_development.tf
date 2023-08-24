@@ -31,6 +31,12 @@ locals {
     }
 
     baseline_ssm_parameters = {
+      # "dev-nomis-web-a" = local.weblogic_ssm_parameters
+      # "dev-nomis-web-b" = local.weblogic_ssm_parameters
+      # "qa11g-nomis-web-a" = local.weblogic_ssm_parameters
+      # "qa11g-nomis-web-b" = local.weblogic_ssm_parameters
+      "qa11r-nomis-web-a" = local.weblogic_ssm_parameters
+      "qa11r-nomis-web-b" = local.weblogic_ssm_parameters
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -144,6 +150,31 @@ locals {
           component   = "jumpserver"
           server-type = "nomis-jumpserver"
         }
+      }
+    }
+
+    baseline_route53_zones = {
+      "development.hmpps-test.modernisation-platform.service.justice.gov.uk" = {
+        records = [
+        ]
+      }
+      "development.nomis.az.justice.gov.uk" = {
+        lb_alias_records = [
+        ]
+      }
+      "development.nomis.service.justice.gov.uk" = {
+        records = [
+          # SYSCON
+          { name = "dev", type = "CNAME", ttl = "300", records = ["dev-a.development.nomis.service.justice.gov.uk"] },
+          { name = "dev-a", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "dev-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "qa11g", type = "CNAME", ttl = "300", records = ["qa11g-a.development.nomis.service.justice.gov.uk"] },
+          { name = "qa11g-a", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "qa11g-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "qa11r", type = "CNAME", ttl = "300", records = ["qa11r-a.development.nomis.service.justice.gov.uk"] },
+          { name = "qa11r-a", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "qa11r-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+        ]
       }
     }
   }
