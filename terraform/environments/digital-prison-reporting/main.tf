@@ -179,6 +179,8 @@ module "kinesis_stream_reconciliation_firehose_s3" {
   target_s3_kms              = local.s3_kms_arn
   buffering_size             = 128
   buffering_interval         = 900
+  database_name              = module.glue_reconciliation_database.db_name
+  table_name                 = module.kinesis_stream_ingestor.kinesis_stream_name
 }
 
 # Glue Registry
@@ -494,6 +496,16 @@ module "glue_curated_zone_database" {
   create_db      = local.create_db
   name           = "curated"
   description    = "Glue Data Catalog - Curated Zone"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for Reconciliation
+module "glue_reconciliation_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "reconciliation"
+  description    = "Glue Data Catalog - Reconciliation"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }

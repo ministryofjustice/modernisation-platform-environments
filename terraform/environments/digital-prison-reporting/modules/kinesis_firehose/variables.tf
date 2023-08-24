@@ -39,3 +39,11 @@ variable "buffering_size" {
 variable "buffering_interval" {
   description = "Buffer incoming data for the specified period of time, in seconds between 60 to 900, before delivering it to S3."
 }
+
+variable "database_name" {
+  description = "When parquet output format, pecifies the name of the AWS Glue database that contains the schema for the output data"
+}
+
+variable "table_name" {
+  description = "Specifies the AWS Glue table that contains the column information that constitutes your data schema."
+}
