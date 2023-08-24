@@ -150,8 +150,7 @@ data "aws_network_interface" "redshift-data" {
 resource "aws_lb" "redshift-data" {
   #checkov:skip=CKV_AWS_91:  "Logging not required"
   #checkov:skip=CKV_AWS_150: "Deletion protection not required"
-  #checkov:skip=CKV_AWS_152: "Cross-zone load balancing not appropriate with current Redshift configuration"
-  enable_cross_zone_load_balancing = false
+  enable_cross_zone_load_balancing = true
   internal                         = true
   load_balancer_type               = "network"
   name                             = format("%s-redshift-lb", local.environment)
@@ -189,9 +188,9 @@ resource "aws_lb_target_group" "redshift-data" {
 }
 
 resource "aws_lb_target_group_attachment" "redshift-data" {
-  for_each         = data.aws_network_interface.redshift-data
+  for_each         = toset([for node in aws_redshift_cluster.wepi_redshift_cluster.cluster_nodes : node.private_ip_address])
   target_group_arn = aws_lb_target_group.redshift-data.arn
-  target_id        = each.value.private_ip
+  target_id        = each.value
   port             = 5439
 }
 
