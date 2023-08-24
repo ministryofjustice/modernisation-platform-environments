@@ -295,8 +295,9 @@ module "glue_reconciliation_table" {
       },
       {
         columns_name    = "metadata"
-        columns_type    = "struct<`timestamp`: timestamp, `record-type`: string, `operation`: string, `partition-key-type`: string, `partition-key-value`: string, `schema-name`: string, `table-name`: string>"
-        columns_comment = "Common data"
+        columns_type    = "string"
+#        columns_type    = "struct<`timestamp`: timestamp, `record-type`: string, `operation`: string, `partition-key-type`: string, `partition-key-value`: string, `schema-name`: string, `table-name`: string>"
+        columns_comment = "Common metadata"
       }
     ]
 
