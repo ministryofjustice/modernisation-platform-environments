@@ -18,6 +18,7 @@ locals {
         tags = merge(local.database_a.tags, {
           description                             = "t2 ${local.application_name} database"
           "${local.application_name}-environment" = "t2"
+          instance-scheduling                     = "skip-scheduling"
         })
       })
       # "t2-${local.application_name}-db-b" = merge(local.database_b, {
