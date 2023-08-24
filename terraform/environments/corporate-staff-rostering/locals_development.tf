@@ -37,6 +37,7 @@ locals {
           ami_owner         = "self"
           availability_zone = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
+          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type                = "m5.4xlarge"
