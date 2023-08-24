@@ -50,6 +50,7 @@ resource "aws_db_instance" "jitbit" {
   deletion_protection         = local.application_data.accounts[local.environment].db_deletion_protection
   delete_automated_backups    = local.application_data.accounts[local.environment].db_delete_automated_backups
   skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
+  final_snapshot_identifier   = try(local.application_data.accounts[local.environment].db_final_snapshot_identifier, null)
   allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
   storage_type                = local.application_data.accounts[local.environment].db_storage_type
