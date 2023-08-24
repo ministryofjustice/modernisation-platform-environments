@@ -41,7 +41,7 @@ variable "buffering_interval" {
 }
 
 variable "database_name" {
-  description = "When parquet output format, pecifies the name of the AWS Glue database that contains the schema for the output data"
+  description = "Specifies the name of the AWS Glue database that contains the schema for the output data"
 }
 
 variable "table_name" {

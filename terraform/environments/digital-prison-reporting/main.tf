@@ -265,6 +265,59 @@ module "glue_raw_table" {
   glue_table_depends_on = [module.glue_raw_zone_database.db_name]
 }
 
+module "glue_reconciliation_table" {
+  source                    = "./modules/glue_table"
+  enable_glue_catalog_table = true
+  name                      = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
+
+  # AWS Glue catalog DB
+  glue_catalog_database_name       = module.glue_reconciliation_database.db_name
+  glue_catalog_database_parameters = null
+
+  # AWS Glue catalog table
+  glue_catalog_table_description = "Glue Table for reconciliation data, managed by Terraform."
+  glue_catalog_table_table_type  = "EXTERNAL_TABLE"
+  glue_catalog_table_parameters  = {
+    EXTERNAL              = "TRUE"
+    "parquet.compression" = "SNAPPY"
+    "classification"      = "parquet"
+  }
+  glue_catalog_table_storage_descriptor = {
+    location      = "s3://${module.s3_working_bucket.bucket_id}/reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    columns = [
+      {
+        columns_name    = "data"
+        columns_type    = "string"
+        columns_comment = "Nested JSON data"
+      },
+      {
+        columns_name    = "metadata"
+        columns_type    = "struct<`timestamp`: timestamp, `record-type`: string, `operation`: string, `partition-key-type`: string, `partition-key-value`: string, `schema-name`: string, `table-name`: string>"
+        columns_comment = "Common data"
+      }
+    ]
+
+    ser_de_info = [
+      {
+        name                  = "raw"
+        serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+        parameters = {
+          "serialization.format" = 1
+        }
+      }
+    ]
+
+    skewed_info = []
+
+    sort_columns = []
+  }
+  glue_table_depends_on = [module.glue_reconciliation_database.db_name]
+}
+
 
 ##################
 ### S3 Buckets ###
