@@ -193,6 +193,12 @@ count  = local.is-production == true ? 1 : 0
   retention_in_days = 365
 }
 
+resource "aws_cloudwatch_log_group" "SQL-Error-Logs" {
+count  = local.is-production == true ? 1 : 0
+  name = "SQL-Error-Logs"
+  retention_in_days = 365
+}
+
 #Metric Filters
 
 resource "aws_cloudwatch_log_metric_filter" "ServiceStatus-Running" {
