@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "firehose-policy" {
       "glue:GetTableVersions"
     ]
     resources = [
-      "arn:aws:glue:${var.aws_region}:${var.aws_account_id}:table/${var.database_name}/${var.table_name}"
+      "arn:aws:glue:${var.aws_region}:${var.aws_account_id}:*"
     ]
   }
 
