@@ -172,6 +172,15 @@ resource "aws_vpc_security_group_ingress_rule" "internal_lb_vpc" {
   to_port           = local.internal_lb_http_port
 }
 
+resource "aws_vpc_security_group_ingress_rule" "internal_lb_vpc_https" {
+  security_group_id = aws_security_group.internal_lb.id
+  description       = "From account VPC"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = local.internal_lb_https_port
+  ip_protocol       = "tcp"
+  to_port           = local.internal_lb_https_port
+}
+
 resource "aws_vpc_security_group_ingress_rule" "internal_lb_https_np_workspaces" {
   count             = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.internal_lb.id
