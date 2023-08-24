@@ -195,7 +195,7 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "nomis/DSOS-2050/split-collectd-cloudwatch-roles" # 2023-08-15 weblogic deployments + updated monitoring
+        branch = "a035c4c5628888a1c7f2e88d9b489402371246a9" # 2023-08-24 weblogic deployments + updated monitoring
       })
     })
     # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {}) 
