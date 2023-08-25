@@ -62,7 +62,7 @@ resource "aws_lb_listener" "https_internal" {
   port              = local.internal_lb_https_port
   protocol        = "HTTPS"
   ssl_policy      = "ELBSecurityPolicy-2016-08"
-  certificate_arn = aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
+  certificate_arn = aws_acm_certificate_validation.external_lb_certificate_validation_aws[0].certificate_arn
 
   default_action {
     type             = "forward"

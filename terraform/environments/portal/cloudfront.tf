@@ -169,7 +169,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
   }
   enabled = true
-  aliases = ["mp-dev-portal.dev.legalservices.gov.uk"]
+  aliases = ["mp-dev-portal.aws.dev.legalservices.gov.uk"]
   default_cache_behavior {
     target_origin_id = aws_lb.external.id
     smooth_streaming = false

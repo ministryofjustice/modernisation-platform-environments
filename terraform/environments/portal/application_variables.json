@@ -36,6 +36,7 @@
       "hosted_zone": "aws.dev.legalservices.gov.uk",
       "acm_domain_name": "dev.legalservices.gov.uk",
       "acm_alt_domain_name": "*.dev.legalservices.gov.uk",
+      "acm_aws_domain_name": "*.aws.dev.legalservices.gov.uk",
       "fqdn":   "portal.dev.legalservices.gov.uk",
       "landing_zone_vpc_cidr": "10.202.0.0/20"
 
