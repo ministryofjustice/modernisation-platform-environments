@@ -165,7 +165,7 @@ module "kinesis_stream_ingestor_experimental" {
 
 module "kinesis_stream_reconciliation_firehose_s3" {
   source                     = "./modules/kinesis_firehose"
-  name                       = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
+  name                       = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}2"
   aws_account_id             = local.account_id
   aws_region                 = local.account_region
   cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
@@ -321,7 +321,7 @@ module "glue_reconciliation_table" {
 
     ser_de_info = [
       {
-        name                  = ""
+        name                  = "raw"
         serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
 
         parameters = {
