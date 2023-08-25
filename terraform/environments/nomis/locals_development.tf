@@ -174,6 +174,11 @@ locals {
           oracle-db-hostname-b = "qa11r-b.development.nomis.service.justice.gov.uk"
           oracle-db-name       = "QA11R"
         })
+        user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
+            branch = "nomis/DSOS-1949/syscon-fix"
+          })
+        })
         autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
           desired_capacity = 1
         })
