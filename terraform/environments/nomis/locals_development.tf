@@ -152,21 +152,6 @@ locals {
         }
       }
 
-      # blue deployment
-      qa11r-nomis-web-a = merge(local.weblogic_ec2_a, {
-        tags = merge(local.weblogic_ec2_a.tags, {
-          nomis-environment    = "syscon"
-          oracle-db-hostname-a = "qa11r-a.development.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "qa11r-b.development.nomis.service.justice.gov.uk"
-          oracle-db-name       = "QA11R"
-        })
-        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 0
-        })
-      })
-
-      # green deployment
       qa11r-nomis-web-b = merge(local.weblogic_ec2_b, {
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "syscon"
