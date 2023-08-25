@@ -266,8 +266,9 @@ locals {
           from_port       = 445
           to_port         = 445
           protocol        = "TCP"
+          cidr_blocks = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers: "${ip}/32"]
           # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
-          cidr_blocks     = ["10.102.0.196"]
+          # cidr_blocks     = ["10.102.0.196/32"]
           security_groups = []
         }
         # http2109 = {
