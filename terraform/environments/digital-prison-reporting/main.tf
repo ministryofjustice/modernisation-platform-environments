@@ -165,7 +165,7 @@ module "kinesis_stream_ingestor_experimental" {
 
 module "kinesis_stream_reconciliation_firehose_s3" {
   source                     = "./modules/kinesis_firehose"
-  name                       = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}-4"
+  name                       = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
   aws_account_id             = local.account_id
   aws_region                 = local.account_region
   cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
@@ -296,7 +296,7 @@ module "glue_reconciliation_table" {
       },
       {
         columns_name    = "metadata"
-        columns_type    = "struct<timestamp:string,record_type:string,operation:string,partition_key_type:string,partition_key_value:string,schema_name:string,table_name:string>"
+        columns_type    = "string"
         columns_comment = "Common metadata"
       }
     ]
