@@ -47,8 +47,7 @@ resource "aws_route53_record" "external_lb_validation_core_network_services" {
   zone_id = each.value.zone.zone_id
 
   depends_on = [
-    aws_acm_certificate.legalservices_cert,
-    aws_acm_certificate.legalservices_cert_aws
+    aws_acm_certificate.legalservices_cert
   ]
 }
 
