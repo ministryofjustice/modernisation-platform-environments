@@ -1,6 +1,6 @@
 resource "aws_acm_certificate" "legalservices_cert" {
   domain_name = "${local.application_data.accounts[local.environment].acm_alt_domain_name}"
-  # subject_alternative_names = ["${local.application_data.accounts[local.environment].acm_aws_domain_name}"]
+  subject_alternative_names = ["${local.application_data.accounts[local.environment].acm_aws_domain_name}"]
   validation_method = "DNS"
    
    

@@ -31,7 +31,7 @@ locals {
             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
             { provider = "external" }
       )))
-      zone_id = dvo.domain_name == "${local.application_data.accounts[local.environment].hosted_zone}." ? data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].zone_id : data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
+      zone_id = dvo.domain_name == "${local.application_data.accounts[local.environment].hosted_zone}" ? data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].zone_id : data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
     }
   }
 
