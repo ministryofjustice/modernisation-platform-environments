@@ -155,9 +155,9 @@ locals {
       qa11r-nomis-web-b = merge(local.weblogic_ec2_b, {
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "syscon"
-          oracle-db-hostname-a = "qa11r-a.development.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "qa11r-b.development.nomis.service.justice.gov.uk"
-          oracle-db-name       = "QA11R"
+          oracle-db-hostname-a = "SDPDL0001"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "qa11r"
         })
         user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
           args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
