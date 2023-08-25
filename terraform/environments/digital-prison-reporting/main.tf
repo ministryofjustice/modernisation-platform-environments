@@ -298,21 +298,6 @@ module "glue_reconciliation_table" {
         columns_name    = "metadata"
         columns_type    = "string"
         columns_comment = "Common metadata"
-      },
-      {
-        columns_name = "year",
-        type = "string",
-        comment = ""
-      },
-      {
-        columns_name = "month",
-        type = "string",
-        comment = ""
-      },
-      {
-        columns_name = "day",
-        type = "string",
-        comment = ""
       }
     ]
 
