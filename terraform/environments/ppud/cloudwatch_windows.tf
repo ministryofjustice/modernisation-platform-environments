@@ -193,9 +193,9 @@ count  = local.is-production == true ? 1 : 0
   retention_in_days = 365
 }
 
-resource "aws_cloudwatch_log_group" "SQL-Error-Logs" {
+resource "aws_cloudwatch_log_group" "SQL-Server-Logs" {
 count  = local.is-production == true ? 1 : 0
-  name = "SQL-Error-Logs"
+  name = "SQL-Server-Logs"
   retention_in_days = 365
 }
 
@@ -265,15 +265,32 @@ count  = local.is-production == true ? 1 : 0
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "SQL-Backup-Failure" {
+resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Successful" {
 count  = local.is-production == true ? 1 : 0
-  name           = "SQL-Backup-Failure"
-  log_group_name = aws_cloudwatch_log_group.SQL-Error-Logs[count.index].name
-  pattern        = "Backup failed"
+  name           = "SQLBackupStatus-Successful"
+  log_group_name = aws_cloudwatch_log_group.SQL-Server-Logs[count.index].name
+  pattern        = "[date, time, Instance, SQLBackup, status=Successful]"
   metric_transformation {
-    name      = "Failure"
-    namespace = "SQLBackup"
+    name      = "Successful"
+    namespace = "SQLBackupStatus"
     value     = "1"
+    dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
+resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Failed" {
+count  = local.is-production == true ? 1 : 0
+  name           = "SQLBackupStatus-Failed"
+  log_group_name = aws_cloudwatch_log_group.SQL-Server-Logs[count.index].name
+  pattern        = "[date, time, Instance, SQLBackup, status=Failed]"
+  metric_transformation {
+    name      = "Failed"
+    namespace = "SQLBackupStatus"
+    value     = "0"
+    dimensions = {
+      Instance = "$Instance"
+    }
+  }
+}
