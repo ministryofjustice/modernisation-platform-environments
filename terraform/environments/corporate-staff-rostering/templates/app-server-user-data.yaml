@@ -7,6 +7,7 @@ tasks:
     inputs:
       - frequency: once
         type: powershell
+        runas: admin # or localSystem
         # Set time to local and locale
         content: |
           # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script 
@@ -15,6 +16,8 @@ tasks:
           Set-WinSystemLocale "en-GB"
       - frequency: once
         type: powershell
+        runas: admin # or localSystem
+        # create a folder and file to test that the script ran
         content: |
           New-Item -ItemType Directory -Force -Path C:\temp\Test
           New-Item -ItemType File -Force -Path C:\temp\Test\test-success.txt
