@@ -155,7 +155,7 @@ locals {
       qa11r-nomis-web-b = merge(local.weblogic_ec2_b, {
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "syscon"
-          oracle-db-hostname-a = "SDPDL0001"
+          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "qa11r"
         })
