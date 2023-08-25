@@ -336,10 +336,10 @@ module "glue_reconciliation_table" {
 
     ser_de_info = [
       {
-        ser_de_info_name                  = ""
-        ser_de_info_serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+        name                  = ""
+        serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
 
-        ser_de_info_parameters = {
+        parameters = {
           "serialization.format" = 2
         }
       }
