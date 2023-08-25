@@ -1,5 +1,6 @@
 resource "aws_acm_certificate" "legalservices_cert" {
   domain_name = "${local.application_data.accounts[local.environment].acm_alt_domain_name}"
+  subject_alternative_names = ["${local.application_data.accounts[local.environment].acm_aws_domain_name}"]
   validation_method = "DNS"
    
    
@@ -13,20 +14,20 @@ resource "aws_acm_certificate" "legalservices_cert" {
   }
 }
 
-resource "aws_acm_certificate" "legalservices_cert_aws" {
-  domain_name = "${local.application_data.accounts[local.environment].acm_aws_domain_name}"
-  validation_method = "DNS"
+# resource "aws_acm_certificate" "legalservices_cert_aws" {
+#   domain_name = "${local.application_data.accounts[local.environment].acm_aws_domain_name}"
+#   validation_method = "DNS"
    
    
-   tags = merge(
-    local.tags,
-    { Name = "laa-${local.application_name}-${local.environment}" }
-  )
+#    tags = merge(
+#     local.tags,
+#     { Name = "laa-${local.application_name}-${local.environment}" }
+#   )
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
 resource "aws_route53_record" "external_lb_validation_core_network_services" {
   provider = aws.core-network-services
@@ -55,9 +56,10 @@ resource "aws_route53_record" "external_lb_validation_core_network_services" {
 resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
   count           = (length(local.validation_records_external_lb) == 0 || local.external_validation_records_created) ? 1 : 0
   certificate_arn = aws_acm_certificate.legalservices_cert.arn
-  validation_record_fqdns = [
-    for key, value in local.validation_records_external_lb : replace(value.name, "/\\.$/", "")
-  ]
+  validation_record_fqdns = [for record in aws_route53_record.external_lb_validation_core_network_services : record.fqdn]
+  # validation_record_fqdns = [
+  #   for key, value in local.validation_records_external_lb : replace(value.name, "/\\.$/", "")
+  # ]
   depends_on = [
     aws_route53_record.external_lb_validation_core_network_services
     # aws_route53_record.external_lb_validation_core_vpc,
@@ -65,15 +67,15 @@ resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
   ]
 }
 
-resource "aws_acm_certificate_validation" "external_lb_certificate_validation_aws" {
-  count           = (length(local.validation_records_external_lb) == 0 || local.external_validation_records_created) ? 1 : 0
-  certificate_arn = aws_acm_certificate.legalservices_cert_aws.arn
-  validation_record_fqdns = [
-    for key, value in local.validation_records_external_lb : replace(value.name, "/\\.$/", "")
-  ]
-  depends_on = [
-    aws_route53_record.external_lb_validation_core_network_services
-    # aws_route53_record.external_lb_validation_core_vpc,
-    # aws_route53_record.external_lb_validation_self
-  ]
-}
+# resource "aws_acm_certificate_validation" "external_lb_certificate_validation_aws" {
+#   count           = (length(local.validation_records_external_lb) == 0 || local.external_validation_records_created) ? 1 : 0
+#   certificate_arn = aws_acm_certificate.legalservices_cert_aws.arn
+#   validation_record_fqdns = [
+#     for key, value in local.validation_records_external_lb : replace(value.name, "/\\.$/", "")
+#   ]
+#   depends_on = [
+#     aws_route53_record.external_lb_validation_core_network_services
+#     # aws_route53_record.external_lb_validation_core_vpc,
+#     # aws_route53_record.external_lb_validation_self
+#   ]
+# }
