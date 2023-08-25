@@ -15,24 +15,24 @@ locals {
   # Temp local variable for environments where we wish to build out the EBS to be transfered to EFS
   ebs_conditional = ["testing", "preproduction", "production"]
 
-  # external_lb_validation_records = {
-  #   for dvo in aws_acm_certificate.legalservices_cert.domain_validation_options : dvo.domain_name => {
-  #     name   = dvo.resource_record_name
-  #     record = dvo.resource_record_value
-  #     type   = dvo.resource_record_type
-  #     zone = lookup(
-  #       local.route53_zones,
-  #       dvo.domain_name,
-  #       lookup(
-  #         local.route53_zones,
-  #         replace(dvo.domain_name, "/^[^.]*./", ""),
-  #         lookup(
-  #           local.route53_zones,
-  #           replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
-  #           { provider = "external" }
-  #     )))
-  #   }
-  # }
+  external_lb_validation_records = {
+    for dvo in aws_acm_certificate.legalservices_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+      zone = lookup(
+        local.route53_zones,
+        dvo.domain_name,
+        lookup(
+          local.route53_zones,
+          replace(dvo.domain_name, "/^[^.]*./", ""),
+          lookup(
+            local.route53_zones,
+            replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
+            { provider = "external" }
+      )))
+    }
+  }
 
 
    route53_zones = merge({
@@ -51,15 +51,20 @@ locals {
     for key, value in data.aws_route53_zone.portal-dev-private : key => merge(value, {
       provider = "core-network-services"
     })
+    }, {
+    for key, value in data.aws_route53_zone.portal-dev-private-aws : key => merge(value, {
+      provider = "core-network-services"
     })
+    }
+    )
 
-  #  validation_records_external_lb = {
-  #   for key, value in local.external_lb_validation_records : key => {
-  #     name   = value.name
-  #     record = value.record
-  #     type   = value.type
-  #   } if value.zone.provider == "external"
-  # }
+   validation_records_external_lb = {
+    for key, value in local.external_lb_validation_records : key => {
+      name   = value.name
+      record = value.record
+      type   = value.type
+    } if value.zone.provider == "external"
+  }
 
     external_validation_records_created = false
 
@@ -88,6 +93,10 @@ locals {
    "${local.application_data.accounts[local.environment].acm_domain_name}" = {
       account   = "core-network-services-private"
       zone_name = "${local.application_data.accounts[local.environment].acm_domain_name}"
+    }
+    "${local.application_data.accounts[local.environment].hosted_zone}" = {
+      account   = "core-network-services-private"
+      zone_name = "${local.application_data.accounts[local.environment].hosted_zone}"
     }
 
   }
