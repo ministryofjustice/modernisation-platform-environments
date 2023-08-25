@@ -97,31 +97,6 @@ locals {
           server-type = "csr-web-server"
         }
       } */
-      app-srv-1 = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "app-test-server-ami"
-          ami_owner                     = "self"
-          ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/app-server-user-data.yaml"))
-          # instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
-        })
-
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["sg-0f692e412a94bbe9c"]
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 256 }
-        }
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0 # set to 0 while testing
-        })
-        tags = {
-          description = "Test Restore Windows Server 2012 R2"
-          os-type     = "Windows"
-          component   = "appserver"
-          server-type = "csr-app-server"
-        }
-      }
       app-srv-2 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "app-test-server-ami-lv2"
@@ -132,7 +107,7 @@ locals {
         })
 
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["sg-0f692e412a94bbe9c"]
+          vpc_security_group_ids = ["migration-app-sg"]
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 256 }
@@ -142,6 +117,31 @@ locals {
         })
         tags = {
           description = "Test Restore Windows Server 2012 R2 includes Ec2LaunchV2"
+          os-type     = "Windows"
+          component   = "appserver"
+          server-type = "csr-app-server"
+        }
+      }
+      app-srv-3 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "app-test-server-ami-lv2-drv"
+          ami_owner                     = "self"
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/app-server-user-data.yaml"))
+          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
+        })
+
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["migration-app-sg"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 256 }
+        }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0 # set to 0 while testing
+        })
+        tags = {
+          description = "Test Restore Windows Server 2012 R2 includes Ec2LaunchV2, NVMe and PV drivers"
           os-type     = "Windows"
           component   = "appserver"
           server-type = "csr-app-server"
