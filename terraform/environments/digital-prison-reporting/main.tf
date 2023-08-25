@@ -592,6 +592,7 @@ module "datamart" {
   logging = {
     enable               = true
     log_destination_type = "cloudwatch"
+    retention_period     = 2
     log_exports          = ["useractivitylog", "userlog", "connectionlog"]
   }
 

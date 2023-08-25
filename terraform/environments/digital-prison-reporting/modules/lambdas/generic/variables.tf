@@ -43,7 +43,7 @@ variable "handler" {
 variable "log_retention_in_days" {
   description = "Log retention in number of days."
   type        = number
-  default     = 14
+  default     = 2
 }
 
 variable "memory_size" {
