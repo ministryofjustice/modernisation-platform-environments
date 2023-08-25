@@ -269,7 +269,7 @@ module "glue_raw_table" {
 module "glue_reconciliation_table" {
   source                    = "./modules/glue_table"
   enable_glue_catalog_table = true
-  name                      = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
+  name                      = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}2"
 
   # AWS Glue catalog DB
   glue_catalog_database_name       = module.glue_reconciliation_database.db_name
@@ -285,8 +285,8 @@ module "glue_reconciliation_table" {
   }
   glue_catalog_table_storage_descriptor = {
     location      = "s3://${module.s3_working_bucket.bucket_id}/reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/"
-    input_format  = "org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat"
-    output_format = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
     columns = [
       {
@@ -336,11 +336,11 @@ module "glue_reconciliation_table" {
 
     ser_de_info = [
       {
-        name                  = "raw"
+        name                  = ""
         serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
 
         parameters = {
-          "serialization.format" = 1
+          "serialization.format" = 2
         }
       }
     ]
