@@ -261,6 +261,14 @@ locals {
           cidr_blocks     = local.security_group_cidrs.rdp.inbound
           security_groups = []
         }
+        smb = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 445
+          to_port         = 445
+          protocol        = "TCP"
+          cidr_blocks     = var.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
+          security_groups = []
+        }
         # http2109 = {
         #   description = "Allow ingress from port 2109"
         #   from_port       = 2109
