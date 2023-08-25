@@ -161,7 +161,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
           args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-            branch = "nomis/DSOS-1949/syscon-fix"
+            branch = "main"
           })
         })
         autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
