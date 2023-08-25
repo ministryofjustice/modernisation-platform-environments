@@ -16,13 +16,13 @@ locals {
 
     baseline_acm_certificates = {
       # nomis_wildcard_cert = {
-      #   # domain_name limited to 64 chars so use modernisation platform domain for this
+      #   # domain_name limited to 64 chars so use modernisation platform domain for this
       #   # and put the wildcard in the san
       #   domain_name = module.environment.domains.public.modernisation_platform
       #   subject_alternate_names = [
       #     "*.${module.environment.domains.public.application_environment}",
       #     "*.${local.environment}.nomis.az.justice.gov.uk",
-      #   ]
+      #   ]
       #   cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
       #   tags = {
       #     description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
@@ -31,6 +31,12 @@ locals {
     }
 
     baseline_ssm_parameters = {
+      # "dev-nomis-web-a" = local.weblogic_ssm_parameters
+      # "dev-nomis-web-b" = local.weblogic_ssm_parameters
+      # "qa11g-nomis-web-a" = local.weblogic_ssm_parameters
+      # "qa11g-nomis-web-b" = local.weblogic_ssm_parameters
+      "qa11r-nomis-web-a" = local.weblogic_ssm_parameters
+      "qa11r-nomis-web-b" = local.weblogic_ssm_parameters
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -144,6 +150,57 @@ locals {
           component   = "jumpserver"
           server-type = "nomis-jumpserver"
         }
+      }
+
+      # blue deployment
+      qa11r-nomis-web-a = merge(local.weblogic_ec2_a, {
+        tags = merge(local.weblogic_ec2_a.tags, {
+          nomis-environment    = "syscon"
+          oracle-db-hostname-a = "qa11r-a.development.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "qa11r-b.development.nomis.service.justice.gov.uk"
+          oracle-db-name       = "QA11R"
+        })
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
+          desired_capacity = 0
+        })
+      })
+
+      # green deployment
+      qa11r-nomis-web-b = merge(local.weblogic_ec2_b, {
+        tags = merge(local.weblogic_ec2_b.tags, {
+          nomis-environment    = "syscon"
+          oracle-db-hostname-a = "qa11r-a.development.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "qa11r-b.development.nomis.service.justice.gov.uk"
+          oracle-db-name       = "QA11R"
+        })
+        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
+          desired_capacity = 1
+        })
+      })
+    }
+
+    baseline_route53_zones = {
+      "development.hmpps-test.modernisation-platform.service.justice.gov.uk" = {
+        records = [
+        ]
+      }
+      "development.nomis.az.justice.gov.uk" = {
+        lb_alias_records = [
+        ]
+      }
+      "development.nomis.service.justice.gov.uk" = {
+        records = [
+          # SYSCON
+          { name = "dev", type = "CNAME", ttl = "300", records = ["dev-a.development.nomis.service.justice.gov.uk"] },
+          { name = "dev-a", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "dev-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "qa11g", type = "CNAME", ttl = "300", records = ["qa11g-a.development.nomis.service.justice.gov.uk"] },
+          { name = "qa11g-a", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "qa11g-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "qa11r", type = "CNAME", ttl = "300", records = ["qa11r-a.development.nomis.service.justice.gov.uk"] },
+          { name = "qa11r-a", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "qa11r-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+        ]
       }
     }
   }
