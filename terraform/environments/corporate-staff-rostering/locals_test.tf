@@ -105,7 +105,7 @@ locals {
           user_data_raw                 = base64encode(file("./templates/app-server-user-data.yaml"))
           # instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
         })
-        
+
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["sg-0f692e412a94bbe9c"]
         })
@@ -130,7 +130,7 @@ locals {
           user_data_raw                 = base64encode(file("./templates/app-server-user-data.yaml"))
           # instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
         })
-        
+
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["sg-0f692e412a94bbe9c"]
         })
