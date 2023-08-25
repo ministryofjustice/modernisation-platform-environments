@@ -14,3 +14,10 @@ tasks:
 
           Set-TimeZone "GMT Standard Time"
           Set-WinSystemLocale "en-GB"
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
+          New-Item -ItemType Directory -Force -Path C:\Temp\Test
+          New-Item -ItemType File -Force -Path C:\Temp\Test\test-success.txt
+          
