@@ -31,6 +31,7 @@ locals {
             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
             { provider = "external" }
       )))
+      zone_id = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].hosted_zone}"].zone_id
     }
   }
 

@@ -44,7 +44,7 @@ resource "aws_route53_record" "external_lb_validation_core_network_services" {
   # NOTE: value.zone is null indicates the validation zone could not be found
   # Ensure route53_zones variable contains the given validation zone or
   # explicitly provide the zone details in the validation variable.
-  zone_id = each.value.zone.zone_id
+  zone_id = each.value.zone_id
 
   depends_on = [
     aws_acm_certificate.legalservices_cert
