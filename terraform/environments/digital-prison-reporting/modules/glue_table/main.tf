@@ -53,7 +53,6 @@ resource "aws_glue_catalog_table" "glue_catalog_table" {
       for_each = lookup(var.glue_catalog_table_storage_descriptor, "ser_de_info", [])
 
       content {
-        name                  = lookup(ser_de_info.value, "name", null)
         parameters            = lookup(ser_de_info.value, "parameters", null)
         serialization_library = lookup(ser_de_info.value, "serialization_library", null)
       }

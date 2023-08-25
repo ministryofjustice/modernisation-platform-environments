@@ -250,7 +250,6 @@ module "glue_raw_table" {
 
     ser_de_info = [
       {
-        name                  = "raw"
         serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
 
         parameters = {
@@ -321,7 +320,6 @@ module "glue_reconciliation_table" {
 
     ser_de_info = [
       {
-        name                  = ""
         serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
 
         parameters = {
