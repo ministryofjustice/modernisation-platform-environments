@@ -175,8 +175,8 @@ module "kinesis_stream_reconciliation_firehose_s3" {
   kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name
   target_s3_arn              = module.s3_working_bucket.bucket_arn
   target_s3_id               = module.s3_working_bucket.bucket_id
-  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
-  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}-error/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/!{firehose:error-output-type}"
+  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
+  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}-error/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/!{firehose:error-output-type}"
   target_s3_kms              = local.s3_kms_arn
   buffering_size             = 128
   buffering_interval         = 900
@@ -313,11 +313,6 @@ module "glue_reconciliation_table" {
         name = "day",
         type = "string",
         comment = ""
-      },
-      {
-        name = "hour",
-        type = "string",
-        comment = ""
       }
     ]
 
@@ -334,11 +329,6 @@ module "glue_reconciliation_table" {
       },
       {
         name = "day",
-        type = "string",
-        comment = ""
-      },
-      {
-        name = "hour",
         type = "string",
         comment = ""
       }
