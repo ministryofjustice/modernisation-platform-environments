@@ -7,7 +7,6 @@ tasks:
     inputs:
       - frequency: once
         type: powershell
-        runAs: admin
         # Set time to local and locale
         content: |
           # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script 
@@ -16,8 +15,7 @@ tasks:
           Set-WinSystemLocale "en-GB"
       - frequency: once
         type: powershell
-        runAs: admin
         content: |
-          New-Item -ItemType Directory -Force -Path C:\Temp\Test
-          New-Item -ItemType File -Force -Path C:\Temp\Test\test-success.txt
+          New-Item -ItemType Directory -Force -Path C:\temp\Test
+          New-Item -ItemType File -Force -Path C:\temp\Test\test-success.txt
           
