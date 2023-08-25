@@ -141,7 +141,7 @@ locals {
           desired_capacity = 0 # set to 0 while testing
         })
         tags = {
-          description = "Test Restore Windows Server 2012 R2 includes Ec2LaunchV2, NVMe and PV drivers"
+          description = "Test Restore Windows Server 2012 R2 includes Ec2LaunchV2 NVMe and PV drivers"
           os-type     = "Windows"
           component   = "appserver"
           server-type = "csr-app-server"
