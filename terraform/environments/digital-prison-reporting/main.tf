@@ -269,7 +269,7 @@ module "glue_raw_table" {
 module "glue_reconciliation_table" {
   source                    = "./modules/glue_table"
   enable_glue_catalog_table = true
-  name                      = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}2"
+  name                      = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
 
   # AWS Glue catalog DB
   glue_catalog_database_name       = module.glue_reconciliation_database.db_name
@@ -300,17 +300,17 @@ module "glue_reconciliation_table" {
         columns_comment = "Common metadata"
       },
       {
-        name = "year",
+        columns_name = "year",
         type = "string",
         comment = ""
       },
       {
-        name = "month",
+        columns_name = "month",
         type = "string",
         comment = ""
       },
       {
-        name = "day",
+        columns_name = "day",
         type = "string",
         comment = ""
       }
