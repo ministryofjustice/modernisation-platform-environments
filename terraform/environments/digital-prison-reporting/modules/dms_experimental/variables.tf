@@ -11,7 +11,7 @@ variable "enable_replication_task" {
 variable "setup_dms_instance" {
   description = "Enable DMS Instance, True or False"
   type        = bool
-  default     = false  
+  default     = false
 }
 
 variable "project_id" {

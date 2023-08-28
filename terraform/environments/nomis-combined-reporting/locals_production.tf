@@ -15,7 +15,7 @@ locals {
       }
       "production.reporting.nomis.service.justice.gov.uk" = {
       }
-      
+
     }
 
   }

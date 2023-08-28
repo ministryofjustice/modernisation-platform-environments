@@ -190,32 +190,32 @@ resource "aws_s3_bucket_public_access_block" "moj-scripts" {
 resource "aws_s3_bucket_policy" "moj-scripts" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.moj-scripts[0].id
-  
+
   policy = jsonencode({
 
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "s3:DeleteObject",
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:ListBucket"
-      ],
-      "Effect": "Allow",
-      "Resource": [
-      "arn:aws:s3:::moj-scripts",
-      "arn:aws:s3:::moj-scripts/*"
-      ],
-      "Principal": {
-        "AWS": [
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role" 
-      ]
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-scripts",
+          "arn:aws:s3:::moj-scripts/*"
+        ],
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role"
+          ]
+        }
       }
-    }
-  ]
-})
+    ]
+  })
 }
 
 
@@ -274,30 +274,30 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Release-Management" {
 resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.MoJ-Release-Management[0].id
-  
+
   policy = jsonencode({
 
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-        "Action": [
-        "s3:DeleteObject",
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:ListBucket"
-      ],
-      "Effect": "Allow",
-      "Resource": [
-        "arn:aws:s3:::moj-release-management",
-        "arn:aws:s3:::moj-release-management/*"
-      ],
-      "Principal": {
-        "AWS": [
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
-          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role" 
-      ]
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-release-management",
+          "arn:aws:s3:::moj-release-management/*"
+        ],
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role"
+          ]
+        }
       }
-    }
     ]
   })
 }
