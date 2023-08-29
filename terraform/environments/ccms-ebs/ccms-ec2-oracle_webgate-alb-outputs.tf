@@ -46,7 +46,7 @@ output "aws_lb_target_group_webgate_tg_name" {
 
 output "aws_lb_target_group_attachment_webgate_id" {
   description = "aws_lb_target_group_attachment webgate id"
-  value       = aws_lb_target_group_attachment[*].webgate.id
+  value       = aws_lb_target_group_attachment.webgate[*].id
 }
 
 #
