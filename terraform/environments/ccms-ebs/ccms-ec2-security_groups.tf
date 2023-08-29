@@ -55,6 +55,7 @@ resource "aws_security_group" "ec2_sg_ebsdb" {
     { Name = lower(format("sg-%s-%s-ebsdb", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_security_group_rule" "ingress_traffic_ebsdb" {
   for_each          = local.application_data.ec2_sg_ingress_rules
   security_group_id = aws_security_group.ec2_sg_ebsdb.id
@@ -65,6 +66,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb" {
   to_port           = each.value.to_port
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod, local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
 }
+
 resource "aws_security_group_rule" "egress_traffic_ebsdb_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
   security_group_id        = aws_security_group.ec2_sg_ebsdb.id
@@ -75,6 +77,7 @@ resource "aws_security_group_rule" "egress_traffic_ebsdb_sg" {
   to_port                  = each.value.to_port
   source_security_group_id = aws_security_group.ec2_sg_ebsdb.id
 }
+
 resource "aws_security_group_rule" "egress_traffic_ebsdb_cidr" {
   for_each          = local.application_data.ec2_sg_egress_rules
   security_group_id = aws_security_group.ec2_sg_ebsdb.id
@@ -95,6 +98,7 @@ resource "aws_security_group" "ec2_sg_ebsapps" {
     { Name = lower(format("sg-%s-%s-ebsapps", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_security_group_rule" "ingress_traffic_ebsapps" {
   for_each          = local.application_data.ec2_sg_ingress_rules
   security_group_id = aws_security_group.ec2_sg_ebsapps.id
@@ -105,6 +109,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps" {
   to_port           = each.value.to_port
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
+
 resource "aws_security_group_rule" "egress_traffic_ebsapps_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
   security_group_id        = aws_security_group.ec2_sg_ebsapps.id
@@ -115,6 +120,7 @@ resource "aws_security_group_rule" "egress_traffic_ebsapps_sg" {
   to_port                  = each.value.to_port
   source_security_group_id = aws_security_group.ec2_sg_ebsapps.id
 }
+
 resource "aws_security_group_rule" "egress_traffic_ebsapps_cidr" {
   for_each          = local.application_data.ec2_sg_egress_rules
   security_group_id = aws_security_group.ec2_sg_ebsapps.id
@@ -135,6 +141,7 @@ resource "aws_security_group" "ec2_sg_webgate" {
     { Name = lower(format("sg-%s-%s-webgate", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_security_group_rule" "ingress_traffic_webgate" {
   for_each          = local.application_data.ec2_sg_ingress_rules
   security_group_id = aws_security_group.ec2_sg_webgate.id
@@ -145,6 +152,7 @@ resource "aws_security_group_rule" "ingress_traffic_webgate" {
   to_port           = each.value.to_port
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
+
 resource "aws_security_group_rule" "egress_traffic_webgate_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
   security_group_id        = aws_security_group.ec2_sg_webgate.id
@@ -155,6 +163,7 @@ resource "aws_security_group_rule" "egress_traffic_webgate_sg" {
   to_port                  = each.value.to_port
   source_security_group_id = aws_security_group.ec2_sg_webgate.id
 }
+
 resource "aws_security_group_rule" "egress_traffic_webgate_cidr" {
   for_each          = local.application_data.ec2_sg_egress_rules
   security_group_id = aws_security_group.ec2_sg_webgate.id
@@ -175,6 +184,7 @@ resource "aws_security_group" "ec2_sg_accessgate" {
     { Name = lower(format("sg-%s-%s-accessgate", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_security_group_rule" "ingress_traffic_accessgate" {
   for_each          = local.application_data.ec2_sg_ingress_rules
   security_group_id = aws_security_group.ec2_sg_accessgate.id
@@ -185,6 +195,7 @@ resource "aws_security_group_rule" "ingress_traffic_accessgate" {
   to_port           = each.value.to_port
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
+
 resource "aws_security_group_rule" "egress_traffic_accessgate_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
   security_group_id        = aws_security_group.ec2_sg_accessgate.id
@@ -195,6 +206,7 @@ resource "aws_security_group_rule" "egress_traffic_accessgate_sg" {
   to_port                  = each.value.to_port
   source_security_group_id = aws_security_group.ec2_sg_accessgate.id
 }
+
 resource "aws_security_group_rule" "egress_traffic_accessgate_cidr" {
   for_each          = local.application_data.ec2_sg_egress_rules
   security_group_id = aws_security_group.ec2_sg_accessgate.id
@@ -205,7 +217,6 @@ resource "aws_security_group_rule" "egress_traffic_accessgate_cidr" {
   to_port           = each.value.to_port
   cidr_blocks       = [each.value.destination_cidr]
 }
-
 
 # Security Group for EBSAPP-Loadbalancer
 resource "aws_security_group" "sg_ebsapps_lb" {
@@ -232,6 +243,7 @@ resource "aws_security_group" "sg_ebsapps_lb" {
     { Name = lower(format("sg-%s-%s-loadbalancer", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_security_group_rule" "ingress_traffic_ebslb" {
   for_each          = local.application_data.lb_sg_ingress_rules
   security_group_id = aws_security_group.sg_ebsapps_lb.id
@@ -242,6 +254,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebslb" {
   to_port           = each.value.to_port
   cidr_blocks       = [each.value.destination_cidr, data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
+
 resource "aws_security_group_rule" "egress_traffic_ebslb_sg" {
   for_each                 = local.application_data.lb_sg_egress_rules
   security_group_id        = aws_security_group.sg_ebsapps_lb.id
@@ -252,6 +265,7 @@ resource "aws_security_group_rule" "egress_traffic_ebslb_sg" {
   to_port                  = each.value.to_port
   source_security_group_id = aws_security_group.ec2_sg_ebsdb.id
 }
+
 resource "aws_security_group_rule" "egress_traffic_ebslb_cidr" {
   for_each          = local.application_data.lb_sg_egress_rules
   security_group_id = aws_security_group.sg_ebsapps_lb.id
@@ -373,7 +387,6 @@ resource "aws_security_group_rule" "all_internal_egress_traffic" {
   ]
 }
 
-
 # Security Group for WEBGATE ELB
 resource "aws_security_group" "sg_webgate_lb" {
   name        = "sg_webgate_lb"
@@ -384,6 +397,7 @@ resource "aws_security_group" "sg_webgate_lb" {
     { Name = lower(format("sg-%s-%s-webgate-loadbalancer", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_security_group_rule" "ingress_traffic_webgatelb" {
   for_each          = local.application_data.lb_sg_ingress_rules
   security_group_id = aws_security_group.sg_webgate_lb.id
