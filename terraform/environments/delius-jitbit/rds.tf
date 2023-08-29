@@ -76,6 +76,15 @@ resource "aws_db_instance" "jitbit" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database", local.application_name, local.environment)) }
   )
+
+  # Temporarily adding this to avoiding recreation of the prod database while some investigation is taking place
+  # This list has to be static so will for a short time affect other environments too
+  lifecycle {
+    ignore_changes = [
+      snapshot_identifier,
+      final_snapshot_identifier
+    ]
+  }
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {
