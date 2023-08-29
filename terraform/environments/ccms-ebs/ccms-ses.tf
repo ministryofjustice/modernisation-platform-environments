@@ -57,12 +57,13 @@ resource "aws_ses_configuration_set" "default_configuration_set" {
 #   }
 # }
 
-output "ses_verification_token" {
-  description = "SES verification token"
-  value       = aws_ses_domain_identity.domain_identity.verification_token
-}
-
-output "ses_domain_dkim" {
-  description = "SES domain DKIM"
-  value       = aws_ses_domain_dkim.domain_identity.dkim_tokens
-}
+# Moved to ccms-ses-outputs.tf
+# output "ses_verification_token" {
+#   description = "SES verification token"
+#   value       = aws_ses_domain_identity.domain_identity.verification_token
+# }
+# 
+# output "ses_domain_dkim" {
+#   description = "SES domain DKIM"
+#   value       = aws_ses_domain_dkim.domain_identity.dkim_tokens
+# }

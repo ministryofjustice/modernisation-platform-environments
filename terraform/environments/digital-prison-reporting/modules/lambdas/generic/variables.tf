@@ -43,7 +43,7 @@ variable "handler" {
 variable "log_retention_in_days" {
   description = "Log retention in number of days."
   type        = number
-  default     = 14
+  default     = 1
 }
 
 variable "memory_size" {
@@ -110,7 +110,7 @@ variable "vpc_settings" {
 
 variable "lambda_trigger" {
   description = "Set Permissions for LAMBDA Triggers,"
-  default     = false  
+  default     = false
 }
 
 variable "trigger_bucket_arn" {

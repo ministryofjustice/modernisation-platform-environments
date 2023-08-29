@@ -1,5 +1,5 @@
 locals {
-cloudfront_validation_records = {
+  cloudfront_validation_records = {
     for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
@@ -19,7 +19,7 @@ cloudfront_validation_records = {
     }
   }
 
-validation_records_cloudfront = {
+  validation_records_cloudfront = {
     for key, value in local.cloudfront_validation_records : key => {
       name   = value.name
       record = value.record
@@ -107,7 +107,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
 }
 
 resource "aws_s3_bucket_public_access_block" "cloudfront" {
-  bucket = aws_s3_bucket.cloudfront.id
+  bucket                  = aws_s3_bucket.cloudfront.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -137,7 +137,7 @@ data "aws_iam_policy_document" "portal_error_page_bucket_policy" {
 }
 
 resource "aws_cloudfront_distribution" "external" {
-  http_version  = "http2"
+  http_version = "http2"
   origin {
     domain_name = aws_lb.external.dns_name
     origin_id   = aws_lb.external.id
@@ -159,10 +159,10 @@ resource "aws_cloudfront_distribution" "external" {
     }
   }
   origin {
-    domain_name                = aws_s3_bucket.portalerrorpagebucket.bucket_regional_domain_name
-    origin_id                  = local.s3_origin_id
+    domain_name = aws_s3_bucket.portalerrorpagebucket.bucket_regional_domain_name
+    origin_id   = local.s3_origin_id
     s3_origin_config {
-      origin_access_identity   = aws_cloudfront_origin_access_identity.portalerrorpagebucket.cloudfront_access_identity_path
+      origin_access_identity = aws_cloudfront_origin_access_identity.portalerrorpagebucket.cloudfront_access_identity_path
     }
     origin_shield {
       enabled              = false
@@ -180,118 +180,118 @@ resource "aws_cloudfront_distribution" "external" {
     forwarded_values {
       query_string = true
       cookies {
-        forward      = "all"
+        forward = "all"
       }
     }
     viewer_protocol_policy = "redirect-to-https"
   }
 
   ordered_cache_behavior {
-      target_origin_id = local.s3_origin_id
-      smooth_streaming = false
-      path_pattern     = "/error-pages/*"
-      min_ttl          = 0
-      default_ttl      = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values {
-        query_string   = false
-        cookies {
-          forward      = "all"
-        }
+    target_origin_id = local.s3_origin_id
+    smooth_streaming = false
+    path_pattern     = "/error-pages/*"
+    min_ttl          = 0
+    default_ttl      = 0
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["HEAD", "GET"]
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "all"
       }
-      viewer_protocol_policy = "redirect-to-https"
     }
+    viewer_protocol_policy = "redirect-to-https"
+  }
 
-    ordered_cache_behavior {
-      target_origin_id = aws_lb.external.id
-      smooth_streaming = false
-      path_pattern     = "*.png"
-      min_ttl          = 0
-      default_ttl      = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values {
-        query_string   = false
-        headers        = ["Host", "User-Agent"]
-        cookies {
-          forward      = "all"
-        }
+  ordered_cache_behavior {
+    target_origin_id = aws_lb.external.id
+    smooth_streaming = false
+    path_pattern     = "*.png"
+    min_ttl          = 0
+    default_ttl      = 0
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["HEAD", "GET"]
+    forwarded_values {
+      query_string = false
+      headers      = ["Host", "User-Agent"]
+      cookies {
+        forward = "all"
       }
-      viewer_protocol_policy = "redirect-to-https"
     }
+    viewer_protocol_policy = "redirect-to-https"
+  }
 
-    ordered_cache_behavior {
-      target_origin_id = aws_lb.external.id
-      smooth_streaming = false
-      path_pattern     = "*.jpg"
-      min_ttl          = 0
-      default_ttl      = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values {
-        query_string   = false
-        headers        = ["Host", "User-Agent"]
-        cookies {
-          forward      = "all"
-        }
+  ordered_cache_behavior {
+    target_origin_id = aws_lb.external.id
+    smooth_streaming = false
+    path_pattern     = "*.jpg"
+    min_ttl          = 0
+    default_ttl      = 0
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["HEAD", "GET"]
+    forwarded_values {
+      query_string = false
+      headers      = ["Host", "User-Agent"]
+      cookies {
+        forward = "all"
       }
-      viewer_protocol_policy = "redirect-to-https"
     }
+    viewer_protocol_policy = "redirect-to-https"
+  }
 
-    ordered_cache_behavior {
-      target_origin_id = aws_lb.external.id
-      smooth_streaming = false
-      path_pattern     = "*.gif"
-      min_ttl          = 0
-      default_ttl      = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values {
-        query_string   = false
-        headers        = ["Host", "User-Agent"]
-        cookies {
-          forward      = "all"
-        }
+  ordered_cache_behavior {
+    target_origin_id = aws_lb.external.id
+    smooth_streaming = false
+    path_pattern     = "*.gif"
+    min_ttl          = 0
+    default_ttl      = 0
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["HEAD", "GET"]
+    forwarded_values {
+      query_string = false
+      headers      = ["Host", "User-Agent"]
+      cookies {
+        forward = "all"
       }
-      viewer_protocol_policy = "redirect-to-https"
     }
+    viewer_protocol_policy = "redirect-to-https"
+  }
 
-    ordered_cache_behavior {
-      target_origin_id = aws_lb.external.id
-      smooth_streaming = false
-      path_pattern     = "*.css"
-      min_ttl          = 0
-      default_ttl      = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values {
-        query_string   = false
-        headers        = ["Host", "User-Agent"]
-        cookies {
-          forward      = "all"
-        }
+  ordered_cache_behavior {
+    target_origin_id = aws_lb.external.id
+    smooth_streaming = false
+    path_pattern     = "*.css"
+    min_ttl          = 0
+    default_ttl      = 0
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["HEAD", "GET"]
+    forwarded_values {
+      query_string = false
+      headers      = ["Host", "User-Agent"]
+      cookies {
+        forward = "all"
       }
-      viewer_protocol_policy = "redirect-to-https"
     }
+    viewer_protocol_policy = "redirect-to-https"
+  }
 
-    ordered_cache_behavior {
-      target_origin_id = aws_lb.external.id
-      smooth_streaming = false
-      path_pattern     = "*.js"
-      min_ttl          = 0
-      default_ttl      = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values {
-        query_string   = false
-        headers        = ["Host", "User-Agent"]
-        cookies {
-          forward      = "all"
-        }
+  ordered_cache_behavior {
+    target_origin_id = aws_lb.external.id
+    smooth_streaming = false
+    path_pattern     = "*.js"
+    min_ttl          = 0
+    default_ttl      = 0
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["HEAD", "GET"]
+    forwarded_values {
+      query_string = false
+      headers      = ["Host", "User-Agent"]
+      cookies {
+        forward = "all"
       }
-      viewer_protocol_policy = "redirect-to-https"
     }
+    viewer_protocol_policy = "redirect-to-https"
+  }
 
   price_class = "PriceClass_100"
 
@@ -306,28 +306,28 @@ resource "aws_cloudfront_distribution" "external" {
     bucket          = aws_s3_bucket.cloudfront.bucket_domain_name
     prefix          = local.application_name
   }
-  web_acl_id        = aws_wafv2_web_acl.wafv2_acl.arn
+  web_acl_id = aws_wafv2_web_acl.wafv2_acl.arn
 
   custom_error_response {
-          error_code            = 404
-          response_code         = 404
-          response_page_path    = "/error-pages/not_found.html"
-          error_caching_min_ttl = 5
+    error_code            = 404
+    response_code         = 404
+    response_page_path    = "/error-pages/not_found.html"
+    error_caching_min_ttl = 5
   }
 
-    custom_error_response {
-          error_code            = 502
-          response_code         = 502
-          response_page_path    = "/error-pages/error.html"
-          error_caching_min_ttl = 5
-    }
+  custom_error_response {
+    error_code            = 502
+    response_code         = 502
+    response_page_path    = "/error-pages/error.html"
+    error_caching_min_ttl = 5
+  }
 
-    custom_error_response {
-          error_code            = 503
-          response_code         = 503
-          response_page_path    = "/error-pages/error.html"
-          error_caching_min_ttl = 5
-    }
+  custom_error_response {
+    error_code            = 503
+    response_code         = 503
+    response_page_path    = "/error-pages/error.html"
+    error_caching_min_ttl = 5
+  }
 
   restrictions {
     geo_restriction {

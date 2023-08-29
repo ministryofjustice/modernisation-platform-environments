@@ -45,14 +45,14 @@ resource "aws_iam_instance_profile" "profile" {
 }
 
 resource "aws_iam_role_policy_attachment" "ec2-ssm-core" {
-  count      = var.enable_compute_node ? 1 : 0
+  count = var.enable_compute_node ? 1 : 0
 
   role       = aws_iam_role.instance-role[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy_attachment" "ec2-ssm" {
-  count      = var.enable_compute_node ? 1 : 0
+  count = var.enable_compute_node ? 1 : 0
 
   role       = aws_iam_role.instance-role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"

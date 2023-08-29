@@ -51,7 +51,7 @@ done
 
 EOF
 
-script_oam2 = <<EOF
+  script_oam2 = <<EOF
 #!/bin/bash
 . $HOME/.bash_profile
 MDOMAIN_HOME=/IDAM/product/runtime/Domain/mserver/domains/IAMAccessDomain/
@@ -100,19 +100,19 @@ EOF
 }
 
 resource "aws_ssm_maintenance_window" "oam_window" {
-  name     = "oam1-${local.application_data.accounts[local.environment].maintenance_window_name}"
-  schedule = "cron(0 0 9 ? * * *)"
-  duration = 4
-  cutoff   = 1
+  name              = "oam1-${local.application_data.accounts[local.environment].maintenance_window_name}"
+  schedule          = "cron(0 0 9 ? * * *)"
+  duration          = 4
+  cutoff            = 1
   schedule_timezone = "Europe/London"
 }
 
 resource "aws_ssm_maintenance_window" "oam2_window" {
-  count    = contains(["development", "testing"], local.environment) ? 0 : 1
-  name     = "oam2-${local.application_data.accounts[local.environment].maintenance_window_name}"
-  schedule = "cron(0 0 9 ? * * *)"
-  duration = 4
-  cutoff   = 1
+  count             = contains(["development", "testing"], local.environment) ? 0 : 1
+  name              = "oam2-${local.application_data.accounts[local.environment].maintenance_window_name}"
+  schedule          = "cron(0 0 9 ? * * *)"
+  duration          = 4
+  cutoff            = 1
   schedule_timezone = "Europe/London"
 }
 
@@ -156,16 +156,16 @@ resource "aws_ssm_maintenance_window_task" "commands_oam" {
 
 
   task_invocation_parameters {
-    
+
     run_command_parameters {
       document_version = "$LATEST"
 
-     parameter {
-        name = "commands"
+      parameter {
+        name   = "commands"
         values = [local.script_oam]
       }
     }
-    
+
   }
 
 }
@@ -186,16 +186,16 @@ resource "aws_ssm_maintenance_window_task" "commands_oam2" {
 
 
   task_invocation_parameters {
-    
+
     run_command_parameters {
       document_version = "$LATEST"
 
-     parameter {
-        name = "commands"
+      parameter {
+        name   = "commands"
         values = [local.script_oam2]
       }
     }
-    
+
   }
 
 }

@@ -92,7 +92,7 @@ resource "aws_security_group_rule" "serverless_gw_egress" {
 
 # VPC Gateway Endpoint SG
 resource "aws_security_group" "gateway_endpoint_sg" {
-  count       = local.include_dbuilder_gw_vpclink ? 1 : 0
+  count = local.include_dbuilder_gw_vpclink ? 1 : 0
 
   name        = "${local.serverless_gw_dbuilder_name}-sg"
   description = "Allow HTTPS inbound traffic"

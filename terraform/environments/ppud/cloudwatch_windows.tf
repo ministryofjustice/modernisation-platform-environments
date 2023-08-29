@@ -5,8 +5,8 @@
 # Create a data source to fetch the tags of each instance
 data "aws_instances" "windows_tagged_instances" {
   filter {
-     name = "tag:patch_group"
-     values = ["prod_win_patch"]
+    name   = "tag:patch_group"
+    values = ["prod_win_patch"]
   }
 }
 
@@ -46,7 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "Memory_percentage_Committed_Bytes_In_Use
   treat_missing_data  = "notBreaching"
   alarm_description   = "Triggers if memory usage is continually high for 15 minutes"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-    dimensions = {
+  dimensions = {
     InstanceId = each.key
   }
 }
@@ -67,7 +67,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   threshold           = "90"
   alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = { 
+  dimensions = {
     InstanceId = each.key
   }
 }
@@ -75,19 +75,19 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
 # CPU Utilization Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "CPU-High-${each.key}"    # name of the alarm
-  comparison_operator = "GreaterThanOrEqualToThreshold"   # threshold to trigger the alarm state
-  period              = "60"                              # period in seconds over which the specified statistic is applied
-  threshold           = "90"                              # threshold for the alarm - see comparison_operator for usage
-  evaluation_periods  = "3"                               # how many periods over which to evaluate the alarm
-  datapoints_to_alarm = "2"                               # how many datapoints must be breaching the threshold to trigger the alarm
-  metric_name         = "CPUUtilization"                  # name of the alarm's associated metric
+  alarm_name          = "CPU-High-${each.key}"          # name of the alarm
+  comparison_operator = "GreaterThanOrEqualToThreshold" # threshold to trigger the alarm state
+  period              = "60"                            # period in seconds over which the specified statistic is applied
+  threshold           = "90"                            # threshold for the alarm - see comparison_operator for usage
+  evaluation_periods  = "3"                             # how many periods over which to evaluate the alarm
+  datapoints_to_alarm = "2"                             # how many datapoints must be breaching the threshold to trigger the alarm
+  metric_name         = "CPUUtilization"                # name of the alarm's associated metric
   treat_missing_data  = "notBreaching"
-  namespace           = "AWS/EC2"                         # namespace of the alarm's associated metric
-  statistic           = "Average"                         # could be Average/Minimum/Maximum etc.
+  namespace           = "AWS/EC2" # namespace of the alarm's associated metric
+  statistic           = "Average" # could be Average/Minimum/Maximum etc.
   alarm_description   = "Monitors ec2 cpu utilisation"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = { 
+  dimensions = {
     InstanceId = each.key
   }
 }
@@ -111,7 +111,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   treat_missing_data  = "notBreaching"
   alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = { 
+  dimensions = {
     InstanceId = each.key
   }
 }
@@ -131,7 +131,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   treat_missing_data  = "notBreaching"
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = { 
+  dimensions = {
     InstanceId = each.key
   }
 }
@@ -156,7 +156,7 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
   treat_missing_data  = "notBreaching"
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = { 
+  dimensions = {
     InstanceId = each.key
   }
 }
@@ -164,45 +164,45 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
 #Log Groups
 
 resource "aws_cloudwatch_log_group" "IIS-Logs" {
-count  = local.is-production == true ? 1 : 0
-  name = "IIS-Logs"
+  count             = local.is-production == true ? 1 : 0
+  name              = "IIS-Logs"
   retention_in_days = 365
 }
 
 resource "aws_cloudwatch_log_group" "System-Event-Logs" {
-count  = local.is-production == true ? 1 : 0
-  name = "System-Event-Logs"
+  count             = local.is-production == true ? 1 : 0
+  name              = "System-Event-Logs"
   retention_in_days = 365
 }
 
 resource "aws_cloudwatch_log_group" "Application-Event-Logs" {
-count  = local.is-production == true ? 1 : 0
-  name = "Application-Event-Logs"
+  count             = local.is-production == true ? 1 : 0
+  name              = "Application-Event-Logs"
   retention_in_days = 365
 }
 
 resource "aws_cloudwatch_log_group" "Windows-Services-Logs" {
-count  = local.is-production == true ? 1 : 0
-  name = "Windows-Services-Logs"
+  count             = local.is-production == true ? 1 : 0
+  name              = "Windows-Services-Logs"
   retention_in_days = 365
 }
 
 resource "aws_cloudwatch_log_group" "Network-Connectivity-Logs" {
-count  = local.is-production == true ? 1 : 0
-  name = "Network-Connectivity-Logs"
+  count             = local.is-production == true ? 1 : 0
+  name              = "Network-Connectivity-Logs"
   retention_in_days = 365
 }
 
-resource "aws_cloudwatch_log_group" "SQL-Error-Logs" {
-count  = local.is-production == true ? 1 : 0
-  name = "SQL-Error-Logs"
+resource "aws_cloudwatch_log_group" "SQL-Server-Logs" {
+  count             = local.is-production == true ? 1 : 0
+  name              = "SQL-Server-Logs"
   retention_in_days = 365
 }
 
 #Metric Filters
 
 resource "aws_cloudwatch_log_metric_filter" "ServiceStatus-Running" {
-count  = local.is-production == true ? 1 : 0
+  count          = local.is-production == true ? 1 : 0
   name           = "ServiceStatus-Running"
   log_group_name = aws_cloudwatch_log_group.Windows-Services-Logs[count.index].name
   pattern        = "[date, time, Instance, Service, status=Running]"
@@ -212,13 +212,13 @@ count  = local.is-production == true ? 1 : 0
     value     = "1"
     dimensions = {
       Instance = "$Instance"
-      Service = "$Service"
+      Service  = "$Service"
     }
   }
 }
 
 resource "aws_cloudwatch_log_metric_filter" "ServiceStatus-NotRunning" {
-count  = local.is-production == true ? 1 : 0
+  count          = local.is-production == true ? 1 : 0
   name           = "ServiceStatus-NotRunning"
   log_group_name = aws_cloudwatch_log_group.Windows-Services-Logs[count.index].name
   pattern        = "[date, time, Instance, Service, status!=Running]"
@@ -228,13 +228,13 @@ count  = local.is-production == true ? 1 : 0
     value     = "0"
     dimensions = {
       Instance = "$Instance"
-      Service = "$Service"
+      Service  = "$Service"
     }
   }
 }
 
 resource "aws_cloudwatch_log_metric_filter" "PortStatus-True" {
-count  = local.is-production == true ? 1 : 0
+  count          = local.is-production == true ? 1 : 0
   name           = "PortStatus-True"
   log_group_name = aws_cloudwatch_log_group.Network-Connectivity-Logs[count.index].name
   pattern        = "[date, time, Instance, Port, status=True]"
@@ -244,13 +244,13 @@ count  = local.is-production == true ? 1 : 0
     value     = "1"
     dimensions = {
       Instance = "$Instance"
-      Port = "$Port"
+      Port     = "$Port"
     }
   }
 }
 
 resource "aws_cloudwatch_log_metric_filter" "PortStatus-False" {
-count  = local.is-production == true ? 1 : 0
+  count          = local.is-production == true ? 1 : 0
   name           = "PortStatus-False"
   log_group_name = aws_cloudwatch_log_group.Network-Connectivity-Logs[count.index].name
   pattern        = "[date, time, Instance, Port, status=False]"
@@ -260,20 +260,37 @@ count  = local.is-production == true ? 1 : 0
     value     = "0"
     dimensions = {
       Instance = "$Instance"
-      Port = "$Port"
+      Port     = "$Port"
     }
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "SQL-Backup-Failure" {
-count  = local.is-production == true ? 1 : 0
-  name           = "SQL-Backup-Failure"
-  log_group_name = aws_cloudwatch_log_group.SQL-Error-Logs[count.index].name
-  pattern        = "Backup failed"
+resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Successful" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "SQLBackupStatus-Successful"
+  log_group_name = aws_cloudwatch_log_group.SQL-Server-Logs[count.index].name
+  pattern        = "[date, time, Instance, SQLBackup, status=Successful]"
   metric_transformation {
-    name      = "Failure"
-    namespace = "SQLBackup"
+    name      = "Successful"
+    namespace = "SQLBackupStatus"
     value     = "1"
+    dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
+resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Failed" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "SQLBackupStatus-Failed"
+  log_group_name = aws_cloudwatch_log_group.SQL-Server-Logs[count.index].name
+  pattern        = "[date, time, Instance, SQLBackup, status=Failed]"
+  metric_transformation {
+    name      = "Failed"
+    namespace = "SQLBackupStatus"
+    value     = "0"
+    dimensions = {
+      Instance = "$Instance"
+    }
+  }
+}

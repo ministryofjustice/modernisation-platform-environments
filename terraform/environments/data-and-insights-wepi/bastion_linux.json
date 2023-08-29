@@ -3,7 +3,11 @@
     "preproduction": {
       "simonytta": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKeBrsu9K2qVs2r/fueve0V+5WBY/ZZTNq1UJYhuXIZp simona.treivase@justice.gov.uk"
     },
-    "development": {"simonytta": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKeBrsu9K2qVs2r/fueve0V+5WBY/ZZTNq1UJYhuXIZp simona.treivase@justice.gov.uk"},
-    "production": {"simonytta": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKeBrsu9K2qVs2r/fueve0V+5WBY/ZZTNq1UJYhuXIZp simona.treivase@justice.gov.uk"}
+    "development": {
+      "simonytta": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKeBrsu9K2qVs2r/fueve0V+5WBY/ZZTNq1UJYhuXIZp simona.treivase@justice.gov.uk"
+    },
+    "production": {
+      "simonytta": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKeBrsu9K2qVs2r/fueve0V+5WBY/ZZTNq1UJYhuXIZp simona.treivase@justice.gov.uk"
+    }
   }
 }

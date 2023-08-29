@@ -87,5 +87,5 @@ For example, resource name takes the form
 - where environmentname is the name for the delius environment, NOT the Modernisation Platform account name, e.g. `dev`, `stage`, `preprod`
 - resourceidentifier is an identifier for the resource that together with the environmentname gives full clarity about what the resource represents, e.g. `ldap-efs` or `delius-db-1`
 e.g.
-`dev-ldap-efs` 
-`preprod-delius-db-1` 
+`dev-ldap-efs`
+`preprod-delius-db-1`
