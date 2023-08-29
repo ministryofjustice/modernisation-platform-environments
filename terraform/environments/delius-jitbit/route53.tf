@@ -1,5 +1,5 @@
 data "aws_route53_zone" "network-services-production" {
-  count   = local.is-production ? 1 : 0
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   name         = "jitbit.cr.probation.service.justice.gov.uk."
@@ -89,7 +89,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
 # }
 
 resource "aws_acm_certificate_validation" "external" {
-  count = local.is-production ? 0 : 1 # Temporary until we have a production dns delegation in place
+  count                   = local.is-production ? 0 : 1 # Temporary until we have a production dns delegation in place
   certificate_arn         = aws_acm_certificate.external.arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }

@@ -17,11 +17,11 @@ The Divorce Section Search Service (DACP) application is a business critical app
 
 ### **Service URLs:**
 
-Dev: https://dacp.hmcts-development.modernisation-platform.service.justice.gov.uk
+Dev: <https://dacp.hmcts-development.modernisation-platform.service.justice.gov.uk>
 
-Preproduction: https://dacp.hmcts-preproduction.modernisation-platform.service.justice.gov.uk
+Preproduction: <https://dacp.hmcts-preproduction.modernisation-platform.service.justice.gov.uk>
 
-Prod: https://divorce-section-search.service.justice.gov.uk
+Prod: <https://divorce-section-search.service.justice.gov.uk>
 
 ### **Incident response hours:**
 
@@ -45,7 +45,7 @@ Modernisation Platform
 
 ### **Other URLs:**
 
-The service's GitHub repository can be found at: https://github.com/ministryofjustice/Dacp
+The service's GitHub repository can be found at: <https://github.com/ministryofjustice/Dacp>
 
 ### **Expected speed and frequency of releases:**
 

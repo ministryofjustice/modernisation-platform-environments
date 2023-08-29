@@ -6,5 +6,5 @@ resource "aws_vpc_endpoint" "this" {
   security_group_ids  = var.security_group_ids
   vpc_endpoint_type   = "Interface"
 
-  tags                = var.tags  
+  tags = var.tags
 }

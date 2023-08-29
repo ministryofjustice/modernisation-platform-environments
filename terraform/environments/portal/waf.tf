@@ -8,49 +8,49 @@ resource "aws_wafv2_ip_set" "portal_whitelist" {
 }
 
 resource "aws_wafv2_web_acl" "wafv2_acl" {
-name                = "${upper(local.application_name)}-WebAcl"
-scope               = "CLOUDFRONT"
-provider            = aws.us-east-1
+  name     = "${upper(local.application_name)}-WebAcl"
+  scope    = "CLOUDFRONT"
+  provider = aws.us-east-1
 
-dynamic "default_action" {
-  for_each = local.environment == "production" ? [1] : []
-  content {
-    allow {}
+  dynamic "default_action" {
+    for_each = local.environment == "production" ? [1] : []
+    content {
+      allow {}
+    }
   }
-}
 
-dynamic "default_action" {
-  for_each = local.environment != "production" ? [1] : []
-  content {
-    block {}
+  dynamic "default_action" {
+    for_each = local.environment != "production" ? [1] : []
+    content {
+      block {}
+    }
   }
-}
 
-visibility_config {
-  cloudwatch_metrics_enabled = true
-  metric_name                = "PortalWebRequests"
-  sampled_requests_enabled   = true
-}
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "PortalWebRequests"
+    sampled_requests_enabled   = true
+  }
 
-rule {
+  rule {
     name     = "WhitelistInternalMoJAndPingdom"
     priority = 4
     action {
       allow {}
-      }
+    }
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "PortalManualAllowRuleMetric"
       sampled_requests_enabled   = true
     }
     statement {
-        ip_set_reference_statement {
-          arn = aws_wafv2_ip_set.portal_whitelist.arn
-        }
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.portal_whitelist.arn
       }
-}
+    }
+  }
 
-rule {
+  rule {
     name     = "AWSManagedRulesCommonRuleSet"
     priority = 0
 
@@ -127,9 +127,9 @@ rule {
 
       }
     }
-}
+  }
 
-rule {
+  rule {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
     priority = 1
 
@@ -149,9 +149,9 @@ rule {
         vendor_name = "AWS"
       }
     }
-}
+  }
 
-rule {
+  rule {
     name     = "AWSManagedRulesAmazonIpReputationList"
     priority = 2
 
@@ -171,14 +171,14 @@ rule {
         vendor_name = "AWS"
       }
     }
-}
+  }
 
-rule {
+  rule {
     name     = "AWSManagedRulesBotControl"
     priority = 3
 
-#the Cloudformation code has the OverrideAction: None: {} in https://github.com/ministryofjustice/laa-portal/blob/master/aws/wafv2/wafv2.template
-#however the LZ Development (and Production) console has the Action set to Override rule group action to count - so Action has been set to count
+    #the Cloudformation code has the OverrideAction: None: {} in https://github.com/ministryofjustice/laa-portal/blob/master/aws/wafv2/wafv2.template
+    #however the LZ Development (and Production) console has the Action set to Override rule group action to count - so Action has been set to count
     override_action {
       count {}
     }
@@ -195,5 +195,5 @@ rule {
         vendor_name = "AWS"
       }
     }
-}
+  }
 }

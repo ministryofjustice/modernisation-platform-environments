@@ -417,13 +417,13 @@ module "s3_artifacts_store" {
   name                = "${local.project}-artifact-store-${local.environment}"
   custom_kms_key      = local.s3_kms_arn
   enable_notification = true #
- 
+
   # Dynamic, supports multiple notifications blocks
   bucket_notifications = {
-    "lambda_function_arn"   = "${module.domain_builder_flyway_Lambda.lambda_function}"
-    "events"                = ["s3:ObjectCreated:*"]
-    "filter_prefix"         = "build-artifacts/domain-builder/jars/"
-    "filter_suffix"         = ".jar"
+    "lambda_function_arn" = "${module.domain_builder_flyway_Lambda.lambda_function}"
+    "events"              = ["s3:ObjectCreated:*"]
+    "filter_prefix"       = "build-artifacts/domain-builder/jars/"
+    "filter_suffix"       = ".jar"
   }
 
   dependency_lambda = [module.domain_builder_flyway_Lambda.lambda_function] # Required if bucket_notications is enabled
@@ -608,7 +608,7 @@ module "datamart" {
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
   source                       = "./modules/dms"
-  setup_dms_instance           = local.setup_dms_instance # Disable all DMS Resources
+  setup_dms_instance           = local.setup_dms_instance      # Disable all DMS Resources
   enable_replication_task      = local.enable_replication_task # Disable Replication Task
   name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
   vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
@@ -633,7 +633,7 @@ module "dms_nomis_ingestor" {
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
 
-  extra_attributes           = "supportResetlog=TRUE"
+  extra_attributes = "supportResetlog=TRUE"
 
   kinesis_settings = {
     "include_null_and_empty"         = "true"
@@ -659,7 +659,7 @@ module "dms_nomis_ingestor" {
 # TODO: DPR-622: Delete when done
 module "dms_nomis_ingestor_full_load" {
   source                       = "./modules/dms_experimental"
-  setup_dms_instance           = local.setup_dms_instance # Disable all DMS Resources
+  setup_dms_instance           = local.setup_dms_instance      # Disable all DMS Resources
   enable_replication_task      = local.enable_replication_task # Disable Replication Task
   name                         = "${local.project}-dms-nomis-ingestor-full-load-${local.env}"
   vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
@@ -684,7 +684,7 @@ module "dms_nomis_ingestor_full_load" {
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
 
-  extra_attributes           = "supportResetlog=TRUE"
+  extra_attributes = "supportResetlog=TRUE"
 
   kinesis_settings = {
     "include_null_and_empty"         = "true"

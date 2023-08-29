@@ -148,8 +148,8 @@ variable "type" {
 }
 
 variable "secret_value" {
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
   description = "(Optional) Value if the type is set to MONO"
 }
 

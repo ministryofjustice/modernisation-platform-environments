@@ -96,8 +96,8 @@ resource "null_resource" "setup_db" {
       SOURCE_DB_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SOURCE_DB_PASSWORD"]
       DB_HOSTNAME        = aws_db_instance.pra_db.address
       DB_NAME            = aws_db_instance.pra_db.db_name
-      PRA_DB_USERNAME   = local.application_data.accounts[local.environment].db_username
-      PRA_DB_PASSWORD   = random_password.password.result
+      PRA_DB_USERNAME    = local.application_data.accounts[local.environment].db_username
+      PRA_DB_PASSWORD    = random_password.password.result
     }
   }
   triggers = {

@@ -110,7 +110,7 @@ variable "vpc_settings" {
 
 variable "lambda_trigger" {
   description = "Set Permissions for LAMBDA Triggers,"
-  default     = false  
+  default     = false
 }
 
 variable "trigger_bucket_arn" {
