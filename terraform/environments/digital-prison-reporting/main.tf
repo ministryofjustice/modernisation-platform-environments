@@ -283,6 +283,7 @@ module "glue_reconciliation_table" {
     "classification"      = "parquet"
   }
   glue_catalog_table_storage_descriptor = {
+
     location      = "s3://${module.s3_working_bucket.bucket_id}/reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
