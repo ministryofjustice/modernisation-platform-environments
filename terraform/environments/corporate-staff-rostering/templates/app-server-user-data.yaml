@@ -11,8 +11,8 @@ tasks:
         # Set time to local and locale
         content: |
           # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script 
-
-          Set-TimeZone "GMT Standard Time"
+          
+          # Set-TimeZone "GMT Standard Time" # does not work for Server 2012 R2 version of PowerShell
           Set-WinSystemLocale "en-GB"
       - frequency: once
         type: powershell
