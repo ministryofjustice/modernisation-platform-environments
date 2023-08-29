@@ -1,52 +1,52 @@
 output "aws_lb_webgate_lb_arn" {
   description = "aws_lb webgate_lb arn"
-  value       = aws_lb.webgate_lb.arn
+  value       = aws_lb.webgate_lb[*].arn
 }
 
 output "aws_lb_webgate_lb_arn_suffix" {
   description = "aws_lb webgate_lb arn_suffix"
-  value       = aws_lb.webgate_lb.arn_suffix
+  value       = aws_lb.webgate_lb[*].arn_suffix
 }
 
 output "aws_lb_webgate_lb_dns_name" {
   description = "aws_lb webgate_lb dns_name"
-  value       = aws_lb.webgate_lb.dns_name
+  value       = aws_lb.webgate_lb[*].dns_name
 }
 
 output "aws_lb_webgate_lb_zone_id" {
   description = "aws_lb webgate_lb zone_id"
-  value       = aws_lb.webgate_lb.zone_id
+  value       = aws_lb.webgate_lb[*].zone_id
 }
 
 #
 
 output "aws_lb_listener_webgate_listener_arn" {
   description = "aws_lb_listener webgate_listener arn"
-  value       = aws_lb_listener.webgate_listener.arn
+  value       = aws_lb_listener.webgate_listener[*].arn
 }
 
 #
 
 output "aws_lb_target_group_webgate_tg_arn" {
   description = "aws_lb_target_group webgate_tg arn"
-  value       = aws_lb_target_group.webgate_tg.arn
+  value       = aws_lb_target_group.webgate_tg[*].arn
 }
 
 output "aws_lb_target_group_webgate_tg_arn_suffix" {
   description = "aws_lb_target_group webgate_tg arn_suffix"
-  value       = aws_lb_target_group.webgate_tg.arn_suffix
+  value       = aws_lb_target_group.webgate_tg[*].arn_suffix
 }
 
 output "aws_lb_target_group_webgate_tg_name" {
   description = "aws_lb_target_group webgate_tg name"
-  value       = aws_lb_target_group.webgate_tg.name
+  value       = aws_lb_target_group.webgate_tg[*].name
 }
 
 #
 
 output "aws_lb_target_group_attachment_webgate_id" {
   description = "aws_lb_target_group_attachment webgate id"
-  value       = aws_lb_target_group_attachment.webgate.id
+  value       = aws_lb_target_group_attachment[*].webgate.id
 }
 
 #
@@ -75,7 +75,7 @@ output "aws_lb_webgate_public_lb_zone_id" {
 
 output "aws_lb_listener_webgate_public_listener_arn" {
   description = "aws_lb_listener webgate_public_listener arn"
-  value       = aws_lb_listener.webgate_public_listener.arn
+  value       = aws_lb_listener.webgate_public_listener[*].arn
 }
 
 #
@@ -99,5 +99,5 @@ output "aws_lb_target_group_webgate_tg_public_name" {
 
 output "aws_lb_target_group_attachment_webgate_public_id" {
   description = "aws_lb_target_group_attachment webgate_public id"
-  value       = aws_lb_target_group_attachment.webgate_public.id
+  value       = aws_lb_target_group_attachment.webgate_public[*].id
 }

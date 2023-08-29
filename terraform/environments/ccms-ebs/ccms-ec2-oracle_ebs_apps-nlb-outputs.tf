@@ -1,46 +1,46 @@
 output "aws_eip_ebs_eip_allocation_id" {
   description = "aws_eip ebs_eip allocation_id"
-  value       = aws_eip.ebs_eip.allocation_id
+  value       = aws_eip.ebs_eip[*].allocation_id
 }
 
 output "aws_eip_ebs_eip_association_id" {
   description = "aws_eip ebs_eip association_id"
-  value       = aws_eip.ebs_eip.association_id
+  value       = aws_eip.ebs_eip[*].association_id
 }
 
 output "aws_eip_ebs_eip_carrier_ip" {
   description = "aws_eip ebs_eip carrier_ip"
-  value       = aws_eip.ebs_eip.carrier_ip
+  value       = aws_eip.ebs_eip[*].carrier_ip
 }
 
 output "aws_eip_ebs_eip_customer_owned_ip" {
   description = "aws_eip ebs_eip customer_owned_ip"
-  value       = aws_eip.ebs_eip.customer_owned_ip
+  value       = aws_eip.ebs_eip[*].customer_owned_ip
 }
 
 output "aws_eip_ebs_eip_id" {
   description = "aws_eip ebs_eip id"
-  value       = aws_eip.ebs_eip.id
+  value       = aws_eip.ebs_eip[*].id
 }
 
 output "aws_eip_ebs_eip_private_dns" {
   description = "aws_eip ebs_eip private_dns"
-  value       = aws_eip.ebs_eip.private_dns
+  value       = aws_eip.ebs_eip[*].private_dns
 }
 
 output "aws_eip_ebs_eip_private_ip" {
   description = "aws_eip ebs_eip private_ip"
-  value       = aws_eip.ebs_eip.private_ip
+  value       = aws_eip.ebs_eip[*].private_ip
 }
 
 output "aws_eip_ebs_eip_public_dns" {
   description = "aws_eip ebs_eip public_dns"
-  value       = aws_eip.ebs_eip.public_dns
+  value       = aws_eip.ebs_eip[*].public_dns
 }
 
 output "aws_eip_ebs_eip_public_ip" {
   description = "aws_eip ebs_eip public_ip"
-  value       = aws_eip.ebs_eip.public_ip
+  value       = aws_eip.ebs_eip[*].public_ip
 }
 
 #

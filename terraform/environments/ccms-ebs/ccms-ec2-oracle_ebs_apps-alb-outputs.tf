@@ -22,7 +22,7 @@ output "aws_lb_ebsapps_lb_zone_id" {
 
 output "aws_lb_listener_ebsapps_listener_arn" {
   description = "aws_lb_listener ebsapps_listener arn"
-  value       = aws_lb_listener.ebsapps_listener.arn
+  value       = aws_lb_listener.ebsapps_listener[*].arn
 }
 
 #
@@ -46,5 +46,5 @@ output "aws_lb_target_group_ebsapp_tg_name" {
 
 output "aws_lb_target_group_attachment_ebsapps_id" {
   description = "aws_lb_target_group_attachment ebsapps id"
-  value       = aws_lb_target_group_attachment.ebsapps.id
+  value       = aws_lb_target_group_attachment.ebsapps[*].id
 }
