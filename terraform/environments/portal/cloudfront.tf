@@ -15,6 +15,7 @@ locals {
             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
             { provider = "external" }
       )))
+      zone_id = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
     }
   }
 
@@ -169,7 +170,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
   }
   enabled = true
-  aliases = ["mp-portal.dev.legalservices.gov.uk"]
+  aliases = ["mp-dev-portal.dev.legalservices.gov.uk"]
   default_cache_behavior {
     target_origin_id = aws_lb.external.id
     smooth_streaming = false
@@ -380,7 +381,7 @@ resource "aws_route53_record" "cloudfront_validation_core_network_services" {
   # NOTE: value.zone is null indicates the validation zone could not be found
   # Ensure route53_zones variable contains the given validation zone or
   # explicitly provide the zone details in the validation variable.
-  zone_id = each.value.zone.zone_id
+  zone_id = each.value.zone_id
 
   depends_on = [
     aws_acm_certificate.cloudfront

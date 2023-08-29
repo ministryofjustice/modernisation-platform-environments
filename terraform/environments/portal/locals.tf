@@ -31,6 +31,7 @@ locals {
             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
             { provider = "external" }
       )))
+      zone_id = dvo.domain_name == "${local.application_data.accounts[local.environment].acm_aws_domain_name}" ? data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].zone_id : data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
     }
   }
 
@@ -51,7 +52,13 @@ locals {
     for key, value in data.aws_route53_zone.portal-dev-private : key => merge(value, {
       provider = "core-network-services"
     })
-  })
+    }, {
+    for key, value in data.aws_route53_zone.portal-dev-private-aws : key => merge(value, {
+      provider = "core-network-services"
+    })
+    }
+    )
+
 
   validation_records_external_lb = {
     for key, value in local.external_lb_validation_records : key => {
@@ -88,6 +95,10 @@ locals {
     "${local.application_data.accounts[local.environment].acm_domain_name}" = {
       account   = "core-network-services-private"
       zone_name = "${local.application_data.accounts[local.environment].acm_domain_name}"
+    }
+    "${local.application_data.accounts[local.environment].hosted_zone}" = {
+      account   = "core-network-services-private"
+      zone_name = "${local.application_data.accounts[local.environment].hosted_zone}"
     }
 
   }
