@@ -237,10 +237,19 @@ locals {
           protocol    = -1
           self        = true
         }
+        # NOTE: this is a bit redundant as mod-platform does not allow http connections
         http = {
           description     = "Allow ingress from port 80"
           from_port       = 80
           to_port         = 80
+          protocol        = "TCP"
+          cidr_blocks     = ["10.0.0.0/8"]
+          security_groups = []
+        }
+        https = {
+          description     = "Allow ingress from port 443"
+          from_port       = 443
+          to_port         = 443
           protocol        = "TCP"
           cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
@@ -295,17 +304,9 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-        global_catalog_3268 = {
+        global_catalog_3268_3269 = {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 3268
-          to_port         = 3268
-          protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
-          security_groups = []
-        }
-        global_catalog_3269 = {
-          description     = "Allow ingress Azure domain controllers"
-          from_port       = 3269
           to_port         = 3269
           protocol        = "TCP"
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
