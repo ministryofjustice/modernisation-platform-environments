@@ -29,7 +29,7 @@
 /terraform/environments/ncas @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/nomis-combined-reporting @ministryofjustice/national-applications-reporting-team @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/nomis-data-hub @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
-/terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/modernisation-platform
+/terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/syscon-nomis @ministryofjustice/modernisation-platform
 /terraform/environments/oas @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/oasys @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
