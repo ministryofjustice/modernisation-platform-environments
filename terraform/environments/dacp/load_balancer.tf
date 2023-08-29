@@ -11,6 +11,29 @@ resource "aws_security_group" "dacp_lb_sc" {
     cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
   }
 
+  // whitelist all IPs from the tacticalproducts prod load balancer security group
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    cidr_blocks = [
+      "179.50.12.212/32",
+      "92.177.120.49/32",
+      "194.33.196.0/25",
+      "194.33.192.0/25",
+      "52.67.148.55/32",
+      "89.32.121.144/32",
+      "195.59.75.0/24",
+      "54.94.206.111/32",
+      "201.33.21.5/32",
+      "194.33.193.0/25",
+      "93.56.171.15/32",
+      "213.121.161.124/32",
+      "188.172.252.34/32",
+      "194.33.197.0/25"
+    ]
+  }
+
   egress {
     description = "allow all outbound traffic for port 80"
     from_port   = 80
