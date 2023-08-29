@@ -162,23 +162,26 @@ module "kinesis_stream_ingestor_experimental" {
   )
 }
 
+
 module "kinesis_stream_reconciliation_firehose_s3" {
   source                     = "./modules/kinesis_firehose"
-  name                       = "reconciliation-${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}"
+  name                       = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
   aws_account_id             = local.account_id
   aws_region                 = local.account_region
-  cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}"
+  cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
   cloudwatch_log_stream_name = "DestinationDelivery"
   cloudwatch_logging_enabled = false
-  kinesis_source_stream_arn  = module.kinesis_stream_ingestor_experimental.kinesis_stream_arn
-  kinesis_source_stream_name = module.kinesis_stream_ingestor_experimental.kinesis_stream_name
+  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn
+  kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name
   target_s3_arn              = module.s3_working_bucket.bucket_arn
   target_s3_id               = module.s3_working_bucket.bucket_id
-  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}/"
-  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor_experimental.kinesis_stream_name}-error/"
+  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
+  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}-error/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/!{firehose:error-output-type}"
   target_s3_kms              = local.s3_kms_arn
   buffering_size             = 128
   buffering_interval         = 900
+  database_name              = module.glue_reconciliation_database.db_name
+  table_name                 = module.glue_reconciliation_table.table_name
 }
 
 # Glue Registry
@@ -247,7 +250,6 @@ module "glue_raw_table" {
 
     ser_de_info = [
       {
-        name                  = "raw"
         serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
 
         parameters = {
@@ -261,6 +263,77 @@ module "glue_raw_table" {
     sort_columns = []
   }
   glue_table_depends_on = [module.glue_raw_zone_database.db_name]
+}
+
+module "glue_reconciliation_table" {
+  source                    = "./modules/glue_table"
+  enable_glue_catalog_table = true
+  name                      = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
+
+  # AWS Glue catalog DB
+  glue_catalog_database_name       = module.glue_reconciliation_database.db_name
+  glue_catalog_database_parameters = null
+
+  # AWS Glue catalog table
+  glue_catalog_table_description = "Glue Table for reconciliation data, managed by Terraform."
+  glue_catalog_table_table_type  = "EXTERNAL_TABLE"
+  glue_catalog_table_parameters  = {
+    EXTERNAL              = "TRUE"
+    "parquet.compression" = "SNAPPY"
+    "classification"      = "parquet"
+  }
+  glue_catalog_table_storage_descriptor = {
+
+    location      = "s3://${module.s3_working_bucket.bucket_id}/reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    columns = [
+      {
+        columns_name    = "data"
+        columns_type    = "string"
+        columns_comment = "Nested JSON data"
+      },
+      {
+        columns_name    = "metadata"
+        columns_type    = "string"
+        columns_comment = "Common metadata"
+      }
+    ]
+
+    partition_keys = [
+      {
+        name = "year",
+        type = "string",
+        comment = ""
+      },
+      {
+        name = "month",
+        type = "string",
+        comment = ""
+      },
+      {
+        name = "day",
+        type = "string",
+        comment = ""
+      }
+    ]
+
+    ser_de_info = [
+      {
+        serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+        parameters = {
+          "serialization.format" = 1
+        }
+      }
+    ]
+
+    skewed_info = []
+
+    sort_columns = []
+  }
+  glue_table_depends_on = [module.glue_reconciliation_database.db_name]
 }
 
 
@@ -494,6 +567,16 @@ module "glue_curated_zone_database" {
   create_db      = local.create_db
   name           = "curated"
   description    = "Glue Data Catalog - Curated Zone"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for Reconciliation
+module "glue_reconciliation_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "reconciliation"
+  description    = "Glue Data Catalog - Reconciliation"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }

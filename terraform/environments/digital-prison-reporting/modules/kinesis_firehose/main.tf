@@ -18,6 +18,27 @@ resource "aws_kinesis_firehose_delivery_stream" "extended_s3_stream" {
     prefix              = var.target_s3_prefix
     error_output_prefix = var.target_s3_error_prefix
 
+    data_format_conversion_configuration {
+
+      input_format_configuration {
+        deserializer {
+          open_x_json_ser_de {}
+        }
+      }
+
+      output_format_configuration {
+        serializer {
+          parquet_ser_de {}
+        }
+      }
+
+      schema_configuration {
+        database_name = var.database_name
+        table_name    = var.table_name
+        role_arn      = aws_iam_role.firehose_role.arn
+      }
+    }
+
     cloudwatch_logging_options {
       enabled         = var.cloudwatch_logging_enabled
       log_group_name  = length(var.cloudwatch_log_group_name) > 0 ? var.cloudwatch_log_group_name : format("/aws/kinesisfirehose/%s", var.name)
