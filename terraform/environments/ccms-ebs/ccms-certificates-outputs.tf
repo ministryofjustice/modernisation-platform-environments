@@ -10,7 +10,7 @@ output "aws_acm_certificate-external-domain_name" {
 
 output "aws_acm_certificate-external-not_after" {
   description = "aws_acm_certificate external not_after"
-  value       = try(try(aws_acm_certificate.external[*].not_after, "None"), "None")
+  value       = try(aws_acm_certificate.external[*].not_after, "None")
 }
 
 output "aws_acm_certificate-external-status" {

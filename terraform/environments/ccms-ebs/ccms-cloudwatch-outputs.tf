@@ -24,9 +24,9 @@ output "aws_ssm_association_update_ssm_agent_arn" {
   value       = aws_ssm_association.update_ssm_agent.arn
 }
 
-output "aws_ssm_association_update_ssm_agenti_instance_id" {
-  description = "aws_ssm_association update_ssm_agent instance_id"
-  value       = aws_ssm_association.update_ssm_agent.instance_id
+output "aws_ssm_association_update_ssm_agent_targets" {
+  description = "aws_ssm_association update_ssm_agent targets"
+  value       = aws_ssm_association.update_ssm_agent.targets
 }
 
 output "aws_ssm_association_update_ssm_agent_name" {
