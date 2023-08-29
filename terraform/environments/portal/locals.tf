@@ -36,7 +36,7 @@ locals {
   }
 
 
-   route53_zones = merge({
+  route53_zones = merge({
     for key, value in data.aws_route53_zone.core_network_services : key => merge(value, {
       provider = "core-network-services"
     })
@@ -59,7 +59,8 @@ locals {
     }
     )
 
-   validation_records_external_lb = {
+
+  validation_records_external_lb = {
     for key, value in local.external_lb_validation_records : key => {
       name   = value.name
       record = value.record
@@ -67,14 +68,14 @@ locals {
     } if value.zone.provider == "external"
   }
 
-    external_validation_records_created = false
+  external_validation_records_created = false
 
-   core_network_services_domains = {
+  core_network_services_domains = {
     for domain, value in local.validation : domain => value if value.account == "core-network-services"
   }
   core_network_services_domains_private = {
-   for domain, value in local.validation : domain => value if value.account == "core-network-services-private"
- }
+    for domain, value in local.validation : domain => value if value.account == "core-network-services-private"
+  }
   core_vpc_domains = {
     for domain, value in local.validation : domain => value if value.account == "core-vpc"
   }
@@ -82,7 +83,7 @@ locals {
     for domain, value in local.validation : domain => value if value.account == "self"
   }
 
-    non_prod_validation = {
+  non_prod_validation = {
     "modernisation-platform.service.justice.gov.uk" = {
       account   = "core-network-services"
       zone_name = "modernisation-platform.service.justice.gov.uk."
@@ -91,7 +92,7 @@ locals {
       account   = "core-vpc"
       zone_name = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
     }
-   "${local.application_data.accounts[local.environment].acm_domain_name}" = {
+    "${local.application_data.accounts[local.environment].acm_domain_name}" = {
       account   = "core-network-services-private"
       zone_name = "${local.application_data.accounts[local.environment].acm_domain_name}"
     }
@@ -109,6 +110,6 @@ locals {
     }
   }
 
-validation = local.environment == "production" ? local.prod_validation : local.non_prod_validation
+  validation = local.environment == "production" ? local.prod_validation : local.non_prod_validation
 
 }

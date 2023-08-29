@@ -355,8 +355,8 @@ resource "aws_route53_record" "cloudfront-non-prod" {
   zone_id  = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
   # name    = local.application_data.accounts[local.environment].fqdn
   # this will need moving to a public hosted in future
-  name      = "mp-portal.dev.legalservices.gov.uk"
-  type     = "A"
+  name = "mp-portal.dev.legalservices.gov.uk"
+  type = "A"
   alias {
     name                   = aws_cloudfront_distribution.external.domain_name
     zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
@@ -368,9 +368,9 @@ resource "aws_route53_record" "cloudfront-prod" {
   count    = local.environment == "production" ? 1 : 0
   provider = aws.core-network-services
   # zone_id  = var.production_zone_id
-  zone_id  = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
+  zone_id = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
   name    = local.application_data.accounts[local.environment].fqdn
-  type     = "A"
+  type    = "A"
   alias {
     name                   = aws_cloudfront_distribution.external.domain_name
     zone_id                = aws_cloudfront_distribution.external.hosted_zone_id

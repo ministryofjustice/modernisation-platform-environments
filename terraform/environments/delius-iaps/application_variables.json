@@ -15,10 +15,7 @@
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
-      "db_enabled_cloudwatch_logs_exports": [
-        "alert",
-        "listener"
-      ],
+      "db_enabled_cloudwatch_logs_exports": ["alert", "listener"],
       "db_performance_insights_enabled": "false",
       "db_skip_final_snapshot": "true",
       "ec2_iaps_instance_type": "t3.medium",

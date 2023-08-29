@@ -435,9 +435,6 @@ locals {
                     values = [
                       "t3-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t3-nomis-web-a.test.nomis.service.justice.gov.uk",
-                      "c-t3.test.nomis.az.justice.gov.uk",
-                      "c-t3.test.nomis.service.justice.gov.uk",
-                      "t3-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -453,6 +450,9 @@ locals {
                     values = [
                       "t3-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t3-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t3.test.nomis.az.justice.gov.uk",
+                      "c-t3.test.nomis.service.justice.gov.uk",
+                      "t3-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]

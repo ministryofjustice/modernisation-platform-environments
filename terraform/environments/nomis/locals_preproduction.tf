@@ -88,9 +88,6 @@ locals {
                       values = [
                         "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
-                        "c.preproduction.nomis.az.justice.gov.uk",
-                        "c.preproduction.nomis.service.justice.gov.uk",
-                        "c.pp-nomis.service.justice.gov.uk",
                       ]
                     }
                   }]
@@ -106,6 +103,9 @@ locals {
                       values = [
                         "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
+                        "c.preproduction.nomis.az.justice.gov.uk",
+                        "c.preproduction.nomis.service.justice.gov.uk",
+                        "c.pp-nomis.az.justice.gov.uk",
                       ]
                     }
                   }]

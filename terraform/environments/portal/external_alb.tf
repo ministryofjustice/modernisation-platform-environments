@@ -166,7 +166,7 @@ resource "aws_lb_listener" "external" {
 
   load_balancer_arn = aws_lb.external.arn
   port              = local.external_lb_port
-  protocol          = "HTTPS" 
+  protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
 

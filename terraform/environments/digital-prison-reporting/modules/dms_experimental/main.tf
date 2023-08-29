@@ -1,6 +1,6 @@
 # Create a new DMS replication instance
 resource "aws_dms_replication_instance" "dms-experimental" {
-  count                        = var.setup_dms_instance ? 1 : 0
+  count = var.setup_dms_instance ? 1 : 0
 
   allocated_storage            = var.replication_instance_storage
   apply_immediately            = true
@@ -38,7 +38,7 @@ data "template_file" "table-mappings_experimental" {
 }
 
 resource "aws_dms_replication_task" "dms-replication-experimental" {
-  count                     = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
+  count = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
 
   migration_type            = var.migration_type
   replication_instance_arn  = aws_dms_replication_instance.dms-experimental[0].replication_instance_arn
@@ -62,7 +62,7 @@ resource "aws_dms_replication_task" "dms-replication-experimental" {
 
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "source-experimental" {
-  count         = var.setup_dms_instance ? 1 : 0
+  count = var.setup_dms_instance ? 1 : 0
 
   database_name = var.source_db_name
   endpoint_id   = "${var.project_id}-dms-experimental-${var.short_name}-${var.dms_source_name}-source"
@@ -84,7 +84,7 @@ resource "aws_dms_endpoint" "source-experimental" {
 }
 
 resource "aws_dms_endpoint" "target-experimental" {
-  count         = var.setup_dms_instance ? 1 : 0
+  count = var.setup_dms_instance ? 1 : 0
 
   endpoint_id   = "${var.project_id}-dms-experimental-${var.short_name}-${var.dms_target_name}-target"
   endpoint_type = "target"
@@ -114,7 +114,7 @@ resource "aws_dms_endpoint" "target-experimental" {
 
 # Create a subnet group using existing VPC subnets
 resource "aws_dms_replication_subnet_group" "dms-experimental" {
-  count                                = var.setup_dms_instance ? 1 : 0
+  count = var.setup_dms_instance ? 1 : 0
 
   replication_subnet_group_description = "DMS experimental replication subnet group"
   replication_subnet_group_id          = "${var.project_id}-dms-experimental-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-subnet-group"
@@ -123,10 +123,10 @@ resource "aws_dms_replication_subnet_group" "dms-experimental" {
 
 # Security Groups
 resource "aws_security_group" "dms_sec_group_experimental" {
-  count         = var.setup_dms_instance ? 1 : 0
+  count = var.setup_dms_instance ? 1 : 0
 
-  name          = "${var.project_id}-dms-experimental-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"
-  vpc_id        = var.vpc
+  name   = "${var.project_id}-dms-experimental-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"
+  vpc_id = var.vpc
 
   ingress {
     from_port   = 443

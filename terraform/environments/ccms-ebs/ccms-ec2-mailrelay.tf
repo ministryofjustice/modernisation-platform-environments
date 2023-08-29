@@ -140,7 +140,8 @@ output "route53_record_mailrelay" {
 }
 */
 
-output "ec2_private_ip_mailrelay" {
-  description = "Mailrelay Private IP"
-  value       = aws_instance.ec2_mailrelay.private_ip
-}
+# Moved to ccms-ec2-mailrelay-outputs.tf
+#output "ec2_private_ip_mailrelay" {
+#  description = "Mailrelay Private IP"
+#  value       = aws_instance.ec2_mailrelay.private_ip
+#}

@@ -56,7 +56,7 @@ done
 
 EOF
 
-script_oim2 = <<EOF
+  script_oim2 = <<EOF
 #!/bin/bash
 . $HOME/.bash_profile
 FOL=`date +%d%m%y`
@@ -116,19 +116,19 @@ EOF
 }
 
 resource "aws_ssm_maintenance_window" "oim_window" {
-  name     = "oim1-${local.application_data.accounts[local.environment].maintenance_window_name}"
-  schedule = "cron(0 0 9 ? * * *)"
-  duration = 4
-  cutoff   = 1
+  name              = "oim1-${local.application_data.accounts[local.environment].maintenance_window_name}"
+  schedule          = "cron(0 0 9 ? * * *)"
+  duration          = 4
+  cutoff            = 1
   schedule_timezone = "Europe/London"
 }
 
 resource "aws_ssm_maintenance_window" "oim2_window" {
-  count    = contains(["development", "testing"], local.environment) ? 0 : 1
-  name     = "oim2-${local.application_data.accounts[local.environment].maintenance_window_name}"
-  schedule = "cron(0 0 9 ? * * *)"
-  duration = 4
-  cutoff   = 1
+  count             = contains(["development", "testing"], local.environment) ? 0 : 1
+  name              = "oim2-${local.application_data.accounts[local.environment].maintenance_window_name}"
+  schedule          = "cron(0 0 9 ? * * *)"
+  duration          = 4
+  cutoff            = 1
   schedule_timezone = "Europe/London"
 }
 
@@ -171,16 +171,16 @@ resource "aws_ssm_maintenance_window_task" "commands_oim" {
 
 
   task_invocation_parameters {
-    
+
     run_command_parameters {
       document_version = "$LATEST"
 
-     parameter {
-        name = "commands"
+      parameter {
+        name   = "commands"
         values = [local.script_oim]
       }
     }
-    
+
   }
 
 }
@@ -201,16 +201,16 @@ resource "aws_ssm_maintenance_window_task" "commands_oim2" {
 
 
   task_invocation_parameters {
-    
+
     run_command_parameters {
       document_version = "$LATEST"
 
-     parameter {
-        name = "commands"
+      parameter {
+        name   = "commands"
         values = [local.script_oim2]
       }
     }
-    
+
   }
 
 }

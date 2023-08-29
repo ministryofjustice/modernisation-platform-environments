@@ -227,7 +227,7 @@ resource "aws_instance" "oam_instance_1" {
   user_data_replace_on_change = true
 
   tags = merge(
-    {"instance-scheduling" = "skip-scheduling"},
+    { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${local.application_name} OAM Instance 1" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
@@ -248,7 +248,7 @@ resource "aws_instance" "oam_instance_2" {
   user_data_base64 = base64encode(local.oam_2_userdata)
 
   tags = merge(
-    {"instance-scheduling" = "skip-scheduling"},
+    { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${local.application_name} OAM Instance 2" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }

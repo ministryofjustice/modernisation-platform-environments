@@ -82,19 +82,19 @@ EOF
 }
 
 resource "aws_ssm_maintenance_window" "idm_window" {
-  name     = "idm1-${local.application_data.accounts[local.environment].maintenance_window_name}"
-  schedule = "cron(0 0 9 ? * * *)"
-  duration = 4
-  cutoff   = 1
+  name              = "idm1-${local.application_data.accounts[local.environment].maintenance_window_name}"
+  schedule          = "cron(0 0 9 ? * * *)"
+  duration          = 4
+  cutoff            = 1
   schedule_timezone = "Europe/London"
 }
 
 resource "aws_ssm_maintenance_window" "idm2_window" {
-  count    = contains(["development", "testing"], local.environment) ? 0 : 1
-  name     = "idm2-${local.application_data.accounts[local.environment].maintenance_window_name}"
-  schedule = "cron(0 0 9 ? * * *)"
-  duration = 4
-  cutoff   = 1
+  count             = contains(["development", "testing"], local.environment) ? 0 : 1
+  name              = "idm2-${local.application_data.accounts[local.environment].maintenance_window_name}"
+  schedule          = "cron(0 0 9 ? * * *)"
+  duration          = 4
+  cutoff            = 1
   schedule_timezone = "Europe/London"
 }
 
@@ -137,16 +137,16 @@ resource "aws_ssm_maintenance_window_task" "commands_idm" {
 
 
   task_invocation_parameters {
-    
+
     run_command_parameters {
       document_version = "$LATEST"
 
-     parameter {
-        name = "commands"
+      parameter {
+        name   = "commands"
         values = [local.script_idm]
       }
     }
-    
+
   }
 
 }
@@ -167,16 +167,16 @@ resource "aws_ssm_maintenance_window_task" "commands_idm2" {
 
 
   task_invocation_parameters {
-    
+
     run_command_parameters {
       document_version = "$LATEST"
 
-     parameter {
-        name = "commands"
+      parameter {
+        name   = "commands"
         values = [local.script_idm2]
       }
     }
-    
+
   }
 
 }
