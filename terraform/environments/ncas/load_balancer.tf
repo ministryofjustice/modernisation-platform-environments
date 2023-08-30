@@ -11,6 +11,31 @@ resource "aws_security_group" "ncas_lb_sc" {
     cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
   }
 
+  // Allow all User IPs
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    cidr_blocks = [
+      "194.33.196.0/25",
+      "201.33.21.5/32",
+      "93.56.171.15/32",
+      "194.33.193.0/25",
+      "179.50.12.212/32",
+      "54.94.206.111/32",
+      "89.32.121.144/32",
+      "195.59.75.0/24",
+      "188.172.252.34/32",
+      "194.33.197.0/25",
+      "81.134.202.0/25",
+      "2.126.42.208/32",
+      "52.67.148.55/32",
+      "194.33.192.0/25",
+      "213.121.161.112/28",
+      "2.219.137.231/32"
+    ]
+  }
+
   egress {
     description = "allow all outbound traffic for port 80"
     from_port   = 80
