@@ -47,7 +47,7 @@ resource "aws_secretsmanager_secret_version" "cloudfront" {
   secret_string = random_password.cloudfront.result
 }
 
-Importing the AWS secrets created previously using arn.
+# Importing the AWS secrets created previously using arn.
 data "aws_secretsmanager_secret" "cloudfront" {
   arn = aws_secretsmanager_secret.cloudfront.arn
 }
