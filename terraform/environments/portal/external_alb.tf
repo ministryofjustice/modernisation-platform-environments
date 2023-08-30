@@ -192,12 +192,12 @@ resource "aws_lb_listener_rule" "external" {
     target_group_arn = aws_lb_target_group.external.arn
   }
 
-  condition {
-    http_header {
-      http_header_name = local.custom_header
-      values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
-    }
-  }
+  # condition {
+  #   http_header {
+  #     http_header_name = local.custom_header
+  #     values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
+  #   }
+  # }
 }
 
 resource "aws_lb_target_group" "external" {

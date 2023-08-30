@@ -32,30 +32,30 @@ locals {
 }
 
 ## Cloudfront Secret Creation
-resource "random_password" "cloudfront" {
-  length  = 16
-  special = false
-}
+# resource "random_password" "cloudfront" {
+#   length  = 16
+#   special = false
+# }
 
-resource "aws_secretsmanager_secret" "cloudfront" {
-  name        = "cloudfront-v1-secret-${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
-  description = "Simple secret created by Terraform"
-}
+# resource "aws_secretsmanager_secret" "cloudfront" {
+#   name        = "cloudfront-v1-secret-${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
+#   description = "Simple secret created by Terraform"
+# }
 
-resource "aws_secretsmanager_secret_version" "cloudfront" {
-  secret_id     = aws_secretsmanager_secret.cloudfront.id
-  secret_string = random_password.cloudfront.result
-}
+# resource "aws_secretsmanager_secret_version" "cloudfront" {
+#   secret_id     = aws_secretsmanager_secret.cloudfront.id
+#   secret_string = random_password.cloudfront.result
+# }
 
-# Importing the AWS secrets created previously using arn.
-data "aws_secretsmanager_secret" "cloudfront" {
-  arn = aws_secretsmanager_secret.cloudfront.arn
-}
+# # Importing the AWS secrets created previously using arn.
+# data "aws_secretsmanager_secret" "cloudfront" {
+#   arn = aws_secretsmanager_secret.cloudfront.arn
+# }
 
-# Importing the AWS secret version created previously using arn.
-data "aws_secretsmanager_secret_version" "cloudfront" {
-  secret_id = data.aws_secretsmanager_secret.cloudfront.arn
-}
+# # Importing the AWS secret version created previously using arn.
+# data "aws_secretsmanager_secret_version" "cloudfront" {
+#   secret_id = data.aws_secretsmanager_secret.cloudfront.arn
+# }
 
 ### Cloudfront S3 bucket creation
 resource "aws_s3_bucket" "cloudfront" {
