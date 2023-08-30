@@ -153,10 +153,10 @@ resource "aws_cloudfront_distribution" "external" {
       enabled              = false
       origin_shield_region = "eu-west-2"
     }
-    custom_header {
-      name  = local.custom_header
-      value = data.aws_secretsmanager_secret_version.cloudfront.secret_string
-    }
+    # custom_header {
+    #   name  = local.custom_header
+    #   value = data.aws_secretsmanager_secret_version.cloudfront.secret_string
+    # }
   }
   origin {
     domain_name = aws_s3_bucket.portalerrorpagebucket.bucket_regional_domain_name
