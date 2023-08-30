@@ -189,14 +189,26 @@ resource "aws_iam_role_policy_attachment" "glue_policies" {
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
-  name              = "/aws-glue/jobs/${var.name}-sec-config"
+  name              = "/aws-glue/jobs/${var.name}"
+  retention_in_days = var.log_group_retention_in_days
+  tags              = var.tags
+}
+
+resource "aws_cloudwatch_log_group" "log_group" {
+  name              = "/aws-glue/jobs/${var.name}-security-config"
+  retention_in_days = var.log_group_retention_in_days
+  tags              = var.tags
+}
+
+resource "aws_cloudwatch_log_group" "log_group" {
+  name              = "/aws-glue/jobs/${var.name}-security-config-role"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
 }
 
 resource "aws_glue_security_configuration" "sec_cfg" {
   count = var.create_security_configuration && var.create_job ? 1 : 0
-  name  = "${var.name}-sec-config"
+  name  = "security-config"
 
   encryption_configuration {
     cloudwatch_encryption {

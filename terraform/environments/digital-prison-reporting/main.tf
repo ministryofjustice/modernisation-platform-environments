@@ -30,6 +30,7 @@ module "glue_reporting_hub_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = 1
 
   tags = merge(
     local.all_tags,
@@ -93,6 +94,7 @@ module "glue_domain_refresh_job" {
   max_concurrent    = 1
   region            = local.account_region
   account           = local.account_id
+  log_group_retention_in_days  = 1
 
   tags = merge(
     local.all_tags,
