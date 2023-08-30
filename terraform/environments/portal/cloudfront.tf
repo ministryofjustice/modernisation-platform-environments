@@ -31,7 +31,7 @@ locals {
 
 }
 
-# Cloudfront Secret Creation
+### Cloudfront Secret Creation
 resource "random_password" "cloudfront" {
   length  = 16
   special = false
@@ -296,7 +296,7 @@ resource "aws_cloudfront_distribution" "external" {
   price_class = "PriceClass_100"
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.cloudfront-test.arn
+    acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2018"
   }
@@ -360,18 +360,6 @@ resource "aws_acm_certificate" "cloudfront" {
   validation_method         = "DNS"
   provider                  = aws.us-east-1
   subject_alternative_names = local.environment == "production" ? null : [local.application_data.accounts[local.environment].cloudfront_acm_alt_domain_name]
-  tags                      = local.tags
-  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
-  lifecycle {
-    prevent_destroy = false
-  }
-}
-
-resource "aws_acm_certificate" "cloudfront-test" {
-  domain_name               = local.application_data.accounts[local.environment].cloudfront_test
-  validation_method         = "DNS"
-  provider                  = aws.us-east-1
-  subject_alternative_names = local.environment == "production" ? null : [local.application_data.accounts[local.environment].cloudfront_alt_test]
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {

@@ -40,9 +40,7 @@
       "fqdn": "portal.dev.legalservices.gov.uk",
       "landing_zone_vpc_cidr": "10.202.0.0/20",
       "cloudfront_acm_domain_name":"laa-development.modernisation-platform.service.justice.gov.uk",
-      "cloudfront_acm_alt_domain_name": "*.laa-development.modernisation-platform.service.justice.gov.uk",
-      "cloudfront_test":"service.justice.gov.uk",
-      "cloudfront_alt_test": "*.service.justice.gov.uk"
+      "cloudfront_acm_alt_domain_name": "*.laa-development.modernisation-platform.service.justice.gov.uk"
     },
     "test": {
       "example_var": "test-data",
