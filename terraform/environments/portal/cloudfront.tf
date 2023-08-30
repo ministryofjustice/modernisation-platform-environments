@@ -351,7 +351,8 @@ resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
     for key, value in local.validation_records_cloudfront : replace(value.name, "/\\.$/", "")
   ]
   depends_on = [
-    aws_route53_record.cloudfront_validation_core_network_services
+    aws_route53_record.cloudfront_validation_core_network_services,
+    aws_route53_record.cloudfront_validation_core_vpc
   ]
 }
 
@@ -382,6 +383,24 @@ resource "aws_route53_record" "cloudfront_validation_core_network_services" {
   # Ensure route53_zones variable contains the given validation zone or
   # explicitly provide the zone details in the validation variable.
   zone_id = each.value.zone.zone_id
+
+  depends_on = [
+    aws_acm_certificate.cloudfront
+  ]
+}
+
+resource "aws_route53_record" "cloudfront_validation_core_vpc" {
+  provider = aws.core-vpc
+  for_each = {
+    for key, value in local.cloudfront_validation_records : key => value if value.zone.provider == "core-vpc"
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = each.value.zone.zone_id
 
   depends_on = [
     aws_acm_certificate.cloudfront
