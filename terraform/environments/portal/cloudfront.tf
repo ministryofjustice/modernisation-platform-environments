@@ -170,7 +170,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
   }
   enabled = true
-  aliases = ["mp-dev-portal.dev.legalservices.gov.uk"]
+  aliases = ["mp-portal.${data.aws_route53_zone.external.name}"]
   default_cache_behavior {
     target_origin_id = aws_lb.external.id
     smooth_streaming = false
@@ -359,7 +359,7 @@ resource "aws_acm_certificate" "cloudfront" {
   domain_name               = local.application_data.accounts[local.environment].cloudfront_acm_domain_name
   validation_method         = "DNS"
   provider                  = aws.us-east-1
-  subject_alternative_names = local.environment == "production" ? null : [local.application_data.accounts[local.environment].cloudfront_acm_alt_domain_name]
+  subject_alternative_names = local.environment == "production" ? null : "mp-portal.${data.aws_route53_zone.external.name}"
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
