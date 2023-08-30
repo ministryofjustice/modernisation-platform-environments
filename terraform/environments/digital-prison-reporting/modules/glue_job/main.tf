@@ -5,7 +5,7 @@ locals {
     "--TempDir"                          = var.temp_dir
     "--checkpoint.location"              = var.checkpoint_dir
     "--spark-event-logs-path"            = var.spark_event_logs
-    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.log_group.name
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.job.name
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
     "--enable-glue-datacatalog"          = "true"
