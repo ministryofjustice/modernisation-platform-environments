@@ -11,6 +11,29 @@ resource "aws_security_group" "wardship_lb_sc" {
     cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
   }
 
+  // Allow all User IPs
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    cidr_blocks = [
+      "194.33.193.0/25",
+      "179.50.12.212/32",
+      "93.56.171.15/32",
+      "52.67.148.55/32",
+      "194.33.197.0/25",
+      "213.121.161.124/32",
+      "194.33.196.0/25",
+      "188.172.252.34/32",
+      "89.32.121.144/32",
+      "195.59.75.0/24",
+      "194.33.192.0/25",
+      "157.203.176.0/25",
+      "201.33.21.5/32",
+      "54.94.206.111/32"
+    ]
+  }
+
   egress {
     description = "allow all outbound traffic for port 80"
     from_port   = 80
