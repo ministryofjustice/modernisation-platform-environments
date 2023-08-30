@@ -11,6 +11,46 @@ resource "aws_security_group" "pra_lb_sc" {
     cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
   }
 
+  ingress {
+    description = "allow access on HTTPS for the Dom1 Cisco VPN"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["194.33.192.1/32"]
+  }
+
+  ingress {
+    description = "allow access on HTTPS for the Global Protect VPN"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["35.176.93.186/32"]
+  }
+
+  // Whitelist User IPs
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    cidr_blocks = [
+      "201.33.21.5/32",
+      "213.121.161.124/32",
+      "157.203.176.0/25",
+      "194.33.196.0/25",
+      "93.56.171.15/32",
+      "195.59.75.0/24",
+      "52.67.148.55/32",
+      "54.94.206.111/32",
+      "188.172.252.34/32",
+      "92.177.120.49/32",
+      "179.50.12.212/32",
+      "89.32.121.144/32",
+      "194.33.192.0/25",
+      "194.33.193.0/25",
+      "194.33.197.0/25"
+    ]
+  }
+
   egress {
     description = "allow all outbound traffic for port 80"
     from_port   = 80
