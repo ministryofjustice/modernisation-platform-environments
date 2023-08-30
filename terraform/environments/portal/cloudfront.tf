@@ -15,7 +15,7 @@ locals {
             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
             { provider = "external" }
       )))
-      zone_id = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
+      # zone_id = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
     }
   }
 
@@ -356,10 +356,10 @@ resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
 }
 
 resource "aws_acm_certificate" "cloudfront" {
-  domain_name               = local.application_data.accounts[local.environment].acm_domain_name
+  domain_name               = local.application_data.accounts[local.environment].cloudfront_acm_domain_name
   validation_method         = "DNS"
   provider                  = aws.us-east-1
-  subject_alternative_names = local.environment == "production" ? null : [local.application_data.accounts[local.environment].acm_alt_domain_name]
+  subject_alternative_names = local.environment == "production" ? null : [local.application_data.accounts[local.environment].cloudfront_acm_alt_domain_name]
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
@@ -381,7 +381,7 @@ resource "aws_route53_record" "cloudfront_validation_core_network_services" {
   # NOTE: value.zone is null indicates the validation zone could not be found
   # Ensure route53_zones variable contains the given validation zone or
   # explicitly provide the zone details in the validation variable.
-  zone_id = each.value.zone_id
+  zone_id = each.value.zone.zone_id
 
   depends_on = [
     aws_acm_certificate.cloudfront
