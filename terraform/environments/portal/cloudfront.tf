@@ -42,10 +42,10 @@ resource "aws_secretsmanager_secret" "cloudfront" {
   description = "Simple secret created by Terraform"
 }
 
-# resource "aws_secretsmanager_secret_version" "cloudfront" {
-#   secret_id     = aws_secretsmanager_secret.cloudfront.id
-#   secret_string = random_password.cloudfront.result
-# }
+resource "aws_secretsmanager_secret_version" "cloudfront" {
+  secret_id     = aws_secretsmanager_secret.cloudfront.id
+  secret_string = random_password.cloudfront.result
+}
 
 # Importing the AWS secrets created previously using arn.
 data "aws_secretsmanager_secret" "cloudfront" {
