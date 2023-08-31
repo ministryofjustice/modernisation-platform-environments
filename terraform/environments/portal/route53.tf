@@ -351,11 +351,9 @@ resource "aws_route53_record" "ohs_external" {
 
 resource "aws_route53_record" "cloudfront-non-prod" {
   count    = local.environment != "production" ? 1 : 0
-  provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].zone_id
-  # name    = local.application_data.accounts[local.environment].fqdn
-  # this will need moving to a public hosted in future
-  name = "mp-portal.dev.legalservices.gov.uk"
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name = "mp-portal.${data.aws_route53_zone.external.name}"
   type = "A"
   alias {
     name                   = aws_cloudfront_distribution.external.domain_name

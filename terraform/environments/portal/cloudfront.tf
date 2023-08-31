@@ -15,7 +15,7 @@ locals {
             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
             { provider = "external" }
       )))
-      zone_id = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
+      # zone_id = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
     }
   }
 
@@ -170,7 +170,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
   }
   enabled = true
-  aliases = ["mp-dev-portal.dev.legalservices.gov.uk"]
+  aliases = ["mp-portal.${data.aws_route53_zone.external.name}"]
   default_cache_behavior {
     target_origin_id = aws_lb.external.id
     smooth_streaming = false
@@ -342,7 +342,7 @@ resource "aws_cloudfront_distribution" "external" {
 }
 
 
-###### Cloudfront Cert
+##### Cloudfront Cert
 resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
   count           = (length(local.validation_records_cloudfront) == 0 || local.external_validation_records_created) ? 1 : 0
   provider        = aws.us-east-1
@@ -351,15 +351,16 @@ resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
     for key, value in local.validation_records_cloudfront : replace(value.name, "/\\.$/", "")
   ]
   depends_on = [
-    aws_route53_record.cloudfront_validation_core_network_services
+    aws_route53_record.cloudfront_validation_core_network_services,
+    aws_route53_record.cloudfront_validation_core_vpc
   ]
 }
 
 resource "aws_acm_certificate" "cloudfront" {
-  domain_name               = local.application_data.accounts[local.environment].acm_domain_name
+  domain_name               = local.application_data.accounts[local.environment].cloudfront_acm_domain_name
   validation_method         = "DNS"
   provider                  = aws.us-east-1
-  subject_alternative_names = local.environment == "production" ? null : [local.application_data.accounts[local.environment].acm_alt_domain_name]
+  subject_alternative_names = local.environment == "production" ? null : ["mp-portal.${data.aws_route53_zone.external.name}"]
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
@@ -381,7 +382,25 @@ resource "aws_route53_record" "cloudfront_validation_core_network_services" {
   # NOTE: value.zone is null indicates the validation zone could not be found
   # Ensure route53_zones variable contains the given validation zone or
   # explicitly provide the zone details in the validation variable.
-  zone_id = each.value.zone_id
+  zone_id = each.value.zone.zone_id
+
+  depends_on = [
+    aws_acm_certificate.cloudfront
+  ]
+}
+
+resource "aws_route53_record" "cloudfront_validation_core_vpc" {
+  provider = aws.core-vpc
+  for_each = {
+    for key, value in local.cloudfront_validation_records : key => value if value.zone.provider == "core-vpc"
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = each.value.zone.zone_id
 
   depends_on = [
     aws_acm_certificate.cloudfront

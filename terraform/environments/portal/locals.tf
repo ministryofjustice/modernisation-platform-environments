@@ -88,7 +88,7 @@ locals {
       account   = "core-network-services"
       zone_name = "modernisation-platform.service.justice.gov.uk."
     }
-    "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].acm_domain_name}" = {
+    "mp-${local.application_name}.${local.vpc_name}-${local.environment}.${local.application_data.accounts[local.environment].cloudfront_acm_domain_name}" = {
       account   = "core-vpc"
       zone_name = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
     }
