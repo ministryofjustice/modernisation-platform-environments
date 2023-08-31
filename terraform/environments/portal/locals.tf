@@ -10,7 +10,7 @@ locals {
   prod_workspaces_cidr    = "10.200.16.0/20"
   redc_cidr               = "172.16.0.0/20"
   atos_cidr               = "10.0.0.0/8"
-  portal_hosted_zone      = local.application_data.accounts[local.environment].acm_domain_name
+  portal_hosted_zone      = local.application_data.accounts[local.environment].hosted_zone
 
   # Temp local variable for environments where we wish to build out the EBS to be transfered to EFS
   ebs_conditional = ["testing", "preproduction", "production"]
@@ -31,7 +31,6 @@ locals {
             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
             { provider = "external" }
       )))
-      zone_id = dvo.domain_name == "${local.application_data.accounts[local.environment].acm_aws_domain_name}" ? data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].zone_id : data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
     }
   }
 
@@ -47,10 +46,6 @@ locals {
     }, {
     for key, value in data.aws_route53_zone.self : key => merge(value, {
       provider = "self"
-    })
-    }, {
-    for key, value in data.aws_route53_zone.portal-dev-private : key => merge(value, {
-      provider = "core-network-services"
     })
     }, {
     for key, value in data.aws_route53_zone.portal-dev-private-aws : key => merge(value, {
@@ -88,13 +83,9 @@ locals {
       account   = "core-network-services"
       zone_name = "modernisation-platform.service.justice.gov.uk."
     }
-    "mp-${local.application_name}.${local.vpc_name}-${local.environment}.${local.application_data.accounts[local.environment].cloudfront_acm_domain_name}" = {
+    "mp-${local.application_name}.${local.vpc_name}-${local.environment}.${local.application_data.accounts[local.environment].mp_domain_name}" = {
       account   = "core-vpc"
       zone_name = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
-    }
-    "${local.application_data.accounts[local.environment].acm_domain_name}" = {
-      account   = "core-network-services-private"
-      zone_name = "${local.application_data.accounts[local.environment].acm_domain_name}"
     }
     "${local.application_data.accounts[local.environment].hosted_zone}" = {
       account   = "core-network-services-private"
@@ -104,10 +95,6 @@ locals {
   }
 
   prod_validation = {
-    "${local.application_data.accounts[local.environment].acm_domain_name}" = {
-      account   = "core-network-services"
-      zone_name = "${local.application_data.accounts[local.environment].acm_domain_name}"
-    }
   }
 
   validation = local.environment == "production" ? local.prod_validation : local.non_prod_validation

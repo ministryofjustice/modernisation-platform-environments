@@ -16,7 +16,7 @@ do
   mount_status=$?
 done
 
-hostnamectl set-hostname ${local.application_name}-ohs1.aws.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-ohs1.${local.portal_hosted_zone}
 
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent

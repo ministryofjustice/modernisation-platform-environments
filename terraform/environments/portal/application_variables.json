@@ -34,12 +34,10 @@
       "url": "s3://laa-portal-development-archive-mp",
       "maintenance_window_name": "diagnostics-log-archive-poc",
       "hosted_zone": "aws.dev.legalservices.gov.uk",
-      "acm_domain_name": "dev.legalservices.gov.uk",
-      "acm_alt_domain_name": "*.dev.legalservices.gov.uk",
       "acm_aws_domain_name": "*.aws.dev.legalservices.gov.uk",
       "fqdn": "portal.dev.legalservices.gov.uk",
       "landing_zone_vpc_cidr": "10.202.0.0/20",
-      "cloudfront_acm_domain_name":"modernisation-platform.service.justice.gov.uk"
+      "mp_domain_name":"modernisation-platform.service.justice.gov.uk"
     },
     "test": {
       "example_var": "test-data",
@@ -60,7 +58,6 @@
       "url": "s3://laa-portal-production-archive-mp",
       "maintenance_window_name": "diagnostics-log-archive-production",
       "hosted_zone": "aws.prd.legalservices.gov.uk",
-      "acm_domain_name": "legalservices.gov.uk",
       "landing_zone_vpc_cidr": "10.205.0.0/20"
     }
   }
