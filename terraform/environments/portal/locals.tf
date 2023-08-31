@@ -47,10 +47,10 @@ locals {
     for key, value in data.aws_route53_zone.self : key => merge(value, {
       provider = "self"
     })
-    # }, {
-    # for key, value in data.aws_route53_zone.portal-dev-private-aws : key => merge(value, {
-    #   provider = "core-network-services"
-    # })
+    }, {
+    for key, value in data.aws_route53_zone.portal-dev-private-aws : key => merge(value, {
+      provider = "core-network-services"
+    })
     }
     )
 
@@ -68,9 +68,9 @@ locals {
   core_network_services_domains = {
     for domain, value in local.validation : domain => value if value.account == "core-network-services"
   }
-  # core_network_services_domains_private = {
-  #   for domain, value in local.validation : domain => value if value.account == "core-network-services-private"
-  # }
+  core_network_services_domains_private = {
+    for domain, value in local.validation : domain => value if value.account == "core-network-services-private"
+  }
   core_vpc_domains = {
     for domain, value in local.validation : domain => value if value.account == "core-vpc"
   }
@@ -87,10 +87,11 @@ locals {
       account   = "core-vpc"
       zone_name = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
     }
-    # "${local.application_data.accounts[local.environment].hosted_zone}" = {
-    #   account   = "core-network-services-private"
-    #   zone_name = "${local.application_data.accounts[local.environment].hosted_zone}"
-    # }
+    "${local.application_data.accounts[local.environment].hosted_zone}" = {
+      account   = "core-network-services-private"
+      zone_name = "${local.application_data.accounts[local.environment].hosted_zone}"
+    }
+
   }
 
   prod_validation = {

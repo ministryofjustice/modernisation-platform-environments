@@ -1,7 +1,7 @@
 resource "aws_acm_certificate" "legalservices_cert" {
 
   domain_name = local.application_data.accounts[local.environment].mp_domain_name
-  # subject_alternative_names = ["${local.application_data.accounts[local.environment].acm_aws_domain_name}"]
+  subject_alternative_names = ["${local.application_data.accounts[local.environment].acm_aws_domain_name}"]
 
   validation_method = "DNS"
 
@@ -59,7 +59,7 @@ resource "aws_route53_record" "external_lb_validation_core_vpc" {
 
 
 resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
-  count           = (length(local.validation_records_external_lb) == 0 || local.external_validation_records_created) ? 1 : 0
+  # count           = (length(local.validation_records_external_lb) == 0 || local.external_validation_records_created) ? 1 : 0
   certificate_arn = aws_acm_certificate.legalservices_cert.arn
   # validation_record_fqdns = [for record in aws_route53_record.external_lb_validation_core_network_services : record.fqdn]
   validation_record_fqdns = [
