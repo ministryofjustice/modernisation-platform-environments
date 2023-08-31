@@ -1,10 +1,10 @@
-data "aws_route53_zone" "portal-dev-private-aws" {
-  for_each = local.core_network_services_domains_private
-  provider = aws.core-network-services
+# data "aws_route53_zone" "portal-dev-private-aws" {
+#   for_each = local.core_network_services_domains_private
+#   provider = aws.core-network-services
 
-  name         = "aws.dev.legalservices.gov.uk."
-  private_zone = true
-}
+#   name         = "aws.dev.legalservices.gov.uk."
+#   private_zone = true
+# }
 
 data "aws_route53_zone" "core_network_services" {
   for_each = local.core_network_services_domains
