@@ -298,14 +298,14 @@ locals {
           security_groups = []
           cidr_blocks = local.security_group_cidrs.http7xxx
         }
-        # http9556 = {
-        #   description = "Allow http9556 ingress"
-        #   from_port   = 9556
-        #   to_port     = 9556
-        #   protocol    = "tcp"
-        #   security_groups = []
-        #   cidr_blocks = local.security_group_cidrs.http7xxx
-        # }
+        http9556 = {
+          description = "Allow http9556 ingress"
+          from_port   = 9556
+          to_port     = 9556
+          protocol    = "tcp"
+          security_groups = []
+          cidr_blocks = local.security_group_cidrs.http7xxx
+        }
         http9704 = {
           description = "Allow http9704 ingress"
           from_port   = 9704
