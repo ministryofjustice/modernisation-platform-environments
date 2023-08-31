@@ -55,6 +55,11 @@ variable "name" {
   description = "(Required) Name that will be used for identify resources."
 }
 
+variable "short_name" {
+  type        = string
+  description = "(Required) short_name that will be used for identify resources."
+}
+
 variable "project_id" {
   type        = string
   description = "(Required) Project Short ID that will be used for resources."

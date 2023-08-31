@@ -11,6 +11,7 @@ module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
+  short_name                    = "${local.project}-reporting-hub"
   description                   = local.description
   command_type                  = "gluestreaming"
   job_language                  = "scala"
@@ -30,6 +31,7 @@ module "glue_reporting_hub_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = 1
 
   tags = merge(
     local.all_tags,
@@ -73,6 +75,7 @@ module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-domain-refresh-${local.env}"
+  short_name                    = "${local.project}-domain-refresh"
   command_type                  = "glueetl"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
   create_security_configuration = local.create_sec_conf
@@ -93,6 +96,7 @@ module "glue_domain_refresh_job" {
   max_concurrent    = 1
   region            = local.account_region
   account           = local.account_id
+  log_group_retention_in_days  = 1
 
   tags = merge(
     local.all_tags,
