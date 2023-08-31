@@ -309,7 +309,7 @@ ebs_block_device {
     patch_group = "dev_win_patch"
     backup      = false
   }
-
+}
 
 #################################
 # Pre-Production (UAT Instances) #
