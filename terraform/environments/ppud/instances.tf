@@ -290,11 +290,11 @@ root_block_device {
 ebs_block_device {
     device_name = "/dev/sdb"
     volume_type = "gp3"
-    volume_size = 50
+    volume_size = 70
   }
 
 ebs_block_device {
-    device_name = "/dev/sdb"
+    device_name = "/dev/sdc"
     volume_type = "gp3"
     volume_size = 50
   }
