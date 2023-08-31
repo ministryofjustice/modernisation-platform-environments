@@ -208,24 +208,24 @@ module "glue_raw_table" {
 
     columns = [
       {
-        columns_name    = "partitionkey"
-        columns_type    = "string"
-        columns_comment = "Partition Key"
+        name    = "partitionkey"
+        type    = "string"
+        comment = "Partition Key"
       },
       {
-        columns_name    = "sequencenumber"
-        columns_type    = "string"
-        columns_comment = "Sequence Number"
+        name    = "sequencenumber"
+        type    = "string"
+        comment = "Sequence Number"
       },
       {
-        columns_name    = "approximatearrivaltimestamp"
-        columns_type    = "timestamp"
-        columns_comment = "Arrival Timestamp"
+        name    = "approximatearrivaltimestamp"
+        type    = "timestamp"
+        comment = "Arrival Timestamp"
       },
       {
-        columns_name    = "data"
-        columns_type    = "string"
-        columns_comment = "Data Column"
+        name    = "data"
+        type    = "string"
+        comment = "Data Column"
       },
     ]
 
@@ -271,14 +271,14 @@ module "glue_reconciliation_table" {
 
     columns = [
       {
-        columns_name    = "data"
-        columns_type    = "string"
-        columns_comment = "Nested JSON data"
+        name    = "data"
+        type    = "string"
+        comment = "Nested JSON data"
       },
       {
-        columns_name    = "metadata"
-        columns_type    = "string"
-        columns_comment = "Common metadata"
+        name    = "metadata"
+        type    = "string"
+        comment = "Common metadata"
       }
     ]
 

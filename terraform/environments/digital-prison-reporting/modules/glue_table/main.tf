@@ -18,7 +18,7 @@ resource "aws_glue_catalog_table" "glue_catalog_table" {
 
   dynamic "partition_keys" {
     iterator = partition_keys
-    for_each = var.glue_catalog_table_partition_keys
+    for_each = lookup(var.glue_catalog_table_storage_descriptor, "partition_keys", [])
 
     content {
       name    = lookup(partition_keys.value, "name", null)
@@ -42,9 +42,9 @@ resource "aws_glue_catalog_table" "glue_catalog_table" {
       for_each = lookup(var.glue_catalog_table_storage_descriptor, "columns", [])
 
       content {
-        name    = lookup(columns.value, "columns_name", null)
-        type    = lookup(columns.value, "columns_type", null)
-        comment = lookup(columns.value, "columns_comment", null)
+        name    = lookup(columns.value, "name", null)
+        type    = lookup(columns.value, "type", null)
+        comment = lookup(columns.value, "comment", null)
       }
     }
 
