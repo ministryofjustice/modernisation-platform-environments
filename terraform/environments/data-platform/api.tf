@@ -1,4 +1,4 @@
-
+# some comment
 resource "aws_api_gateway_rest_api" "data_platform" {
   name = "data_platform"
 }
