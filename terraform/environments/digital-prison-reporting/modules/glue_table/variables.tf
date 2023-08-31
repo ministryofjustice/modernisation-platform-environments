@@ -53,11 +53,6 @@ variable "glue_catalog_table_retention" {
   default     = null
 }
 
-variable "glue_catalog_table_partition_keys" {
-  description = "(Optional) A list of columns by which the table is partitioned. Only primitive types are supported as partition keys."
-  default     = []
-}
-
 variable "glue_catalog_table_view_original_text" {
   description = "(Optional) If the table is a view, the original text of the view; otherwise null."
   default     = null
