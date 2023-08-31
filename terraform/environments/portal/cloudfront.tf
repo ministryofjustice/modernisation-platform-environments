@@ -15,7 +15,6 @@ locals {
             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
             { provider = "external" }
       )))
-      # zone_id = data.aws_route53_zone.portal-dev-private["${local.application_data.accounts[local.environment].acm_domain_name}"].zone_id
     }
   }
 
@@ -38,7 +37,7 @@ resource "random_password" "cloudfront" {
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
-  name        = "cloudfront-v1-secret-${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
+  name        = "cloudfront-v1-secret-${local.application_name}"
   description = "Simple secret created by Terraform"
 }
 
@@ -357,7 +356,7 @@ resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
 }
 
 resource "aws_acm_certificate" "cloudfront" {
-  domain_name               = local.application_data.accounts[local.environment].cloudfront_acm_domain_name
+  domain_name               = local.application_data.accounts[local.environment].mp_domain_name
   validation_method         = "DNS"
   provider                  = aws.us-east-1
   subject_alternative_names = local.environment == "production" ? null : ["mp-portal.${data.aws_route53_zone.external.name}"]
