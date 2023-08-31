@@ -23,6 +23,9 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
     ])
+    http7xxx = flatten([
+      "10.0.0.0/8",
+    ])
   }
   security_group_cidrs_preprod_prod = {
     icmp = flatten([
@@ -30,7 +33,6 @@ locals {
     ])
     ssh = module.ip_addresses.azure_fixngo_cidrs.prod
     https_internal = flatten([
-      "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
     ])
     https_external = flatten([
@@ -39,12 +41,14 @@ locals {
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
     oracle_db = flatten([
-      "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+    ])
+    http7xxx = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
     ])
   }
   security_group_cidrs_by_environment = {
@@ -263,6 +267,52 @@ locals {
           to_port     = "3872"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.oracle_oem_agent
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+    bip = {
+      description = "Security group for bip"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http7001 = {
+          description = "Allow http7001 ingress"
+          from_port   = 7001
+          to_port     = 7001
+          protocol    = "tcp"
+          security_groups = []
+          cidr_blocks = local.security_group_cidrs.http7xxx
+        }
+        # http9556 = {
+        #   description = "Allow http9556 ingress"
+        #   from_port   = 9556
+        #   to_port     = 9556
+        #   protocol    = "tcp"
+        #   security_groups = []
+        #   cidr_blocks = local.security_group_cidrs.http7xxx
+        # }
+        http9704 = {
+          description = "Allow http9704 ingress"
+          from_port   = 9704
+          to_port     = 9704
+          protocol    = "tcp"
+          security_groups = []
+          cidr_blocks = local.security_group_cidrs.http7xxx
         }
       }
       egress = {
