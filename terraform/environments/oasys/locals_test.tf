@@ -100,10 +100,24 @@ locals {
       ##
       ## test
       ##
-      # "test-${local.application_name}-bip-a" = local.bip_a
+      "test-${local.application_name}-bip-a" = merge(local.bip_a, {
+        autoscaling_schedules = {}
+        tags = merge(local.bip_a.tags, {
+          oracle-db-hostname-a = "t2-oasys-db-a"
+          oracle-db-hostname-b = "t2-oasys-db-b"
+          oracle-db-name       = "T2BIPINF"
+        })
+      })
+
       "test-${local.application_name}-bip-b" = merge(local.bip_b, {
         autoscaling_schedules = {}
+        tags = merge(local.bip_b.tags, {
+          oracle-db-hostname-a = "t2-oasys-db-a"
+          oracle-db-hostname-b = "t2-oasys-db-b"
+          oracle-db-name       = "T2BIPINF"
+        })
       })
+      
     }
 
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
