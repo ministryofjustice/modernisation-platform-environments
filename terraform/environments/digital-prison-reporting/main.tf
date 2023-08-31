@@ -11,6 +11,7 @@ module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
+  short_name                    = "${local.project}-reporting-hub"
   description                   = local.description
   command_type                  = "gluestreaming"
   job_language                  = "scala"
@@ -74,6 +75,7 @@ module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-domain-refresh-${local.env}"
+  short_name                    = "${local.project}-domain-refresh"
   command_type                  = "glueetl"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
   create_security_configuration = local.create_sec_conf
