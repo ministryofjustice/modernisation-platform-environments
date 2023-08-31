@@ -208,7 +208,7 @@ resource "aws_cloudwatch_log_group" "sec_config_role" {
 
 resource "aws_glue_security_configuration" "sec_cfg" {
   count = var.create_security_configuration && var.create_job ? 1 : 0
-  name  = "security-config"
+  name  = "${var.name}-security-config"
 
   encryption_configuration {
     cloudwatch_encryption {
