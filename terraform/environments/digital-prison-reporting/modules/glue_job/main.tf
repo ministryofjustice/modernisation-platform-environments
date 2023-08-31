@@ -206,7 +206,7 @@ resource "aws_cloudwatch_log_group" "sec_config_role" {
   tags              = var.tags
 }
 
-resource "aws_cloudwatch_log_group" "sec_config_role" {
+resource "aws_cloudwatch_log_group" "continuous_log" {
   name              = "/aws-glue/jobs/${var.name}-${var.short_name}-sec-config"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
