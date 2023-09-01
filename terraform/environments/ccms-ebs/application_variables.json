@@ -519,7 +519,7 @@
     "FTP_20": {
       "application": "FTP",
       "from_port": 20,
-      "to_port": 22,
+      "to_port": 21,
       "protocol": "TCP"
     },
     "FTP_3010": {
@@ -539,7 +539,7 @@
     "FTP_20": {
       "application": "FTP",
       "from_port": 20,
-      "to_port": 22,
+      "to_port": 21,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/13"
     },
