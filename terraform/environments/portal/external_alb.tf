@@ -2,7 +2,7 @@ locals {
   lb_logs_bucket                        = local.application_data.accounts[local.environment].lb_access_logs_existing_bucket_name
   account_number                        = local.environment_management.account_ids[terraform.workspace]
   external_lb_idle_timeout              = 65
-  enable_deletion_protection            = true
+  lb_enable_deletion_protection         = local.application_data.accounts[local.environment].lb_enable_deletion_protection
   external_lb_port                      = 443
   custom_header                         = "X-Custom-Header-LAA-Portal"
   force_destroy_lb_logs_bucket          = true
@@ -144,7 +144,7 @@ resource "aws_lb" "external" {
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.external_lb.id]
   subnets                    = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
-  enable_deletion_protection = local.enable_deletion_protection
+  enable_deletion_protection = local.lb_enable_deletion_protection
   idle_timeout               = local.external_lb_idle_timeout
   # drop_invalid_header_fields = true
 
