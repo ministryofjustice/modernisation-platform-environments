@@ -14,7 +14,7 @@ locals {
           availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private-web"]
+          vpc_security_group_ids = ["private-dc"]
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group    = merge(module.baseline_presets.ec2_autoscaling_group.default, {
