@@ -354,7 +354,7 @@ resource "aws_security_group_rule" "all_internal_ingress_traffic" {
   for_each          = { for sub in data.aws_security_groups.all_security_groups.ids : sub => sub }
   security_group_id = each.value
   type              = "ingress"
-  description       = "Ingress for all internal traffic"
+  description       = "Inbound: all internal traffic"
   protocol          = "all"
   from_port         = 0
   to_port           = 0
@@ -373,7 +373,7 @@ resource "aws_security_group_rule" "all_internal_egress_traffic" {
   security_group_id = each.value
   #security_group_id = aws_security_group.ec2_sg_oracle_base.id
   type        = "egress"
-  description = "Egress for all internal traffic"
+  description = "Outbound: all internal traffic"
   protocol    = "all"
   from_port   = 0
   to_port     = 0
