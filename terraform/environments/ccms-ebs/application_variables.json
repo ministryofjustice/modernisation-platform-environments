@@ -437,6 +437,13 @@
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
+    "FTP_20": {
+      "application": "FTP",
+      "from_port": 20,
+      "to_port": 21,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
     "SSH_22": {
       "application": "SSH",
       "from_port": 22,
