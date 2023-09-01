@@ -233,66 +233,6 @@ resource "aws_instance" "s609693lo6vw108" {
   }
 }
 
-#################################
-# Windows DEV Test Instances #
-#################################
-
-# Test SQL Server
-
-resource "aws_instance" "TestSQLServer1" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0dee621967810b9e8"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-
-root_block_device {
-      volume_size = 100
-      volume_type = "gp3"
-      }
-
-ebs_block_device {
-    device_name = "/dev/sdb"
-    volume_type = "gp3"
-    volume_size = 100
-  }
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "TestSQLServer1"
-    patch_group = "dev_win_patch"
-    backup      = false
-  }
-}
-
-# Test Web Server
-
-resource "aws_instance" "TestWebServer3" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-070c9a4ee0e5d83d5"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
-  subnet_id              = data.aws_subnet.private_subnets_c.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "TestWebServer3"
-    patch_group = "dev_win_patch"
-    backup      = false
-  }
-}
 
 #################################
 # Pre-Production (UAT Instances) #
