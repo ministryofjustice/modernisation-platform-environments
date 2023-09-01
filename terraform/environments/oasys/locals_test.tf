@@ -100,14 +100,14 @@ locals {
       ##
       ## test
       ##
-      "test-${local.application_name}-bip-a" = merge(local.bip_a, {
-        autoscaling_schedules = {}
-        tags = merge(local.bip_a.tags, {
-          oracle-db-hostname-a = "t2-oasys-db-a"
-          oracle-db-hostname-b = "t2-oasys-db-b"
-          oracle-db-name       = "T2BIPINF"
-        })
-      })
+      # "test-${local.application_name}-bip-a" = merge(local.bip_a, {
+      #   autoscaling_schedules = {}
+      #   tags = merge(local.bip_a.tags, {
+      #     oracle-db-hostname-a = "t2-oasys-db-a"
+      #     oracle-db-hostname-b = "t2-oasys-db-b"
+      #     oracle-db-name       = "T2BIPINF"
+      #   })
+      # })
 
       "test-${local.application_name}-bip-b" = merge(local.bip_b, {
         autoscaling_schedules = {}
