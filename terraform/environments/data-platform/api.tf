@@ -194,37 +194,44 @@ resource "aws_api_gateway_integration" "get_glue_metadata" {
   }
 }
 
+resource "aws_api_gateway_method_settings" "s" {
+rest_api_id = aws_api_gateway_rest_api.data_platform.id
+stage_name  = aws_api_gateway_stage.default_stage.stage_name
+method_path = "*/*"
 
-# create data product metadata API endpoint
-
-resource "aws_api_gateway_resource" "create_data_product_metadata" {
-  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
-  path_part   = "register_data_product"
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+settings {
+metrics_enabled = true
+logging_level   = "INFO"
+}
 }
 
-resource "aws_api_gateway_method" "create_data_product_metadata_post" {
-  authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.authorizer.id
-  http_method   = "POST"
-  resource_id   = aws_api_gateway_resource.create_data_product_metadata.id
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
-
-  request_parameters = {
-    "method.request.header.Authorization" = true
-    "method.request.querystring.metadata" = true,
-  }
+# Allow API Gateway to push logs to CloudWatch
+resource "aws_api_gateway_account" "api_logging_account" {
+  cloudwatch_role_arn = aws_iam_role.api_gateway_logs_role.arn
 }
 
-resource "aws_api_gateway_integration" "create_data_product_metadata_to_lambda" {
-  http_method             = aws_api_gateway_method.create_data_product_metadata_post.http_method
-  resource_id             = aws_api_gateway_resource.create_data_product_metadata.id
-  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = module.data_product_create_metadata_lambda.lambda_function_invoke_arn
+resource "aws_iam_role" "api_gateway_logs_role" {
+  name = "api-gateway-logs-role"
 
-  request_parameters = {
-    "integration.request.querystring.metadata" = "method.request.querystring.metadata"
-  }
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+
+}
+
+resource "aws_iam_role_policy_attachment" "main" {
+  role       = aws_iam_role.api_gateway_logs_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
