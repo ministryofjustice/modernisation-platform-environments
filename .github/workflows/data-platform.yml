@@ -5,22 +5,22 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/environments/data-platform/**'
-      - '.github/workflows/data-platform.yml'
+      - "terraform/environments/data-platform/**"
+      - ".github/workflows/data-platform.yml"
 
   pull_request:
     branches:
       - main
     types: [opened, edited, reopened, synchronize]
     paths:
-      - 'terraform/environments/data-platform/**'
-      - '.github/workflows/data-platform.yml'
+      - "terraform/environments/data-platform/**"
+      - ".github/workflows/data-platform.yml"
 
   workflow_dispatch:
     inputs:
       action:
-        description: 'Set either [deploy|destroy].'
-        default: 'deploy'
+        description: "Set either [deploy|destroy]."
+        default: "deploy"
         required: true
         type: string
         options:
@@ -28,8 +28,8 @@ on:
           - destroy
 
 permissions:
-  id-token: write  # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
 
 jobs:
   strategy:
@@ -52,6 +52,32 @@ jobs:
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+
+  testing:
+    needs: [strategy, terraform]
+    if: inputs.action != 'destroy'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    env:
+      ACCOUNT_NAME: "${{ github.workflow }}-${{ matrix.target }}"
+      ENVIRONMENT_MANAGEMENT: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+
+      - name: Get AWS Account Number
+        run: |
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@04b98b3f9e85f563fb061be8751a0352327246b0 # v3.0.1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: "eu-west-2"
 
   destroy-development:
     if: inputs.action == 'destroy'
