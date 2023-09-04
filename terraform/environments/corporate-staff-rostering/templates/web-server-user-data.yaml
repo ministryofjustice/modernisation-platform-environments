@@ -1,3 +1,4 @@
+# IMPORTANT: This is MOSTLY used to address issues with the current Azure AMI's that are carried over from fixngo
 # This is an EC2Launch V2 type user-data script
 # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
 # See C:\ProgramData\Amazon\EC2Launch\log for logs
@@ -9,28 +10,28 @@ tasks:
         type: powershell
         runAs: admin
         # disable local firewall completely
-        content: |
+        content: |-
           Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
       - frequency: once
         type: powershell
         runAs: admin
         # turn off Azure related services
-        content: |
+        content: |-
           Stop-Service -Name 'WindowsAzureGuestAgent' -Force
       - frequency: once
         type: powershell
         runAs: admin
         # Set time to local and locale
-        content: |
+        content: |-
           # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script 
 
-          Set-TimeZone "GMT Standard Time"
+          # Set-TimeZone "GMT Standard Time" # does not work for Server 2012 R2 version of PowerShell
           Set-WinSystemLocale "en-GB"
       - frequency: once
         type: powershell
         runAs: admin
         # use latest EC2 Launch which should support everything
-        content: |
+        content: |-
           New-Item -Path "$env:USERPROFILE\Desktop\EC2Launchv2" -ItemType Director
           $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
           $DownloadFile = "$env:USERPROFILE\Desktop\EC2Launchv2\" + $(Split-Path -Path $Url -Leaf)
@@ -39,7 +40,7 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
-        content: |
+        content: |-
           [System.Net.ServicePointManager]::SecurityProtocol = 'TLS12'
           $progressPreference = 'silentlyContinue'
           Invoke-WebRequest https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe -OutFile $env:USERPROFILE\Desktop\SSMAgent_latest.exe
@@ -53,7 +54,7 @@ tasks:
         type: powershell
         runAs: admin
         # add session manager to path
-        content: |
+        content: |-
           # Get the current system PATH
           $currentPath = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
 
