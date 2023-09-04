@@ -11,8 +11,8 @@ parameters:
     description: "The file to create"
     default: "C:\\temp\\Test\\test-success-ssm.txt"
 mainSteps:
-  - name: "create test document"
-    action: "aws:runPowerShellScript"
+  - name: CreateTestDocument
+    action: aws:runPowerShellScript
     inputs:
       runCommand: |
         "$secretValue1 = (Get-SSMParameterValue -Name 'test-param-1' ).Parameters[0].Value"
