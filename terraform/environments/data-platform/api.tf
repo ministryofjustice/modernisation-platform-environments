@@ -205,8 +205,8 @@ resource "aws_api_gateway_method" "create_data_product_metadata_put" {
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
 
   request_parameters = {
-    "method.request.header.Authorization"   = true
-    "method.request.querystring.metadata"   = true,
+    "method.request.header.Authorization" = true
+    "method.request.querystring.metadata" = true,
   }
 }
 
@@ -219,6 +219,6 @@ resource "aws_api_gateway_integration" "create_data_product_metadata_to_lambda" 
   uri                     = module.data_product_create_metadata_lambda.lambda_function_invoke_arn
 
   request_parameters = {
-    "integration.request.querystring.metadata"   = "method.request.querystring.metadata"
+    "integration.request.querystring.metadata" = "method.request.querystring.metadata"
   }
 }

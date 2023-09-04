@@ -231,9 +231,9 @@ data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
 # api gateway create data product metdata permissions
 data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" {
   statement {
-    sid       = "GetPutDataObject"
-    effect    = "Allow"
-    actions   = ["s3:GetObject", "s3:PutObject"]
+    sid     = "GetPutDataObject"
+    effect  = "Allow"
+    actions = ["s3:GetObject", "s3:PutObject"]
     resources = [
       "${module.s3-bucket.bucket.arn}/metadata/*",
       "${module.s3-bucket.bucket.arn}data_product_metadata_spec/*"
@@ -243,7 +243,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" 
   statement {
     sid       = "ListBucket"
     effect    = "Allow"
-    actions = ["s3:ListBucket"]
+    actions   = ["s3:ListBucket"]
     resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
   }
 
