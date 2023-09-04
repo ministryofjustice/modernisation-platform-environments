@@ -2,7 +2,6 @@ locals {
   lb_logs_bucket                        = local.application_data.accounts[local.environment].lb_access_logs_existing_bucket_name
   account_number                        = local.environment_management.account_ids[terraform.workspace]
   external_lb_idle_timeout              = 65
-  lb_enable_deletion_protection         = local.application_data.accounts[local.environment].lb_enable_deletion_protection
   external_lb_port                      = 443
   custom_header                         = "X-Custom-Header-LAA-Portal"
   force_destroy_lb_logs_bucket          = true
