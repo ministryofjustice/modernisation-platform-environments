@@ -36,7 +36,7 @@ resource "aws_efs_file_system" "efs" {
   )
 
   lifecycle {
-    prevent_destroy = local.efs_enable_deletion_protection
+    prevent_destroy = false
   }
 
 }
