@@ -224,7 +224,7 @@ locals {
                   host_header = {
                     values = [
                       "qa11r-nomis-web-b.development.nomis.service.justice.gov.uk",
-                      "qa11r.development.nomis.service.justice.gov.uk",
+                      "c-qa11r.development.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -258,7 +258,7 @@ locals {
           #        host_header = {
           #          values = [
           #            "qa11r-nomis-web-b.development.nomis.service.justice.gov.uk",
-          #            "qa11r.development.nomis.service.justice.gov.uk",
+          #            "c-qa11r.development.nomis.service.justice.gov.uk",
           #          ]
           #        }
           #      }]
@@ -294,7 +294,7 @@ locals {
           # qa11r
           { name = "qa11r-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "qa11r-nomis-web-b", type = "A", lbs_map_key = "private" },
-          { name = "qa11r", type = "A", lbs_map_key = "private" },
+          { name = "c-qa11r", type = "A", lbs_map_key = "private" },
         ]
       }
     }
