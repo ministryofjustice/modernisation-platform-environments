@@ -227,3 +227,45 @@ data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
   }
 
 }
+
+# api gateway create data product metdata permissions
+data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" {
+  statement {
+    sid       = "GetPutDataObject"
+    effect    = "Allow"
+    actions   = ["s3:GetObject", "s3:PutObject"]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/metadata/*",
+      "${module.s3-bucket.bucket.arn}data_product_metadata_spec/*"
+    ]
+  }
+
+  statement {
+    sid       = "ListBucket"
+    effect    = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
+  }
+
+  statement {
+    sid    = "AllowLambdaToCreateLogGroup"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup"
+    ]
+    resources = [
+      format("arn:aws:logs:eu-west-2:%s:*", data.aws_caller_identity.current.account_id)
+    ]
+  }
+  statement {
+    sid    = "AllowLambdaToWriteLogsToGroup"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      format("arn:aws:logs:eu-west-2:%s:*", data.aws_caller_identity.current.account_id)
+    ]
+  }
+}

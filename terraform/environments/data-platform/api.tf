@@ -187,3 +187,38 @@ resource "aws_api_gateway_integration" "get_glue_metadata" {
     "integration.request.querystring.table"    = "method.request.querystring.table"
   }
 }
+
+
+# create data product metadata API endpoint
+
+resource "aws_api_gateway_resource" "create_data_product_metadata" {
+  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
+  path_part   = "register_data_product"
+  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+}
+
+resource "aws_api_gateway_method" "create_data_product_metadata_put" {
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.authorizer.id
+  http_method   = "POST"
+  resource_id   = aws_api_gateway_resource.create_data_product_metadata.id
+  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+
+  request_parameters = {
+    "method.request.header.Authorization"   = true
+    "method.request.querystring.metadata"   = true,
+  }
+}
+
+resource "aws_api_gateway_integration" "create_data_product_metadata_to_lambda" {
+  http_method             = aws_api_gateway_method.create_data_product_metadata_put.http_method
+  resource_id             = aws_api_gateway_resource.create_data_product_metadata.id
+  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.data_product_create_metadata_lambda.lambda_function_invoke_arn
+
+  request_parameters = {
+    "integration.request.querystring.metadata"   = "method.request.querystring.metadata"
+  }
+}
