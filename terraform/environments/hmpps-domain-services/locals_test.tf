@@ -17,11 +17,11 @@ locals {
           vpc_security_group_ids = ["private-web"]
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        autoscaling_group    = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags                  = {
+        tags = {
           description = "For testing connection to Azure domain"
           os-type     = "Linux"
           component   = "test"

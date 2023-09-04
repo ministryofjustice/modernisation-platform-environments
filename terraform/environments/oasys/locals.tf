@@ -219,9 +219,9 @@ locals {
       availability_zone         = "${local.region}a"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      instance_type             = "t3.xlarge"
-      monitoring                = true
-      vpc_security_group_ids    = ["bip"]
+      instance_type          = "t3.xlarge"
+      monitoring             = true
+      vpc_security_group_ids = ["bip"]
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
