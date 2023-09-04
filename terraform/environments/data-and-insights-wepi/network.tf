@@ -1,50 +1,38 @@
 # Redshift VPC security group for bastion access
 resource "aws_security_group" "wepi_sg_allow_redshift" {
-  # checkov:skip=CKV2_AWS_5: Configured in Redshfit cluster, Checkov not detecting reference.
+  # checkov:skip=CKV2_AWS_5: Configured in Redshift cluster, Checkov not detecting reference.
   name        = "wepi_allow_redshift"
-  description = "Allow Redshift inbound traffic from bastion"
+  description = "Redshift Cluster SG"
   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   description = "Redshift ingress from bastion"
-  #   from_port   = 0
-  #   to_port     = 65535
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  #   security_groups = [
-  #     module.wepi_bastion.bastion_security_group
-  #   ]
-  # }
+  tags = merge(local.tags,
+    { "Name" = "sg-wepi_redshift_cluster" }
+  )
+}
 
-  # egress {
-  #   description = "Redshift egress to S3 endpoint"
-  #   from_port   = 0
-  #   to_port     = 0
-  #   protocol    = "-1"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  #   prefix_list_ids = [
-  #     data.aws_vpc_endpoint.s3.prefix_list_id
-  #   ]
-  # }
-  ingress {
-    description = "Redshift ingress from bastion"
-    from_port   = 5439
-    to_port     = 5439
-    protocol    = "tcp"
-    security_groups = [
-      module.wepi_bastion.bastion_security_group
-    ]
-  }
+resource "aws_security_group_rule" "tcp_5439_ingress_vpc" {
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  from_port         = 5439
+  protocol          = "TCP"
+  security_group_id = aws_security_group.wepi_sg_allow_redshift.id
+  to_port           = 5439
+  type              = "ingress"
+}
 
-  egress {
-    description = "Redshift egress to S3 endpoint"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    prefix_list_ids = [
-      data.aws_vpc_endpoint.s3.prefix_list_id
-    ]
-  }
+resource "aws_security_group_rule" "tcp_5439_ingress_bastion" {
+  from_port                = 5439
+  protocol                 = "TCP"
+  security_group_id        = aws_security_group.wepi_sg_allow_redshift.id
+  source_security_group_id = module.wepi_bastion.bastion_security_group
+  to_port                  = 5439
+  type                     = "ingress"
+}
 
-  tags = local.tags
+resource "aws_security_group_rule" "tcp_443_egress_s3" {
+  from_port         = 443
+  prefix_list_ids   = [data.aws_vpc_endpoint.s3.prefix_list_id]
+  protocol          = "TCP"
+  security_group_id = aws_security_group.wepi_sg_allow_redshift.id
+  to_port           = 443
+  type              = "egress"
 }

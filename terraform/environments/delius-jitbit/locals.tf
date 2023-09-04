@@ -2,7 +2,7 @@ locals {
   ##
   # Variables used across multiple areas
   ##
-  domain           = "modernisation-platform.service.justice.gov.uk"
+  domain = "modernisation-platform.service.justice.gov.uk"
   # domain           = local.is-production ? "jitbit.cr.probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
   # non_prod_app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
