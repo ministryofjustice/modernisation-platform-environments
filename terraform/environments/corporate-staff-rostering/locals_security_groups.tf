@@ -140,7 +140,6 @@ locals {
           cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
         }
-
         http = {
           description     = "Allow ingress from port 80"
           from_port       = 80
@@ -149,20 +148,70 @@ locals {
           cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
         }
-        # http445 = {
-        #   description = "Allow ingress from port 445"
-        #   from_port       = 445
-        #   to_port         = 445
-        #   protocol        = "TCP"
-        #   cidr_blocks     = ["10.0.0.0/8"]
-        #   security_groups = []
-        # }
         rdp = {
           description     = "Allow ingress from port 3389"
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.rdp.inbound
+          security_groups = []
+        }
+        smb = {
+          description = "Allow ingress Azure domain controllers"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
+          # cidr_blocks     = ["10.102.0.196/32"]
+          security_groups = []
+        }
+        dns = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 53
+          to_port         = 53
+          protocol        = "TCP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        ldap = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 389
+          to_port         = 389
+          protocol        = "TCP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        ldap_ssl = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 636
+          to_port         = 636
+          protocol        = "TCP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        global_catalog_3268_3269 = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 3268
+          to_port         = 3269
+          protocol        = "TCP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        rpc = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 135
+          to_port         = 135
+          protocol        = "TCP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        rpc_dynamic = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 49152
+          to_port         = 65535
+          protocol        = "TCP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
         # http5985 = {
