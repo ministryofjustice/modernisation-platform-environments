@@ -14,6 +14,8 @@ resource "aws_s3_bucket" "storage" { # TBC "application_tf_state" should be gene
     prevent_destroy = false
   }
 
+  bucket_key_enabled = true
+
   tags = var.tags
 }
 
