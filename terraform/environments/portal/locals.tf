@@ -52,7 +52,7 @@ locals {
     #   provider = "core-network-services"
     # })
     }
-    )
+  )
 
 
   validation_records_external_lb = {

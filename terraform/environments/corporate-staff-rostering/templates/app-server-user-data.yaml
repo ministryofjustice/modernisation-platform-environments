@@ -21,4 +21,43 @@ tasks:
         content: |
           New-Item -ItemType Directory -Force -Path C:\temp\Test
           New-Item -ItemType File -Force -Path C:\temp\Test\test-success.txt
-          
+      - frequency: once
+        type: powershell
+        runAs: admin # or localSystem
+        # run a test SSM document
+        content: |
+          # Install AWS PowerShell module if not already installed
+          if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
+          Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
+          }
+
+          # Function to check if SSM Agent is running
+          Function Check-SSMAgent {
+            $service = Get-Service -Name "AmazonSSMAgent"
+            if ($service.Status -eq "Running") {
+                return $true
+            } else {
+                return $false
+            }
+          }
+
+          # Function to execute the SSM command
+          Function Execute-SSMCommand {
+            $instanceId = Invoke-RestMethod -Uri "http://169.254.169.254/latest/meta-data/instance-id"
+            $documentName = "csr-server-config"
+
+            $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $documentName
+            Write-Host "Executed SSM command with Command ID: $($commandId.CommandId)"
+          }
+
+          # Main loop to wait for SSM Agent to be running
+          while ($true) {
+            if (Check-SSMAgent) {
+              Write-Host "SSM Agent is running, executing SSM command."
+              Execute-SSMCommand
+              break
+            } else {
+              Write-Host "SSM Agent is not running yet. Waiting..."
+              Start-Sleep -Seconds 10
+            }
+          }
