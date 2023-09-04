@@ -10,14 +10,14 @@ parameters:
     type: "String"
     description: "The file to create"
     default: "C:\\temp\\Test\\test-success-ssm.txt"
-runtimeConfig:
-  aws:runPowerShellScript:
-    properties:
-      - id: "0.aws:runPowerShellScript"
-        runCommand: |
-          "$secretValue1 = (Get-SSMParameterValue -Name 'test-param-1' ).Parameters[0].Value"
-          "$secretValue2 = (Get-SSMParameterValue -Name 'test-param-2' ).Parameters[0].Value"
-          New-Item -ItemType Directory -Force -Path $configFolder
-          New-Item -ItemType File -Force -Path $configFile
-          Add-Content -Path $configFile -Value $secretValue1
-          Add-Content -Path $configFile -Value $secretValue2
+mainSteps:
+  - name: "create test document"
+    action: "aws:runPowerShellScript"
+    inputs:
+      runCommand: |
+        "$secretValue1 = (Get-SSMParameterValue -Name 'test-param-1' ).Parameters[0].Value"
+        "$secretValue2 = (Get-SSMParameterValue -Name 'test-param-2' ).Parameters[0].Value"
+        New-Item -ItemType Directory -Force -Path $configFolder
+        New-Item -ItemType File -Force -Path $configFile
+        Add-Content -Path $configFile -Value $secretValue1
+        Add-Content -Path $configFile -Value $secretValue2

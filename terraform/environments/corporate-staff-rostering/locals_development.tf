@@ -41,6 +41,7 @@ locals {
 
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["migration-app-sg"]
+          instance_type          = "t3.xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 256 }
