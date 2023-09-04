@@ -36,7 +36,7 @@ resource "aws_efs_file_system" "efs" {
   )
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = local.application_data.accounts[local.environment].efs_enable_deletion_protection
   }
 
 }
