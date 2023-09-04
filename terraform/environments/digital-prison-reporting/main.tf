@@ -90,13 +90,13 @@ module "glue_domain_refresh_job" {
   aws_kms_key                  = local.s3_kms_arn
   additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   # timeout                       = 1440
-  execution_class   = "FLEX"
-  worker_type       = local.refresh_job_worker_type
-  number_of_workers = local.refresh_job_num_workers
-  max_concurrent    = 1
-  region            = local.account_region
-  account           = local.account_id
-  log_group_retention_in_days  = 1
+  execution_class             = "FLEX"
+  worker_type                 = local.refresh_job_worker_type
+  number_of_workers           = local.refresh_job_num_workers
+  max_concurrent              = 1
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = 1
 
   tags = merge(
     local.all_tags,
@@ -258,7 +258,7 @@ module "glue_reconciliation_table" {
   # AWS Glue catalog table
   glue_catalog_table_description = "Glue Table for reconciliation data, managed by Terraform."
   glue_catalog_table_table_type  = "EXTERNAL_TABLE"
-  glue_catalog_table_parameters  = {
+  glue_catalog_table_parameters = {
     EXTERNAL              = "TRUE"
     "parquet.compression" = "SNAPPY"
     "classification"      = "parquet"
@@ -284,18 +284,18 @@ module "glue_reconciliation_table" {
 
     partition_keys = [
       {
-        name = "year",
-        type = "string",
+        name    = "year",
+        type    = "string",
         comment = ""
       },
       {
-        name = "month",
-        type = "string",
+        name    = "month",
+        type    = "string",
         comment = ""
       },
       {
-        name = "day",
-        type = "string",
+        name    = "day",
+        type    = "string",
         comment = ""
       }
     ]

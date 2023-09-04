@@ -117,7 +117,7 @@ locals {
           oracle-db-name       = "T2BIPINF"
         })
       })
-      
+
     }
 
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme

@@ -291,28 +291,28 @@ locals {
           self        = true
         }
         http7001 = {
-          description = "Allow http7001 ingress"
-          from_port   = 7001
-          to_port     = 7001
-          protocol    = "tcp"
+          description     = "Allow http7001 ingress"
+          from_port       = 7001
+          to_port         = 7001
+          protocol        = "tcp"
           security_groups = []
-          cidr_blocks = local.security_group_cidrs.http7xxx
+          cidr_blocks     = local.security_group_cidrs.http7xxx
         }
         http9556 = {
-          description = "Allow http9556 ingress"
-          from_port   = 9556
-          to_port     = 9556
-          protocol    = "tcp"
+          description     = "Allow http9556 ingress"
+          from_port       = 9556
+          to_port         = 9556
+          protocol        = "tcp"
           security_groups = []
-          cidr_blocks = local.security_group_cidrs.http7xxx
+          cidr_blocks     = local.security_group_cidrs.http7xxx
         }
         http9704 = {
-          description = "Allow http9704 ingress"
-          from_port   = 9704
-          to_port     = 9704
-          protocol    = "tcp"
+          description     = "Allow http9704 ingress"
+          from_port       = 9704
+          to_port         = 9704
+          protocol        = "tcp"
           security_groups = []
-          cidr_blocks = local.security_group_cidrs.http7xxx
+          cidr_blocks     = local.security_group_cidrs.http7xxx
         }
       }
       egress = {
