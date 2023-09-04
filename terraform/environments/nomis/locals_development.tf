@@ -15,19 +15,20 @@ locals {
     cloudwatch_metric_alarms_dbnames_misload = []
 
     baseline_acm_certificates = {
-      # nomis_wildcard_cert = {
-      #   # domain_name limited to 64 chars so use modernisation platform domain for this
-      #   # and put the wildcard in the san
-      #   domain_name = module.environment.domains.public.modernisation_platform
-      #   subject_alternate_names = [
-      #     "*.${module.environment.domains.public.application_environment}",
-      #     "*.${local.environment}.nomis.az.justice.gov.uk",
-      #   ]
-      #   cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
-      #   tags = {
-      #     description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
-      #   }
-      # }
+      nomis_wildcard_cert = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          "*.${module.environment.domains.public.application_environment}",
+          "*.${local.environment}.nomis.service.justice.gov.uk",
+          "*.${local.environment}.nomis.az.justice.gov.uk",
+        ]
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+        tags = {
+          description = "wildcard cert for nomis ${local.environment} domains"
+        }
+      }
     }
 
     baseline_ssm_parameters = {
@@ -152,6 +153,20 @@ locals {
         }
       }
 
+      qa11r-nomis-web-a = merge(local.weblogic_ec2_a, {
+        tags = merge(local.weblogic_ec2_a.tags, {
+          nomis-environment    = "syscon"
+          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "qa11r"
+        })
+        cloudwatch_metric_alarms = {}
+        user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+      })
+
       qa11r-nomis-web-b = merge(local.weblogic_ec2_b, {
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "syscon"
@@ -161,13 +176,96 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
           args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "b5c4038616cc2d28056b9fd4e7d9e1388a6f8c29" # 2022-09-04 allow single connection string
           })
         })
         autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
           desired_capacity = 1
         })
       })
+    }
+
+    baseline_lbs = {
+      # AWS doesn't let us call it internal
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = ["private-lb"]
+
+        listeners = {
+          http = local.weblogic_lb_listeners.http
+
+          http7777 = merge(local.weblogic_lb_listeners.http7777, {
+            rules = {
+              # qa11r-nomis-web-a = {
+              #   priority = 300
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "qa11r-nomis-web-a-http-7777"
+              #   }]
+              #   conditions = [{
+              #      host_header = {
+              #      values = [
+              #        "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
+              #      ]
+              #    }
+              #  }]
+              # }
+              qa11r-nomis-web-b = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "qa11r-nomis-web-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "qa11r-nomis-web-b.development.nomis.service.justice.gov.uk",
+                      "qa11r.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+
+          #https = merge(local.weblogic_lb_listeners.https, {
+          #  rules = {
+          #    qa11r-nomis-web-a-http-7777 = {
+          #      priority = 300
+          #      actions = [{
+          #        type              = "forward"
+          #        target_group_name = "qa11r-nomis-web-a-http-7777"
+          #      }]
+          #      conditions = [{
+          #        host_header = {
+          #          values = [
+          #            "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
+          #          ]
+          #        }
+          #      }]
+          #    }
+          #    qa11r-nomis-web-b-http-7777 = {
+          #      priority = 450
+          #      actions = [{
+          #        type              = "forward"
+          #        target_group_name = "qa11r-nomis-web-b-http-7777"
+          #      }]
+          #      conditions = [{
+          #        host_header = {
+          #          values = [
+          #            "qa11r-nomis-web-b.development.nomis.service.justice.gov.uk",
+          #            "qa11r.development.nomis.service.justice.gov.uk",
+          #          ]
+          #        }
+          #      }]
+          #  }
+          #})
+        }
+      }
     }
 
     baseline_route53_zones = {
@@ -191,6 +289,12 @@ locals {
           { name = "qa11r", type = "CNAME", ttl = "300", records = ["qa11r-a.development.nomis.service.justice.gov.uk"] },
           { name = "qa11r-a", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
           { name = "qa11r-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+        ]
+        lb_alias_records = [
+          # qa11r
+          { name = "qa11r-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "qa11r-nomis-web-b", type = "A", lbs_map_key = "private" },
+          { name = "qa11r", type = "A", lbs_map_key = "private" },
         ]
       }
     }
