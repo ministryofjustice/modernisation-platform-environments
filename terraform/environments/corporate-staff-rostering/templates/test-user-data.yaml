@@ -9,7 +9,7 @@ tasks:
         type: powershell
         runAs: admin # or localSystem
         # Set time to local and locale
-        content: |
+        content: |-
           # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script 
           
           # Set-TimeZone "GMT Standard Time" # does not work for Server 2012 R2 version of PowerShell
@@ -18,20 +18,20 @@ tasks:
         type: powershell
         runAs: admin # or localSystem
         # install AD commands
-        content: |
+        content: |-
           Install-WindowsFeature -Name RSAT-AD-PowerShell
       - frequency: always
         type: powershell
         runAs: admin # or localSystem
         # create a folder and file to test that the script ran
-        content: |
+        content: |-
           New-Item -ItemType Directory -Force -Path C:\temp\Test
           New-Item -ItemType File -Force -Path C:\temp\Test\test-success.txt
       - frequency: always
         type: powershell
         runAs: admin # or localSystem
         # run a test SSM document
-        content: |
+        content: |-
           # Install AWS PowerShell module if not already installed
           if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
           Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
