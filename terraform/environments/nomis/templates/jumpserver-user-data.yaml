@@ -107,6 +107,9 @@ tasks:
         # IE COMPATIBILITY MODE SITE LIST
         content: |
           $ie_compatibility_mode_site_list = @(
+              "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
+              "qa11r-nomis-web-b.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
+              "c-qa11r.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
               "t1-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
               "t1-nomis-web-a.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
               "t1-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
