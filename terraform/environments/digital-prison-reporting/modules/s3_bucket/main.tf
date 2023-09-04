@@ -14,8 +14,6 @@ resource "aws_s3_bucket" "storage" { # TBC "application_tf_state" should be gene
     prevent_destroy = false
   }
 
-  bucket_key_enabled = true
-
   tags = var.tags
 }
 
@@ -53,13 +51,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
+
   bucket = aws_s3_bucket.storage[0].id
+
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = "aws:kms"
       kms_master_key_id = var.custom_kms_key
     }
   }
+
+  bucket_key_enabled = var.bucket_key
 }
 
 resource "aws_sqs_queue_policy" "allow_sqs_access" {
