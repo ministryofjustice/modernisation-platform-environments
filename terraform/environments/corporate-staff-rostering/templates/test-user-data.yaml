@@ -5,7 +5,7 @@ version: 1.1
 tasks:
   - task: executeScript
     inputs:
-      - frequency: once
+      - frequency: always
         type: powershell
         runAs: admin # or localSystem
         # Set time to local and locale
@@ -14,14 +14,20 @@ tasks:
           
           # Set-TimeZone "GMT Standard Time" # does not work for Server 2012 R2 version of PowerShell
           Set-WinSystemLocale "en-GB"
-      - frequency: once
+      - frequency: always
+        type: powershell
+        runAs: admin # or localSystem
+        # install AD commands
+        content: |
+          Install-WindowsFeature -Name RSAT-AD-PowerShell
+      - frequency: always
         type: powershell
         runAs: admin # or localSystem
         # create a folder and file to test that the script ran
         content: |
           New-Item -ItemType Directory -Force -Path C:\temp\Test
           New-Item -ItemType File -Force -Path C:\temp\Test\test-success.txt
-      - frequency: once
+      - frequency: always
         type: powershell
         runAs: admin # or localSystem
         # run a test SSM document
