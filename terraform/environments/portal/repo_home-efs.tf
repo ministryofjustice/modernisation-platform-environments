@@ -37,7 +37,6 @@ resource "aws_efs_file_system" "efs" {
 
 }
 
-
 resource "aws_efs_mount_target" "target_a" {
 
   file_system_id  = aws_efs_file_system.efs.id
