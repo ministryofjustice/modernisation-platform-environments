@@ -77,7 +77,7 @@ locals {
       })
 
       prod-jumpserver-a = merge(local.jumpserver_ec2_default, {
-        config = merge(local.jumpserver_ec2_default, {
+        config = merge(local.jumpserver_ec2_default.config, {
           user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
             ie_compatibility_mode_site_list = join(",", [
               "prod-nomis-web-a.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
