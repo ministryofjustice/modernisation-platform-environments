@@ -1,11 +1,17 @@
 locals {
-  compact_raw_job_name        = "${local.project}-maintenance-compact-raw-${local.env}"
-  compact_structured_job_name = "${local.project}-maintenance-compact-structured-${local.env}"
-  compact_curated_job_name    = "${local.project}-maintenance-compact-curated-${local.env}"
+  compact_raw_job_name              = "${local.project}-maintenance-compact-raw-${local.env}"
+  compact_raw_job_short_name        = "${local.project}-maintenance-compact-raw"
+  compact_structured_job_name       = "${local.project}-maintenance-compact-structured-${local.env}"
+  compact_structured_job_short_name = "${local.project}-maintenance-compact-structured"
+  compact_curated_job_name          = "${local.project}-maintenance-compact-curated-${local.env}"
+  compact_curated_job_short_name    = "${local.project}-maintenance-compact-curated"
 
-  retention_raw_job_name        = "${local.project}-maintenance-retention-raw-${local.env}"
-  retention_structured_job_name = "${local.project}-maintenance-retention-structured-${local.env}"
-  retention_curated_job_name    = "${local.project}-maintenance-retention-curated-${local.env}"
+  retention_raw_job_name              = "${local.project}-maintenance-retention-raw-${local.env}"
+  retention_raw_job_short_name        = "${local.project}-maintenance-retention-raw"
+  retention_structured_job_name       = "${local.project}-maintenance-retention-structured-${local.env}"
+  retention_structured_job_short_name = "${local.project}-maintenance-retention-structured"
+  retention_curated_job_name          = "${local.project}-maintenance-retention-curated-${local.env}"
+  retention_curated_job_short_name    = "${local.project}-maintenance-retention-curated"
 
 
   raw_zone_nomis_path        = "s3://${module.s3_raw_bucket.bucket_id}/nomis/"
@@ -21,6 +27,7 @@ module "glue_compact_raw_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = local.compact_raw_job_name
+  short_name                    = local.compact_raw_job_short_name
   command_type                  = "glueetl"
   description                   = "Runs compaction on tables in the raw layer"
   create_security_configuration = local.create_sec_conf
@@ -61,6 +68,7 @@ module "glue_compact_structured_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = local.compact_structured_job_name
+  short_name                    = local.compact_structured_job_short_name
   command_type                  = "glueetl"
   description                   = "Runs compaction on tables in the structured layer"
   create_security_configuration = local.create_sec_conf
@@ -101,6 +109,7 @@ module "glue_compact_curated_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = local.compact_curated_job_name
+  short_name                    = local.compact_curated_job_short_name
   command_type                  = "glueetl"
   description                   = "Runs compaction on tables in the curated layer"
   create_security_configuration = local.create_sec_conf
@@ -141,6 +150,7 @@ module "glue_retention_raw_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = local.retention_raw_job_name
+  short_name                    = local.retention_raw_job_short_name
   command_type                  = "glueetl"
   description                   = "Runs the vacuum retention job on tables in the raw layer"
   create_security_configuration = local.create_sec_conf
@@ -181,6 +191,7 @@ module "glue_retention_structured_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = local.retention_structured_job_name
+  short_name                    = local.retention_structured_job_short_name
   command_type                  = "glueetl"
   description                   = "Runs the vacuum retention job on tables in the structured layer"
   create_security_configuration = local.create_sec_conf
@@ -221,6 +232,7 @@ module "glue_retention_curated_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = local.retention_curated_job_name
+  short_name                    = local.retention_curated_job_short_name
   command_type                  = "glueetl"
   description                   = "Runs the vacuum retention job on tables in the curated layer"
   create_security_configuration = local.create_sec_conf
