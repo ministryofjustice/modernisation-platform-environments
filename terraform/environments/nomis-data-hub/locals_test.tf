@@ -23,7 +23,7 @@ locals {
           server-type = "ndh-management-server"
         }
       }
-
+#Tonys hacky destroy rebuild text to trigger change, can be deleted
       test-ndh-app-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
