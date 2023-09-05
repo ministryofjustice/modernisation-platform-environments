@@ -99,7 +99,7 @@ locals {
           server-type = "csr-db"
         }
       }
-      dev-tst-1 = {
+      dev-tst-2 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "base_windows_server_2012_r2_release_2023-*"
           ami_owner                     = "374269020027"
