@@ -305,16 +305,19 @@
   },
   "ec2_sg_base_ingress_rules": {
     "TCP_80": {
+      "application": "HTTP",
       "from_port": 80,
       "to_port": 80,
       "protocol": "TCP"
     },
     "TCP_443": {
+      "application": "HTTPS",
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP"
     },
     "TCP_22": {
+      "application": "SSH",
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP"
@@ -322,18 +325,21 @@
   },
   "ec2_sg_base_egress_rules": {
     "TCP_80": {
+      "application": "HTTP",
       "from_port": 80,
       "to_port": 80,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_443": {
+      "application": "HTTPS",
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "SSH_22": {
+      "application": "SSH",
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP",
@@ -342,62 +348,74 @@
   },
   "ec2_sg_ingress_rules": {
     "TCP_80": {
+      "application": "HTTP",
       "from_port": 80,
       "to_port": 80,
       "protocol": "TCP"
     },
     "TCP_443": {
+      "application": "HTTPS",
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP"
     },
     "TCP_22": {
+      "application": "SSH",
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP"
     },
     "TCP_1389": {
+      "application": "Oracle LDAP",
       "from_port": 1389,
       "to_port": 1389,
       "protocol": "TCP"
     },
     "TCP_152x": {
+      "application": "Oracle Net Listener",
       "from_port": 1521,
       "to_port": 1522,
       "protocol": "TCP"
     },
     "TCP_5101": {
+      "application": "Unknown",
       "from_port": 5101,
       "to_port": 5101,
       "protocol": "TCP"
     },
     "TCP_5401": {
+      "application": "Unknown",
       "from_port": 5401,
       "to_port": 5401,
       "protocol": "TCP"
     },
     "TCP_5575": {
+      "application": "Unknown",
       "from_port": 5575,
       "to_port": 5575,
       "protocol": "TCP"
     },
     "TCP_1636": {
+      "application": "Oracle LDAP SSL",
       "from_port": 1636,
       "to_port": 1636,
       "protocol": "TCP"
     },
     "TCP_10401": {
+      "application": "Unknown",
       "from_port": 10401,
       "to_port": 10401,
       "protocol": "TCP"
     },
     "TCP_800x": {
+      "application": "Oracle HTTP",
       "from_port": 8000,
       "to_port": 8005,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/20"
     },
     "TCP_444x": {
+      "application": "Oracle HTTPS",
       "from_port": 4443,
       "to_port": 4444,
       "protocol": "TCP",
@@ -406,78 +424,98 @@
   },
   "ec2_sg_egress_rules": {
     "TCP_80": {
+      "application": "HTTP",
       "from_port": 80,
       "to_port": 80,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_443": {
+      "application": "HTTPS",
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
+    "FTP_20": {
+      "application": "FTP",
+      "from_port": 20,
+      "to_port": 21,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
     "SSH_22": {
-      "from_port": 21,
+      "application": "SSH",
+      "from_port": 22,
       "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_1389": {
+      "application": "Oracle LDAP",
       "from_port": 1389,
       "to_port": 1389,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_152x": {
+      "application": "Oracle Net Listener",
       "from_port": 1521,
       "to_port": 1522,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_5101": {
+      "application": "Unknown",
       "from_port": 5101,
       "to_port": 5101,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_5401": {
+      "application": "Unknown",
       "from_port": 5401,
       "to_port": 5401,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_5575": {
+      "application": "Unknown",
       "from_port": 5575,
       "to_port": 5575,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_1636": {
+      "application": "Oracle LDAP SSL",
       "from_port": 1636,
       "to_port": 1636,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_10401": {
+      "application": "Unknown",
       "from_port": 10401,
       "to_port": 10401,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_50000": {
+      "application": "Lloyds FTP",
       "from_port": 50000,
       "to_port": 51000,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_800x": {
+      "application": "Oracle HTTP",
       "from_port": 8000,
       "to_port": 8005,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_444x": {
+      "application": "Oracle HTTPS",
       "from_port": 4443,
       "to_port": 4444,
       "protocol": "TCP",
@@ -486,16 +524,19 @@
   },
   "ec2_sg_ftp_ingress_rules": {
     "FTP_20": {
+      "application": "FTP",
       "from_port": 20,
-      "to_port": 22,
+      "to_port": 21,
       "protocol": "TCP"
     },
     "FTP_3010": {
+      "application": "FTP passive ports",
       "from_port": 3000,
       "to_port": 3010,
       "protocol": "TCP"
     },
     "SSH_22": {
+      "application": "SSH",
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP"
@@ -503,18 +544,21 @@
   },
   "ec2_sg_ftp_egress_rules": {
     "FTP_20": {
+      "application": "FTP",
       "from_port": 20,
-      "to_port": 22,
+      "to_port": 21,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/13"
     },
     "SSH_22": {
+      "application": "SSH",
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/13"
     },
     "TCP_443": {
+      "application": "HTTPS",
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP",
@@ -523,11 +567,13 @@
   },
   "ec2_sg_clamav_ingress_rules": {
     "TCP_3310": {
+      "application": "ClamAV",
       "from_port": 3310,
       "to_port": 3310,
       "protocol": "TCP"
     },
     "SSH_22": {
+      "application": "SSH",
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP"
@@ -535,18 +581,21 @@
   },
   "ec2_sg_clamav_egress_rules": {
     "TCP_3310": {
+      "application": "ClamAV",
       "from_port": 3310,
       "to_port": 3310,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "SSH_22": {
+      "application": "SSH",
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_443": {
+      "application": "HTTPS",
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP",
@@ -555,11 +604,13 @@
   },
   "ec2_sg_mailrelay_ingress_rules": {
     "SSH_22": {
+      "application": "SSH",
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP"
     },
     "SMTP_25": {
+      "application": "SMTP",
       "from_port": 25,
       "to_port": 25,
       "protocol": "TCP"
@@ -567,24 +618,28 @@
   },
   "ec2_sg_mailrelay_egress_rules": {
     "SSH_22": {
+      "application": "SSH",
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/13"
     },
     "SMTP_25": {
+      "application": "SMTP",
       "from_port": 25,
       "to_port": 25,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/13"
     },
     "HTTPS_443": {
+      "application": "HTTPS",
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "SMTP_587": {
+      "application": "SMTP SES",
       "from_port": 587,
       "to_port": 587,
       "protocol": "TCP",
@@ -641,6 +696,7 @@
   },
   "ec2_sg_ingress_rules_db": {
     "UDP_ALL": {
+      "application": "UDP ALL",
       "from_port": 0,
       "to_port": 65535,
       "protocol": "UDP"
@@ -648,18 +704,21 @@
   },
   "ec2_sg_egress_rules_db": {
     "TCP_80": {
+      "application": "HTTP",
       "from_port": 80,
       "to_port": 80,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_443": {
+      "application": "HTTPS",
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
     "SSH_22": {
+      "application": "SSH",
       "from_port": 21,
       "to_port": 22,
       "protocol": "TCP",
@@ -668,6 +727,7 @@
   },
   "lb_sg_ingress_rules": {
     "TCP_443": {
+      "application": "HTTPS",
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP",
@@ -676,6 +736,7 @@
   },
   "lb_sg_egress_rules": {
     "TCP_80": {
+      "application": "HTTP",
       "from_port": 0,
       "to_port": 0,
       "protocol": "TCP",

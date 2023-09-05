@@ -94,3 +94,8 @@ variable "dependency_lambda" {
   type    = any
   default = []
 }
+
+variable "bucket_key" {
+  description = "If Bucket Key is Enabled or Disabled"
+  default     = true
+}
