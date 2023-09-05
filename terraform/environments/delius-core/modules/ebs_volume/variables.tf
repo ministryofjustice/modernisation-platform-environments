@@ -45,5 +45,6 @@ variable "tags" {
 variable "kms_key_id" {
     description = "The ARN of the KMS key to use to encrypt the volume"
     type        = string
+    default     = null
 }
 

@@ -201,19 +201,19 @@ resource "aws_instance" "db_ec2_primary_instance" {
     # We want to include kms_key_id here
     tags = local.tags
   }
-  dynamic "ebs_block_device" {
-    for_each = { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false }
-    content {
-      device_name = ebs_block_device.key
-      volume_type = ebs_block_device.value.volume_type
-      volume_size = ebs_block_device.value.volume_size
-      iops        = var.db_config.ebs_volumes.iops
-      throughput  = var.db_config.ebs_volumes.throughput
-      encrypted   = true
-      # We want to include kms_key_id here
-      tags = local.tags
-    }
-  }
+  # dynamic "ebs_block_device" {
+  #   for_each = { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false }
+  #   content {
+  #     device_name = ebs_block_device.key
+  #     volume_type = ebs_block_device.value.volume_type
+  #     volume_size = ebs_block_device.value.volume_size
+  #     iops        = var.db_config.ebs_volumes.iops
+  #     throughput  = var.db_config.ebs_volumes.throughput
+  #     encrypted   = true
+  #     # We want to include kms_key_id here
+  #     tags = local.tags
+  #   }
+  # }
   dynamic "ephemeral_block_device" {
     for_each = { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == true }
     content {
@@ -227,10 +227,28 @@ resource "aws_instance" "db_ec2_primary_instance" {
     { database = format("%s-1", var.db_config.name) }
   )
 
-  lifecycle {
-    ignore_changes = [
-      ebs_block_device # We'd like to remove this and create ebs volumes as managed resources in order for terraform to manage changes such as volume type/size
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     ebs_block_device # We'd like to remove this and create ebs volumes as managed resources in order for terraform to manage changes such as volume type/size
+  #   ]
+  # }
 }
 
+module "ebs_volume" {
+  source = "../ebs_volume"
+  for_each = {
+    for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false
+  }
+  availability_zone = aws_instance.db_ec2_primary_instance.availability_zone
+  instance_id       = aws_instance.db_ec2_primary_instance.id
+  device_name       = each.key
+  size              = each.value.volume_size
+  iops              = var.db_config.ebs_volumes.iops
+  throughput        = var.db_config.ebs_volumes.throughput
+  tags              = local.tags
+  #kms_key_id = var.db_config.ebs_volumes.aws_kms_key_id
+
+  depends_on = [
+    aws_instance.db_ec2_primary_instance
+  ]
+}
