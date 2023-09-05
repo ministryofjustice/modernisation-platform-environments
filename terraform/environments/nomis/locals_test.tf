@@ -206,12 +206,6 @@ locals {
               "*.hmpp-azdt.justice.gov.uk",
             ])
             desktop_shortcuts = join(",", [
-              "t1-nomis-web-a|https://t1-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t1-nomis-web-b|https://t1-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t2-nomis-web-a|https://t2-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t2-nomis-web-b|https://t2-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t3-nomis-web-a|https://t3-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t3-nomis-web-b|https://t3-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
               "T1 NOMIS|https://c-t1.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
               "T2 NOMIS|https://c-t2.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
               "T3 NOMIS|https://c-t3.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",

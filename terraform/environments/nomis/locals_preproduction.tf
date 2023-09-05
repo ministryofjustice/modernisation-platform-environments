@@ -78,8 +78,6 @@ locals {
               "*.nomis.az.justice.gov.uk",
             ])
             desktop_shortcuts = join(",", [
-              "preprod-nomis-web-a|https://preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "preprod-nomis-web-b|https://preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
               "Preprod NOMIS|https://c.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
             ])
           }))

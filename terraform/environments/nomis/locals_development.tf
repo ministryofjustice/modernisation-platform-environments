@@ -143,8 +143,6 @@ locals {
             ])
             # using port 7777 as Edge takes an age to verify certs, see DSOS-2142
             desktop_shortcuts = join(",", [
-              "qa11r-nomis-web-a|https://qa11r-nomis-web-a.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "qa11r-nomis-web-b|https://qa11r-nomis-web-b.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
               "QA11R NOMIS|http://c-qa11r.development.nomis.service.justice.gov.uk:7777/forms/frmservlet?config=tag",
             ])
           }))
