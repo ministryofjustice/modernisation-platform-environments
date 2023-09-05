@@ -131,7 +131,8 @@ module "data_product_athena_load_lambda" {
   create_role                    = true
   reserved_concurrent_executions = 1
   depends_on = [
-    aws_athena_workgroup.data_product_athena_workgroup
+    aws_athena_workgroup.data_product_athena_workgroup,
+    module.s3-bucket
   ]
 
   image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:${local.athena_load_version}"
