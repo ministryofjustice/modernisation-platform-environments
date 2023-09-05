@@ -113,7 +113,7 @@ locals {
           instance_type          = "t3.medium"
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
+          "/dev/sda1" = { type = "gp3", size = 192 } # minimum size has to be 128 due to snapshot sizes
         }
         tags = {
           description = "Test AWS AMI Windows Server 2012 R2"
