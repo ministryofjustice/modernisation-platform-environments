@@ -99,9 +99,9 @@ locals {
           server-type = "csr-db"
         }
       }
-      dev-tst-2 = {
+      dev-tst-3 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "base_windows_server_2012_r2_release_2023-*"
+          ami_name                      = "base_windows_server_2012_r2_release_2023-09-05*"
           ami_owner                     = "374269020027"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/test-user-data.yaml"))
@@ -110,10 +110,10 @@ locals {
 
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["migration-app-sg"]
-          instance_type          = "t3.xlarge"
+          instance_type          = "t3.medium"
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 256 }
+          "/dev/sda1" = { type = "gp3", size = 100 }
         }
         tags = {
           description = "Test AWS AMI Windows Server 2012 R2"
