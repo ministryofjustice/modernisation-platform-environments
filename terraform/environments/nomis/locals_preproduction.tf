@@ -63,12 +63,8 @@ locals {
         })
       })
 
-      preprod-jumpserver-2022 = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "hmpps_windows_server_2022_release_2023-*"
-          availability_zone             = null
-          ebs_volumes_copy_all_from_ami = false
+      preprod-jumpserver-a = merge(local.jumpserver_ec2_default, {
+        config = merge(local.jumpserver_ec2_default, {
           user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
             ie_compatibility_mode_site_list = join(",", [
               "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
@@ -88,24 +84,7 @@ locals {
             ])
           }))
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t3.large"
-          vpc_security_group_ids = ["private-jumpserver"]
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
-        }
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 1 # set to 0 while testing
-        })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
-          description = "Windows Server 2022 Jumpserver for NOMIS"
-          os-type     = "Windows"
-          component   = "jumpserver"
-          server-type = "nomis-jumpserver"
-        }
-      }
+      })
     }
 
     baseline_lbs = {
