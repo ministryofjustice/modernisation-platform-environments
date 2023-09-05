@@ -31,7 +31,7 @@ locals {
         }
       }
 
-      dev-tst-4 = {
+      dev-tst = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "base_windows_server_2012_r2_release_2023-09-05*"
           ami_owner                     = "374269020027"
@@ -43,6 +43,9 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["migration-app-sg"]
           instance_type          = "t3.medium"
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0 # set to 0 while testing
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 192 } # minimum size has to be 128 due to snapshot sizes
