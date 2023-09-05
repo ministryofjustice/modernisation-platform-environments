@@ -106,7 +106,8 @@ tasks:
         runAs: admin
         # IE COMPATIBILITY MODE SITE LIST
         content: |
-          $ie_compatibility_mode_site_list = @(${ie_compatibility_mode_site_list})
+          $ie_compatibility_mode_site_list = "${ie_compatibility_mode_site_list}".Split(",")
+          $ie_compatibility_mode_site_list
           $compatibility_site_list_path = "C:\\compatibility_site_list.xml"
 
           $xmlDoc = New-Object System.Xml.XmlDocument
@@ -154,7 +155,8 @@ tasks:
         # - Trusted Sites - HKCU, HKLM does not apply since the machine is not on the domain 
         # NOTE: https:// traffic ONLY is allowed, these settings are external to this environment and are not managed by this script
         content: |
-          $domains = @(${ie_trusted_domains})
+          $domains = "${ie_trusted_domains}".Split(",")
+          $domains
 
           $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Edge\EnhanceSecurityModeBypassListDomains"
 
@@ -224,7 +226,8 @@ tasks:
         runAs: admin
         # Add desktop shortcuts for Nomis URLs
         content: |
-          $desktop_shortcuts = @(${desktop_shortcuts})
+          $desktop_shortcuts = "${desktop_shortcuts}".Split(",")
+          $desktop_shortcuts
 
           for ($i = 0; $i -lt $desktop_shortcuts.Length; $i++) {
             $desktop_shortcut = $desktop_shortcuts[$i].Split("|")
