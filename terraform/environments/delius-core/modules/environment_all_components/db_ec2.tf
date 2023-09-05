@@ -214,6 +214,7 @@ resource "aws_instance" "db_ec2_primary_instance" {
   #     tags = local.tags
   #   }
   # }
+
   dynamic "ephemeral_block_device" {
     for_each = { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == true }
     content {
@@ -234,21 +235,21 @@ resource "aws_instance" "db_ec2_primary_instance" {
   # }
 }
 
-module "ebs_volume" {
-  source = "../ebs_volume"
-  for_each = {
-    for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false
-  }
-  availability_zone = aws_instance.db_ec2_primary_instance.availability_zone
-  instance_id       = aws_instance.db_ec2_primary_instance.id
-  device_name       = each.key
-  size              = each.value.volume_size
-  iops              = var.db_config.ebs_volumes.iops
-  throughput        = var.db_config.ebs_volumes.throughput
-  tags              = local.tags
-  #kms_key_id = var.db_config.ebs_volumes.aws_kms_key_id
+# module "ebs_volume" {
+#   source = "../ebs_volume"
+#   for_each = {
+#     for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false
+#   }
+#   availability_zone = aws_instance.db_ec2_primary_instance.availability_zone
+#   instance_id       = aws_instance.db_ec2_primary_instance.id
+#   device_name       = each.key
+#   size              = each.value.volume_size
+#   iops              = var.db_config.ebs_volumes.iops
+#   throughput        = var.db_config.ebs_volumes.throughput
+#   tags              = local.tags
+#   #kms_key_id = var.db_config.ebs_volumes.aws_kms_key_id
 
-  depends_on = [
-    aws_instance.db_ec2_primary_instance
-  ]
-}
+#   depends_on = [
+#     aws_instance.db_ec2_primary_instance
+#   ]
+# }
