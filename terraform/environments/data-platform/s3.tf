@@ -122,3 +122,11 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket      = module.s3-bucket.bucket.id
   eventbridge = true
 }
+
+# load the json schema for data product metadata
+resource "aws_s3_object" "object" {
+  bucket = module.s3-bucket.bucket.id
+  key    = "data_product_metadata_spec/v1.0.0/moj_data_product_metadata_spec.json"
+  source = "data-product-metadata-json-schema/v1.0.0/moj_data_product_metadata_spec.json"
+  etag   = filemd5("data-product-metadata-json-schema/v1.0.0/moj_data_product_metadata_spec.json")
+}
