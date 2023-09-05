@@ -135,7 +135,23 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))
+          user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
+            ie_compatibility_mode_site_list = join(",", [
+              "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "qa11r-nomis-web-b.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "c-qa11r.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+            ie_trusted_domains = join(",", [
+              "*.nomis.hmpps-development.modernisation-platform.justice.gov.uk",
+              "*.nomis.service.justice.gov.uk",
+            ])
+            # using port 7777 as Edge takes an age to verify certs, see DSOS-2142
+            desktop_shortcuts = join(",", [
+              "qa11r-nomis-web-a|https://qa11r-nomis-web-a.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "qa11r-nomis-web-b|https://qa11r-nomis-web-b.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "QA11R NOMIS|http://c-qa11r.development.nomis.service.justice.gov.uk:7777/forms/frmservlet?config=tag",
+            ])
+          }))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-jumpserver"]

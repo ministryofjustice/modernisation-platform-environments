@@ -75,6 +75,49 @@ locals {
           is-production        = "true-no-default-backup-workaround"
         })
       })
+
+      prod-jumpserver-2022 = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "hmpps_windows_server_2022_release_2023-*"
+          availability_zone             = null
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
+            ie_compatibility_mode_site_list = join(",", [
+              "prod-nomis-web-a.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "prod-nomis-web-b.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "c.nomis.az.justice.gov.uk/forms/frmservlet?config=tag",
+              "c.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+            ie_trusted_domains = join(",", [
+              "*.nomis.hmpps-production.modernisation-platform.justice.gov.uk",
+              "*.nomis.service.justice.gov.uk",
+              "*.nomis.az.justice.gov.uk",
+            ])
+            desktop_shortcuts = join(",", [
+              "prod-nomis-web-a|https://prod-nomis-web-a.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "prod-nomis-web-b|https://prod-nomis-web-b.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "Prod NOMIS|https://c.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+          }))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-jumpserver"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 1 # set to 0 while testing
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description = "Windows Server 2022 Jumpserver for NOMIS"
+          os-type     = "Windows"
+          component   = "jumpserver"
+          server-type = "nomis-jumpserver"
+        }
+      }
     }
 
     baseline_ec2_instances = {
