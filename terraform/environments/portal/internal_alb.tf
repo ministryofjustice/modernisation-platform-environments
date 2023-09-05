@@ -15,7 +15,7 @@ resource "aws_lb" "internal" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.internal_lb.id]
   subnets            = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
-  # enable_deletion_protection = local.enable_deletion_protection
+  enable_deletion_protection = local.lb_enable_deletion_protection
   idle_timeout = local.internal_lb_idle_timeout
 
   access_logs {
@@ -62,7 +62,7 @@ resource "aws_lb_listener" "https_internal" {
   port              = local.internal_lb_https_port
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
+  certificate_arn   = aws_acm_certificate_validation.external_lb_certificate_validation.certificate_arn
 
   default_action {
     type             = "forward"

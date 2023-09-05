@@ -37,7 +37,9 @@
       "acm_aws_domain_name": "*.aws.dev.legalservices.gov.uk",
       "fqdn": "portal.dev.legalservices.gov.uk",
       "landing_zone_vpc_cidr": "10.202.0.0/20",
-      "mp_domain_name": "modernisation-platform.service.justice.gov.uk"
+      "mp_domain_name": "modernisation-platform.service.justice.gov.uk",
+      "lb_enable_deletion_protection": "false",
+      "efs_enable_deletion_protection": "false"
     },
     "test": {
       "example_var": "test-data",
