@@ -98,6 +98,8 @@ module "data_product_presigned_url_lambda" {
   function_name                  = "data_product_presigned_url_${local.environment}"
   create_role                    = true
   reserved_concurrent_executions = 1
+  depends_on = [module.s3-bucket]
+
 
   image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-presigned-url-lambda-ecr-repo:${local.presigned_url_version}"
   timeout      = 600
