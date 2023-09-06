@@ -98,7 +98,7 @@ locals {
           test = {}
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
@@ -194,7 +194,9 @@ locals {
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         ssm_parameters = {
-          test = {}
+          test = {
+            kms_key_id = "general"
+          }
         }
         tags = {
           description = "For testing our base RHEL7.9 base image"
