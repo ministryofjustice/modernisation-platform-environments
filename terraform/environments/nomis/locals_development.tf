@@ -94,6 +94,9 @@ locals {
           vpc_security_group_ids = ["private-web"]
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        ssm_parameters = {
+          test = {}
+        }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
