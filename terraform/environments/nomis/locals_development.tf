@@ -188,7 +188,6 @@ locals {
       dev-tmp-rhel79 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "base_rhel_7_9_*"
-          availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
