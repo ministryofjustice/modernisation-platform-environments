@@ -11,6 +11,7 @@ module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
+  short_name                    = "${local.project}-reporting-hub"
   description                   = local.description
   command_type                  = "gluestreaming"
   job_language                  = "scala"
@@ -25,11 +26,12 @@ module "glue_reporting_hub_job" {
   aws_kms_key                  = local.s3_kms_arn
   additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   execution_class              = "STANDARD"
-  worker_type                  = "G.1X"
-  number_of_workers            = 4
+  worker_type                  = local.reporting_hub_worker_type
+  number_of_workers            = local.reporting_hub_num_workers
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = 1
 
   tags = merge(
     local.all_tags,
@@ -47,7 +49,7 @@ module "glue_reporting_hub_job" {
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
     "--dpr.aws.region"                          = local.account_region
     "--dpr.curated.s3.path"                     = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.kinesis.reader.batchDurationSeconds" = 60
+    "--dpr.kinesis.reader.batchDurationSeconds" = local.reporting_hub_kinesis_reader_batch_duration_seconds
     "--dpr.kinesis.reader.streamName"           = local.kinesis_stream_ingestor
     "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/"
     "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/"
@@ -57,7 +59,14 @@ module "glue_reporting_hub_job" {
     "--enable-auto-scaling"                     = true
     "--enable-job-insights"                     = true
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
+    "--dpr.aws.dynamodb.endpointUrl"            = "https://dynamodb.${local.account_region}.amazonaws.com"
     "--dpr.contract.registryName"               = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.domain.registry"                     = "${local.project}-domain-registry-${local.environment}"
+    "--dpr.domain.target.path"                  = "s3://${module.s3_domain_bucket.bucket_id}"
+    "--dpr.domain.catalog.db"                   = module.glue_data_domain_database.db_name
+    "--dpr.redshift.secrets.name"               = "${local.project}-redshift-secret-${local.environment}"
+    "--dpr.datamart.db.name"                    = "datamart"
+    "--dpr.log.level"                           = local.reporting_hub_log_level
   }
 }
 
@@ -66,6 +75,7 @@ module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-domain-refresh-${local.env}"
+  short_name                    = "${local.project}-domain-refresh"
   command_type                  = "glueetl"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
   create_security_configuration = local.create_sec_conf
@@ -80,12 +90,13 @@ module "glue_domain_refresh_job" {
   aws_kms_key                  = local.s3_kms_arn
   additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   # timeout                       = 1440
-  execution_class   = "FLEX"
-  worker_type       = "G.1X"
-  number_of_workers = 2
-  max_concurrent    = 1
-  region            = local.account_region
-  account           = local.account_id
+  execution_class             = "FLEX"
+  worker_type                 = local.refresh_job_worker_type
+  number_of_workers           = local.refresh_job_num_workers
+  max_concurrent              = 1
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = 1
 
   tags = merge(
     local.all_tags,
@@ -107,6 +118,7 @@ module "glue_domain_refresh_job" {
     "--dpr.domain.registry"          = "${local.project}-domain-registry-${local.environment}"
     "--dpr.domain.target.path"       = "s3://${module.s3_domain_bucket.bucket_id}"
     "--dpr.domain.catalog.db"        = module.glue_data_domain_database.db_name
+    "--dpr.log.level"                = local.refresh_job_log_level
   }
 }
 
@@ -116,7 +128,7 @@ module "kinesis_stream_ingestor" {
   create_kinesis_stream     = local.create_kinesis
   name                      = local.kinesis_stream_ingestor
   shard_count               = 1 # Not Valid when ON-DEMAND Mode
-  retention_period          = 24
+  retention_period          = local.kinesis_retention_hours
   shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
   enforce_consumer_deletion = false
   encryption_type           = "KMS"
@@ -130,6 +142,27 @@ module "kinesis_stream_ingestor" {
       Resource_Type = "Kinesis Data Stream"
     }
   )
+}
+
+module "kinesis_stream_reconciliation_firehose_s3" {
+  source                     = "./modules/kinesis_firehose"
+  name                       = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
+  aws_account_id             = local.account_id
+  aws_region                 = local.account_region
+  cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
+  cloudwatch_log_stream_name = "DestinationDelivery"
+  cloudwatch_logging_enabled = false
+  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn
+  kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name
+  target_s3_arn              = module.s3_working_bucket.bucket_arn
+  target_s3_id               = module.s3_working_bucket.bucket_id
+  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
+  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}-error/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/!{firehose:error-output-type}"
+  target_s3_kms              = local.s3_kms_arn
+  buffering_size             = 128
+  buffering_interval         = 900
+  database_name              = module.glue_reconciliation_database.db_name
+  table_name                 = module.glue_reconciliation_table.table_name
 }
 
 # Glue Registry
@@ -198,7 +231,6 @@ module "glue_raw_table" {
 
     ser_de_info = [
       {
-        name                  = "raw"
         serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
 
         parameters = {
@@ -212,6 +244,77 @@ module "glue_raw_table" {
     sort_columns = []
   }
   glue_table_depends_on = [module.glue_raw_zone_database.db_name]
+}
+
+module "glue_reconciliation_table" {
+  source                    = "./modules/glue_table"
+  enable_glue_catalog_table = true
+  name                      = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
+
+  # AWS Glue catalog DB
+  glue_catalog_database_name       = module.glue_reconciliation_database.db_name
+  glue_catalog_database_parameters = null
+
+  # AWS Glue catalog table
+  glue_catalog_table_description = "Glue Table for reconciliation data, managed by Terraform."
+  glue_catalog_table_table_type  = "EXTERNAL_TABLE"
+  glue_catalog_table_parameters = {
+    EXTERNAL              = "TRUE"
+    "parquet.compression" = "SNAPPY"
+    "classification"      = "parquet"
+  }
+  glue_catalog_table_storage_descriptor = {
+
+    location      = "s3://${module.s3_working_bucket.bucket_id}/reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    columns = [
+      {
+        columns_name    = "data"
+        columns_type    = "string"
+        columns_comment = "Nested JSON data"
+      },
+      {
+        columns_name    = "metadata"
+        columns_type    = "string"
+        columns_comment = "Common metadata"
+      }
+    ]
+
+    partition_keys = [
+      {
+        name    = "year",
+        type    = "string",
+        comment = ""
+      },
+      {
+        name    = "month",
+        type    = "string",
+        comment = ""
+      },
+      {
+        name    = "day",
+        type    = "string",
+        comment = ""
+      }
+    ]
+
+    ser_de_info = [
+      {
+        serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+        parameters = {
+          "serialization.format" = 1
+        }
+      }
+    ]
+
+    skewed_info = []
+
+    sort_columns = []
+  }
+  glue_table_depends_on = [module.glue_reconciliation_database.db_name]
 }
 
 
@@ -253,7 +356,6 @@ module "s3_landing_bucket" {
     }
   )
 }
-
 # S3 RAW
 module "s3_raw_bucket" {
   source                    = "./modules/s3_bucket"
@@ -369,13 +471,13 @@ module "s3_artifacts_store" {
   name                = "${local.project}-artifact-store-${local.environment}"
   custom_kms_key      = local.s3_kms_arn
   enable_notification = true #
- 
+
   # Dynamic, supports multiple notifications blocks
   bucket_notifications = {
-    "lambda_function_arn"   = "${module.domain_builder_flyway_Lambda.lambda_function}"
-    "events"                = ["s3:ObjectCreated:*"]
-    "filter_prefix"         = "build-artifacts/domain-builder/jars/"
-    "filter_suffix"         = ".jar"
+    "lambda_function_arn" = "${module.domain_builder_flyway_Lambda.lambda_function}"
+    "events"              = ["s3:ObjectCreated:*"]
+    "filter_prefix"       = "build-artifacts/domain-builder/jars/"
+    "filter_suffix"       = ".jar"
   }
 
   dependency_lambda = [module.domain_builder_flyway_Lambda.lambda_function] # Required if bucket_notications is enabled
@@ -446,6 +548,16 @@ module "glue_curated_zone_database" {
   create_db      = local.create_db
   name           = "curated"
   description    = "Glue Data Catalog - Curated Zone"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for Reconciliation
+module "glue_reconciliation_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "reconciliation"
+  description    = "Glue Data Catalog - Reconciliation"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }
@@ -544,6 +656,7 @@ module "datamart" {
   logging = {
     enable               = true
     log_destination_type = "cloudwatch"
+    retention_period     = 1
     log_exports          = ["useractivitylog", "userlog", "connectionlog"]
   }
 
@@ -559,7 +672,8 @@ module "datamart" {
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
   source                       = "./modules/dms"
-  enable_replication_task      = local.enable_replication_task
+  setup_dms_instance           = local.setup_dms_instance      # Disable all DMS Resources
+  enable_replication_task      = local.enable_replication_task # Disable Replication Task
   name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
   vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
   source_engine_name           = "oracle"
@@ -576,14 +690,14 @@ module "dms_nomis_ingestor" {
   dms_target_name              = "kinesis"
   short_name                   = "nomis"
   migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.6"
+  replication_instance_version = "3.4.6" # Rollback
   replication_instance_class   = "dms.t3.medium"
   subnet_ids                   = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
 
-  extra_attributes           = "supportResetlog=TRUE"
+  extra_attributes = "supportResetlog=TRUE"
 
   kinesis_settings = {
     "include_null_and_empty"         = "true"

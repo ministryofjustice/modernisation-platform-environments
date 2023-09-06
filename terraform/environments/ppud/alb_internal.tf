@@ -6,11 +6,13 @@ resource "aws_lb" "PPUD-internal-ALB" {
   count              = local.is-development == false ? 1 : 0
   name               = local.application_data.accounts[local.environment].PPUD_Internal_ALB
   internal           = true
+  idle_timeout       = 240
   load_balancer_type = "application"
   security_groups    = [aws_security_group.PPUD-ALB.id]
   subnets            = [data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
 
-  enable_deletion_protection = false
+  enable_deletion_protection = true
+  drop_invalid_header_fields = true
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"

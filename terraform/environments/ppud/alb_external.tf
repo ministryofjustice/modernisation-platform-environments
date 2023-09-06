@@ -9,7 +9,8 @@ resource "aws_lb" "PPUD-ALB" {
   security_groups    = [aws_security_group.PPUD-ALB.id]
   subnets            = [data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
 
-  enable_deletion_protection = false
+  enable_deletion_protection = true
+  drop_invalid_header_fields = true
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
@@ -82,7 +83,8 @@ resource "aws_lb" "WAM-ALB" {
   security_groups    = [aws_security_group.WAM-ALB.id]
   subnets            = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
 
-  enable_deletion_protection = false
+  enable_deletion_protection = true
+  drop_invalid_header_fields = true
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"

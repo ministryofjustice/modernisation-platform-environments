@@ -10,8 +10,7 @@ resource "aws_security_group" "database_security_group" {
     to_port     = 1433
     security_groups = [
       aws_security_group.jitbit.id,
-      module.bastion_linux.bastion_security_group,
-      aws_security_group.onprem_gateway.id
+      module.bastion_linux.bastion_security_group
     ]
   }
 
@@ -41,14 +40,17 @@ resource "aws_db_instance" "jitbit" {
   instance_class = local.application_data.accounts[local.environment].db_instance_class
   identifier     = "${local.application_name}-${local.environment}-database"
   username       = local.application_data.accounts[local.environment].db_user
-  password       = aws_secretsmanager_secret_version.db_admin_password.secret_string
+
+  manage_master_user_password = true
 
   snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
 
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.sqlserver-se-15.0"
   deletion_protection         = local.application_data.accounts[local.environment].db_deletion_protection
+  delete_automated_backups    = local.application_data.accounts[local.environment].db_delete_automated_backups
   skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
+  final_snapshot_identifier   = try(local.application_data.accounts[local.environment].db_final_snapshot_identifier, null)
   allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
   storage_type                = local.application_data.accounts[local.environment].db_storage_type
@@ -74,6 +76,15 @@ resource "aws_db_instance" "jitbit" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database", local.application_name, local.environment)) }
   )
+
+  # Temporarily adding this to avoiding recreation of the prod database while some investigation is taking place
+  # This list has to be static so will for a short time affect other environments too
+  lifecycle {
+    ignore_changes = [
+      snapshot_identifier,
+      final_snapshot_identifier
+    ]
+  }
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {

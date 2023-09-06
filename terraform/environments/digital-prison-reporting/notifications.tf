@@ -21,10 +21,10 @@ module "notifications_sns" {
 module "slack_alerts" {
   count = local.enable_slack_alerts ? 1 : 0
 
-  source     = "./modules/notifications/email"
+  source = "./modules/notifications/email"
 
   sns_topic_arn = module.notifications_sns.sns_topic_arn
-  email_url     = local.enable_slack_alerts ? data.aws_secretsmanager_secret_version.slack_integration[0].secret_string : null
+  email_url     = local.enable_slack_alerts ? data.aws_secretsmanager_secret_version.slack_integration[0].secret_string : "no@email.com"
 
   tags = merge(
     local.all_tags,
@@ -40,7 +40,7 @@ module "slack_alerts" {
 
 # PagerDuty notifications
 module "pagerduty_notifications" {
-  count      = local.enable_pagerduty_alerts ? 1 : 0
+  count = local.enable_pagerduty_alerts ? 1 : 0
 
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = ["${local.project}-notification-topic-${local.environment}"]

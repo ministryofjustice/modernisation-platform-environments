@@ -4,7 +4,8 @@ locals {
   # baseline config
   preproduction_config = {
 
-    cloudwatch_metric_alarms_dbnames = []
+    cloudwatch_metric_alarms_dbnames         = []
+    cloudwatch_metric_alarms_dbnames_misload = []
 
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
@@ -19,7 +20,7 @@ locals {
           "*.lsast-nomis.az.justice.gov.uk",
         ]
         external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for nomis ${local.environment} domains"
         }
@@ -40,15 +41,46 @@ locals {
           oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
           oracle-db-name       = "PPCNOM"
         })
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
+          desired_capacity = 0
+        })
       })
 
       # green deployment
       preprod-nomis-web-b = merge(local.weblogic_ec2_b, {
+        instance = merge(local.weblogic_ec2_b.instance, {
+          instance_type = "t2.xlarge"
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "preprod"
           oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
           oracle-db-name       = "PPCNOM"
+        })
+        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
+          desired_capacity = 2
+          max_size         = 2
+        })
+      })
+
+      preprod-jumpserver-a = merge(local.jumpserver_ec2_default, {
+        config = merge(local.jumpserver_ec2_default.config, {
+          user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
+            ie_compatibility_mode_site_list = join(",", [
+              "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "c.pp-nomis.az.justice.gov.uk/forms/frmservlet?config=tag",
+              "c.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+            ie_trusted_domains = join(",", [
+              "*.nomis.hmpps-preproduction.modernisation-platform.justice.gov.uk",
+              "*.nomis.service.justice.gov.uk",
+              "*.nomis.az.justice.gov.uk",
+            ])
+            desktop_shortcuts = join(",", [
+              "Preprod NOMIS|https://c.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+          }))
         })
       })
     }
@@ -80,9 +112,6 @@ locals {
                       values = [
                         "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
-                        "c.preproduction.nomis.az.justice.gov.uk",
-                        "c.preproduction.nomis.service.justice.gov.uk",
-                        "c.pp-nomis.service.justice.gov.uk",
                       ]
                     }
                   }]
@@ -98,6 +127,9 @@ locals {
                       values = [
                         "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
+                        "c.preproduction.nomis.az.justice.gov.uk",
+                        "c.preproduction.nomis.service.justice.gov.uk",
+                        "c.pp-nomis.az.justice.gov.uk",
                       ]
                     }
                   }]

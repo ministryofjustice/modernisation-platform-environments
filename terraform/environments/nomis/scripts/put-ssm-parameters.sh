@@ -25,6 +25,17 @@ for param in $params; do
   else
     value=$(cat ssm-parameters/$PROFILE/$param)
     echo aws ssm put-parameter --name $param --type "SecureString" --data-type "text" --value "$value" --profile $PROFILE --overwrite >&2
+  fi
+done
+echo Press RETURN to put-parameters, CTRL-C to cancel
+read
+
+for param in $params; do
+  if [[ ! -e ssm-parameters/$PROFILE/$param ]]; then
+    echo "skipping $param as file does not exist" >&2
+  else
+    value=$(cat ssm-parameters/$PROFILE/$param)
+    echo aws ssm put-parameter --name $param --type "SecureString" --data-type "text" --value "$value" --profile $PROFILE --overwrite >&2
     aws ssm put-parameter --name $param --type "SecureString" --data-type "text" --value "$value" --profile $PROFILE --overwrite
   fi
 done

@@ -3,7 +3,7 @@ locals {
 
     baseline_ec2_instances = {
 
-      test-managementserver-2022 = {
+      test-management-server-2022 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
@@ -52,7 +52,7 @@ locals {
         }
       }
     }
-    baseline_ec2_autoscaling_group = {
+    baseline_ec2_autoscaling_groups = {
       # Example ASG using base image with ansible provisioning
       # Include the autoscale-trigger-hook ansible role when using hooks
       # dev-base-rhel79 = {

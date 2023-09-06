@@ -19,16 +19,16 @@ Terraform Infrastructure as code that creates 3 AWS environments for the PPUD ap
 ### **Service URLs:**
 
 PPUD - UAT
-https://uat.ppud.justice.gov.uk/
- 
+<https://uat.ppud.justice.gov.uk/>
+
 WAM – UAT
-https://wamuat.ppud.justice.gov.uk/Account/Login
- 
+<https://wamuat.ppud.justice.gov.uk/Account/Login>
+
 PPUD - PROD
-https://www.ppud.justice.gov.uk/
- 
+<https://www.ppud.justice.gov.uk/>
+
 WAM – PROD
-https://wam.ppud.justice.gov.uk/
+<https://wam.ppud.justice.gov.uk/>
 
 
 <!--  The URL(s) of the service’s production environment, and test environments if possible-->
@@ -41,15 +41,15 @@ https://wam.ppud.justice.gov.uk/
 
 ### **Incident contact details:**
 
-PPUDAppSupportTeam@lumen.com
+<PPUDAppSupportTeam@lumen.com>
 
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
 ### **Service team contact:**
 
-pankaj.pant@lumen.com
-david.savage@lumen.com
-helen.stimpson@lumen.com
+<pankaj.pant@lumen.com>
+<david.savage@lumen.com>
+<helen.stimpson@lumen.com>
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 

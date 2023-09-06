@@ -1,3 +1,7 @@
+locals {
+  pagerduty_integration_key = local.is-production ? local.pagerduty_integration_keys["jitbit_prod_alarms"] : local.pagerduty_integration_keys["jitbit_nonprod_alarms"]
+}
+
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "jitbit_alerting" {
   name = "jitbit_alerting"
@@ -6,7 +10,7 @@ resource "aws_sns_topic" "jitbit_alerting" {
 resource "aws_sns_topic_subscription" "jitbit_pagerduty_subscription" {
   topic_arn = aws_sns_topic.jitbit_alerting.arn
   protocol  = "https"
-  endpoint  = "https://events.pagerduty.com/integration/${local.pagerduty_integration_keys["jitbit_nonprod_alarms"]}/enqueue"
+  endpoint  = "https://events.pagerduty.com/integration/${local.pagerduty_integration_key}/enqueue"
 }
 
 
@@ -36,5 +40,5 @@ module "pagerduty_core_alerts" {
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.jitbit_alerting.name]
-  pagerduty_integration_key = local.pagerduty_integration_keys["jitbit_nonprod_alarms"]
+  pagerduty_integration_key = local.pagerduty_integration_key
 }

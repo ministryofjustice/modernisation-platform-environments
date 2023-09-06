@@ -147,6 +147,7 @@ resource "aws_instance" "oim_instance_1" {
   # }
 
   tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${local.application_name} OIM Instance 1" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
@@ -177,6 +178,7 @@ resource "aws_instance" "oim_instance_2" {
 
 
   tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${local.application_name} OIM Instance 2" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }

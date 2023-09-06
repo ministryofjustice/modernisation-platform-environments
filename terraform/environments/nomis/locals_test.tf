@@ -14,6 +14,10 @@ locals {
       "T3CNOM"
     ]
 
+    cloudwatch_metric_alarms_dbnames_misload = [
+      "T1MIS"
+    ]
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -26,7 +30,7 @@ locals {
           "*.hmpp-azdt.justice.gov.uk",
         ]
         external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for nomis ${local.environment} domains"
         }
@@ -156,10 +160,16 @@ locals {
           oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T3CNOM"
         })
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
+          desired_capacity = 0
+        })
       })
 
       # green deployment
       t3-nomis-web-b = merge(local.weblogic_ec2_b, {
+        instance = merge(local.weblogic_ec2_b.instance, {
+          instance_type = "t2.xlarge"
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t3"
           oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
@@ -171,31 +181,38 @@ locals {
         })
       })
 
-      test-jumpserver-2022 = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "hmpps_windows_server_2022_release_2023-*"
-          availability_zone             = null
-          ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))
+      test-jumpserver-a = merge(local.jumpserver_ec2_default, {
+        config = merge(local.jumpserver_ec2_default.config, {
+          user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
+            ie_compatibility_mode_site_list = join(",", [
+              "t1-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t1-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t1-cn.hmpp-azdt.justice.gov.uk:7777/forms/frmservlet?config=tag",
+              "t1-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
+              "c-t1.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t2-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t2-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t2-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
+              "c-t2.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t3-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t3-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t3-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
+              "t3-cn-ha.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
+              "c-t3.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+            ie_trusted_domains = join(",", [
+              "*.nomis.hmpps-test.modernisation-platform.justice.gov.uk",
+              "*.nomis.service.justice.gov.uk",
+              "*.hmpp-azdt.justice.gov.uk",
+            ])
+            desktop_shortcuts = join(",", [
+              "T1 NOMIS|https://c-t1.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "T2 NOMIS|https://c-t2.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "T3 NOMIS|https://c-t3.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+          }))
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private-jumpserver"]
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
-        }
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 1 # set to 0 while testing
-        })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
-          description = "Windows Server 2022 Jumpserver for NOMIS"
-          os-type     = "Windows"
-          component   = "jumpserver"
-          server-type = "nomis-jumpserver"
-        }
-      }
+      })
     }
 
     baseline_ec2_instances = {
@@ -428,9 +445,6 @@ locals {
                     values = [
                       "t3-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t3-nomis-web-a.test.nomis.service.justice.gov.uk",
-                      "c-t3.test.nomis.az.justice.gov.uk",
-                      "c-t3.test.nomis.service.justice.gov.uk",
-                      "t3-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -446,6 +460,9 @@ locals {
                     values = [
                       "t3-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t3-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t3.test.nomis.az.justice.gov.uk",
+                      "c-t3.test.nomis.service.justice.gov.uk",
+                      "t3-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -479,9 +496,6 @@ locals {
       }
       "test.nomis.service.justice.gov.uk" = {
         records = [
-          # OEM (IP hardcoded while we are testing under an ASG)
-          { name = "oem", type = "A", ttl = "300", records = ["10.26.12.163"] },
-
           # T1 [1-a: T1CNOM, T1NDH, T1TRDAT, T1ORSYS] [2-a: T1MIS, T1CNMAUD]
           { name = "t1nomis", type = "CNAME", ttl = "300", records = ["t1nomis-a.test.nomis.service.justice.gov.uk"] },
           { name = "t1nomis-a", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },

@@ -35,30 +35,38 @@ locals {
 
     baseline_ssm_parameters = {
       # T1
-      "t1-ncr-tomcat"          = local.tomcat_ssm_parameters
-      "t1-ncr-bip"             = local.bip_ssm_parameters
+      "t1-ncr-tomcat" = local.tomcat_ssm_parameters
+      "t1-ncr-bip"    = local.bip_ssm_parameters
     }
 
     baseline_ec2_instances = {
-      t1-ncr-biplatform-cmc = merge(local.bi-platform_ec2_default, {
+      t1-ncr-bip-cmc = merge(local.bi-platform_ec2_default, {
         tags = merge(local.bi-platform_ec2_default.tags, {
-          description = "For testing SAP BI CMC installation and configurations"
-          server-type = "ncr-bip-cmc"
+          description                          = "For testing SAP BI CMC installation and configurations"
+          server-type                          = "ncr-bip-cmc"
           nomis-combined-reporting-environment = "t1"
         })
       })
+      t1-ncr-db-1-a = merge(local.database_ec2_default, {
+        tags = merge(local.database_ec2_default.tags, {
+          description                          = "T1 NCR DATABASE"
+          nomis-combined-reporting-environment = "t1"
+          oracle-sids                          = "T1BIPSYS T1BIPAUD"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
     }
-    
+
     baseline_ec2_autoscaling_groups = {
 
-      t1-ncr-bitomcat = merge(local.tomcat_ec2_default, {
+      t1-ncr-tomcat = merge(local.tomcat_ec2_default, {
         autoscaling_group = {
           desired_capacity    = 1
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
         tags = merge(local.tomcat_ec2_default.tags, {
-          description = "For testing SAP tomcat installation and configurations"
+          description                          = "For testing SAP tomcat installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })
@@ -70,7 +78,7 @@ locals {
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
         tags = merge(local.bi-platform_ec2_default.tags, {
-          description = "For testing BIP 4.3 installation and configurations"
+          description                          = "For testing BIP 4.3 installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })
@@ -114,9 +122,16 @@ locals {
       }
     }
     baseline_route53_zones = {
-      (module.environment.domains.public.modernisation_platform) = {
-        lb_alias_records = [
-          { name = "web.test.${local.application_name}", type = "A", lbs_map_key = "private" }
+      "test.reporting.nomis.service.justice.gov.uk" = {
+        records = [
+          # T1 BIP
+
+          # T1 Tomcat
+
+          # Oracle database
+          { name = "t1ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.reporting.nomis.service.justice.gov.uk"] },
+          { name = "t1ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
     }

@@ -10,8 +10,50 @@ locals {
     }
   }
 
+  # TODO - change alarm actions to dba_pagerduty once alarms proven out
+  xtag_cloudwatch_metric_alarms = merge(
+    module.baseline_presets.cloudwatch_metric_alarms.ec2,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd,
+    {
+      xtag-wls-nodemanager-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_wlsnodemanager_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "wls_nodemanager.service has stopped"
+        alarm_actions       = ["dso_pagerduty"]
+      }
+      xtag-wls-adminserver-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_wlsadminserver_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "wls_adminserver.service has stopped"
+        alarm_actions       = ["dso_pagerduty"]
+      }
+      xtag-wls-managedserver-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_wlsmanagedserver_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "wls_managedserver.service has stopped"
+        alarm_actions       = ["dso_pagerduty"]
+      }
+    }
+  )
+
   xtag_ec2_default = {
-    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].ec2_linux_default
+    cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
@@ -52,13 +94,13 @@ locals {
   })
 
   xtag_ec2_b = merge(local.xtag_ec2_default, {
-    cloudwatch_metric_alarms = {}
+    # cloudwatch_metric_alarms = {}
     config = merge(local.xtag_ec2_default.config, {
       ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
     })
     user_data_cloud_init = merge(local.xtag_ec2_default.user_data_cloud_init, {
       args = merge(local.xtag_ec2_default.user_data_cloud_init.args, {
-        branch = "61f2bd80235ff8453f516d6549c9fb89bf38feec" # from AMI, no collectd, NDH taken from tag
+        branch = "96770af14211519830613a93eb8faf2b7ef1ebcb" # from AMI setup, config-management repo 11-08-23
       })
     })
     autoscaling_group = merge(local.xtag_ec2_default.autoscaling_group, {
@@ -68,5 +110,4 @@ locals {
       ami = "nomis_rhel_7_9_weblogic_xtag_10_3"
     })
   })
-
 }

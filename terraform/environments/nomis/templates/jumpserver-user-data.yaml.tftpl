@@ -1,0 +1,243 @@
+# This is an EC2Launch V2 type user-data script
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
+# See C:\ProgramData\Amazon\EC2Launch\log for logs
+version: 1.1
+tasks:
+  - task: executeScript
+    inputs:
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Set time to local and locale
+        content: |
+          # $ErrorActionPreference = "Stop" # set all errors to terminate script
+
+          Set-TimeZone "GMT Standard Time"
+          Set-WinSystemLocale "en-GB"
+      - frequency: once
+        type: powershell
+        runAs: admin
+        #not actually a secret
+        #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+        # Install Cloudwatch agent if missing, otherwise update config and start it
+        content: |
+          # $ErrorActionPreference = "Stop" # set all errors to terminate script
+          $timeout = New-TimeSpan -Seconds 600
+          $endTime = (Get-Date).Add($timeout)
+          $cwagent = Get-Service -Name "AmazonCloudWatchAgent"
+          
+          # Check if parameter doc exists before trying to use it
+          Get-SSMParameter -Name 'cloud-watch-config-windows' -Region 'eu-west-2'
+          if ($?) {
+            Write-Host "Parameter cloud-watch-config-windows found, continuing"
+          } else {
+            Write-Host "Parameter cloud-watch-config-windows not found, exiting"
+            exit 1
+          }
+
+          if ($cwagent) {
+            Do {
+            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
+            } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
+          } else {
+            Invoke-WebRequest -Uri "https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi" -OutFile "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
+            $cwagent_installer = "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
+            Start-Process -FilePath msiexec.exe -ArgumentList "/i $cwagent_installer /qn" -Wait
+            Do {
+            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
+            } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
+          }
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Install Java from S3 Bucket
+        # Version is uploaded manually from Oracle User site by DBA's
+        content: |
+          $S3_BUCKET = "ec2-image-builder-nomis20220314103938567000000001"
+
+          # Download Java exe from S3 Bucket
+          Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/jre-6u33-windows-i586.exe -File C:\jumpserver-software\jre-6u33-windows-i586.exe
+
+          # Install Java
+          Start-Process -Wait -Verbose -FilePath "C:\jumpserver-software\jre-6u33-windows-i586.exe" -ArgumentList "/s", "/L C:\jumpserver-software\jre-install.log"
+
+          # Set JAVA_HOME environment variable
+          [System.Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files (x86)\Java\jre6", [System.EnvironmentVariableTarget]::Machine)
+
+          # Add Java to PATH environment variable
+          [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";%JAVA_HOME%\bin", [System.EnvironmentVariableTarget]::Machine)
+
+          # Copy deployment config files
+          $deployment_folder = "C:\Windows\Sun\Java\Deployment"
+          New-Item -Path $deployment_folder -ItemType Directory -Force
+          Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/deployment.config -File $deployment_folder\deployment.config
+          Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/deployment.properties -File $deployment_folder\deployment.properties
+          Read-S3Object -BucketName $S3_BUCKET -Key jumpserver-software/trusted.certs -File $deployment_folder\trusted.certs
+
+          # Prevent Java update check
+          $javaPath = "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run"
+          $valueName = "SunJavaUpdateSched"
+
+          $properties = Get-ItemProperty -Path $javaPath
+
+          if ($properties.PSObject.Properties.Name -contains $valueName) {
+            Remove-ItemProperty -Path $javaPath -Name $valueName -Force
+          }
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Edge Global Changes
+        content: |          
+          $reg_path = "HKLM:\SOFTWARE\Policies\Microsoft\Edge"
+          
+          # Turn off Edge first run experience
+          New-Item -Path $reg_path -Force
+          New-ItemProperty -Path $reg_path -Name HideFirstRunExperience -Value 1 -PropertyType DWORD -Force
+
+          # Turn on Edge IE Mode using reg_path from previous step
+          New-ItemProperty -Path $reg_path -Name InternetExplorerIntegrationLevel -Value 1 -PropertyType DWORD -Force
+
+          # Allow popups for .justice.gov.uk urls
+          $reg_path = "HKLM:\SOFTWARE\Policies\Microsoft\Edge\PopupsAllowedForUrls"
+          New-Item -Path $reg_path -Force
+          New-ItemProperty -Path $reg_path -Name 1 -Value "[*.]justice.gov.uk" -PropertyType String -Force
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # IE COMPATIBILITY MODE SITE LIST
+        content: |
+          $ie_compatibility_mode_site_list = "${ie_compatibility_mode_site_list}".Split(",")
+          $ie_compatibility_mode_site_list
+          $compatibility_site_list_path = "C:\\compatibility_site_list.xml"
+
+          $xmlDoc = New-Object System.Xml.XmlDocument
+          $root = $xmlDoc.CreateElement("site-list")
+          $root.SetAttribute('version', 1)
+          $xmlDoc.AppendChild($root)
+
+          $created_byElement = $xmlDoc.CreateElement("created-by")
+
+          $toolElement = $xmlDoc.CreateElement("tool")
+          $versionElement = $xmlDoc.CreateElement("version")
+          $date_createdElement = $xmlDoc.CreateElement("date_created")
+          $toolElement.InnerText = "EMIESiteListManager"
+          $versionElement.InnerText = "10.0.0.0"
+          $date_createdElement.InnerText = $(Get-Date -Format "MM/dd/yyyy hh:mm:ss")
+          $created_byElement.AppendChild($toolElement)
+          $created_byElement.AppendChild($versionElement)
+          $created_byElement.AppendChild($date_createdElement)
+          $root.AppendChild($created_byElement)
+
+          foreach ($site in $ie_compatibility_mode_site_list) {
+            $siteElement = $xmlDoc.CreateElement("site")
+            $siteElement.SetAttribute('url', $site)
+            $compatModeElement = $xmlDoc.CreateElement("compat-mode")
+            $openInElement = $xmlDoc.CreateElement("open-in")
+            $openInElement.SetAttribute('allow-redirect', 'true')
+            $compatModeElement.InnerText = "Default"
+            $openInElement.InnerText = "IE11"
+            $siteElement.AppendChild($compatModeElement)
+            $siteElement.AppendChild($openInElement)
+            $root.AppendChild($siteElement)
+          }
+
+          $xmlDoc.Save($compatibility_site_list_path)
+
+          # Add compatibility list to registry
+          New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Edge" -Name InternetExplorerIntegrationSiteList -Value $compatibility_site_list_path -PropertyType String -Force
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Create domain allow list for Edge
+
+        # The jumpserver is using IE Enhanced Security so each domain needs to be explicitly added to the following
+        # - Registry to allow certain domains to Bypass Enhanced Security (see below)  
+        # - Trusted Sites - HKCU, HKLM does not apply since the machine is not on the domain 
+        # NOTE: https:// traffic ONLY is allowed, these settings are external to this environment and are not managed by this script
+        content: |
+          $domains = "${ie_trusted_domains}".Split(",")
+          $domains
+
+          $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Edge\EnhanceSecurityModeBypassListDomains"
+
+          # Ensure the registry path exists
+          if (!(Test-Path $registryPath)) {
+            New-Item -Path $registryPath -Force
+          }
+
+          # Add each domain to the exclusion list for IE Enhanced Security
+          # NOTE: subdomains are automatically included
+          for ($i = 0; $i -lt $domains.Length; $i++) {
+            $index = $i + 1
+            $value = $domains[$i] -replace '^\*\.', '' 
+
+            New-Item -Path "$registryPath\$index" -Force    
+
+            New-ItemProperty -Path "$registryPath\$index" -Name "(Default)" -Value $value -PropertyType String -Force
+          
+          }
+
+          # Add each domain to the trusted sites list
+          $paths = @(
+              "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains"
+          )
+
+          foreach($path in $paths){
+            $domains | ForEach-Object {
+                New-Item -Path $path\$_ -Force
+                New-ItemProperty -Path $path\$_ -Name https -Value 2 -PropertyType DWORD -Force
+            }
+          }
+
+          # Use Local Machine settings for Internet Security Settings
+          $reg_path = "HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings"
+
+          if (!(Test-Path $reg_path)) {
+            New-Item -Path $reg_path -Force
+          }
+          
+          New-ItemProperty -Path $reg_path -Name Security_HKLM_only -Value 1 -PropertyType DWORD -Force
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Install SQL Developer from hmpps common location
+        content: |
+          $S3_BUCKET = "mod-platform-image-artefact-bucket20230203091453221500000001"
+
+          Read-S3Object -BucketName $S3_BUCKET -Key "hmpps/sqldeveloper/sqldeveloper-22.2.1.234.1810-x64.zip" -File C:\jumpserver-software\sqldeveloper-22.2.1.234.1810-x64.zip
+
+          # Extract SQL Developer - there is no installer for this application
+          Expand-Archive -Path C:\jumpserver-software\sqldeveloper-22.2.1.234.1810-x64.zip -DestinationPath "C:\Program Files\Oracle"
+
+          # Create a desktop shortcut
+          $shortcut = New-Object -ComObject WScript.Shell
+          $shortcut_link = $shortcut.CreateShortcut("C:\Users\Public\Desktop\SQL Developer.lnk")
+          $shortcut_link.TargetPath = "C:\Program Files\Oracle\sqldeveloper\sqldeveloper.exe"
+          $shortcut_link.Save()
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Install LibreOffice
+        content: |
+          choco install -y libreoffice-still
+
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Add desktop shortcuts for Nomis URLs
+        content: |
+          $desktop_shortcuts = "${desktop_shortcuts}".Split(",")
+          $desktop_shortcuts
+
+          for ($i = 0; $i -lt $desktop_shortcuts.Length; $i++) {
+            $desktop_shortcut = $desktop_shortcuts[$i].Split("|")
+            $name = $desktop_shortcut[0]
+            $url = $desktop_shortcut[1]
+            $shortcut = New-Object -ComObject WScript.Shell
+            $destination = $shortcut.SpecialFolders.Item("AllUsersDesktop")
+            $source_path = Join-Path -Path $destination -ChildPath "\\$name.url"
+            $sourc = $shortcut.CreateShortcut($source_path)
+            $sourc.TargetPath = $url
+
+            $sourc.Save()       
+          }

@@ -3,7 +3,7 @@
 ###########################################################################################
 
 module "ecs-cluster" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v3.0.0"
 
   ec2_capacity_instance_type     = local.application_data.accounts[local.environment].container_instance_type
   ec2_capacity_max_size          = local.application_data.accounts[local.environment].ec2_max_size
@@ -16,16 +16,18 @@ module "ecs-cluster" {
   ]
   environment = local.environment
   name        = local.ecs_application_name
+  namespace   = "platforms"
 
   tags = local.tags
 }
 
 module "service" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v2.0.1"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
 
   container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
   ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
   name                      = "${local.ecs_application_name}-task_definition_volume"
+  namespace                 = "platforms"
   vpc_id                    = local.vpc_all
 
   launch_type  = local.application_data.accounts[local.environment].launch_type
@@ -123,7 +125,7 @@ locals {
 
 # Load balancer build using the module
 module "ecs_lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v3.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v3.1.0"
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module

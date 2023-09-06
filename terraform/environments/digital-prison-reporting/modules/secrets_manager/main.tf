@@ -1,5 +1,5 @@
 resource "random_password" "random_string" {
-  count            = var.generate_random ? 1 : 0  
+  count            = var.generate_random ? 1 : 0
   length           = var.length
   lower            = var.use_lower
   numeric          = var.use_number
@@ -27,7 +27,7 @@ resource "aws_secretsmanager_secret" "secret" {
 
 # value managed on ui/console
 resource "aws_secretsmanager_secret_version" "secret_val_remote" {
-  count         = var.type == "MONO" && var.ignore_secret_string == true ? 1 : 0
+  count = var.type == "MONO" && var.ignore_secret_string == true ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
   secret_string = var.generate_random ? random_password.random_string[0].result : var.secret_value
@@ -38,7 +38,7 @@ resource "aws_secretsmanager_secret_version" "secret_val_remote" {
 }
 
 resource "aws_secretsmanager_secret_version" "secret_val" {
-  count         = var.type == "MONO" && var.ignore_secret_string == false ? 1 : 0
+  count = var.type == "MONO" && var.ignore_secret_string == false ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
   secret_string = var.generate_random ? random_password.random_string[0].result : var.secret_value
@@ -46,7 +46,7 @@ resource "aws_secretsmanager_secret_version" "secret_val" {
 
 # value managed on ui/console
 resource "aws_secretsmanager_secret_version" "secret_key_val_remote" {
-  count         = var.type == "KEY_VALUE" && var.ignore_secret_string == true ? 1 : 0
+  count = var.type == "KEY_VALUE" && var.ignore_secret_string == true ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
   secret_string = var.generate_random ? random_password.random_string[0].result : jsonencode("${var.secrets}")
@@ -57,7 +57,7 @@ resource "aws_secretsmanager_secret_version" "secret_key_val_remote" {
 }
 
 resource "aws_secretsmanager_secret_version" "secret_key_val" {
-  count         = var.type == "KEY_VALUE" && var.ignore_secret_string == false ? 1 : 0
+  count = var.type == "KEY_VALUE" && var.ignore_secret_string == false ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.secret.id
   secret_string = var.generate_random ? random_password.random_string[0].result : jsonencode("${var.secrets}")

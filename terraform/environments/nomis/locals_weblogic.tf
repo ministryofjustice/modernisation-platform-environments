@@ -91,7 +91,7 @@ locals {
       protocol                  = "HTTPS"
       ssl_policy                = "ELBSecurityPolicy-2016-08"
       certificate_names_or_arns = ["nomis_wildcard_cert"]
-      cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].lb_default
+      cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms.lb
 
       default_action = {
         type = "fixed-response"
@@ -105,30 +105,25 @@ locals {
 
   }
 
-  weblogic_cloudwatch_metric_alarms = {
-    weblogic-asg-collectd-services = {
-      comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "3"
-      namespace           = "CWAgent"
-      metric_name         = "collectd_exec_value"
-      period              = "60"
-      statistic           = "Maximum"
-      threshold           = "1"
-      alarm_description   = "A weblogic service or metric that's being supplied by collectd has stopped"
+  # TODO - change alarm actions to dba_pagerduty once alarms proven out
+  weblogic_cloudwatch_metric_alarms = merge(
+    module.baseline_presets.cloudwatch_metric_alarms.ec2,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd,
+    {
+      weblogic-healthcheck = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_weblogichealthcheck_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "weblogic-healthcheck has found an unhealthy service"
+        alarm_actions       = ["dso_pagerduty"]
+      }
     }
-  }
-
-  weblogic_cloudwatch_metric_alarms_lists = {
-    weblogic = {
-      parent_keys = [
-        "ec2_default",
-        "ec2_linux_default"
-      ]
-      alarms_list = [
-        { key = "weblogic", name = "weblogic-asg-collectd-services" }
-      ]
-    }
-  }
+  )
 
   weblogic_cloudwatch_log_groups = {
     cwagent-weblogic-logs = {
@@ -138,7 +133,7 @@ locals {
 
   weblogic_ec2_default = {
 
-    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].weblogic
+    cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
 
     # Note: use any availability zone since DB latency does not appear to be an issue
     config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -200,10 +195,10 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "main"
+        branch = "e6cf03433540d764309430077c1cc030df8dddea" # 2023-08-25 weblogic deployments + updated monitoring
       })
     })
-    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {}) 
+    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {})
     autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
       desired_capacity = 0
     })

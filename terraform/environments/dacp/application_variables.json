@@ -8,7 +8,7 @@
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
-      "engine_version": "14.4",
+      "engine_version": "14.7",
       "instance_class": "db.t3.micro",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
@@ -18,7 +18,8 @@
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
-      "domain_name": "modernisation-platform.service.justice.gov.uk"
+      "domain_name": "modernisation-platform.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": "5fWKaj"
     },
     "preproduction": {
       "moj_ip": "81.134.202.29/32",
@@ -28,18 +29,18 @@
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
-      "engine_version": "14.4",
+      "engine_version": "14.7",
       "instance_class": "db.t3.micro",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
       "server_port_2": "443",
       "lb_listener_protocol_2": "HTTPS",
       "client_id": "4c3ac31e-58d7-495e-bd98-e6eadf782d4a",
-      "curserver": "PREPRODUCTION",
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
-      "domain_name": "modernisation-platform.service.justice.gov.uk"
+      "domain_name": "modernisation-platform.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": "AHK8Tj"
     },
     "production": {
       "moj_ip": "81.134.202.29/32",
@@ -49,18 +50,18 @@
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
-      "engine_version": "14.4",
+      "engine_version": "14.7",
       "instance_class": "db.t3.micro",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
       "server_port_2": "443",
       "lb_listener_protocol_2": "HTTPS",
       "client_id": "304de4e5-f8be-4b00-9c0e-9e5495ab94a3",
-      "curserver": "PRODUCTION",
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
-      "domain_name": "dacp.service.justice.gov.uk"
+      "domain_name": "divorce-section-search.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": "VQasvo"
     }
   }
 }

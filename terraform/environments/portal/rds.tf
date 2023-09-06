@@ -532,7 +532,7 @@ resource "aws_db_instance" "appdb1" {
   password               = random_password.rds_password_igdb.result
   vpc_security_group_ids = [aws_security_group.igdb.id]
   #skip_final_snapshot             = false
-  final_snapshot_identifier = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  final_snapshot_identifier = "${local.application_name}-igdb-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name      = aws_db_parameter_group.igdb-parametergroup-19c.name
   db_subnet_group_name      = aws_db_subnet_group.igdb.name
   maintenance_window        = local.igdb_maintenance_window
@@ -588,7 +588,7 @@ resource "aws_db_instance" "appdb2" {
   password               = random_password.rds_password_iadb.result
   vpc_security_group_ids = [aws_security_group.iadb.id]
   #skip_final_snapshot             = false
-  final_snapshot_identifier = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  final_snapshot_identifier = "${local.application_name}-iadb-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name      = aws_db_parameter_group.iadb-parametergroup-19c.name
   db_subnet_group_name      = aws_db_subnet_group.iadb.name
   maintenance_window        = local.iadb_maintenance_window
@@ -625,26 +625,6 @@ resource "aws_db_instance" "appdb2" {
   }
 
 }
-
-#TODO add correct entry for DNS
-# resource "aws_route53_record" "igdb_rds" {
-#   provider = aws.core-vpc
-#   zone_id  = data.aws_route53_zone.external.zone_id
-#   name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
-#   type     = "CNAME"
-#   ttl      = 60
-#   records  = [aws_db_instance.appdb1.address]
-# }
-
-#TODO add correct entry for DNS
-# resource "aws_route53_record" "iadb_rds" {
-#   provider = aws.core-vpc
-#   zone_id  = data.aws_route53_zone.external.zone_id
-#   name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
-#   type     = "CNAME"
-#   ttl      = 60
-#   records  = [aws_db_instance.appdb2.address]
-# }
 
 #IGDB alarms
 resource "aws_cloudwatch_metric_alarm" "igdb_rds_cpu" {

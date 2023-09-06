@@ -16,7 +16,7 @@ do
   mount_status=$?
 done
 
-hostnamectl set-hostname ${local.application_name}-ohs1-ms.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-ohs1.${local.portal_hosted_zone}
 
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent
@@ -116,6 +116,7 @@ resource "aws_instance" "ohs_instance_1" {
   user_data_replace_on_change = true
 
   tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${local.application_name} OHS Instance 1" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
@@ -145,6 +146,7 @@ resource "aws_instance" "ohs_instance_2" {
 
 
   tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${local.application_name} OHS Instance 2" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }

@@ -80,17 +80,22 @@ variable "enable_notification" {
 #}
 
 variable "bucket_notifications" {
-  type = any
+  type        = any
   description = "AWS S3 Bucket Notifications"
   default = {
     lambda_function_arn = null,
-    events = [],
-    filter_prefix = null,
-    filter_suffix = null
-   }
+    events              = [],
+    filter_prefix       = null,
+    filter_suffix       = null
+  }
 }
 
 variable "dependency_lambda" {
   type    = any
   default = []
+}
+
+variable "bucket_key" {
+  description = "If Bucket Key is Enabled or Disabled"
+  default     = true
 }

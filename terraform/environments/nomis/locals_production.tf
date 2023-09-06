@@ -4,7 +4,8 @@ locals {
   # baseline config
   production_config = {
 
-    cloudwatch_metric_alarms_dbnames = []
+    cloudwatch_metric_alarms_dbnames         = []
+    cloudwatch_metric_alarms_dbnames_misload = []
 
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
@@ -19,7 +20,7 @@ locals {
           "*.nomis.az.justice.gov.uk",
         ]
         external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for nomis ${local.environment} domains"
         }
@@ -74,6 +75,27 @@ locals {
           is-production        = "true-no-default-backup-workaround"
         })
       })
+
+      prod-jumpserver-a = merge(local.jumpserver_ec2_default, {
+        config = merge(local.jumpserver_ec2_default.config, {
+          user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
+            ie_compatibility_mode_site_list = join(",", [
+              "prod-nomis-web-a.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "prod-nomis-web-b.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "c.nomis.az.justice.gov.uk/forms/frmservlet?config=tag",
+              "c.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+            ie_trusted_domains = join(",", [
+              "*.nomis.hmpps-production.modernisation-platform.justice.gov.uk",
+              "*.nomis.service.justice.gov.uk",
+              "*.nomis.az.justice.gov.uk",
+            ])
+            desktop_shortcuts = join(",", [
+              "Prod NOMIS|https://c.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+          }))
+        })
+      })
     }
 
     baseline_ec2_instances = {
@@ -120,8 +142,9 @@ locals {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
-        cloudwatch_metric_alarms = merge(local.database_ec2_a.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].fixngo_connection
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_a.cloudwatch_metric_alarms,
+          local.fixngo_connection_cloudwatch_metric_alarms
         )
       })
 
@@ -143,8 +166,9 @@ locals {
           data  = { total_size = 3000, iops = 3750, throughput = 750 }
           flash = { total_size = 500 }
         })
-        cloudwatch_metric_alarms = merge(local.database_ec2_a.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dba_high_priority_pagerduty"].database_dba_high_priority
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_a.cloudwatch_metric_alarms,
+          local.database_ec2_cloudwatch_metric_alarms_high_priority
         )
       })
     }
@@ -177,7 +201,7 @@ locals {
                         "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
                         "c.production.nomis.az.justice.gov.uk",
-                        "c.production.nomis.service.justice.gov.uk",
+                        "c.nomis.service.justice.gov.uk",
                         "c.nomis.az.justice.gov.uk",
                       ]
                     }
@@ -212,6 +236,21 @@ locals {
         ]
       }
       "nomis.service.justice.gov.uk" = {
+        # NOTE this top level zone is currently hosted in Azure but
+        # will be moved here at some point
+        lb_alias_records = [
+          { name = "c", type = "A", lbs_map_key = "private" },
+        ]
+        ns_records = [
+          # use this if NS records can be pulled from terrafrom, otherwise use records variable
+          { name = "production", ttl = "86400", zone_name = "production.nomis.service.justice.gov.uk" }
+        ]
+        records = [
+          { name = "development", type = "NS", ttl = "86400", records = ["ns-1010.awsdns-62.net", "ns-1353.awsdns-41.org", "ns-1693.awsdns-19.co.uk", "ns-393.awsdns-49.com"] },
+          { name = "test", type = "NS", ttl = "86400", records = ["ns-1423.awsdns-49.org", "ns-1921.awsdns-48.co.uk", "ns-304.awsdns-38.com", "ns-747.awsdns-29.net"] },
+          { name = "preproduction", type = "NS", ttl = "86400", records = ["ns-1200.awsdns-22.org", "ns-1958.awsdns-52.co.uk", "ns-44.awsdns-05.com", "ns-759.awsdns-30.net"] },
+          { name = "reporting", type = "NS", ttl = "86400", records = ["ns-1122.awsdns-12.org", "ns-1844.awsdns-38.co.uk", "ns-388.awsdns-48.com", "ns-887.awsdns-46.net"] },
+        ]
       }
       "production.nomis.az.justice.gov.uk" = {
         lb_alias_records = [

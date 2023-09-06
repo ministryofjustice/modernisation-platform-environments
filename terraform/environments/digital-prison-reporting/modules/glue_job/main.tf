@@ -5,7 +5,7 @@ locals {
     "--TempDir"                          = var.temp_dir
     "--checkpoint.location"              = var.checkpoint_dir
     "--spark-event-logs-path"            = var.spark_event_logs
-    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.log_group.name
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.job.name
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
     "--enable-glue-datacatalog"          = "true"
@@ -133,6 +133,15 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = [
+      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*"
+    ]
+  }
+  statement {
+    actions = [
       "kms:Encrypt*",
       "kms:Decrypt*",
       "kms:ReEncrypt*",
@@ -179,15 +188,40 @@ resource "aws_iam_role_policy_attachment" "glue_policies" {
   policy_arn = each.value
 }
 
-resource "aws_cloudwatch_log_group" "log_group" {
-  name              = "/aws-glue/jobs/${var.name}-sec-config"
+resource "aws_cloudwatch_log_group" "job" {
+  name              = "/aws-glue/jobs/${var.name}"
+  retention_in_days = var.log_group_retention_in_days
+  tags              = var.tags
+}
+
+resource "aws_cloudwatch_log_group" "sec_config" {
+  name              = "/aws-glue/jobs/${var.short_name}-sec-config"
+  retention_in_days = var.log_group_retention_in_days
+  tags              = var.tags
+}
+
+resource "aws_cloudwatch_log_group" "sec_config_error" {
+  name              = "/aws-glue/jobs/${var.short_name}-sec-config-role/${var.name}-glue-role/error"
+  retention_in_days = var.log_group_retention_in_days
+  tags              = var.tags
+}
+
+resource "aws_cloudwatch_log_group" "sec_config_output" {
+  name              = "/aws-glue/jobs/${var.short_name}-sec-config-role/${var.name}-glue-role/output"
+  retention_in_days = var.log_group_retention_in_days
+  tags              = var.tags
+}
+
+
+resource "aws_cloudwatch_log_group" "continuous_log" {
+  name              = "/aws-glue/jobs/${var.name}-${var.short_name}-sec-config"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
 }
 
 resource "aws_glue_security_configuration" "sec_cfg" {
   count = var.create_security_configuration && var.create_job ? 1 : 0
-  name  = "${var.name}-sec-config"
+  name  = "${var.short_name}-sec-config"
 
   encryption_configuration {
     cloudwatch_encryption {

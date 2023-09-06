@@ -44,7 +44,7 @@ locals {
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
-    autoscaling_schedules    = {
+    autoscaling_schedules = {
       "scale_up" = {
         recurrence = "0 5 * * Mon-Fri"
       }
@@ -53,7 +53,7 @@ locals {
         recurrence       = "0 19 * * Mon-Fri"
       }
     }
-    autoscaling_group        = module.baseline_presets.ec2_autoscaling_group.default
+    autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
     lb_target_groups = {
       pv-http-8080 = local.target_group_http_8080
       pb-http-8080 = local.target_group_http_8080
@@ -70,7 +70,7 @@ locals {
       oasys-environment = local.environment
       environment-name  = terraform.workspace
       #oracle-db-hostname = "T2ODL0009.azure.noms.root"
-      oracle-db-sid = "T2OASYS" # for each env using azure DB will need to be OASPROD
+      oracle-db-sid = "OASPROD" # for each env using azure DB will need to be OASPROD
     }
   }
   webserver_b = merge(local.webserver_a, {
@@ -219,7 +219,9 @@ locals {
       availability_zone         = "${local.region}a"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      monitoring = true
+      instance_type          = "t3.xlarge"
+      monitoring             = true
+      vpc_security_group_ids = ["bip"]
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags

@@ -19,7 +19,7 @@ do
   mount_status=$?
 done
 
-hostnamectl set-hostname ${local.application_name}-idm1-ms.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-ods1-ms.${local.portal_hosted_zone}
 
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent
@@ -33,7 +33,7 @@ EOF
 
   idm_2_userdata = <<EOF
 #!/bin/bash
-hostnamectl set-hostname ${local.application_name}-idm2-ms.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-ods2-ms.${local.portal_hosted_zone}
 EOF
 }
 
@@ -276,6 +276,7 @@ resource "aws_instance" "idm_instance_1" {
   user_data_replace_on_change = true
 
   tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${local.application_name} IDM Instance 1" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
@@ -294,6 +295,7 @@ resource "aws_instance" "idm_instance_2" {
   user_data_base64       = base64encode(local.oam_2_userdata)
 
   tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${local.application_name} IDM Instance 2" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }

@@ -84,7 +84,7 @@ locals {
         ]
       }
     }
-    
+
     PreprodReadOnlyAccessBucketPolicy = {
       effect = "Allow"
       actions = [
@@ -95,8 +95,7 @@ locals {
       principals = {
         type = "AWS"
         identifiers = [
-          for account_name in var.environment.account_names :
-          endswith(account_name, "-preproduction") ? var.environment.account_root_arns[account_name] : ""
+          var.environment.account_root_arns["${var.environment.application_name}-preproduction"]
         ]
       }
     }

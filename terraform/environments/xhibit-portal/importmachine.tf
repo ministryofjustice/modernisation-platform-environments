@@ -71,7 +71,7 @@ resource "aws_instance" "importmachine" {
     ignore_changes = [
       # This prevents clobbering the tags of attached EBS volumes. See
       # [this bug][1] in the AWS provider upstream.
-      
+
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
       volume_tags,
     ]

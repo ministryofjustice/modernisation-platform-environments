@@ -12,6 +12,50 @@ resource "aws_api_gateway_resource" "this" {
   rest_api_id = aws_api_gateway_rest_api.this.id
 }
 
+resource "aws_api_gateway_resource" "preview" {
+  parent_id   = aws_api_gateway_rest_api.this.root_resource_id
+  path_part   = "preview"
+  rest_api_id = aws_api_gateway_rest_api.this.id
+}
+
+resource "aws_api_gateway_method" "preview" {
+  authorization = "NONE"
+  http_method   = "ANY"
+  resource_id   = aws_api_gateway_resource.preview.id
+  rest_api_id   = aws_api_gateway_rest_api.this.id
+}
+
+resource "aws_api_gateway_integration" "preview" {
+  http_method             = aws_api_gateway_method.preview.http_method
+  resource_id             = aws_api_gateway_resource.preview.id
+  rest_api_id             = aws_api_gateway_rest_api.this.id
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = var.lambda_arn
+}
+
+resource "aws_api_gateway_resource" "publish" {
+  parent_id   = aws_api_gateway_rest_api.this.root_resource_id
+  path_part   = "publish"
+  rest_api_id = aws_api_gateway_rest_api.this.id
+}
+
+resource "aws_api_gateway_method" "publish" {
+  authorization = "NONE"
+  http_method   = "ANY"
+  resource_id   = aws_api_gateway_resource.publish.id
+  rest_api_id   = aws_api_gateway_rest_api.this.id
+}
+
+resource "aws_api_gateway_integration" "publish" {
+  http_method             = aws_api_gateway_method.publish.http_method
+  resource_id             = aws_api_gateway_resource.publish.id
+  rest_api_id             = aws_api_gateway_rest_api.this.id
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = var.lambda_arn
+}
+
 resource "aws_api_gateway_method" "this" {
   authorization = "NONE"
   http_method   = "ANY"
@@ -43,6 +87,12 @@ resource "aws_api_gateway_deployment" "default_deployment" {
       aws_api_gateway_resource.this.id,
       aws_api_gateway_method.this.id,
       aws_api_gateway_integration.this.id,
+      aws_api_gateway_resource.preview.id,
+      aws_api_gateway_method.preview.id,
+      aws_api_gateway_integration.preview.id,
+      aws_api_gateway_resource.publish.id,
+      aws_api_gateway_method.publish.id,
+      aws_api_gateway_integration.publish.id,
     ]))
   }
   lifecycle {
@@ -52,7 +102,11 @@ resource "aws_api_gateway_deployment" "default_deployment" {
   depends_on = [
     aws_api_gateway_method.this,
     aws_api_gateway_integration.this,
-    aws_api_gateway_rest_api_policy.this
+    aws_api_gateway_rest_api_policy.this,
+    aws_api_gateway_method.preview,
+    aws_api_gateway_integration.preview,
+    aws_api_gateway_method.publish,
+    aws_api_gateway_integration.publish,
   ]
 }
 

@@ -57,8 +57,6 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
 
   cluster_parameter_group_name = aws_redshift_parameter_group.wepi_redshift_param_group.name
 
-  aqua_configuration_status = "enabled"
-
   automated_snapshot_retention_period = local.application_data.accounts[local.environment].redshift_auto_snapshot_retention
   manual_snapshot_retention_period    = local.application_data.accounts[local.environment].redshift_manual_snapshot_retention
   skip_final_snapshot                 = true
@@ -135,4 +133,76 @@ resource "aws_redshift_cluster_iam_roles" "wepi_redshift_iam_roles" {
   iam_role_arns = [
     aws_iam_role.wepi_iam_role_redshift_default.arn
   ]
+}
+
+data "aws_vpc_endpoint" "redshift" {
+  provider     = aws.core-vpc
+  vpc_id       = data.aws_vpc.shared.id
+  service_name = "com.amazonaws.eu-west-2.redshift"
+}
+
+data "aws_network_interface" "redshift-data" {
+  provider = aws.core-vpc
+  for_each = data.aws_vpc_endpoint.redshift.network_interface_ids
+  id       = each.value
+}
+
+resource "aws_lb" "redshift-data" {
+  #checkov:skip=CKV_AWS_91:  "Logging not required"
+  #checkov:skip=CKV_AWS_150: "Deletion protection not required"
+  enable_cross_zone_load_balancing = true
+  internal                         = true
+  load_balancer_type               = "network"
+  name                             = format("%s-redshift-lb", local.environment)
+  subnets                          = data.aws_subnets.shared-private.ids
+  tags = merge(
+    local.tags,
+    { "Name" = format("%s-redshift-lb", local.environment) }
+  )
+}
+
+resource "aws_lb_listener" "redshift-data" {
+  load_balancer_arn = aws_lb.redshift-data.arn
+  port              = "5439"
+  protocol          = "TCP"
+  tags              = local.tags
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.redshift-data.arn
+  }
+}
+
+resource "aws_lb_target_group" "redshift-data" {
+  name        = "redshift-lb-tg-5439"
+  port        = 5439
+  protocol    = "TCP"
+  target_type = "ip"
+  vpc_id      = data.aws_vpc.shared.id
+
+  health_check {
+    enabled  = true
+    port     = "5439"
+    protocol = "TCP"
+  }
+}
+
+resource "aws_lb_target_group_attachment" "redshift-data" {
+  for_each         = toset([for node in aws_redshift_cluster.wepi_redshift_cluster.cluster_nodes : node.private_ip_address])
+  target_group_arn = aws_lb_target_group.redshift-data.arn
+  target_id        = each.value
+  port             = 5439
+}
+
+resource "aws_route53_record" "redshift-lb-dns" {
+  provider = aws.core-vpc
+  name     = format("redshift.%s.%s", local.application_name, data.aws_route53_zone.inner.name)
+  type     = "A"
+  zone_id  = data.aws_route53_zone.inner.zone_id
+
+  alias {
+    name                   = aws_lb.redshift-data.dns_name
+    zone_id                = aws_lb.redshift-data.zone_id
+    evaluate_target_health = true
+  }
 }

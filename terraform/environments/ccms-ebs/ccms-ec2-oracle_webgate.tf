@@ -1,7 +1,7 @@
 resource "aws_instance" "ec2_webgate" {
   count                  = local.application_data.accounts[local.environment].webgate_no_instances
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
-  ami                    = data.aws_ami.webgate.id
+  ami                    = local.application_data.accounts[local.environment]["webgate_ami_id-${count.index + 1}"]
   key_name               = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg_webgate.id]
   subnet_id              = local.private_subnets[count.index]
@@ -14,36 +14,21 @@ resource "aws_instance" "ec2_webgate" {
   cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_webgate
   cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_webgate
 
-  # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
+  # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below.
   # Also includes ebs_optimized and cpu_core_count due to changing instance family from c5d.2xlarge to m5d.large
   lifecycle {
     ignore_changes = [
       ebs_block_device,
       ebs_optimized,
-      cpu_core_count
+      cpu_core_count,
+      user_data,
+      user_data_replace_on_change
     ]
   }
   user_data_replace_on_change = false
-  user_data                   = <<EOF
-#!/bin/bash
-
-exec > /tmp/userdata.log 2>&1
-yum update -y
-yum install -y wget unzip
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-./aws/install
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-rpm -U ./amazon-cloudwatch-agent.rpm
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
-
-systemctl stop amazon-ssm-agent
-rm -rf /var/lib/amazon/ssm/ipc/
-systemctl start amazon-ssm-agent
-mount -a
-
-EOF
+  user_data = base64encode(templatefile("./templates/ec2_user_data_webgate.sh", {
+    hostname = "webgate"
+  }))
 
   # AMI ebs mappings from /dev/sd[a-d]
   # root

@@ -46,7 +46,7 @@ data "aws_iam_policy_document" "glue-policy-data" {
 # Resuse for all S3 read Only
 # S3 Read Only Policy
 resource "aws_iam_policy" "s3_read_access_policy" {
-  name = "dpr_s3_read_policy"
+  name = local.s3_read_access_policy
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -73,7 +73,7 @@ resource "aws_iam_policy" "s3_read_access_policy" {
 
 # KMS Read/Decrypt Policy
 resource "aws_iam_policy" "kms_read_access_policy" {
-  name = "dpr_kms_read_policy"
+  name = local.kms_read_access_policy
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -330,4 +330,47 @@ resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
 
   role       = aws_iam_role.redshift-spectrum-role.name
   policy_arn = each.value
+}
+
+# Additional policy to allow execution of preview queries.
+data "aws_iam_policy_document" "domain_builder_preview" {
+  statement {
+    actions = [
+      "athena:GetQueryExecution",
+      "athena:StartQueryExecution",
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "domain_builder_preview_policy" {
+  name        = "${local.project}-domain-builder-preview-policy"
+  description = "Additional policy to allow execution of query previews in Athena"
+  policy      = data.aws_iam_policy_document.domain_builder_preview.json
+}
+
+# Additional policy to allow execution of publish requests.
+data "aws_iam_policy_document" "domain_builder_publish" {
+  statement {
+    actions = [
+      "dynamodb:Query",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "domain_builder_publish_policy" {
+  name        = "${local.project}-domain-builder-publish-policy"
+  description = "Additional policy to allow execution of query publish in Athena"
+  policy      = data.aws_iam_policy_document.domain_builder_publish.json
 }

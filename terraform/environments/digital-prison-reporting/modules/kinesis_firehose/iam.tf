@@ -68,7 +68,18 @@ data "aws_iam_policy_document" "firehose-policy" {
 
   statement {
     actions = [
-      "logs:PutLogEvents",
+      "glue:GetTable",
+      "glue:GetTableVersion",
+      "glue:GetTableVersions"
+    ]
+    resources = [
+      "arn:aws:glue:${var.aws_region}:${var.aws_account_id}:*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "logs:PutLogEvents"
     ]
     resources = [
       "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:/aws/kinesisfirehose/*"

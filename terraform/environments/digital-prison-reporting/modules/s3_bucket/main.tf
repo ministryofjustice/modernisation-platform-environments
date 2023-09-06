@@ -51,13 +51,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
+
   bucket = aws_s3_bucket.storage[0].id
+
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = "aws:kms"
       kms_master_key_id = var.custom_kms_key
     }
+  bucket_key_enabled = var.bucket_key  
   }
+
 }
 
 resource "aws_sqs_queue_policy" "allow_sqs_access" {
@@ -140,16 +144,16 @@ POLICY
 
 # S3 bucket lambda trigger
 resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
-  count = var.create_s3 && var.enable_notification ? 1 : 0  
+  count  = var.create_s3 && var.enable_notification ? 1 : 0
   bucket = aws_s3_bucket.storage[0].id
 
   dynamic "lambda_function" {
     for_each = var.bucket_notifications != null ? [true] : []
     content {
-      lambda_function_arn   = lookup(var.bucket_notifications, "lambda_function_arn", null)
-      events                = lookup(var.bucket_notifications, "events", null)
-      filter_prefix         = lookup(var.bucket_notifications, "filter_prefix", null)
-      filter_suffix         = lookup(var.bucket_notifications, "filter_suffix", null)
+      lambda_function_arn = lookup(var.bucket_notifications, "lambda_function_arn", null)
+      events              = lookup(var.bucket_notifications, "events", null)
+      filter_prefix       = lookup(var.bucket_notifications, "filter_prefix", null)
+      filter_suffix       = lookup(var.bucket_notifications, "filter_suffix", null)
     }
   }
 

@@ -185,7 +185,7 @@ resource "aws_ssm_document" "perform_healthcheck_s3" {
           "action" = "aws:runPowerShellScript",
           "name"   = "health_check_reports",
           "inputs" = {
-            "runCommand" = ["powershell.exe -ExecutionPolicy Bypass -file 'c:\\xfer\\scripts\\health_check.ps1' -force"]
+            "runCommand" = ["powershell.exe -file 'c:\\scripts\\windows_health_check.ps1'"]
           }
         }
       ]

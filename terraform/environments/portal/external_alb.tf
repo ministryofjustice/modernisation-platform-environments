@@ -2,8 +2,7 @@ locals {
   lb_logs_bucket                        = local.application_data.accounts[local.environment].lb_access_logs_existing_bucket_name
   account_number                        = local.environment_management.account_ids[terraform.workspace]
   external_lb_idle_timeout              = 65
-  enable_deletion_protection            = true
-  external_lb_port                      = 80 #TODO This needs changing to 443 once Cert and CloudFront has been set up
+  external_lb_port                      = 443
   custom_header                         = "X-Custom-Header-LAA-Portal"
   force_destroy_lb_logs_bucket          = true
   lb_target_response_time_threshold     = 10
@@ -15,7 +14,6 @@ locals {
   lb_target_4xx_threshold               = 50
   lb_origin_4xx_threshold               = 10
 }
-
 
 ####################################
 # ELB Access Logging
@@ -145,7 +143,7 @@ resource "aws_lb" "external" {
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.external_lb.id]
   subnets                    = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
-  enable_deletion_protection = local.enable_deletion_protection
+  enable_deletion_protection = local.lb_enable_deletion_protection
   idle_timeout               = local.external_lb_idle_timeout
   # drop_invalid_header_fields = true
 
@@ -167,46 +165,39 @@ resource "aws_lb_listener" "external" {
 
   load_balancer_arn = aws_lb.external.arn
   port              = local.external_lb_port
-  protocol          = "HTTP" #TODO This needs changing to HTTPS once Cert and CloudFront has been set up
-  ssl_policy        = null   # TODO This needs changing once Cert and CloudFront has been set up
-  certificate_arn   = null   # TODO This needs changing once Cert and CloudFront has been set up
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate_validation.external_lb_certificate_validation.certificate_arn
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.external.arn
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access Denied - must access via CloudFront"
+      status_code  = 403
+    }
   }
-
-  # TODO This needs using once Cert and CloudFront has been set up. Remove the forward action block above
-  # default_action {
-  #   type = "fixed-response"
-  #   fixed_response {
-  #     content_type = "text/plain"
-  #     message_body = "Access Denied - must access via CloudFront"
-  #     status_code  = 403
-  #   }
-  # }
 
   tags = local.tags
 
 }
 
-# TODO To be enabled once Cert and CloudFront has been set up
-# resource "aws_lb_listener_rule" "external" {
-#   listener_arn = aws_lb_listener.external.arn
-#   priority     = 100
-#
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.external.arn
-#   }
-#
-#   condition {
-#     http_header {
-#       http_header_name = local.custom_header
-#       values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
-#     }
-#   }
-# }
+resource "aws_lb_listener_rule" "external" {
+  listener_arn = aws_lb_listener.external.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.external.arn
+  }
+
+  condition {
+    http_header {
+      http_header_name = local.custom_header
+      values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
+    }
+  }
+}
 
 resource "aws_lb_target_group" "external" {
   name     = "${local.application_name}-ohs-target-group"

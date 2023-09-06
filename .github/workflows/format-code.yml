@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 #v3.5.3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 #v3.6.0
         with:
           token: '${{ secrets.GITHUB_TOKEN }}'
           fetch-depth: 0
@@ -38,7 +38,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter/flavors/terraform@c72cdea919d17076dbc54f4864b1c82db0f181f2 #v7.2.0
+        uses: oxsecurity/megalinter/flavors/terraform@fda6ac3a38be0e969820709ac16e442464e5a035 #v7.3.0
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/#shared-variables

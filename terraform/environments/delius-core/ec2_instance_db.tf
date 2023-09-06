@@ -24,6 +24,30 @@ resource "aws_vpc_security_group_egress_rule" "base_ami_test_instance_https_out"
   )
 }
 
+resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_rman" {
+  security_group_id = aws_security_group.base_ami_test_instance_sg.id
+  cidr_ipv4         = local.environment_config_dev.legacy_engineering_vpc_cidr
+  from_port         = 1521
+  to_port           = 1521
+  ip_protocol       = "tcp"
+  description       = "Allow communication in out port 1521 to legacy rman"
+  tags = merge(local.tags,
+    { Name = "legacy-rman-out" }
+  )
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
+  security_group_id = aws_security_group.base_ami_test_instance_sg.id
+  cidr_ipv4         = local.environment_config_dev.legacy_engineering_vpc_cidr
+  from_port         = 1521
+  to_port           = 1521
+  ip_protocol       = "tcp"
+  description       = "Allow communication in on port 1521 from legacy rman"
+  tags = merge(local.tags,
+    { Name = "legacy-rman-in" }
+  )
+}
+
 # Pre-req - IAM role, attachment for SSM usage and instance profile
 data "aws_iam_policy_document" "base_ami_test_instance_iam_assume_policy" {
   statement {
@@ -126,23 +150,13 @@ data "aws_ami" "aws_ami_base_ol" {
   name_regex  = "^delius_core_ol_8_5_oracle_db_19c_"
 }
 
-data "template_file" "userdata" {
-  template = file("${path.module}/templates/userdata.sh.tftpl")
-
-  vars = {
-    branch               = "main"
-    ansible_repo         = "modernisation-platform-configuration-management"
-    ansible_repo_basedir = "ansible"
-    ansible_args         = "oracle_19c_install"
-  }
-}
-
 resource "aws_instance" "base_ami_test_instance" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   # Specify the instance type and ami to be used
   instance_type = "r6i.xlarge"
-  ami           = data.aws_ami.aws_ami_base_ol.id
+  # ami           = data.aws_ami.aws_ami_base_ol.id
   # ami = "ami-0e3dd4f4b84ef84f5" # AL2 amzn2-ami-hvm-2.0.20230418.0-x86_64-gp2
+  ami                         = "ami-0ac919fb38fe18044" # fix ami to avoid recreating as new amis are generated
   vpc_security_group_ids      = [aws_security_group.base_ami_test_instance_sg.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.base_ami_test_instance_profile.name
@@ -150,7 +164,17 @@ resource "aws_instance" "base_ami_test_instance" {
   monitoring                  = false
   ebs_optimized               = true
 
-  user_data = data.template_file.userdata.rendered
+  user_data = base64encode(
+    templatefile(
+      "${path.module}/templates/userdata.sh.tftpl",
+      {
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        ansible_args         = "oracle_19c_install"
+      }
+    )
+  )
 
   metadata_options {
     http_endpoint = "enabled"
@@ -164,7 +188,8 @@ resource "aws_instance" "base_ami_test_instance" {
   # }
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-base-ami-test-instance", local.application_name, local.environment)) },
-    { server-type = "delius_core_db" }
+    { server-type = "delius_core_db" },
+    { delius-environment-name = "dev" },
+    { database = "delius-db-1" }
   )
 }
-

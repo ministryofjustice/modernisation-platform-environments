@@ -8,6 +8,12 @@ variable "enable_replication_task" {
   default     = false
 }
 
+variable "setup_dms_instance" {
+  description = "Enable DMS Instance, True or False"
+  type        = bool
+  default     = false
+}
+
 variable "project_id" {
   type        = string
   description = "(Required) Project Short ID that will be used for resources."

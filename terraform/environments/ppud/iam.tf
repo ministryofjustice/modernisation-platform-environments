@@ -70,23 +70,23 @@ resource "aws_iam_policy_attachment" "CloudWatchAgentServerPolicy" {
 #####################################
 
 resource "aws_iam_policy" "production-s3-access" {
-  count      = local.is-production == false ? 1 : 0
+  count       = local.is-production == false ? 1 : 0
   name        = "production-s3-access"
   path        = "/"
   description = "production-s3-access"
   policy = jsonencode({
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Action": "s3:ListBucket",
-    "Effect": "Allow",
-    "Resource": [
-       "arn:aws:s3:::moj-scripts",
-       "arn:aws:s3:::moj-scripts/*",
-       "arn:aws:s3:::moj-release-management",
-       "arn:aws:s3:::moj-release-management/*"
-    ]
-  }]
-})
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Action" : "s3:ListBucket",
+      "Effect" : "Allow",
+      "Resource" : [
+        "arn:aws:s3:::moj-scripts",
+        "arn:aws:s3:::moj-scripts/*",
+        "arn:aws:s3:::moj-release-management",
+        "arn:aws:s3:::moj-release-management/*"
+      ]
+    }]
+  })
 }
 
 #################################
@@ -124,9 +124,9 @@ resource "aws_iam_role_policy_attachment" "maintenance_window_task_policy_attach
 ###############################
 
 resource "aws_iam_role" "lambda_role" {
-count      = local.is-production == true ? 1 : 0
-name   = "PPUD_Lambda_Function_Role"
-assume_role_policy = <<EOF
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role"
+  assume_role_policy = <<EOF
 {
  "Version": "2012-10-17",
  "Statement": [
@@ -145,11 +145,11 @@ EOF
 
 
 resource "aws_iam_policy" "iam_policy_for_lambda" {
- count      = local.is-production == true ? 1 : 0
- name         = "aws_iam_policy_for_terraform_aws_lambda_role"
- path         = "/"
- description  = "AWS IAM Policy for managing aws lambda role"
- policy = <<EOF
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role"
+  policy      = <<EOF
 {
  "Version": "2012-10-17",
  "Statement": [
@@ -176,9 +176,9 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_lambda_role" {
- count      = local.is-production == true ? 1 : 0
- role        = aws_iam_role.lambda_role[0].name
- policy_arn  = aws_iam_policy.iam_policy_for_lambda[0].arn
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda[0].arn
 }
 
 ###################
@@ -186,7 +186,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_lambda_role" 
 ###################
 
 data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
-  count         = local.is-production == true ? 1 : 0
+  count     = local.is-production == true ? 1 : 0
   policy_id = "SnsTopicId"
   statement {
     sid = "statement1"
@@ -205,6 +205,13 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
       "SNS:Publish",
       "SNS:Receive"
     ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceOwner"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+
     resources = [
       aws_sns_topic.cw_alerts[0].arn
     ]

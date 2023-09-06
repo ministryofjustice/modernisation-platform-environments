@@ -13,6 +13,7 @@ locals {
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
+    enable_oracle_secure_web                     = true
     iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
@@ -39,6 +40,10 @@ locals {
   baseline_s3_buckets = {
     s3-bucket = {
       iam_policies = module.baseline_presets.s3_iam_policies
+    }
+    ncr-db-backup-bucket = {
+      custom_kms_key = module.environment.kms_keys["general"].arn
+      iam_policies   = module.baseline_presets.s3_iam_policies
     }
   }
   environment_config = local.environment_configs[local.environment]

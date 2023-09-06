@@ -1,0 +1,100 @@
+# IMPORTANT: This is MOSTLY used to address issues with the current Azure AMI's that are carried over from fixngo
+# This is an EC2Launch V2 type user-data script
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
+# See C:\ProgramData\Amazon\EC2Launch\log for logs
+version: 1.1
+tasks:
+  - task: executeScript
+    inputs:
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # disable local firewall completely
+        content: |-
+          Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # turn off Azure related services
+        content: |-
+          Stop-Service -Name 'WindowsAzureGuestAgent' -Force
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Set time to local and locale
+        content: |-
+          # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script 
+
+          # Set-TimeZone "GMT Standard Time" # does not work for Server 2012 R2 version of PowerShell
+          Set-WinSystemLocale "en-GB"
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # use latest EC2 Launch which should support everything
+        content: |-
+          New-Item -Path "$env:USERPROFILE\Desktop\EC2Launchv2" -ItemType Director
+          $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
+          $DownloadFile = "$env:USERPROFILE\Desktop\EC2Launchv2\" + $(Split-Path -Path $Url -Leaf)
+          Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
+          msiexec /i "$DownloadFile" ADDLOCAL="Basic,Clean,Telemetry" /q       
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          [System.Net.ServicePointManager]::SecurityProtocol = 'TLS12'
+          $progressPreference = 'silentlyContinue'
+          Invoke-WebRequest https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe -OutFile $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+
+          Start-Process -FilePath $env:USERPROFILE\Desktop\SSMAgent_latest.exe -ArgumentList "/S"
+
+          rm -Force $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+
+          Start-Service -Name "AmazonSSMAgent"
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # add session manager to path
+        content: |-
+          # Get the current system PATH
+          $currentPath = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
+
+          # Append the Session Manager path to the current PATH
+          $newPath = $currentPath + ";C:\Program Files\Amazon\SessionManagerPlugin\bin\"
+
+          # Set the new PATH
+          [System.Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
+
+          Restart-Service -Name "AmazonSSMAgent"
+      # - frequency: once
+      #   type: powershell
+      #   runAs: admin
+      #   #not actually a secret
+      #   #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+      #   # Install Cloudwatch agent if missing, otherwise update config and start it
+      #   content: |
+      #     # $ErrorActionPreference = "Stop" # set all errors to terminate script
+      #     $timeout = New-TimeSpan -Seconds 600
+      #     $endTime = (Get-Date).Add($timeout)
+      #     $cwagent = Get-Service -Name "AmazonCloudWatchAgent"
+          
+      #     # Check if parameter doc exists before trying to use it
+      #     Get-SSMParameter -Name 'cloud-watch-config-windows' -Region 'eu-west-2'
+      #     if ($?) {
+      #       Write-Host "Parameter cloud-watch-config-windows found, continuing"
+      #     } else {
+      #       Write-Host "Parameter cloud-watch-config-windows not found, exiting"
+      #       exit 1
+      #     }
+
+      #     if ($cwagent) {
+      #       Do {
+      #       & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
+      #       } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
+      #     } else {
+      #       Invoke-WebRequest -Uri "https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi" -OutFile "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
+      #       $cwagent_installer = "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
+      #       Start-Process -FilePath msiexec.exe -ArgumentList "/i $cwagent_installer /qn" -Wait
+      #       Do {
+      #       & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
+      #       } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
+      #     }

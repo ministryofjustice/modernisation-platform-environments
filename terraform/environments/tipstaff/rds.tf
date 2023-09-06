@@ -20,6 +20,28 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
   subnet_ids = data.aws_subnets.shared-public.ids
 }
 
+//SG for accessing the tacticalproducts source DB:
+resource "aws_security_group" "modernisation_tipstaff_access" {
+  provider    = aws.tacticalproducts
+  name        = "modernisation_tipstaff_access_${local.environment}"
+  description = "Allow tipstaff on modernisation platform to access the source database"
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    description = "Allow tipstaff on modernisation platform to connect to source database"
+    cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "postgresql_db_sc" {
   name        = "postgres_security_group"
   description = "control access to the database"
@@ -46,13 +68,6 @@ resource "aws_security_group" "postgresql_db_sc" {
     description = "Allows Github Actions to access RDS"
     cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
   }
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    description     = "Allows DMS to access RDS"
-    security_groups = [aws_security_group.vpc_dms_replication_instance_group.id]
-  }
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
@@ -72,13 +87,35 @@ resource "null_resource" "setup_db" {
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
-    command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
+    command     = "chmod +x ./migrate_db.sh; ./migrate_db.sh"
 
     environment = {
+      SOURCE_DB_HOSTNAME   = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SOURCE_DB_HOSTNAME"]
+      SOURCE_DB_NAME       = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SOURCE_DB_NAME"]
+      SOURCE_DB_USERNAME   = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SOURCE_DB_USERNAME"]
+      SOURCE_DB_PASSWORD   = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SOURCE_DB_PASSWORD"]
       DB_HOSTNAME          = aws_db_instance.tipstaff_db.address
       DB_NAME              = aws_db_instance.tipstaff_db.db_name
       TIPSTAFF_DB_USERNAME = local.application_data.accounts[local.environment].db_username
       TIPSTAFF_DB_PASSWORD = random_password.password.result
+    }
+  }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
+
+// executes a local script to set up the security group for the source RDS instance.
+resource "null_resource" "setup_source_rds_security_group" {
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command     = "chmod +x ./setup-security-group-${local.environment}.sh; ./setup-security-group-${local.environment}.sh"
+
+    environment = {
+      RDS_SECURITY_GROUP            = aws_security_group.modernisation_tipstaff_access.id
+      RDS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["ACCESS_KEY"]
+      RDS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SECRET_KEY"]
+      RDS_SOURCE_ACCOUNT_REGION     = "eu-west-2"
     }
   }
   triggers = {

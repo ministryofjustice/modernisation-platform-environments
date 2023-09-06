@@ -1,11 +1,11 @@
 locals {
   dashboard_name            = "${local.application_name}-${local.environment}-application-Dashboard"
-  cpu_alarm_threshold       = 85
+  cpu_alarm_threshold       = 85 # in percentage
   status_alarm_threshold    = 1
-  memory_alarm_threshold    = 80
-  swapspace_alarm_threshold = 50
-  diskspace_alarm_threshold = 80
-  mserver_alarm_threshold   = 80
+  memory_alarm_threshold    = 80          # in percentage
+  swapspace_alarm_threshold = 50000000000 # in Bytes
+  diskspace_alarm_threshold = 80          # in percentage
+  mserver_alarm_threshold   = 80          # in percentage
 
   alarms_1 = {
     oam1 = {

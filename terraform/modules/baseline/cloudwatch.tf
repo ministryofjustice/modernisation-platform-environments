@@ -21,7 +21,7 @@ locals {
   }
   cloudwatch_metric_alarms = merge(
     local.cloudwatch_metric_alarms_list_by_dimension,
-    local.cloudwatch_metric_alarms_list_without_dimension
+    local.cloudwatch_metric_alarms_list_without_dimension,
   )
 }
 

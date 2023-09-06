@@ -13,10 +13,15 @@ resource "aws_instance" "ec2_mailrelay" {
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
   lifecycle {
-    ignore_changes = [ebs_block_device, root_block_device]
+    ignore_changes = [
+      ebs_block_device,
+      root_block_device,
+      user_data,
+      user_data_replace_on_change
+    ]
   }
 
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   user_data = base64encode(templatefile("./templates/ec2_user_data_mailrelay.sh", {
     hostname  = "mailrelay"
     mp_fqdn   = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
@@ -135,7 +140,8 @@ output "route53_record_mailrelay" {
 }
 */
 
-output "ec2_private_ip_mailrelay" {
-  description = "Mailrelay Private IP"
-  value       = aws_instance.ec2_mailrelay.private_ip
-}
+# Moved to ccms-ec2-mailrelay-outputs.tf
+#output "ec2_private_ip_mailrelay" {
+#  description = "Mailrelay Private IP"
+#  value       = aws_instance.ec2_mailrelay.private_ip
+#}

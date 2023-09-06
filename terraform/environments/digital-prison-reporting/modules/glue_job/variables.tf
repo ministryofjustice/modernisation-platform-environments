@@ -55,6 +55,11 @@ variable "name" {
   description = "(Required) Name that will be used for identify resources."
 }
 
+variable "short_name" {
+  type        = string
+  description = "(Required) short_name that will be used for identify resources."
+}
+
 variable "project_id" {
   type        = string
   description = "(Required) Project Short ID that will be used for resources."
@@ -235,7 +240,7 @@ variable "security_configuration_s3_encryption" {
 
 variable "log_group_retention_in_days" {
   type        = number
-  default     = 7
+  default     = 1
   description = "(Optional) The default number of days log events retained in the glue job log group."
 }
 

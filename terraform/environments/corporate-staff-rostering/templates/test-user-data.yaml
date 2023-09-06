@@ -1,0 +1,69 @@
+# This is an EC2Launch V2 type user-data script
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
+# See C:\ProgramData\Amazon\EC2Launch\log for logs
+version: 1.1
+tasks:
+  - task: executeScript
+    inputs:
+      - frequency: always
+        type: powershell
+        runAs: admin # or localSystem
+        # Set time to local and locale
+        content: |-
+          # $ErrorActionPreference = "Stop" # un-comment to set all errors to terminate script 
+          
+          # Set-TimeZone "GMT Standard Time" # does not work for Server 2012 R2 version of PowerShell
+          Set-WinSystemLocale "en-GB"
+      - frequency: always
+        type: powershell
+        runAs: admin # or localSystem
+        # install AD commands
+        content: |-
+          Install-WindowsFeature -Name RSAT-AD-PowerShell
+      - frequency: always
+        type: powershell
+        runAs: admin # or localSystem
+        # create a folder and file to test that the script ran
+        content: |-
+          New-Item -ItemType Directory -Force -Path C:\temp\Test
+          New-Item -ItemType File -Force -Path C:\temp\Test\test-success.txt
+      - frequency: always
+        type: powershell
+        runAs: admin # or localSystem
+        # run a test SSM document
+        content: |-
+          # Install AWS PowerShell module if not already installed
+          if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
+          Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
+          }
+
+          # Function to check if SSM Agent is running
+          Function Check-SSMAgent {
+            $service = Get-Service -Name "AmazonSSMAgent"
+            if ($service.Status -eq "Running") {
+                return $true
+            } else {
+                Start-Service -Name "AmazonSSMAgent" -Force
+            }
+          }
+
+          # Function to execute the SSM command
+          Function Execute-SSMCommand {
+            $instanceId = Invoke-RestMethod -Uri "http://169.254.169.254/latest/meta-data/instance-id"
+            $documentName = "csr-server-config"
+
+            $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $documentName
+            Write-Host "Executed SSM command with Command ID: $($commandId.CommandId)"
+          }
+
+          # Main loop to wait for SSM Agent to be running
+          while ($true) {
+            if (Check-SSMAgent) {
+              Write-Host "SSM Agent is running, executing SSM command."
+              Execute-SSMCommand
+              break
+            } else {
+              Write-Host "SSM Agent is not running yet. Waiting..."
+              Start-Sleep -Seconds 10
+            }
+          }
