@@ -149,7 +149,7 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-        ldap = {
+        ldap_new = {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 389
           to_port         = 389
