@@ -149,8 +149,8 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-        ldap_new = {
-          description     = "Allow ingress Azure domain controllers"
+        ldap = {
+          description     = "Allow ingress Azure domain controllers for LDAP"
           from_port       = 389
           to_port         = 389
           protocol        = -1
@@ -328,8 +328,8 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-        ldap_new = {
-          description     = "Allow ingress Azure domain controllers"
+        ldap = {
+          description     = "Allow ingress Azure domain controllers for LDAP"
           from_port       = 389
           to_port         = 389
           protocol        = -1
