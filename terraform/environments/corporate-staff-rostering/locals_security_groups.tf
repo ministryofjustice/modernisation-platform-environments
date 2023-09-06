@@ -328,7 +328,7 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-          /* } FIXME: add this back in 
+        /* } FIXME: add this back in 
         netbios = {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 137
@@ -337,7 +337,7 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         } */
-                /* ldap = {  FIXME: add this back in 
+        /* ldap = {  FIXME: add this back in 
           description     = "Allow ingress Azure domain controllers"
           from_port       = 389
           to_port         = 389
@@ -412,79 +412,79 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-          # http2109 = {
-          #   description = "Allow ingress from port 2109"
-          #   from_port       = 2109
-          #   to_port         = 2109
-          #   protocol        = "TCP"
-          #   cidr_blocks     = ["10.0.0.0/8"]
-          #   security_groups = ["Web-SG-migration", "data-db"]
-          # }
-          # http5985 = {
-          #   description = "Allow ingress from port 5985"
-          #   from_port       = 5985
-          #   to_port         = 5985
-          #   protocol        = "TCP"
-          #   cidr_blocks     = ["10.0.0.0/8"]
-          #   security_groups = []
-          # }
-          # http5986 = {
-          #   description = "Allow ingress from port 5986"
-          #   from_port       = 5986
-          #   to_port         = 5986
-          #   protocol        = "TCP"
-          #   cidr_blocks     = ["10.0.0.0/8"]
-          #   security_groups = []
-          # }
-          # http9100 = {
-          #   description = "Allow ingress from port 9100"
-          #   from_port       = 9100
-          #   to_port         = 9100
-          #   protocol        = "TCP"
-          #   cidr_blocks     = ["10.0.0.0/8"]
-          #   security_groups = []
-          # }
-          # http9172 = {
-          #   description = "Allow ingress from port 9172"
-          #   from_port       = 9172
-          #   to_port         = 9172
-          #   protocol        = "TCP"
-          #   cidr_blocks     = ["10.0.0.0/8"]
-          #   security_groups = []
-          # }
-          # http9182 = {
-          #   description = "Allow ingress from port 9182"
-          #   from_port       = 9182
-          #   to_port         = 9182
-          #   protocol        = "TCP"
-          #   cidr_blocks     = ["10.0.0.0/8"]
-          #   security_groups = []
-          # }
-          # http45054 = {
-          #   description = "Allow ingress from port 45054"
-          #   from_port       = 45054
-          #   to_port         = 45054
-          #   protocol        = "TCP"
-          #   cidr_blocks     = ["10.0.0.0/8"]
-          #   security_groups = []
-          # }
-          # http7001 = {
-          #   description = "Allow ingress from port 7001"
-          #   from_port       = 7001
-          #   to_port         = 7001
-          #   protocol        = "TCP"
-          #   cidr_blocks     = ["10.0.0.0/8"]
-          #   security_groups = []
-          # }
-          # http7= {
-          #   description = "Allow ingress from port 7"
-          #   from_port       = 7
-          #   to_port         = 7
-          #   protocol        = "TCP"
-          #   cidr_blocks     = ["10.0.0.0/8"]
-          #   security_groups = []
-          # }
-        }
+        # http2109 = {
+        #   description = "Allow ingress from port 2109"
+        #   from_port       = 2109
+        #   to_port         = 2109
+        #   protocol        = "TCP"
+        #   cidr_blocks     = ["10.0.0.0/8"]
+        #   security_groups = ["Web-SG-migration", "data-db"]
+        # }
+        # http5985 = {
+        #   description = "Allow ingress from port 5985"
+        #   from_port       = 5985
+        #   to_port         = 5985
+        #   protocol        = "TCP"
+        #   cidr_blocks     = ["10.0.0.0/8"]
+        #   security_groups = []
+        # }
+        # http5986 = {
+        #   description = "Allow ingress from port 5986"
+        #   from_port       = 5986
+        #   to_port         = 5986
+        #   protocol        = "TCP"
+        #   cidr_blocks     = ["10.0.0.0/8"]
+        #   security_groups = []
+        # }
+        # http9100 = {
+        #   description = "Allow ingress from port 9100"
+        #   from_port       = 9100
+        #   to_port         = 9100
+        #   protocol        = "TCP"
+        #   cidr_blocks     = ["10.0.0.0/8"]
+        #   security_groups = []
+        # }
+        # http9172 = {
+        #   description = "Allow ingress from port 9172"
+        #   from_port       = 9172
+        #   to_port         = 9172
+        #   protocol        = "TCP"
+        #   cidr_blocks     = ["10.0.0.0/8"]
+        #   security_groups = []
+        # }
+        # http9182 = {
+        #   description = "Allow ingress from port 9182"
+        #   from_port       = 9182
+        #   to_port         = 9182
+        #   protocol        = "TCP"
+        #   cidr_blocks     = ["10.0.0.0/8"]
+        #   security_groups = []
+        # }
+        # http45054 = {
+        #   description = "Allow ingress from port 45054"
+        #   from_port       = 45054
+        #   to_port         = 45054
+        #   protocol        = "TCP"
+        #   cidr_blocks     = ["10.0.0.0/8"]
+        #   security_groups = []
+        # }
+        # http7001 = {
+        #   description = "Allow ingress from port 7001"
+        #   from_port       = 7001
+        #   to_port         = 7001
+        #   protocol        = "TCP"
+        #   cidr_blocks     = ["10.0.0.0/8"]
+        #   security_groups = []
+        # }
+        # http7= {
+        #   description = "Allow ingress from port 7"
+        #   from_port       = 7
+        #   to_port         = 7
+        #   protocol        = "TCP"
+        #   cidr_blocks     = ["10.0.0.0/8"]
+        #   security_groups = []
+        # }
+      }
       egress = {
         all = {
           description     = "Allow all egress"
