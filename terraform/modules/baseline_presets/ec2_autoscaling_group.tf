@@ -32,6 +32,18 @@ locals {
       }
     }
 
+    default_with_warm_pool = {
+      desired_capacity    = 1
+      max_size            = 1
+      force_delete        = true
+      vpc_zone_identifier = var.environment.subnets["private"].ids
+
+      warm_pool = {
+        reuse_on_scale_in           = true
+        max_group_prepared_capacity = 1
+      }
+    }
+
     default_with_ready_hook_and_warm_pool = {
       desired_capacity          = 1
       max_size                  = 1

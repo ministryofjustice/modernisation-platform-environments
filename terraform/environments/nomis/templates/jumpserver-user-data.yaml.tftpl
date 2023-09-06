@@ -106,47 +106,8 @@ tasks:
         runAs: admin
         # IE COMPATIBILITY MODE SITE LIST
         content: |
-          $ie_compatibility_mode_site_list = @(
-              "t1-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "t1-nomis-web-a.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "t1-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "t1-nomis-web-b.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "t1-cn.hmpp-azdt.justice.gov.uk:7777/forms/frmservlet?config=tag"
-              "t1-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag"
-              "c-t1.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "c-t1.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "t2-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "t2-nomis-web-a.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "t2-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "t2-nomis-web-b.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "t2-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag"
-              "c-t2.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "c-t2.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "t3-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "t3-nomis-web-a.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "t3-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "t3-nomis-web-b.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "t3-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag"
-              "t3-cn-ha.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag"
-              "c-t3.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "c-t3.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "c.pp-nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "c.preproduction.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "c.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "prod-nomis-web-a.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "prod-nomis-web-a.production.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "prod-nomis-web-b.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "prod-nomis-web-b.production.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "c.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "c.production.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-              "c.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              "c.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-          )
-
+          $ie_compatibility_mode_site_list = "${ie_compatibility_mode_site_list}".Split(",")
+          $ie_compatibility_mode_site_list
           $compatibility_site_list_path = "C:\\compatibility_site_list.xml"
 
           $xmlDoc = New-Object System.Xml.XmlDocument
@@ -194,15 +155,8 @@ tasks:
         # - Trusted Sites - HKCU, HKLM does not apply since the machine is not on the domain 
         # NOTE: https:// traffic ONLY is allowed, these settings are external to this environment and are not managed by this script
         content: |
-          $domains = @(
-            "*.nomis.hmpps-development.modernisation-platform.justice.gov.uk"
-            "*.nomis.hmpps-test.modernisation-platform.justice.gov.uk"
-            "*.nomis.hmpps-preproduction.modernisation-platform.justice.gov.uk"
-            "*.nomis.hmpps-production.modernisation-platform.justice.gov.uk"
-            "*.nomis.service.justice.gov.uk"
-            "*.nomis.az.justice.gov.uk"
-            "*.hmpp-azdt.justice.gov.uk"
-          )
+          $domains = "${ie_trusted_domains}".Split(",")
+          $domains
 
           $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Edge\EnhanceSecurityModeBypassListDomains"
 
@@ -270,21 +224,20 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
-        # Add desktop shortcuts for T1-3
+        # Add desktop shortcuts for Nomis URLs
         content: |
-          for ($i = 1; $i -le 3; $i++) {
+          $desktop_shortcuts = "${desktop_shortcuts}".Split(",")
+          $desktop_shortcuts
 
-            $url = "https://c-t$i.test.nomis.az.justice.gov.uk/forms/frmservlet?config=tag"
-
+          for ($i = 0; $i -lt $desktop_shortcuts.Length; $i++) {
+            $desktop_shortcut = $desktop_shortcuts[$i].Split("|")
+            $name = $desktop_shortcut[0]
+            $url = $desktop_shortcut[1]
             $shortcut = New-Object -ComObject WScript.Shell
             $destination = $shortcut.SpecialFolders.Item("AllUsersDesktop")
-            $source_path = Join-Path -Path $destination -ChildPath "\\C-T$i-Nomis.url"
+            $source_path = Join-Path -Path $destination -ChildPath "\\$name.url"
             $sourc = $shortcut.CreateShortcut($source_path)
             $sourc.TargetPath = $url
 
             $sourc.Save()       
-          
           }
-          
-          ######## ADD DESKTOP SHORTCUTS FOR PRODUCTION AND PREPRODUCTION ########
-          # NOTE: Not yet implemented, hoping to add these later based on the environment the jumpserver is deployed to

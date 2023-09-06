@@ -198,7 +198,7 @@ locals {
         branch = "e6cf03433540d764309430077c1cc030df8dddea" # 2023-08-25 weblogic deployments + updated monitoring
       })
     })
-    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {}) 
+    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {})
     autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
       desired_capacity = 0
     })

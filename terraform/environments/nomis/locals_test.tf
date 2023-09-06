@@ -181,31 +181,38 @@ locals {
         })
       })
 
-      test-jumpserver-2022 = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "hmpps_windows_server_2022_release_2023-*"
-          availability_zone             = null
-          ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))
+      test-jumpserver-a = merge(local.jumpserver_ec2_default, {
+        config = merge(local.jumpserver_ec2_default.config, {
+          user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
+            ie_compatibility_mode_site_list = join(",", [
+              "t1-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t1-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t1-cn.hmpp-azdt.justice.gov.uk:7777/forms/frmservlet?config=tag",
+              "t1-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
+              "c-t1.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t2-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t2-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t2-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
+              "c-t2.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t3-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t3-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "t3-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
+              "t3-cn-ha.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
+              "c-t3.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+            ie_trusted_domains = join(",", [
+              "*.nomis.hmpps-test.modernisation-platform.justice.gov.uk",
+              "*.nomis.service.justice.gov.uk",
+              "*.hmpp-azdt.justice.gov.uk",
+            ])
+            desktop_shortcuts = join(",", [
+              "T1 NOMIS|https://c-t1.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "T2 NOMIS|https://c-t2.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "T3 NOMIS|https://c-t3.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+            ])
+          }))
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private-jumpserver"]
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
-        }
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 1 # set to 0 while testing
-        })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
-          description = "Windows Server 2022 Jumpserver for NOMIS"
-          os-type     = "Windows"
-          component   = "jumpserver"
-          server-type = "nomis-jumpserver"
-        }
-      }
+      })
     }
 
     baseline_ec2_instances = {
