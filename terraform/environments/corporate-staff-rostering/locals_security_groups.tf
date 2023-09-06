@@ -12,7 +12,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
     rdp = {
-      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.3.0/26"]
+      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.3.0/26", "10.102.1.64/26"]
     }
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -141,30 +141,22 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-        /* netbios = {   FIXME: add this back in
+        netbios = {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 137
           to_port         = 139
           protocol        = -1
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
-        } */
-        /* ldap = { FIXME: add this back in
+        }
+        ldap = {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 389
           to_port         = 389
-          protocol        = "TCP"
+          protocol        = -1
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-        ldap_udp = {
-          description     = "Allow ingress Azure domain controllers"
-          from_port       = 389
-          to_port         = 389
-          protocol        = "UDP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
-          security_groups = []
-        } */
         https = {
           description     = "Allow ingress from port 443"
           from_port       = 443
@@ -328,7 +320,6 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-        /* } FIXME: add this back in 
         netbios = {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 137
@@ -336,23 +327,15 @@ locals {
           protocol        = -1
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
-        } */
-        /* ldap = {  FIXME: add this back in 
+        }
+        ldap = {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 389
           to_port         = 389
-          protocol        = "TCP"
+          protocol        = -1
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-        ldap_udp = {
-          description     = "Allow ingress Azure domain controllers"
-          from_port       = 389
-          to_port         = 389
-          protocol        = "UDP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
-          security_groups = []
-        } */
         https = {
           description     = "Allow ingress from port 443"
           from_port       = 443
