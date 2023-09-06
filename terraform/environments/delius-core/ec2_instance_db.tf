@@ -150,17 +150,6 @@ data "aws_ami" "aws_ami_base_ol" {
   name_regex  = "^delius_core_ol_8_5_oracle_db_19c_"
 }
 
-# data "template_file" "userdata" {
-#   template = file("${path.module}/templates/userdata.sh.tftpl")
-
-#   vars = {
-#     branch               = "main"
-#     ansible_repo         = "modernisation-platform-configuration-management"
-#     ansible_repo_basedir = "ansible"
-#     ansible_args         = "oracle_19c_install"
-#   }
-# }
-
 resource "aws_instance" "base_ami_test_instance" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   # Specify the instance type and ami to be used
@@ -175,7 +164,6 @@ resource "aws_instance" "base_ami_test_instance" {
   monitoring                  = false
   ebs_optimized               = true
 
-  # user_data = data.template_file.userdata.rendered
   user_data = base64encode(
     templatefile(
       "${path.module}/templates/userdata.sh.tftpl",

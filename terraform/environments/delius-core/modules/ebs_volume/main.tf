@@ -4,7 +4,7 @@ resource "aws_ebs_volume" "this" {
   iops              = var.iops
   throughput        = var.throughput
   size              = var.size
-#   encrypted         = true
+  encrypted         = true
   kms_key_id        = var.kms_key_id
   tags              = var.tags
 }
