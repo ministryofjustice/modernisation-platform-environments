@@ -100,6 +100,25 @@ output "s3_buckets" {
   value       = module.s3_bucket
 }
 
+output "secretsmanager" {
+  description = "map of secretsmanager secrets and secret versions"
+  value = {
+    secrets = aws_secretsmanager_secret.this
+    secret_versions = {
+      for key, value in merge(
+        aws_secretsmanager_secret_version.fixed,
+        aws_secretsmanager_secret_version.placeholder
+        ) : key => {
+        arn            = value.arn
+        id             = value.id
+        secret_id      = value.secret_id
+        version_id     = value.version_id
+        version_stages = value.version_stages
+      }
+    }
+  }
+}
+
 output "security_groups" {
   description = "map of security groups corresponding to var.security_groups"
   value       = aws_security_group.this
