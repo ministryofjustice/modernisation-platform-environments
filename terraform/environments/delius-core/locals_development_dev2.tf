@@ -59,43 +59,39 @@ locals {
         volume_size = 30
       }
       ebs_non_root_volumes = {
-        "/dev/sdb" = {
+        "/dev/sdb" = { # /u01 oracle app disk
           volume_type = "gp3"
           volume_size = 200
         }
-        "/dev/sdc" = {
+        "/dev/sdc" = { # /u02 oracle app disk
           volume_type = "gp3"
           volume_size = 100
         }
-        "/dev/sdc" = {
-          volume_type = "gp3"
-          volume_size = 100
-        }
-        "/dev/sds" = {
+        "/dev/sds" = { # swap disk
           volume_type = "gp3"
           volume_size = 4
         }
-        "/dev/sde" = {
+        "/dev/sde" = { # oracle asm disk DATA01
           volume_type = "gp3"
           volume_size = 500
         }
-        "/dev/sdf" = {
+        "/dev/sdf" = { # oracle asm disk DATA02
           no_device = true
         }
-        "/dev/sdg" = {
+        "/dev/sdg" = { # oracle asm disk DATA03
           no_device = true
         }
-        "/dev/sdh" = {
+        "/dev/sdh" = { # oracle asm disk DATA04
           no_device = true
         }
-        "/dev/sdi" = {
+        "/dev/sdi" = { # oracle asm disk DATA05
           no_device = true
         }
-        "/dev/sdj" = {
+        "/dev/sdj" = { # oracle asm disk FLASH01
           volume_type = "gp3"
           volume_size = 500
         }
-        "/dev/sdk" = {
+        "/dev/sdk" = { # oracle asm disk FLASH02
           no_device = true
         }
       }
