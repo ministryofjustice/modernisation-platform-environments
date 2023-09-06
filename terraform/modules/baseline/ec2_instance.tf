@@ -1,7 +1,8 @@
 module "ec2_instance" {
   for_each = var.ec2_instances
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.1.0"
+  # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=DSOS-2124-allow-placeholder-ssm-params"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -34,9 +35,17 @@ module "ec2_instance" {
   user_data_raw                 = each.value.config.user_data_raw
   user_data_cloud_init          = each.value.user_data_cloud_init
   ssm_parameters_prefix         = each.value.config.ssm_parameters_prefix
-  ssm_parameters                = each.value.ssm_parameters
   iam_resource_names_prefix     = each.value.config.iam_resource_names_prefix
   route53_records               = each.value.route53_records
+
+  # add KMS Key Ids if they are referenced by name
+  ssm_parameters = each.value.ssm_parameters == null ? null : {
+    for key, value in each.value.ssm_parameters : key => merge(value,
+      value.kms_key_id == null ? {} : {
+        kms_key_id = try(var.environment.kms_keys[value.kms_key_id].arn, value.kms_key_id)
+      }
+    )
+  }
 
   # either reference policies created by this module by using the name, e.g.
   # "BusinessUnitKmsCmkPolicy", or pass in policy ARNs from outside module

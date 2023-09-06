@@ -13,7 +13,8 @@ locals {
 module "ec2_autoscaling_group" {
   for_each = var.ec2_autoscaling_groups
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.1.0"
+  # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=DSOS-2124-allow-placeholder-ssm-params"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -45,8 +46,16 @@ module "ec2_autoscaling_group" {
   user_data_raw                 = each.value.config.user_data_raw
   user_data_cloud_init          = each.value.user_data_cloud_init
   ssm_parameters_prefix         = each.value.config.ssm_parameters_prefix
-  ssm_parameters                = each.value.ssm_parameters
   iam_resource_names_prefix     = each.value.config.iam_resource_names_prefix
+
+  # add KMS Key Ids if they are referenced by name
+  ssm_parameters = each.value.ssm_parameters == null ? null : {
+    for key, value in each.value.ssm_parameters : key => merge(value,
+      value.kms_key_id == null ? {} : {
+        kms_key_id = try(var.environment.kms_keys[value.kms_key_id].arn, value.kms_key_id)
+      }
+    )
+  }
 
   # either reference policies created by this module by using the name, e.g.
   # "BusinessUnitKmsCmkPolicy", or pass in policy ARNs from outside module

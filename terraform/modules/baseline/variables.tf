@@ -222,11 +222,15 @@ variable "ec2_autoscaling_groups" {
       recurrence       = string
     })), {})
     ssm_parameters = optional(map(object({
-      random = object({
+      description = optional(string)
+      type        = optional(string, "SecureString")
+      kms_key_id  = optional(string, "general")
+      file        = optional(string)
+      random = optional(object({
         length  = number
-        special = bool
-      })
-      description = string
+        special = optional(bool)
+      }))
+      value = optional(string)
     })))
     lb_target_groups = optional(map(object({
       port                 = optional(number)
@@ -332,11 +336,15 @@ variable "ec2_instances" {
       kms_key_id  = optional(string)
     })), {})
     ssm_parameters = optional(map(object({
-      random = object({
+      description = optional(string)
+      type        = optional(string, "SecureString")
+      kms_key_id  = optional(string, "general")
+      file        = optional(string)
+      random = optional(object({
         length  = number
-        special = bool
-      })
-      description = string
+        special = optional(bool)
+      }))
+      value = optional(string)
     })))
     route53_records = optional(object({
       create_internal_record = bool
@@ -906,7 +914,7 @@ variable "ssm_parameters" {
   type = map(object({
     prefix     = optional(string, "")
     postfix    = optional(string, "/")
-    kms_key_id = optional(string)
+    kms_key_id = optional(string, "general")
     parameters = map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
