@@ -141,7 +141,7 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-        /* netbios = {
+        netbios = {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 137
           to_port         = 139
@@ -156,7 +156,7 @@ locals {
           protocol        = -1
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
-        } */
+        }
         https = {
           description     = "Allow ingress from port 443"
           from_port       = 443
@@ -320,7 +320,7 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
-        /* netbios = {
+        netbios = {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 137
           to_port         = 139
@@ -335,7 +335,7 @@ locals {
           protocol        = -1
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
-        } */
+        }
         https = {
           description     = "Allow ingress from port 443"
           from_port       = 443
