@@ -150,7 +150,7 @@ locals {
           security_groups = []
         }
         ldap = {
-          description     = "Allow ingress Azure domain controllers for LDAP"
+          description     = "Allow LDAP ingress from Azure domain controllers"
           from_port       = 389
           to_port         = 389
           protocol        = -1
@@ -329,7 +329,7 @@ locals {
           security_groups = []
         }
         ldap = {
-          description     = "Allow ingress Azure domain controllers for LDAP"
+          description     = "Allow LDAP ingress from Azure domain controllers"
           from_port       = 389
           to_port         = 389
           protocol        = -1
