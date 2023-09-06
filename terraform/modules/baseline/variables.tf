@@ -914,7 +914,7 @@ variable "ssm_parameters" {
   type = map(object({
     prefix     = optional(string, "")
     postfix    = optional(string, "/")
-    kms_key_id = optional(string, "general")
+    kms_key_id = optional(string) # FIXME set default to "general" for DSOS-2011
     parameters = map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
