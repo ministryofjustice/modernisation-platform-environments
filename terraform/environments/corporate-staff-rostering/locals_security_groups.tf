@@ -12,7 +12,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
     rdp = {
-      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.3.0/26", "10.102.1.64/26"]
+      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.3.0/26", "10.102.1.64/26", "10.102.0.128/26"]
     }
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
