@@ -95,7 +95,9 @@ locals {
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         ssm_parameters = {
-          test = {}
+          test = {
+            kms_key_id = "general"
+          }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 1
