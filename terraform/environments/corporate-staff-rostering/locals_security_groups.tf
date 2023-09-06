@@ -178,7 +178,7 @@ locals {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 389
           to_port         = 389
-          protocol        = "TCP"
+          protocol        = -1
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
@@ -210,6 +210,22 @@ locals {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 49152
           to_port         = 65535
+          protocol        = "TCP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        netbios = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 137
+          to_port         = 139
+          protocol        = -1
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        active_directory_web_services = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 9389
+          to_port         = 9389
           protocol        = "TCP"
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
@@ -341,7 +357,7 @@ locals {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 389
           to_port         = 389
-          protocol        = "TCP"
+          protocol        = -1
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         }
@@ -365,6 +381,22 @@ locals {
           description     = "Allow ingress Azure domain controllers"
           from_port       = 135
           to_port         = 135
+          protocol        = "TCP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        netbios = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 137
+          to_port         = 139
+          protocol        = -1
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        active_directory_web_services = {
+          description     = "Allow ingress Azure domain controllers"
+          from_port       = 9389
+          to_port         = 9389
           protocol        = "TCP"
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []

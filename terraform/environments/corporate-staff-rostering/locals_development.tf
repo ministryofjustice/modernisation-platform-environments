@@ -30,7 +30,7 @@ locals {
           server-type = "base-ol-8-5"
         }
       }
-      
+
     }
 
     baseline_ec2_instances = {
