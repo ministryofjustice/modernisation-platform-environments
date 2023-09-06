@@ -236,7 +236,16 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" 
     actions = ["s3:GetObject", "s3:PutObject"]
     resources = [
       "${module.s3-bucket.bucket.arn}/metadata/*",
-      "${module.s3-bucket.bucket.arn}data_product_metadata_spec/*"
+      "${module.s3-bucket.bucket.arn}/data_product_metadata_spec/*"
+    ]
+  }
+
+    statement {
+    sid     = "PutDataObject"
+    effect  = "Allow"
+    actions = ["s3:PutObject"]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/logs/*"
     ]
   }
 
