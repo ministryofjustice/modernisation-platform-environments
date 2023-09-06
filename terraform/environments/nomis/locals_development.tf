@@ -184,6 +184,29 @@ locals {
       })
     }
 
+    baseline_ec2_instances = {
+      dev-tmp-rhel79 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "base_rhel_7_9_*"
+          availability_zone = null
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-web"]
+        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        ssm_parameters = {
+          test = {}
+        }
+        tags = {
+          description = "For testing our base RHEL7.9 base image"
+          ami         = "base_rhel_7_9"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "base-rhel79"
+        }
+      }
+    }
+
     baseline_lbs = {
       # AWS doesn't let us call it internal
       private = {
