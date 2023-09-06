@@ -95,8 +95,9 @@ module "data_product_presigned_url_lambda" {
   description                    = "Lambda to generate a presigned url for uploading data"
   role_name                      = "presigned_url_lambda_role_${local.environment}"
 #   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_presigned_url_lambda.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_get_glue_metadata_lambda.json
   function_name                  = "data_product_presigned_url_${local.environment}"
-  create_role                    = false
+  create_role                    = true
   reserved_concurrent_executions = 1
   depends_on = [module.s3-bucket]
 
@@ -129,8 +130,9 @@ module "data_product_athena_load_lambda" {
   description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
   role_name                      = "athena_load_lambda_role_${local.environment}"
 #   policy_json                    = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_get_glue_metadata_lambda.json
   function_name                  = "data_product_athena_load_${local.environment}"
-  create_role                    = false
+  create_role                    = true
   reserved_concurrent_executions = 1
   depends_on = [
     aws_athena_workgroup.data_product_athena_workgroup,
