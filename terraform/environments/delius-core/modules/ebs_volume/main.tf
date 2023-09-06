@@ -14,4 +14,4 @@ resource "aws_volume_attachment" "this" {
   volume_id    = aws_ebs_volume.this.id
   instance_id  = var.instance_id
   skip_destroy = true
-} 
+}
