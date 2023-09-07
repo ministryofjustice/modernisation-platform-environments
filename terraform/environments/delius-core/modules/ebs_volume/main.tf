@@ -10,8 +10,7 @@ resource "aws_ebs_volume" "this" {
 }
 
 resource "aws_volume_attachment" "this" {
-  device_name  = var.device_name
-  volume_id    = aws_ebs_volume.this.id
-  instance_id  = var.instance_id
-  #skip_destroy = true
+  device_name = var.device_name
+  volume_id   = aws_ebs_volume.this.id
+  instance_id = var.instance_id
 }
