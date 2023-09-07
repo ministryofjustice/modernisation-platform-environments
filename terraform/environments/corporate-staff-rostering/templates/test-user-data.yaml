@@ -11,16 +11,19 @@ tasks:
         content: |-
           $aws_ssm_status = (Get-Service -Name "AmazonSSMAgent").Status
 
+          $logFilePath = "C:\Temp\ssm_status.txt"
+          New-Item -Type File -Force -Path $logFilePath -Value $aws_ssm_status
+
           if ($aws_ssm_status -eq "Running") {
-            Write-Host "SSM Agent is running, no action required."
+            Add-Content -Path $logFilePath -Value "SSM Agent is running, no action required."
           } elseif ($aws_ssm_status -eq "Stopped") {
-            Write-Host "SSM Agent is not running, starting service."
+            Add-Content -Path $logFilePath -Value "SSM Agent is not running, starting service."
             Start-Service -Name "AmazonSSMAgent"
           } elseif ($aws_ssm_status -eq "Paused") {
-            Write-Host "SSM Agent is paused, resuming service."
+            Add-Content -Path $logFilePath -Value "SSM Agent is paused, resuming service."
             Resume-Service -Name "AmazonSSMAgent"
           } elseif ($aws_ssm_status -eq $null) {
-            Write-Host "SSM Agent is not installed... Installing"
+            Add-Content -Path $logFilePath -Value "SSM Agent is not installed... Installing"
             [System.Net.ServicePointManager]::SecurityProtocol = 'TLS12'
             $progressPreference = 'silentlyContinue'
             Invoke-WebRequest https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe -OutFile $env:USERPROFILE\Desktop\SSMAgent_latest.exe
@@ -31,7 +34,7 @@ tasks:
 
             Start-Service -Name "AmazonSSMAgent"
           } else {
-            Write-Host "SSM Agent is in an unknown state: $aws_ssm_status"
+            Add-Content -Path $logFilePath -Value "SSM Agent is in an unknown state: $aws_ssm_status"
           }
       - frequency: once
         type: powershell
@@ -51,8 +54,6 @@ tasks:
           }
 
           Execute-SSMCommand
-
-
       # - frequency: always
       #   type: powershell
       #   runAs: admin # or localSystem
