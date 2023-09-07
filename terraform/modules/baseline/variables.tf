@@ -224,7 +224,7 @@ variable "ec2_autoscaling_groups" {
     ssm_parameters = optional(map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
-      kms_key_id  = optional(string) # FIXME set default to "general" for DSOS-2011
+      kms_key_id  = optional(string, "general")
       file        = optional(string)
       random = optional(object({
         length  = number
@@ -338,7 +338,7 @@ variable "ec2_instances" {
     ssm_parameters = optional(map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
-      kms_key_id  = optional(string) # FIXME set default to "general" for DSOS-2011
+      kms_key_id  = optional(string, "general")
       file        = optional(string)
       random = optional(object({
         length  = number
@@ -914,7 +914,7 @@ variable "ssm_parameters" {
   type = map(object({
     prefix     = optional(string, "")
     postfix    = optional(string, "/")
-    kms_key_id = optional(string) # FIXME set default to "general" for DSOS-2011
+    kms_key_id = optional(string, "general")
     parameters = map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
