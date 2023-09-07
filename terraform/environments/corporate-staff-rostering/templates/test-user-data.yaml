@@ -12,7 +12,8 @@ tasks:
           $aws_ssm_status = (Get-Service -Name "AmazonSSMAgent").Status
 
           $logFilePath = "C:\Temp\ssm_status.txt"
-          New-Item -Type File -Force -Path $logFilePath -Value $aws_ssm_status
+          New-Item -Type File -Force -Path $logFilePath
+          Add-Content -Path $logFilePath -Value "SSM Agent status start: $aws_ssm_status"
 
           if ($aws_ssm_status -eq "Running") {
             Add-Content -Path $logFilePath -Value "SSM Agent is running, no action required."
@@ -40,16 +41,16 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
-          Install AWS PowerShell module if not already installed
+          # Install AWS PowerShell module if not already installed
           if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
             Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
           }
 
           Function Execute-SSMCommand {
-            $instanceId = Invoke-RestMethod -Uri "http://169.254.169.254/latest/meta-data/instance-id"
+            $instanceId = Get-EC2InstanceMetadata -Category InstanceId
             $documentName = "csr-server-config"
 
-            $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $documentName -Force -TimeoutSecond 300
+            $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $documentName -Force
             Write-Host "Executed SSM command with Command ID: $($commandId.CommandId)"
           }
 

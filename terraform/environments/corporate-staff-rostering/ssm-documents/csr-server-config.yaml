@@ -2,22 +2,17 @@
 schemaVersion: "2.2"
 description: "SSM Document for creating local configs on Windows Server"
 parameters:
-  configFolder:
-    type: "String"
-    description: "The folder to create"
-    default: "C:\\temp\\Test"
   configFile:
     type: "String"
     description: "The file to create"
-    default: "C:\\temp\\Test\\test-success-ssm.txt"
+    default: "C:\\Temp\\test-success-ssm.txt"
 mainSteps:
   - name: CreateTestDocument
     action: aws:runPowerShellScript
     inputs:
       runCommand: |
-        "$secretValue1 = (Get-SSMParameterValue -Name 'test-param-1' ).Parameters[0].Value"
-        "$secretValue2 = (Get-SSMParameterValue -Name 'test-param-2' ).Parameters[0].Value"
-        New-Item -ItemType Directory -Force -Path $configFolder
+        $secretValue1 = (Get-SSMParameterValue -Name 'test-param-1' -WithDecryption $true -Region eu-west-2).Parameters[0].Value
+        $secretValue2 = (Get-SSMParameterValue -Name 'test-param-2' -WithDecryption $true -Region eu-west-2).Parameters[0].Value
         New-Item -ItemType File -Force -Path $configFile
         Add-Content -Path $configFile -Value $secretValue1
         Add-Content -Path $configFile -Value $secretValue2
