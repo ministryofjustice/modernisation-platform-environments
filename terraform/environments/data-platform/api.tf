@@ -212,7 +212,7 @@ resource "aws_api_gateway_method" "create_data_product_metadata_post" {
 
   request_parameters = {
     "method.request.header.Authorization" = true
-    "method.request.body.metadata" = true,
+    "method.request.querystring.metadata" = true,
   }
 }
 
@@ -225,6 +225,6 @@ resource "aws_api_gateway_integration" "create_data_product_metadata_to_lambda" 
   uri                     = module.data_product_create_metadata_lambda.lambda_function_invoke_arn
 
   request_parameters = {
-    "integration.request.body.metadata" = "method.request.body.metadata"
+    "integration.request.querystring.metadata" = "method.request.querystring.metadata"
   }
 }
