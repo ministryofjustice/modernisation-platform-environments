@@ -15,6 +15,8 @@ locals {
 
 # following AWS terraform naming convention here aws_lb, aws_lb_listener, so lbs.tf and lb_listeners.tf.
 module "lb" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
+
   for_each = var.lbs
 
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v3.0.0"

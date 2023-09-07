@@ -11,6 +11,8 @@ locals {
 }
 
 module "ec2_autoscaling_group" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
+
   for_each = var.ec2_autoscaling_groups
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.1.1"

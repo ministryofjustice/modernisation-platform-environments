@@ -1,4 +1,6 @@
 module "ec2_instance" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
+
   for_each = var.ec2_instances
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.1.1"
