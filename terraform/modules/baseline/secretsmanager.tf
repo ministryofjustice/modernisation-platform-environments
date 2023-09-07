@@ -91,6 +91,8 @@ data "aws_iam_policy_document" "secretsmanager_secret_policy" {
 }
 
 resource "aws_secretsmanager_secret" "this" {
+  #checkov:skip=CKV2_AWS_57:Ensure Secrets Manager secrets should have automatic rotation enabled; needs to be manual as these are intended to store things like DB passwords
+
   for_each = merge(
     local.secretsmanager_secrets_value,
     local.secretsmanager_secrets_random,
