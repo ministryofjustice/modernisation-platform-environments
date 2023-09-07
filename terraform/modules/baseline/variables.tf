@@ -31,6 +31,7 @@ variable "acm_certificates" {
 variable "backups" {
   description = "map of backup_vaults with associated backup plans to create, where the plan name is the backup_vault name and plan key combined.  Use  'everything' as the map key to use the modernisation platform managed vault"
   type = map(object({
+    kms_key_id = optional(string, "general")
     plans = map(object({
       rule = object({
         schedule                 = optional(string)
