@@ -1,8 +1,7 @@
 module "ec2_instance" {
   for_each = var.ec2_instances
 
-  # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.1.0"
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=DSOS-2124-allow-placeholder-ssm-params"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.1.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc
