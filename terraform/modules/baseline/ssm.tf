@@ -63,7 +63,7 @@ resource "aws_ssm_parameter" "fixed" {
   name        = each.key
   description = each.value.description
   type        = each.value.type
-  key_id      = each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
+  key_id      = each.value.type == "SecureString" && each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
   value       = each.value.value
 
   tags = merge(local.tags, {
@@ -77,7 +77,7 @@ resource "aws_ssm_parameter" "placeholder" {
   name        = each.key
   description = each.value.description
   type        = each.value.type
-  key_id      = each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
+  key_id      = each.value.type == "SecureString" && each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
   value       = each.value.value
 
   tags = merge(local.tags, {

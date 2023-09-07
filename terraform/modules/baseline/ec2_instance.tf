@@ -40,7 +40,8 @@ module "ec2_instance" {
   # add KMS Key Ids if they are referenced by name
   ssm_parameters = each.value.ssm_parameters == null ? null : {
     for key, value in each.value.ssm_parameters : key => merge(value,
-      value.kms_key_id == null ? {} : {
+      value.kms_key_id == null || value.type != "SecureString" ? {
+        kms_key_id = null } : {
         kms_key_id = try(var.environment.kms_keys[value.kms_key_id].arn, value.kms_key_id)
       }
     )
