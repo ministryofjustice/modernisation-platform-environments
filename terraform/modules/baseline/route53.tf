@@ -264,6 +264,8 @@ resource "aws_route53_record" "core_network_services" {
 # Create single security group to cover all resolvers
 # Prefix the name with application since this is created in VPC account
 resource "aws_security_group" "route53_resolver" {
+  #checkov:skip=CKV2_AWS_5:Ensure that Security Groups are attached to another resource; this is attached to the resolver endpoint
+
   count = length(var.route53_resolvers) != 0 ? 1 : 0
 
   provider = aws.core-vpc

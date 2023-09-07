@@ -31,6 +31,7 @@ variable "acm_certificates" {
 variable "backups" {
   description = "map of backup_vaults with associated backup plans to create, where the plan name is the backup_vault name and plan key combined.  Use  'everything' as the map key to use the modernisation platform managed vault"
   type = map(object({
+    kms_key_id = optional(string, "general")
     plans = map(object({
       rule = object({
         schedule                 = optional(string)
@@ -224,7 +225,7 @@ variable "ec2_autoscaling_groups" {
     ssm_parameters = optional(map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
-      kms_key_id  = optional(string) # FIXME set default to "general" for DSOS-2011
+      kms_key_id  = optional(string, "general")
       file        = optional(string)
       random = optional(object({
         length  = number
@@ -338,7 +339,7 @@ variable "ec2_instances" {
     ssm_parameters = optional(map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
-      kms_key_id  = optional(string) # FIXME set default to "general" for DSOS-2011
+      kms_key_id  = optional(string, "general")
       file        = optional(string)
       random = optional(object({
         length  = number
@@ -473,6 +474,8 @@ variable "rds_instances" {
 }
 
 variable "environment" {
+  # tflint-ignore: terraform_typed_variables
+  # Not defining 'type' as it is defined in the output of the environment module
   description = "Standard environmental data resources from the environment module"
 }
 
@@ -914,7 +917,7 @@ variable "ssm_parameters" {
   type = map(object({
     prefix     = optional(string, "")
     postfix    = optional(string, "/")
-    kms_key_id = optional(string) # FIXME set default to "general" for DSOS-2011
+    kms_key_id = optional(string, "general")
     parameters = map(object({
       description = optional(string)
       type        = optional(string, "SecureString")

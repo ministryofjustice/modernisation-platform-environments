@@ -11,6 +11,8 @@ locals {
 }
 
 module "ec2_autoscaling_group" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
+
   for_each = var.ec2_autoscaling_groups
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.1.1"
@@ -50,7 +52,8 @@ module "ec2_autoscaling_group" {
   # add KMS Key Ids if they are referenced by name
   ssm_parameters = each.value.ssm_parameters == null ? null : {
     for key, value in each.value.ssm_parameters : key => merge(value,
-      value.kms_key_id == null ? {} : {
+      value.kms_key_id == null || value.type != "SecureString" ? {
+        kms_key_id = null } : {
         kms_key_id = try(var.environment.kms_keys[value.kms_key_id].arn, value.kms_key_id)
       }
     )

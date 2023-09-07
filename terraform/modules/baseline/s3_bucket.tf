@@ -27,6 +27,8 @@ locals {
 }
 
 module "s3_bucket" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
+
   for_each = var.s3_buckets
 
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
