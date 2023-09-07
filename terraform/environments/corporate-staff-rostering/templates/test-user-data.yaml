@@ -63,8 +63,10 @@ tasks:
             Write-Host "Executed SSM command with Command ID: $($commandId.CommandId)"
           }
 
+          $startTime = Get-Date
+
           # Main loop to wait for SSM Agent to be running
-          while ($true) {
+          do {
             if (Check-SSMAgent) {
               Add-Content -Path "C:\Temp\ssm_status.txt" -Value "SSM Agent is running, executing SSM command. $(Get-Date)"
               Execute-SSMCommand
@@ -73,9 +75,7 @@ tasks:
               Add-Content -Path "C:\Temp\ssm_status.txt" -Value "SSM Agent is not running yet. $(Get-Date) Waiting..."
               Start-Sleep -Seconds 10
             }
-          }
-
-          Execute-SSMCommand
+          } while ((Get-Date) -lt $startTime.AddMinutes(10))
       # - frequency: always
       #   type: powershell
       #   runAs: admin # or localSystem
