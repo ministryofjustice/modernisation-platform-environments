@@ -228,7 +228,7 @@ module "ebs_volume" {
   iops              = var.db_config.ebs_volumes.iops
   throughput        = var.db_config.ebs_volumes.throughput
   tags              = local.tags
-  #kms_key_id        = var.db_config.ebs_volumes.kms_key_id
+  kms_key_id        = var.db_config.ebs_volumes.kms_key_id
 
   depends_on = [
     aws_instance.db_ec2_primary_instance
