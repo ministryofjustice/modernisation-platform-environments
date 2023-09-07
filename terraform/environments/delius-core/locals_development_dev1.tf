@@ -51,7 +51,7 @@ locals {
     })
 
     ebs_volumes = {
-      kms_key_id = data.aws_kms_key.ebs_shared.id
+      kms_key_id = data.aws_kms_key.ebs_shared.arn
       tags       = local.tags
       iops       = 3000
       throughput = 125
