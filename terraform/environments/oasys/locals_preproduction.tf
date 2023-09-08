@@ -35,7 +35,7 @@ locals {
           "pp-b.oasys.service.justice.gov.uk",
           "pp-b-int.oasys.service.justice.gov.uk",
           "bridge-pp-oasys.az.justice.gov.uk",
-          "pp-oasys.az.justice.gov.uk ",
+          "pp-oasys.az.justice.gov.uk",
           "*.pp-oasys.az.justice.gov.uk",
         ]
         external_validation_records_created = false
