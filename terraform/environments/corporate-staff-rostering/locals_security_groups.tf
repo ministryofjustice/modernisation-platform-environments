@@ -414,13 +414,6 @@ locals {
     domain-controller-access = {
       description = "Security group for domain controller inbound"
       ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
         /* dns = {
           description     = "53: Allow DNS ingress from Azure DC"
           from_port       = 53
@@ -497,17 +490,6 @@ locals {
 
         }
       }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-
     }
   }
 }
