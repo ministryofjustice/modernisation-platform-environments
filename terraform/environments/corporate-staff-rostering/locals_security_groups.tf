@@ -133,6 +133,14 @@ locals {
           cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
         }
+        rdp = {
+          description     = "3389: Allow RDP ingress"
+          from_port       = 3389
+          to_port         = 3389
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.rdp.inbound
+          security_groups = []
+        }
         # http5985 = {
         #   description = "Allow ingress from port 5985"
         #   from_port       = 5985
@@ -229,6 +237,14 @@ locals {
           to_port         = 443
           protocol        = "TCP"
           cidr_blocks     = ["10.0.0.0/8"]
+          security_groups = []
+        }
+        rdp = {
+          description     = "3389: Allow RDP ingress"
+          from_port       = 3389
+          to_port         = 3389
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.rdp.inbound
           security_groups = []
         }
 
