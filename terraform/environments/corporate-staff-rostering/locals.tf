@@ -39,6 +39,7 @@ locals {
         effect = "Allow"
         actions = [
           "ec2-instance-connect:SendSerialConsoleSSHPublicKey",
+          "ssm:SendCommand",
         ]
         resources = ["*"]
       }]
