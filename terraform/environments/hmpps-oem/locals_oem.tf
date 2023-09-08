@@ -46,7 +46,7 @@ locals {
   }
   oem_secretsmanager_secrets = {
     policy = [local.oem_secret_policy]
-    parameters = {
+    secrets = {
       passwords = {}
     }
   }
