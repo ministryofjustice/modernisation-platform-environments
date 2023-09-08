@@ -41,7 +41,7 @@ locals {
         })
 
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["migration-app-sg","domain-controller"]
+          vpc_security_group_ids = ["migration-app-sg"]
           instance_type          = "t3.medium"
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
