@@ -54,6 +54,9 @@ resource "random_password" "this" {
 }
 
 resource "aws_ssm_parameter" "fixed" {
+  #checkov:skip=CKV_AWS_337:Ensure SSM parameters are using KMS CMK; default is now to use general business unit key
+  #checkov:skip=CKV2_AWS_34:AWS SSM Parameter should be Encrypted; default is SecureString but some resources don't support this, e.g. cloud watch agent
+
   for_each = merge(
     local.ssm_parameters_value,
     local.ssm_parameters_random,
@@ -63,7 +66,7 @@ resource "aws_ssm_parameter" "fixed" {
   name        = each.key
   description = each.value.description
   type        = each.value.type
-  key_id      = each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
+  key_id      = each.value.type == "SecureString" && each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
   value       = each.value.value
 
   tags = merge(local.tags, {
@@ -72,12 +75,15 @@ resource "aws_ssm_parameter" "fixed" {
 }
 
 resource "aws_ssm_parameter" "placeholder" {
+  #checkov:skip=CKV_AWS_337:Ensure SSM parameters are using KMS CMK; default is now to use general business unit key
+  #checkov:skip=CKV2_AWS_34:AWS SSM Parameter should be Encrypted; default is SecureString but some resources don't support this, e.g. cloud watch agent
+
   for_each = local.ssm_parameters_default
 
   name        = each.key
   description = each.value.description
   type        = each.value.type
-  key_id      = each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
+  key_id      = each.value.type == "SecureString" && each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
   value       = each.value.value
 
   tags = merge(local.tags, {

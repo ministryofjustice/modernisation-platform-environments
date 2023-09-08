@@ -35,7 +35,8 @@ data "aws_iam_role" "backup" {
 resource "aws_backup_vault" "this" {
   for_each = local.backup_vaults
 
-  name = each.key
+  name        = each.key
+  kms_key_arn = try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id)
 
   tags = merge(local.tags, each.value.tags, {
     Name = each.key

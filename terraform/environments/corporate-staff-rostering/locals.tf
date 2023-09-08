@@ -67,6 +67,7 @@ locals {
     migration-web-sg = local.security_groups.Web-SG-migration
     migration-app-sg = local.security_groups.App-SG-migration
     migration-db-sg  = local.security_groups.DB-SG-migration
+    # domain-controller = local.security_groups.domain-controller NOTE: not yet implemented
   }
 
   baseline_sns_topics = {}

@@ -1,4 +1,6 @@
 module "bastion_linux" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
+
   count = var.bastion_linux != null ? 1 : 0
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.0.0"

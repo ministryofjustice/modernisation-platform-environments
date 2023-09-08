@@ -17,3 +17,7 @@ variable "presigned_url_versions" {
 variable "athena_load_versions" {
   type = map(any)
 }
+
+variable "create_metadata_versions" {
+  type = map(any)
+}
