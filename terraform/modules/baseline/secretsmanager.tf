@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "secretsmanager_secret_policy" {
     content {
       effect    = statement.value.effect
       actions   = statement.value.actions
-      resources = ["*"]
+      resources = statement.value.resources
       dynamic "principals" {
         for_each = statement.value.principals != null ? [statement.value.principals] : []
         content {
