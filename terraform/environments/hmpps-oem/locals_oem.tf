@@ -25,6 +25,32 @@ locals {
     }
   }
 
+  oem_secret_policy = {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+    principals = {
+      type = "AWS"
+      identifiers = [
+        "corporate-staff-rostering-${local.environment}",
+        "hmpps-oem-${local.environment}",
+        "nomis-${local.environment}",
+        "nomis-combined-reporting-${local.environment}",
+        "oasys-${local.environment}",
+      ]
+    }
+    resources = [
+      "arn:aws:secretsmanager:*:*:secret/${local.environment}/*"
+    ]
+  }
+  oem_secretsmanager_secrets = {
+    policy = [local.oem_secret_policy]
+    parameters = {
+      passwords = {}
+    }
+  }
+
   oem_ec2_default = {
 
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
