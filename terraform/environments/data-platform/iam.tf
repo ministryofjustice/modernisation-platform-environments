@@ -240,7 +240,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" 
     ]
   }
 
-    statement {
+  statement {
     sid     = "PutDataObject"
     effect  = "Allow"
     actions = ["s3:PutObject"]
