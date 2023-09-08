@@ -9,6 +9,22 @@ resource "aws_route53_zone" "data_platform_service_justice_gov_uk" {
   tags = local.tags
 }
 
+# delegating to data-platform-apps-and-tools-production
+resource "aws_route53_record" "delegate_development_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "apps-tools.data-platform.service.justice.gov.uk"
+  type    = "NS"
+  ttl     = "300"
+  records = [
+    "ns-1707.awsdns-21.co.uk.",
+    "ns-492.awsdns-61.com.",
+    "ns-1189.awsdns-20.org.",
+    "ns-581.awsdns-08.net."
+  ]
+}
+
 # Delegating to data-platform-development
 resource "aws_route53_record" "delegate_development_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
