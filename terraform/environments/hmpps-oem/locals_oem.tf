@@ -40,9 +40,10 @@ locals {
         "oasys-${local.environment}",
       ]
     }
-    resources = [
-      "arn:aws:secretsmanager:*:*:secret/${local.environment}/*"
-    ]
+    resources = ["*"]
+    # resources = [
+    #   "arn:aws:secretsmanager:*:*:secret/${local.environment}/*"
+    # ]
   }
   oem_secretsmanager_secrets = {
     policy = [local.oem_secret_policy]
