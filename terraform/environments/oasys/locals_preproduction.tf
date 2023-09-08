@@ -10,18 +10,18 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      "pp-${local.application_name}-db-a" = merge(local.database_a, {
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "oasys-"
-          })
-        })
-        tags = merge(local.database_a.tags, {
-          description                             = "pp ${local.application_name} database"
-          "${local.application_name}-environment" = "pp"
-          instance-scheduling                     = "skip-scheduling"
-        })
-      })
+      # "pp-${local.application_name}-db-a" = merge(local.database_a, {
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "oasys-db-az-backup"
+      #     })
+      #   })
+      #   tags = merge(local.database_a.tags, {
+      #     description                             = "pp ${local.application_name} database"
+      #     "${local.application_name}-environment" = "pp"
+      #     instance-scheduling                     = "skip-scheduling"
+      #   })
+      # })
     }
 
     baseline_acm_certificates = {
@@ -37,7 +37,7 @@ locals {
         external_validation_records_created = false
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
-          description = "cert for t2 ${local.application_name} ${local.environment} domains"
+          description = "cert for ${local.application_name} ${local.environment} domains"
         }
       }
     }
