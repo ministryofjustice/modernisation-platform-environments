@@ -33,7 +33,7 @@ locals {
 
       dev-tst = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "base_windows_server_2012_r2_release_2023-09-05*"
+          ami_name                      = "base_windows_server_2012_r2_release_2023-*"
           ami_owner                     = "374269020027"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/test-user-data.yaml"))
