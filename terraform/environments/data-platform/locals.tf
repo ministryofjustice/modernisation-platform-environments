@@ -24,10 +24,12 @@ locals {
   max_concurrent                   = 5
   glue_log_group_retention_in_days = 7
 
-  docs_version              = lookup(var.docs_versions, local.environment)
-  authorizer_version        = lookup(var.authorizer_versions, local.environment)
-  get_glue_metadata_version = lookup(var.get_glue_metadata_versions, local.environment)
-  presigned_url_version     = lookup(var.presigned_url_versions, local.environment)
-  athena_load_version       = lookup(var.athena_load_versions, local.environment)
-  create_metadata_version   = lookup(var.create_metadata_versions, local.environment)
+  docs_version                     = lookup(var.docs_versions, local.environment)
+  authorizer_version               = lookup(var.authorizer_versions, local.environment)
+  get_glue_metadata_version        = lookup(var.get_glue_metadata_versions, local.environment)
+  presigned_url_version            = lookup(var.presigned_url_versions, local.environment)
+  athena_load_version              = lookup(var.athena_load_versions, local.environment)
+  create_metadata_version          = lookup(var.create_metadata_versions, local.environment)
+  resync_unprocessed_files_version = lookup(var.resync_unprocessed_files_versions, local.environment)
+  reload_data_product_version      = lookup(var.reload_data_product_versions, local.environment)
 }

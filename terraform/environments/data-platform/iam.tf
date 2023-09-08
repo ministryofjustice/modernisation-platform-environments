@@ -145,6 +145,12 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
       values   = ["code/*"]
     }
   }
+  statement {
+    sid       = "LambdaLogGroup"
+    effect    = "Allow"
+    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
+  }
 }
 
 # API Gateway authoriser IAM permissions
@@ -276,5 +282,47 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" 
     resources = [
       format("arn:aws:logs:eu-west-2:%s:*", data.aws_caller_identity.current.account_id)
     ]
+  }
+}
+
+data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lambda" {
+  statement {
+    sid       = "ListBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid       = "InvokeAthenaLoadLambda"
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = [module.data_product_authorizer_lambda.lambda_function_arn]
+  }
+  statement {
+    sid       = "LambdaLogGroup"
+    effect    = "Allow"
+    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
+  }
+}
+
+data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files_lambda" {
+  statement {
+    sid       = "ListBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid       = "InvokeAthenaLoadLambda"
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = [module.data_product_authorizer_lambda.lambda_function_arn]
+  }
+  statement {
+    sid       = "LambdaLogGroup"
+    effect    = "Allow"
+    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
   }
 }
