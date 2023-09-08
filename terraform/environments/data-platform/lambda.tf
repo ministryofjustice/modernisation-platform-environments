@@ -129,7 +129,7 @@ module "data_product_athena_load_lambda" {
   policy_json                    = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
   function_name                  = "data_product_athena_load_${local.environment}"
   create_role                    = true
-  reserved_concurrent_executions = 1
+  reserved_concurrent_executions = 100
 
   image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-athena-load-lambda-ecr-repo:${local.athena_load_version}"
   timeout      = 600
@@ -147,6 +147,40 @@ module "data_product_athena_load_lambda" {
       function_name = "data_product_athena_load_${local.environment}"
       principal     = "events.amazonaws.com"
       source_arn    = aws_cloudwatch_event_rule.object_created_raw_data.arn
+    }
+  }
+
+}
+
+
+module "data_product_create_metadata_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
+  application_name               = "data_product_create_metadata"
+  tags                           = local.tags
+  description                    = "Lambda to create the first version of a json metadata file for a data product"
+  role_name                      = "data_product_metadata_lambda_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_create_metadata_lambda.json
+  function_name                  = "data_product_create_metadata_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-create-metadata-lambda-ecr-repo:${local.create_metadata_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 128
+
+  environment_variables = {
+    ENVIRONMENT = local.environment
+    BUCKET_NAME = module.s3-bucket.bucket.id
+  }
+
+  allowed_triggers = {
+
+    AllowExecutionFromAPIGateway = {
+      action        = "lambda:InvokeFunction"
+      function_name = "data_product_create_metadata_${local.environment}"
+      principal     = "apigateway.amazonaws.com"
+      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.create_data_product_metadata_post.http_method}${aws_api_gateway_resource.create_data_product_metadata.path}"
     }
   }
 
