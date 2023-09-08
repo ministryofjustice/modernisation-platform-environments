@@ -36,7 +36,7 @@ locals {
           "pp-b-int.oasys.service.justice.gov.uk",
           "bridge-pp-oasys.az.justice.gov.uk",
           "pp-oasys.az.justice.gov.uk ",
-          "oasys-ukwest.pp-oasys.az.justice.gov.uk",
+          "*.pp-oasys.az.justice.gov.uk",
         ]
         external_validation_records_created = false
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
