@@ -41,6 +41,38 @@ resource "aws_route53_record" "delegate_development_data_platform_service_justic
   ]
 }
 
+# Delegating to data-platform-preproduction
+resource "aws_route53_record" "delegate_preproduction_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "preproduction.data-platform.service.justice.gov.uk"
+  type    = "NS"
+  ttl     = "300"
+  records = [
+    "ns-328.awsdns-41.com.",
+    "ns-1671.awsdns-16.co.uk.",
+    "ns-792.awsdns-35.net.",
+    "ns-1106.awsdns-10.org."
+  ]
+}
+
+# Delegating to data-platform-test
+resource "aws_route53_record" "delegate_test_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "test.data-platform.service.justice.gov.uk"
+  type    = "NS"
+  ttl     = "300"
+  records = [
+    "ns-407.awsdns-50.com.",
+    "ns-1837.awsdns-37.co.uk.",
+    "ns-681.awsdns-21.net.",
+    "ns-1302.awsdns-34.org."
+  ]
+}
+
 ##################################################
 # Development
 ##################################################
@@ -69,17 +101,6 @@ resource "aws_route53_record" "delegate_apps_tools_development_data_platform_ser
 }
 
 ##################################################
-# Test
-##################################################
-
-resource "aws_route53_zone" "test_data_platform_service_justice_gov_uk" {
-  count = terraform.workspace == "data-platform-test" ? 1 : 0
-
-  name = "test.data-platform.service.justice.gov.uk"
-  tags = local.tags
-}
-
-##################################################
 # PreProduction
 ##################################################
 
@@ -87,5 +108,16 @@ resource "aws_route53_zone" "preproduction_data_platform_service_justice_gov_uk"
   count = terraform.workspace == "data-platform-preproduction" ? 1 : 0
 
   name = "preproduction.data-platform.service.justice.gov.uk"
+  tags = local.tags
+}
+
+##################################################
+# Test
+##################################################
+
+resource "aws_route53_zone" "test_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-test" ? 1 : 0
+
+  name = "test.data-platform.service.justice.gov.uk"
   tags = local.tags
 }
