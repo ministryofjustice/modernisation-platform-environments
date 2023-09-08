@@ -2,7 +2,7 @@
 # This is an EC2Launch V2 type user-data script
 # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
 # See C:\ProgramData\Amazon\EC2Launch\log for logs
-version: 1.1
+version: 1.0 # version 1.0 is required as this executes AFTER the SSM Agent is running
 tasks:
   - task: executeScript
     inputs:
