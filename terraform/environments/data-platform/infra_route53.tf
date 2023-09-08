@@ -10,7 +10,7 @@ resource "aws_route53_zone" "data_platform_service_justice_gov_uk" {
 }
 
 # delegating to data-platform-apps-and-tools-production
-resource "aws_route53_record" "delegate_development_data_platform_service_justice_gov_uk" {
+resource "aws_route53_record" "delegate_apps_tools_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
 
   zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
