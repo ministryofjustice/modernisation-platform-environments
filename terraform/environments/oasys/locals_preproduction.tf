@@ -26,13 +26,17 @@ locals {
 
     baseline_acm_certificates = {
       "pp_${local.application_name}_cert" = {
-        # domain_name limited to 64 chars so use modernisation platform domain for this
-        # and put the wildcard in the san
+        # domain_name limited to 64 chars
         domain_name = "pp.oasys.service.justice.gov.uk"
         subject_alternate_names = [
-          "*.oasys.service.justice.gov.uk",
-          "*.az.justice.gov.uk",
-          "*.pp-oasys.az.justice.gov.uk",
+          "pp-int.oasys.service.justice.gov.uk",
+          "pp-a.oasys.service.justice.gov.uk",
+          "pp-a-int.oasys.service.justice.gov.uk",
+          "pp-b.oasys.service.justice.gov.uk",
+          "pp-b-int.oasys.service.justice.gov.uk",
+          "bridge-pp-oasys.az.justice.gov.uk",
+          "pp-oasys.az.justice.gov.uk ",
+          "oasys-ukwest.pp-oasys.az.justice.gov.uk",
         ]
         external_validation_records_created = false
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
