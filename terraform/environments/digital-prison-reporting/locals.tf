@@ -42,6 +42,8 @@ locals {
   datamart_password = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
 
   # Glue Job parameters
+  glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
+  glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
   # Reporting Hub Job
   reporting_hub_driver_mem   = local.application_data.accounts[local.environment].reporting_hub_spark_driver_mem
   reporting_hub_executor_mem = local.application_data.accounts[local.environment].reporting_hub_spark_executor_mem
@@ -55,6 +57,42 @@ locals {
   refresh_job_worker_type = local.application_data.accounts[local.environment].refresh_job_worker_type
   refresh_job_num_workers = local.application_data.accounts[local.environment].refresh_job_num_workers
   refresh_job_log_level   = local.application_data.accounts[local.environment].refresh_job_log_level
+
+  # Compact Raw Job
+  compact_raw_job_worker_type = local.application_data.accounts[local.environment].compact_raw_job_worker_type
+  compact_raw_job_num_workers = local.application_data.accounts[local.environment].compact_raw_job_num_workers
+  compact_raw_job_log_level   = local.application_data.accounts[local.environment].compact_raw_job_log_level
+  compact_raw_job_schedule    = local.application_data.accounts[local.environment].compact_raw_job_schedule
+
+  # Compact Structured Job
+  compact_structured_job_worker_type = local.application_data.accounts[local.environment].compact_structured_job_worker_type
+  compact_structured_job_num_workers = local.application_data.accounts[local.environment].compact_structured_job_num_workers
+  compact_structured_job_log_level   = local.application_data.accounts[local.environment].compact_structured_job_log_level
+  compact_structured_job_schedule    = local.application_data.accounts[local.environment].compact_structured_job_schedule
+
+  # Compact Curated Job
+  compact_curated_job_worker_type = local.application_data.accounts[local.environment].compact_curated_job_worker_type
+  compact_curated_job_num_workers = local.application_data.accounts[local.environment].compact_curated_job_num_workers
+  compact_curated_job_log_level   = local.application_data.accounts[local.environment].compact_curated_job_log_level
+  compact_curated_job_schedule    = local.application_data.accounts[local.environment].compact_curated_job_schedule
+
+  # Retention (vacuum) Raw Job
+  retention_raw_job_worker_type = local.application_data.accounts[local.environment].retention_raw_job_worker_type
+  retention_raw_job_num_workers = local.application_data.accounts[local.environment].retention_raw_job_num_workers
+  retention_raw_job_log_level   = local.application_data.accounts[local.environment].retention_raw_job_log_level
+  retention_raw_job_schedule    = local.application_data.accounts[local.environment].retention_raw_job_schedule
+
+  # Retention (vacuum) Structured Job
+  retention_structured_job_worker_type = local.application_data.accounts[local.environment].retention_structured_job_worker_type
+  retention_structured_job_num_workers = local.application_data.accounts[local.environment].retention_structured_job_num_workers
+  retention_structured_job_log_level   = local.application_data.accounts[local.environment].retention_structured_job_log_level
+  retention_structured_job_schedule    = local.application_data.accounts[local.environment].retention_structured_job_schedule
+
+  # Retention (vacuum) Curated Job
+  retention_curated_job_worker_type = local.application_data.accounts[local.environment].retention_curated_job_worker_type
+  retention_curated_job_num_workers = local.application_data.accounts[local.environment].retention_curated_job_num_workers
+  retention_curated_job_log_level   = local.application_data.accounts[local.environment].retention_curated_job_log_level
+  retention_curated_job_schedule    = local.application_data.accounts[local.environment].retention_curated_job_schedule
 
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
