@@ -15,5 +15,5 @@ mainSteps:
           $secretValue1 = (Get-SSMParameterValue -Name 'test-param-1' -WithDecryption $true -Region eu-west-2).Parameters[0].Value
           $secretValue2 = (Get-SSMParameterValue -Name 'test-param-2' -WithDecryption $true -Region eu-west-2).Parameters[0].Value
           New-Item -ItemType File -Path {{configFile}} -Force
-          Add-Content -Path $configFile -Value $secretValue1
-          Add-Content -Path $configFile -Value $secretValue2
+          Add-Content -Path {{configFile}} -Value $secretValue1
+          Add-Content -Path {{configFile}} -Value $secretValue2
