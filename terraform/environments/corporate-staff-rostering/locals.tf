@@ -64,11 +64,11 @@ locals {
   }
 
   baseline_security_groups = {
-    data-db          = local.security_groups.data_db
-    migration-web-sg = local.security_groups.Web-SG-migration
-    migration-app-sg = local.security_groups.App-SG-migration
-    migration-db-sg  = local.security_groups.DB-SG-migration
-    # domain-controller = local.security_groups.domain-controller NOTE: not yet implemented
+    data-db           = local.security_groups.data_db
+    migration-web-sg  = local.security_groups.Web-SG-migration
+    migration-app-sg  = local.security_groups.App-SG-migration
+    migration-db-sg   = local.security_groups.DB-SG-migration
+    domain-controller = local.security_groups.domain-controller-access
   }
 
   baseline_sns_topics = {}
