@@ -35,8 +35,9 @@ locals {
 
     baseline_ssm_parameters = {
       # T1
-      "t1-ncr-tomcat" = local.tomcat_ssm_parameters
-      "t1-ncr-bip"    = local.bip_ssm_parameters
+      "t1-ncr-tomcat"  = local.tomcat_ssm_parameters
+      "t1-ncr-bip"     = local.bip_ssm_parameters
+      "t1-ncr-bip-cmc" = local.bip_cmc_ssm_parameters
     }
 
     baseline_ec2_instances = {
