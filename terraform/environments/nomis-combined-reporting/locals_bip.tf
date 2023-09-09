@@ -3,8 +3,6 @@ locals {
   bip_ssm_parameters = {
     prefix = "/bi-platform/"
     parameters = {
-      bobj_account_password   = { description = "bobj account password" }
-      oracle_account_password = { description = "oracle account password" }
       product_key             = { description = "BIP product key" }
       oracle_cms_tnsname      = { description = "Oracle TNS name for CMS repository" }
       oracle_cms_username     = { description = "Oracle username for CMS repository" }
