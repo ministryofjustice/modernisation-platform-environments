@@ -13,9 +13,7 @@ locals {
     }
 
 
-    baseline_s3_buckets = {
-
-    }
+    baseline_s3_buckets = {}
 
     baseline_ec2_instances = {
       "dev-${local.application_name}-db-a" = local.database_a
@@ -24,10 +22,13 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
 
-      # "dev-${local.application_name}-db-b" = merge(local.database_b, {
-      #   autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-      #   tags                  = local.database_tags
-      # })
+      "dev-${local.application_name}-db-b" = merge(local.database_b, {
+        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+            branch = "app-and-env-vars"
+          })
+        })
+      })
 
       # "dev-${local.application_name}-web-a" = local.webserver_a
 
