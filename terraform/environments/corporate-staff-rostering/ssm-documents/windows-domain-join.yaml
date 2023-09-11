@@ -18,19 +18,19 @@ parameters:
     type: "String"
     description: "domain to join"
 mainSteps:
-  - name: JoinDevDomain
-    action: aws:RunPowerShellScript
+  - name: JoinDomain
+    action: aws:runPowerShellScript
     inputs:
       runCommand:
-      - |
-        # $ErrorActionPreference = "Stop"
-        $domainUsername = "{{domainUsername}}"
-        $domainPassword = "{{domainPassword}}"
-        $hostname = "{{hostname}}"
-        $primaryDC = "{{primaryDC}}"
-        $domain = "{{domain}}"
+        - |
+          # $ErrorActionPreference = "Stop"
+          $domainUsername = "{{domainUsername}}"
+          $domainPassword = "{{domainPassword}}"
+          $hostname = "{{hostname}}"
+          $primaryDC = "{{primaryDC}}"
+          $domain = "{{domain}}"
 
-        $secpasswd = ConvertTo-SecureString $domainPassword -AsPlainText -Force
-        $mycreds = New-Object System.Management.Automation.PSCredential ($domainUsername, $secpasswd)
+          $secpasswd = ConvertTo-SecureString $domainPassword -AsPlainText -Force
+          $mycreds = New-Object System.Management.Automation.PSCredential ($domainUsername, $secpasswd)
 
-        Add-Computer -DomainName $domain -Credential $mycreds -NewName $hostname -Restart -Server "$primaryDC.$domain"
+          Add-Computer -DomainName $domain -Credential $mycreds -NewName $hostname -Restart -Server "$primaryDC.$domain"

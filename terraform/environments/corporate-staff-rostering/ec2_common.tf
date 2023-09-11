@@ -12,7 +12,7 @@ resource "aws_ssm_document" "csr_server_config" {
   )
 }
 
-resource "aws_ssm_document" "windows-domain_join" {
+resource "aws_ssm_document" "windows_domain_join" {
   name            = "windows-domain-join"
   document_type   = "Command"
   document_format = "YAML"
