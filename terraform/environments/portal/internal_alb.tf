@@ -10,13 +10,13 @@ locals {
 ####################################
 
 resource "aws_lb" "internal" {
-  name               = "${local.application_name}-internal-lb"
-  internal           = true
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.internal_lb.id]
-  subnets            = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  name                       = "${local.application_name}-internal-lb"
+  internal                   = true
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.internal_lb.id]
+  subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   enable_deletion_protection = local.lb_enable_deletion_protection
-  idle_timeout = local.internal_lb_idle_timeout
+  idle_timeout               = local.internal_lb_idle_timeout
 
   access_logs {
     bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id

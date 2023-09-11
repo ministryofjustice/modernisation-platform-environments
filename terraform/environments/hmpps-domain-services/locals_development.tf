@@ -5,7 +5,7 @@ locals {
   development_config = {
 
     baseline_ec2_autoscaling_groups = {
-      
+
       dev-windows-2022 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
