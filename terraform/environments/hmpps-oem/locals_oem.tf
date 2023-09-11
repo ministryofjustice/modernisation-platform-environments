@@ -29,7 +29,7 @@ locals {
     effect = "Allow"
     actions = [
       "secretsmanager:DescribeSecret",
-      "secretsmanager:UpdateSecretValue",
+      "secretsmanager:UpdateSecret",
     ]
     principals = {
       type = "AWS"
