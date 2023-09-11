@@ -20,6 +20,7 @@ variable "options" {
     enable_ec2_cloud_watch_agent                 = optional(bool, false)
     enable_ec2_self_provision                    = optional(bool, false)
     enable_ec2_put_parameter                     = optional(bool, false)
+    enable_ec2_put_secret                        = optional(bool, false)
     enable_shared_s3                             = optional(bool, false)
     enable_oracle_secure_web                     = optional(bool, false)
     db_backup_s3                                 = optional(bool, false)
