@@ -18,7 +18,7 @@ data "aws_secretsmanager_secret" "delius_core_ldap_credential" {
 }
 
 resource "aws_ssm_parameter" "delius_core_ldap_host" {
-  name  = format("/%s/%s/LDAP_HOST", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/LDAP_HOST", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
@@ -30,7 +30,7 @@ resource "aws_ssm_parameter" "delius_core_ldap_host" {
 }
 
 resource "aws_ssm_parameter" "delius_core_ldap_principal" {
-  name  = format("/%s/%s/LDAP_PRINCIPLE", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/LDAP_PRINCIPLE", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
