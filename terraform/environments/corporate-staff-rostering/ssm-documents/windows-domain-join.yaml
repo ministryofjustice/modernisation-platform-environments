@@ -1,0 +1,36 @@
+---
+schemaVersion: "2.2"
+description: "SSM Document for creating local configs on Windows Server"
+parameters:
+  domainUsername:
+    type: "String"
+    description: "username for the domain join credentials"
+  domainPassword:
+    type: "String"
+    description: "password for the domain join credentials"
+  hostname:
+    type: "String"
+    description: "hostname for the new instance"
+  primaryDC:
+    type: "String"
+    description: "primary domain controller"
+  domain:
+    type: "String"
+    description: "domain to join"
+mainSteps:
+  - name: JoinDevDomain
+    action: aws:RunPowerShellScript
+    inputs:
+      runCommand:
+      - |
+        # $ErrorActionPreference = "Stop"
+        $domainUsername = "{{domainUsername}}"
+        $domainPassword = "{{domainPassword}}"
+        $hostname = "{{hostname}}"
+        $primaryDC = "{{primaryDC}}"
+        $domain = "{{domain}}"
+
+        $secpasswd = ConvertTo-SecureString $domainPassword -AsPlainText -Force
+        $mycreds = New-Object System.Management.Automation.PSCredential ($domainUsername, $secpasswd)
+
+        Add-Computer -DomainName $domain -Credential $mycreds -NewName $hostname -Restart -Server "$primaryDC.$domain"

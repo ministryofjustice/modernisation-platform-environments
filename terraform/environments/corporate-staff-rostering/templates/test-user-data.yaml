@@ -8,6 +8,7 @@ tasks:
       - frequency: always
         type: powershell
         runAs: admin
+        # debug AmazonSSMAgent service start
         content: |-
           $aws_ssm_status = (Get-Service -Name "AmazonSSMAgent").Status
 
@@ -40,6 +41,7 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
+        # run SSM test document
         content: |-
           # Install AWS PowerShell module if not already installed
           if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
@@ -76,6 +78,12 @@ tasks:
               Start-Sleep -Seconds 10
             }
           } while ((Get-Date) -lt $startTime.AddMinutes(10))
+      - frequency: once
+        type: powershell
+        runAs: admin # or localSystem
+        # install AD commands
+        content: |-
+          Install-WindowsFeature -Name RSAT-AD-PowerShell    
       # - frequency: always
       #   type: powershell
       #   runAs: admin # or localSystem
@@ -85,9 +93,18 @@ tasks:
           
       #     # Set-TimeZone "GMT Standard Time" # does not work for Server 2012 R2 version of PowerShell
       #     Set-WinSystemLocale "en-GB"
-      # - frequency: always
+      # IGNORE THIS - WIP
+
+      # - frequency: once
       #   type: powershell
       #   runAs: admin # or localSystem
-      #   # install AD commands
+      #   # join domain calling SSM document
       #   content: |-
-      #     Install-WindowsFeature -Name RSAT-AD-PowerShell -IncludeAllSubFeature -IncludeManagementTools
+      #     Function Execute-SSMCommand {
+      #       $instanceId = Get-EC2InstanceMetadata -Category InstanceId
+      #       $documentName = "csr-domain-join"
+
+      #       $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $documentName -Force
+      #       Write-Host "Executed SSM command with Command ID: $($commandId.CommandId)"
+      #     }
+
