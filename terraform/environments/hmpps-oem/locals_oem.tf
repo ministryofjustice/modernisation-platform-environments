@@ -25,7 +25,23 @@ locals {
     }
   }
 
-  oem_secret_policy = {
+  oem_secret_policy_write = {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:PutSecretValue",
+    ]
+    principals = {
+      type = "AWS"
+      identifiers = [
+        "hmpps-oem-${local.environment}",
+      ]
+    }
+    resources = [
+      "arn:aws:secretsmanager:*:*:secret:/ec2/*"
+    ]
+  }
+  oem_secret_policy_read = {
     effect = "Allow"
     actions = [
       "secretsmanager:GetSecretValue",
@@ -45,7 +61,10 @@ locals {
     ]
   }
   oem_secretsmanager_secrets = {
-    policy = [local.oem_secret_policy]
+    policy = [
+      local.oem_secret_policy_read,
+      local.oem_secret_policy_write,
+    ]
     secrets = {
       passwords = {}
     }
