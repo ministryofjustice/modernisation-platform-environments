@@ -18,7 +18,7 @@ locals {
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
     enable_oracle_secure_web                     = true
-    enable_ec2_put_parameter                     = false
+    enable_ec2_put_parameter                     = true
     enable_ec2_put_secret                        = true
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = true # adds db backup buckets
