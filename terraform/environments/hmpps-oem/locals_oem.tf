@@ -63,7 +63,7 @@ locals {
   oem_secretsmanager_secrets = {
     policy = [
       local.oem_secret_policy_read,
-      # local.oem_secret_policy_write,
+      local.oem_secret_policy_write,
     ]
     secrets = {
       passwords = {}
