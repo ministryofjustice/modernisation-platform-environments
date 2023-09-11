@@ -4,6 +4,7 @@ locals {
     prefix = "/bi-platform/"
     parameters = {
       product_key             = { description = "BIP product key" }
+      cms_cluster_key         = { description = "CMS Cluster Key" }
       cms_db_password         = { description = "CMS DB Password" }
     }
   }
