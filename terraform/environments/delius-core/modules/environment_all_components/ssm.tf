@@ -80,10 +80,7 @@ resource "aws_ssm_parameter" "iaps_user" {
 }
 
 resource "aws_ssm_parameter" "iaps_user_password" {
-  # filepath: /users/george.taylor/documents/github/modernisation-platform-environments/terraform/environments/delius-core/modules/environment_all_components/ssm.tf
-  # begin: ed8c6549bwf9
-  name = format("/%s-%s/iaps_user_password", var.account_info.application_name, var.env_name)
-  # end: ed8c6549bwf9
+  name  = format("/%s-%s/iaps_user_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
@@ -96,10 +93,7 @@ resource "aws_ssm_parameter" "iaps_user_password" {
 }
 
 resource "aws_ssm_parameter" "dss_user" {
-  # filepath: /users/george.taylor/documents/github/modernisation-platform-environments/terraform/environments/delius-core/modules/environment_all_components/ssm.tf
-  # begin: ed8c6549bwf9
-  name = format("/%s-%s/dss_user", var.account_info.application_name, var.env_name)
-  # end: ed8c6549bwf9
+  name  = format("/%s-%s/dss_user", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
@@ -125,10 +119,7 @@ resource "aws_ssm_parameter" "dss_user_password" {
 }
 
 resource "aws_ssm_parameter" "casenotes_user" {
-  # filepath: /users/george.taylor/documents/github/modernisation-platform-environments/terraform/environments/delius-core/modules/environment_all_components/ssm.tf
-  # begin: ed8c6549bwf9
-  name = format("/%s-%s/casenotes_user", var.account_info.application_name, var.env_name)
-  # end: ed8c6549bwf9
+  name  = format("/%s-%s/casenotes_user", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
@@ -141,10 +132,7 @@ resource "aws_ssm_parameter" "casenotes_user" {
 }
 
 resource "aws_ssm_parameter" "casenotes_user_password" {
-  # filepath: /users/george.taylor/documents/github/modernisation-platform-environments/terraform/environments/delius-core/modules/environment_all_components/ssm.tf
-  # begin: ed8c6549bwf9
-  name = format("/%s-%s/casenotes_user_password", var.account_info.application_name, var.env_name)
-  # end: ed8c6549bwf9
+  name  = format("/%s-%s/casenotes_user_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
@@ -156,10 +144,7 @@ resource "aws_ssm_parameter" "casenotes_user_password" {
 }
 
 resource "aws_ssm_parameter" "test_user_password" {
-  # filepath: /users/george.taylor/documents/github/modernisation-platform-environments/terraform/environments/delius-core/modules/environment_all_components/ssm.tf
-  # begin: ed8c6549bwf9
-  name = format("/%s-%s/test_user_password", var.account_info.application_name, var.env_name)
-  # end: ed8c6549bwf9
+  name  = format("/%s-%s/test_user_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
@@ -172,10 +157,7 @@ resource "aws_ssm_parameter" "test_user_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_gdpr_api_client_secret" {
-  # filepath: /users/george.taylor/documents/github/modernisation-platform-environments/terraform/environments/delius-core/modules/environment_all_components/ssm.tf
-  # begin: ed8c6549bwf9
-  name = format("/%s-%s/gdpr_api_client_secret", var.account_info.application_name, var.env_name)
-  # end: ed8c6549bwf9
+  name  = format("/%s-%s/gdpr_api_client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
@@ -189,10 +171,7 @@ resource "aws_ssm_parameter" "delius_core_gdpr_api_client_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_pwm_config_password" {
-  # filepath: /users/george.taylor/documents/github/modernisation-platform-environments/terraform/environments/delius-core/modules/environment_all_components/ssm.tf
-  # begin: ed8c6549bwf9
-  name = format("/%s-%s/pwm_config_password", var.account_info.application_name, var.env_name)
-  # end: ed8c6549bwf9
+  name  = format("/%s-%s/pwm_config_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
@@ -206,10 +185,7 @@ resource "aws_ssm_parameter" "delius_core_pwm_config_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_merge_api_client_secret" {
-  # filepath: /users/george.taylor/documents/github/modernisation-platform-environments/terraform/environments/delius-core/modules/environment_all_components/ssm.tf
-  # begin: ed8c6549bwf9
-  name = format("/%s-%s/merge_api_client_secret", var.account_info.application_name, var.env_name)
-  # end: ed8c6549bwf9
+  name  = format("/%s-%s/merge_api_client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
@@ -223,10 +199,7 @@ resource "aws_ssm_parameter" "delius_core_merge_api_client_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_weblogic_ndelius_domain_umt_client_secret" {
-  # filepath: /users/george.taylor/documents/github/modernisation-platform-environments/terraform/environments/delius-core/modules/environment_all_components/ssm.tf
-  # begin: ed8c6549bwf9
-  name = format("/%s-%s/umt_client_secret", var.account_info.application_name, var.env_name)
-  # end: ed8c6549bwf9
+  name  = format("/%s-%s/umt_client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
