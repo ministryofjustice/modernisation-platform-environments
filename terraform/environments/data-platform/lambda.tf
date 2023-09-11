@@ -192,8 +192,7 @@ module "reload_data_product_lambda" {
   tags                           = local.tags
   description                    = "Reload the data in a data product from raw history to curated, and recreate the athena tables."
   role_name                      = "reload_data_product_${local.environment}"
-  # policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_reload_data_product_lambda.json
-  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_authorizer_lambda.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_reload_data_product_lambda.json
   function_name                  = "reload_data_product_${local.environment}"
   create_role                    = true
   reserved_concurrent_executions = 1
@@ -217,8 +216,7 @@ module "resync_unprocessed_files_lambda" {
   tags                           = local.tags
   description                    = "Retrigger the athena load for extraction timestamps in raw history and not in curated data, for one data product"
   role_name                      = "resync_unprocessed_files_role_${local.environment}"
-  # policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_resync_unprocessed_files_lambda.json
-  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_authorizer_lambda.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_resync_unprocessed_files_lambda.json
   function_name                  = "resync_unprocessed_files_${local.environment}"
   create_role                    = true
   reserved_concurrent_executions = 1
