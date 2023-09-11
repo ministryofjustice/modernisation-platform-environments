@@ -299,6 +299,14 @@ data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lamb
     resources = [module.data_product_authorizer_lambda.lambda_function_arn]
   }
   statement {
+    sid     = "PutLogDataObject"
+    effect  = "Allow"
+    actions = ["s3:PutObject"]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/logs/*"
+    ]
+  }
+  statement {
     sid       = "LambdaLogGroup"
     effect    = "Allow"
     actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
@@ -318,6 +326,14 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
     effect    = "Allow"
     actions   = ["lambda:InvokeFunction"]
     resources = [module.data_product_authorizer_lambda.lambda_function_arn]
+  }
+  statement {
+    sid     = "PutLogDataObject"
+    effect  = "Allow"
+    actions = ["s3:PutObject"]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/logs/*"
+    ]
   }
   statement {
     sid       = "LambdaLogGroup"
