@@ -73,6 +73,16 @@ resource "aws_route53_record" "delegate_test_data_platform_service_justice_gov_u
   ]
 }
 
+resource "aws_route53_record" "data_platform_technical_documentation" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "technical-documentation.data-platform.service.justice.gov.uk"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["ministryofjustice.github.io."]
+}
+
 ##################################################
 # Development
 ##################################################
