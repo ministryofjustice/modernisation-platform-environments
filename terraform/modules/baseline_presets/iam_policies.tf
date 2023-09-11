@@ -163,7 +163,7 @@ locals {
         effect = "Allow"
         actions = [
           "secretsmanager:DescribeSecret",
-          "secretsmanager:PutSecretValue",
+          "secretsmanager:UpdateSecretValue",
         ]
         resources = ["arn:aws:secretsmanager:*:*:secret:/ec2/*"]
       }]
