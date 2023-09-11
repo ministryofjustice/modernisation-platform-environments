@@ -210,7 +210,7 @@ module "reload_data_product_lambda" {
 
 }
 
-module "resync-unprocessed-files-lambda" {
+module "resync_unprocessed_files_lambda" {
   source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
   application_name               = "resync_unprocessed_files"
   tags                           = local.tags

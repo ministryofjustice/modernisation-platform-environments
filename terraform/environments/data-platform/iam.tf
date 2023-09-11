@@ -296,7 +296,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lamb
     sid       = "InvokeAthenaLoadLambda"
     effect    = "Allow"
     actions   = ["lambda:InvokeFunction"]
-    resources = [module.reload_data_product.lambda_function_arn]
+    resources = [module.reload_data_product_lambda.lambda_function_arn]
   }
   statement {
     sid    = "GlueGetDeleteTable"
@@ -336,7 +336,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
     sid       = "InvokeAthenaLoadLambda"
     effect    = "Allow"
     actions   = ["lambda:InvokeFunction"]
-    resources = [module.resync_unprocessed_files.lambda_function_arn]
+    resources = [module.resync_unprocessed_files_lambda.lambda_function_arn]
   }
   statement {
     sid     = "PutLogDataObject"
