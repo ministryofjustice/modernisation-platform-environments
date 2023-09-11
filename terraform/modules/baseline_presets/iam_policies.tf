@@ -162,6 +162,7 @@ locals {
       statements = [{
         effect = "Allow"
         actions = [
+          "secretsmanager:DeleteResourcePolicy",
           "secretsmanager:DescribeSecret",
           "secretsmanager:GetResourcePolicy",
           "secretsmanager:UpdateSecret",

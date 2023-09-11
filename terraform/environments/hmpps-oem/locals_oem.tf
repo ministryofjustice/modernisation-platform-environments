@@ -28,6 +28,7 @@ locals {
   oem_secret_policy_write = {
     effect = "Allow"
     actions = [
+      "secretsmanager:DeleteResourcePolicy",
       "secretsmanager:DescribeSecret",
       "secretsmanager:GetResourcePolicy",
       "secretsmanager:UpdateSecret",
