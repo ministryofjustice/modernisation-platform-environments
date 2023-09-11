@@ -154,7 +154,7 @@ locals {
           "ssm:PutParameter",
           "ssm:PutParameters"
         ]
-        resources = ["arn:aws:ssm:*:*:parameter/*"] # TODO scope to ec2/ path
+        resources = ["arn:aws:ssm:*:*:parameter:/ec2/*"]
       }]
     }
     Ec2PutSecretPolicy = {
@@ -165,8 +165,7 @@ locals {
           "secretsmanager:DescribeSecret",
           "secretsmanager:PutSecretValue",
         ]
-#        resources = ["arn:aws:secretsmanager:*:*:secret:/ec2/*"]
-        resources = ["*"]
+        resources = ["arn:aws:secretsmanager:*:*:secret:/ec2/*"]
       }]
     }
 
