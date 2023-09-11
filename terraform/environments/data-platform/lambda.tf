@@ -221,7 +221,7 @@ module "resync-unprocessed-files-lambda" {
   create_role                    = true
   reserved_concurrent_executions = 1
 
-  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-presigned-url-lambda-ecr-repo:${local.resync_unprocessed_files_version}"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-resync-unprocessed-files-lambda-ecr-repo:${local.resync_unprocessed_files_version}"
   timeout      = 600
   tracing_mode = "Active"
   memory_size  = 512
