@@ -29,6 +29,7 @@ locals {
     effect = "Allow"
     actions = [
       "secretsmanager:DescribeSecret",
+      "secretsmanager:GetResourcePolicy",
       "secretsmanager:UpdateSecret",
     ]
     principals = {
