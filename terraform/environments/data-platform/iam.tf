@@ -299,6 +299,17 @@ data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lamb
     resources = [module.data_product_authorizer_lambda.lambda_function_arn]
   }
   statement {
+    sid    = "GlueGetDeleteTable"
+    effect = "Allow"
+    actions = [
+      "glue:DeleteTable",
+      "glue:GetTables"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
     sid     = "PutLogDataObject"
     effect  = "Allow"
     actions = ["s3:PutObject"]
