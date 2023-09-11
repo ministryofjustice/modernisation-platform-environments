@@ -24,18 +24,18 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      # "pp-${local.application_name}-db-a" = merge(local.database_a, {
-      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "app-and-env-vars"
-      #     })
-      #   })
-      #   tags = merge(local.database_a.tags, {
-      #     description                             = "pp ${local.application_name} database"
-      #     "${local.application_name}-environment" = "pp"
-      #     instance-scheduling                     = "skip-scheduling"
-      #   })
-      # })
+      "pp-${local.application_name}-db-a" = merge(local.database_a, {
+        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+            branch = "app-and-env-vars"
+          })
+        })
+        tags = merge(local.database_a.tags, {
+          description                             = "pp ${local.application_name} database"
+          "${local.application_name}-environment" = "pp"
+          instance-scheduling                     = "skip-scheduling"
+        })
+      })
     }
 
     baseline_acm_certificates = {
