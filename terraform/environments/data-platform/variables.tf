@@ -21,3 +21,11 @@ variable "athena_load_versions" {
 variable "create_metadata_versions" {
   type = map(any)
 }
+
+variable "resync_unprocessed_files_versions" {
+  type = map(any)
+}
+
+variable "reload_data_product_versions" {
+  type = map(any)
+}
