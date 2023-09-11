@@ -166,7 +166,7 @@ locals {
           "secretsmanager:PutSecretValue",
         ]
 #        resources = ["arn:aws:secretsmanager:*:*:secret:/ec2/*"]
-        resource = ["*"]
+        resources = ["*"]
       }]
     }
 
