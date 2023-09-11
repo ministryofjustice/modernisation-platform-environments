@@ -55,7 +55,7 @@ locals {
   }
 
   baseline_secretsmanager_secrets = {
-    "/${local.environment}/oracle/oem" = local.oem_secretsmanager_secrets
+    "/ec2/oracle/oem" = local.oem_secretsmanager_secrets
   }
 
   baseline_security_groups = {

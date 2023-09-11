@@ -41,7 +41,7 @@ locals {
       ]
     }
     resources = [
-      "arn:aws:secretsmanager:*:*:secret:/${local.environment}/*"
+      "arn:aws:secretsmanager:*:*:secret:/ec2/*"
     ]
   }
   oem_secretsmanager_secrets = {
