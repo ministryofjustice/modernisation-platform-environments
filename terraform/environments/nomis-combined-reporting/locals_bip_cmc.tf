@@ -5,7 +5,7 @@ locals {
       parameters = {
         product_key               = { description = "BIP product key" }
         cms_cluster_key           = { description = "CMS Cluster Key" }
-        cms_password              = { description = "CMS Password"    }
+        cms_admin_password        = { description = "CMS Admin Password" }
         cms_db_password           = { description = "CMS DB password" }
         auditing_db_password      = { description = "Auditing DB password" }
         lcm_password              = { description = "LCM Password" }
