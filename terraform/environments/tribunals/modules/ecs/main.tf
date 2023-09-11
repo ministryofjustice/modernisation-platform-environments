@@ -363,7 +363,7 @@ resource "aws_ecs_task_definition" "linux_ecs_task_definition" {
 }
 
 resource "aws_ecs_service" "ecs_service" {
-  name            = "${var.app_name}-ecs-service"
+  name            = "${var.app_name}"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = data.aws_ecs_task_definition.task_definition.id
   desired_count   = var.app_count
