@@ -27,7 +27,7 @@ locals {
       "pp-${local.application_name}-db-a" = merge(local.database_a, {
         user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "oasys-db-az-backup"
+            branch = "app-and-env-vars"
           })
         })
         tags = merge(local.database_a.tags, {
