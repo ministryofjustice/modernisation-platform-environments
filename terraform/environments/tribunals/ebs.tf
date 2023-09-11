@@ -1,6 +1,6 @@
 resource "aws_ebs_volume" "tribunals-ebs" {
   #depends_on        = [aws_instance.cjip-server]
-  availability_zone = "${local.region}a"
+  availability_zone = "eu-west-2a"
   type              = "gp2"
   size              = 40
 
