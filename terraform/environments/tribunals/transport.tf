@@ -17,7 +17,7 @@ locals {
     app_name = "transport"
   }))
   task_definition = templatefile("task_definition.json", {
-    app_name            = "transport"
+    app_name            = "${local.appeals}-container"
     #ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
     #docker_image_tag    = "latest" 
     #sentry_env          = local.environment
