@@ -4,9 +4,7 @@ locals {
     prefix = "/bi-platform/"
     parameters = {
       product_key             = { description = "BIP product key" }
-      oracle_cms_tnsname      = { description = "Oracle TNS name for CMS repository" }
-      oracle_cms_username     = { description = "Oracle username for CMS repository" }
-      oracle_cms_password     = { description = "Oracle password for CMS repository" }
+      cms_db_password         = { description = "CMS DB Password" }
     }
   }
 
