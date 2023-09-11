@@ -1,5 +1,5 @@
 resource "aws_route53_zone" "apps_tools" {
-  name = local.route53_zone
+  name = local.environment_configuration.route53_zone
 }
 
 resource "aws_route53_record" "apps_tools_ses_verification" {
