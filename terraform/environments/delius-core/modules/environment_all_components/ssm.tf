@@ -67,7 +67,7 @@ resource "aws_ssm_parameter" "oasys_password" {
 }
 
 resource "aws_ssm_parameter" "iaps_user" {
-  name  = format("/%s-%s/iaps_users", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/iaps_user", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
