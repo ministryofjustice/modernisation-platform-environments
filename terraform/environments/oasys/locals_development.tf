@@ -24,7 +24,7 @@ locals {
 
       "dev-${local.application_name}-db-b" = merge(local.database_b, {
         instance              = merge(module.baseline_presets.ec2_instance.instance.default_db, {
-          disable_api_termination      = true
+          disable_api_termination      = false
         })
         user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
