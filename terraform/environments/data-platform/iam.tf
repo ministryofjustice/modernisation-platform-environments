@@ -299,7 +299,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lamb
     resources = [module.data_product_athena_load_lambda.lambda_function_arn]
   }
   statement {
-    sid    = "GlueGetTableDeleteTable"
+    sid    = "GlueGetTableandDeleteTable"
     effect = "Allow"
     actions = [
       "glue:DeleteTable",
