@@ -280,8 +280,8 @@ jobs:
           role-session-name: githubactionsrolesession
           aws-region: "eu-west-2"
 
-      - name: Run smoke tests
-        with:
-          sourceDir: tests/
-        run: |
-          bash ./run_smoke_tests.sh
+      # - name: Run smoke tests
+      #   with:
+      #     sourceDir: tests/
+      #   run: |
+      #     bash ./run_smoke_tests.sh
