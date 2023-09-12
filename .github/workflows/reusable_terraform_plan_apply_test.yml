@@ -196,7 +196,7 @@ jobs:
   terratest:
     name: "terratest"
     needs: plan
-    if: inputs.environment == 'development' && needs.plan.outputs.plan_exitcode == '2'
+    if: inputs.action == 'plan_apply' && inputs.environment == 'development'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
