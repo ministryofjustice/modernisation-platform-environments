@@ -1,7 +1,7 @@
 database="example_prison_data_product"
 table="testing"
 
-file="tiny_test_4.csv"
+file="test_data.csv"
 file_md5=$(cat $file | openssl dgst -md5 -binary | base64)
 request_presigned_url="https://hsolkci589.execute-api.eu-west-2.amazonaws.com/development/upload_data"
 query_string="database=$database&table=$table&contentMD5=$file_md5"
