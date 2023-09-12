@@ -427,7 +427,7 @@ locals {
           from_port       = 88
           to_port         = 88
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
         kerberos_udp = {
@@ -435,7 +435,7 @@ locals {
           from_port       = 88
           to_port         = 88
           protocol        = "UDP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
         kerberos_tcp_pwd = {
@@ -443,7 +443,7 @@ locals {
           from_port       = 464
           to_port         = 464
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
         kerberos_udp_pwd = {
@@ -451,7 +451,7 @@ locals {
           from_port       = 464
           to_port         = 464
           protocol        = "UDP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
         rpc_udp = {
@@ -459,7 +459,7 @@ locals {
           from_port       = 135
           to_port         = 135
           protocol        = "UDP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
         rpc_tcp = {
@@ -467,7 +467,7 @@ locals {
           from_port       = 135
           to_port         = 135
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
         netbios = {
@@ -475,7 +475,7 @@ locals {
           from_port       = 139
           to_port         = 139
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
         /* ldap = {
@@ -491,7 +491,7 @@ locals {
           from_port   = 445
           to_port     = 445
           protocol    = "UDP"
-          cidr_blocks = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks = ["10.102.0.0/16"]
           # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
           # cidr_blocks     = ["10.102.0.196/32"]
           security_groups = []
@@ -501,7 +501,7 @@ locals {
           from_port   = 445
           to_port     = 445
           protocol    = "TCP"
-          cidr_blocks = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks = ["10.102.0.0/16"]
           # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
           # cidr_blocks     = ["
         }
@@ -534,7 +534,7 @@ locals {
           from_port       = 49152
           to_port         = 65535
           protocol        = "UDP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
         rpc_dynamic_tcp = {
@@ -542,7 +542,7 @@ locals {
           from_port       = 49152
           to_port         = 65535
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
       }
