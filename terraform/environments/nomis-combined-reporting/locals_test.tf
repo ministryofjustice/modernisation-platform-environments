@@ -41,9 +41,8 @@ locals {
     }
 
     baseline_ec2_instances = {
-      t1-ncr-bip-cmc-1 = merge(local.bi-platform_ec2_default, {
+      t1-ncr-bip-cmc = merge(local.bi-platform_ec2_default, {
         tags = merge(local.bi-platform_ec2_default.tags, {
-          Name                                 = "t1-ncr-bip-cmc"
           description                          = "For testing SAP BI CMC installation and configurations"
           server-type                          = "ncr-bip-cmc"
           nomis-combined-reporting-environment = "t1"
