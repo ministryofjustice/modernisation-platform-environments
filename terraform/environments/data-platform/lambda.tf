@@ -126,7 +126,8 @@ module "data_product_athena_load_lambda" {
   tags                           = local.tags
   description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
   role_name                      = "athena_load_lambda_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
+  # policy_json                    = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_authorizer_lambda.json
   function_name                  = "data_product_athena_load_${local.environment}"
   create_role                    = true
   reserved_concurrent_executions = 100
