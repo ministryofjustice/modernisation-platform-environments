@@ -46,6 +46,7 @@ locals {
   oem_secret_policy_read = {
     effect = "Allow"
     actions = [
+      "secretsmanager:GetResourcePolicy",
       "secretsmanager:GetSecretValue",
     ]
     principals = {
