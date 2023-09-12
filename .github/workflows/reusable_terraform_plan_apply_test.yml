@@ -196,7 +196,7 @@ jobs:
   terratest:
     name: "terratest"
     needs: plan
-    if: inputs.action == 'plan_apply' && inputs.environment == 'development'
+    if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2' && inputs.environment == 'development'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -280,7 +280,6 @@ jobs:
     needs: apply
     if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2' && inputs.environment == 'development'
     runs-on: ubuntu-latest
-    environment: "${{ inputs.application }}-${{ inputs.environment }}"
     steps:
       - name: Checkout Repository
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
