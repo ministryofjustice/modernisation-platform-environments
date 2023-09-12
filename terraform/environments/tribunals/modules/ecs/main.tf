@@ -378,7 +378,7 @@ resource "aws_ecs_service" "ecs_service" {
 
   load_balancer {
     target_group_arn = var.lb_tg_arn
-    container_name   = var.app_name
+    container_name   = "${var.app_name}-container"
     container_port   = var.server_port
   }
 
