@@ -648,7 +648,7 @@ module "datamart" {
     resume = {
       name           = "${local.redshift_cluster_name}-resume"
       description    = "Resume cluster every morning"
-      schedule       = "cron(30 07 * * ? *)"
+      schedule       = "cron(00 07 * * ? *)"
       resume_cluster = true
     }
   }
