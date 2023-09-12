@@ -496,6 +496,28 @@ resource "aws_instance" "s618358rgvw205" {
   }
 }
 
+# Test Server
+
+resource "aws_instance" "s618358test" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-09301a37d119fe4c5"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name          = "s618358test"
+    is-production = true
+  }
+}
+
 resource "aws_instance" "s618358rgsw025p" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0b8f6843db88aa8a6"
