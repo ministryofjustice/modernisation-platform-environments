@@ -259,7 +259,8 @@ module "transport-ecs" {
   ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
   fsx_subnet_ids            = [data.aws_subnets.shared-public.ids[0]]
   environment               = local.environment
-  fsx_vpc_id                = data.aws_vpc.shared.id
+  //fsx_vpc_id                = data.aws_vpc.shared.id
+  lb_listener               = aws_lb_listener.transport_lb
 }
 
 resource "aws_ecr_repository" "transport-ecr-repo" {

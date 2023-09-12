@@ -160,8 +160,12 @@ variable "fsx_subnet_ids" {
 variable "environment" {  
 }
 
-variable "fsx_vpc_id" {  
+# variable "fsx_vpc_id" {  
+# }
+
+variable "lb_listener" {  
 }
+
 
 
 
