@@ -185,3 +185,51 @@ module "data_product_create_metadata_lambda" {
   }
 
 }
+
+module "reload_data_product_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
+  application_name               = "reload_data_product"
+  tags                           = local.tags
+  description                    = "Reload the data in a data product from raw history to curated, and recreate the athena tables."
+  role_name                      = "reload_data_product_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_reload_data_product_lambda.json
+  function_name                  = "reload_data_product_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-reload-data-product-lambda-ecr-repo:${local.reload_data_product_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 512
+
+  environment_variables = {
+    RAW_DATA_BUCKET = module.s3-bucket.bucket.id
+    CURATED_DATA_BUCKET = module.s3-bucket.bucket.id
+    ATHENA_LOAD_LAMBDA = module.data_product_athena_load_lambda.lambda_function_name
+  }
+
+}
+
+module "resync_unprocessed_files_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
+  application_name               = "resync_unprocessed_files"
+  tags                           = local.tags
+  description                    = "Retrigger the athena load for extraction timestamps in raw history and not in curated data, for one data product"
+  role_name                      = "resync_unprocessed_files_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_resync_unprocessed_files_lambda.json
+  function_name                  = "resync_unprocessed_files_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-resync-unprocessed-files-lambda-ecr-repo:${local.resync_unprocessed_files_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 512
+
+  environment_variables = {
+    RAW_DATA_BUCKET = module.s3-bucket.bucket.id
+    CURATED_DATA_BUCKET = module.s3-bucket.bucket.id
+    ATHENA_LOAD_LAMBDA = module.data_product_athena_load_lambda.lambda_function_name
+  }
+
+}
