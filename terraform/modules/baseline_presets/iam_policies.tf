@@ -170,6 +170,7 @@ locals {
       statements = [{
         effect = "Allow"
         actions = [
+          "secretsmanager:GetResourcePolicy",
           "secretsmanager:GetSecret",
         ]
         resources = ["arn:aws:secretsmanager:*:*:secret:/ec2/*"]
