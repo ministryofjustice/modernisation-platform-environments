@@ -478,14 +478,22 @@ locals {
           cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
-        /* ldap = {
-          description     = "389: Allow LDAP ingress from Azure DC"
+        ldap_tcp = {
+          description     = "389: TCP Allow LDAP ingress from Azure DC"
           from_port       = 389
           to_port         = 389
-          protocol        = -1
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          protocol        = "TCP"
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
-        } */
+        }
+        ldap_udp = {
+          description     = "389: UDP Allow LDAP ingress from Azure DC"
+          from_port       = 389
+          to_port         = 389
+          protocol        = "UDP"
+          cidr_blocks     = ["10.102.0.0/16"]
+          security_groups = []
+        }
         smb_udp = {
           description = "445: UDP SMB ingress from Azure DC"
           from_port   = 445
