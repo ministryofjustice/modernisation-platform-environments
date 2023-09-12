@@ -67,7 +67,7 @@ resource "aws_ssm_parameter" "oasys_password" {
 }
 
 resource "aws_ssm_parameter" "iaps_user" {
-  name  = format("/%s-%s/iaps_users", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/iaps_user", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
@@ -157,7 +157,7 @@ resource "aws_ssm_parameter" "test_user_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_gdpr_api_client_secret" {
-  name  = format("/%s-%s/gdpr_api_client_secret", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/gdpr/api/client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
@@ -171,7 +171,7 @@ resource "aws_ssm_parameter" "delius_core_gdpr_api_client_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_pwm_config_password" {
-  name  = format("/%s-%s/pwm_config_password", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/pwm/pwm/config_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
@@ -185,7 +185,7 @@ resource "aws_ssm_parameter" "delius_core_pwm_config_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_merge_api_client_secret" {
-  name  = format("/%s-%s/merge_api_client_secret", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/merge/api/client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
@@ -199,21 +199,7 @@ resource "aws_ssm_parameter" "delius_core_merge_api_client_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_weblogic_ndelius_domain_umt_client_secret" {
-  name  = format("/%s-%s/umt_client_secret", var.account_info.application_name, var.env_name)
-  type  = "SecureString"
-  value = "INITIAL_VALUE_OVERRIDDEN"
-
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
-
-  tags = local.tags
-}
-
-resource "aws_ssm_parameter" "delius_core_weblogic_ndelius_domain_umt_client_id" {
-  name  = format("/%s-%s/umt_client_id", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/weblogic/ndelius-domain/umt_client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
