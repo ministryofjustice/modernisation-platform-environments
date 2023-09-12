@@ -35,10 +35,10 @@ locals {
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
     tags = {
-      description = "ncr bip webtier component"
+      description = "ncr bip cmc webtier component"
       ami         = "base_rhel_8_5"
       os-type     = "Linux"
-      server-type = "ncr-bip"
+      server-type = "ncr-bip-cmc"
       component   = "web"
     }
   }
