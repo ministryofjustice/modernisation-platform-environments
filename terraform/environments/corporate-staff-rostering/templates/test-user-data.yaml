@@ -100,11 +100,20 @@ tasks:
       #   runAs: admin # or localSystem
       #   # join domain calling SSM document
       #   content: |-
+      #      $parameters = @{
+      #        domainUsername = "domain-join-user"
+      #        domainPassword = "domain-join-password"
+      #        hostname = "test-hostname"
+      #        primaryDC = "test-primary-dc"
+      #        domain = "test-domain"
+      #      }
+      # 
       #     Function Execute-SSMCommand {
       #       $instanceId = Get-EC2InstanceMetadata -Category InstanceId
-      #       $documentName = "csr-domain-join"
-
-      #       $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $documentName -Force
+      #       $documentName = "windows-domain-join"
+      #   
+      # 
+      #       $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $documentName -Force -Parameter $parameters
       #       Write-Host "Executed SSM command with Command ID: $($commandId.CommandId)"
       #     }
 

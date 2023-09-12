@@ -422,6 +422,38 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         } */
+        kerberos_tcp = {
+          description     = "88: TCP Allow Kerberos ingress from Azure DC"
+          from_port       = 88
+          to_port         = 88
+          protocol        = "TCP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        kerberos_udp = {
+          description     = "88: UDP Allow Kerberos ingress from Azure DC"
+          from_port       = 88
+          to_port         = 88
+          protocol        = "UDP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        kerberos_tcp_pwd = {
+          description     = "464: TCP Allow Kerberos Password Change ingress from Azure DC"
+          from_port       = 464
+          to_port         = 464
+          protocol        = "TCP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
+        kerberos_udp_pwd = {
+          description     = "464: UDP Allow Kerberos Password Change ingress from Azure DC"
+          from_port       = 464
+          to_port         = 464
+          protocol        = "UDP"
+          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          security_groups = []
+        }
         rpc_udp = {
           description     = "135: UDP MS-RPC AD connect ingress from Azure DC"
           from_port       = 135
