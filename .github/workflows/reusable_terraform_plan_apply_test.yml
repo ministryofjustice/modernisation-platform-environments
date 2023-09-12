@@ -198,7 +198,6 @@ jobs:
     needs: plan
     if: inputs.environment == 'development' && needs.plan.outputs.plan_exitcode == '2'
     runs-on: ubuntu-latest
-    environment: "${{ inputs.application }}-${{ inputs.environment }}"
     steps:
       - name: Checkout Repository
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
