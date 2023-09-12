@@ -31,6 +31,7 @@ locals {
       "secretsmanager:DeleteResourcePolicy",
       "secretsmanager:DescribeSecret",
       "secretsmanager:GetResourcePolicy",
+      "secretsmanager:PutResourcePolicy",
       "secretsmanager:UpdateSecret",
     ]
     principals = {

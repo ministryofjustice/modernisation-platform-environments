@@ -194,6 +194,7 @@ locals {
           "secretsmanager:DeleteResourcePolicy",
           "secretsmanager:DescribeSecret",
           "secretsmanager:GetResourcePolicy",
+          "secretsmanager:PutResourcePolicy",
           "secretsmanager:UpdateSecret",
         ]
         resources = ["arn:aws:secretsmanager:*:*:secret:/ec2/*"]
