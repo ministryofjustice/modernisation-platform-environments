@@ -281,5 +281,6 @@ jobs:
           aws-region: "eu-west-2"
 
       - name: Run smoke tests
+        working-directory: ./tests
         run: |
-          bash ./tests/run_smoke_tests.sh
+          bash run_smoke_tests.sh
