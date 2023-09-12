@@ -483,7 +483,7 @@ locals {
           from_port       = 389
           to_port         = 389
           protocol        = "TCP"
-          cidr_blocks     = ["10.102.0.0/16"]
+          cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
         }
         ldap_udp = {
@@ -491,7 +491,7 @@ locals {
           from_port       = 389
           to_port         = 389
           protocol        = "UDP"
-          cidr_blocks     = ["10.102.0.0/16"]
+          cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
         }
         smb_udp = {
@@ -521,14 +521,14 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         } */
-        /* global_catalog_3268_3269 = {
+        global_catalog_3268_3269 = {
           description     = "3268-3269: Allow LDAP connection to Global Catalog over plain text and SSL"
           from_port       = 3268
           to_port         = 3269
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
-        } */
+        }
         /* active_directory_web_services = {
           description     = "9389: Allow Active Directory Web Services ingress from Azure DC"
           from_port       = 9389
