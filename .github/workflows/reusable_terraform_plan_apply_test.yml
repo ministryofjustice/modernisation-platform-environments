@@ -262,8 +262,8 @@ jobs:
           terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
   smoketest:
     name: "smoketest"
-    needs: apply
-    if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2' && inputs.environment == 'development'
+    # needs: apply
+    # if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2' && inputs.environment == 'development'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -281,5 +281,6 @@ jobs:
           aws-region: "eu-west-2"
 
       - name: Run smoke tests
+        working-directory: ./terraform/environments/data-platform/tests/
         run: |
-          ls && bash ./tests/run_smoke_tests.sh
+          bash run_smoke_tests.sh
