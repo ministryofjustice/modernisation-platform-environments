@@ -6,6 +6,8 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_ec2_get_parameter ? ["Ec2GetParameterPolicy"] : [],
+    var.options.enable_ec2_get_secret ? ["Ec2GetSecretPolicy"] : [],
     var.options.enable_ec2_put_parameter ? ["Ec2PutParameterPolicy"] : [],
     var.options.enable_ec2_put_secret ? ["Ec2PutSecretPolicy"] : [],
     var.options.enable_oracle_secure_web ? ["S3ListAllBucketsAndGetLocationPolicy"] : [],
@@ -17,6 +19,8 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_ec2_get_parameter ? ["Ec2GetParameterPolicy"] : [],
+    var.options.enable_ec2_get_secret ? ["Ec2GetSecretPolicy"] : [],
     var.options.enable_ec2_put_parameter ? ["Ec2PutParameterPolicy"] : [],
     var.options.enable_ec2_put_secret ? ["Ec2PutSecretPolicy"] : [],
     var.options.enable_oracle_secure_web ? ["S3ListAllBucketsAndGetLocationPolicy"] : [],
@@ -146,13 +150,38 @@ locals {
         ])
       }]
     }
+    Ec2GetParameterPolicy = {
+      description = "Permissions to allow EC2 to get SSM parameter(s)"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+        ]
+        resources = [
+          "arn:aws:ssm:*:*:parameter:/ec2/*",
+          "arn:aws:ssm:*:*:parameter:cloud-watch-config-windows",
+          "arn:aws:ssm:*:*:parameter:modernisation_platform_account_id",
+        ]
+      }]
+    }
+    Ec2GetSecretPolicy = {
+      description = "Permissions to allow EC2 to get SecretManager Secrets"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecret",
+        ]
+        resources = ["arn:aws:secretsmanager:*:*:secret:/ec2/*"]
+      }]
+    }
     Ec2PutParameterPolicy = {
       description = "Permissions to allow EC2 to put parameter(s) for retrieval"
       statements = [{
         effect = "Allow"
         actions = [
           "ssm:PutParameter",
-          "ssm:PutParameters"
+          "ssm:PutParameters",
         ]
         resources = ["arn:aws:ssm:*:*:parameter:/ec2/*"]
       }]
