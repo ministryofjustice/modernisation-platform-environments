@@ -500,7 +500,7 @@ resource "aws_instance" "s618358rgvw205" {
 
 resource "aws_instance" "s618358test" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-09301a37d119fe4c5"
+  ami                    = "ami-070c9a4ee0e5d83d5"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
