@@ -300,4 +300,4 @@ jobs:
         with:
           sourceDir: tests/
         run: |
-          bash run_smoke_tests.sh
+          bash ./run_smoke_tests.sh
