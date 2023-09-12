@@ -245,7 +245,7 @@ module "transport-ecs" {
   ec2_min_size              = local.application_data.accounts[local.environment].ec2_min_size
   task_definition_volume    = local.application_data.accounts[local.environment].task_definition_volume
   network_mode              = local.application_data.accounts[local.environment].network_mode
-  server_port               = local.application_data.accounts[local.environment].server_port
+  server_port               = local.application_data.accounts[local.environment].server_port_1
   app_count                 = local.application_data.accounts[local.environment].app_count
   ec2_ingress_rules         = local.transport_ec2_ingress_rules
   ec2_egress_rules          = local.transport_ec2_egress_rules
