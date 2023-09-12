@@ -56,7 +56,8 @@ locals {
   }
 
   baseline_secretsmanager_secrets = {
-    "/ec2/oracle/oem" = local.oem_secretsmanager_secrets
+    "/ec2/oracle/oem"            = local.oem_secretsmanager_secrets
+    "/ec2/oracle/database/EMREP" = local.oem_secretsmanager_secrets
   }
 
   baseline_security_groups = {
