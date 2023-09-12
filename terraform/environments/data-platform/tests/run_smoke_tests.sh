@@ -8,6 +8,7 @@ request_presigned_url="https://hsolkci589.execute-api.eu-west-2.amazonaws.com/de
 query_string="database=$database&table=$table&contentMD5=$file_md5"
 response=$(curl "$request_presigned_url?$query_string" -H "authorizationToken: placeholder")
 
+echo $response
 echo "Attempting to delete $database.$table from glue"
 echo $(aws glue delete-table --database-name $database --name $table)
 
