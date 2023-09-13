@@ -190,8 +190,9 @@ resource "aws_instance" "db_ec2_primary_instance" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = "required"
+    http_tokens   = "optional"
   }
+
   root_block_device {
     volume_type = var.db_config.ebs_volumes.root_volume.volume_type
     volume_size = var.db_config.ebs_volumes.root_volume.volume_size
@@ -212,7 +213,7 @@ resource "aws_instance" "db_ec2_primary_instance" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-1", var.env_name, var.db_config.name)) },
     { server-type = "delius_core_db" },
-    { database = format("%s-1", var.db_config.name) }
+    { database = "delius_primarydb" }
   )
 }
 
