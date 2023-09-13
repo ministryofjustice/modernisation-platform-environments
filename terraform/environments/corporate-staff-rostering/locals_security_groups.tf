@@ -513,14 +513,14 @@ locals {
           # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
           # cidr_blocks     = ["
         }
-        /* ldap_ssl = {
-          description     = "636: Allow LDAP SSL ingress from Azure DC"
+        ldap_ssl = {
+          description     = "636: TCP LDAP SSL ingress from Azure DC"
           from_port       = 636
           to_port         = 636
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
-        } */
+        }
         global_catalog_3268_3269 = {
           description     = "3268-3269: Allow LDAP connection to Global Catalog over plain text and SSL"
           from_port       = 3268
