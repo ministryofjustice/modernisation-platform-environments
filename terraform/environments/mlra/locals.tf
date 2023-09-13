@@ -1,6 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 
 locals {
+  env_account_id = local.environment_management.account_ids[terraform.workspace]
   application_test_url = "https://mlra.laa-development.modernisation-platform.service.justice.gov.uk/mlra/"
 
   # ECS local variables for ecs.tf
@@ -38,7 +39,7 @@ locals {
     maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
     maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
     sentry_env          = local.environment
-    db_secret_arn       = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.environment_management.account_ids["terraform.workspace"]}:parameter/APP_MAATDB_DBPASSWORD_MLA1"
+    db_secret_arn       = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_MLA1"
   })
 
   # SNS local variables for cloudwatch.tf
