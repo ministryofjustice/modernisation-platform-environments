@@ -151,6 +151,7 @@ locals {
       }]
     }
     Ec2GetParameterPolicy = {
+      # Not required if AmazonSSMManagedInstanceCore is being used
       description = "Permissions to allow EC2 to get SSM parameter(s)"
       statements = [{
         effect = "Allow"
@@ -159,20 +160,21 @@ locals {
           "ssm:GetParameters",
         ]
         resources = [
-          "arn:aws:ssm:*:*:parameter:/ec2/*",
+          "arn:aws:ssm:*:*:parameter:/*",
           "arn:aws:ssm:*:*:parameter:cloud-watch-config-windows",
           "arn:aws:ssm:*:*:parameter:modernisation_platform_account_id",
         ]
       }]
     }
     Ec2GetSecretPolicy = {
+      # This doesn't seem to be required.  EC2s can access secrets without
       description = "Permissions to allow EC2 to get SecretManager Secrets"
       statements = [{
         effect = "Allow"
         actions = [
           "secretsmanager:GetSecret",
         ]
-        resources = ["arn:aws:secretsmanager:*:*:secret:/ec2/*"]
+        resources = ["arn:aws:secretsmanager:*:*:secret:/*"]
       }]
     }
     Ec2PutParameterPolicy = {
@@ -183,7 +185,7 @@ locals {
           "ssm:PutParameter",
           "ssm:PutParameters",
         ]
-        resources = ["arn:aws:ssm:*:*:parameter:/ec2/*"]
+        resources = ["arn:aws:ssm:*:*:parameter:/*"]
       }]
     }
     Ec2PutSecretPolicy = {
@@ -197,7 +199,7 @@ locals {
           "secretsmanager:PutResourcePolicy",
           "secretsmanager:UpdateSecret",
         ]
-        resources = ["arn:aws:secretsmanager:*:*:secret:/ec2/*"]
+        resources = ["arn:aws:secretsmanager:*:*:secret:/*"]
       }]
     }
 
