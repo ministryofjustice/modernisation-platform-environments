@@ -822,8 +822,9 @@ variable "secretsmanager_secrets" {
     postfix    = optional(string, "/")
     kms_key_id = optional(string, "general")
     policy = optional(list(object({
-      effect  = string
-      actions = list(string)
+      effect    = string
+      actions   = list(string)
+      resources = list(string)
       principals = optional(object({
         type        = string
         identifiers = list(string)

@@ -25,6 +25,54 @@ locals {
     }
   }
 
+  oem_secret_policy_write = {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:DeleteResourcePolicy",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:PutResourcePolicy",
+      "secretsmanager:UpdateSecret",
+    ]
+    principals = {
+      type = "AWS"
+      identifiers = [
+        "hmpps-oem-${local.environment}",
+      ]
+    }
+    resources = [
+      "arn:aws:secretsmanager:*:*:secret:*"
+    ]
+  }
+  oem_secret_policy_read = {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+    principals = {
+      type = "AWS"
+      identifiers = [
+        "corporate-staff-rostering-${local.environment}",
+        "hmpps-oem-${local.environment}",
+        "nomis-${local.environment}",
+        "nomis-combined-reporting-${local.environment}",
+        "oasys-${local.environment}",
+      ]
+    }
+    resources = [
+      "arn:aws:secretsmanager:*:*:secret:*"
+    ]
+  }
+  oem_secretsmanager_secrets = {
+    policy = [
+      local.oem_secret_policy_read,
+      local.oem_secret_policy_write,
+    ]
+    secrets = {
+      passwords = {}
+    }
+  }
+
   oem_ec2_default = {
 
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
