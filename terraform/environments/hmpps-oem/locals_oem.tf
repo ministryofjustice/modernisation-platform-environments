@@ -41,7 +41,7 @@ locals {
       ]
     }
     resources = [
-      "arn:aws:secretsmanager:*:*:secret:/ec2/*"
+      "arn:aws:secretsmanager:*:*:secret:*"
     ]
   }
   oem_secret_policy_read = {
@@ -60,7 +60,7 @@ locals {
       ]
     }
     resources = [
-      "arn:aws:secretsmanager:*:*:secret:/ec2/*"
+      "arn:aws:secretsmanager:*:*:secret:*"
     ]
   }
   oem_secretsmanager_secrets = {
