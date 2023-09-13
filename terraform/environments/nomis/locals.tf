@@ -18,8 +18,8 @@ locals {
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
     enable_oracle_secure_web                     = true
-    enable_ec2_get_parameter                     = true
-    enable_ec2_get_secret                        = true
+    enable_ec2_get_parameter                     = false
+    enable_ec2_get_secret                        = false
     cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
