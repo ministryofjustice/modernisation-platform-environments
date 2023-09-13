@@ -470,11 +470,19 @@ locals {
           cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
-        netbios = {
-          description     = "139: NetBIOS ingress from Azure DC"
-          from_port       = 139
+        netbios_tcp = {
+          description     = "137-139: TCP NetBIOS ingress from Azure DC"
+          from_port       = 137
           to_port         = 139
           protocol        = "TCP"
+          cidr_blocks     = ["10.102.0.0/16"]
+          security_groups = []
+        }
+        netbios_udp = {
+          description     = "137-139: UDP NetBIOS ingress from Azure DC"
+          from_port       = 137
+          to_port         = 139
+          protocol        = "UDP"
           cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
@@ -518,6 +526,14 @@ locals {
           from_port       = 636
           to_port         = 636
           protocol        = "TCP"
+          cidr_blocks     = ["10.0.0.0/8"]
+          security_groups = []
+        }
+        ldap_ssl_udp = {
+          description     = "636: UDP LDAP SSL ingress from Azure DC"
+          from_port       = 636
+          to_port         = 636
+          protocol        = "UDP"
           cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
         }
