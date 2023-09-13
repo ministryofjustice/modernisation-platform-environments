@@ -20,7 +20,7 @@ resource "aws_ssm_patch_baseline" "linux_os_baseline" {
   operating_system = "AMAZON_LINUX_2"
 
   approval_rule {
-    approve_after_days  = 14
+    approve_after_days  = 6
     enable_non_security = false
 
     patch_filter {
@@ -43,7 +43,7 @@ resource "aws_ssm_patch_baseline" "linux_os_baseline" {
 
 # Create Maintenance Windows
 # Production Linux
-# second Monday of the month at 20:00
+# Fourth Wednesday of the month at 20:00
 
 resource "aws_ssm_maintenance_window" "prod_lin_patch_maintenance_window" {
   count             = local.is-production == true ? 1 : 0

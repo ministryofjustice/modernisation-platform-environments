@@ -15,7 +15,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   operating_system = "WINDOWS"
 
   approval_rule {
-    approve_after_days = 14
+    approve_after_days = 6
 
     patch_filter {
       key    = "PRODUCT"
@@ -33,7 +33,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   }
 
   approval_rule {
-    approve_after_days = 14
+    approve_after_days = 6
 
     patch_filter {
       key    = "PATCH_SET"
@@ -51,9 +51,9 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
 
 # Create Maintenance Windows
 
-# Development : First Monday of the month at 18:00
-# UAT: First Tuesday of the month at 18:00
-# Production: Second Tuesday of the month at 20:00
+# Development : Third Tuesday of the month at 18:00
+# UAT: Third Tuesday of the month at 18:00
+# Production: Fourth Tuesday of the month at 20:00
 
 resource "aws_ssm_maintenance_window" "patch_maintenance_window" {
   name              = local.application_data.accounts[local.environment].patch_maintenance_window_name
