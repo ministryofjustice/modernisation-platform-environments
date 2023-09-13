@@ -36,9 +36,11 @@ locals {
     region              = local.application_data.accounts[local.environment].region
     maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point
     maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
-    maat_db_password    = data.aws_ssm_parameter.db_password.value
     maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
     sentry_env          = local.environment
+    db_secret_arn       = "arn:aws:ssm:${local.region}:${local.environment_management.account_ids["terraform.workspace"]}:parameter/APP_MAATDB_DBPASSWORD_MLA1
+    
+    "
   })
 
   # SNS local variables for cloudwatch.tf

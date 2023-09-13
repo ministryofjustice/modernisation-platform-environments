@@ -34,9 +34,3 @@ module "mlra-ecs" {
   ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
 
 }
-
-# MAAT DB Password
-
-data "aws_ssm_parameter" "db_password" {
-  name = local.application_data.accounts[local.environment].maat_db_password
-}
