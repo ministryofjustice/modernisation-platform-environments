@@ -19,6 +19,7 @@ locals {
     enable_ec2_self_provision                    = true
     enable_oracle_secure_web                     = true
     enable_ec2_put_parameter                     = true
+    enable_ec2_put_secret                        = true
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = true # adds db backup buckets
     enable_oracle_secure_web                     = true # allows db to list all buckets
@@ -54,7 +55,10 @@ locals {
     }
   }
 
-  baseline_secretsmanager_secrets = {}
+  baseline_secretsmanager_secrets = {
+    "/oracle/oem"            = local.oem_secretsmanager_secrets
+    "/oracle/database/EMREP" = local.oem_secretsmanager_secrets
+  }
 
   baseline_security_groups = {
     data-oem = local.security_groups.data_oem

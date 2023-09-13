@@ -6,7 +6,10 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_ec2_get_parameter ? ["Ec2GetParameterPolicy"] : [],
+    var.options.enable_ec2_get_secret ? ["Ec2GetSecretPolicy"] : [],
     var.options.enable_ec2_put_parameter ? ["Ec2PutParameterPolicy"] : [],
+    var.options.enable_ec2_put_secret ? ["Ec2PutSecretPolicy"] : [],
     var.options.enable_oracle_secure_web ? ["S3ListAllBucketsAndGetLocationPolicy"] : [],
     var.options.iam_policies_filter,
   ])
@@ -16,7 +19,10 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_ec2_get_parameter ? ["Ec2GetParameterPolicy"] : [],
+    var.options.enable_ec2_get_secret ? ["Ec2GetSecretPolicy"] : [],
     var.options.enable_ec2_put_parameter ? ["Ec2PutParameterPolicy"] : [],
+    var.options.enable_ec2_put_secret ? ["Ec2PutSecretPolicy"] : [],
     var.options.enable_oracle_secure_web ? ["S3ListAllBucketsAndGetLocationPolicy"] : [],
     var.options.iam_policies_ec2_default,
   ])
@@ -144,15 +150,56 @@ locals {
         ])
       }]
     }
+    Ec2GetParameterPolicy = {
+      # Not required if AmazonSSMManagedInstanceCore is being used
+      description = "Permissions to allow EC2 to get SSM parameter(s)"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+        ]
+        resources = [
+          "arn:aws:ssm:*:*:parameter:/*",
+          "arn:aws:ssm:*:*:parameter:cloud-watch-config-windows",
+          "arn:aws:ssm:*:*:parameter:modernisation_platform_account_id",
+        ]
+      }]
+    }
+    Ec2GetSecretPolicy = {
+      # This doesn't seem to be required.  EC2s can access secrets without
+      description = "Permissions to allow EC2 to get SecretManager Secrets"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecret",
+        ]
+        resources = ["arn:aws:secretsmanager:*:*:secret:/*"]
+      }]
+    }
     Ec2PutParameterPolicy = {
       description = "Permissions to allow EC2 to put parameter(s) for retrieval"
       statements = [{
         effect = "Allow"
         actions = [
           "ssm:PutParameter",
-          "ssm:PutParameters"
+          "ssm:PutParameters",
         ]
-        resources = ["arn:aws:ssm:*:*:parameter/*"]
+        resources = ["arn:aws:ssm:*:*:parameter:/*"]
+      }]
+    }
+    Ec2PutSecretPolicy = {
+      description = "Permissions to allow EC2 to put SecretManager Secrets"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "secretsmanager:DeleteResourcePolicy",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:GetResourcePolicy",
+          "secretsmanager:PutResourcePolicy",
+          "secretsmanager:UpdateSecret",
+        ]
+        resources = ["arn:aws:secretsmanager:*:*:secret:/*"]
       }]
     }
 

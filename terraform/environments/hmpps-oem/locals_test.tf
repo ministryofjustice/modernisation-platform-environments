@@ -24,7 +24,7 @@ locals {
           })
         })
         tags = merge(local.oem_ec2_default.tags, {
-            oracle-sids = "EMREP TRCVCAT"
+          oracle-sids = "EMREP TRCVCAT"
         })
       })
     }

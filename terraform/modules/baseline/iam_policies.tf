@@ -45,4 +45,8 @@ resource "aws_iam_policy" "this" {
   tags = merge(local.tags, {
     Name = each.key
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
