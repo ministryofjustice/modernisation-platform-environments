@@ -16,19 +16,13 @@ run_ansible() {
   fi
 
   if ! command -v aws > /dev/null; then
-    echo "aws cli must be installed, trying to install.." >&2
-    if ! command -v unzip > /dev/null; then
-      yum install unzip -y
-    fi
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
-    unzip /tmp/awscliv2.zip -d /tmp 1> /dev/null
-    /tmp/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
-    rm -rf /tmp/awscliv2.zip /tmp/aws
+    echo "aws cli must be installed, not installing any ansible" >&2
+    exit 0
   fi
 
   if ! command -v git > /dev/null; then
-    echo "git must be installed, trying to install.." >&2
-    yum install git -y
+    echo "git must be installed, not installing any ansible" >&2
+    exit 0
   fi
 
   echo "# Retrieving API Token"
@@ -39,7 +33,7 @@ run_ansible() {
 
   echo "# Retrieving tags using aws cli"
   IFS=$'\n'
-  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=os-type,ami,server-type,environment-name" --output=text))
+  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=Name,os-type,ami,server-type,environment-name" --output=text))
   unset IFS
 
   # clone ansible roles and playbook
@@ -56,13 +50,20 @@ run_ansible() {
   for ((i=0; i<$${#tags[@]}; i++)); do
     tag=($${tags[i]})
     group=$(echo "$${tag[1]}_$${tag[4]}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
-    if [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
+    if [[ "$${tag[1]}" == "Name" ]]; then
+      ansible_group_vars="$ansible_group_vars --extra-vars ec2_name=$${tag[4]}"
+    elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
       ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
     elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
       ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
     else
       echo "Could not find group_vars $group yml"
       exit 1
+    fi
+    if [[ "$${tag[1]}" == "environment-name" ]]; then
+      aws_environment=$(echo $${tag[4]} | rev | cut -d- -f1 | rev)
+      application=$(echo $${tag[4]} | rev | cut -d- -f2- | rev)
+      ansible_group_vars="$ansible_group_vars --extra-vars aws_environment=$aws_environment --extra-vars application=$application"
     fi
   done
 
@@ -72,9 +73,8 @@ run_ansible() {
   elif [[ $(which python3.6 2> /dev/null) ]]; then
     python=$(which python3.6)
   else
-    echo "Python3.9/3.6 not found. Installing 3.9"
-    yum install python39 -y 1> /dev/null
-    python=$(which python3.9)
+    echo "Python3.9/3.6 not found"
+    exit 1
   fi
   echo "# Using python: $python"
 
@@ -82,25 +82,24 @@ run_ansible() {
   mkdir $ansible_dir/python-venv && cd "$_"
   $python -m venv ansible
   source ansible/bin/activate
-  $python -m pip install --upgrade pip 1> /dev/null
+  $python -m pip install --upgrade pip
   if [[ "$python" =~ 3.6 ]]; then
     $python -m pip install wheel
     $python -m pip install cryptography==2.3
     export LC_ALL=en_US.UTF-8
     $python -m pip install ansible-core==2.11.12
   else
-    $python -m pip install ansible==6.0.0 1> /dev/null
+    $python -m pip install ansible==6.0.0
   fi
 
   # install requirements in virtual env
   echo "# Installing ansible requirements"
   cd $ansible_dir/${ansible_repo}/${ansible_repo_basedir}
-  $python -m pip install -r requirements.txt 1> /dev/null
-  ansible-galaxy role install -r requirements.yml 1> /dev/null
-  ansible-galaxy collection install -r requirements.yml 1> /dev/null
+  $python -m pip install -r requirements.txt
+  ansible-galaxy role install -r requirements.yml
+  ansible-galaxy collection install -r requirements.yml
 
   # run ansible (comma after localhost deliberate)
-  # ansible_python_interpreter used unless defined in group_vars
   echo "# Execute ansible site.yml ${ansible_args} $ansible_group_vars ..."
   ansible-playbook site.yml ${ansible_args} $ansible_group_vars \
    --connection=local \
