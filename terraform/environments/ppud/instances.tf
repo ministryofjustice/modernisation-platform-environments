@@ -130,7 +130,7 @@ resource "aws_instance" "s609693lo6vw103" {
 
 resource "aws_instance" "TestServer1" {
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-070c9a4ee0e5d83d5"
+  ami                    = "ami-009f58789421bafd65"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
