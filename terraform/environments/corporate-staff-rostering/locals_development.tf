@@ -21,7 +21,7 @@ locals {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
-        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing our base OL8.5 base image"
           ami         = "base_ol_8_5"
@@ -47,6 +47,7 @@ locals {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0 # set to 0 while testing
         })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 192 } # minimum size has to be 128 due to snapshot sizes
         }
@@ -125,7 +126,7 @@ locals {
           server-type = "csr-db"
         }
       }
-      dev-tst-3 = {
+      /* dev-tst-3 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "base_windows_server_2012_r2_release_2023-*"
           ami_owner                     = "374269020027"
@@ -147,8 +148,8 @@ locals {
           component   = "appserver"
           server-type = "test-server"
         }
-      }
-      dev-base-rhel85 = {
+      } */
+      /* dev-base-rhel85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "base_rhel_8_5_*"
         })
@@ -167,8 +168,8 @@ locals {
           component   = "test"
           server-type = "base-rhel85"
         }
-      }
-      dev-tst-4 = {
+      } */
+      /* dev-tst-4 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "base_windows_server_2012_r2_release_2023-*"
           ami_owner                     = "374269020027"
@@ -190,7 +191,7 @@ locals {
           component   = "appserver"
           server-type = "test-server"
         }
-      }
+      } */
 
     }
     baseline_route53_zones = {
