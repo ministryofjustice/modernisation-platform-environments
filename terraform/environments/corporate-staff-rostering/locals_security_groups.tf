@@ -422,12 +422,44 @@ locals {
           cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
           security_groups = []
         } */
+        kerberos_tcp = {
+          description     = "88: TCP Allow Kerberos ingress from Azure DC"
+          from_port       = 88
+          to_port         = 88
+          protocol        = "TCP"
+          cidr_blocks     = ["10.102.0.0/16"]
+          security_groups = []
+        }
+        kerberos_udp = {
+          description     = "88: UDP Allow Kerberos ingress from Azure DC"
+          from_port       = 88
+          to_port         = 88
+          protocol        = "UDP"
+          cidr_blocks     = ["10.102.0.0/16"]
+          security_groups = []
+        }
+        kerberos_tcp_pwd = {
+          description     = "464: TCP Allow Kerberos Password Change ingress from Azure DC"
+          from_port       = 464
+          to_port         = 464
+          protocol        = "TCP"
+          cidr_blocks     = ["10.102.0.0/16"]
+          security_groups = []
+        }
+        kerberos_udp_pwd = {
+          description     = "464: UDP Allow Kerberos Password Change ingress from Azure DC"
+          from_port       = 464
+          to_port         = 464
+          protocol        = "UDP"
+          cidr_blocks     = ["10.102.0.0/16"]
+          security_groups = []
+        }
         rpc_udp = {
           description     = "135: UDP MS-RPC AD connect ingress from Azure DC"
           from_port       = 135
           to_port         = 135
           protocol        = "UDP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
         rpc_tcp = {
@@ -435,31 +467,47 @@ locals {
           from_port       = 135
           to_port         = 135
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
-        netbios = {
-          description     = "139: NetBIOS ingress from Azure DC"
-          from_port       = 139
+        netbios_tcp = {
+          description     = "137-139: TCP NetBIOS ingress from Azure DC"
+          from_port       = 137
           to_port         = 139
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
-        /* ldap = {
-          description     = "389: Allow LDAP ingress from Azure DC"
+        netbios_udp = {
+          description     = "137-139: UDP NetBIOS ingress from Azure DC"
+          from_port       = 137
+          to_port         = 139
+          protocol        = "UDP"
+          cidr_blocks     = ["10.102.0.0/16"]
+          security_groups = []
+        }
+        ldap_tcp = {
+          description     = "389: TCP Allow LDAP ingress from Azure DC"
           from_port       = 389
           to_port         = 389
-          protocol        = -1
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          protocol        = "TCP"
+          cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
-        } */
+        }
+        ldap_udp = {
+          description     = "389: UDP Allow LDAP ingress from Azure DC"
+          from_port       = 389
+          to_port         = 389
+          protocol        = "UDP"
+          cidr_blocks     = ["10.0.0.0/8"]
+          security_groups = []
+        }
         smb_udp = {
           description = "445: UDP SMB ingress from Azure DC"
           from_port   = 445
           to_port     = 445
           protocol    = "UDP"
-          cidr_blocks = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks = ["10.102.0.0/16"]
           # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
           # cidr_blocks     = ["10.102.0.196/32"]
           security_groups = []
@@ -469,26 +517,34 @@ locals {
           from_port   = 445
           to_port     = 445
           protocol    = "TCP"
-          cidr_blocks = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks = ["10.102.0.0/16"]
           # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
           # cidr_blocks     = ["
         }
-        /* ldap_ssl = {
-          description     = "636: Allow LDAP SSL ingress from Azure DC"
+        ldap_ssl = {
+          description     = "636: TCP LDAP SSL ingress from Azure DC"
           from_port       = 636
           to_port         = 636
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
-        } */
-        /* global_catalog_3268_3269 = {
+        }
+        ldap_ssl_udp = {
+          description     = "636: UDP LDAP SSL ingress from Azure DC"
+          from_port       = 636
+          to_port         = 636
+          protocol        = "UDP"
+          cidr_blocks     = ["10.0.0.0/8"]
+          security_groups = []
+        }
+        global_catalog_3268_3269 = {
           description     = "3268-3269: Allow LDAP connection to Global Catalog over plain text and SSL"
           from_port       = 3268
           to_port         = 3269
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
-        } */
+        }
         /* active_directory_web_services = {
           description     = "9389: Allow Active Directory Web Services ingress from Azure DC"
           from_port       = 9389
@@ -502,7 +558,7 @@ locals {
           from_port       = 49152
           to_port         = 65535
           protocol        = "UDP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
         rpc_dynamic_tcp = {
@@ -510,7 +566,7 @@ locals {
           from_port       = 49152
           to_port         = 65535
           protocol        = "TCP"
-          cidr_blocks     = [for ip in module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers : "${ip}/32"]
+          cidr_blocks     = ["10.102.0.0/16"]
           security_groups = []
         }
       }
