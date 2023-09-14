@@ -40,6 +40,7 @@ locals {
         actions = [
           "ec2-instance-connect:SendSerialConsoleSSHPublicKey",
           "ssm:SendCommand",
+          "ds:describeDirectories",
         ]
         resources = ["*"]
       }]

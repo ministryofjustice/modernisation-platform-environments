@@ -21,7 +21,7 @@ locals {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
-        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing our base OL8.5 base image"
           ami         = "base_ol_8_5"
@@ -41,12 +41,13 @@ locals {
         })
 
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["migration-app-sg"]
+          vpc_security_group_ids = ["migration-app-sg","domain-controller"]
           instance_type          = "t3.medium"
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0 # set to 0 while testing
         })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 192 } # minimum size has to be 128 due to snapshot sizes
         }
@@ -125,6 +126,72 @@ locals {
           server-type = "csr-db"
         }
       }
+      /* dev-tst-3 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "base_windows_server_2012_r2_release_2023-*"
+          ami_owner                     = "374269020027"
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/test-user-data.yaml"))
+          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
+        })
+
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["migration-app-sg","domain-controller"]
+          instance_type          = "t3.medium"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 192 } # minimum size has to be 128 due to snapshot sizes
+        }
+        tags = {
+          description = "Test AWS AMI Windows Server 2012 R2"
+          os-type     = "Windows"
+          component   = "appserver"
+          server-type = "test-server"
+        }
+      } */
+      /* dev-base-rhel85 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "base_rhel_8_5_*"
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["migration-app-sg","domain-controller"]
+        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description = "For testing our base RHEL8.5 base image"
+          ami         = "base_rhel_8_5"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "base-rhel85"
+        }
+      } */
+      /* dev-tst-4 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "base_windows_server_2012_r2_release_2023-*"
+          ami_owner                     = "374269020027"
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/test-user-data.yaml"))
+          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
+        })
+
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["migration-app-sg","domain-controller"]
+          instance_type          = "t3.medium"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 192 } # minimum size has to be 128 due to snapshot sizes
+        }
+        tags = {
+          description = "Test AWS AMI Windows Server 2012 R2"
+          os-type     = "Windows"
+          component   = "appserver"
+          server-type = "test-server"
+        }
+      } */
 
     }
     baseline_route53_zones = {
