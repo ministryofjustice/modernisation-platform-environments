@@ -4,16 +4,16 @@ description: "SSM Document for creating local configs on Windows Server"
 parameters:
   domainJoinUsername:
     type: "String"
-    description: "username for the domain join credentials"
+    description: "username with domain join permissions"
   domainJoinPassword:
     type: "String"
-    description: "password for the domain join credentials"
+    description: "password for domain join user"
   hostname:
     type: "String"
     description: "hostname for the new instance"
   domain:
     type: "String"
-    description: "domain to join"
+    description: "domain to join, either Prod or Dev"
 mainSteps:
   - name: JoinDomain
     action: aws:runPowerShellScript
@@ -22,22 +22,74 @@ mainSteps:
         - |
           $ErrorActionPreference = "Stop" # all errors will terminate the script
 
-          $domainUsername = "{{domainJoinUsername}}"
-          $domainPassword = "{{domainJoinPassword}}"
+          $domainJoinUsername = "{{domainJoinUsername}}"
+          $domainJoinPassword = "{{domainJoinPassword}}"
           $hostname = "{{hostname}}"
           $domain = "{{domain}}"
 
-          # TODO: set up the domain join pre-requisites here
+          # Install AWS PowerShell module if not already installed
+          if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
+            Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
+          }
 
-          # TODO: check if the proposed hostname is already in use
+          function Set-UsernameString {
+            param (
+              [Parameter(Mandatory=$true)]
+              [string]$domainJoinUsername
+              [Parameter(Mandatory=$true)]
+              [string]$domain
+            )
+            if ($domain -contains "prod") {
+              return "hmpp\$domainJoinUsername"
+            } elseif ($domain -contains "dev") {
+              return "azure\$domainJoinUsername"
+            } else {
+              Write-Error "Domain must be either Prod or Dev"
+              exit 1
+            }
+          }
+
+          function Set-DomainString {
+            param (
+              [Parameter(Mandatory=$true)]
+              [string]$domain
+            )
+            if ($domain -contains "prod") {
+              return "azure.hmpp.root"
+            } elseif ($domain -contains "dev") {
+              return "azure.noms.root"
+            } else {
+              Write-Error "Domain must be either Prod or Dev"
+              exit 1
+            }
+          }
+
+          function Check-HostnameInUse {
+            param (
+              [Parameter(Mandatory=$true)]
+              [string]$hostname
+            )
+            $hostnameInUse = Get-ADComputer -Filter {Name -eq $hostname}
+            if ($hostnameInUse) {
+              return $true
+            } else {
+              return $false
+            }
+          }
+
+          $secpasswd = ConvertTo-SecureString $domainJoinPassword -AsPlainText -Force
+          $credentials = New-Object System.Management.Automation.PSCredential ((Set-UsernameString -domainJoinUsername $domainJoinUsername -domain $domain), $secpasswd)
+
+          if (Check-HostnameInUse -hostname $hostname) {
+            Write-Error "Hostname $hostname is already in use"
+            exit 1         
+          } else {
+            Write-Host "Hostname $hostname is not in use, continuing"
+            Write-Host "Adding instance as $hostname to (Set-DomainString -domain $domain)"
+            Write-Host "WARNING: Instance will restart to complete domain join"
+            Add-Computer -DomainName (Set-DomainString -domain $domain) -Credential $credentials -NewName $hostname -Restart
+          }
 
           # TODO: check if the instance is part of an ASG and terminate if it is since reboot may just result in another instance being spawned which won't be joined to the domain
+          # Get-EC2Instance ID then find out whether it's in an asg? 
 
-          $secpasswd = ConvertTo-SecureString $domainPassword -AsPlainText -Force
-          $mycreds = New-Object System.Management.Automation.PSCredential ($domainUsername, $secpasswd)
-
-          # TODO: check this next command is in a fit state to be run before the domain join
-
-          # TODO: check to what extent we need to rename the instance and add it to the domain
-
-          Add-Computer -DomainName $domain -Credential $mycreds -NewName $hostname -Restart
