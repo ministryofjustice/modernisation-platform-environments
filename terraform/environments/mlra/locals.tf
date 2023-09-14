@@ -30,6 +30,7 @@ locals {
     app_name = local.application_name
   }))
 
+  maatdb_password_secret_name = "APP_MAATDB_DBPASSWORD_MLA1"
   task_definition = templatefile("task_definition.json", {
     app_name            = local.application_name
     ecr_url             = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
@@ -39,7 +40,7 @@ locals {
     maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
     maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
     sentry_env          = local.environment
-    db_secret_arn       = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_MLA1"
+    db_secret_arn       = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maatdb_password_secret_name}"
   })
 
   # SNS local variables for cloudwatch.tf

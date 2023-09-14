@@ -452,6 +452,30 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam
 EOF
 }
 
+resource "aws_iam_policy" "ecs_task_execution_ssm_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name = "${var.app_name}-ecs-task-execution-ssm-policy"
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-task-execution-ssm-policy"
+    }
+  )
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters"
+      ],
+      "Resource": ["arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maatdb_password_secret_name}"]
+    }
+  ]
+}
+EOF
+}
+
 
 # ECS task execution role
 resource "aws_iam_role" "ecs_task_execution_role" {
@@ -477,6 +501,10 @@ resource "aws_iam_role_policy_attachment" "ecs_task_secrets_manager" {
 resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
+}
+resource "aws_iam_role_policy_attachment" "ecs_task_ssm_access" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_task_execution_ssm_policy.arn
 }
 
 
