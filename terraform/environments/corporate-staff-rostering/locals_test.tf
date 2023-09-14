@@ -70,6 +70,29 @@ locals {
           server-type = "csr-db"
         }
       }
+      t3-test-1 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "base_windows_server_2012_r2_release_2023-*"
+          ami_owner                     = "374269020027"
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/test-user-data.yaml"))
+          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
+        })
+
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["migration-app-sg","domain-controller"]
+          instance_type          = "t3.medium"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 192 } # minimum size has to be 128 due to snapshot sizes
+        }
+        tags = {
+          description = "Test AWS AMI Windows Server 2012 R2"
+          os-type     = "Windows"
+          component   = "appserver"
+          server-type = "test-server"
+        }
+      }
     }
     baseline_ec2_autoscaling_groups = {
       /* web-srv-1 = {
