@@ -2,18 +2,15 @@
 schemaVersion: "2.2"
 description: "SSM Document for creating local configs on Windows Server"
 parameters:
-  domainUsername:
+  domainJoinUsername:
     type: "String"
     description: "username for the domain join credentials"
-  domainPassword:
+  domainJoinPassword:
     type: "String"
     description: "password for the domain join credentials"
   hostname:
     type: "String"
     description: "hostname for the new instance"
-  primaryDC:
-    type: "String"
-    description: "primary domain controller"
   domain:
     type: "String"
     description: "domain to join"
@@ -23,14 +20,24 @@ mainSteps:
     inputs:
       runCommand:
         - |
-          # $ErrorActionPreference = "Stop"
-          $domainUsername = "{{domainUsername}}"
-          $domainPassword = "{{domainPassword}}"
+          $ErrorActionPreference = "Stop" # all errors will terminate the script
+
+          $domainUsername = "{{domainJoinUsername}}"
+          $domainPassword = "{{domainJoinPassword}}"
           $hostname = "{{hostname}}"
-          $primaryDC = "{{primaryDC}}"
           $domain = "{{domain}}"
+
+          # TODO: set up the domain join pre-requisites here
+
+          # TODO: check if the proposed hostname is already in use
+
+          # TODO: check if the instance is part of an ASG and terminate if it is since reboot may just result in another instance being spawned which won't be joined to the domain
 
           $secpasswd = ConvertTo-SecureString $domainPassword -AsPlainText -Force
           $mycreds = New-Object System.Management.Automation.PSCredential ($domainUsername, $secpasswd)
 
-          Add-Computer -DomainName $domain -Credential $mycreds -NewName $hostname -Restart -Server "$primaryDC.$domain"
+          # TODO: check this next command is in a fit state to be run before the domain join
+
+          # TODO: check to what extent we need to rename the instance and add it to the domain
+
+          Add-Computer -DomainName $domain -Credential $mycreds -NewName $hostname -Restart

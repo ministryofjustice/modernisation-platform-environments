@@ -83,8 +83,6 @@ locals {
         ec2-user_pem = {}
         test-param-1 = { description = "for SSM docs test" }
         test-param-2 = { description = "for SSM docs test" }
-        domain-join-username = { description = "domain join username" }
-        domain-join-password = { description = "domain join password" }
       }
     }
   }
