@@ -32,5 +32,8 @@ module "mlra-ecs" {
   ec2_scaling_mem_threshold = local.application_data.accounts[local.environment].ec2_scaling_mem_threshold
   ecs_scaling_cpu_threshold = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  region                    = local.application_data.accounts[local.environment].region
+  account_number            = local.environment_management.account_ids[terraform.workspace]
+  maatdb_password_secret_name = local.maatdb_password_secret_name
 
 }

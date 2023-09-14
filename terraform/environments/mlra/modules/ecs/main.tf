@@ -469,7 +469,7 @@ resource "aws_iam_policy" "ecs_task_execution_ssm_policy" { #tfsec:ignore:aws-ia
       "Action": [
         "ssm:GetParameters"
       ],
-      "Resource": ["arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maatdb_password_secret_name}"]
+      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.maatdb_password_secret_name}"]
     }
   ]
 }
