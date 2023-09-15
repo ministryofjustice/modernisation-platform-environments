@@ -25,7 +25,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   desired_capacity    = var.ec2_desired_capacity
   max_size            = var.ec2_max_size
   min_size            = var.ec2_min_size
-  protect_from_scale_in = true
+  # protect_from_scale_in = true
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
@@ -585,9 +585,9 @@ resource "aws_ecs_capacity_provider" "mlra" {
 }
 
 
-resource "aws_ecs_cluster_capacity_providers" "mlra" {
-  cluster_name = aws_ecs_cluster.ecs_cluster.name
+# resource "aws_ecs_cluster_capacity_providers" "mlra" {
+#   cluster_name = aws_ecs_cluster.ecs_cluster.name
 
-  capacity_providers = [aws_ecs_capacity_provider.mlra.name]
-}
+#   capacity_providers = [aws_ecs_capacity_provider.mlra.name]
+# }
 
