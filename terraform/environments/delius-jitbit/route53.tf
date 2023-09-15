@@ -53,6 +53,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_route53_record" "external_validation" {
+  count   = local.is-production ? 0 : 1
   provider = aws.core-network-services
 
   allow_overwrite = true
@@ -61,6 +62,18 @@ resource "aws_route53_record" "external_validation" {
   ttl             = 60
   type            = local.domain_type_main[0]
   zone_id         = data.aws_route53_zone.network-services.zone_id
+}
+
+resource "aws_route53_record" "external_validation_prod" {
+  count   = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = local.domain_name_main[0]
+  records         = local.domain_record_main
+  ttl             = 60
+  type            = local.domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services-production[0].zone_id
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
@@ -84,7 +97,7 @@ resource "aws_route53_record" "external_validation_subdomain_prod" {
   records         = local.domain_record_sub
   ttl             = 60
   type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = data.aws_route53_zone.network-services-production[0].zone_id
 }
 
 resource "aws_acm_certificate_validation" "external" {
