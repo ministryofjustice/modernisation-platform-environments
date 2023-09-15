@@ -207,6 +207,18 @@ resource "aws_lb_listener" "redshift-data" {
   }
 }
 
+resource "aws_lb_listener" "redshift-data-ssl" {
+  load_balancer_arn = aws_lb.redshift-data.arn
+  port              = "443"
+  protocol          = "TCP"
+  tags              = local.tags
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.redshift-data-ssl.arn
+  }
+}
+
 resource "aws_lb_target_group" "redshift-data" {
   name        = "redshift-lb-tg-5439"
   port        = 5439
