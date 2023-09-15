@@ -142,7 +142,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["code/*"]
+      values   = ["metadata/*"]
     }
   }
   statement {
