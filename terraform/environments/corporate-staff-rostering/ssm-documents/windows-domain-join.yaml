@@ -14,6 +14,9 @@ parameters:
   domain:
     type: "String"
     description: "domain to join, either Prod or Dev"
+    allowedValues:
+     - Prod
+     - Dev
 mainSteps:
   - name: JoinDomain
     action: aws:runPowerShellScript
@@ -30,6 +33,20 @@ mainSteps:
           # Install AWS PowerShell module if not already installed
           if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
             Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
+          }
+
+          # Set up DNS IP addresses and suffixes
+          if ($domain -contains "dev") {
+            Write-Host "Setting DNS Client Server and DNS Client Global Settings for Dev domain"
+            Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("10.102.0.196","10.102.0.200")
+            Set-DnsClientGlobalSetting -SuffixSearchList "azure.noms.root"
+          } elseif ($domain -contains "prod") {
+            Write-Host "Setting DNS Client Server and DNS Client Global Settings for Prod domain"
+            Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("","")
+            Set-DnsClientGlobalSetting -SuffixSearchList "azure.hmpp.root"
+          } else {
+            Write-Error "Domain must be either Prod or Dev"
+            exit 1
           }
 
           function Set-UsernameString {
