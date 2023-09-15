@@ -81,7 +81,6 @@ resource "aws_db_instance" "jitbit" {
   # This list has to be static so will for a short time affect other environments too
   lifecycle {
     ignore_changes = [
-      snapshot_identifier,
       final_snapshot_identifier
     ]
   }
