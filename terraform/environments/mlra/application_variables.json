@@ -18,7 +18,7 @@
       "task_definition_volume": "upload_volume",
       "network_mode": "bridge",
       "server_port": 8080,
-      "app_count": 2,
+      "app_count": 0,
       "appscaling_min_capacity": 0,
       "appscaling_max_capacity": 6,
       "ec2_scaling_cpu_threshold": 75,
