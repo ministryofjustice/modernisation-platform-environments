@@ -153,3 +153,18 @@ variable "ecs_scaling_mem_threshold" {
   type        = string
   description = "The utilised memory threshold for ec2 cluster scaling"
 }
+
+variable "region" {
+  type        = string
+  description = "Region in AWS"
+}
+
+variable "account_number" {
+  type        = string
+  description = "Account number of current environment"
+}
+
+variable "maatdb_password_secret_name" {
+  type        = string
+  description = "Parameter store secret name containing the MAATDB database password"
+}
