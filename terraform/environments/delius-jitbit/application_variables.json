@@ -98,7 +98,6 @@
       "db_deletion_protection": "false",
       "db_skip_final_snapshot": "false",
       "db_delete_automated_backups": "false",
-      "db_snapshot_identifier": "cr-jitbit-prod-migration-copy",
       "db_final_snapshot_identifier": "jitbit-prod-final"
     }
   }
