@@ -25,6 +25,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   desired_capacity    = var.ec2_desired_capacity
   max_size            = var.ec2_max_size
   min_size            = var.ec2_min_size
+  protect_from_scale_in = true
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
@@ -561,19 +562,19 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
   }
 }
 
-resource "aws_ecs_capacity_provider" "mlra" {
-  name = "${var.app_name}-capacity-provider"
+# resource "aws_ecs_capacity_provider" "mlra" {
+#   name = "${var.app_name}-capacity-provider"
 
-  auto_scaling_group_provider {
-    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
-    managed_termination_protection = "ENABLED"
+#   auto_scaling_group_provider {
+#     auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
+#     managed_termination_protection = "ENABLED"
 
-    managed_scaling {
-      # maximum_scaling_step_size = 1000
-      # minimum_scaling_step_size = 1
-      status                    = "ENABLED"
-      target_capacity           = var.ecs_target_capacity
-    }
-  }
-}
+#     managed_scaling {
+#       # maximum_scaling_step_size = 1000
+#       # minimum_scaling_step_size = 1
+#       status                    = "ENABLED"
+#       target_capacity           = var.ecs_target_capacity
+#     }
+#   }
+# }
 
