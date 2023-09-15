@@ -162,6 +162,15 @@ resource "aws_security_group_rule" "lb_tcp_5439_ingress_vpc" {
   type              = "ingress"
 }
 
+resource "aws_security_group_rule" "lb_tcp_5439_egress_redshift" {
+  from_port         = 5439
+  prefix_list_ids   = [data.aws_vpc_endpoint.redshift.prefix_list_id]
+  protocol          = "TCP"
+  security_group_id = aws_security_group.redshift-data-lb.id
+  to_port           = 5439
+  type              = "egress"
+}
+
 resource "aws_lb" "redshift-data" {
   #checkov:skip=CKV_AWS_91:  "Logging not required"
   #checkov:skip=CKV_AWS_150: "Deletion protection not required"
