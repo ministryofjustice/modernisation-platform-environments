@@ -168,3 +168,8 @@ variable "maatdb_password_secret_name" {
   type        = string
   description = "Parameter store secret name containing the MAATDB database password"
 }
+
+variable "ecs_target_capacity" {
+  type        = string
+  description = "The target value for the CloudWatch metric used in the Amazon ECS-managed target tracking scaling policy. For example, a value of 100 will result in the Amazon EC2 instances in your Auto Scaling group being completely utilized."
+}

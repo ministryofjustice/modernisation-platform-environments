@@ -264,38 +264,38 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
 
 # EC2 Target Tracking scaling
 
-resource "aws_autoscaling_policy" "ec2-cpu-scaling-target" {
-  name                      = "ec2-cpu-scaling-target"
-  policy_type               = "TargetTrackingScaling"
-  autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
-  estimated_instance_warmup = 200
-  target_tracking_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "ASGAverageCPUUtilization"
-    }
-    target_value = var.ec2_scaling_cpu_threshold
-  }
-}
+# resource "aws_autoscaling_policy" "ec2-cpu-scaling-target" {
+#   name                      = "ec2-cpu-scaling-target"
+#   policy_type               = "TargetTrackingScaling"
+#   autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
+#   estimated_instance_warmup = 200
+#   target_tracking_configuration {
+#     predefined_metric_specification {
+#       predefined_metric_type = "ASGAverageCPUUtilization"
+#     }
+#     target_value = var.ec2_scaling_cpu_threshold
+#   }
+# }
 
-resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
-  name                      = "ec2-mem-scaling-target"
-  policy_type               = "TargetTrackingScaling"
-  autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
-  estimated_instance_warmup = 200
-  target_tracking_configuration {
-    target_value     = var.ec2_scaling_mem_threshold
-    disable_scale_in = false
-    customized_metric_specification {
-      metric_name = "mem_used_percent"
-      namespace   = "CWAgent"
-      statistic   = "Average"
-      metric_dimension {
-        name  = "InstanceId"
-        value = "${var.app_name}-cluster-scaling-group"
-      }
-    }
-  }
-}
+# resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
+#   name                      = "ec2-mem-scaling-target"
+#   policy_type               = "TargetTrackingScaling"
+#   autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
+#   estimated_instance_warmup = 200
+#   target_tracking_configuration {
+#     target_value     = var.ec2_scaling_mem_threshold
+#     disable_scale_in = false
+#     customized_metric_specification {
+#       metric_name = "mem_used_percent"
+#       namespace   = "CWAgent"
+#       statistic   = "Average"
+#       metric_dimension {
+#         name  = "InstanceId"
+#         value = "${var.app_name}-cluster-scaling-group"
+#       }
+#     }
+#   }
+# }
 
 
 
@@ -507,7 +507,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_ssm_access" {
   policy_arn = aws_iam_policy.ecs_task_execution_ssm_policy.arn
 }
 
-
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
@@ -561,3 +560,20 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
     target_value = var.ecs_scaling_mem_threshold
   }
 }
+
+resource "aws_ecs_capacity_provider" "mlra" {
+  name = "${var.app_name}-capacity-provider"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
+    managed_termination_protection = "ENABLED"
+
+    managed_scaling {
+      # maximum_scaling_step_size = 1000
+      # minimum_scaling_step_size = 1
+      status                    = "ENABLED"
+      target_capacity           = var.ecs_target_capacity
+    }
+  }
+}
+
