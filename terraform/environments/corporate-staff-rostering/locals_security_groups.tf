@@ -138,7 +138,23 @@ locals {
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.rdp.inbound
+          cidr_blocks     = ["10.102.0.0/16"] # TODO: needs to be changed over to reference a cidr block later
+          security_groups = []
+        }
+        http7770_1 = {
+          description = "Allow ingress from port 7770-7771"
+          from_port       = 7770
+          to_port         = 7771
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = []
+        }
+        http7780_1 = {
+          description = "Allow ingress from port 7780-7781"
+          from_port       = 7780
+          to_port         = 7781
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
           security_groups = []
         }
         # http5985 = {
@@ -244,7 +260,7 @@ locals {
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.rdp.inbound
+          cidr_blocks     = ["10.102.0.0/16"] # TODO: needs to be changed back to reference a cidr block later
           security_groups = []
         }
 
