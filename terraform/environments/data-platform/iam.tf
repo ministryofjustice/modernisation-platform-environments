@@ -114,7 +114,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_authorizer_lambda" {
       "s3:PutObject",
     ]
     resources = [
-      "${module.s3-bucket.bucket.arn}/logs/*
+      "${module.s3-bucket.bucket.arn}/logs/*"
     ]
 }
 
@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda
       "s3:PutObject",
     ]
     resources = [
-      "${module.s3-bucket.bucket.arn}/logs/*
+      "${module.s3-bucket.bucket.arn}/logs/*"
     ]
 }
 
@@ -154,7 +154,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
     actions   = ["s3:GetObject", "s3:PutObject"]
     resources = [
       "${module.s3-bucket.bucket.arn}/raw_data/*",
-      "${module.s3-bucket.bucket.arn}/logs/*
+      "${module.s3-bucket.bucket.arn}/logs/*"
     ]
   }
   statement {
@@ -277,7 +277,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" 
       "s3:PutObject",
     ]
     resources = [
-      "${module.s3-bucket.bucket.arn}/logs/*
+      "${module.s3-bucket.bucket.arn}/logs/*"
     ]
   }
 
@@ -343,7 +343,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lamb
       "s3:PutObject",
     ]
     resources = [
-      "${module.s3-bucket.bucket.arn}/logs/*
+      "${module.s3-bucket.bucket.arn}/logs/*"
     ]
   }
   statement {
@@ -375,7 +375,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
       "s3:PutObject",
     ]
     resources = [
-      "${module.s3-bucket.bucket.arn}/logs/*
+      "${module.s3-bucket.bucket.arn}/logs/*"
     ]
   }
   statement {
