@@ -242,7 +242,7 @@ resource "aws_lb_target_group_attachment" "redshift-data" {
   port             = 5439
 }
 
-resource "aws_lb_target_group_attachment" "redshift-data" {
+resource "aws_lb_target_group_attachment" "redshift-data-ssl" {
   for_each         = toset([for node in aws_redshift_cluster.wepi_redshift_cluster.cluster_nodes : node.private_ip_address])
   target_group_arn = aws_lb_target_group.redshift-data-ssl.arn
   target_id        = each.value
