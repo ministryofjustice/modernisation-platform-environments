@@ -171,15 +171,6 @@ resource "aws_security_group_rule" "lb_tcp_5439_egress_redshift" {
   type              = "egress"
 }
 
-resource "aws_security_group_rule" "lb_tcp_443_egress_redshift" {
-  security_group_id = aws_security_group.redshift-data-lb.id
-  from_port         = 443
-  protocol          = "TCP"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  to_port           = 443
-  type              = "egress"
-}
-
 resource "aws_lb" "redshift-data" {
   #checkov:skip=CKV_AWS_91:  "Logging not required"
   #checkov:skip=CKV_AWS_150: "Deletion protection not required"
@@ -207,18 +198,6 @@ resource "aws_lb_listener" "redshift-data" {
   }
 }
 
-resource "aws_lb_listener" "redshift-data-ssl" {
-  load_balancer_arn = aws_lb.redshift-data.arn
-  port              = "443"
-  protocol          = "TCP"
-  tags              = local.tags
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.redshift-data-ssl.arn
-  }
-}
-
 resource "aws_lb_target_group" "redshift-data" {
   name        = "redshift-lb-tg-5439"
   port        = 5439
@@ -233,32 +212,11 @@ resource "aws_lb_target_group" "redshift-data" {
   }
 }
 
-resource "aws_lb_target_group" "redshift-data-ssl" {
-  name        = "redshift-lb-tg-443"
-  port        = 443
-  protocol    = "TCP"
-  target_type = "ip"
-  vpc_id      = data.aws_vpc.shared.id
-
-  health_check {
-    enabled  = true
-    port     = "443"
-    protocol = "TCP"
-  }
-}
-
 resource "aws_lb_target_group_attachment" "redshift-data" {
   for_each         = toset([for node in aws_redshift_cluster.wepi_redshift_cluster.cluster_nodes : node.private_ip_address])
   target_group_arn = aws_lb_target_group.redshift-data.arn
   target_id        = each.value
   port             = 5439
-}
-
-resource "aws_lb_target_group_attachment" "redshift-data-ssl" {
-  for_each         = toset([for node in aws_redshift_cluster.wepi_redshift_cluster.cluster_nodes : node.private_ip_address])
-  target_group_arn = aws_lb_target_group.redshift-data-ssl.arn
-  target_id        = each.value
-  port             = 443
 }
 
 resource "aws_route53_record" "redshift-lb-dns" {
