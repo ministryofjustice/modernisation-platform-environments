@@ -12,7 +12,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
     rdp = {
-      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.3.0/26", "10.102.1.64/26", "10.102.0.128/26"]
+      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.0.0/16"]
     }
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -138,7 +138,7 @@ locals {
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
-          cidr_blocks     = ["10.102.0.0/16"] # TODO: needs to be changed over to reference a cidr block later
+          cidr_blocks     = local.security_group_cidrs.rdp.inbound
           security_groups = []
         }
         http7770_1 = {
@@ -260,7 +260,7 @@ locals {
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
-          cidr_blocks     = ["10.102.0.0/16"] # TODO: needs to be changed back to reference a cidr block later
+          cidr_blocks     = local.security_group_cidrs.rdp.inbound
           security_groups = []
         }
 
