@@ -585,9 +585,9 @@ resource "aws_ecs_capacity_provider" "mlra" {
 }
 
 
-# resource "aws_ecs_cluster_capacity_providers" "mlra" {
-#   cluster_name = aws_ecs_cluster.ecs_cluster.name
+resource "aws_ecs_cluster_capacity_providers" "mlra" {
+  cluster_name = aws_ecs_cluster.ecs_cluster.name
 
-#   capacity_providers = [aws_ecs_capacity_provider.mlra.name]
-# }
+  capacity_providers = [aws_ecs_capacity_provider.mlra.name]
+}
 
