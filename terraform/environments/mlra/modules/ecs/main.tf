@@ -38,6 +38,12 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     propagate_at_launch = true
   }
 
+  tag {
+    key                 = "AmazonECSManaged"
+    value               = true
+    propagate_at_launch = true
+  }
+
   dynamic "tag" {
     for_each = var.tags_common
 
