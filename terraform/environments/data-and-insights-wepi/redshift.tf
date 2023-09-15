@@ -154,7 +154,7 @@ resource "aws_security_group" "redshift-data-lb" {
 }
 
 resource "aws_security_group_rule" "lb_tcp_5439_ingress_vpc" {
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = ["0.0.0.0/0"]
   from_port         = 5439
   protocol          = "TCP"
   security_group_id = aws_security_group.redshift-data-lb.id
