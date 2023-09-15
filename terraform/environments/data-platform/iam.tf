@@ -116,6 +116,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_authorizer_lambda" {
     resources = [
       "${module.s3-bucket.bucket.arn}/logs/*"
     ]
+  }
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda" {
@@ -145,6 +146,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda
     resources = [
       "${module.s3-bucket.bucket.arn}/logs/*"
     ]
+  }
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
