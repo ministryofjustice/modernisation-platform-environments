@@ -84,7 +84,7 @@ resource "aws_route53_record" "external_validation_subdomain_prod" {
   records         = local.domain_record_sub
   ttl             = 60
   type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = data.aws_route53_zone.network-services-production[0].zone_id
 }
 
 resource "aws_acm_certificate_validation" "external" {
