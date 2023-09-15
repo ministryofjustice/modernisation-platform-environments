@@ -163,10 +163,10 @@ resource "aws_security_group_rule" "lb_tcp_5439_ingress_vpc" {
 }
 
 resource "aws_security_group_rule" "lb_tcp_5439_egress_redshift" {
+  for_each          = toset([for node in aws_redshift_cluster.wepi_redshift_cluster.cluster_nodes : node.private_ip_address])
   from_port         = 5439
-  prefix_list_ids   = [data.aws_vpc_endpoint.redshift.prefix_list_id]
   protocol          = "TCP"
-  security_group_id = aws_security_group.redshift-data-lb.id
+  cidr_blocks       = [format("%s/32", each.value)]
   to_port           = 5439
   type              = "egress"
 }
