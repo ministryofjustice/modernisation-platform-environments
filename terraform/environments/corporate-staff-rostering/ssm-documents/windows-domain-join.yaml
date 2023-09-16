@@ -10,7 +10,8 @@ parameters:
     description: "password for domain join user"
   hostname:
     type: "String"
-    description: "hostname for the new instance"
+    description: "hostname for the new instance, must not be longer than 15 characters"
+    maxChars: 15
   domain:
     type: "String"
     description: "domain to join, either Prod or Dev"
@@ -18,8 +19,12 @@ parameters:
      - Prod
      - Dev
 mainSteps:
-  - name: JoinDomain
+  - name: WindowsDomainJoin
     action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
     inputs:
       runCommand:
         - |
