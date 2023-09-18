@@ -147,6 +147,30 @@ data "aws_network_interface" "redshift-data" {
   id       = each.value
 }
 
+resource "aws_security_group" "redshift-data-lb" {
+  name   = format("%s-%s-redshift-lb-sg", local.environment, local.application_name)
+  vpc_id = data.aws_vpc.shared.id
+  tags   = local.tags
+}
+
+resource "aws_security_group_rule" "lb_tcp_5439_ingress_vpc" {
+  cidr_blocks       = ["0.0.0.0/0"]
+  from_port         = 5439
+  protocol          = "TCP"
+  security_group_id = aws_security_group.redshift-data-lb.id
+  to_port           = 5439
+  type              = "ingress"
+}
+
+resource "aws_security_group_rule" "lb_tcp_5439_egress_redshift" {
+  security_group_id = aws_security_group.redshift-data-lb.id
+  from_port         = 5439
+  protocol          = "TCP"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  to_port           = 5439
+  type              = "egress"
+}
+
 resource "aws_lb" "redshift-data" {
   #checkov:skip=CKV_AWS_91:  "Logging not required"
   #checkov:skip=CKV_AWS_150: "Deletion protection not required"
@@ -155,6 +179,7 @@ resource "aws_lb" "redshift-data" {
   load_balancer_type               = "network"
   name                             = format("%s-redshift-lb", local.environment)
   subnets                          = data.aws_subnets.shared-private.ids
+  security_groups                  = [aws_security_group.redshift-data-lb.id]
   tags = merge(
     local.tags,
     { "Name" = format("%s-redshift-lb", local.environment) }
