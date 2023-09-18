@@ -36,5 +36,6 @@ module "mlra-ecs" {
   account_number            = local.environment_management.account_ids[terraform.workspace]
   maatdb_password_secret_name = local.maatdb_password_secret_name
   ecs_target_capacity       = local.ecs_target_capacity
+  environment               = local.environment
 
 }

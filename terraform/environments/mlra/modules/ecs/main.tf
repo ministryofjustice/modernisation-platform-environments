@@ -569,7 +569,7 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
 }
 
 resource "aws_ecs_capacity_provider" "mlra" {
-  name = "${var.app_name}-capacity-provider"
+  name = "${var.app_name}-${var.environment}-capacity-provider"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
