@@ -250,7 +250,7 @@ locals {
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1423.awsdns-49.org", "ns-1921.awsdns-48.co.uk", "ns-304.awsdns-38.com", "ns-747.awsdns-29.net"] },
           { name = "preproduction", type = "NS", ttl = "86400", records = ["ns-1200.awsdns-22.org", "ns-1958.awsdns-52.co.uk", "ns-44.awsdns-05.com", "ns-759.awsdns-30.net"] },
           { name = "reporting", type = "NS", ttl = "86400", records = ["ns-1122.awsdns-12.org", "ns-1844.awsdns-38.co.uk", "ns-388.awsdns-48.com", "ns-887.awsdns-46.net"] },
-          { name = "ndh", type = "NS", ttl = "86400", records = ["ns-1528.awsdns-63.org", "ns-973.awsdns-57.net", "ns-1867.awsdns-41.co.uk", "ns-427.awsdns-53.com"]},
+          { name = "ndh", type = "NS", ttl = "86400", records = ["ns-1528.awsdns-63.org", "ns-973.awsdns-57.net", "ns-1867.awsdns-41.co.uk", "ns-427.awsdns-53.com"] },
         ]
       }
       "production.nomis.az.justice.gov.uk" = {
