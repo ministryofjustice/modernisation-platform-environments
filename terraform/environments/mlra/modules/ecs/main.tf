@@ -568,26 +568,26 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
   }
 }
 
-resource "aws_ecs_capacity_provider" "mlra" {
-  name = "${var.app_name}-capacity-provider"
+# resource "aws_ecs_capacity_provider" "mlra" {
+#   name = "${var.app_name}-capacity-provider"
 
-  auto_scaling_group_provider {
-    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
-    managed_termination_protection = "ENABLED"
+#   auto_scaling_group_provider {
+#     auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
+#     managed_termination_protection = "ENABLED"
 
-    managed_scaling {
-      # maximum_scaling_step_size = 1000
-      # minimum_scaling_step_size = 1
-      status                    = "ENABLED"
-      target_capacity           = var.ecs_target_capacity
-    }
-  }
-}
+#     managed_scaling {
+#       # maximum_scaling_step_size = 1000
+#       # minimum_scaling_step_size = 1
+#       status                    = "ENABLED"
+#       target_capacity           = var.ecs_target_capacity
+#     }
+#   }
+# }
 
 
-resource "aws_ecs_cluster_capacity_providers" "mlra" {
-  cluster_name = aws_ecs_cluster.ecs_cluster.name
+# resource "aws_ecs_cluster_capacity_providers" "mlra" {
+#   cluster_name = aws_ecs_cluster.ecs_cluster.name
 
-  capacity_providers = [aws_ecs_capacity_provider.mlra.name]
-}
+#   capacity_providers = [aws_ecs_capacity_provider.mlra.name]
+# }
 
