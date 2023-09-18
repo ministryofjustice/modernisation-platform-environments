@@ -376,6 +376,11 @@ resource "aws_ecs_service" "ecs_service" {
   desired_count   = var.app_count
   launch_type     = "EC2"
 
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.mlra.name
+    weight = 1
+  }
+
   health_check_grace_period_seconds = 300
 
   ordered_placement_strategy {
