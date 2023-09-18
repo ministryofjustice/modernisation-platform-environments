@@ -44,4 +44,5 @@ locals {
       iam_policies = module.baseline_presets.s3_iam_policies
     }
   }
+  baseline_route53_zones = {}
 }
