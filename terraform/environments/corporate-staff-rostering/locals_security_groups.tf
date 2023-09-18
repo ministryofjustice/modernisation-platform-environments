@@ -29,19 +29,19 @@ locals {
   }
 
   security_group_cidrs_preprod_prod = {
-    ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
+    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
     https = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.providers,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
     ])
     http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
     rdp = {
-      inbound = ["10.40.165.0/26"]
+      inbound = ["10.40.0.0/8"]
     }
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
