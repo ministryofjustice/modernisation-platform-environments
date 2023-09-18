@@ -268,7 +268,6 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
   policy_arn = aws_iam_policy.ec2_instance_policy.arn
 }
 
-
 # EC2 Target Tracking scaling
 
 # resource "aws_autoscaling_policy" "ec2-cpu-scaling-target" {
