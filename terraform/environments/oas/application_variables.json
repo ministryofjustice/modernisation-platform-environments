@@ -27,7 +27,7 @@
       "multi_az": false,
       "username": "sysdba",
       "db_password_rotation_period": 28,
-      "license_model": "license-included",
+      "license_model": "bring-your-own-license",
       "rds_snapshot_name": "man-oas-migration-laws-3462",
       "lz_vpc_cidr": "10.202.0.0/20",
       "deletion_protection": "false",
