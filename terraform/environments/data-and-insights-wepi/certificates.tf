@@ -4,6 +4,7 @@ resource "aws_acm_certificate" "redshift_cert" {
 
   subject_alternative_names = [
     format("redshift.%s.%s", local.application_name, data.aws_route53_zone.inner.name),
+    aws_redshift_cluster.wepi_redshift_cluster.dns_name
   ]
 
   tags = merge(local.tags,
