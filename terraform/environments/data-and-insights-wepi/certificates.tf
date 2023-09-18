@@ -1,5 +1,5 @@
 resource "aws_acm_certificate" "redshift_cert" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = format("%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
   validation_method = "DNS"
 
   subject_alternative_names = [
@@ -24,7 +24,7 @@ resource "aws_acm_certificate_validation" "redshift_cert" {
 }
 
 resource "aws_route53_record" "redshift_cert_validation" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
   for_each = {
     for dvo in aws_acm_certificate.redshift_cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
