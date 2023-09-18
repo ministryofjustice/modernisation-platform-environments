@@ -1,14 +1,14 @@
 resource "aws_acm_certificate" "redshift_cert" {
-  domain_name       = data.aws_route53_zone.inner.name
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = [
-    format("redshift.%s.%s", local.application_name, data.aws_route53_zone.inner.name),
+    format("redshift.%s.%s-%s.modernisation-platform.service.justice.gov.uk", local.application_name, var.networking[0].business-unit, local.environment),
     aws_redshift_cluster.wepi_redshift_cluster.dns_name
   ]
 
   tags = merge(local.tags,
-    { Name = lower(format("redshift.%s.%s", local.application_name, data.aws_route53_zone.inner.name)) }
+    { Name = lower(format("redshift.%s.%s-%s.modernisation-platform.service.justice.gov.uk", local.application_name, var.networking[0].business-unit, local.environment)) }
   )
 
   lifecycle {
