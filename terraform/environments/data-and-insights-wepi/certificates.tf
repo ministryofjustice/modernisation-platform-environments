@@ -4,7 +4,6 @@ resource "aws_acm_certificate" "redshift_cert" {
 
   subject_alternative_names = [
     format("redshift.%s.%s-%s.modernisation-platform.service.justice.gov.uk", local.application_name, var.networking[0].business-unit, local.environment),
-    aws_redshift_cluster.wepi_redshift_cluster.dns_name
   ]
 
   tags = merge(local.tags,
