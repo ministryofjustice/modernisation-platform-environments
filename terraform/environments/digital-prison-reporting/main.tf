@@ -747,8 +747,6 @@ module "dms_fake_data_ingestor" {
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
 
-  extra_attributes = "supportResetlog=TRUE"
-
   kinesis_settings = {
     "include_null_and_empty"         = "true"
     "partition_include_schema_table" = "true"
