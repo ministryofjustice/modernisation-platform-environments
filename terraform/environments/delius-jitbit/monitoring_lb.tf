@@ -11,7 +11,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_5XX_count" {
   insufficient_data_actions = []
   alarm_actions             = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions                = [aws_sns_topic.jitbit_alerting.arn]
-  treat_missing_data        = "missing"
+  treat_missing_data        = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.arn
   }
@@ -30,7 +30,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_4XX_count" {
   insufficient_data_actions = []
   alarm_actions             = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions                = [aws_sns_topic.jitbit_alerting.arn]
-  treat_missing_data        = "missing"
+  treat_missing_data        = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.arn
   }
@@ -49,10 +49,9 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_target_response_time" {
   insufficient_data_actions = []
   alarm_actions             = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions                = [aws_sns_topic.jitbit_alerting.arn]
-  treat_missing_data        = "missing"
+  treat_missing_data        = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.arn
-    TargetGroup  = aws_lb_target_group.target_group_fargate.arn
   }
 }
 
@@ -88,7 +87,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate" {
   alarm_description   = "Sum of 4XX error responses returned by targets in target group exceeds 1 in given period"
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
   dimensions = {
     LoadBalancer   = aws_lb.external.arn_suffix
     TargetGroupArn = aws_lb_target_group.target_group_fargate.arn_suffix
@@ -107,7 +106,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate" {
   alarm_description   = "Sum of 5XX error responses returned by targets in target group exceeds 1 in given period"
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
   dimensions = {
     LoadBalancer   = aws_lb.external.arn
     TargetGroupArn = aws_lb_target_group.target_group_fargate.arn
