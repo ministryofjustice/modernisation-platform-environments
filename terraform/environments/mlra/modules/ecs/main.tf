@@ -374,7 +374,7 @@ resource "aws_ecs_service" "ecs_service" {
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = data.aws_ecs_task_definition.task_definition.id
   desired_count   = var.app_count
-  launch_type     = "EC2"
+  # launch_type     = "EC2"
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.mlra.name
