@@ -98,6 +98,6 @@ locals {
 
   validation = local.environment == "production" ? local.prod_validation : local.non_prod_validation
 
-  lb_enable_deletion_protection         = local.application_data.accounts[local.environment].lb_enable_deletion_protection
-  efs_enable_deletion_protection        = local.application_data.accounts[local.environment].efs_enable_deletion_protection
+  lb_enable_deletion_protection  = local.application_data.accounts[local.environment].lb_enable_deletion_protection
+  efs_enable_deletion_protection = local.application_data.accounts[local.environment].efs_enable_deletion_protection
 }

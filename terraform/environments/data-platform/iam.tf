@@ -151,9 +151,9 @@ data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda
 
 data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
   statement {
-    sid       = "GetPutDataObject"
-    effect    = "Allow"
-    actions   = ["s3:GetObject", "s3:PutObject"]
+    sid     = "GetPutDataObject"
+    effect  = "Allow"
+    actions = ["s3:GetObject", "s3:PutObject"]
     resources = [
       "${module.s3-bucket.bucket.arn}/raw_data/*",
       "${module.s3-bucket.bucket.arn}/logs/*"

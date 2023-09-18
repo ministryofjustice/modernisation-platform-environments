@@ -81,8 +81,8 @@
     ],
     "secrets": [
       {
-          "name": "APP_DB_PASSWORD",
-          "valueFrom": "${db_secret_arn}"
+        "name": "APP_DB_PASSWORD",
+        "valueFrom": "${db_secret_arn}"
       }
     ]
   }

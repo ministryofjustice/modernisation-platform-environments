@@ -53,7 +53,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_route53_record" "external_validation" {
-  count   = local.is-production ? 0 : 1
+  count    = local.is-production ? 0 : 1
   provider = aws.core-network-services
 
   allow_overwrite = true
@@ -65,7 +65,7 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_route53_record" "external_validation_prod" {
-  count   = local.is-production ? 1 : 0
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   allow_overwrite = true

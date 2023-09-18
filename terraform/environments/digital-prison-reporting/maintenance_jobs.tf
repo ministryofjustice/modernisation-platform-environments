@@ -36,16 +36,16 @@ module "glue_compact_raw_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.compact_raw_job_name}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.compact_raw_job_name}/"
   # Placeholder Script Location
-  script_location               = local.glue_placeholder_script_location
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  execution_class               = "FLEX"
-  worker_type                   = local.compact_raw_job_worker_type
-  number_of_workers             = local.compact_raw_job_num_workers
-  max_concurrent                = 1
-  region                        = local.account_region
-  account                       = local.account_id
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  execution_class              = "FLEX"
+  worker_type                  = local.compact_raw_job_worker_type
+  number_of_workers            = local.compact_raw_job_num_workers
+  max_concurrent               = 1
+  region                       = local.account_region
+  account                      = local.account_id
 
   tags = merge(
     local.all_tags,
@@ -77,16 +77,16 @@ module "glue_compact_structured_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.compact_structured_job_name}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.compact_structured_job_name}/"
   # Placeholder Script Location
-  script_location               = local.glue_placeholder_script_location
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  execution_class               = "FLEX"
-  worker_type                   = local.compact_structured_job_worker_type
-  number_of_workers             = local.compact_structured_job_num_workers
-  max_concurrent                = 1
-  region                        = local.account_region
-  account                       = local.account_id
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  execution_class              = "FLEX"
+  worker_type                  = local.compact_structured_job_worker_type
+  number_of_workers            = local.compact_structured_job_num_workers
+  max_concurrent               = 1
+  region                       = local.account_region
+  account                      = local.account_id
 
   tags = merge(
     local.all_tags,
@@ -118,16 +118,16 @@ module "glue_compact_curated_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.compact_curated_job_name}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.compact_curated_job_name}/"
   # Placeholder Script Location
-  script_location               = local.glue_placeholder_script_location
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  execution_class               = "FLEX"
-  worker_type                   = local.compact_curated_job_worker_type
-  number_of_workers             = local.compact_curated_job_num_workers
-  max_concurrent                = 1
-  region                        = local.account_region
-  account                       = local.account_id
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  execution_class              = "FLEX"
+  worker_type                  = local.compact_curated_job_worker_type
+  number_of_workers            = local.compact_curated_job_num_workers
+  max_concurrent               = 1
+  region                       = local.account_region
+  account                      = local.account_id
 
   tags = merge(
     local.all_tags,
@@ -159,16 +159,16 @@ module "glue_retention_raw_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.retention_raw_job_name}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.retention_raw_job_name}/"
   # Placeholder Script Location
-  script_location               = local.glue_placeholder_script_location
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  execution_class               = "FLEX"
-  worker_type                   = local.retention_raw_job_worker_type
-  number_of_workers             = local.retention_raw_job_num_workers
-  max_concurrent                = 1
-  region                        = local.account_region
-  account                       = local.account_id
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  execution_class              = "FLEX"
+  worker_type                  = local.retention_raw_job_worker_type
+  number_of_workers            = local.retention_raw_job_num_workers
+  max_concurrent               = 1
+  region                       = local.account_region
+  account                      = local.account_id
 
   tags = merge(
     local.all_tags,
@@ -200,16 +200,16 @@ module "glue_retention_structured_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.retention_structured_job_name}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.retention_structured_job_name}/"
   # Placeholder Script Location
-  script_location               = local.glue_placeholder_script_location
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  execution_class               = "FLEX"
-  worker_type                   = local.retention_structured_job_worker_type
-  number_of_workers             = local.retention_structured_job_num_workers
-  max_concurrent                = 1
-  region                        = local.account_region
-  account                       = local.account_id
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  execution_class              = "FLEX"
+  worker_type                  = local.retention_structured_job_worker_type
+  number_of_workers            = local.retention_structured_job_num_workers
+  max_concurrent               = 1
+  region                       = local.account_region
+  account                      = local.account_id
 
   tags = merge(
     local.all_tags,
@@ -241,16 +241,16 @@ module "glue_retention_curated_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.retention_curated_job_name}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.retention_curated_job_name}/"
   # Placeholder Script Location
-  script_location               = local.glue_placeholder_script_location
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  execution_class               = "FLEX"
-  worker_type                   = local.retention_curated_job_worker_type
-  number_of_workers             = local.retention_curated_job_num_workers
-  max_concurrent                = 1
-  region                        = local.account_region
-  account                       = local.account_id
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  execution_class              = "FLEX"
+  worker_type                  = local.retention_curated_job_worker_type
+  number_of_workers            = local.retention_curated_job_num_workers
+  max_concurrent               = 1
+  region                       = local.account_region
+  account                      = local.account_id
 
   tags = merge(
     local.all_tags,

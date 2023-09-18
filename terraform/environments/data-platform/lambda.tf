@@ -203,9 +203,9 @@ module "reload_data_product_lambda" {
   memory_size  = 512
 
   environment_variables = {
-    RAW_DATA_BUCKET = module.s3-bucket.bucket.id
+    RAW_DATA_BUCKET     = module.s3-bucket.bucket.id
     CURATED_DATA_BUCKET = module.s3-bucket.bucket.id
-    ATHENA_LOAD_LAMBDA = module.data_product_athena_load_lambda.lambda_function_name
+    ATHENA_LOAD_LAMBDA  = module.data_product_athena_load_lambda.lambda_function_name
   }
 
 }
@@ -227,9 +227,9 @@ module "resync_unprocessed_files_lambda" {
   memory_size  = 512
 
   environment_variables = {
-    RAW_DATA_BUCKET = module.s3-bucket.bucket.id
+    RAW_DATA_BUCKET     = module.s3-bucket.bucket.id
     CURATED_DATA_BUCKET = module.s3-bucket.bucket.id
-    ATHENA_LOAD_LAMBDA = module.data_product_athena_load_lambda.lambda_function_name
+    ATHENA_LOAD_LAMBDA  = module.data_product_athena_load_lambda.lambda_function_name
   }
 
 }
