@@ -1,6 +1,6 @@
 ---
 schemaVersion: "2.2"
-description: "SSM Document for creating local configs on Windows Server"
+description: "SSM Document for joining Windows EC2 instances to the domain. The instance will be RESTARTED so this is not applicable for ASG's."
 parameters:
   domainJoinUsername:
     type: "String"
@@ -47,7 +47,7 @@ mainSteps:
             Set-DnsClientGlobalSetting -SuffixSearchList "azure.noms.root"
           } elseif ($domain -contains "prod") {
             Write-Host "Setting DNS Client Server and DNS Client Global Settings for Prod domain"
-            Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("","")
+            Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("10.40.128.196","10.40.0.133")
             Set-DnsClientGlobalSetting -SuffixSearchList "azure.hmpp.root"
           } else {
             Write-Error "Domain must be either Prod or Dev"
@@ -109,7 +109,7 @@ mainSteps:
             Write-Host "Hostname $hostname is not in use, continuing"
             Write-Host "Adding instance as $hostname to (Set-DomainString -domain $domain)"
             Write-Host "WARNING: Instance will restart to complete domain join"
-            Add-Computer -DomainName (Set-DomainString -domain $domain) -Credential $credentials -NewName $hostname -Restart
+            Add-Computer -DomainName (Set-DomainString -domain $domain) -Credential $credentials -NewName $hostname -Restart -Verbose
           }
 
           # TODO: check if the instance is part of an ASG and terminate if it is since reboot may just result in another instance being spawned which won't be joined to the domain
