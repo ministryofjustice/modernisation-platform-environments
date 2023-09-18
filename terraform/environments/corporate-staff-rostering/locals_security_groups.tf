@@ -12,7 +12,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
     rdp = {
-      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.3.0/26", "10.102.1.64/26", "10.102.0.128/26"]
+      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.0.0/16"]
     }
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -29,19 +29,21 @@ locals {
   }
 
   security_group_cidrs_preprod_prod = {
-    ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
+    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
     https = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
     ])
     http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
     rdp = {
-      inbound = ["10.40.165.0/26"]
+      inbound = flatten([
+        module.ip_addresses.azure_fixngo_cidrs.prod,
+      ])
     }
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -139,6 +141,22 @@ locals {
           to_port         = 3389
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.rdp.inbound
+          security_groups = []
+        }
+        http7770_1 = {
+          description = "Allow ingress from port 7770-7771"
+          from_port       = 7770
+          to_port         = 7771
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = []
+        }
+        http7780_1 = {
+          description = "Allow ingress from port 7780-7781"
+          from_port       = 7780
+          to_port         = 7781
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
           security_groups = []
         }
         # http5985 = {
