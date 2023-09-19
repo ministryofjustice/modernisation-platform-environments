@@ -15,15 +15,19 @@ resource "aws_acm_certificate" "redshift_cert" {
   }
 }
 
-resource "aws_acm_certificate_validation" "example_cert" {
-  certificate_arn         = aws_acm_certificate.redshift_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.redshift_cert_validation : record.fqdn]
+resource "aws_acm_certificate_validation" "redshift_cert" {
+  certificate_arn = aws_acm_certificate.redshift_cert.arn
+  validation_record_fqdns = concat(
+    [for record_core in aws_route53_record.redshift_cert_validation_core : record_core.fqdn],
+    [for record_vpc in aws_route53_record.redshift_cert_validation_vpc : record_vpc.fqdn]
+  )
   timeouts {
     create = "10m"
   }
 }
 
-resource "aws_route53_record" "redshift_cert_validation" {
+# Because we need validation records in multiple zones, we'll call them twice with different providers
+resource "aws_route53_record" "redshift_cert_validation_core" {
   provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.redshift_cert.domain_validation_options : dvo.domain_name => {
@@ -39,4 +43,22 @@ resource "aws_route53_record" "redshift_cert_validation" {
   ttl             = 60
   type            = each.value.type
   zone_id         = data.aws_route53_zone.network-services.zone_id
+}
+
+resource "aws_route53_record" "redshift_cert_validation_vpc" {
+  provider = aws.core-vpc
+  for_each = {
+    for dvo in aws_acm_certificate.redshift_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.inner.zone_id
 }
