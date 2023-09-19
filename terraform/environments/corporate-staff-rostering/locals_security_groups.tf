@@ -84,7 +84,7 @@ locals {
           to_port     = "1521"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.oracle_db
-          security_groups = [
+          security_groups = ["migration-web-sg","migration-app-sg"
           ]
         }
         oracle3872 = {
