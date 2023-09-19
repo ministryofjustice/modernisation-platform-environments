@@ -5,7 +5,7 @@ locals {
   preproduction_config = {
       test-srv-1 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "ami-055c4a9db6f698661" # Microsoft Windows Server 2019 Base
+          ami_name                      = "mp_WindowsServer2019_2023-*" # Microsoft Windows Server 2019 Base
           ami_owner                     = "self"
           ebs_volumes_copy_all_from_ami = false
           # user_data_raw                 = base64encode(file("./templates/app-server-user-data.yaml"))
