@@ -60,7 +60,8 @@ resource "aws_instance" "ec2_oracle_ebs" {
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-ebsdb", local.application_name, local.environment)) },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
-    { backup = "true" }
+    { backup = "true" },
+    { OracleDbLTS-ManagedInstance = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_ebsdb]
 }
