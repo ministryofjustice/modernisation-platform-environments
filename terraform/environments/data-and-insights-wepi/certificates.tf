@@ -16,6 +16,7 @@ resource "aws_acm_certificate" "redshift_cert" {
 }
 
 resource "aws_acm_certificate_validation" "redshift_cert" {
+  depends_on = [aws_route53_record.redshift_cert_validation_core, aws_route53_record.redshift_cert_validation_vpc]
   certificate_arn = aws_acm_certificate.redshift_cert.arn
   validation_record_fqdns = concat(
     [for record_core in aws_route53_record.redshift_cert_validation_core : record_core.fqdn],
