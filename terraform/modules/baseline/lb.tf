@@ -19,7 +19,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=DSOS-2150-loadbalancer-logging-fix"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v3.1.1"
 
   providers = {
     aws.bucket-replication = aws
