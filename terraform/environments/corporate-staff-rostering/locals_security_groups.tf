@@ -273,7 +273,7 @@ locals {
           security_groups = []
         }
         winrm = {
-          description     = "5985: Allow WinRM ingress"
+          description     = "5985-6: Allow WinRM ingress"
           from_port       = 5985
           to_port         = 5986
           protocol        = "TCP"
