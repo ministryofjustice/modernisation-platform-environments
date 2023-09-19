@@ -1,5 +1,5 @@
 resource "aws_acm_certificate" "redshift_cert" {
-  domain_name       = format("%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = [
@@ -7,7 +7,7 @@ resource "aws_acm_certificate" "redshift_cert" {
   ]
 
   tags = merge(local.tags,
-    { Name = lower(format("redshift.%s.%s-%s.modernisation-platform.service.justice.gov.uk", local.application_name, var.networking[0].business-unit, local.environment)) }
+    { Name = lower(format("redshift.%s-%s-certificate", local.application_name, local.environment)) }
   )
 
   lifecycle {
@@ -15,16 +15,16 @@ resource "aws_acm_certificate" "redshift_cert" {
   }
 }
 
-resource "aws_acm_certificate_validation" "redshift_cert" {
+resource "aws_acm_certificate_validation" "example_cert" {
   certificate_arn         = aws_acm_certificate.redshift_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.redshift_cert_validation : record.fqdn]
   timeouts {
-    create = "15m"
+    create = "10m"
   }
 }
 
 resource "aws_route53_record" "redshift_cert_validation" {
-  provider = aws.core-vpc
+  provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.redshift_cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
