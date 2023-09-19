@@ -257,6 +257,13 @@ locals {
           cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
         }
+        http_2109_csr = {
+          description = "2109: TCP CSR ingress"
+          from_port       = 2109
+          to_port         = 2109
+          protocol        = "TCP"
+          cidr_blocks     = ["10.0.0.0/8"]
+        }
         rdp = {
           description     = "3389: Allow RDP ingress"
           from_port       = 3389
@@ -265,15 +272,23 @@ locals {
           cidr_blocks     = local.security_group_cidrs.rdp.inbound
           security_groups = []
         }
+        winrm = {
+          description     = "5985-6: Allow WinRM ingress"
+          from_port       = 5985
+          to_port         = 5986
+          protocol        = "TCP"
+          cidr_blocks     = ["10.0.0.0/8"] # TODO: change this to Jumpserver IP range from Azure
+          security_groups = []
+        }
+        http_45054_csr = {
+          description = "45054: TCP CSR ingress"
+          from_port       = 45054
+          to_port         = 45054
+          protocol        = "TCP"
+          cidr_blocks     = ["10.0.0.0/8"]
+          security_groups = []
+        }
 
-        # http2109 = {
-        #   description = "Allow ingress from port 2109"
-        #   from_port       = 2109
-        #   to_port         = 2109
-        #   protocol        = "TCP"
-        #   cidr_blocks     = ["10.0.0.0/8"]
-        #   security_groups = ["Web-SG-migration", "data-db"]
-        # }
         # http5985 = {
         #   description = "Allow ingress from port 5985"
         #   from_port       = 5985
