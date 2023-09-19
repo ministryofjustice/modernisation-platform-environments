@@ -1,7 +1,7 @@
 locals {
 
   bip_ssm_parameters = {
-    prefix = "/bi-platform/"
+    prefix = "/bip/"
     parameters = {
       product_key             = { description = "BIP product key" }
       cms_cluster_key         = { description = "CMS Cluster Key" }
@@ -91,12 +91,12 @@ locals {
     }
   }
 
-  bi-platform_ec2_default = {
+  bip_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "base_rhel_8_5_*"
-      ssm_parameters_prefix     = "bi-platform/"
-      iam_resource_names_prefix = "ec2-bi-platform"
+      ssm_parameters_prefix     = "bip/"
+      iam_resource_names_prefix = "ec2-bip"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"

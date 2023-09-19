@@ -1,7 +1,7 @@
 locals {
 
     bip_cmc_ssm_parameters = {
-      prefix = "/bi-platform-cmc/"
+      prefix = "/bip-cmc/"
       parameters = {
         product_key               = { description = "BIP product key" }
         cms_cluster_key           = { description = "CMS Cluster Key" }
@@ -11,12 +11,12 @@ locals {
         lcm_password              = { description = "LCM Password" }
       }
   }
-    bi-platform-cmc_ec2_default = {
+    bip_cmc_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "base_rhel_8_5_*"
-      ssm_parameters_prefix     = "bi-platform-cmc/"
-      iam_resource_names_prefix = "ec2-bi-platform-cmc"
+      ssm_parameters_prefix     = "bip-cmc/"
+      iam_resource_names_prefix = "ec2-bip-cmc"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"
@@ -35,10 +35,10 @@ locals {
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
     tags = {
-      description = "ncr bip webtier component"
+      description = "ncr bip cmc webtier component"
       ami         = "base_rhel_8_5"
       os-type     = "Linux"
-      server-type = "ncr-bip"
+      server-type = "ncr-bip-cmc"
       component   = "web"
     }
   }
