@@ -1,6 +1,6 @@
 resource "aws_db_instance" "iaps" {
   engine         = "oracle-ee"
-  engine_version = "19"
+  engine_version = local.application_data.accounts[local.environment].db_engine_version
   license_model  = "bring-your-own-license"
   instance_class = local.application_data.accounts[local.environment].db_instance_class
   db_name        = "IAPS"
