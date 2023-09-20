@@ -45,49 +45,6 @@ resource "aws_db_instance" "iaps" {
   )
 }
 
-resource "aws_db_instance" "iaps_magic_testing" {
-  engine         = "oracle-ee"
-  engine_version = "19.0.0.0.ru-2023-07.rur-2023-07.r1"
-  license_model  = "bring-your-own-license"
-  instance_class = local.application_data.accounts[local.environment].db_instance_class
-  db_name        = "TEST"
-  identifier     = "test"
-
-  username                    = "admin"
-  manage_master_user_password = true
-  snapshot_identifier         = null
-  db_subnet_group_name        = aws_db_subnet_group.iaps.id
-  vpc_security_group_ids      = [aws_security_group.iaps_db.id]
-
-  # tflint-ignore: aws_db_instance_default_parameter_group
-  parameter_group_name        = "default.oracle-ee-19"
-  skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
-  allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
-  max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
-  apply_immediately           = local.application_data.accounts[local.environment].db_apply_immediately
-  maintenance_window          = local.application_data.accounts[local.environment].db_maintenance_window
-  auto_minor_version_upgrade  = local.application_data.accounts[local.environment].db_auto_minor_version_upgrade
-  allow_major_version_upgrade = local.application_data.accounts[local.environment].db_allow_major_version_upgrade
-  backup_window               = local.application_data.accounts[local.environment].db_backup_window
-  backup_retention_period     = local.application_data.accounts[local.environment].db_backup_retention_period
-  #checkov:skip=CKV_AWS_133: "backup_retention enabled, can be edited it application_variables.json"
-  iam_database_authentication_enabled = local.application_data.accounts[local.environment].db_iam_database_authentication_enabled
-  #checkov:skip=CKV_AWS_161: "iam auth enabled, but optional"
-  multi_az = local.application_data.accounts[local.environment].db_multi_az
-  #checkov:skip=CKV_AWS_157: "multi-az enabled, but optional"
-  monitoring_interval = local.application_data.accounts[local.environment].db_monitoring_interval
-  monitoring_role_arn = local.application_data.accounts[local.environment].db_monitoring_interval == 0 ? "" : aws_iam_role.rds_enhanced_monitoring[0].arn
-  #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
-  kms_key_id                      = data.aws_kms_key.rds_shared.arn
-  storage_encrypted               = true
-  performance_insights_enabled    = local.application_data.accounts[local.environment].db_performance_insights_enabled
-  performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
-  enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
-
-  deletion_protection      = false
-  delete_automated_backups = false
-}
-
 resource "aws_ssm_parameter" "iaps_snapshot_data_refresh_id" {
   name        = "/iaps/snapshot_id"
   description = "The ID of the RDS snapshot used for the IAPS database data refresh"
