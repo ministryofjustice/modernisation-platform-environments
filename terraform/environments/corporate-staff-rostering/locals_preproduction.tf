@@ -7,7 +7,7 @@ locals {
     baseline_ec2_autoscaling_groups = {
       prepprod-tst-1 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "mp_WindowsServer2019_2023-*" # Microsoft Windows Server 2019 Base
+          ami_name                      = "base_windows_server_2012_r2_release_2023-*" # Use known working ami
           ami_owner                     = "374269020027"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/app-server-user-data.yaml"))
@@ -17,7 +17,6 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["migration-web-sg", "domain-controller"]
           instance_type          = "t3.medium"
-
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 256 }
