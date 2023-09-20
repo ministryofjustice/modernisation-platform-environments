@@ -19,6 +19,15 @@ resource "aws_security_group_rule" "tcp_5439_ingress_vpc" {
   type              = "ingress"
 }
 
+resource "aws_security_group_rule" "tcp_5439_ingress_lb" {
+  from_port                = 5439
+  protocol                 = "TCP"
+  security_group_id        = aws_security_group.wepi_sg_allow_redshift.id
+  source_security_group_id = aws_security_group.redshift-data-lb.id
+  to_port                  = 5439
+  type                     = "ingress"
+}
+
 resource "aws_security_group_rule" "tcp_5439_ingress_bastion" {
   from_port                = 5439
   protocol                 = "TCP"

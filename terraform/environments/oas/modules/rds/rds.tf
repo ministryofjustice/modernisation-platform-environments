@@ -21,7 +21,7 @@ resource "aws_db_subnet_group" "appdbsubnetgroup" {
 
 resource "aws_db_parameter_group" "appdbparametergroup19" {
   name        = "appdbparametergroup19"
-  family      = "oracle-se2-19"
+  family      = "oracle-ee-19"
   description = "${var.application_name}-${var.environment}-parametergroup"
 
   parameter {

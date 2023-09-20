@@ -57,7 +57,7 @@ mainSteps:
           function Set-UsernameString {
             param (
               [Parameter(Mandatory=$true)]
-              [string]$domainJoinUsername
+              [string]$domainJoinUsername,
               [Parameter(Mandatory=$true)]
               [string]$domain
             )
@@ -86,7 +86,7 @@ mainSteps:
             }
           }
 
-          function Check-HostnameInUse {
+          function Get-HostnameInUse {
             param (
               [Parameter(Mandatory=$true)]
               [string]$hostname
@@ -102,7 +102,7 @@ mainSteps:
           $secpasswd = ConvertTo-SecureString $domainJoinPassword -AsPlainText -Force
           $credentials = New-Object System.Management.Automation.PSCredential ((Set-UsernameString -domainJoinUsername $domainJoinUsername -domain $domain), $secpasswd)
 
-          if (Check-HostnameInUse -hostname $hostname) {
+          if (Get-HostnameInUse -hostname $hostname) {
             Write-Error "Hostname $hostname is already in use"
             exit 1         
           } else {

@@ -42,6 +42,7 @@ locals {
     sentry_env          = local.environment
     db_secret_arn       = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maatdb_password_secret_name}"
   })
+  ecs_target_capacity = 100
 
   # SNS local variables for cloudwatch.tf
   pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
