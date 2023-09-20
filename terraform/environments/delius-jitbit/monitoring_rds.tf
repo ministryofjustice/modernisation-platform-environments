@@ -11,6 +11,17 @@ resource "aws_cloudwatch_metric_alarm" "cpu_over_threshold" {
   threshold           = "80"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  dimensions = {
+    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = local.application_name
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
@@ -23,9 +34,20 @@ resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
   evaluation_periods  = "5"
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
-  threshold           = "2500000000"
+  threshold           = "950000000"
   treat_missing_data  = "missing"
   comparison_operator = "LessThanThreshold"
+
+  dimensions = {
+    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = local.application_name
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
@@ -41,6 +63,17 @@ resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
   threshold           = "5"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  dimensions = {
+    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = local.application_name
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "write_latency_over_threshold" {
@@ -56,6 +89,17 @@ resource "aws_cloudwatch_metric_alarm" "write_latency_over_threshold" {
   threshold           = "5"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  dimensions = {
+    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = local.application_name
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "db_connections_over_threshold" {
@@ -71,4 +115,41 @@ resource "aws_cloudwatch_metric_alarm" "db_connections_over_threshold" {
   threshold           = "100"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  dimensions = {
+    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = local.application_name
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "db_queue_depth_over_threshold" {
+  alarm_name          = "jitbit-rds-db-queue-depth-threshold"
+  alarm_description   = "Triggers alarm if RDS database queue depth crosses a threshold"
+  namespace           = "AWS/RDS"
+  metric_name         = "DiskQueueDepth"
+  statistic           = "Average"
+  period              = "300"
+  evaluation_periods  = "5"
+  alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
+  ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
+  threshold           = "60"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+
+  dimensions = {
+    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = local.application_name
+    }
+  )
 }
