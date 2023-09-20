@@ -593,4 +593,3 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
 
 #   capacity_providers = [aws_ecs_capacity_provider.mlra.name]
 # }
-
