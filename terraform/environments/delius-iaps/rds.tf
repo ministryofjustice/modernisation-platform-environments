@@ -47,7 +47,7 @@ resource "aws_db_instance" "iaps" {
 
 resource "aws_db_instance" "iaps_magic_testing" {
   engine         = "oracle-ee"
-  engine_version = "19"
+  engine_version = "19.0.0.0.ru-2023-04"
   license_model  = "bring-your-own-license"
   instance_class = local.application_data.accounts[local.environment].db_instance_class
   db_name        = "upgrade-test"
