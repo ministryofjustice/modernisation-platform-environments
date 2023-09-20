@@ -24,7 +24,7 @@ locals {
         }
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 1 # set to 0 while testing
+          desired_capacity = 0 # set to 0 while testing
         })
         tags = {
           description = "Test Windows Web Server 2019"

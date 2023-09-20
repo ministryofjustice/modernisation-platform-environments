@@ -125,7 +125,7 @@ locals {
           to_port         = 80
           protocol        = "TCP"
           cidr_blocks     = ["10.0.0.0/8"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         https = {
           description     = "443: https ingress"
@@ -149,7 +149,7 @@ locals {
           to_port         = 7771
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         http7780_1 = {
           description = "Allow ingress from port 7780-7781"
@@ -157,7 +157,7 @@ locals {
           to_port         = 7781
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         # http5985 = {
         #   description = "Allow ingress from port 5985"
@@ -493,7 +493,7 @@ locals {
           to_port         = 135
           protocol        = "UDP"
           cidr_blocks     = ["10.102.0.0/16"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         rpc_tcp = {
           description     = "135: TCP MS-RPC AD connect ingress from Azure DC"
@@ -501,7 +501,7 @@ locals {
           to_port         = 135
           protocol        = "TCP"
           cidr_blocks     = ["10.102.0.0/16"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         netbios_tcp = {
           description     = "137-139: TCP NetBIOS ingress from Azure DC"
@@ -543,7 +543,7 @@ locals {
           cidr_blocks = ["10.102.0.0/16"]
           # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
           # cidr_blocks     = ["10.102.0.196/32"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         smb_tcp = {
           description = "445: TCP SMB ingress from Azure DC"
@@ -553,6 +553,7 @@ locals {
           cidr_blocks = ["10.102.0.0/16"]
           # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
           # cidr_blocks     = ["
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         ldap_ssl = {
           description     = "636: TCP LDAP SSL ingress from Azure DC"
@@ -592,7 +593,7 @@ locals {
           to_port         = 65535
           protocol        = "UDP"
           cidr_blocks     = ["10.102.0.0/16"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         rpc_dynamic_tcp = {
           description     = "49152-65535: TCP Dynamic Port range"
@@ -600,7 +601,7 @@ locals {
           to_port         = 65535
           protocol        = "TCP"
           cidr_blocks     = ["10.102.0.0/16"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
       }
       egress = {
