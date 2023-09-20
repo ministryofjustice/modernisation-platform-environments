@@ -281,10 +281,12 @@ jobs:
           role-session-name: githubactionsrolesession
           aws-region: "eu-west-2"
 
-      - name: Run smoke tests
+      - name: Setup python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
+
+      - name: Run smoke tests
         working-directory: ./terraform/environments/data-platform/tests/
         run: |
           pip install -r requirements.txt && python run_smoke_tests.py
