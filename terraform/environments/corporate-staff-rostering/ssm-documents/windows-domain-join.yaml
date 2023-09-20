@@ -14,10 +14,10 @@ parameters:
     maxChars: 15
   domain:
     type: "String"
-    description: "domain to join, either Prod or Dev"
+    description: "domain to join, either Dev (default) or Prod"
     allowedValues:
-     - Prod
-     - Dev
+     - dev # default
+     - prod
 mainSteps:
   - name: WindowsDomainJoin
     action: aws:runPowerShellScript
@@ -40,73 +40,51 @@ mainSteps:
             Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
           }
 
+          # Define environment settings
+          $environments = @{
+            "dev" = @{
+                "domain" = "azure.noms.root";
+                "primarydns" = "10.102.0.196";
+                "serveraddresses" = @("10.102.0.196","10.102.0.200");
+                "suffixsearchlist" = @("azure.noms.root", "noms.root");
+                "domaincontroller" = "MGMCW0002.azure.noms.root";
+                "usernameprefix" = "azure";
+            };
+            "prod" = @{
+                "domain" = "azure.hmpp.root";
+                "primarydns" = "10.40.128.196";
+                "serveraddresses" = @("10.40.128.196","10.40.0.133");
+                "suffixsearchlist" = @("azure.hmpp.root", "hmpp.root");
+                "domaincontroller" = "PCMCW0011.azure.hmpp.root";
+                "usernameprefix" = "hmpp";
+            };
+          }
+
           # Set up DNS IP addresses and suffixes
           if ($domain -contains "dev") {
-            Write-Host "Setting DNS Client Server and DNS Client Global Settings for Dev domain"
+            Write-Host "INFO: Setting DNS Client Server and DNS Client Global Settings for $domain domain"
 
             # Get the network interface alias
             $interfaceAlias = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object -ExpandProperty Name
-            Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses ("10.102.0.196","10.102.0.200")
+            Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $environments[$domain]["serveraddresses"]
 
-            # Get existing SuffixSearchList and prepend "azure.noms.root" and "noms.root"
+            # Get existing SuffixSearchList and prepend suffixSearchList
             $existingSuffixSearchList = (Get-DnsClientGlobalSetting).SuffixSearchList
-            $newSuffixSearchList = @("azure.noms.root", "noms.root") + $existingSuffixSearchList
+            $newSuffixSearchList = $environments[$domain]["suffixsearchlist"] + $existingSuffixSearchList
             Set-DnsClientGlobalSetting -SuffixSearchList $newSuffixSearchList
             
-          } elseif ($domain -contains "prod") {
-            Write-Host "Setting DNS Client Server and DNS Client Global Settings for Prod domain"
-
-            # Get the network interface alias
-            $interfaceAlias = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object -ExpandProperty Name
-            Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses ("10.40.128.196","10.40.0.133")
-            
-            # Get existing SuffixSearchList and prepend "azure.noms.root" and "noms.root"
-            $existingSuffixSearchList = (Get-DnsClientGlobalSetting).SuffixSearchList
-            $newSuffixSearchList = @("azure.hmpp.root", "hmpp.root") + $existingSuffixSearchList
-            Set-DnsClientGlobalSetting -SuffixSearchList $newSuffixSearchList
-          } else {
-            Write-Error "Domain must be either Prod or Dev"
-            exit 1
-          }
-
-          function Set-UsernameString {
-            param (
-              [Parameter(Mandatory=$true)]
-              [string]$domainJoinUsername,
-              [Parameter(Mandatory=$true)]
-              [string]$domain
-            )
-            if ($domain -contains "prod") {
-              return "hmpp\$domainJoinUsername"
-            } elseif ($domain -contains "dev") {
-              return "azure\$domainJoinUsername"
-            } else {
-              Write-Error "Domain must be either Prod or Dev"
-              exit 1
-            }
-          }
-
-          function Set-DomainString {
-            param (
-              [Parameter(Mandatory=$true)]
-              [string]$domain
-            )
-            if ($domain -contains "prod") {
-              return "azure.hmpp.root"
-            } elseif ($domain -contains "dev") {
-              return "azure.noms.root"
-            } else {
-              Write-Error "Domain must be either Prod or Dev"
-              exit 1
-            }
-          }
-
           function Get-HostnameInUse {
             param (
               [Parameter(Mandatory=$true)]
-              [string]$hostname
+              [string]$hostname,
+              [Parameter(Mandatory=$true)]
+              [System.Management.Automation.PSCredential]$credentials,
+              [Parameter(Mandatory=$true)]
+              [string]$domain
             )
-            $hostnameInUse = Get-ADComputer -Filter 'Name -eq $hostname'
+
+            $hostnameInUse = Get-ADComputer -Filter 'Name -eq $hostname' -Credential $credentials -Server $environments[$domain]["domaincontroller"])
+
             if ($hostnameInUse) {
               return $true
             } else {
@@ -115,16 +93,16 @@ mainSteps:
           }
 
           $secpasswd = ConvertTo-SecureString $domainJoinPassword -AsPlainText -Force
-          $credentials = New-Object System.Management.Automation.PSCredential ((Set-UsernameString -domainJoinUsername $domainJoinUsername -domain $domain), $secpasswd)
+          $credentials = New-Object System.Management.Automation.PSCredential (($environments[$domain]["usernameprefix"] + "\" + $domainJoinUsername), $secpasswd)
 
-          if (Get-HostnameInUse -hostname $hostname) {
-            Write-Error "Hostname $hostname is already in use"
+          if (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain) {
+            Write-Error "ERROR: Hostname $hostname is already in use"
             exit 1         
           } else {
-            Write-Host "Hostname $hostname is not in use, continuing"
-            Write-Host "Adding instance as $hostname to (Set-DomainString -domain $domain)"
+            Write-Host "INFO: Hostname $hostname is not in use elsewhere, continuing"
+            Write-Host "INFO: Adding instance as $hostname to $environment[$domain]["domain"]"
             Write-Host "WARNING: Instance will restart to complete domain join"
-            Add-Computer -DomainName (Set-DomainString -domain $domain) -Credential $credentials -NewName $hostname -Restart -Verbose
+            Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -NewName $hostname -Restart -Verbose
           }
 
           # TODO: check if the instance is part of an ASG and terminate if it is since reboot may just result in another instance being spawned which won't be joined to the domain
