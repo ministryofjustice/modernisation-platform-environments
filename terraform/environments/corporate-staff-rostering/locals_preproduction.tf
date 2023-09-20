@@ -27,10 +27,10 @@ locals {
     baseline_ec2_autoscaling_groups = {
       prepprod-tst-1 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "mp_WindowsServer2019_2023-*" # Microsoft Windows Server 2019 Base
+          ami_name                      = "hmpps_windows_server_2022_release_2023-*" # Microsoft Windows Server 2019 Base
           ami_owner                     = "374269020027"
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/app-server-user-data.yaml"))
+          user_data_raw                 = base64encode(file("./templates/test-user-data.yaml"))
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
         })
 
