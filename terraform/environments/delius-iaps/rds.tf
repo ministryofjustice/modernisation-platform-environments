@@ -50,8 +50,8 @@ resource "aws_db_instance" "iaps_magic_testing" {
   engine_version = "19"
   license_model  = "bring-your-own-license"
   instance_class = local.application_data.accounts[local.environment].db_instance_class
-  db_name        = "upgrade-test"
-  identifier     = "upgrade-test"
+  db_name        = "test"
+  identifier     = "test"
 
   username                    = "admin"
   manage_master_user_password = true
