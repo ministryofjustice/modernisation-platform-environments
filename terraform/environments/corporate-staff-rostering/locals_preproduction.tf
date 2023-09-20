@@ -5,7 +5,7 @@ locals {
   preproduction_config = {
 
     baseline_ec2_autoscaling_groups = {
-      prepprod-tst-1 = {
+      preprod-tst-1 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "base_windows_server_2012_r2_release_2023-*" # Use known working ami
           ami_owner                     = "374269020027"
