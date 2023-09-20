@@ -282,6 +282,9 @@ jobs:
           aws-region: "eu-west-2"
 
       - name: Run smoke tests
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
         working-directory: ./terraform/environments/data-platform/tests/
         run: |
-          bash run_smoke_tests.sh
+          pip install -r requirements.txt && python run_smoke_tests.py
