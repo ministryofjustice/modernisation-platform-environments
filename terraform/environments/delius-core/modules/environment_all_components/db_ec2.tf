@@ -199,7 +199,7 @@ resource "aws_instance" "db_ec2_primary_instance" {
     iops        = var.db_config.ebs_volumes.iops
     throughput  = var.db_config.ebs_volumes.throughput
     encrypted   = true
-    kms_key_id  = var.db_config.ebs_volumes.kms_key_id
+    # We want to include kms_key_id here
     tags = local.tags
   }
 
