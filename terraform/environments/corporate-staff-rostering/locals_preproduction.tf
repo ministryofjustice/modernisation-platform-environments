@@ -35,7 +35,7 @@ locals {
       }
     }
     baseline_route53_zones = {
-      "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
+      "hmpps-preproduction.modernisation-platform.service.justice.gov.uk" = {
         records = [
         ]
       }
