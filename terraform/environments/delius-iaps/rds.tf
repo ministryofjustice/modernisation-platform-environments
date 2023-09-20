@@ -51,7 +51,7 @@ resource "aws_db_instance" "iaps_magic_testing" {
   license_model  = "bring-your-own-license"
   instance_class = local.application_data.accounts[local.environment].db_instance_class
   db_name        = "TEST"
-  identifier     = "TEST"
+  identifier     = "test"
 
   username                    = "admin"
   manage_master_user_password = true
