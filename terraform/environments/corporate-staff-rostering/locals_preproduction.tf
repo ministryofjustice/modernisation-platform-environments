@@ -5,7 +5,7 @@ locals {
   preproduction_config = {
 
     baseline_ec2_autoscaling_groups = {
-      test-srv-1 = {
+      prepprod-tst-1 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "mp_WindowsServer2019_2023-*" # Microsoft Windows Server 2019 Base
           ami_owner                     = "374269020027"
@@ -32,6 +32,12 @@ locals {
           component   = "Test"
           server-type = "test-windows-server"
         }
+      }
+    }
+    baseline_route53_zones = {
+      "hmpps-preproduction.modernisation-platform.service.justice.gov.uk" = {
+        records = [
+        ]
       }
     }
   }
