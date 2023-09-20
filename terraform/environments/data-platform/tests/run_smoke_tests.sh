@@ -1,4 +1,4 @@
-
+set -e
 database="test_product5"
 table="testing"
 
