@@ -28,7 +28,7 @@ locals {
       prepprod-tst-1 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*" # Microsoft Windows Server 2019 Base
-          ami_owner                     = "374269020027"
+          ami_owner                     = "754260907303"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/test-user-data.yaml"))
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
