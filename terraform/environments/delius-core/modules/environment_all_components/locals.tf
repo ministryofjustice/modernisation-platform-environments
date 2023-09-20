@@ -23,4 +23,6 @@ locals {
 
   certificate_arn = aws_acm_certificate.external.arn
 
+  s3_oracledb_backup_key_alias = "oracledb-backup-key"
+
 }
