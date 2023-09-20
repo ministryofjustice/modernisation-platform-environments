@@ -106,6 +106,17 @@ data "aws_iam_policy_document" "iam_policy_document_for_authorizer_lambda" {
     actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
     resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
   }
+  statement {
+    sid    = "s3LogAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/logs/*"
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda" {
@@ -125,6 +136,17 @@ data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda
     actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
     resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
   }
+  statement {
+    sid    = "s3LogAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/logs/*"
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
@@ -132,7 +154,10 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
     sid       = "GetPutDataObject"
     effect    = "Allow"
     actions   = ["s3:GetObject", "s3:PutObject"]
-    resources = ["${module.s3-bucket.bucket.arn}/raw_data/*"]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/raw_data/*",
+      "${module.s3-bucket.bucket.arn}/logs/*"
+    ]
   }
   statement {
     sid       = "ListExistingDataProducts"
@@ -142,7 +167,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["code/*"]
+      values   = ["metadata/*"]
     }
   }
   statement {
@@ -247,9 +272,12 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" 
   }
 
   statement {
-    sid     = "PutDataObject"
-    effect  = "Allow"
-    actions = ["s3:PutObject"]
+    sid    = "s3LogAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
     resources = [
       "${module.s3-bucket.bucket.arn}/logs/*"
     ]
@@ -310,9 +338,12 @@ data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lamb
     ]
   }
   statement {
-    sid     = "PutLogDataObject"
-    effect  = "Allow"
-    actions = ["s3:PutObject"]
+    sid    = "s3LogAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
     resources = [
       "${module.s3-bucket.bucket.arn}/logs/*"
     ]
@@ -339,9 +370,12 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
     resources = [module.data_product_athena_load_lambda.lambda_function_arn]
   }
   statement {
-    sid     = "PutLogDataObject"
-    effect  = "Allow"
-    actions = ["s3:PutObject"]
+    sid    = "s3LogAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
     resources = [
       "${module.s3-bucket.bucket.arn}/logs/*"
     ]

@@ -12,7 +12,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
     rdp = {
-      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.3.0/26", "10.102.1.64/26", "10.102.0.128/26"]
+      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.0.0/16"]
     }
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -29,19 +29,21 @@ locals {
   }
 
   security_group_cidrs_preprod_prod = {
-    ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
+    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
     https = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
     ])
     http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
     ])
     rdp = {
-      inbound = ["10.40.165.0/26"]
+      inbound = flatten([
+        module.ip_addresses.azure_fixngo_cidrs.prod,
+      ])
     }
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -82,7 +84,7 @@ locals {
           to_port     = "1521"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.oracle_db
-          security_groups = [
+          security_groups = ["migration-web-sg","migration-app-sg"
           ]
         }
         oracle3872 = {
@@ -123,7 +125,7 @@ locals {
           to_port         = 80
           protocol        = "TCP"
           cidr_blocks     = ["10.0.0.0/8"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         https = {
           description     = "443: https ingress"
@@ -140,6 +142,22 @@ locals {
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.rdp.inbound
           security_groups = []
+        }
+        http7770_1 = {
+          description = "Allow ingress from port 7770-7771"
+          from_port       = 7770
+          to_port         = 7771
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["migration-web-sg","migration-app-sg"]
+        }
+        http7780_1 = {
+          description = "Allow ingress from port 7780-7781"
+          from_port       = 7780
+          to_port         = 7781
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         # http5985 = {
         #   description = "Allow ingress from port 5985"
@@ -239,6 +257,13 @@ locals {
           cidr_blocks     = ["10.0.0.0/8"]
           security_groups = []
         }
+        http_2109_csr = {
+          description = "2109: TCP CSR ingress"
+          from_port       = 2109
+          to_port         = 2109
+          protocol        = "TCP"
+          cidr_blocks     = ["10.0.0.0/8"]
+        }
         rdp = {
           description     = "3389: Allow RDP ingress"
           from_port       = 3389
@@ -247,15 +272,23 @@ locals {
           cidr_blocks     = local.security_group_cidrs.rdp.inbound
           security_groups = []
         }
+        winrm = {
+          description     = "5985-6: Allow WinRM ingress"
+          from_port       = 5985
+          to_port         = 5986
+          protocol        = "TCP"
+          cidr_blocks     = ["10.0.0.0/8"] # TODO: change this to Jumpserver IP range from Azure
+          security_groups = []
+        }
+        http_45054_csr = {
+          description = "45054: TCP CSR ingress"
+          from_port       = 45054
+          to_port         = 45054
+          protocol        = "TCP"
+          cidr_blocks     = ["10.0.0.0/8"]
+          security_groups = []
+        }
 
-        # http2109 = {
-        #   description = "Allow ingress from port 2109"
-        #   from_port       = 2109
-        #   to_port         = 2109
-        #   protocol        = "TCP"
-        #   cidr_blocks     = ["10.0.0.0/8"]
-        #   security_groups = ["Web-SG-migration", "data-db"]
-        # }
         # http5985 = {
         #   description = "Allow ingress from port 5985"
         #   from_port       = 5985
@@ -460,7 +493,7 @@ locals {
           to_port         = 135
           protocol        = "UDP"
           cidr_blocks     = ["10.102.0.0/16"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         rpc_tcp = {
           description     = "135: TCP MS-RPC AD connect ingress from Azure DC"
@@ -468,7 +501,7 @@ locals {
           to_port         = 135
           protocol        = "TCP"
           cidr_blocks     = ["10.102.0.0/16"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         netbios_tcp = {
           description     = "137-139: TCP NetBIOS ingress from Azure DC"
@@ -510,7 +543,7 @@ locals {
           cidr_blocks = ["10.102.0.0/16"]
           # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
           # cidr_blocks     = ["10.102.0.196/32"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         smb_tcp = {
           description = "445: TCP SMB ingress from Azure DC"
@@ -520,6 +553,7 @@ locals {
           cidr_blocks = ["10.102.0.0/16"]
           # cidr_blocks     = var.modules.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
           # cidr_blocks     = ["
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         ldap_ssl = {
           description     = "636: TCP LDAP SSL ingress from Azure DC"
@@ -559,7 +593,7 @@ locals {
           to_port         = 65535
           protocol        = "UDP"
           cidr_blocks     = ["10.102.0.0/16"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
         rpc_dynamic_tcp = {
           description     = "49152-65535: TCP Dynamic Port range"
@@ -567,7 +601,7 @@ locals {
           to_port         = 65535
           protocol        = "TCP"
           cidr_blocks     = ["10.102.0.0/16"]
-          security_groups = []
+          security_groups = ["migration-web-sg","migration-app-sg"]
         }
       }
       egress = {
