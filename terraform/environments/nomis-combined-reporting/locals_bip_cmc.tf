@@ -1,5 +1,4 @@
 locals {
-
     bip_cmc_ssm_parameters = {
       prefix = "/bip-cmc/"
       parameters = {
