@@ -1,70 +1,27 @@
 {
     "rules": [
         {
-            "rule-type": "selection",
-            "rule-id": "516455653",
-            "rule-name": "870343798",
+            "rule-type": "transformation",
+            "rule-id": "131859668",
+            "rule-name": "131859668",
+            "rule-target": "schema",
             "object-locator": {
-                "schema-name": "OMS_OWNER",
-                "table-name": "OFFENDERS"
+                "schema-name": "public"
             },
-            "rule-action": "include",
-            "filters": []
+            "rule-action": "rename",
+            "value": "fake",
+            "old-value": null
         },
         {
             "rule-type": "selection",
-            "rule-id": "870343798",
-            "rule-name": "870343798",
+            "rule-id": "516455654",
+            "rule-name": "870343799",
             "object-locator": {
-                "schema-name": "OMS_OWNER",
-                "table-name": "OFFENDER_BOOKINGS"
+                "schema-name": "public",
+                "table-name": "fake_preferences"
             },
             "rule-action": "include",
             "filters": []
-        },
-        {
-            "rule-type": "selection",
-            "rule-id": "870343799",
-            "rule-name": "870343798",
-            "object-locator": {
-                "schema-name": "OMS_OWNER",
-                "table-name": "AGENCY_LOCATIONS"
-            },
-            "rule-action": "include",
-            "filters": []
-        },
-        {
-            "rule-type": "selection",
-            "rule-id": "870343800",
-            "rule-name": "870343798",
-            "object-locator": {
-                "schema-name": "OMS_OWNER",
-                "table-name": "AGENCY_INTERNAL_LOCATIONS"
-            },
-            "rule-action": "include",
-            "filters": []
-        },
-        {
-            "rule-type": "selection",
-            "rule-id": "870343801",
-            "rule-name": "870343798",
-            "object-locator": {
-                "schema-name": "OMS_OWNER",
-                "table-name": "OFFENDER_EXTERNAL_MOVEMENTS"
-            },
-            "rule-action": "include",
-            "filters": []
-        },
-        {
-            "rule-type": "selection",
-            "rule-id": "870343802",
-            "rule-name": "870343798",
-            "object-locator": {
-                "schema-name": "OMS_OWNER",
-                "table-name": "MOVEMENT_REASONS"
-            },
-            "rule-action": "include",
-            "filters": []
-        }                    
+        }
     ]
 }
