@@ -70,7 +70,9 @@ output "iam_policies" {
 output "key_pairs" {
   description = "Common key pairs to create"
 
-  value = local.key_pairs
+  value = {
+    for key, value in local.key_pairs : key => value if contains(local.key_pairs_filter, key)
+  }
 }
 
 output "kms_grants" {
@@ -108,6 +110,13 @@ output "s3_iam_policies" {
 output "s3_buckets" {
   description = "Map of s3_buckets"
   value       = local.s3_buckets
+}
+
+output "ssm_parameters" {
+  description = "Map of common ssm parameters to create"
+  value = {
+    for key, value in local.ssm_parameters : key => value if contains(local.ssm_parameters_filter, key)
+  }
 }
 
 output "sns_topics" {

@@ -26,18 +26,7 @@ locals {
     "ndh_harkemsadmin_ssl_pass",
   ]
 
-  baseline_ssm_parameters = {
-    "" = {
-      postfix = ""
-      parameters = {
-        cloud-watch-config-windows = {
-          description = "cloud watch agent config for windows"
-          file        = "./templates/cloud_watch_windows.json"
-          type        = "String"
-        }
-      }
-    }
-  }
+  baseline_ssm_parameters = {}
 
   baseline_s3_buckets = {
     s3-bucket = {

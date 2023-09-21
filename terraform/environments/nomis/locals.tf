@@ -20,6 +20,7 @@ locals {
     enable_oracle_secure_web                     = true
     enable_ec2_get_parameter                     = false
     enable_ec2_get_secret                        = false
+    enable_ec2_user_keypair                      = true
     cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
@@ -107,22 +108,6 @@ locals {
     data-db            = local.security_groups.data_db
   }
 
-  baseline_sns_topics = {}
-
-  baseline_ssm_parameters = {
-    "" = {
-      postfix = ""
-      parameters = {
-        cloud-watch-config-windows = {
-          description = "cloud watch agent config for windows"
-          file        = "./templates/cloud_watch_windows.json"
-          type        = "String"
-        }
-
-        # Placeholders - set values outside of terraform
-        ec2-user_pem       = { description = "ec2-user ssh private key" }
-        github-ci-user-pat = { description = "for SSM docs, see ssm-documents/README.md" }
-      }
-    }
-  }
+  baseline_sns_topics     = {}
+  baseline_ssm_parameters = {}
 }
