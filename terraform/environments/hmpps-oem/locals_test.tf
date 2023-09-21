@@ -20,7 +20,7 @@ locals {
       test-oem = merge(local.oem_ec2_default, {
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
           args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "DSOS-2151-asm-password-new-code"
           })
         })
         tags = merge(local.oem_ec2_default.tags, {
