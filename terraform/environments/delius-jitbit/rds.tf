@@ -33,8 +33,11 @@ resource "aws_db_subnet_group" "jitbit" {
   tags = local.tags
 }
 
+locals {
+  skip_final_snapshot = try(local.application_data.accounts[local.environment].db_skip_final_snapshot, false)
+}
+
 resource "aws_db_instance" "jitbit" {
-  # count          = local.is-production ? 0 : 1
   engine         = "sqlserver-se"
   license_model  = "license-included"
   engine_version = local.application_data.accounts[local.environment].db_engine_version
@@ -47,11 +50,11 @@ resource "aws_db_instance" "jitbit" {
   snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
 
   # tflint-ignore: aws_db_instance_default_parameter_group
-  parameter_group_name     = "default.sqlserver-se-15.0"
-  deletion_protection      = local.application_data.accounts[local.environment].db_deletion_protection
-  delete_automated_backups = local.application_data.accounts[local.environment].db_delete_automated_backups
-  skip_final_snapshot      = true
-  # final_snapshot_identifier   = "${local.application_name}-${local.environment}-database-final-snapshot"
+  parameter_group_name        = "default.sqlserver-se-15.0"
+  deletion_protection         = local.application_data.accounts[local.environment].db_deletion_protection
+  delete_automated_backups    = local.application_data.accounts[local.environment].db_delete_automated_backups
+  skip_final_snapshot         = local.skip_final_snapshot
+  final_snapshot_identifier   = !local.skip_final_snapshot ? "${local.application_name}-${local.environment}-database-final-snapshot" : null
   allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
   storage_type                = local.application_data.accounts[local.environment].db_storage_type
