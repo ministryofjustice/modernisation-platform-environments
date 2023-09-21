@@ -61,17 +61,16 @@ mainSteps:
           }
 
           # Set up DNS IP addresses and suffixes
-          if ($domain -contains "dev") {
-            Write-Host "INFO: Setting DNS Client Server and DNS Client Global Settings for $domain domain"
+          Write-Host "INFO: Setting DNS Client Server and DNS Client Global Settings for $domain domain"
 
-            # Get the network interface alias
-            $interfaceAlias = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object -ExpandProperty Name
-            Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $environments[$domain]["serveraddresses"]
+          # Get the network interface alias
+          $interfaceAlias = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object -ExpandProperty Name
+          Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $environments[$domain]["serveraddresses"]
 
-            # Get existing SuffixSearchList and prepend suffixSearchList
-            $existingSuffixSearchList = (Get-DnsClientGlobalSetting).SuffixSearchList
-            $newSuffixSearchList = $environments[$domain]["suffixsearchlist"] + $existingSuffixSearchList
-            Set-DnsClientGlobalSetting -SuffixSearchList $newSuffixSearchList
+          # Get existing SuffixSearchList and prepend suffixSearchList
+          $existingSuffixSearchList = (Get-DnsClientGlobalSetting).SuffixSearchList
+          $newSuffixSearchList = $environments[$domain]["suffixsearchlist"] + $existingSuffixSearchList
+          Set-DnsClientGlobalSetting -SuffixSearchList $newSuffixSearchList
             
           function Get-HostnameInUse {
             param (
