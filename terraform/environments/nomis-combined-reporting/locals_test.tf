@@ -41,10 +41,9 @@ locals {
     }
 
     baseline_ec2_instances = {
-      t1-ncr-bip-cmc = merge(local.bi-platform_ec2_default, {
-        tags = merge(local.bi-platform_ec2_default.tags, {
+      t1-ncr-bip-cmc = merge(local.bip_cmc_ec2_default, {
+        tags = merge(local.bip_cmc_ec2_default.tags, {
           description                          = "For testing SAP BI CMC installation and configurations"
-          server-type                          = "ncr-bip-cmc"
           nomis-combined-reporting-environment = "t1"
         })
       })
@@ -67,18 +66,18 @@ locals {
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
         tags = merge(local.tomcat_ec2_default.tags, {
-          description                          = "For testing SAP tomcat installation and configurations"
+          description                          = "For testing BIP tomcat installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })
 
-      t1-ncr-biplatform = merge(local.bi-platform_ec2_default, {
+      t1-ncr-bip = merge(local.bip_ec2_default, {
         autoscaling_group = {
-          desired_capacity    = 0
+          desired_capacity    = 1
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
-        tags = merge(local.bi-platform_ec2_default.tags, {
+        tags = merge(local.bip_ec2_default.tags, {
           description                          = "For testing BIP 4.3 installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
