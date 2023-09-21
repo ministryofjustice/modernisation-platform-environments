@@ -73,7 +73,7 @@ locals {
 
       t1-ncr-bip = merge(local.bip_ec2_default, {
         autoscaling_group = {
-          desired_capacity    = 0
+          desired_capacity    = 1
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
