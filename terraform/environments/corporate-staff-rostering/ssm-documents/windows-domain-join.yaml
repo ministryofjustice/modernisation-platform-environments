@@ -94,17 +94,13 @@ mainSteps:
           $secpasswd = ConvertTo-SecureString $domainJoinPassword -AsPlainText -Force
           $credentials = New-Object System.Management.Automation.PSCredential (($environments[$domain]["usernameprefix"] + "\" + $domainJoinUsername), $secpasswd)
 
-          if (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain) {
-            Write-Error "ERROR: Hostname $hostname is already in use"
-            exit 1         
-          } else {
+          if ( -not (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain)) {
             Write-Host "INFO: Hostname $hostname is not in use elsewhere, continuing"
-            Write-Host "INFO: Adding instance as $hostname to $environment[$domain]["domain"]"
+            Write-Host "INFO: Adding instance as $hostname to $environment[$domain] domain"
             Write-Host "WARNING: Instance will restart to complete domain join"
             Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -NewName $hostname -Restart -Verbose
+          } else {
+            Write-Error "ERROR: Hostname $hostname is already in use"
+            exit 1
           }
-
-          # TODO: check if the instance is part of an ASG and terminate if it is since reboot may just result in another instance being spawned which won't be joined to the domain
-          # Get-EC2Instance ID then find out whether it's in an asg? 
-
 
