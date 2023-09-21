@@ -35,14 +35,23 @@ locals {
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       preprod-nomis-web-a = merge(local.weblogic_ec2_a, {
+        instance = merge(local.weblogic_ec2_a.instance, {
+          instance_type = "t2.xlarge"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
+            branch = "fe6a23e51a41575b1e3584a8876279927ab4d18c" # 2023-09-21 DB_V11.2.1.1.219
+          })
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 2
+          max_size         = 2
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "preprod"
           oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
           oracle-db-name       = "PPCNOM"
-        })
-        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 0
         })
       })
 
