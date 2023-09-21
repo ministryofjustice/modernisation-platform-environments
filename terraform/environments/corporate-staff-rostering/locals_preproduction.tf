@@ -40,6 +40,11 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 200 }
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
+        tags = {
+            description = "copy of PPCWW00008, fully converted, ready for config files"
+            os-type     = "Windows"
+            component   = "web" / "app" 
+        }
       }
     }
 
