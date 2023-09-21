@@ -18,6 +18,7 @@ locals {
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
     enable_ec2_oracle_enterprise_manager         = true
+    enable_ec2_reduced_ssm_policy                = true
     enable_ec2_user_keypair                      = true
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = true # adds db backup buckets

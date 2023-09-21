@@ -19,6 +19,7 @@ variable "options" {
     enable_image_builder                         = optional(bool, false)
     enable_ec2_cloud_watch_agent                 = optional(bool, false)
     enable_ec2_self_provision                    = optional(bool, false)
+    enable_ec2_reduced_ssm_policy                = optional(bool, false)
     enable_ec2_oracle_enterprise_managed_server  = optional(bool, false)
     enable_ec2_oracle_enterprise_manager         = optional(bool, false)
     enable_ec2_user_keypair                      = optional(bool, false)

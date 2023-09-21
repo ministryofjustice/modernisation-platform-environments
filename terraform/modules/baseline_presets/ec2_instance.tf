@@ -12,10 +12,7 @@ locals {
         user_data_raw                 = null
         ssm_parameters_prefix         = "ec2/"
         iam_resource_names_prefix     = "ec2-instance"
-        instance_profile_policies = flatten([
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-          local.iam_policies_ec2_default,
-        ])
+        instance_profile_policies     = local.iam_policies_ec2_default
       }
 
       db = {
@@ -25,10 +22,7 @@ locals {
         user_data_raw                 = null
         ssm_parameters_prefix         = "database/"
         iam_resource_names_prefix     = "ec2-database"
-        instance_profile_policies = flatten([
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-          local.iam_policies_ec2_default,
-        ])
+        instance_profile_policies     = local.iam_policies_ec2_default
       }
     }
 
