@@ -6,11 +6,12 @@ resource "aws_db_instance" "iaps" {
   db_name        = "IAPS"
   identifier     = "iaps"
 
-  username                    = local.application_data.accounts[local.environment].db_user
-  manage_master_user_password = true
-  snapshot_identifier         = length(data.aws_ssm_parameter.iaps_snapshot_data_refresh_id.value) > 0 ? data.aws_ssm_parameter.iaps_snapshot_data_refresh_id.value : null
-  db_subnet_group_name        = aws_db_subnet_group.iaps.id
-  vpc_security_group_ids      = [aws_security_group.iaps_db.id]
+  username                      = local.application_data.accounts[local.environment].db_user
+  manage_master_user_password   = true
+  master_user_secret_kms_key_id = data.aws_kms_key.general_shared.arn
+  snapshot_identifier           = length(data.aws_ssm_parameter.iaps_snapshot_data_refresh_id.value) > 0 ? data.aws_ssm_parameter.iaps_snapshot_data_refresh_id.value : null
+  db_subnet_group_name          = aws_db_subnet_group.iaps.id
+  vpc_security_group_ids        = [aws_security_group.iaps_db.id]
 
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.oracle-ee-19"
