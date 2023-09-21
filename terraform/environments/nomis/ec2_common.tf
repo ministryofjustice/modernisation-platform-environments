@@ -74,21 +74,22 @@ resource "aws_ssm_document" "cloud_watch_agent" {
 # Patch Management - Run Ansible Roles manually from SSM document
 #------------------------------------------------------------------------------
 
-resource "aws_ssm_document" "run_ansible_patches" {
-  name            = "RunAnsiblePatches"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/run-ansible-patches.yaml")
-  target_type     = "/AWS::EC2::Instance"
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "run-ansible-patches"
-    },
-  )
-}
-
+# Disabling - we need to migrate to new solution for CI/CD user and this isn't
+# being used in practice.
+#resource "aws_ssm_document" "run_ansible_patches" {
+#  name            = "RunAnsiblePatches"
+#  document_type   = "Command"
+#  document_format = "YAML"
+#  content         = file("./ssm-documents/run-ansible-patches.yaml")
+#  target_type     = "/AWS::EC2::Instance"
+#
+#  tags = merge(
+#    local.tags,
+#    {
+#      Name = "run-ansible-patches"
+#    },
+#  )
+#}
 
 #------------------------------------------------------------------------------
 # Patch Manager
