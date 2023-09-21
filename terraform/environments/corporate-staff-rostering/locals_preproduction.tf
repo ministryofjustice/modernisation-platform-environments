@@ -43,7 +43,7 @@ locals {
         tags = {
             description = "copy of PPCWW00008, fully converted, ready for config files"
             os-type     = "Windows"
-            component   = "web" / "app" 
+            component   = "web"
         }
       }
     }
