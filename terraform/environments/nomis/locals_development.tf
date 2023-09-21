@@ -182,7 +182,7 @@ locals {
     }
 
     baseline_ec2_instances = {
-      dev-nomis-db-1-a = merge(local.database_ec2_a, {
+      dev-nomis-db-1-b = merge(local.database_ec2_a, {
         tags = merge(local.database_ec2_a.tags, {
           nomis-environment   = "dev"
           description         = "dev database"
