@@ -40,7 +40,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
           args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-            branch = "fe6a23e51a41575b1e3584a8876279927ab4d18c" # 2023-09-21 DB_V11.2.1.1.219
+            branch = "8cc652b22d51483a5902f04809618cc88516093c" # 2023-09-21 DB_V11.2.1.1.219, nomis web release deployment DB_V11.2.1.1.228
           })
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
