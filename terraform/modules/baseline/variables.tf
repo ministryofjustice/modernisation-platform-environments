@@ -505,10 +505,21 @@ variable "iam_policies" {
 variable "iam_roles" {
   description = "map of iam roles to create, where the key is the name of the role"
   type = map(object({
-    assume_role_policy_principals_type        = string
-    assume_role_policy_principals_identifiers = list(string)
-    policy_attachments                        = optional(list(string), [])
-    tags                                      = optional(map(string), {})
+    assume_role_policy = list(object({
+      effect  = string
+      actions = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    }))
+    policy_attachments = optional(list(string), [])
+    tags               = optional(map(string), {})
   }))
   default = {}
 }

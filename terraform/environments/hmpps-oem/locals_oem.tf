@@ -1,5 +1,15 @@
 locals {
 
+  # Once an account has baseline "enable_ec2_oracle_enterprise_managed_server"
+  # enabled and run, or the equivalent terraform to create the 
+  # EC2OracleEnterpriseManagementSecretsRole IAM role, add it to this list
+  oem_managed_applications = [
+    # "corporate-staff-rostering",
+    "nomis",
+    # "nomis-combined-reporting",
+    # "oasys",
+  ]
+
   oem_database_instance_ssm_parameters = {
     prefix = "/database/"
     parameters = {
@@ -25,24 +35,21 @@ locals {
     }
   }
 
+  oem_share_secret_principal_ids = [
+    for key, value in module.environment.account_ids :
+    "arn:aws:iam::${value}:role/EC2OracleEnterpriseManagementSecretsRole" if contains(local.oem_managed_applications, "${key}-${local.environment}")
+  ]
+
   oem_secret_policy_write = {
     effect = "Allow"
     actions = [
-      "secretsmanager:DeleteResourcePolicy",
-      "secretsmanager:DescribeSecret",
-      "secretsmanager:GetResourcePolicy",
-      "secretsmanager:PutResourcePolicy",
-      "secretsmanager:UpdateSecret",
+      "secretsmanager:PutSecretValue",
     ]
     principals = {
-      type = "AWS"
-      identifiers = [
-        "hmpps-oem-${local.environment}",
-      ]
+      type        = "AWS"
+      identifiers = "hmpps-oem-${local.environment}"
     }
-    resources = [
-      "arn:aws:secretsmanager:*:*:secret:*"
-    ]
+    resources = ["*"]
   }
   oem_secret_policy_read = {
     effect = "Allow"
@@ -50,18 +57,10 @@ locals {
       "secretsmanager:GetSecretValue",
     ]
     principals = {
-      type = "AWS"
-      identifiers = [
-        "corporate-staff-rostering-${local.environment}",
-        "hmpps-oem-${local.environment}",
-        "nomis-${local.environment}",
-        "nomis-combined-reporting-${local.environment}",
-        "oasys-${local.environment}",
-      ]
+      type        = "AWS"
+      identifiers = local.oem_share_secret_principal_ids
     }
-    resources = [
-      "arn:aws:secretsmanager:*:*:secret:*"
-    ]
+    resources = ["*"]
   }
   oem_secretsmanager_secrets = {
     policy = [
