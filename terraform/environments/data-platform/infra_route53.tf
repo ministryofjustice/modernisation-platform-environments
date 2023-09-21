@@ -73,6 +73,7 @@ resource "aws_route53_record" "delegate_test_data_platform_service_justice_gov_u
   ]
 }
 
+# Technical Documentation on GitHub Pages
 resource "aws_route53_record" "data_platform_technical_documentation" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
 
@@ -81,6 +82,61 @@ resource "aws_route53_record" "data_platform_technical_documentation" {
   type    = "CNAME"
   ttl     = "300"
   records = ["ministryofjustice.github.io."]
+}
+
+# PagerDuty Status Page (HTTP Traffic)
+resource "aws_route53_record" "http_traffic_status_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "status.data-platform.service.justice.gov.uk"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["cd-4a9d4d61b9ba517b444f76f11a406278.hosted-status.pagerduty.com"]
+}
+
+# PagerDuty Status Page (TLS Validation)
+resource "aws_route53_record" "http_traffic_status_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "_701f6977b827d5ad23c4f98802a51bc3.status.data-platform.service.justice.gov.uk"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["_56473aa9b1f7b9aec52ac3d3ea416721.yygwskclfy.acm-validations.aws."]
+}
+
+# PagerDuty Status Page (DKIM 1)
+resource "aws_route53_record" "http_traffic_status_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "pdt._domainkey.status.data-platform.service.justice.gov.uk"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["pdt.domainkey.u31181182.wl183.sendgrid.net."]
+}
+
+# PagerDuty Status Page (DKIM 2)
+resource "aws_route53_record" "http_traffic_status_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "pdt2._domainkey.status.data-platform.service.justice.gov.uk"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["pdt2.domainkey.u31181182.wl183.sendgrid.net."]
+}
+
+# PagerDuty Status Page (Mail CNAME)
+resource "aws_route53_record" "http_traffic_status_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "em9648.status.data-platform.service.justice.gov.uk"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["u31181182.wl183.sendgrid.net."]
 }
 
 ##################################################
