@@ -41,9 +41,10 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-            description = "copy of PPCWW00008, fully converted, ready for config files"
-            os-type     = "Windows"
-            component   = "web"
+          description = "copy of PPCWW00008 for csr ${local.environment}"
+          os-type     = "Windows"
+          ami         = "pp-csr-w-8-b"
+          component   = "web"
         }
       }
     }
