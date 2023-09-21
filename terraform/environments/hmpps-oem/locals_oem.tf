@@ -10,31 +10,6 @@ locals {
     # "oasys-${local.environment}",
   ]
 
-  oem_database_instance_ssm_parameters = {
-    prefix = "/database/"
-    parameters = {
-      rcvcatownerpassword = {}
-      syspassword         = {}
-      systempassword      = {}
-    }
-  }
-  oem_emrep_ssm_parameters = {
-    prefix = "/oem/"
-    parameters = {
-      sysmanpassword = {}
-      syspassword    = {}
-      systempassword = {}
-    }
-  }
-  oem_ssm_parameters = {
-    prefix = "/oem/"
-    parameters = {
-      agentregpassword    = {}
-      nodemanagerpassword = {}
-      weblogicpassword    = {}
-    }
-  }
-
   oem_share_secret_principal_ids = [
     for key, value in module.environment.account_ids :
     "arn:aws:iam::${value}:role/EC2OracleEnterpriseManagementSecretsRole" if contains(local.oem_managed_applications, key)
@@ -68,6 +43,12 @@ locals {
       local.oem_secret_policy_write,
     ]
     secrets = {
+      passwords = {}
+    }
+  }
+
+  oem_ssm_parameters_passwords = {
+    parameters = {
       passwords = {}
     }
   }
