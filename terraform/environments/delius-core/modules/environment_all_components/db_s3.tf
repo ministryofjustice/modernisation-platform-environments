@@ -61,22 +61,12 @@ resource "aws_iam_role_policy" "oracledb_backup_bucket_access_policy" {
   role   = aws_iam_role.db_ec2_instance_iam_role.name
   policy = data.aws_iam_policy_document.oracledb_backup_bucket_access.json
 }
-
-resource "aws_kms_key" "oracledb_backup_key" {
-  description = "kms key for oracle db backup"
-}
-
-resource "aws_kms_alias" "oracledb_backup_kms_key_alias" {
-  name          = "alias/${lower(local.s3_oracledb_backup_key_alias)}"
-  target_key_id = aws_kms_key.oracledb_backup_key.key_id
-}
-
 resource "aws_s3_bucket_server_side_encryption_configuration" "s3_oracledb_backup_bucket_encryption" {
   bucket = module.s3_bucket_oracledb_backups.bucket.id
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.oracledb_backup_key.key_id
+      kms_master_key_id = var.account_config.general_shared_kms_key_arn
       sse_algorithm     = "aws:kms"
     }
   }
