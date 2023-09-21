@@ -690,7 +690,7 @@ module "dms_nomis_ingestor" {
   dms_target_name              = "kinesis"
   short_name                   = "nomis"
   migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.6" # Rollback
+  replication_instance_version = "3.4.7" # Upgrade
   replication_instance_class   = "dms.t3.medium"
   subnet_ids                   = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
@@ -722,8 +722,8 @@ module "dms_nomis_ingestor" {
 
 module "dms_fake_data_ingestor" {
   source                       = "./modules/dms"
-  setup_dms_instance           = local.setup_dms_instance      # Disable all DMS Resources
-  enable_replication_task      = local.enable_replication_task # Disable Replication Task
+  setup_dms_instance           = local.setup_fake_data_dms_instance 
+  enable_replication_task      = local.enable_fake_data_replication_task # Disable Replication Task
   name                         = "${local.project}-dms-fake-data-ingestor-${local.env}"
   vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
   source_engine_name           = "postgres"
