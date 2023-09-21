@@ -31,6 +31,7 @@ module "baseline_presets" {
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
+    enable_ec2_user_keypair                      = true
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = true # adds db backup buckets
     enable_oracle_secure_web                     = true # allows db to list all buckets
