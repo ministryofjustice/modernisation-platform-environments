@@ -35,9 +35,9 @@ mainSteps:
           $hostname = "{{hostname}}"
           $domain = "{{domain}}"
 
-          # Install AWS PowerShell module if not already installed
-          if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
-            Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
+          # Install Active Directory Powershellmodule if not already installed
+          if (-Not (Get-Module -ListAvailable -Name "ActiveDirectory")) {
+            Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
           }
 
           # Define environment settings
