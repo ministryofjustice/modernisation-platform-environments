@@ -96,7 +96,7 @@ resource "aws_route53_record" "http_traffic_status_data_platform_service_justice
 }
 
 # PagerDuty Status Page (TLS Validation)
-resource "aws_route53_record" "http_traffic_status_data_platform_service_justice_gov_uk" {
+resource "aws_route53_record" "tls_validation_status_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
 
   zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
@@ -107,7 +107,7 @@ resource "aws_route53_record" "http_traffic_status_data_platform_service_justice
 }
 
 # PagerDuty Status Page (DKIM 1)
-resource "aws_route53_record" "http_traffic_status_data_platform_service_justice_gov_uk" {
+resource "aws_route53_record" "dkim_one_status_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
 
   zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
@@ -118,7 +118,7 @@ resource "aws_route53_record" "http_traffic_status_data_platform_service_justice
 }
 
 # PagerDuty Status Page (DKIM 2)
-resource "aws_route53_record" "http_traffic_status_data_platform_service_justice_gov_uk" {
+resource "aws_route53_record" "dkim_two_status_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
 
   zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
@@ -129,7 +129,7 @@ resource "aws_route53_record" "http_traffic_status_data_platform_service_justice
 }
 
 # PagerDuty Status Page (Mail CNAME)
-resource "aws_route53_record" "http_traffic_status_data_platform_service_justice_gov_uk" {
+resource "aws_route53_record" "mail_cname_status_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
 
   zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
