@@ -1,10 +1,9 @@
 locals {
 
-
   # the modernisation platform secret 'environment_management' can not be
   # accessed from EC2s. Create a copy as an SSM parameter with just
   # the relevant account ids.
-  account_ssm_parameter_names = distinct(flatten([
+  account_names_for_account_ids_ssm_parameter = distinct(flatten([
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["hmpps-oem-${var.environment.environment}"] : [],
     var.options.enable_ec2_oracle_enterprise_manager ? ["hmpps-oem-${var.environment.environment}"] : [],
   ]))
@@ -13,7 +12,7 @@ locals {
   cloud_watch_windows_filename = "./templates/cloud_watch_windows.json"
 
   ssm_parameters_filter = flatten([
-    length(local.account_ssm_parameter_names) != 0 ? ["account"] : [],
+    length(local.account_names_for_account_ids_ssm_parameter) != 0 ? ["account"] : [],
     var.options.enable_ec2_user_keypair ? ["ec2-user"] : [],
     var.options.enable_ec2_cloud_watch_agent && fileexists(local.cloud_watch_windows_filename) ? ["cloud-watch-config"] : [],
   ])
@@ -24,10 +23,10 @@ locals {
       postfix = "_"
       parameters = {
         ids = {
-          description = "Account ID for hmpps-oem account"
+          description = "Selected modernisation platform AWS account IDs"
           value = jsonencode({
             for key, value in var.environment.account_ids :
-            key => value if contains(local.account_ssm_parameter_names, key)
+            key => value if contains(local.account_names_for_account_ids_ssm_parameter, key)
           })
         }
       }
