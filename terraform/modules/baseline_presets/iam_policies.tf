@@ -6,11 +6,9 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
-    var.options.enable_ec2_get_parameter ? ["Ec2GetParameterPolicy"] : [],
-    var.options.enable_ec2_get_secret ? ["Ec2GetSecretPolicy"] : [],
-    var.options.enable_ec2_put_parameter ? ["Ec2PutParameterPolicy"] : [],
-    var.options.enable_ec2_put_secret ? ["Ec2PutSecretPolicy"] : [],
-    var.options.enable_oracle_secure_web ? ["S3ListAllBucketsAndGetLocationPolicy"] : [],
+    var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy"] : [],
+    var.options.enable_ec2_oracle_enterprise_managed_server ? ["Ec2OracleEnterpriseManagedServerPolicy"] : [],
+    var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
     var.options.iam_policies_filter,
   ])
 
@@ -19,42 +17,44 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
-    var.options.enable_ec2_get_parameter ? ["Ec2GetParameterPolicy"] : [],
-    var.options.enable_ec2_get_secret ? ["Ec2GetSecretPolicy"] : [],
-    var.options.enable_ec2_put_parameter ? ["Ec2PutParameterPolicy"] : [],
-    var.options.enable_ec2_put_secret ? ["Ec2PutSecretPolicy"] : [],
-    var.options.enable_oracle_secure_web ? ["S3ListAllBucketsAndGetLocationPolicy"] : [],
+    var.options.enable_ec2_oracle_enterprise_managed_server ? ["Ec2OracleEnterpriseManagedServerPolicy"] : [],
+    var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
     var.options.iam_policies_ec2_default,
   ])
+
+  oem_account_id = try(var.environment.account_ids["hmpps-oem-${var.environment.environment}"], "OemAccountNotFound")
 
   iam_policies = {
 
     ImageBuilderLaunchTemplatePolicy = {
       description = "Policy allowing access to image builder launch templates"
-      statements = [{
-        effect = "Allow"
-        actions = [
-          "ec2:CreateLaunchTemplateVersion",
-          "ec2:ModifyLaunchTemplate"
-        ]
-        resources = ["*"]
-        conditions = [{
-          test     = "StringEquals"
-          variable = "aws:ResourceTag/CreatedBy"
-          values   = ["EC2 Image Builder"]
-        }]
-        }, {
-        effect = "Allow"
-        actions = [
-          "ec2:DescribeLaunchTemplates"
-        ]
-        resources = ["arn:aws:ec2:*:*:launch-template/*"]
-        conditions = [{
-          test     = "StringEquals"
-          variable = "aws:ResourceTag/CreatedBy"
-          values   = ["EC2 Image Builder"]
-        }]
-      }]
+      statements = [
+        {
+          effect = "Allow"
+          actions = [
+            "ec2:CreateLaunchTemplateVersion",
+            "ec2:ModifyLaunchTemplate"
+          ]
+          resources = ["*"]
+          conditions = [{
+            test     = "StringEquals"
+            variable = "aws:ResourceTag/CreatedBy"
+            values   = ["EC2 Image Builder"]
+          }]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "ec2:DescribeLaunchTemplates"
+          ]
+          resources = ["arn:aws:ec2:*:*:launch-template/*"]
+          conditions = [{
+            test     = "StringEquals"
+            variable = "aws:ResourceTag/CreatedBy"
+            values   = ["EC2 Image Builder"]
+          }]
+        }
+      ]
     }
 
     BusinessUnitKmsCmkPolicy = {
@@ -80,33 +80,40 @@ locals {
 
     CloudWatchAgentServerReducedPolicy = {
       description = "Same as CloudWatchAgentServerReducedPolicy but with CreateLogGroup permission removed to ensure groups are created in code"
-      statements = [{
-        effect = "Allow"
-        actions = [
-          "cloudwatch:PutMetricData",
-          "ec2:DescribeVolumes",
-          "ec2:DescribeTags",
-          "logs:PutLogEvents",
-          "logs:DescribeLogStreams",
-          "logs:DescribeLogGroups",
-          "logs:CreateLogStream",
-          "logs:CreateLogGroup"
-        ]
-        resources = ["*"]
-        }, {
-        effect = "Deny"
-        actions = [
-          "logs:CreateLogGroup"
-        ]
-        resources = ["*"]
-        }, {
-        effect = "Allow"
-        actions = [
-          "ssm:GetParameter",
-          "ssm:GetParameters"
-        ]
-        resources = ["arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*"]
-      }]
+      statements = [
+        {
+          effect = "Allow"
+          actions = [
+            "cloudwatch:PutMetricData",
+            "ec2:DescribeVolumes",
+            "ec2:DescribeTags",
+            "logs:PutLogEvents",
+            "logs:DescribeLogStreams",
+            "logs:DescribeLogGroups",
+            "logs:CreateLogStream",
+            "logs:CreateLogGroup"
+          ]
+          resources = ["*"]
+        },
+        {
+          effect = "Deny"
+          actions = [
+            "logs:CreateLogGroup"
+          ]
+          resources = ["*"]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "ssm:GetParameter",
+            "ssm:GetParameters"
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*",
+            "arn:aws:ssm:*:*:parameter/cloud-watch-config-windows",
+          ]
+        }
+      ]
     }
 
     Ec2SelfProvisionPolicy = {
@@ -148,58 +155,6 @@ locals {
           "arn:aws:s3:::modernisation-platform-software*/*",
           "arn:aws:s3:::modernisation-platform-software*"
         ])
-      }]
-    }
-    Ec2GetParameterPolicy = {
-      # Not required if AmazonSSMManagedInstanceCore is being used
-      description = "Permissions to allow EC2 to get SSM parameter(s)"
-      statements = [{
-        effect = "Allow"
-        actions = [
-          "ssm:GetParameter",
-          "ssm:GetParameters",
-        ]
-        resources = [
-          "arn:aws:ssm:*:*:parameter:/*",
-          "arn:aws:ssm:*:*:parameter:cloud-watch-config-windows",
-          "arn:aws:ssm:*:*:parameter:modernisation_platform_account_id",
-        ]
-      }]
-    }
-    Ec2GetSecretPolicy = {
-      # This doesn't seem to be required.  EC2s can access secrets without
-      description = "Permissions to allow EC2 to get SecretManager Secrets"
-      statements = [{
-        effect = "Allow"
-        actions = [
-          "secretsmanager:GetSecret",
-        ]
-        resources = ["arn:aws:secretsmanager:*:*:secret:/*"]
-      }]
-    }
-    Ec2PutParameterPolicy = {
-      description = "Permissions to allow EC2 to put parameter(s) for retrieval"
-      statements = [{
-        effect = "Allow"
-        actions = [
-          "ssm:PutParameter",
-          "ssm:PutParameters",
-        ]
-        resources = ["arn:aws:ssm:*:*:parameter:/*"]
-      }]
-    }
-    Ec2PutSecretPolicy = {
-      description = "Permissions to allow EC2 to put SecretManager Secrets"
-      statements = [{
-        effect = "Allow"
-        actions = [
-          "secretsmanager:DeleteResourcePolicy",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:GetResourcePolicy",
-          "secretsmanager:PutResourcePolicy",
-          "secretsmanager:UpdateSecret",
-        ]
-        resources = ["arn:aws:secretsmanager:*:*:secret:/*"]
       }]
     }
 
@@ -271,18 +226,91 @@ locals {
       }]
     }
 
-    S3ListAllBucketsAndGetLocationPolicy = {
-      description = "Permissions to list all S3 buckets and get location.  Required for OracleSecureWeb"
+    OracleEnterpriseManagementSecretsPolicy = {
+      description = "For cross account secret access identity policy"
       statements = [{
         effect = "Allow"
         actions = [
-          "s3:ListAllMyBuckets",
-          "s3:GetBucketLocation",
+          "secretsmanager:GetSecretValue",
         ]
-        resources = [
-          "arn:aws:s3:::*"
-        ]
+        resources = ["*"]
       }]
     }
+
+    # NOTE, this doesn't include GetSecretValue since the EC2 must assume
+    # a separate role to get these (EC2OracleEnterpriseManagementSecretsRole)
+    Ec2OracleEnterpriseManagedServerPolicy = {
+      description = "Permissions required for Oracle Enterprise Managed Server"
+      statements = [
+        {
+          effect = "Allow"
+          actions = [
+            "s3:ListAllMyBuckets",
+            "s3:GetBucketLocation",
+          ]
+          resources = [
+            "arn:aws:s3:::*"
+          ]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "ssm:GetParameter",
+            "ssm:GetParameters",
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/account_ids",
+          ]
+        }
+      ]
+    }
+
+    Ec2OracleEnterpriseManagerPolicy = {
+      description = "Permissions required for Oracle Enterprise Manager"
+      statements = [
+        {
+          effect = "Allow"
+          actions = [
+            "s3:ListAllMyBuckets",
+            "s3:GetBucketLocation",
+          ]
+          resources = [
+            "arn:aws:s3:::*"
+          ]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "secretsmanager:GetSecretValue",
+            "secretsmanager:PutSecretValue",
+          ]
+          resources = [
+            "arn:aws:secretsmanager:*:*:secret:/oracle/*",
+          ]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "ssm:GetParameter",
+            "ssm:GetParameters",
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/account_ids",
+            "arn:aws:ssm:*:*:parameter/oracle/*",
+          ]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "ssm:PutParameter",
+            "ssm:PutParameters",
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/oracle/*",
+          ]
+        }
+      ]
+    }
+
   }
 }

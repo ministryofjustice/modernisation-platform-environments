@@ -17,9 +17,7 @@ locals {
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
-    enable_oracle_secure_web                     = true
-    enable_ec2_get_parameter                     = false
-    enable_ec2_get_secret                        = false
+    enable_ec2_oracle_enterprise_managed_server  = true
     enable_ec2_user_keypair                      = true
     cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
     route53_resolver_rules = {
