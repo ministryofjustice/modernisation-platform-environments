@@ -6,6 +6,7 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
@@ -17,6 +18,7 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
     var.options.iam_policies_ec2_default,
@@ -312,5 +314,51 @@ locals {
       ]
     }
 
+    SSMManagedInstanceCoreReducedPolicy = {
+      description = "AmazonSSMManagedInstanceCore minus GetParameters"
+      statements = [
+        {
+          effect = "Allow"
+          actions = [
+            "ssm:DescribeAssociation",
+            "ssm:GetDeployablePatchSnapshotForInstance",
+            "ssm:GetDocument",
+            "ssm:DescribeDocument",
+            "ssm:GetManifest",
+            "ssm:ListAssociations",
+            "ssm:ListInstanceAssociations",
+            "ssm:PutInventory",
+            "ssm:PutComplianceItems",
+            "ssm:PutConfigurePackageResult",
+            "ssm:UpdateAssociationStatus",
+            "ssm:UpdateInstanceAssociationStatus",
+            "ssm:UpdateInstanceInformation",
+          ]
+          resources = ["*"]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "ssmmessages:CreateControlChannel",
+            "ssmmessages:CreateDataChannel",
+            "ssmmessages:OpenControlChannel",
+            "ssmmessages:OpenDataChannel",
+          ]
+          resources = ["*"]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "ec2messages:AcknowledgeMessage",
+            "ec2messages:DeleteMessage",
+            "ec2messages:FailMessage",
+            "ec2messages:GetEndpoint",
+            "ec2messages:GetMessages",
+            "ec2messages:SendReply"
+          ]
+          resources = ["*"]
+        },
+      ]
+    }
   }
 }

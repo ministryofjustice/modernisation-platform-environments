@@ -12,10 +12,7 @@ locals {
         user_data_raw                 = null
         ssm_parameters_prefix         = "ec2/"
         iam_resource_names_prefix     = "ec2-instance"
-        instance_profile_policies = flatten([
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-          local.iam_policies_ec2_default,
-        ])
+        instance_profile_policies     = local.iam_policies_ec2_default
       }
 
       db = {
@@ -23,12 +20,9 @@ locals {
         subnet_name                   = "data"
         ebs_volumes_copy_all_from_ami = true
         user_data_raw                 = null
-        ssm_parameters_prefix         = "database/"
+        ssm_parameters_prefix         = "ec2/"
         iam_resource_names_prefix     = "ec2-database"
-        instance_profile_policies = flatten([
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-          local.iam_policies_ec2_default,
-        ])
+        instance_profile_policies     = local.iam_policies_ec2_default
       }
     }
 
