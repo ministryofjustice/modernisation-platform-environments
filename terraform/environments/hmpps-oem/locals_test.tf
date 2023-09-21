@@ -5,9 +5,9 @@ locals {
   test_config = {
 
     baseline_ssm_parameters = {
-      "oracle/database/EMREP"   = local.ssm_parameters_passwords
-      "oracle/database/TRCVCAT" = local.ssm_parameters_passwords
-      "oracle/database/TRCVCAT" = local.ssm_parameters_passwords
+      "oracle/database/EMREP"   = local.oem_ssm_parameters_passwords
+      "oracle/database/TRCVCAT" = local.oem_ssm_parameters_passwords
+      "oracle/database/TRCVCAT" = local.oem_ssm_parameters_passwords
     }
 
     baseline_ec2_autoscaling_groups = {
