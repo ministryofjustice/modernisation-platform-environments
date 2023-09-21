@@ -47,7 +47,7 @@ locals {
     ]
     principals = {
       type        = "AWS"
-      identifiers = "hmpps-oem-${local.environment}"
+      identifiers = ["hmpps-oem-${local.environment}"]
     }
     resources = ["*"]
   }
