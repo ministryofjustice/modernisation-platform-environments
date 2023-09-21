@@ -77,6 +77,7 @@ module "baseline" {
     lookup(local.environment_config, "baseline_rds_instances", {}),
   )
   ssm_parameters = merge(
+    module.baseline_presets.ssm_parameters,
     local.baseline_ssm_parameters,
     lookup(local.environment_config, "baseline_ssm_parameters", {}),
   )

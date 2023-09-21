@@ -19,6 +19,7 @@ locals {
     enable_ec2_self_provision                    = true
     enable_oracle_secure_web                     = false
     enable_ec2_put_parameter                     = false
+    enable_ec2_user_keypair                      = true
     enable_shared_s3                             = false # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = false # adds db backup buckets
     enable_oracle_secure_web                     = false # allows db to list all buckets
@@ -60,16 +61,6 @@ locals {
     private-dc = local.security_groups.private_dc
   }
 
-  baseline_sns_topics = {}
-
-  baseline_ssm_parameters = {
-    # ssm params at root level
-    "" = {
-      prefix  = ""
-      postfix = ""
-      parameters = {
-        ec2-user_pem = {}
-      }
-    }
-  }
+  baseline_sns_topics     = {}
+  baseline_ssm_parameters = {}
 }
