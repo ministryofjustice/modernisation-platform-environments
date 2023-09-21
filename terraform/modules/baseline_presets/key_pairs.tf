@@ -1,11 +1,16 @@
+# See README.md for how to use
+
 locals {
 
-  key_pairs = {
+  ec2_user_public_key_filename = ".ssh/${var.environment.account_name}/ec2-user.pub"
 
-    # default admin user for EC2s
+  key_pairs_filter = flatten([
+    var.options.enable_ec2_user_keypair && fileexists(local.ec2_user_public_key_filename) ? ["ec2-user"] : [],
+  ])
+
+  key_pairs = {
     ec2-user = {
-      # commit the public key into environments repo, keep the private key somewhere safe
-      public_key_filename = ".ssh/${var.environment.account_name}/ec2-user.pub"
+      public_key_filename = local.ec2_user_public_key_filename
     }
   }
 

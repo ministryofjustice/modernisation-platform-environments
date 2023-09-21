@@ -30,6 +30,7 @@ module "baseline_presets" {
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
+    enable_ec2_user_keypair                      = true
     iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
@@ -61,12 +62,17 @@ module "baseline" {
   key_pairs                = module.baseline_presets.key_pairs
   kms_grants               = module.baseline_presets.kms_grants
   route53_resolvers        = module.baseline_presets.route53_resolvers
+  route53_zones = merge(
+    local.baseline_route53_zones,
+    lookup(local.baseline_environment_config, "baseline_route53_zones", {})
+  )
 
   ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
   lbs                    = lookup(local.environment_config, "baseline_lbs", {})
 
   ssm_parameters = merge(
+    module.baseline_presets.ssm_parameters,
     local.baseline_ssm_parameters,
     lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
   )

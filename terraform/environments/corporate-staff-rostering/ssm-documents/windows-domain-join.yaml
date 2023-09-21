@@ -1,43 +1,106 @@
 ---
 schemaVersion: "2.2"
-description: "SSM Document for creating local configs on Windows Server"
+description: "SSM Document for joining Windows EC2 instances to the domain. The instance will be RESTARTED so this is not applicable for ASG's."
 parameters:
   domainJoinUsername:
     type: "String"
-    description: "username for the domain join credentials"
+    description: "username with domain join permissions"
   domainJoinPassword:
     type: "String"
-    description: "password for the domain join credentials"
+    description: "password for domain join user"
   hostname:
     type: "String"
-    description: "hostname for the new instance"
+    description: "hostname for the new instance, must not be longer than 15 characters"
+    maxChars: 15
   domain:
     type: "String"
-    description: "domain to join"
+    description: "domain to join, either Dev (default) or Prod"
+    allowedValues:
+     - dev # default
+     - prod
 mainSteps:
-  - name: JoinDomain
+  - name: WindowsDomainJoin
     action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
     inputs:
       runCommand:
         - |
           $ErrorActionPreference = "Stop" # all errors will terminate the script
 
-          $domainUsername = "{{domainJoinUsername}}"
-          $domainPassword = "{{domainJoinPassword}}"
+          $domainJoinUsername = "{{domainJoinUsername}}"
+          $domainJoinPassword = "{{domainJoinPassword}}"
           $hostname = "{{hostname}}"
           $domain = "{{domain}}"
 
-          # TODO: set up the domain join pre-requisites here
+          # Install AWS PowerShell module if not already installed
+          if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
+            Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
+          }
 
-          # TODO: check if the proposed hostname is already in use
+          # Define environment settings
+          $environments = @{
+            "dev" = @{
+                "domain" = "azure.noms.root";
+                "primarydns" = "10.102.0.196";
+                "serveraddresses" = @("10.102.0.196","10.102.0.200");
+                "suffixsearchlist" = @("azure.noms.root", "noms.root");
+                "domaincontroller" = "MGMCW0002.azure.noms.root";
+                "usernameprefix" = "azure";
+            };
+            "prod" = @{
+                "domain" = "azure.hmpp.root";
+                "primarydns" = "10.40.128.196";
+                "serveraddresses" = @("10.40.128.196","10.40.0.133");
+                "suffixsearchlist" = @("azure.hmpp.root", "hmpp.root");
+                "domaincontroller" = "PCMCW0011.azure.hmpp.root";
+                "usernameprefix" = "hmpp";
+            };
+          }
 
-          # TODO: check if the instance is part of an ASG and terminate if it is since reboot may just result in another instance being spawned which won't be joined to the domain
+          # Set up DNS IP addresses and suffixes
+          Write-Host "INFO: Setting DNS Client Server and DNS Client Global Settings for $domain domain"
 
-          $secpasswd = ConvertTo-SecureString $domainPassword -AsPlainText -Force
-          $mycreds = New-Object System.Management.Automation.PSCredential ($domainUsername, $secpasswd)
+          # Get the network interface alias
+          $interfaceAlias = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object -ExpandProperty Name
+          Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $environments[$domain]["serveraddresses"]
 
-          # TODO: check this next command is in a fit state to be run before the domain join
+          # Get existing SuffixSearchList and prepend suffixSearchList
+          $existingSuffixSearchList = (Get-DnsClientGlobalSetting).SuffixSearchList
+          $newSuffixSearchList = $environments[$domain]["suffixsearchlist"] + $existingSuffixSearchList
+          Set-DnsClientGlobalSetting -SuffixSearchList $newSuffixSearchList
+            
+          function Get-HostnameInUse {
+            param (
+              [Parameter(Mandatory=$true)]
+              [string]$hostname,
+              [Parameter(Mandatory=$true)]
+              [System.Management.Automation.PSCredential]$credentials,
+              [Parameter(Mandatory=$true)]
+              [string]$domain
+            )
 
-          # TODO: check to what extent we need to rename the instance and add it to the domain
+            $hostnameInUse = Get-ADComputer -Filter 'Name -eq $hostname' -Credential $credentials -Server ($environments[$domain]["domaincontroller"])
 
-          Add-Computer -DomainName $domain -Credential $mycreds -NewName $hostname -Restart
+            if ($hostnameInUse) {
+              return $true
+            } else {
+              return $false
+            }
+          }
+
+          $secpasswd = ConvertTo-SecureString $domainJoinPassword -AsPlainText -Force
+          $credentials = New-Object System.Management.Automation.PSCredential (($environments[$domain]["usernameprefix"] + "\" + $domainJoinUsername), $secpasswd)
+
+          if ( -not (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain)) {
+            Write-Host "INFO: Hostname $hostname is not in use elsewhere, continuing"
+            Write-Host "INFO: Adding instance as $hostname to $environment[$domain] domain"
+            Write-Host "WARNING: Instance will restart to complete domain join"
+            Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -NewName $hostname -Restart -Verbose
+          } else {
+            Write-Error "ERROR: Hostname $hostname is already in use"
+            exit 1
+          }
+

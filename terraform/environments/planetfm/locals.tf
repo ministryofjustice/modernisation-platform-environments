@@ -18,6 +18,7 @@ locals {
     enable_ec2_self_provision                    = true
     enable_oracle_secure_web                     = true
     enable_ec2_put_parameter                     = false
+    enable_ec2_user_keypair                      = true
     cloudwatch_metric_alarms                     = {}
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
@@ -51,16 +52,6 @@ locals {
     data-db = local.security_groups.data_db
   }
 
-  baseline_sns_topics = {}
-
-  baseline_ssm_parameters = {
-    # ssm params at root level
-    "" = {
-      prefix  = ""
-      postfix = ""
-      parameters = {
-        ec2-user_pem = {}
-      }
-    }
-  }
+  baseline_sns_topics     = {}
+  baseline_ssm_parameters = {}
 }

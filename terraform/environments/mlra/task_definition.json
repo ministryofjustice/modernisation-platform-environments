@@ -32,7 +32,7 @@
       }
     ],
     "links": ["xray-daemon"],
-    "memory": 2000,
+    "memory": 5000,
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {

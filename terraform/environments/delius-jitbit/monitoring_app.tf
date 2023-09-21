@@ -12,9 +12,10 @@ resource "aws_cloudwatch_log_metric_filter" "error" {
   log_group_name = aws_cloudwatch_log_group.app_logs.name
 
   metric_transformation {
-    name      = "ErrorCount"
-    namespace = "JitbitMetrics"
-    value     = "1"
+    name          = "ErrorCount"
+    namespace     = "JitbitMetrics"
+    value         = "1"
+    default_value = "0"
   }
 }
 

@@ -33,9 +33,12 @@ output "modernisation_platform_account_id" {
   value       = data.aws_ssm_parameter.modernisation_platform_account_id.value
 }
 
+# account ids are not secret, but are marked as sensitive as they
+# are read from a SecretsManager secret. This can cause problems
+# with terraform (for_each loops) so marking as nonsensitive
 output "account_id" {
   description = "id of the application account"
-  value       = var.environment_management.account_ids[local.account_name]
+  value       = nonsensitive(var.environment_management.account_ids[local.account_name])
 }
 
 output "application_name" {
@@ -55,12 +58,12 @@ output "subnet_set" {
 
 output "account_ids" {
   description = "account id map where the key is the account name and the value is the account id"
-  value       = var.environment_management.account_ids
+  value       = nonsensitive(var.environment_management.account_ids)
 }
 
 output "account_root_arns" {
   description = "account arn map where the key is the account name and the value is the account id"
-  value       = { for name, id in var.environment_management.account_ids : name => "arn:aws:iam::${id}:root" }
+  value       = nonsensitive({ for name, id in var.environment_management.account_ids : name => "arn:aws:iam::${id}:root" })
 }
 
 output "access" {

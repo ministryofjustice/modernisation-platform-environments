@@ -118,5 +118,16 @@ locals {
         iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
+
+    baseline_route53_zones = {
+      "test.ndh.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "t1-app", type = "A", ttl = 300, records = ["10.101.3.196"] },
+          { name = "t1-ems", type = "A", ttl = 300, records = ["10.101.3.197"] },
+          { name = "t2-app", type = "A", ttl = 300, records = ["10.101.33.196"] },
+          { name = "t2-ems", type = "A", ttl = 300, records = ["10.101.33.197"] },
+        ]
+      }
+    }
   }
 }
