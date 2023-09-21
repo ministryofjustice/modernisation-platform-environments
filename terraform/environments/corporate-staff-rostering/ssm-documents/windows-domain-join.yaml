@@ -82,7 +82,7 @@ mainSteps:
               [string]$domain
             )
 
-            $hostnameInUse = Get-ADComputer -Filter 'Name -eq $hostname' -Credential $credentials -Server $environments[$domain]["domaincontroller"])
+            $hostnameInUse = Get-ADComputer -Filter 'Name -eq $hostname' -Credential $credentials -Server ($environments[$domain]["domaincontroller"])
 
             if ($hostnameInUse) {
               return $true
