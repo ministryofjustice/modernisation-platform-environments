@@ -114,20 +114,7 @@ locals {
     }
 
     ssm_parameters = {
-      ASMSYS = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSYS password"
-      }
-      ASMSNMP = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSNMP password"
-      }
+      asm-passwords = {}
     }
 
     tags = {

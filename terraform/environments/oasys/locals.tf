@@ -172,20 +172,7 @@ locals {
     }
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
     ssm_parameters = {
-      ASMSYS = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSYS password"
-      }
-      ASMSNMP = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSNMP password"
-      }
+      asm-passwords = {}
     }
     # Example target group setup below
     lb_target_groups = {}
