@@ -729,7 +729,7 @@ module "dms_fake_data_ingestor" {
   source_engine_name           = "postgres"
   source_db_name               = "db59b5cf9e5de6b794"
   source_app_username          = "cp9Zr5bLim"
-  source_app_password          = whkthrI65zpcFEe5
+  source_app_password          = "whkthrI65zpcFEe5"
   source_address               = "cloud-platform-59b5cf9e5de6b794.cdwm328dlye6.eu-west-2.rds.amazonaws.com"
   source_db_port               = 5432
   vpc                          = data.aws_vpc.shared.id
