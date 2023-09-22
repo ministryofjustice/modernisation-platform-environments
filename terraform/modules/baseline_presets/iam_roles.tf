@@ -38,7 +38,6 @@ locals {
           variable = "aws:PrincipalArn"
           values = [
             "arn:aws:iam::${var.environment.account_id}:role/ec2-*",
-            "arn:aws:iam::${var.environment.account_id}:role/database-*",
           ]
         }]
       }]

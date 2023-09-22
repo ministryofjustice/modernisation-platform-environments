@@ -268,43 +268,6 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
   policy_arn = aws_iam_policy.ec2_instance_policy.arn
 }
 
-# EC2 Target Tracking scaling
-
-# resource "aws_autoscaling_policy" "ec2-cpu-scaling-target" {
-#   name                      = "ec2-cpu-scaling-target"
-#   policy_type               = "TargetTrackingScaling"
-#   autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
-#   estimated_instance_warmup = 200
-#   target_tracking_configuration {
-#     predefined_metric_specification {
-#       predefined_metric_type = "ASGAverageCPUUtilization"
-#     }
-#     target_value = var.ec2_scaling_cpu_threshold
-#   }
-# }
-
-# resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
-#   name                      = "ec2-mem-scaling-target"
-#   policy_type               = "TargetTrackingScaling"
-#   autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
-#   estimated_instance_warmup = 200
-#   target_tracking_configuration {
-#     target_value     = var.ec2_scaling_mem_threshold
-#     disable_scale_in = false
-#     customized_metric_specification {
-#       metric_name = "mem_used_percent"
-#       namespace   = "CWAgent"
-#       statistic   = "Average"
-#       metric_dimension {
-#         name  = "InstanceId"
-#         value = "${var.app_name}-cluster-scaling-group"
-#       }
-#     }
-#   }
-# }
-
-
-
 //ECS cluster
 
 resource "aws_ecs_cluster" "ecs_cluster" {
@@ -373,7 +336,6 @@ resource "aws_ecs_service" "ecs_service" {
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = data.aws_ecs_task_definition.task_definition.id
   desired_count   = var.app_count
-  # launch_type     = "EC2"
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.mlra.name
