@@ -4,12 +4,6 @@ locals {
   # baseline config
   test_config = {
 
-    baseline_ssm_parameters = {
-      "/oracle/database/EMREP"   = local.oem_ssm_parameters_passwords
-      "/oracle/database/TRCVCAT" = local.oem_ssm_parameters_passwords
-      "/oracle/database/TRCVCAT" = local.oem_ssm_parameters_passwords
-    }
-
     baseline_ec2_autoscaling_groups = {
       test-oem = merge(local.oem_ec2_default, {
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
