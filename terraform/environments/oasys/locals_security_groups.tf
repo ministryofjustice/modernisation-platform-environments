@@ -21,7 +21,7 @@ locals {
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     http7xxx = flatten([
       "10.0.0.0/8",
@@ -45,7 +45,7 @@ locals {
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,

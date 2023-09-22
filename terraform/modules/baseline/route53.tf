@@ -133,9 +133,8 @@ resource "aws_route53_zone" "this" {
   for_each = local.route53_zones_to_create
 
   #checkov:skip=CKV2_AWS_38:skip "Ensure Domain Name System Security Extensions (DNSSEC) signing is enabled for Amazon Route 53 public hosted zones"
-  #checkov:skip=CKV2_AWS_39:skip "Ensure Domain Name System (DNS) query logging is enabled for Amazon Route 53 hosted zones"
+  #checkov:skip=CKV2_AWS_39:skip "Ensure Domain Name System (DNS) query logging is enabled for Amazon Route 53 hosted zones" - this is enabled
   #CKV2_AWS_38: enable in https://dsdmoj.atlassian.net/browse/DSOS-1495
-  #CKV2_AWS_39: enable in https://dsdmoj.atlassian.net/browse/DSOS-1866
 
   name          = each.key
   force_destroy = true
@@ -154,12 +153,16 @@ resource "aws_route53_zone" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "route53" {
+  #checkov:skip=CKV_AWS_338: skip "Ensure CloudWatch log groups retains logs for at least 1 year"
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
+  #CKV_AWS_158 enable in https://dsdmoj.atlassian.net/browse/DSOS-2192
+
   for_each = local.route53_zones_to_create
 
   provider = aws.us-east-1
 
   name              = "/route53/${each.key}"
-  retention_in_days = 30
+  retention_in_days = 90
 
   tags = merge(local.tags, {
     Name = "aws/route53/${each.key}"
