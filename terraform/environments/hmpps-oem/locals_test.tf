@@ -6,9 +6,12 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
       test-oem = merge(local.oem_ec2_default, {
+        autoscaling_group = merge(local.oem_ec2_default.autoscaling_group, {
+          desired_capacity = 0
+        })
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
           args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "DSOS-2151-asm-password-new-code"
+            branch = "main"
           })
         })
         tags = merge(local.oem_ec2_default.tags, {
