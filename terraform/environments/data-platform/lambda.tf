@@ -141,7 +141,12 @@ module "data_product_athena_load_lambda" {
   memory_size  = 512
 
   environment_variables = {
-    ENVIRONMENT = local.environment
+    ENVIRONMENT         = local.environment
+    RAW_DATA_BUCKET     = module.s3-bucket.bucket.id
+    CURATED_DATA_BUCKET = module.s3-bucket.bucket.id
+    LOG_BUCKET          = module.s3-bucket.bucket.id
+    METADATA_BUCKET     = module.s3-bucket.bucket.id
+    LANDING_ZONE_BUCKET = module.s3-bucket.bucket.id
   }
 
   allowed_triggers = {
