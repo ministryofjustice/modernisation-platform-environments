@@ -4,10 +4,10 @@ locals {
   # enabled and run, or the equivalent terraform to create the 
   # EC2OracleEnterpriseManagementSecretsRole IAM role, add it to this list
   oem_managed_applications = [
-    # "corporate-staff-rostering-${local.environment}",
+    "corporate-staff-rostering-${local.environment}",
     "nomis-${local.environment}",
-    # "nomis-combined-reporting-${local.environment}",
-    # "oasys-${local.environment}",
+    "nomis-combined-reporting-${local.environment}",
+    "oasys-${local.environment}",
   ]
 
   oem_share_secret_principal_ids = [
