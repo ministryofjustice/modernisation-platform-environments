@@ -12,7 +12,7 @@ locals {
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
     ])
     oracle_oem_agent = flatten([
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
   }
 
@@ -28,7 +28,7 @@ locals {
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
     ])
     oracle_oem_agent = flatten([
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
   }
 
