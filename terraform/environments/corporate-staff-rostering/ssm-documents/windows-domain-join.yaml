@@ -2,22 +2,24 @@
 schemaVersion: "2.2"
 description: "SSM Document for joining Windows EC2 instances to the domain. The instance will be RESTARTED so this is not applicable for ASG's."
 parameters:
+  domain:
+  type: "String"
+  default: "dev"
+  description: "Domain to join, either Dev (default) or Prod"
+  allowedValues:
+    - dev
+    - prod
   domainJoinUsername:
     type: "String"
-    description: "username with domain join permissions"
+    description: "Username with domain join permissions"
   domainJoinPassword:
     type: "String"
-    description: "password for domain join user"
-  hostname:
+    description: "Password for domain join user"
+  newHostname:
     type: "String"
-    description: "hostname for the new instance, must not be longer than 15 characters"
+    description: "If over-written, the hostname will be changed to this value. If un-changed the existing hostname will be kept. The new hostname must be 15 characters or less"
+    default: "keep-existing"
     maxChars: 15
-  domain:
-    type: "String"
-    description: "domain to join, either Dev (default) or Prod"
-    allowedValues:
-     - dev # default
-     - prod
 mainSteps:
   - name: WindowsDomainJoin
     action: aws:runPowerShellScript
@@ -32,12 +34,21 @@ mainSteps:
 
           $domainJoinUsername = "{{domainJoinUsername}}"
           $domainJoinPassword = "{{domainJoinPassword}}"
-          $hostname = "{{hostname}}"
+          $newHostname = "{{newHostname}}"
           $domain = "{{domain}}"
 
-          # Install Active Directory Powershellmodule if not already installed
+          # Check pre-requisites are installed, exit if not
           if (-Not (Get-Module -ListAvailable -Name "ActiveDirectory")) {
-            Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
+            Write-Error "ERROR: ActiveDirectory module not installed"
+            Write-Error "ERROR: Run 'Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature' via PoweShell as admin to install the ActiveDirectory, then re-run this ssm document"
+            exit 1
+          }
+
+          if ($newHostname -eq "keep-existing") {
+            $hostname = $env:COMPUTERNAME
+            Write-Host "INFO: No new hostname supplied, using existing hostname - $hostname"
+          } else {
+            $hostname = $newHostname
           }
 
           # Define environment settings
@@ -95,10 +106,15 @@ mainSteps:
           $credentials = New-Object System.Management.Automation.PSCredential (($environments[$domain]["usernameprefix"] + "\" + $domainJoinUsername), $secpasswd)
 
           if ( -not (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain)) {
-            Write-Host "INFO: Hostname $hostname is not in use elsewhere, continuing"
-            Write-Host "INFO: Adding instance as $hostname to $environment[$domain] domain"
+            Write-Host "INFO: Hostname $hostname is not already a member of the $domain domain, continuing"
             Write-Host "WARNING: Instance will restart to complete domain join"
-            Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -NewName $hostname -Restart -Verbose
+            if ($newHostname -eq "keep-existing") {
+              Write-Host "INFO: No new hostname supplied, using existing hostname - $hostname"
+              Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -Restart -Verbose
+            } else {
+              Write-Host "INFO: New hostname supplied, changing hostname to $hostname"
+              Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -NewName $hostname -Restart -Verbose
+            }
           } else {
             Write-Error "ERROR: Hostname $hostname is already in use"
             exit 1
