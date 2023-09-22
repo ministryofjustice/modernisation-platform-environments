@@ -1,6 +1,6 @@
 module "s3_bucket_oracledb_backups" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
-  bucket_name         = "${var.env_name}-oracledb-backups"
+  bucket_name         = "${var.env_name}-oracle-database-backups"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
