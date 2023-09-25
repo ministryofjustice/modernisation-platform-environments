@@ -92,6 +92,12 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 }
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
+        tags = {
+          description = "copy of PPCWW00007 for csr ${local.environment}"
+          os-type     = "Windows"
+          ami         = "pp-csr-w-7-b"
+          component   = "web"
+        }
       }
 
       pp-csr-w-8-b-2 = {
