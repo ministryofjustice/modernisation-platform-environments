@@ -77,7 +77,7 @@ resource "aws_api_gateway_account" "api_gateway_account" {
 
 resource "aws_api_gateway_method_settings" "api_gateway_log_settings" {
   rest_api_id = aws_api_gateway_rest_api.data_platform.id
-  stage_name  = aws_api_gateway_stage.default_stage.id
+  stage_name  = local.environment
   method_path = "*/*"
 
   settings {
