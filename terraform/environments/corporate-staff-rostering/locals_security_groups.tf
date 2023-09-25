@@ -87,6 +87,14 @@ locals {
           security_groups = ["migration-web-sg", "migration-app-sg"
           ]
         }
+        ssh = {
+          description     = "Allow SSH ingress"
+          from_port       = 22
+          to_port         = 22
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.ssh
+          security_groups = []
+        }
         oracle3872 = {
           description = "Allow oem agent ingress"
           from_port   = "3872"
@@ -365,85 +373,8 @@ locals {
         }
       }
     }
-    DB-SG-migration = {
-      description = "Security group for database servers"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        ssh = {
-          description     = "Allow SSH ingress"
-          from_port       = 22
-          to_port         = 22
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.ssh
-          security_groups = []
-        }
-        # http41521 = {
-        #   description = "Allow ingress from port 1521"
-        #   from_port       = 1521
-        #   to_port         = 1521
-        #   protocol        = "TCP"
-        #   cidr_blocks     = ["10.0.0.0/8"]
-        #   security_groups = []
-        # }
-        # http9100 = {
-        #   description = "Allow ingress from port 9100"
-        #   from_port       = 9100
-        #   to_port         = 9100
-        #   protocol        = "TCP"
-        #   cidr_blocks     = ["10.0.0.0/8"]
-        #   security_groups = []
-        # }
-        # http9172 = {
-        #   description = "Allow ingress from port 9172"
-        #   from_port       = 9172
-        #   to_port         = 9172
-        #   protocol        = "TCP"
-        #   cidr_blocks     = ["10.0.0.0/8"]
-        #   security_groups = []
-        # }
-        # http9182 = {
-        #   description = "Allow ingress from port 9182"
-        #   from_port       = 9182
-        #   to_port         = 9182
-        #   protocol        = "TCP"
-        #   cidr_blocks     = ["10.0.0.0/8"]
-        #   security_groups = []
-        # }
-        # http3872= {
-        #   description = "Allow ingress from port 3872"
-        #   from_port       = 3872
-        #   to_port         = 3872
-        #   protocol        = "TCP"
-        #   cidr_blocks     = ["10.0.0.0/8"]
-        #   security_groups = []
-        # }
-        # http7= {
-        #   description = "Allow ingress from port 7"
-        #   from_port       = 7
-        #   to_port         = 7
-        #   protocol        = "TCP"
-        #   cidr_blocks     = ["10.0.0.0/8"]
-        #   security_groups = []
-        # }
 
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
+
     domain-controller-access = {
       description = "Security group for domain controller inbound"
       ingress = {
