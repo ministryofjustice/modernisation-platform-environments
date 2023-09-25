@@ -136,6 +136,11 @@ locals {
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       t1-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2T1WeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
@@ -146,6 +151,11 @@ locals {
 
       # green deployment
       t1-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_b.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2T1WeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
@@ -175,6 +185,11 @@ locals {
 
       # blue deployment
       t2-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2T2WeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t2"
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
@@ -185,6 +200,11 @@ locals {
 
       # green deployment
       t2-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_b.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2T2WeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t2"
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
@@ -214,6 +234,11 @@ locals {
 
       # blue deployment
       t3-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2T3WeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t3"
           oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
@@ -227,6 +252,11 @@ locals {
 
       # green deployment
       t3-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_b.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2T3WeblogicPolicy",
+          ])
+        })
         instance = merge(local.weblogic_ec2_b.instance, {
           instance_type = "t2.xlarge"
         })

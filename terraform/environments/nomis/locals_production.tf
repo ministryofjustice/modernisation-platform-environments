@@ -80,6 +80,11 @@ locals {
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       prod-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2ProdWeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "prod"
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
@@ -91,6 +96,11 @@ locals {
 
       # green deployment
       prod-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_b.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2ProdWeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "prod"
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"

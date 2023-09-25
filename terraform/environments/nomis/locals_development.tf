@@ -174,6 +174,11 @@ locals {
       })
 
       qa11r-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2Qa11RWeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "qa11r"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
@@ -188,6 +193,11 @@ locals {
       })
 
       qa11r-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2Qa11RWeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "qa11r"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"

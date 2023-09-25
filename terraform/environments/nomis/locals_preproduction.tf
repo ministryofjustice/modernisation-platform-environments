@@ -59,6 +59,11 @@ locals {
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       preprod-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2PreprodWeblogicPolicy",
+          ])
+        })
         instance = merge(local.weblogic_ec2_a.instance, {
           instance_type = "t2.xlarge"
         })
@@ -81,6 +86,11 @@ locals {
 
       # green deployment
       preprod-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_b.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2PreprodWeblogicPolicy",
+          ])
+        })
         instance = merge(local.weblogic_ec2_b.instance, {
           instance_type = "t2.xlarge"
         })
