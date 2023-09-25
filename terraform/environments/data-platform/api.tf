@@ -45,6 +45,44 @@ resource "aws_api_gateway_stage" "default_stage" {
   deployment_id = aws_api_gateway_deployment.deployment.id
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
   stage_name    = local.environment
+
+  xray_tracing_enabled = true
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.data_platform_api.arn
+    format = jsonencode({
+      requestId        = "$context.requestId"
+      requestTime      = "$context.requestTime"
+      requestTimeEpoch = "$context.requestTimeEpoch"
+      ip               = "$context.identity.sourceIp"
+      caller           = "$context.identity.caller"
+      user             = "$context.identity.user"
+      path             = "$context.path"
+      resourcePath     = "$context.resourcePath"
+      method           = "$context.httpMethod"
+      status           = "$context.status"
+      protocol         = "$context.protocol"
+      responseLength   = "$context.responseLength"
+    })
+  }
+}
+
+resource "aws_cloudwatch_log_group" "data_platform_api" {
+  name = "data_platform_api"
+}
+
+resource "aws_api_gateway_account" "api_gateway_account" {
+  cloudwatch_role_arn = aws_iam_role.api_gateway_cloud_watch_role.arn
+}
+
+resource "aws_api_gateway_method_settings" "api_gateway_log_settings" {
+  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  stage_name  = aws_api_gateway_stage.default_stage.id
+  method_path = "*/*"
+
+  settings {
+    logging_level = "INFO"
+  }
 }
 
 resource "aws_api_gateway_authorizer" "authorizer" {
