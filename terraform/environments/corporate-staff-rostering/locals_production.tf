@@ -73,6 +73,6 @@ locals {
           server-type = "csr-db"
         }
       }
+    }
   }
- }
 }
