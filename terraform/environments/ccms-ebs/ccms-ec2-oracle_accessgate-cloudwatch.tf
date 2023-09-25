@@ -1,4 +1,4 @@
-resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_accessgate_temp" {
     alarm_name                = "${local.application_data.accounts[local.environment].short_env}-EBSDB-disk_free_DBF"
     alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
     comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -22,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
       device       = "/dev/sdc"
     }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_accessgate_home" {
     alarm_name                = "${local.application_data.accounts[local.environment].short_env}-EBSDB-disk_free_DBF"
     alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
     comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -46,7 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
       device       = "/dev/sdd"
     }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_accessgate_u01" {
     alarm_name                = "${local.application_data.accounts[local.environment].short_env}-EBSDB-disk_free_DBF"
     alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
     comparison_operator       = "GreaterThanOrEqualToThreshold"
