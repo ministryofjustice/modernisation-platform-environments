@@ -76,7 +76,8 @@
       "ebs_size_ebsdb_diag": 50,
       "ebs_default_iops_test": 9000,
       "dbf_device": "/dev/nvme5n1",
-      "dbf_path": "/CCMS/EBS/dbf"
+      "dbf_path": "/CCMS/EBS/dbf",
+      "ebs_type_ebsdb_backup": "gp3"
     },
     "test": {
       "short_env": "tst",
@@ -150,7 +151,8 @@
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
       "dbf_device": "/dev/nvme2n1",
-      "dbf_path": "/CCMS/EBS/dbf"
+      "dbf_path": "/CCMS/EBS/dbf",
+      "ebs_type_ebsdb_backup": "io2"
     },
     "preproduction": {
       "short_env": "prep",
@@ -224,7 +226,8 @@
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
       "dbf_device": "/dev/nvme3n1",
-      "dbf_path": "/CCMS/EBS/dbf"
+      "dbf_path": "/CCMS/EBS/dbf",
+      "ebs_type_ebsdb_backup": "io2"
     },
     "production": {
       "short_env": "prod",
@@ -300,7 +303,8 @@
       "dbf_device": "/dev/nvme8n1",
       "dbf_path": "/CCMS/EBSPROD/dbf",
       "ebs_size_ebsdb_dbf2": 9000,
-      "ebs_default_dbf2_iops": 10000
+      "ebs_default_dbf2_iops": 10000,
+      "ebs_type_ebsdb_backup": "io2"
     }
   },
   "ec2_sg_base_ingress_rules": {
