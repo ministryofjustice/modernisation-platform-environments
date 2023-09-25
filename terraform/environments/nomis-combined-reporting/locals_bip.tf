@@ -3,11 +3,11 @@ locals {
   bip_ssm_parameters = {
     prefix = "/bip/"
     parameters = {
-      product_key             = { description = "BIP product key" }
-      lcm_password            = { description = "LCM Password" }
-      cms_cluster_key         = { description = "CMS Cluster Key" }
-      cms_admin_password      = { description = "CMS Admin Password" }
-      cms_db_password         = { description = "CMS DB Password" }
+      product_key        = { description = "BIP product key" }
+      lcm_password       = { description = "LCM Password" }
+      cms_cluster_key    = { description = "CMS Cluster Key" }
+      cms_admin_password = { description = "CMS Admin Password" }
+      cms_db_password    = { description = "CMS DB Password" }
     }
   }
 
