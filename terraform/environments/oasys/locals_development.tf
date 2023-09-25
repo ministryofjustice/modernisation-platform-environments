@@ -22,16 +22,16 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
 
-      "dev-${local.application_name}-db-b" = merge(local.database_b, {
-        instance              = merge(module.baseline_presets.ec2_instance.instance.default_db, {
-          disable_api_termination      = false
-        })
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "app-and-env-vars"
-          })
-        })
-      })
+      # "dev-${local.application_name}-db-b" = merge(local.database_b, {
+      #   instance              = merge(module.baseline_presets.ec2_instance.instance.default_db, {
+      #     disable_api_termination      = false
+      #   })
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "app-and-env-vars"
+      #     })
+      #   })
+      # })
 
       # "dev-${local.application_name}-web-a" = local.webserver_a
 
