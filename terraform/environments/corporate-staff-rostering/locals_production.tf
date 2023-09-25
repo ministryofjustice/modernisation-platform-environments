@@ -66,10 +66,10 @@ locals {
         }
 
         tags = {
-          description = "PP CSR DB server"
+          description = "PD CSR DB server"
           ami         = "base_ol_8_5"
           os-type     = "Linux"
-          component   = "test"
+          component   = "data"
           server-type = "csr-db"
         }
       }
