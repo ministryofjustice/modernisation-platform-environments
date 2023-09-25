@@ -1,4 +1,4 @@
-resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_temp" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_temp" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-temp"
   alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -23,7 +23,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_temp" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_home" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_home" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-home"
   alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -48,7 +48,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_home" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_export_home" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_export_home" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-export_home"
   alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -73,7 +73,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_export_home" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_u01" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_u01" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-u01"
   alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -98,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_u01" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_u03" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_u03" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-u03"
   alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -123,7 +123,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_u03" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_stage" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_stage" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-stage"
   alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
