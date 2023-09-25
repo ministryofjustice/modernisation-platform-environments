@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_temp" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-temp"
-  alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+  alarm_description         = "This metric monitors the amount of free disk space on /temp mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
@@ -25,7 +25,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_temp" {
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_home" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-home"
-  alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+  alarm_description         = "This metric monitors the amount of free disk space on /home mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
@@ -50,7 +50,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_home" {
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_export_home" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-export_home"
-  alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+  alarm_description         = "This metric monitors the amount of free disk space on /export/home mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
@@ -75,7 +75,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_export_home" {
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_u01" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-u01"
-  alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+  alarm_description         = "This metric monitors the amount of free disk space on /u01 mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
@@ -100,7 +100,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_u01" {
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_u03" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-u03"
-  alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+  alarm_description         = "This metric monitors the amount of free disk space on /u03 mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
@@ -125,7 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_u03" {
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_stage" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-stage"
-  alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+  alarm_description         = "This metric monitors the amount of free disk space on /stage mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
