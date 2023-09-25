@@ -32,12 +32,17 @@ locals {
     }
 
     baseline_ssm_parameters = {
+      # NEW
+      "/oracle/weblogic/qa11r" = local.weblogic_ssm_parameters
+      "/oracle/database/qa11r" = local.database_ssm_parameters
+
+      # OLD
       # "dev-nomis-web-a" = local.weblogic_ssm_parameters
       # "dev-nomis-web-b" = local.weblogic_ssm_parameters
       # "qa11g-nomis-web-a" = local.weblogic_ssm_parameters
       # "qa11g-nomis-web-b" = local.weblogic_ssm_parameters
-      "qa11r-nomis-web-a" = local.weblogic_ssm_parameters
-      "qa11r-nomis-web-b" = local.weblogic_ssm_parameters
+      "qa11r-nomis-web-a" = local.weblogic_ssm_parameters_old
+      "qa11r-nomis-web-b" = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -151,7 +156,7 @@ locals {
 
       qa11r-nomis-web-a = merge(local.weblogic_ec2_a, {
         tags = merge(local.weblogic_ec2_a.tags, {
-          nomis-environment    = "syscon"
+          nomis-environment    = "qa11r"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "qa11r"
@@ -165,7 +170,7 @@ locals {
 
       qa11r-nomis-web-b = merge(local.weblogic_ec2_b, {
         tags = merge(local.weblogic_ec2_b.tags, {
-          nomis-environment    = "syscon"
+          nomis-environment    = "qa11r"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "qa11r"

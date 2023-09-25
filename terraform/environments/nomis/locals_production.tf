@@ -28,8 +28,13 @@ locals {
     }
 
     baseline_ssm_parameters = {
-      "prod-nomis-web-a" = local.weblogic_ssm_parameters
-      "prod-nomis-web-b" = local.weblogic_ssm_parameters
+      # NEW
+      "/oracle/weblogic/prod"  = local.weblogic_ssm_parameters
+      "/oracle/database/CNOMP" = local.database_ssm_parameters
+
+      # OLD
+      "prod-nomis-web-a" = local.weblogic_ssm_parameters_old
+      "prod-nomis-web-b" = local.weblogic_ssm_parameters_old
     }
 
     baseline_cloudwatch_log_groups = {
@@ -125,10 +130,10 @@ locals {
 
       prod-nomis-db-1-b = merge(local.database_ec2_b, {
         tags = merge(local.database_ec2_b.tags, {
-          nomis-environment         = "prod"
-          description               = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
-          oracle-sids               = ""
-          is-production             = "true-no-default-backup-workaround"
+          nomis-environment = "prod"
+          description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
+          oracle-sids       = ""
+          is-production     = "true-no-default-backup-workaround"
         })
         config = merge(module.baseline_presets.ec2_instance.config.db, {
           ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -175,10 +180,10 @@ locals {
 
       prod-nomis-db-2-b = merge(local.database_ec2_b, {
         tags = merge(local.database_ec2_b.tags, {
-          nomis-environment         = "prod"
-          description               = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
-          oracle-sids               = ""
-          is-production             = "true-no-default-backup-workaround"
+          nomis-environment = "prod"
+          description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
+          oracle-sids       = ""
+          is-production     = "true-no-default-backup-workaround"
         })
         config = merge(module.baseline_presets.ec2_instance.config.db, {
           ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"

@@ -38,6 +38,15 @@ locals {
     }
 
     baseline_ssm_parameters = {
+      # NEW
+      "/oracle/weblogic/t1"     = local.weblogic_ssm_parameters
+      "/oracle/weblogic/t2"     = local.weblogic_ssm_parameters
+      "/oracle/weblogic/t3"     = local.weblogic_ssm_parameters
+      "/oracle/database/CNOMT1" = local.database_ssm_parameters
+      "/oracle/database/CNOMT2" = local.database_ssm_parameters
+      "/oracle/database/CNOMT3" = local.database_ssm_parameters
+
+      # OLD
       # T1
       "t1-nomis-db-1-a/CNOMT1"  = local.database_instance_ssm_parameters
       "t1-nomis-db-1-a/NDHT1"   = local.database_instance_ssm_parameters
@@ -51,8 +60,8 @@ locals {
       "t1-nomis-db-2-b/MIST1"   = local.database_instance_ssm_parameters
       "t1-nomis-db-2-a"         = local.database_ec2_misload_ssm_parameters
       "t1-nomis-db-2-b"         = local.database_ec2_misload_ssm_parameters
-      "t1-nomis-web-a"          = local.weblogic_ssm_parameters
-      "t1-nomis-web-b"          = local.weblogic_ssm_parameters
+      "t1-nomis-web-a"          = local.weblogic_ssm_parameters_old
+      "t1-nomis-web-b"          = local.weblogic_ssm_parameters_old
       "t1-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
       "t1-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
       "t2-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
@@ -65,12 +74,12 @@ locals {
       "t2-nomis-db-1-b/CNOMT2"  = local.database_instance_ssm_parameters
       "t2-nomis-db-1-b/NDHT2"   = local.database_instance_ssm_parameters
       "t2-nomis-db-1-b/TRDATT2" = local.database_instance_ssm_parameters
-      "t2-nomis-web-a"          = local.weblogic_ssm_parameters
-      "t2-nomis-web-b"          = local.weblogic_ssm_parameters
+      "t2-nomis-web-a"          = local.weblogic_ssm_parameters_old
+      "t2-nomis-web-b"          = local.weblogic_ssm_parameters_old
 
       # T3
-      "t3-nomis-web-a" = local.weblogic_ssm_parameters
-      "t3-nomis-web-b" = local.weblogic_ssm_parameters
+      "t3-nomis-web-a" = local.weblogic_ssm_parameters_old
+      "t3-nomis-web-b" = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {

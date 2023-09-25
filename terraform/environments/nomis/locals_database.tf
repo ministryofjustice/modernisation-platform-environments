@@ -6,6 +6,12 @@
 
 locals {
 
+  database_ssm_parameters = {
+    parameters = {
+      passwords = { description = "database passwords" }
+    }
+  }
+
   # Include this in ec2-instance ssm parameters if using oracle-db-standby-setup role with azure storage account
   database_azure_ssm_parameters = {
     prefix = "/database/"
