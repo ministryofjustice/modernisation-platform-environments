@@ -27,10 +27,29 @@ locals {
       }
     }
 
+    baseline_iam_policies = {
+      Ec2ProdWeblogicPolicy = {
+        description = "Permissions required for prod Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/prod/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMP/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ssm_parameters = {
       # NEW
       "/oracle/weblogic/prod"  = local.weblogic_ssm_parameters
-      "/oracle/database/CNOMP" = local.database_ssm_parameters
+      "/oracle/database/CNOMP" = local.database_1_ssm_parameters
 
       # OLD
       "prod-nomis-web-a" = local.weblogic_ssm_parameters_old

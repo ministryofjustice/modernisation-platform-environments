@@ -31,10 +31,29 @@ locals {
       }
     }
 
+    baseline_iam_policies = {
+      Ec2Qa11RWeblogicPolicy = {
+        description = "Permissions required for QA11R Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/qa11r/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/qa11r/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ssm_parameters = {
       # NEW
       "/oracle/weblogic/qa11r" = local.weblogic_ssm_parameters
-      "/oracle/database/qa11r" = local.database_ssm_parameters
+      "/oracle/database/qa11r" = local.database_1_ssm_parameters
 
       # OLD
       # "dev-nomis-web-a" = local.weblogic_ssm_parameters

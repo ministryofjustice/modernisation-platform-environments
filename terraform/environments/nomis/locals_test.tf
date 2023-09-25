@@ -37,14 +37,65 @@ locals {
       }
     }
 
+    baseline_iam_policies = {
+      Ec2T1WeblogicPolicy = {
+        description = "Permissions required for T1 Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t1/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMT1/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+      Ec2T2WeblogicPolicy = {
+        description = "Permissions required for T2 Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t2/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMT2/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+      Ec2T3WeblogicPolicy = {
+        description = "Permissions required for T3 Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t3/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMT3/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ssm_parameters = {
       # NEW
       "/oracle/weblogic/t1"     = local.weblogic_ssm_parameters
       "/oracle/weblogic/t2"     = local.weblogic_ssm_parameters
       "/oracle/weblogic/t3"     = local.weblogic_ssm_parameters
-      "/oracle/database/CNOMT1" = local.database_ssm_parameters
-      "/oracle/database/CNOMT2" = local.database_ssm_parameters
-      "/oracle/database/CNOMT3" = local.database_ssm_parameters
+      "/oracle/database/CNOMT1" = local.database_1_ssm_parameters
+      "/oracle/database/CNOMT2" = local.database_1_ssm_parameters
+      "/oracle/database/CNOMT3" = local.database_1_ssm_parameters
 
       # OLD
       # T1

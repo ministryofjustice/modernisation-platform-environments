@@ -27,10 +27,29 @@ locals {
       }
     }
 
+    baseline_iam_policies = {
+      Ec2PreprodWeblogicPolicy = {
+        description = "Permissions required for Preprod Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/preprod/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMPP/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ssm_parameters = {
       # NEW
       "/oracle/weblogic/preprod" = local.weblogic_ssm_parameters
-      "/oracle/database/CNOMPP"  = local.database_ssm_parameters
+      "/oracle/database/CNOMPP"  = local.database_1_ssm_parameters
 
       # OLD
       "preprod-nomis-web-a" = local.weblogic_ssm_parameters_old
