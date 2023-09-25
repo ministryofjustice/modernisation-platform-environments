@@ -231,11 +231,11 @@ output "aws_volume_attachment_diag_att_volume_id" {
 
 #
 
-output "aws_cloudwatch_metric_alarm_disk_free_dbf_arn" {
-  description = "aws_cloudwatch_metric_alarm disk_free_dbf arn"
-  value       = aws_cloudwatch_metric_alarm.disk_free_dbf.arn
+output "aws_cloudwatch_metric_alarm_disk_free_ebsdb_dbf_arn" {
+  description = "aws_cloudwatch_metric_alarm disk_free_ebsdb_dbf arn"
+  value       = aws_cloudwatch_metric_alarm.disk_free_ebsdb_dbf.arn
 }
-output "aws_cloudwatch_metric_alarm_disk_free_dbf_id" {
-  description = "aws_cloudwatch_metric_alarm disk_free_dbf id"
-  value       = aws_cloudwatch_metric_alarm.disk_free_dbf.id
+output "aws_cloudwatch_metric_alarm_disk_free_ebsdb_dbf_id" {
+  description = "aws_cloudwatch_metric_alarm disk_free_ebsdb_dbf id"
+  value       = aws_cloudwatch_metric_alarm.disk_free_ebsdb_dbf.id
 }
