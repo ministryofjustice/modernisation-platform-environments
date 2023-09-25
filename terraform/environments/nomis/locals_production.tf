@@ -123,6 +123,31 @@ locals {
         })
       })
 
+      prod-nomis-db-1-b = merge(local.database_ec2_b, {
+        tags = merge(local.database_ec2_b.tags, {
+          nomis-environment         = "prod"
+          description               = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
+          oracle-sids               = ""
+          is-production             = "true-no-default-backup-workaround"
+        })
+        config = merge(module.baseline_presets.ec2_instance.config.db, {
+          ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          ami_owner = "self"
+        })
+        instance = merge(local.database_ec2_b.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 3000 }
+        })
+        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
+        })
+        cloudwatch_metric_alarms = {}
+      })
+
       prod-nomis-db-2 = merge(local.database_ec2_a, {
         tags = merge(local.database_ec2_a.tags, {
           nomis-environment         = "prod"
@@ -146,6 +171,31 @@ locals {
           local.database_ec2_a.cloudwatch_metric_alarms,
           local.fixngo_connection_cloudwatch_metric_alarms
         )
+      })
+
+      prod-nomis-db-2-b = merge(local.database_ec2_b, {
+        tags = merge(local.database_ec2_b.tags, {
+          nomis-environment         = "prod"
+          description               = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
+          oracle-sids               = ""
+          is-production             = "true-no-default-backup-workaround"
+        })
+        config = merge(module.baseline_presets.ec2_instance.config.db, {
+          ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          ami_owner = "self"
+        })
+        instance = merge(local.database_ec2_b.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 3000 }
+        })
+        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
+        })
+        cloudwatch_metric_alarms = {}
       })
 
       prod-nomis-db-3 = merge(local.database_ec2_a, {
@@ -231,9 +281,6 @@ locals {
     baseline_route53_zones = {
 
       "hmpps-production.modernisation-platform.internal" = {
-        records = [
-          { name = "oem.nomis", type = "A", ttl = "300", records = ["10.40.0.136"] },
-        ]
       }
       "nomis.service.justice.gov.uk" = {
         # NOTE this top level zone is currently hosted in Azure but
