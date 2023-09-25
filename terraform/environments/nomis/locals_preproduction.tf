@@ -27,14 +27,43 @@ locals {
       }
     }
 
+    baseline_iam_policies = {
+      Ec2PreprodWeblogicPolicy = {
+        description = "Permissions required for Preprod Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/preprod/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMPP/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ssm_parameters = {
-      "preprod-nomis-web-a" = local.weblogic_ssm_parameters
-      "preprod-nomis-web-b" = local.weblogic_ssm_parameters
+      # NEW
+      "/oracle/weblogic/preprod" = local.weblogic_ssm_parameters
+      "/oracle/database/CNOMPP"  = local.database_1_ssm_parameters
+
+      # OLD
+      "preprod-nomis-web-a" = local.weblogic_ssm_parameters_old
+      "preprod-nomis-web-b" = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       preprod-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2PreprodWeblogicPolicy",
+          ])
+        })
         instance = merge(local.weblogic_ec2_a.instance, {
           instance_type = "t2.xlarge"
         })
@@ -57,6 +86,11 @@ locals {
 
       # green deployment
       preprod-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_b.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2PreprodWeblogicPolicy",
+          ])
+        })
         instance = merge(local.weblogic_ec2_b.instance, {
           instance_type = "t2.xlarge"
         })

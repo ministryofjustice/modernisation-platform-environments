@@ -27,9 +27,33 @@ locals {
       }
     }
 
+    baseline_iam_policies = {
+      Ec2ProdWeblogicPolicy = {
+        description = "Permissions required for prod Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/prod/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMP/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ssm_parameters = {
-      "prod-nomis-web-a" = local.weblogic_ssm_parameters
-      "prod-nomis-web-b" = local.weblogic_ssm_parameters
+      # NEW
+      "/oracle/weblogic/prod"  = local.weblogic_ssm_parameters
+      "/oracle/database/CNOMP" = local.database_1_ssm_parameters
+
+      # OLD
+      "prod-nomis-web-a" = local.weblogic_ssm_parameters_old
+      "prod-nomis-web-b" = local.weblogic_ssm_parameters_old
     }
 
     baseline_cloudwatch_log_groups = {
@@ -56,6 +80,11 @@ locals {
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       prod-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2ProdWeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "prod"
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
@@ -67,6 +96,11 @@ locals {
 
       # green deployment
       prod-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_b.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2ProdWeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "prod"
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
@@ -125,10 +159,10 @@ locals {
 
       prod-nomis-db-1-b = merge(local.database_ec2_b, {
         tags = merge(local.database_ec2_b.tags, {
-          nomis-environment         = "prod"
-          description               = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
-          oracle-sids               = ""
-          is-production             = "true-no-default-backup-workaround"
+          nomis-environment = "prod"
+          description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
+          oracle-sids       = ""
+          is-production     = "true-no-default-backup-workaround"
         })
         config = merge(module.baseline_presets.ec2_instance.config.db, {
           ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -175,10 +209,10 @@ locals {
 
       prod-nomis-db-2-b = merge(local.database_ec2_b, {
         tags = merge(local.database_ec2_b.tags, {
-          nomis-environment         = "prod"
-          description               = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
-          oracle-sids               = ""
-          is-production             = "true-no-default-backup-workaround"
+          nomis-environment = "prod"
+          description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
+          oracle-sids       = ""
+          is-production     = "true-no-default-backup-workaround"
         })
         config = merge(module.baseline_presets.ec2_instance.config.db, {
           ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"

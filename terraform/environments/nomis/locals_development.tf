@@ -31,13 +31,37 @@ locals {
       }
     }
 
+    baseline_iam_policies = {
+      Ec2Qa11RWeblogicPolicy = {
+        description = "Permissions required for QA11R Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/qa11r/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/qa11r/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ssm_parameters = {
+      # NEW
+      "/oracle/weblogic/qa11r" = local.weblogic_ssm_parameters
+      "/oracle/database/qa11r" = local.database_1_ssm_parameters
+
+      # OLD
       # "dev-nomis-web-a" = local.weblogic_ssm_parameters
       # "dev-nomis-web-b" = local.weblogic_ssm_parameters
       # "qa11g-nomis-web-a" = local.weblogic_ssm_parameters
       # "qa11g-nomis-web-b" = local.weblogic_ssm_parameters
-      "qa11r-nomis-web-a" = local.weblogic_ssm_parameters
-      "qa11r-nomis-web-b" = local.weblogic_ssm_parameters
+      "qa11r-nomis-web-a" = local.weblogic_ssm_parameters_old
+      "qa11r-nomis-web-b" = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -150,8 +174,13 @@ locals {
       })
 
       qa11r-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2Qa11RWeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
-          nomis-environment    = "syscon"
+          nomis-environment    = "qa11r"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "qa11r"
@@ -164,8 +193,13 @@ locals {
       })
 
       qa11r-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2Qa11RWeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
-          nomis-environment    = "syscon"
+          nomis-environment    = "qa11r"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "qa11r"

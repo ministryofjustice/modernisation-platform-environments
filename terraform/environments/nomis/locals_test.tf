@@ -37,7 +37,67 @@ locals {
       }
     }
 
+    baseline_iam_policies = {
+      Ec2T1WeblogicPolicy = {
+        description = "Permissions required for T1 Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t1/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMT1/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+      Ec2T2WeblogicPolicy = {
+        description = "Permissions required for T2 Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t2/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMT2/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+      Ec2T3WeblogicPolicy = {
+        description = "Permissions required for T3 Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t3/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMT3/weblogic-passwords",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ssm_parameters = {
+      # NEW
+      "/oracle/weblogic/t1"     = local.weblogic_ssm_parameters
+      "/oracle/weblogic/t2"     = local.weblogic_ssm_parameters
+      "/oracle/weblogic/t3"     = local.weblogic_ssm_parameters
+      "/oracle/database/CNOMT1" = local.database_1_ssm_parameters
+      "/oracle/database/CNOMT2" = local.database_1_ssm_parameters
+      "/oracle/database/CNOMT3" = local.database_1_ssm_parameters
+
+      # OLD
       # T1
       "t1-nomis-db-1-a/CNOMT1"  = local.database_instance_ssm_parameters
       "t1-nomis-db-1-a/NDHT1"   = local.database_instance_ssm_parameters
@@ -51,8 +111,8 @@ locals {
       "t1-nomis-db-2-b/MIST1"   = local.database_instance_ssm_parameters
       "t1-nomis-db-2-a"         = local.database_ec2_misload_ssm_parameters
       "t1-nomis-db-2-b"         = local.database_ec2_misload_ssm_parameters
-      "t1-nomis-web-a"          = local.weblogic_ssm_parameters
-      "t1-nomis-web-b"          = local.weblogic_ssm_parameters
+      "t1-nomis-web-a"          = local.weblogic_ssm_parameters_old
+      "t1-nomis-web-b"          = local.weblogic_ssm_parameters_old
       "t1-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
       "t1-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
       "t2-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
@@ -65,17 +125,22 @@ locals {
       "t2-nomis-db-1-b/CNOMT2"  = local.database_instance_ssm_parameters
       "t2-nomis-db-1-b/NDHT2"   = local.database_instance_ssm_parameters
       "t2-nomis-db-1-b/TRDATT2" = local.database_instance_ssm_parameters
-      "t2-nomis-web-a"          = local.weblogic_ssm_parameters
-      "t2-nomis-web-b"          = local.weblogic_ssm_parameters
+      "t2-nomis-web-a"          = local.weblogic_ssm_parameters_old
+      "t2-nomis-web-b"          = local.weblogic_ssm_parameters_old
 
       # T3
-      "t3-nomis-web-a" = local.weblogic_ssm_parameters
-      "t3-nomis-web-b" = local.weblogic_ssm_parameters
+      "t3-nomis-web-a" = local.weblogic_ssm_parameters_old
+      "t3-nomis-web-b" = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       t1-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2T1WeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
@@ -86,6 +151,11 @@ locals {
 
       # green deployment
       t1-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_b.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2T1WeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
@@ -115,6 +185,11 @@ locals {
 
       # blue deployment
       t2-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2T2WeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t2"
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
@@ -125,6 +200,11 @@ locals {
 
       # green deployment
       t2-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_b.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2T2WeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t2"
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
@@ -154,6 +234,11 @@ locals {
 
       # blue deployment
       t3-nomis-web-a = merge(local.weblogic_ec2_a, {
+        config = merge(local.weblogic_ec2_a.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+            "Ec2T3WeblogicPolicy",
+          ])
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t3"
           oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
@@ -167,6 +252,11 @@ locals {
 
       # green deployment
       t3-nomis-web-b = merge(local.weblogic_ec2_b, {
+        config = merge(local.weblogic_ec2_b.config, {
+          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+            "Ec2T3WeblogicPolicy",
+          ])
+        })
         instance = merge(local.weblogic_ec2_b.instance, {
           instance_type = "t2.xlarge"
         })

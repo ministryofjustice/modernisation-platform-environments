@@ -1,6 +1,13 @@
 locals {
 
   weblogic_ssm_parameters = {
+    parameters = {
+      passwords = { description = "weblogic passwords" }
+      rms       = { description = "combined reporting secrets" }
+    }
+  }
+
+  weblogic_ssm_parameters_old = {
     prefix = "/weblogic/"
     parameters = {
       admin_username     = { description = "weblogic admin username" }
