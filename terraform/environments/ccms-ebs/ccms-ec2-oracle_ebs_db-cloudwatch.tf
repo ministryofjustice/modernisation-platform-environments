@@ -10,7 +10,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redoa" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -19,7 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redoa" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme2n1"
+    device       = "nvme2n1"
   }
 }
 
@@ -44,7 +44,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_dbf" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme3n1" # local.application_data.accounts[local.environment].dbf_device
+    device       = "nvme3n1" # local.application_data.accounts[local.environment].dbf_device
   }
 }
 
@@ -60,7 +60,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_arch" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -69,7 +69,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_arch" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme4n1"
+    device       = "nvme4n1"
   }
 }
 
@@ -85,7 +85,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_backup" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -94,7 +94,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_backup" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme5n1"
+    device       = "nvme5n1"
   }
 }
 
@@ -110,7 +110,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_temp" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -119,7 +119,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_temp" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme6n1" # "/dev/sdc"
+    device       = "nvme6n1" # "/dev/sdc"
   }
 }
 
@@ -135,7 +135,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_diag" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -144,7 +144,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_diag" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme7n1"
+    device       = "nvme7n1"
   }
 }
 
@@ -160,7 +160,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redob" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -169,7 +169,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redob" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme8n1"
+    device       = "nvme8n1"
   }
 }
 
@@ -185,7 +185,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_home" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -194,7 +194,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_home" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme9n1"
+    device       = "nvme9n1"
   }
 }
 
@@ -210,7 +210,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_backup_prod" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -219,7 +219,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_backup_prod" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme10n1"
+    device       = "nvme10n1"
   }
 }
 
@@ -235,7 +235,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_u01" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -244,7 +244,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_u01" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme11n1"
+    device       = "nvme11n1"
   }
 }
 
@@ -260,7 +260,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_export_home" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -269,7 +269,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_export_home" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme12n1"
+    device       = "nvme12n1"
   }
 }
 
@@ -285,7 +285,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_techst" {
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
+  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
@@ -294,6 +294,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_techst" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "/dev/nvme13n1"
+    device       = "nvme13n1"
   }
 }
