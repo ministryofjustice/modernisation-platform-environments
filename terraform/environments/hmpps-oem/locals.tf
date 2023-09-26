@@ -54,20 +54,12 @@ locals {
     }
   }
 
-  baseline_secretsmanager_secrets = {
-    "/oracle/oem"            = local.oem_secretsmanager_secrets
-    "/oracle/database/EMREP" = local.oem_secretsmanager_secrets
-  }
+  baseline_secretsmanager_secrets = {}
 
   baseline_security_groups = {
     data-oem = local.security_groups.data_oem
   }
 
-  baseline_sns_topics = {}
-
-  baseline_ssm_parameters = {
-    "/oracle/oem"              = local.oem_ssm_parameters_passwords
-    "/oracle/database/EMREP"   = local.oem_ssm_parameters_passwords
-    "/oracle/database/TRCVCAT" = local.oem_ssm_parameters_passwords
-  }
+  baseline_sns_topics     = {}
+  baseline_ssm_parameters = {}
 }
