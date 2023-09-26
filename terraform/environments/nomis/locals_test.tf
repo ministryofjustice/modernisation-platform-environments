@@ -134,7 +134,7 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      # blue deployment
+      # ACTIVE (blue deployment)
       t1-nomis-web-a = merge(local.weblogic_ec2_a, {
         config = merge(local.weblogic_ec2_a.config, {
           instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
@@ -149,12 +149,20 @@ locals {
         })
       })
 
-      # green deployment
+      # NOT-ACTIVE (green deployment)
       t1-nomis-web-b = merge(local.weblogic_ec2_b, {
+        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
+          desired_capacity = 1
+        })
         config = merge(local.weblogic_ec2_b.config, {
           instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
             "Ec2T1WeblogicPolicy",
           ])
+        })
+        user_data_cloud_init = merge(local.database_ec2_b.user_data_cloud_init, {
+          args = merge(local.database_ec2_b.user_data_cloud_init.args, {
+            branch = "2468978f69041b1204ffa3dc55dfb81c1a2ad3e1" # 2023-09-25 new SSM params
+          })
         })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t1"
@@ -183,7 +191,7 @@ locals {
         })
       })
 
-      # blue deployment
+      # ACTIVE (blue deployment)
       t2-nomis-web-a = merge(local.weblogic_ec2_a, {
         config = merge(local.weblogic_ec2_a.config, {
           instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
@@ -198,12 +206,20 @@ locals {
         })
       })
 
-      # green deployment
+      # NOT-ACTIVE (green deployment)
       t2-nomis-web-b = merge(local.weblogic_ec2_b, {
+        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
+          desired_capacity = 1
+        })
         config = merge(local.weblogic_ec2_b.config, {
           instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
             "Ec2T2WeblogicPolicy",
           ])
+        })
+        user_data_cloud_init = merge(local.database_ec2_b.user_data_cloud_init, {
+          args = merge(local.database_ec2_b.user_data_cloud_init.args, {
+            branch = "2468978f69041b1204ffa3dc55dfb81c1a2ad3e1" # 2023-09-25 new SSM params
+          })
         })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t2"
@@ -232,8 +248,11 @@ locals {
         })
       })
 
-      # blue deployment
+      # NON-ACTIVE (blue deployment)
       t3-nomis-web-a = merge(local.weblogic_ec2_a, {
+        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
+          desired_capacity = 0
+        })
         config = merge(local.weblogic_ec2_a.config, {
           instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
             "Ec2T3WeblogicPolicy",
@@ -245,13 +264,13 @@ locals {
           oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T3CNOM"
         })
-        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 0
-        })
       })
 
-      # green deployment
+      # ACTIVE (green deployment)
       t3-nomis-web-b = merge(local.weblogic_ec2_b, {
+        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
+          desired_capacity = 1
+        })
         config = merge(local.weblogic_ec2_b.config, {
           instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
             "Ec2T3WeblogicPolicy",
@@ -260,14 +279,16 @@ locals {
         instance = merge(local.weblogic_ec2_b.instance, {
           instance_type = "t2.xlarge"
         })
+        user_data_cloud_init = merge(local.database_ec2_b.user_data_cloud_init, {
+          args = merge(local.database_ec2_b.user_data_cloud_init.args, {
+            branch = "2468978f69041b1204ffa3dc55dfb81c1a2ad3e1" # 2023-09-25 new SSM params
+          })
+        })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t3"
           oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T3CNOM"
-        })
-        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
-          desired_capacity = 1
         })
       })
 
