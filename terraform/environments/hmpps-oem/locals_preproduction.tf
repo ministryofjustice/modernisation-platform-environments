@@ -11,11 +11,11 @@ locals {
         })
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
           args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "2468978f69041b1204ffa3dc55dfb81c1a2ad3e1" # 2023-09-25 new SSM params
+            branch = "3d2586abc9063aee8d09add6098e534962145a73" # 2023-09-26 preprod ansible config
           })
         })
       })
-      # test-oem-b = merge(local.oem_ec2_default, {
+      # preprod-oem-b = merge(local.oem_ec2_default, {
       #   config = merge(local.oem_ec2_default.config, {
       #     availability_zone = "eu-west-2b"
       #   })
