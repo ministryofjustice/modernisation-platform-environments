@@ -1,5 +1,5 @@
-resource "aws_wafv2_web_acl"  "waf" {
-  name  = "${local.environment}"
+resource "aws_wafv2_web_acl" "waf" {
+  name  = local.environment
   scope = "REGIONAL"
 
   default_action {
@@ -22,9 +22,9 @@ resource "aws_wafv2_web_acl"  "waf" {
     }
 
     visibility_config {
-        cloudwatch_metrics_enabled = true
-        metric_name                = "AWSManagedRulesCommonRuleSet"
-        sampled_requests_enabled   = false
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWSManagedRulesCommonRuleSet"
+      sampled_requests_enabled   = false
     }
   }
 
@@ -44,18 +44,12 @@ resource "aws_wafv2_web_acl"  "waf" {
     }
 
     visibility_config {
-        cloudwatch_metrics_enabled = true
-        metric_name                = "AWSManagedRulesAmazonIpReputationList"
-        sampled_requests_enabled   = false
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWSManagedRulesAmazonIpReputationList"
+      sampled_requests_enabled   = false
     }
   }
 
-    visibility_config {
-        cloudwatch_metrics_enabled = true
-        metric_name                = "AWSManagedRulesAnonymousIpList"
-        sampled_requests_enabled   = false
-    }
-  }
 
   visibility_config {
     cloudwatch_metrics_enabled = true
