@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_metric_alarm" "disk_free_accessgate_temp" {
   count                     = local.application_data.accounts[local.environment].accessgate_no_instances
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-accessgate-disk_free-temp"
+  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-accessgate${count.index + 1}-disk_free-temp"
   alarm_description         = "This metric monitors the amount of free disk space on /temp mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
@@ -26,7 +26,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_accessgate_temp" {
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_accessgate_home" {
   count                     = local.application_data.accounts[local.environment].accessgate_no_instances
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-accessgate-disk_free-home"
+  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-accessgate${count.index + 1}-disk_free-home"
   alarm_description         = "This metric monitors the amount of free disk space on /home mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
@@ -52,7 +52,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_accessgate_home" {
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_accessgate_ccms" {
   count                     = local.application_data.accounts[local.environment].accessgate_no_instances
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-accessgate-disk_free-ccms"
+  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-accessgate${count.index + 1}-disk_free-ccms"
   alarm_description         = "This metric monitors the amount of free disk space on /CCMS mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
