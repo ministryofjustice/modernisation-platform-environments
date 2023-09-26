@@ -73,6 +73,13 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
   }
   ingress {
+    description = "Access to the managed server from laa development"
+    from_port   = 9502
+    to_port     = 9502
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz] #!ImportValue env-ManagementCIDR
+  }
+  ingress {
     description = "Access to the managed server"
     from_port   = 9514
     to_port     = 9514
