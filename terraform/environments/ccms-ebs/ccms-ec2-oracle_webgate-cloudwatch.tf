@@ -52,7 +52,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_webgate_home" {
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_webgate_ccms" {
   count                     = local.application_data.accounts[local.environment].webgate_no_instances
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-webgate-disk_free_u01"
+  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-webgate-disk_free-ccms"
   alarm_description         = "This metric monitors the amount of free disk space on /CCMS mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
