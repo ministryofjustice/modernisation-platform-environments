@@ -19,15 +19,6 @@ resource "aws_security_group_rule" "tcp_5439_ingress_vpc" {
   type              = "ingress"
 }
 
-resource "aws_security_group_rule" "tcp_5439_ingress_lb" {
-  from_port                = 5439
-  protocol                 = "TCP"
-  security_group_id        = aws_security_group.wepi_sg_allow_redshift.id
-  source_security_group_id = aws_security_group.redshift-data-lb.id
-  to_port                  = 5439
-  type                     = "ingress"
-}
-
 resource "aws_security_group_rule" "tcp_5439_ingress_bastion" {
   from_port                = 5439
   protocol                 = "TCP"
@@ -35,6 +26,15 @@ resource "aws_security_group_rule" "tcp_5439_ingress_bastion" {
   source_security_group_id = module.wepi_bastion.bastion_security_group
   to_port                  = 5439
   type                     = "ingress"
+}
+
+resource "aws_security_group_rule" "tcp_5439_ingress_customer" {
+  cidr_blocks       = ["10.0.0.0/8"]
+  from_port         = 5439
+  protocol          = "TCP"
+  security_group_id = aws_security_group.wepi_sg_allow_redshift.id
+  to_port           = 5439
+  type              = "ingress"
 }
 
 resource "aws_security_group_rule" "tcp_443_egress_s3" {
