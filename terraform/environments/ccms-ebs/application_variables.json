@@ -75,7 +75,7 @@
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
       "ebs_default_iops_test": 9000,
-      "dbf_device": "/dev/nvme5n1",
+      "dbf_device": "nvme5n1",
       "dbf_path": "/CCMS/EBS/dbf",
       "ebs_type_ebsdb_backup": "gp3"
     },
@@ -150,7 +150,7 @@
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
-      "dbf_device": "/dev/nvme2n1",
+      "dbf_device": "nvme2n1",
       "dbf_path": "/CCMS/EBS/dbf",
       "ebs_type_ebsdb_backup": "io2"
     },
@@ -225,7 +225,7 @@
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
-      "dbf_device": "/dev/nvme3n1",
+      "dbf_device": "nvme3n1",
       "dbf_path": "/CCMS/EBS/dbf",
       "ebs_type_ebsdb_backup": "io2"
     },
@@ -300,7 +300,7 @@
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
-      "dbf_device": "/dev/nvme8n1",
+      "dbf_device": "nvme8n1",
       "dbf_path": "/CCMS/EBSPROD/dbf",
       "ebs_size_ebsdb_dbf2": 9000,
       "ebs_default_dbf2_iops": 10000,
