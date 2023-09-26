@@ -24,6 +24,7 @@ module "rds" {
   username                    = local.application_data.accounts[local.environment].username
   db_password_rotation_period = local.application_data.accounts[local.environment].db_password_rotation_period
   license_model               = local.application_data.accounts[local.environment].license_model
+  managementcidr                 = local.application_data.accounts[local.environment].managementcidr
   lz_vpc_cidr                 = local.application_data.accounts[local.environment].lz_vpc_cidr
   deletion_protection         = local.application_data.accounts[local.environment].deletion_protection
   rds_snapshot_arn            = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.application_data.accounts[local.environment].rds_snapshot_name)
