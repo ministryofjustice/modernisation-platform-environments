@@ -3,7 +3,7 @@
     "development": {
       "example_var": "dev-data",
       "ec2amiid": "ami-0226bb471f4122cd8",
-      "ec2instancetype": "r5a.large",
+      "ec2instancetype": "r5.large",
       "bucketname": "laa-oracle-software",
       "orahomesize": "200",
       "orahome_snapshot": "snap-0dd55da487a23f8b7",
@@ -28,7 +28,7 @@
       "username": "sysdba",
       "db_password_rotation_period": 28,
       "license_model": "bring-your-own-license",
-      "rds_snapshot_name": "man-oas-migration-laws-3462",
+      "rds_snapshot_name": "man-oas-migration-laws-3462-new",
       "lz_vpc_cidr": "10.202.0.0/20",
       "deletion_protection": "false",
       "dashboard_widget_period": 60,
