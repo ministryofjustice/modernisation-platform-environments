@@ -3,7 +3,7 @@
     "development": {
       "example_var": "dev-data",
       "ec2amiid": "ami-0226bb471f4122cd8",
-      "ec2instancetype": "r5.large",
+      "ec2instancetype": "r5a.large",
       "bucketname": "laa-oracle-software",
       "orahomesize": "200",
       "orahome_snapshot": "snap-0dd55da487a23f8b7",
