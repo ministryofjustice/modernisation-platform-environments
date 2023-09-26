@@ -124,6 +124,32 @@ locals {
           component   = "web"
         }
       }
+
+      pp-csr-w-8-b-T = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-w-8-b"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}b"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          monitoring              = true
+          vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 200 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        tags = {
+          # description = "copy of PPCWW00008 for csr ${local.environment}"
+          description = "testing group policies in ${local.environment}"
+          os-type     = "Windows"
+          ami         = "pp-csr-w-8-b"
+          component   = "web"
+        }
+      }
     }
 
     baseline_ec2_autoscaling_groups = {
