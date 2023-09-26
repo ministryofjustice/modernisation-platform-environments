@@ -96,10 +96,18 @@ locals {
 
       # green deployment
       prod-nomis-web-b = merge(local.weblogic_ec2_b, {
+        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
+          desired_capacity = 1
+        })
         config = merge(local.weblogic_ec2_b.config, {
           instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
           ])
+        })
+        user_data_cloud_init = merge(local.database_ec2_b.user_data_cloud_init, {
+          args = merge(local.database_ec2_b.user_data_cloud_init.args, {
+            branch = "2468978f69041b1204ffa3dc55dfb81c1a2ad3e1" # 2023-09-25 new SSM params
+          })
         })
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "prod"
