@@ -155,6 +155,14 @@ resource "aws_security_group" "laalz-secgroup" {
     cidr_blocks = [var.lz_vpc_cidr]
   }
 
+  ingress {
+    description = "Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [var.managementcidr]
+  }
+
   egress {
     description = "Sql Net on 1521"
     from_port   = 1521
