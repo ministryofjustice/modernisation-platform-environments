@@ -125,7 +125,7 @@ locals {
         }
       }
 
-      pp-csr-w-8-b-poc = {
+      pp-csr-w-8-b-T = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "pp-csr-w-8-b"
           ami_owner                     = "self"
