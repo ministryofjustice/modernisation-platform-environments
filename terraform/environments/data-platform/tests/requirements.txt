@@ -1,2 +1,2 @@
-requests
-boto3
+requests==2.31.0
+boto3==1.28.51
