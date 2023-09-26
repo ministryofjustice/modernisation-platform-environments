@@ -35,6 +35,8 @@ locals {
   # DMS Specific
   setup_dms_instance      = local.application_data.accounts[local.environment].setup_dms_instance
   enable_replication_task = local.application_data.accounts[local.environment].enable_dms_replication_task
+  setup_fake_data_dms_instance      = local.application_data.accounts[local.environment].setup_fake_data_dms_instance
+  enable_fake_data_replication_task = local.application_data.accounts[local.environment].enable_fake_data_dms_replication_task
   # DataMart Specific
   datamart_endpoint = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["host"]
   datamart_port     = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["port"]
