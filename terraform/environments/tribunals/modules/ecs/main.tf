@@ -324,7 +324,6 @@ resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
   requires_compatibilities = [
     "EC2",
   ]
-  network_mode       = "awsvpc"
 
   volume {
     name = var.task_definition_volume
