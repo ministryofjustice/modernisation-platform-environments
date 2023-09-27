@@ -59,7 +59,7 @@ locals {
 
     baseline_iam_policies = {
       Ec2T1DatabasePolicy = {
-        description = "Permissions required for T1 Weblogic EC2s"
+        description = "Permissions required for T1 Database EC2s"
         statements = [
           {
             effect = "Allow"
@@ -81,6 +81,60 @@ locals {
             resources = [
               "arn:aws:ssm:*:*:parameter/oracle/database/*T1/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/T1*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T2DatabasePolicy = {
+        description = "Permissions required for T2 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::nomis-db-backup-bucket*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/database/*T2/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/T2*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T3DatabasePolicy = {
+        description = "Permissions required for T3 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::nomis-db-backup-bucket*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/database/*T3/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/T3*/*",
             ]
           }
         ]
@@ -446,6 +500,9 @@ locals {
         })
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2T2DatabasePolicy",
+          ])
         })
         user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
           args = merge(local.database_ec2_a.user_data_cloud_init.args, {
@@ -468,6 +525,11 @@ locals {
           description         = "T3 NOMIS database to replace Azure T3PDL0070"
           oracle-sids         = "T3CNOM"
           instance-scheduling = "skip-scheduling"
+        })
+        config = merge(local.database_ec2_a.config, {
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2T3DatabasePolicy",
+          ])
         })
         ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }

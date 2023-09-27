@@ -38,6 +38,33 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2ProdDatabasePolicy = {
+        description = "Permissions required for prod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::nomis-db-backup-bucket*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/database/*P/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/P*/*",
+            ]
+          }
+        ]
+      }
       Ec2ProdWeblogicPolicy = {
         description = "Permissions required for prod Weblogic EC2s"
         statements = [
@@ -117,8 +144,8 @@ locals {
             "Ec2ProdWeblogicPolicy",
           ])
         })
-        user_data_cloud_init = merge(local.database_ec2_b.user_data_cloud_init, {
-          args = merge(local.database_ec2_b.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.weblogic_ec2_b.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2_b.user_data_cloud_init.args, {
             branch = "2468978f69041b1204ffa3dc55dfb81c1a2ad3e1" # 2023-09-25 new SSM params
           })
         })
@@ -163,6 +190,9 @@ locals {
         })
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
         })
         instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.2xlarge"
@@ -185,9 +215,11 @@ locals {
           oracle-sids       = ""
           is-production     = "true-no-default-backup-workaround"
         })
-        config = merge(module.baseline_presets.ec2_instance.config.db, {
-          ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          ami_owner = "self"
+        config = merge(local.database_ec2_b.config, {
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          instance_profile_policies = concat(local.database_ec2_b.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
         })
         instance = merge(local.database_ec2_b.instance, {
           instance_type = "r6i.2xlarge"
@@ -210,6 +242,11 @@ locals {
           oracle-sids               = "CNMAUD"
           fixngo-connection-targets = "10.40.0.136 4903 10.40.129.79 22" # fixngo connection alarm
           is-production             = "true-no-default-backup-workaround"
+        })
+        config = merge(local.database_ec2_a.config, {
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
         })
         instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.2xlarge"
@@ -235,9 +272,11 @@ locals {
           oracle-sids       = ""
           is-production     = "true-no-default-backup-workaround"
         })
-        config = merge(module.baseline_presets.ec2_instance.config.db, {
-          ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          ami_owner = "self"
+        config = merge(local.database_ec2_b.config, {
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          instance_profile_policies = concat(local.database_ec2_b.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
         })
         instance = merge(local.database_ec2_b.instance, {
           instance_type = "r6i.2xlarge"
@@ -259,6 +298,11 @@ locals {
           description       = "Production NOMIS HA database to replace Azure PDPDL00062"
           oracle-sids       = "PCNOMHA"
           is-production     = "true-no-default-backup-workaround"
+        })
+        config = merge(local.database_ec2_a.config, {
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
         })
         instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.4xlarge"
