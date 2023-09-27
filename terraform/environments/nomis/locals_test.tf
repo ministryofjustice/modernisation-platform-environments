@@ -26,6 +26,16 @@ locals {
           module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy,
         ]
       }
+
+      # use this bucket for storing artefacts for use across all accounts
+      ec2-image-builder-nomis = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
     }
 
     baseline_acm_certificates = {
@@ -714,18 +724,6 @@ locals {
           { name = "t3-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-t3", type = "A", lbs_map_key = "private" },
         ]
-      }
-    }
-
-    baseline_s3_buckets = {
-      # use this bucket for storing artefacts for use across all accounts
-      ec2-image-builder-nomis = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
   }
