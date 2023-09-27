@@ -93,7 +93,7 @@ module "glue_domain_refresh_job" {
   execution_class             = "FLEX"
   worker_type                 = local.refresh_job_worker_type
   number_of_workers           = local.refresh_job_num_workers
-  max_concurrent              = 1
+  max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
   log_group_retention_in_days = 1
