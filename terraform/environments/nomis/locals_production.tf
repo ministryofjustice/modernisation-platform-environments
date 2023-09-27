@@ -78,8 +78,11 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      # blue deployment
+      # NOT-ACTIVE (blue deployment)
       prod-nomis-web-a = merge(local.weblogic_ec2_a, {
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
+          desired_capacity = 0
+        })
         config = merge(local.weblogic_ec2_a.config, {
           instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
@@ -94,7 +97,7 @@ locals {
         })
       })
 
-      # green deployment
+      # ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.weblogic_ec2_b, {
         autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
           desired_capacity = 1
@@ -279,7 +282,10 @@ locals {
 
           https = merge(
             local.weblogic_lb_listeners.https, {
-              alarm_target_group_names = ["prod-nomis-web-a-http-7777"]
+              alarm_target_group_names = [
+                # "prod-nomis-web-a-http-7777",
+                "prod-nomis-web-b-http-7777",
+              ]
               rules = {
                 prod-nomis-web-a-http-7777 = {
                   priority = 200
@@ -292,9 +298,6 @@ locals {
                       values = [
                         "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
-                        "c.production.nomis.az.justice.gov.uk",
-                        "c.nomis.service.justice.gov.uk",
-                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
@@ -310,6 +313,9 @@ locals {
                       values = [
                         "prod-nomis-web-b.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
+                        "c.production.nomis.az.justice.gov.uk",
+                        "c.nomis.service.justice.gov.uk",
+                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]

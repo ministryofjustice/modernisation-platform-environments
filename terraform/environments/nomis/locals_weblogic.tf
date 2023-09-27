@@ -186,10 +186,10 @@ locals {
         branch = "b13cad848c48c9b7e4b99a253f40b6602206a9d8" # 2023-06-12 update DSOS-1934
       })
     })
-    autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {})
-    # autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-    #  desired_capacity = 0
-    # })
+    # autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {})
+    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      desired_capacity = 0
+    })
     # cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
       deployment = "blue"
