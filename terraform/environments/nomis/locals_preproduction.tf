@@ -7,6 +7,16 @@ locals {
     cloudwatch_metric_alarms_dbnames         = []
     cloudwatch_metric_alarms_dbnames_misload = []
 
+    baseline_s3_buckets = {
+      nomis-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
+        ]
+      }
+    }
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -28,6 +38,33 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2PreprodDatabasePolicy = {
+        description = "Permissions required for Preprod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::nomis-db-backup-bucket*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/database/*PP/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/PP*/*",
+            ]
+          }
+        ]
+      }
       Ec2PreprodWeblogicPolicy = {
         description = "Permissions required for Preprod Weblogic EC2s"
         statements = [

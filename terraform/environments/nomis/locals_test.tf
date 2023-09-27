@@ -18,6 +18,26 @@ locals {
       "T1MIS"
     ]
 
+    baseline_s3_buckets = {
+      nomis-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy,
+        ]
+      }
+
+      # use this bucket for storing artefacts for use across all accounts
+      ec2-image-builder-nomis = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+    }
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -38,6 +58,54 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2T1DatabasePolicy = {
+        description = "Permissions required for T1 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/database/*T1/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/T1*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T2DatabasePolicy = {
+        description = "Permissions required for T2 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/database/*T2/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/T2*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T3DatabasePolicy = {
+        description = "Permissions required for T3 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/database/*T3/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/T3*/*",
+            ]
+          }
+        ]
+      }
       Ec2T1WeblogicPolicy = {
         description = "Permissions required for T1 Weblogic EC2s"
         statements = [
@@ -342,6 +410,9 @@ locals {
         })
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2T1DatabasePolicy",
+          ])
         })
         user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
           args = merge(local.database_ec2_a.user_data_cloud_init.args, {
@@ -368,6 +439,9 @@ locals {
         })
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2T1DatabasePolicy",
+          ])
         })
         user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
           args = merge(local.database_ec2_a.user_data_cloud_init.args, {
@@ -393,6 +467,9 @@ locals {
         })
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2T2DatabasePolicy",
+          ])
         })
         user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
           args = merge(local.database_ec2_a.user_data_cloud_init.args, {
@@ -415,6 +492,11 @@ locals {
           description         = "T3 NOMIS database to replace Azure T3PDL0070"
           oracle-sids         = "T3CNOM"
           instance-scheduling = "skip-scheduling"
+        })
+        config = merge(local.database_ec2_a.config, {
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2T3DatabasePolicy",
+          ])
         })
         ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
@@ -671,18 +753,6 @@ locals {
           { name = "t3-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-t3", type = "A", lbs_map_key = "private" },
         ]
-      }
-    }
-
-    baseline_s3_buckets = {
-      # use this bucket for storing artefacts for use across all accounts
-      ec2-image-builder-nomis = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
   }

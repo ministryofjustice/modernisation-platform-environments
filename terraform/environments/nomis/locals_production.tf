@@ -7,6 +7,16 @@ locals {
     cloudwatch_metric_alarms_dbnames         = []
     cloudwatch_metric_alarms_dbnames_misload = []
 
+    baseline_s3_buckets = {
+      nomis-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
+        ]
+      }
+    }
+
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -28,6 +38,22 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2ProdDatabasePolicy = {
+        description = "Permissions required for prod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/database/*P/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/P*/*",
+            ]
+          }
+        ]
+      }
       Ec2ProdWeblogicPolicy = {
         description = "Permissions required for prod Weblogic EC2s"
         statements = [
@@ -107,8 +133,8 @@ locals {
             "Ec2ProdWeblogicPolicy",
           ])
         })
-        user_data_cloud_init = merge(local.database_ec2_b.user_data_cloud_init, {
-          args = merge(local.database_ec2_b.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.weblogic_ec2_b.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2_b.user_data_cloud_init.args, {
             branch = "2468978f69041b1204ffa3dc55dfb81c1a2ad3e1" # 2023-09-25 new SSM params
           })
         })
@@ -153,6 +179,9 @@ locals {
         })
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
         })
         instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.2xlarge"
@@ -168,30 +197,32 @@ locals {
         })
       })
 
-      prod-nomis-db-1-b = merge(local.database_ec2_b, {
-        tags = merge(local.database_ec2_b.tags, {
-          nomis-environment = "prod"
-          description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
-          oracle-sids       = ""
-          is-production     = "true-no-default-backup-workaround"
-        })
-        config = merge(module.baseline_presets.ec2_instance.config.db, {
-          ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          ami_owner = "self"
-        })
-        instance = merge(local.database_ec2_b.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 3000 }
-        })
-        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
-          data  = { total_size = 4000 }
-          flash = { total_size = 1000 }
-        })
-        cloudwatch_metric_alarms = {}
-      })
+      # prod-nomis-db-1-b = merge(local.database_ec2_b, {
+      #   tags = merge(local.database_ec2_b.tags, {
+      #     nomis-environment = "prod"
+      #     description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
+      #     oracle-sids       = ""
+      #     is-production     = "true-no-default-backup-workaround"
+      #   })
+      #   config = merge(local.database_ec2_b.config, {
+      #     ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+      #     instance_profile_policies = concat(local.database_ec2_b.config.instance_profile_policies, [
+      #       "Ec2ProdDatabasePolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.database_ec2_b.instance, {
+      #     instance_type = "r6i.2xlarge"
+      #   })
+      #   ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
+      #     "/dev/sdb" = { label = "app", size = 100 }
+      #     "/dev/sdc" = { label = "app", size = 3000 }
+      #   })
+      #   ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
+      #     data  = { total_size = 4000 }
+      #     flash = { total_size = 1000 }
+      #   })
+      #   cloudwatch_metric_alarms = {}
+      # })
 
       prod-nomis-db-2 = merge(local.database_ec2_a, {
         tags = merge(local.database_ec2_a.tags, {
@@ -200,6 +231,11 @@ locals {
           oracle-sids               = "CNMAUD"
           fixngo-connection-targets = "10.40.0.136 4903 10.40.129.79 22" # fixngo connection alarm
           is-production             = "true-no-default-backup-workaround"
+        })
+        config = merge(local.database_ec2_a.config, {
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
         })
         instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.2xlarge"
@@ -218,30 +254,32 @@ locals {
         )
       })
 
-      prod-nomis-db-2-b = merge(local.database_ec2_b, {
-        tags = merge(local.database_ec2_b.tags, {
-          nomis-environment = "prod"
-          description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
-          oracle-sids       = ""
-          is-production     = "true-no-default-backup-workaround"
-        })
-        config = merge(module.baseline_presets.ec2_instance.config.db, {
-          ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          ami_owner = "self"
-        })
-        instance = merge(local.database_ec2_b.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 3000 }
-        })
-        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
-          data  = { total_size = 4000 }
-          flash = { total_size = 1000 }
-        })
-        cloudwatch_metric_alarms = {}
-      })
+      # prod-nomis-db-2-b = merge(local.database_ec2_b, {
+      #   tags = merge(local.database_ec2_b.tags, {
+      #     nomis-environment = "prod"
+      #     description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
+      #     oracle-sids       = ""
+      #     is-production     = "true-no-default-backup-workaround"
+      #   })
+      #   config = merge(local.database_ec2_b.config, {
+      #     ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+      #     instance_profile_policies = concat(local.database_ec2_b.config.instance_profile_policies, [
+      #       "Ec2ProdDatabasePolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.database_ec2_b.instance, {
+      #     instance_type = "r6i.2xlarge"
+      #   })
+      #   ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
+      #     "/dev/sdb" = { label = "app", size = 100 }
+      #     "/dev/sdc" = { label = "app", size = 3000 }
+      #   })
+      #   ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
+      #     data  = { total_size = 4000 }
+      #     flash = { total_size = 1000 }
+      #   })
+      #   cloudwatch_metric_alarms = {}
+      # })
 
       prod-nomis-db-3 = merge(local.database_ec2_a, {
         tags = merge(local.database_ec2_a.tags, {
@@ -249,6 +287,11 @@ locals {
           description       = "Production NOMIS HA database to replace Azure PDPDL00062"
           oracle-sids       = "PCNOMHA"
           is-production     = "true-no-default-backup-workaround"
+        })
+        config = merge(local.database_ec2_a.config, {
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
         })
         instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.4xlarge"

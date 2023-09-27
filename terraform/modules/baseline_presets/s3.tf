@@ -118,6 +118,21 @@ locals {
       }
     }
 
+    ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:GetObjectTagging",
+        "s3:ListBucket",
+      ]
+      principals = {
+        type = "AWS"
+        identifiers = [for account_name in var.environment.prodpreprod_account_names :
+          var.environment.account_root_arns[account_name]
+        ]
+      }
+    }
+
     ProdPreprodEnvironmentsWriteAccessBucketPolicy = {
       effect = "Allow"
       actions = [
@@ -150,6 +165,21 @@ locals {
       principals = {
         type = "AWS"
         identifiers = [for account_name in var.environment.account_names :
+          var.environment.account_root_arns[account_name]
+        ]
+      }
+    }
+
+    DevTestEnvironmentsReadOnlyAccessBucketPolicy = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:GetObjectTagging",
+        "s3:ListBucket",
+      ]
+      principals = {
+        type = "AWS"
+        identifiers = [for account_name in var.environment.devtest_account_names :
           var.environment.account_root_arns[account_name]
         ]
       }
