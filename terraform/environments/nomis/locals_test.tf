@@ -64,17 +64,6 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "s3:GetObject",
-              "s3:GetObjectTagging",
-              "s3:ListBucket",
-            ]
-            resources = [
-              "arn:aws:s3:::nomis-db-backup-bucket*/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
               "ssm:GetParameter",
               "ssm:PutParameter",
             ]
@@ -91,17 +80,6 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "s3:GetObject",
-              "s3:GetObjectTagging",
-              "s3:ListBucket",
-            ]
-            resources = [
-              "arn:aws:s3:::nomis-db-backup-bucket*/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
               "ssm:GetParameter",
               "ssm:PutParameter",
             ]
@@ -115,17 +93,6 @@ locals {
       Ec2T3DatabasePolicy = {
         description = "Permissions required for T3 Database EC2s"
         statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "s3:GetObject",
-              "s3:GetObjectTagging",
-              "s3:ListBucket",
-            ]
-            resources = [
-              "arn:aws:s3:::nomis-db-backup-bucket*/*",
-            ]
-          },
           {
             effect = "Allow"
             actions = [

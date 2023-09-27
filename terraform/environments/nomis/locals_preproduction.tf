@@ -38,6 +38,33 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2PreprodDatabasePolicy = {
+        description = "Permissions required for Preprod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::nomis-db-backup-bucket*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/oracle/database/*PP/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/PP*/*",
+            ]
+          }
+        ]
+      }
       Ec2PreprodWeblogicPolicy = {
         description = "Permissions required for Preprod Weblogic EC2s"
         statements = [
