@@ -58,7 +58,7 @@ locals {
     }
 
     baseline_iam_policies = {
-      Ec2T1DatabasePolicyTmp = {
+      Ec2T1DatabasePolicy = {
         description = "Permissions required for T1 Database EC2s"
         statements = [
           {
@@ -411,7 +411,7 @@ locals {
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
           instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
-            "Ec2T1DatabasePolicyTmp",
+            "Ec2T1DatabasePolicy",
           ])
         })
         user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
@@ -440,7 +440,7 @@ locals {
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
           instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
-            "Ec2T1DatabasePolicyTmp",
+            "Ec2T1DatabasePolicy",
           ])
         })
         user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
