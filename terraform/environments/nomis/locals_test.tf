@@ -134,8 +134,11 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      # ACTIVE (blue deployment)
+      # NOT-ACTIVE (blue deployment)
       t1-nomis-web-a = merge(local.weblogic_ec2_a, {
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
+          desired_capacity = 0
+        })
         config = merge(local.weblogic_ec2_a.config, {
           instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
             "Ec2T1WeblogicPolicy",
@@ -149,7 +152,7 @@ locals {
         })
       })
 
-      # NOT-ACTIVE (green deployment)
+      # ACTIVE (green deployment)
       t1-nomis-web-b = merge(local.weblogic_ec2_b, {
         autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
           desired_capacity = 1
@@ -191,8 +194,11 @@ locals {
         })
       })
 
-      # ACTIVE (blue deployment)
+      # NOT-ACTIVE (blue deployment)
       t2-nomis-web-a = merge(local.weblogic_ec2_a, {
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
+          desired_capacity = 0
+        })
         config = merge(local.weblogic_ec2_a.config, {
           instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
             "Ec2T2WeblogicPolicy",
@@ -206,7 +212,7 @@ locals {
         })
       })
 
-      # NOT-ACTIVE (green deployment)
+      # ACTIVE (green deployment)
       t2-nomis-web-b = merge(local.weblogic_ec2_b, {
         autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
           desired_capacity = 1
@@ -248,9 +254,9 @@ locals {
         })
       })
 
-      # NON-ACTIVE (blue deployment)
+      # NOT-ACTIVE (blue deployment)
       t3-nomis-web-a = merge(local.weblogic_ec2_a, {
-        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
           desired_capacity = 0
         })
         config = merge(local.weblogic_ec2_a.config, {
@@ -451,9 +457,6 @@ locals {
                     values = [
                       "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-                      "c-t1.test.nomis.az.justice.gov.uk",
-                      "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -469,6 +472,9 @@ locals {
                     values = [
                       "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.az.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -477,7 +483,14 @@ locals {
           })
 
           https = merge(local.weblogic_lb_listeners.https, {
-            alarm_target_group_names = ["t1-nomis-web-a-http-7777"]
+            alarm_target_group_names = [
+              # "t1-nomis-web-a-http-7777",
+              "t1-nomis-web-b-http-7777",
+              # "t2-nomis-web-a-http-7777",
+              "t2-nomis-web-b-http-7777",
+              # "t3-nomis-web-a-http-7777",
+              "t3-nomis-web-b-http-7777",
+            ]
             rules = {
               t1-nomis-web-a-http-7777 = {
                 priority = 300
@@ -490,9 +503,6 @@ locals {
                     values = [
                       "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-                      "c-t1.test.nomis.az.justice.gov.uk",
-                      "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -508,6 +518,9 @@ locals {
                     values = [
                       "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.az.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -523,9 +536,6 @@ locals {
                     values = [
                       "t2-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t2-nomis-web-a.test.nomis.service.justice.gov.uk",
-                      "c-t2.test.nomis.az.justice.gov.uk",
-                      "c-t2.test.nomis.service.justice.gov.uk",
-                      "t2-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -541,6 +551,9 @@ locals {
                     values = [
                       "t2-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t2-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t2.test.nomis.az.justice.gov.uk",
+                      "c-t2.test.nomis.service.justice.gov.uk",
+                      "t2-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
