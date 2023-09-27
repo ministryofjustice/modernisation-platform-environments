@@ -1,16 +1,16 @@
 locals {
-    bip_cmc_ssm_parameters = {
-      prefix = "/bip-cmc/"
-      parameters = {
-        product_key               = { description = "BIP product key" }
-        cms_cluster_key           = { description = "CMS Cluster Key" }
-        cms_admin_password        = { description = "CMS Admin Password" }
-        cms_db_password           = { description = "CMS DB password" }
-        auditing_db_password      = { description = "Auditing DB password" }
-        lcm_password              = { description = "LCM Password" }
-      }
+  bip_cmc_ssm_parameters = {
+    prefix = "/bip-cmc/"
+    parameters = {
+      product_key          = { description = "BIP product key" }
+      cms_cluster_key      = { description = "CMS Cluster Key" }
+      cms_admin_password   = { description = "CMS Admin Password" }
+      cms_db_password      = { description = "CMS DB password" }
+      auditing_db_password = { description = "Auditing DB password" }
+      lcm_password         = { description = "LCM Password" }
+    }
   }
-    bip_cmc_ec2_default = {
+  bip_cmc_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "base_rhel_8_5_*"

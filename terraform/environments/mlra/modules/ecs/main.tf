@@ -20,11 +20,11 @@ data "aws_subnets" "shared-private" {
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
-  vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
-  name                = "${var.app_name}-cluster-scaling-group"
-  desired_capacity    = var.ec2_desired_capacity
-  max_size            = var.ec2_max_size
-  min_size            = var.ec2_min_size
+  vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
+  name                  = "${var.app_name}-cluster-scaling-group"
+  desired_capacity      = var.ec2_desired_capacity
+  max_size              = var.ec2_max_size
+  min_size              = var.ec2_min_size
   protect_from_scale_in = true
 
   launch_template {
@@ -339,7 +339,7 @@ resource "aws_ecs_service" "ecs_service" {
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.mlra.name
-    weight = 1
+    weight            = 1
   }
 
   health_check_grace_period_seconds = 300
@@ -544,8 +544,8 @@ resource "aws_ecs_capacity_provider" "mlra" {
     managed_scaling {
       # maximum_scaling_step_size = 1000
       # minimum_scaling_step_size = 1
-      status                    = "ENABLED"
-      target_capacity           = var.ecs_target_capacity
+      status          = "ENABLED"
+      target_capacity = var.ecs_target_capacity
     }
   }
 }
