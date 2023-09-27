@@ -331,10 +331,10 @@ resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
 
   container_definitions = var.task_definition
 
-  runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
-    cpu_architecture        = "X86_64"
-  }
+  # runtime_platform {
+  #   operating_system_family = "WINDOWS_SERVER_2019_CORE"
+  #   cpu_architecture        = "X86_64"
+  # }
 
   tags = merge(
     var.tags_common,
