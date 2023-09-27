@@ -72,6 +72,7 @@ locals {
           os-type     = "Linux"
           component   = "test"
           server-type = "csr-db"
+          instance-scheduling = "skip-scheduling"
         }
       }
 
