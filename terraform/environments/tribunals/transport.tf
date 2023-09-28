@@ -30,8 +30,8 @@ locals {
   transport_ec2_ingress_rules = {
     "cluster_ec2_lb_ingress_3" = {
       description     = "Cluster EC2 ingress rule 3"
-      from_port       = 32768
-      to_port         = 61000
+      from_port       = 80
+      to_port         = 80
       protocol        = "tcp"
       cidr_blocks     = []
       security_groups = [aws_security_group.transport_lb_sc.id]
