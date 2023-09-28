@@ -53,7 +53,7 @@ locals {
   reporting_hub_num_workers  = local.application_data.accounts[local.environment].reporting_hub_num_workers
   reporting_hub_log_level    = local.application_data.accounts[local.environment].reporting_hub_spark_log_level
 
-  reporting_hub_kinesis_reader_batch_duration_seconds = local.application_data.accounts[local.environment].reporting_hub_kinesis_reader_batch_duration_seconds
+  reporting_hub_batch_duration_seconds = local.application_data.accounts[local.environment].reporting_hub_batch_duration_seconds
 
   # Refresh Job
   refresh_job_worker_type = local.application_data.accounts[local.environment].refresh_job_worker_type
