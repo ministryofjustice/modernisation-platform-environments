@@ -33,6 +33,12 @@ resource "aws_lb_listener" "PPUD-Front-End-Preprod" {
   }
 }
 
+resource "aws_lb_listener_certificate" "PPUD-Training-Certificate" {
+  count           = local.is-preproduction == true ? 1 : 0
+  listener_arn    = aws_lb_listener.PPUD-Front-End-Preprod[0].arn
+  certificate_arn = data.aws_acm_certificate.PPUD_Training_ALB[0].arn
+}
+
 resource "aws_lb_listener" "PPUD-Front-End-Prod" {
   count             = local.is-production == true ? 1 : 0
   load_balancer_arn = aws_lb.PPUD-internal-ALB[0].arn
