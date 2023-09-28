@@ -164,6 +164,7 @@ locals {
 
     tags = {
       ami         = "nomis_rhel_6_10_weblogic_appserver_10_3"
+      backup      = "false" # disable mod platform backup since everything is in code
       description = "nomis weblogic appserver 10.3"
       os-type     = "Linux"
       server-type = "nomis-web"

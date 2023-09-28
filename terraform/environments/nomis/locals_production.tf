@@ -119,7 +119,6 @@ locals {
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
           oracle-db-name       = "PCNOM"
-          is-production        = "true-no-default-backup-workaround"
         })
       })
 
@@ -143,7 +142,6 @@ locals {
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
           oracle-db-name       = "PCNOM"
-          is-production        = "true-no-default-backup-workaround"
         })
       })
 
@@ -175,7 +173,6 @@ locals {
           nomis-environment = "preprod"
           description       = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
           oracle-sids       = "PPCNMAUD"
-          is-production     = "true-no-default-backup-workaround"
         })
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
@@ -202,7 +199,6 @@ locals {
       #     nomis-environment = "prod"
       #     description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
       #     oracle-sids       = ""
-      #     is-production     = "true-no-default-backup-workaround"
       #   })
       #   config = merge(local.database_ec2_b.config, {
       #     ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -230,7 +226,6 @@ locals {
           description               = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
           oracle-sids               = "CNMAUD"
           fixngo-connection-targets = "10.40.0.136 4903 10.40.129.79 22" # fixngo connection alarm
-          is-production             = "true-no-default-backup-workaround"
         })
         config = merge(local.database_ec2_a.config, {
           instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
@@ -259,7 +254,6 @@ locals {
       #     nomis-environment = "prod"
       #     description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
       #     oracle-sids       = ""
-      #     is-production     = "true-no-default-backup-workaround"
       #   })
       #   config = merge(local.database_ec2_b.config, {
       #     ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -286,7 +280,6 @@ locals {
           nomis-environment = "prod"
           description       = "Production NOMIS HA database to replace Azure PDPDL00062"
           oracle-sids       = "PCNOMHA"
-          is-production     = "true-no-default-backup-workaround"
         })
         config = merge(local.database_ec2_a.config, {
           instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [

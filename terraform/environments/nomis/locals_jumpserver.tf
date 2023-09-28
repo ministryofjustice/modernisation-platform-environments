@@ -25,6 +25,7 @@ locals {
       os-type     = "Windows"
       component   = "jumpserver"
       server-type = "nomis-jumpserver"
+      backup      = "false" # no need to back this up as they are destroyed each night
     }
   }
 }
