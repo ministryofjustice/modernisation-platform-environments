@@ -822,34 +822,6 @@ module "dynamo_tab_domain_registry" {
   )
 }
 
-# Dynamo Reporting HUB (DPR-340, DPR-378)
-module "dynamo_tab_reporting_hub" {
-  source              = "./modules/dynamo_tables"
-  create_table        = true
-  autoscaling_enabled = false
-  name                = "${local.project}-reporting-hub-${local.environment}"
-
-  hash_key    = "leaseKey" # Hash
-  range_key   = ""         # Sort
-  table_class = "STANDARD"
-  ttl_enabled = false
-
-  attributes = [
-    {
-      name = "leaseKey"
-      type = "S"
-    }
-  ]
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-reporting-hub-${local.environment}"
-      Resource_Type = "Dynamo Table"
-    }
-  )
-}
-
 ##########################
 # Application Backend TF # 
 ##########################
