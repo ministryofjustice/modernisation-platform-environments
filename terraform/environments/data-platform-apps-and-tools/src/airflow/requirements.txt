@@ -1,4 +1,4 @@
 --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.6.3/constraints-3.10.txt"
-apache-airflow[cncf.kubernetes]
+apache-airflow-providers-cncf-kubernetes
 kubernetes
 open-metadata-ingestion==1.1.0
