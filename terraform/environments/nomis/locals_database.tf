@@ -314,6 +314,7 @@ locals {
 
     tags = {
       ami                  = "nomis_rhel_7_9_oracledb_11_2"
+      backup               = "false" # disable mod platform backup since we use our own policies
       component            = "data"
       server-type          = "nomis-db"
       os-type              = "Linux"
