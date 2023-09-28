@@ -279,7 +279,7 @@ resource "aws_lb_target_group" "transport_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
+  #target_type          = "instance"
   deregistration_delay = 30
 
   stickiness {
@@ -296,6 +296,23 @@ resource "aws_lb_target_group" "transport_target_group" {
   }
 
 }
+
+resource "aws_lb_listener_rule" "transport_alb_listener_rule" {
+  listener_arn = aws_lb_listener.transport_lb.arn
+  priority     = 1
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.transport_target_group.arn
+  }
+
+  condition {
+   path_pattern {
+      values = ["/"]
+    }
+  }
+}
+
 
 resource "aws_lb_listener" "transport_lb" {
   depends_on = [
