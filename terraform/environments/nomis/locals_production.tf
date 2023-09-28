@@ -216,7 +216,7 @@ locals {
         })
         ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 3000 }
+          "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
           data  = { total_size = 4000 }
@@ -276,7 +276,7 @@ locals {
         })
         ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 3000 }
+          "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
           data  = { total_size = 4000 }
