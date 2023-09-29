@@ -297,21 +297,21 @@ resource "aws_lb_target_group" "lands_target_group" {
 
 }
 
-resource "aws_lb_listener_rule" "lands_alb_listener_rule" {
-  listener_arn = aws_lb_listener.lands_lb.arn
-  priority     = 1
+# resource "aws_lb_listener_rule" "lands_alb_listener_rule" {
+#   listener_arn = aws_lb_listener.lands_lb.arn
+#   priority     = 1
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.lands_target_group.arn
-  }
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.lands_target_group.arn
+#   }
 
-  condition {
-   path_pattern {
-      values = ["/"]
-    }
-  }
-}
+#   condition {
+#    path_pattern {
+#       values = ["/"]
+#     }
+#   }
+# }
 
 
 resource "aws_lb_listener" "lands_lb" {
