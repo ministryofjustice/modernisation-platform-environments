@@ -14,7 +14,7 @@ locals {
   transport_source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   transport_source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
   transport_user_data = base64encode(templatefile("user_data.sh", {
-    cluster_name = "transport"
+    cluster_name = "${local.transport}_app_cluster"
   }))
   transport_task_definition = templatefile("task_definition.json", {
     app_name            = "${local.transport}"
