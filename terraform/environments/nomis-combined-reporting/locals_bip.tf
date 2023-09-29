@@ -102,6 +102,10 @@ locals {
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"
       vpc_security_group_ids = ["private"]
+
+      tags = {
+        backup-plan = "daily-and-weekly"
+      }
     })
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
@@ -123,6 +127,7 @@ locals {
     tags = {
       description = "ncr bip webtier component"
       ami         = "base_rhel_8_5"
+      backup      = "false" # opt out of mod platform default backup plan
       os-type     = "Linux"
       server-type = "ncr-bip"
       component   = "web"
