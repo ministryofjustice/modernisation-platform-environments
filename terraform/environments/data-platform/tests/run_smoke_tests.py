@@ -37,18 +37,6 @@ multipart_form_data = {
     "file": (post_policy_form_data["key"], open(file_path, "r")),
 }
 
-# Remove any existing table
-try:
-    glue.get_table(DatabaseName=database, Name=table)
-    print(f"{database}.{table} found in glue")
-except Exception as e:
-    raise e
-try:
-    glue.delete_table(DatabaseName=database, Name=table)
-    print(f"{database}.{table} deleted from glue")
-except Exception as e:
-    raise e
-
 # Upload data
 time.sleep(5)
 print("Uploading data")
@@ -61,5 +49,17 @@ time.sleep(10)
 try:
     glue.get_table(DatabaseName=database, Name=table)
     print(f"{database}.{table} recreated in glue")
+except Exception as e:
+    raise e
+
+# Clean up created table
+try:
+    glue.get_table(DatabaseName=database, Name=table)
+    print(f"{database}.{table} found in glue")
+except Exception as e:
+    raise e
+try:
+    glue.delete_table(DatabaseName=database, Name=table)
+    print(f"{database}.{table} deleted from glue")
 except Exception as e:
     raise e
