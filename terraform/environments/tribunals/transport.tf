@@ -14,9 +14,9 @@ locals {
   transport_source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   transport_source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
   transport_user_data = base64encode(templatefile("user_data.sh", {
-    app_name = "transport"
+    cluster_name = "transport"
   }))
-  task_definition = templatefile("task_definition.json", {
+  transport_task_definition = templatefile("task_definition.json", {
     app_name            = "${local.transport}"
     #ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
     #docker_image_tag    = "latest" 
@@ -27,9 +27,6 @@ locals {
     CurServer           = "${local.application_data.accounts[local.environment].curserver}"
 
   })
-  user_data = base64encode(templatefile("user_data.sh", {
-    cluster_name = "${local.transport}_app_cluster"
-  }))
   transport_ec2_ingress_rules = {
     "cluster_ec2_lb_ingress_3" = {
       description     = "Cluster EC2 ingress rule 3"
@@ -397,9 +394,9 @@ module "transport-ecs" {
   container_instance_type   = "windows"
   ami_image_id              = local.application_data.accounts[local.environment].ami_image_id
   instance_type             = local.application_data.accounts[local.environment].instance_type
-  user_data                 = local.user_data
+  user_data                 = local.transport_user_data
   key_name                  = ""
-  task_definition           = local.task_definition
+  task_definition           = local.transport_task_definition
   ec2_desired_capacity      = local.application_data.accounts[local.environment].ec2_desired_capacity
   ec2_max_size              = local.application_data.accounts[local.environment].ec2_max_size
   ec2_min_size              = local.application_data.accounts[local.environment].ec2_min_size
