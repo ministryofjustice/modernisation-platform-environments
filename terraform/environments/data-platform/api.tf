@@ -51,14 +51,14 @@ resource "aws_api_gateway_authorizer" "authorizer" {
   identity_source        = "method.request.header.authorizationToken"
 }
 
-# /data-product endpoint
+# /data-product resource
 resource "aws_api_gateway_resource" "data_product" {
   parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
   path_part   = "data-product"
   rest_api_id = aws_api_gateway_rest_api.data_platform.id
 }
 
-# /data-product/register endpoint
+# /data-product/register resource
 resource "aws_api_gateway_resource" "register_data_product" {
   parent_id   = aws_api_gateway_resource.data_product.id
   path_part   = "register"
