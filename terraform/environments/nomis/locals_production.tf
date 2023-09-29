@@ -81,12 +81,12 @@ locals {
     baseline_ssm_parameters = {
       # NEW
       "/oracle/weblogic/prod"     = local.weblogic_ssm_parameters
-      "/oracle/database/PCNOM "   = local.database_nomis_ssm_parameters
+      "/oracle/database/PCNOM"    = local.database_nomis_ssm_parameters
       "/oracle/database/PNDH"     = local.database_ssm_parameters
       "/oracle/database/PTRDAT"   = local.database_ssm_parameters
       "/oracle/database/PCNMAUD"  = local.database_ssm_parameters
       "/oracle/database/PMIS"     = local.database_ssm_parameters
-      "/oracle/database/DRCNOM "  = local.database_nomis_ssm_parameters
+      "/oracle/database/DRCNOM"   = local.database_nomis_ssm_parameters
       "/oracle/database/DRNDH"    = local.database_ssm_parameters
       "/oracle/database/DRTRDAT"  = local.database_ssm_parameters
       "/oracle/database/DRCNMAUD" = local.database_ssm_parameters
