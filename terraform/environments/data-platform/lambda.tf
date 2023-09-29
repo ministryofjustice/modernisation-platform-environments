@@ -189,7 +189,7 @@ module "data_product_create_metadata_lambda" {
       action        = "lambda:InvokeFunction"
       function_name = "data_product_create_metadata_${local.environment}"
       principal     = "apigateway.amazonaws.com"
-      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.create_data_product_metadata_post.http_method}${aws_api_gateway_resource.create_data_product_metadata.path}"
+      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.register_data_product.http_method}${aws_api_gateway_resource.register_data_product.path}"
     }
   }
 
