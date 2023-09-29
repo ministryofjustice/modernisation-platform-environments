@@ -74,7 +74,7 @@ locals {
           os-type     = "Linux"
           component   = "data"
           server-type = "csr-db"
-          backup      = "false" # opt out of mod platform default backup plan
+          backup      = "false" # opt out of mod platform default backup plan
         }
       }
     }

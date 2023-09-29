@@ -100,7 +100,7 @@ locals {
 
     tags = {
       ami                  = "hmpps_ol_8_5_oracledb_19c" # not including as hardening role seems to cause an issue
-      backup               = "false"                     # opt out of mod platform default backup plan
+      backup               = "false"                     # opt out of mod platform default backup plan
       component            = "data"
       instance-scheduling  = "skip-scheduling"
       server-type          = "hmpps-oem"

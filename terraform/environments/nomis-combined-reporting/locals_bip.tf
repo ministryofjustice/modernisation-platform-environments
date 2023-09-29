@@ -127,7 +127,7 @@ locals {
     tags = {
       description = "ncr bip webtier component"
       ami         = "base_rhel_8_5"
-      backup      = "false" # opt out of mod platform default backup plan
+      backup      = "false" # opt out of mod platform default backup plan
       os-type     = "Linux"
       server-type = "ncr-bip"
       component   = "web"
