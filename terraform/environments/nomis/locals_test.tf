@@ -68,6 +68,7 @@ locals {
               "ssm:PutParameter",
             ]
             resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/*T1/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/T1*/*",
             ]
@@ -84,6 +85,7 @@ locals {
               "ssm:PutParameter",
             ]
             resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/*T2/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/T2*/*",
             ]
@@ -100,6 +102,7 @@ locals {
               "ssm:PutParameter",
             ]
             resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/*T3/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/T3*/*",
             ]
@@ -117,7 +120,8 @@ locals {
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/oracle/weblogic/t1/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMT1/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/*T1/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/T1*/weblogic-passwords",
             ]
           }
         ]
@@ -133,7 +137,8 @@ locals {
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/oracle/weblogic/t2/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMT2/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/*T2/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/T2*/weblogic-passwords",
             ]
           }
         ]
@@ -149,7 +154,8 @@ locals {
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/oracle/weblogic/t3/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMT3/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/*T3/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/T3*/weblogic-passwords",
             ]
           }
         ]
@@ -158,15 +164,23 @@ locals {
 
     baseline_ssm_parameters = {
       # NEW
-      "/oracle/weblogic/t1"     = local.weblogic_ssm_parameters
-      "/oracle/weblogic/t2"     = local.weblogic_ssm_parameters
-      "/oracle/weblogic/t3"     = local.weblogic_ssm_parameters
-      "/oracle/database/CNOMT1" = local.database_1_ssm_parameters
-      "/oracle/database/CNOMT2" = local.database_1_ssm_parameters
-      "/oracle/database/CNOMT3" = local.database_1_ssm_parameters
+      "/oracle/weblogic/t1"       = local.weblogic_ssm_parameters
+      "/oracle/weblogic/t2"       = local.weblogic_ssm_parameters
+      "/oracle/weblogic/t3"       = local.weblogic_ssm_parameters
+      "/oracle/database/T1CNOM"   = local.database_nomis_ssm_parameters
+      "/oracle/database/T1NDH"    = local.database_ssm_parameters
+      "/oracle/database/T1TRDAT"  = local.database_ssm_parameters
+      "/oracle/database/T1CNMAUD" = local.database_ssm_parameters
+      "/oracle/database/T1MIS"    = local.database_ssm_parameters
+      "/oracle/database/T2CNOM"   = local.database_nomis_ssm_parameters
+      "/oracle/database/T2NDH"    = local.database_nomis_ssm_parameters
+      "/oracle/database/T2TRDAT"  = local.database_nomis_ssm_parameters
+      "/oracle/database/T3CNOM"   = local.database_nomis_ssm_parameters
 
-      # OLD
-      # T1
+      # OLD (delete these once all servers have correct ansible code)
+      "/oracle/database/CNOMT1" = local.database_nomis_ssm_parameters
+      "/oracle/database/CNOMT2" = local.database_nomis_ssm_parameters
+      "/oracle/database/CNOMT3" = local.database_nomis_ssm_parameters
       "t1-nomis-db-1-a/CNOMT1"  = local.database_instance_ssm_parameters
       "t1-nomis-db-1-a/NDHT1"   = local.database_instance_ssm_parameters
       "t1-nomis-db-1-a/TRDATT1" = local.database_instance_ssm_parameters
@@ -183,10 +197,6 @@ locals {
       "t1-nomis-web-b"          = local.weblogic_ssm_parameters_old
       "t1-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
       "t1-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
-      "t2-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
-      "t2-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
-
-      # T2
       "t2-nomis-db-1-a/CNOMT2"  = local.database_instance_ssm_parameters
       "t2-nomis-db-1-a/NDHT2"   = local.database_instance_ssm_parameters
       "t2-nomis-db-1-a/TRDATT2" = local.database_instance_ssm_parameters
@@ -195,10 +205,10 @@ locals {
       "t2-nomis-db-1-b/TRDATT2" = local.database_instance_ssm_parameters
       "t2-nomis-web-a"          = local.weblogic_ssm_parameters_old
       "t2-nomis-web-b"          = local.weblogic_ssm_parameters_old
-
-      # T3
-      "t3-nomis-web-a" = local.weblogic_ssm_parameters_old
-      "t3-nomis-web-b" = local.weblogic_ssm_parameters_old
+      "t2-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
+      "t2-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
+      "t3-nomis-web-a"          = local.weblogic_ssm_parameters_old
+      "t3-nomis-web-b"          = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {

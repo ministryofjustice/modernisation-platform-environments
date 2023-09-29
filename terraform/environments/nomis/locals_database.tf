@@ -6,18 +6,13 @@
 
 locals {
 
-  database_1_ssm_parameters = {
+  database_nomis_ssm_parameters = {
     parameters = {
       passwords          = { description = "database passwords" }
       weblogic-passwords = { description = "passwords available to weblogic servers" }
     }
   }
-  database_2_ssm_parameters = {
-    parameters = {
-      passwords = { description = "database passwords" }
-    }
-  }
-  database_3_ssm_parameters = {
+  database_ssm_parameters = {
     parameters = {
       passwords = { description = "database passwords" }
     }

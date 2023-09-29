@@ -59,6 +59,7 @@ locals {
               "ssm:PutParameter",
             ]
             resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/*PP/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/PP*/*",
             ]
@@ -76,7 +77,8 @@ locals {
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/oracle/weblogic/preprod/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMPP/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/*PP/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/PP*/weblogic-passwords",
             ]
           }
         ]
@@ -85,12 +87,17 @@ locals {
 
     baseline_ssm_parameters = {
       # NEW
-      "/oracle/weblogic/preprod" = local.weblogic_ssm_parameters
-      "/oracle/database/CNOMPP"  = local.database_1_ssm_parameters
+      "/oracle/weblogic/preprod"  = local.weblogic_ssm_parameters
+      "/oracle/database/PPCNOM"   = local.database_nomis_ssm_parameters
+      "/oracle/database/PPNDH"    = local.database_ssm_parameters
+      "/oracle/database/PPTRDAT"  = local.database_ssm_parameters
+      "/oracle/database/PPCNMAUD" = local.database_ssm_parameters
+      "/oracle/database/PPMIS"    = local.database_ssm_parameters
 
       # OLD
-      "preprod-nomis-web-a" = local.weblogic_ssm_parameters_old
-      "preprod-nomis-web-b" = local.weblogic_ssm_parameters_old
+      "/oracle/database/CNOMPP" = local.database_nomis_ssm_parameters
+      "preprod-nomis-web-a"     = local.weblogic_ssm_parameters_old
+      "preprod-nomis-web-b"     = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {

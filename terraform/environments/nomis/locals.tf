@@ -102,6 +102,13 @@ locals {
     data-db            = local.security_groups.data_db
   }
 
-  baseline_sns_topics     = {}
-  baseline_ssm_parameters = {}
+  baseline_sns_topics = {}
+
+  baseline_ssm_parameters = {
+    "/azure" = {
+      parameters = {
+        sas_token = { description = "database backup storage account read-only sas token" }
+      }
+    }
+  }
 }

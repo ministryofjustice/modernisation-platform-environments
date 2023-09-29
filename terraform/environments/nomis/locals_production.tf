@@ -48,8 +48,11 @@ locals {
               "ssm:PutParameter",
             ]
             resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/*P/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/P*/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/*DR/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/DR*/*",
             ]
           }
         ]
@@ -65,7 +68,10 @@ locals {
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/oracle/weblogic/prod/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/CNOMP/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/P*/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/*P/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/DR*/weblogic-passwords",
+              "arn:aws:ssm:*:*:parameter/oracle/database/*DR/weblogic-passwords",
             ]
           }
         ]
@@ -74,12 +80,22 @@ locals {
 
     baseline_ssm_parameters = {
       # NEW
-      "/oracle/weblogic/prod"  = local.weblogic_ssm_parameters
-      "/oracle/database/CNOMP" = local.database_1_ssm_parameters
+      "/oracle/weblogic/prod"     = local.weblogic_ssm_parameters
+      "/oracle/database/PCNOM "   = local.database_nomis_ssm_parameters
+      "/oracle/database/PNDH"     = local.database_ssm_parameters
+      "/oracle/database/PTRDAT"   = local.database_ssm_parameters
+      "/oracle/database/PCNMAUD"  = local.database_ssm_parameters
+      "/oracle/database/PMIS"     = local.database_ssm_parameters
+      "/oracle/database/DRCNOM "  = local.database_nomis_ssm_parameters
+      "/oracle/database/DRNDH"    = local.database_ssm_parameters
+      "/oracle/database/DRTRDAT"  = local.database_ssm_parameters
+      "/oracle/database/DRCNMAUD" = local.database_ssm_parameters
+      "/oracle/database/DRMIS"    = local.database_ssm_parameters
 
       # OLD
-      "prod-nomis-web-a" = local.weblogic_ssm_parameters_old
-      "prod-nomis-web-b" = local.weblogic_ssm_parameters_old
+      "/oracle/database/CNOMP" = local.database_nomis_ssm_parameters
+      "prod-nomis-web-a"       = local.weblogic_ssm_parameters_old
+      "prod-nomis-web-b"       = local.weblogic_ssm_parameters_old
     }
 
     baseline_cloudwatch_log_groups = {

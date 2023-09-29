@@ -63,7 +63,7 @@ locals {
     baseline_ssm_parameters = {
       # NEW
       "/oracle/weblogic/qa11r" = local.weblogic_ssm_parameters
-      "/oracle/database/qa11r" = local.database_1_ssm_parameters
+      "/oracle/database/qa11r" = local.database_nomis_ssm_parameters
 
       # OLD
       # "dev-nomis-web-a" = local.weblogic_ssm_parameters
