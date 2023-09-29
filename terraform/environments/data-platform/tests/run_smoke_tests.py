@@ -50,14 +50,14 @@ try:
     glue.get_table(DatabaseName=database, Name=table)
     print(f"{database}.{table} recreated in glue")
 except Exception as e:
-    raise e
+    print(e)
 
 # Clean up created table
 try:
     glue.get_table(DatabaseName=database, Name=table)
     print(f"{database}.{table} found in glue")
 except Exception as e:
-    raise e
+    print(e)
 try:
     glue.delete_table(DatabaseName=database, Name=table)
     print(f"{database}.{table} deleted from glue")
