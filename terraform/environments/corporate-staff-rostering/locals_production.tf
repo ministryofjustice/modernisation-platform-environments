@@ -16,6 +16,9 @@ locals {
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
           monitoring                   = true
           vpc_security_group_ids       = ["data-db"]
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
         })
 
         user_data_cloud_init = {
@@ -71,6 +74,7 @@ locals {
           os-type     = "Linux"
           component   = "data"
           server-type = "csr-db"
+          backup      = "false" # opt out of mod platform default backup plan
         }
       }
     }
