@@ -27,6 +27,9 @@ locals {
     CurServer           = "${local.application_data.accounts[local.environment].curserver}"
 
   })
+  user_data = base64encode(templatefile("user_data.sh", {
+    cluster_name = "${local.transport}_app_cluster"
+  }))
   transport_ec2_ingress_rules = {
     "cluster_ec2_lb_ingress_3" = {
       description     = "Cluster EC2 ingress rule 3"
@@ -394,7 +397,7 @@ module "transport-ecs" {
   container_instance_type   = "windows"
   ami_image_id              = local.application_data.accounts[local.environment].ami_image_id
   instance_type             = local.application_data.accounts[local.environment].instance_type
-  user_data                 = ""
+  user_data                 = local.user_data
   key_name                  = ""
   task_definition           = local.task_definition
   ec2_desired_capacity      = local.application_data.accounts[local.environment].ec2_desired_capacity
