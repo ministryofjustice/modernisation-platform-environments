@@ -18,6 +18,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.upload_data,
       aws_api_gateway_resource.get_glue_metadata,
       aws_api_gateway_resource.docs,
+      aws_api_gateway_resource.data_product,
       aws_api_gateway_resource.register_data_product,
       aws_api_gateway_method.upload_data_get,
       aws_api_gateway_method.docs,
