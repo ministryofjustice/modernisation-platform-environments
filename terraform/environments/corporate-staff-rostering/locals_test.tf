@@ -17,6 +17,9 @@ locals {
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
           monitoring                   = true
           vpc_security_group_ids       = ["data-db"]
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
         })
 
         user_data_cloud_init = {
@@ -112,6 +115,9 @@ locals {
 
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["migration-app-sg"]
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 256 }
@@ -137,6 +143,9 @@ locals {
 
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["migration-app-sg"]
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 256 }

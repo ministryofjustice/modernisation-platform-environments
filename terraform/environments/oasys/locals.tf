@@ -105,7 +105,11 @@ locals {
       ami_owner         = "self"
       availability_zone = "${local.region}a"
     })
-    instance              = module.baseline_presets.ec2_instance.instance.default_db
+    instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
+      tags = {
+        backup-plan = "daily-and-weekly"
+      }
+    })
     autoscaling_schedules = {}
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
@@ -177,6 +181,7 @@ locals {
     # Example target group setup below
     lb_target_groups = {}
     tags = {
+      backup                                  = "false" # opt out of mod platform default backup plan
       component                               = "data"
       oracle-sids                             = "OASPROD BIPINFRA"
       os-type                                 = "Linux"
@@ -209,6 +214,9 @@ locals {
       instance_type          = "t3.xlarge"
       monitoring             = true
       vpc_security_group_ids = ["bip"]
+      tags = {
+        backup-plan = "daily-and-weekly"
+      }
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
@@ -216,6 +224,7 @@ locals {
     autoscaling_group        = module.baseline_presets.ec2_autoscaling_group.default
     lb_target_groups         = {}
     tags = {
+      backup            = "false" # opt out of mod platform default backup plan
       component         = "bip"
       description       = "${local.environment} ${local.application_name} bip"
       os-type           = "Linux"
