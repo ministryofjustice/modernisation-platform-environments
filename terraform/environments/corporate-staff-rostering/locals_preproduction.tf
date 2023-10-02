@@ -183,6 +183,8 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
           "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
           description = "copy of PPCWW00001 for csr ${local.environment}"
