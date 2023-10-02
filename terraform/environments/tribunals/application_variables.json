@@ -7,7 +7,7 @@
       "db_identifier": "tribunals-rds-dev",
       "engine": "sqlserver-se",
       "engine_version": "15.00.4198.2.v1",
-      "instance_class": "db.m5.large",
+      "instance_class": "t2.small",
       "username": "admin",
       "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com",
       "curserver": "DEVELOPMENT",
