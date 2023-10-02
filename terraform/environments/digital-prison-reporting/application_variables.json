@@ -130,7 +130,7 @@
       "enable_transfer_component_lambda": true,
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": false,
-      "enable_fake_data_dms_replication_task": false      
+      "enable_fake_data_dms_replication_task": false
     },
     "preproduction": {
       "project_short_id": "dpr",

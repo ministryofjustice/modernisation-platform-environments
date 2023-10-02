@@ -33,8 +33,8 @@ locals {
   generic_lambda           = "${local.project}-generic-lambda"
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
   # DMS Specific
-  setup_dms_instance      = local.application_data.accounts[local.environment].setup_dms_instance
-  enable_replication_task = local.application_data.accounts[local.environment].enable_dms_replication_task
+  setup_dms_instance                = local.application_data.accounts[local.environment].setup_dms_instance
+  enable_replication_task           = local.application_data.accounts[local.environment].enable_dms_replication_task
   setup_fake_data_dms_instance      = local.application_data.accounts[local.environment].setup_fake_data_dms_instance
   enable_fake_data_replication_task = local.application_data.accounts[local.environment].enable_fake_data_dms_replication_task
   # DataMart Specific
