@@ -7,7 +7,7 @@
       "db_identifier": "tribunals-rds-dev",
       "engine": "sqlserver-se",
       "engine_version": "15.00.4198.2.v1",
-      "instance_class": "t2.small",
+      "instance_class": "db.m5.large",
       "username": "admin",
       "dms_source_db": "ec2-46-137-38-249.eu-west-1.compute.amazonaws.com",
       "curserver": "DEVELOPMENT",
@@ -31,7 +31,7 @@
       "ec2_scaling_mem_threshold": 61,
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80,
-      "instance_type": "m5.large"
+      "instance_type": "t2.small"
     },
     "test": {
       "example_var": "test-data"
