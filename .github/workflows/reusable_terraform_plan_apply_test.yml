@@ -280,12 +280,6 @@ jobs:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: githubactionsrolesession
           aws-region: "eu-west-2"
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@04b98b3f9e85f563fb061be8751a0352327246b0 # v3.0.1
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
-          role-session-name: memberinfrastructureaccessrolesession
-          aws-region: "eu-west-2"
 
       - name: Setup python
         uses: actions/setup-python@v4
@@ -295,4 +289,10 @@ jobs:
       - name: Run smoke tests
         working-directory: ./terraform/environments/data-platform/tests/
         run: |
+          export $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN=%s" \
+          $(aws sts assume-role \
+          --role-arn arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess \
+          --role-session-name smoketesting-data-platform \
+          --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" \
+          --output text))
           pip install -r requirements.txt && python run_smoke_tests.py
