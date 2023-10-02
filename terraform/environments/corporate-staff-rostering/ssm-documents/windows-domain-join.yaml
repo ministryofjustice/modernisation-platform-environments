@@ -24,6 +24,13 @@ parameters:
     type: "String"
     description: "If not specified, the instance will be joined to the domain's default OU. Example: Specify OUpath in the format MEMBER_SERVERS/APPLICATIONS/PPROD/CSR to join to the CSR OU in the PreProd APPLICATIONS OU in the MEMBER_SERVERS OU."
     default: "default"
+  restart:
+    type: "String"
+    description: "If set to true, the instance will be restarted after joining the domain. If set to false, the instance will not be restarted. Default is true."
+    default: "true"
+    allowedValues:
+      - true
+      - false
 mainSteps:
   - name: WindowsDomainJoin
     action: aws:runPowerShellScript
@@ -41,6 +48,7 @@ mainSteps:
           $newHostname = "{{newHostname}}"
           $domain = "{{domain}}"
           $ouPath = "{{ouPath}}"
+          $restart = "{{restart}}"
 
           # Check pre-requisites are installed, exit if not
           if (-Not (Get-Module -ListAvailable -Name "ActiveDirectory")) {
@@ -48,14 +56,6 @@ mainSteps:
             Write-Error "ERROR: Run 'Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature' via PoweShell as admin to install the ActiveDirectory, then re-run this ssm document"
             exit 1
           }
-
-          if ($newHostname -eq "keep-existing") {
-            $hostname = $env:COMPUTERNAME
-            Write-Host "INFO: No new hostname supplied, using existing hostname - $hostname"
-          } else {
-            $hostname = $newHostname
-          }
-
           # Define environment settings
           $environments = @{
             "dev" = @{
@@ -65,7 +65,7 @@ mainSteps:
                 "suffixsearchlist" = @("azure.noms.root", "noms.root");
                 "domaincontroller" = "MGMCW0002.azure.noms.root";
                 "usernameprefix" = "azure";
-                "oudefault" = "CN=Computers";
+                "oudefault" = $null;
             };
             "prod" = @{
                 "domain" = "azure.hmpp.root";
@@ -102,6 +102,13 @@ mainSteps:
           $existingSuffixSearchList = (Get-DnsClientGlobalSetting).SuffixSearchList
           $newSuffixSearchList = $environments[$domain]["suffixsearchlist"] + $existingSuffixSearchList
           Set-DnsClientGlobalSetting -SuffixSearchList $newSuffixSearchList
+
+          # set the hostname for 'is hostname already in use' check
+          if ($newHostname -eq "keep-existing") {
+            $hostname = $env:COMPUTERNAME
+          } else {
+            $hostname = $newHostname
+          }
             
           function Get-HostnameInUse {
             param (
@@ -125,16 +132,39 @@ mainSteps:
           $secpasswd = ConvertTo-SecureString $domainJoinPassword -AsPlainText -Force
           $credentials = New-Object System.Management.Automation.PSCredential (($environments[$domain]["usernameprefix"] + "\" + $domainJoinUsername), $secpasswd)
 
-          if ( -not (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain)) {
-            Write-Host "INFO: Hostname $hostname is not already a member of the $domain domain, continuing"
+          # splatting Add-Computer parameters to make it easier to read
+          $args = @{
+            DomainName = $environments[$domain]["domain"]
+            Credential = $credentials
+            Verbose = $true
+          }
+
+          # adds new name to parameters if supplied
+          if (-not($newHostname -eq "keep-existing")) {
+            Write-Host "INFO: New hostname supplied, changing hostname to $newHostname"
+            $args.Add("NewName", $newHostname)
+          } else {
+            Write-Host "INFO: No new hostname supplied, using existing hostname $env:COMPUTERNAME"
+          }
+
+          # handles the fact that a default dev/test OU doesn't exist
+          if (-not($ouPath -eq $null)) {
+            $args.Add("OUPath", $ouPath)
+          }
+
+          # optional restart parameter, mainly for testing, defaults to true
+          if ($restart -eq "true") {
             Write-Host "WARNING: Instance will restart to complete domain join"
-            if ($newHostname -eq "keep-existing") {
-              Write-Host "INFO: No new hostname supplied, using existing hostname - $hostname"
-              Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -OUPath $ouPath -Restart -Verbose
-            } else {
-              Write-Host "INFO: New hostname supplied, changing hostname to $hostname"
-              Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -NewName $hostname -OUPath $ouPath -Restart -Verbose
-            }
+            $args.Add("Restart", $true)
+          } else {
+            Write-Host "WARNING: Instance will not be restarted but must be restarted manually to complete domain join operation"
+            $args.Add("Restart", $false)
+          }
+
+          if ( -not (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain)) {
+            Write-Host "INFO: Hostname $hostname is not already a member of the $domain domain, continuing to add"
+            Write-Host "INFO: Running Add-Computer with args" @args
+            Add-Computer @args
           } else {
             Write-Error "ERROR: Hostname $hostname is already in use"
             exit 1
