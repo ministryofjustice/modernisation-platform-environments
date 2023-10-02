@@ -114,9 +114,6 @@ resource "aws_api_gateway_method" "ingest_data_for_data_product" {
 
   request_parameters = {
     "method.request.header.Authorization"   = true,
-    "method.request.querystring.database"   = true,
-    "method.request.querystring.table"      = true,
-    "method.request.querystring.contentMD5" = true,
     "method.request.path.data-product-name" = true,
   }
 }
@@ -131,9 +128,6 @@ resource "aws_api_gateway_integration" "ingest_data_for_data_product_to_lambda" 
   uri                     = module.data_product_presigned_url_lambda.lambda_function_invoke_arn
 
   request_parameters = {
-    "integration.request.querystring.database"   = "method.request.querystring.database",
-    "integration.request.querystring.table"      = "method.request.querystring.table",
-    "integration.request.querystring.contentMD5" = "method.request.querystring.contentMD5",
     "integration.request.path.data-product-name" = "method.request.path.data-product-name",
   }
 }
