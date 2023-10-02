@@ -180,43 +180,19 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
 
 # API Gateway authoriser IAM permissions
 
-data "aws_iam_policy_document" "apigateway_trust_policy" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["apigateway.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
+moved {
+  from = aws_iam_role.authoriser_role
+  to   = module.api_core.aws_iam_role.authoriser_role
 }
 
-resource "aws_iam_role" "authoriser_role" {
-  name               = "authoriser_role_${local.environment}"
-  assume_role_policy = data.aws_iam_policy_document.apigateway_trust_policy.json
-  tags               = local.tags
+moved {
+  from = aws_iam_policy.allow_invoke_authoriser_lambda
+  to   = module.api_core.aws_iam_policy.allow_invoke_authoriser_lambda
 }
 
-data "aws_iam_policy_document" "allow_invoke_authoriser_lambda_doc" {
-  statement {
-    effect    = "Allow"
-    actions   = ["lambda:InvokeFunction"]
-    resources = [module.data_product_authorizer_lambda.lambda_function_arn]
-  }
-}
-
-resource "aws_iam_policy" "allow_invoke_authoriser_lambda" {
-  name   = "allow_invoke_authoriser_lambda"
-  path   = "/"
-  policy = data.aws_iam_policy_document.allow_invoke_authoriser_lambda_doc.json
-  tags   = local.tags
-}
-
-resource "aws_iam_role_policy_attachment" "attach_allow_invoke_authoriser_lambda" {
-  role       = aws_iam_role.authoriser_role.name
-  policy_arn = aws_iam_policy.allow_invoke_authoriser_lambda.arn
+moved {
+  from = aws_iam_role_policy_attachment.attach_allow_invoke_authoriser_lambda
+  to   = module.api_core.aws_iam_role_policy_attachment.attach_allow_invoke_authoriser_lambda
 }
 
 # S3 policy

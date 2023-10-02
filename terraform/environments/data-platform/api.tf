@@ -1,10 +1,24 @@
+module "api_core" {
+  source             = "./modules/api_core"
+  environment        = local.environment
+  tags               = local.tags
+  account_id         = local.account_id
+  region             = local.region
+  authorizer_version = local.authorizer_version
+}
 
-resource "aws_api_gateway_rest_api" "data_platform" {
-  name = "data_platform"
+moved {
+  from = aws_api_gateway_rest_api.data_platform
+  to   = module.api_core.aws_api_gateway_rest_api.data_platform
+}
+
+moved {
+  from = aws_api_gateway_authorizer.authorizer
+  to   = module.api_core.aws_api_gateway_authorizer.authorizer
 }
 
 resource "aws_api_gateway_deployment" "deployment" {
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id = module.api_core.gateway_id
 
   triggers = {
     # NOTE: The configuration below will satisfy ordering considerations,
@@ -40,39 +54,31 @@ resource "aws_api_gateway_deployment" "deployment" {
 
 resource "aws_api_gateway_stage" "default_stage" {
   deployment_id = aws_api_gateway_deployment.deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id   = module.api_core.gateway_id
   stage_name    = local.environment
-}
-
-resource "aws_api_gateway_authorizer" "authorizer" {
-  name                   = "authorizer-${local.environment}"
-  rest_api_id            = aws_api_gateway_rest_api.data_platform.id
-  authorizer_uri         = module.data_product_authorizer_lambda.lambda_function_invoke_arn
-  authorizer_credentials = aws_iam_role.authoriser_role.arn
-  identity_source        = "method.request.header.authorizationToken"
 }
 
 # /data-product resource
 resource "aws_api_gateway_resource" "data_product" {
-  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
+  parent_id   = module.api_core.root_resource_id
   path_part   = "data-product"
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id = module.api_core.gateway_id
 }
 
 # /data-product/register resource
 resource "aws_api_gateway_resource" "register_data_product" {
   parent_id   = aws_api_gateway_resource.data_product.id
   path_part   = "register"
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id = module.api_core.gateway_id
 }
 
 # /data-product/register POST method
 resource "aws_api_gateway_method" "register_data_product" {
   authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.authorizer.id
+  authorizer_id = module.api_core.authorizor_id
   http_method   = "POST"
   resource_id   = aws_api_gateway_resource.register_data_product.id
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id   = module.api_core.gateway_id
 
   request_parameters = {
     "method.request.header.Authorization" = true
@@ -83,7 +89,7 @@ resource "aws_api_gateway_method" "register_data_product" {
 resource "aws_api_gateway_integration" "register_data_product_to_lambda" {
   http_method             = aws_api_gateway_method.register_data_product.http_method
   resource_id             = aws_api_gateway_resource.register_data_product.id
-  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id             = module.api_core.gateway_id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = module.data_product_create_metadata_lambda.lambda_function_invoke_arn
@@ -92,17 +98,17 @@ resource "aws_api_gateway_integration" "register_data_product_to_lambda" {
 # presigned url API endpoint
 
 resource "aws_api_gateway_resource" "upload_data" {
-  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
+  parent_id   = module.api_core.root_resource_id
   path_part   = "upload_data"
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id = module.api_core.gateway_id
 }
 
 resource "aws_api_gateway_method" "upload_data_get" {
   authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.authorizer.id
+  authorizer_id = module.api_core.authorizor_id
   http_method   = "GET"
   resource_id   = aws_api_gateway_resource.upload_data.id
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id   = module.api_core.gateway_id
 
   request_parameters = {
     "method.request.header.Authorization"   = true
@@ -115,7 +121,7 @@ resource "aws_api_gateway_method" "upload_data_get" {
 resource "aws_api_gateway_integration" "upload_data_to_lambda" {
   http_method             = aws_api_gateway_method.upload_data_get.http_method
   resource_id             = aws_api_gateway_resource.upload_data.id
-  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id             = module.api_core.gateway_id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = module.data_product_presigned_url_lambda.lambda_function_invoke_arn
@@ -130,20 +136,20 @@ resource "aws_api_gateway_integration" "upload_data_to_lambda" {
 # API docs endpoint
 
 resource "aws_api_gateway_resource" "docs" {
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
-  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
+  rest_api_id = module.api_core.gateway_id
+  parent_id   = module.api_core.root_resource_id
   path_part   = "docs"
 }
 
 resource "aws_api_gateway_method" "docs" {
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id   = module.api_core.gateway_id
   resource_id   = aws_api_gateway_resource.docs.id
   http_method   = "ANY"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "docs_to_lambda" {
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id = module.api_core.gateway_id
   resource_id = aws_api_gateway_method.docs.resource_id
   http_method = aws_api_gateway_method.docs.http_method
 
@@ -153,20 +159,20 @@ resource "aws_api_gateway_integration" "docs_to_lambda" {
 }
 
 resource "aws_api_gateway_resource" "proxy" {
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id = module.api_core.gateway_id
   parent_id   = aws_api_gateway_resource.docs.id
   path_part   = "{proxy+}"
 }
 
 resource "aws_api_gateway_method" "proxy" {
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id   = module.api_core.gateway_id
   resource_id   = aws_api_gateway_resource.proxy.id
   http_method   = "ANY"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "proxy_to_lambda" {
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id = module.api_core.gateway_id
   resource_id = aws_api_gateway_method.proxy.resource_id
   http_method = aws_api_gateway_method.proxy.http_method
 
@@ -176,14 +182,14 @@ resource "aws_api_gateway_integration" "proxy_to_lambda" {
 }
 
 resource "aws_api_gateway_method" "proxy_root" {
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
-  resource_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
+  rest_api_id   = module.api_core.gateway_id
+  resource_id   = module.api_core.root_resource_id
   http_method   = "ANY"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "docs_lambda_root" {
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id = module.api_core.gateway_id
   resource_id = aws_api_gateway_method.proxy_root.resource_id
   http_method = aws_api_gateway_method.proxy_root.http_method
 
@@ -199,17 +205,17 @@ resource "aws_api_gateway_integration" "docs_lambda_root" {
 # get_glue_metadata endpoint
 
 resource "aws_api_gateway_resource" "get_glue_metadata" {
-  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
+  parent_id   = module.api_core.root_resource_id
   path_part   = "get_glue_metadata"
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id = module.api_core.gateway_id
 }
 
 resource "aws_api_gateway_method" "get_glue_metadata" {
   authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.authorizer.id
+  authorizer_id = module.api_core.authorizor_id
   http_method   = "GET"
   resource_id   = aws_api_gateway_resource.get_glue_metadata.id
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id   = module.api_core.gateway_id
 
   request_parameters = {
     "method.request.header.Authorization" = true,
@@ -221,7 +227,7 @@ resource "aws_api_gateway_method" "get_glue_metadata" {
 resource "aws_api_gateway_integration" "get_glue_metadata" {
   http_method             = aws_api_gateway_method.get_glue_metadata.http_method
   resource_id             = aws_api_gateway_resource.get_glue_metadata.id
-  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  rest_api_id             = module.api_core.gateway_id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = module.data_product_get_glue_metadata_lambda.lambda_function_invoke_arn
