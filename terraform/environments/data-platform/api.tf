@@ -18,17 +18,18 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.upload_data,
       aws_api_gateway_resource.get_glue_metadata,
       aws_api_gateway_resource.docs,
-      aws_api_gateway_resource.create_data_product_metadata,
+      aws_api_gateway_resource.data_product,
+      aws_api_gateway_resource.register_data_product,
       aws_api_gateway_method.upload_data_get,
       aws_api_gateway_method.docs,
       aws_api_gateway_method.get_glue_metadata,
-      aws_api_gateway_method.create_data_product_metadata_post,
+      aws_api_gateway_method.register_data_product,
       aws_api_gateway_integration.docs_to_lambda,
       aws_api_gateway_integration.upload_data_to_lambda,
       aws_api_gateway_integration.proxy_to_lambda,
       aws_api_gateway_integration.docs_lambda_root,
       aws_api_gateway_integration.get_glue_metadata,
-      aws_api_gateway_integration.create_data_product_metadata_to_lambda
+      aws_api_gateway_integration.register_data_product_to_lambda
     ]))
   }
 
@@ -49,6 +50,43 @@ resource "aws_api_gateway_authorizer" "authorizer" {
   authorizer_uri         = module.data_product_authorizer_lambda.lambda_function_invoke_arn
   authorizer_credentials = aws_iam_role.authoriser_role.arn
   identity_source        = "method.request.header.authorizationToken"
+}
+
+# /data-product resource
+resource "aws_api_gateway_resource" "data_product" {
+  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
+  path_part   = "data-product"
+  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+}
+
+# /data-product/register resource
+resource "aws_api_gateway_resource" "register_data_product" {
+  parent_id   = aws_api_gateway_resource.data_product.id
+  path_part   = "register"
+  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+}
+
+# /data-product/register POST method
+resource "aws_api_gateway_method" "register_data_product" {
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.authorizer.id
+  http_method   = "POST"
+  resource_id   = aws_api_gateway_resource.register_data_product.id
+  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+
+  request_parameters = {
+    "method.request.header.Authorization" = true
+  }
+}
+
+# /data-product/register lambda integration
+resource "aws_api_gateway_integration" "register_data_product_to_lambda" {
+  http_method             = aws_api_gateway_method.register_data_product.http_method
+  resource_id             = aws_api_gateway_resource.register_data_product.id
+  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.data_product_create_metadata_lambda.lambda_function_invoke_arn
 }
 
 # presigned url API endpoint
@@ -191,40 +229,5 @@ resource "aws_api_gateway_integration" "get_glue_metadata" {
   request_parameters = {
     "integration.request.querystring.database" = "method.request.querystring.database",
     "integration.request.querystring.table"    = "method.request.querystring.table"
-  }
-}
-
-
-# create data product metadata API endpoint
-
-resource "aws_api_gateway_resource" "create_data_product_metadata" {
-  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
-  path_part   = "register_data_product"
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
-}
-
-resource "aws_api_gateway_method" "create_data_product_metadata_post" {
-  authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.authorizer.id
-  http_method   = "POST"
-  resource_id   = aws_api_gateway_resource.create_data_product_metadata.id
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
-
-  request_parameters = {
-    "method.request.header.Authorization" = true
-    "method.request.querystring.metadata" = true,
-  }
-}
-
-resource "aws_api_gateway_integration" "create_data_product_metadata_to_lambda" {
-  http_method             = aws_api_gateway_method.create_data_product_metadata_post.http_method
-  resource_id             = aws_api_gateway_resource.create_data_product_metadata.id
-  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = module.data_product_create_metadata_lambda.lambda_function_invoke_arn
-
-  request_parameters = {
-    "integration.request.querystring.metadata" = "method.request.querystring.metadata"
   }
 }
