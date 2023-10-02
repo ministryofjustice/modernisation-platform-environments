@@ -89,32 +89,41 @@ resource "aws_api_gateway_integration" "register_data_product_to_lambda" {
   uri                     = module.data_product_create_metadata_lambda.lambda_function_invoke_arn
 }
 
-# presigned url API endpoint
-
-resource "aws_api_gateway_resource" "upload_data" {
-  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
-  path_part   = "upload_data"
+# /data-product/{data-product-name} resource
+resource "aws_api_gateway_resource" "data_product_name" {
+  parent_id   = aws_api_gateway_resource.data_product.id
+  path_part   = "{data-product-name}"
   rest_api_id = aws_api_gateway_rest_api.data_platform.id
 }
 
-resource "aws_api_gateway_method" "upload_data_get" {
+# /data-product/{data-product-name}/ingest resource
+resource "aws_api_gateway_resource" "ingest_data_for_data_product" {
+  parent_id   = aws_api_gateway_resource.data_product_name.id
+  path_part   = "ingest"
+  rest_api_id = aws_api_gateway_rest_api.data_platform.id
+}
+
+# /data-product/{data-product-name}/ingest POST method
+resource "aws_api_gateway_method" "ingest_data_for_data_product" {
   authorization = "CUSTOM"
   authorizer_id = aws_api_gateway_authorizer.authorizer.id
-  http_method   = "GET"
-  resource_id   = aws_api_gateway_resource.upload_data.id
+  http_method   = "POST"
+  resource_id   = aws_api_gateway_resource.ingest_data_for_data_product.id
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
 
   request_parameters = {
-    "method.request.header.Authorization"   = true
+    "method.request.header.Authorization"   = true,
     "method.request.querystring.database"   = true,
     "method.request.querystring.table"      = true,
     "method.request.querystring.contentMD5" = true,
+    "method.request.path.data-product-name" = true,
   }
 }
 
-resource "aws_api_gateway_integration" "upload_data_to_lambda" {
-  http_method             = aws_api_gateway_method.upload_data_get.http_method
-  resource_id             = aws_api_gateway_resource.upload_data.id
+# /data-product/{data-product-name}/ingest lambda integration
+resource "aws_api_gateway_integration" "ingest_data_for_data_product_to_lambda" {
+  http_method             = aws_api_gateway_method.ingest_data_for_data_product.http_method
+  resource_id             = aws_api_gateway_resource.ingest_data_for_data_product.id
   rest_api_id             = aws_api_gateway_rest_api.data_platform.id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
@@ -123,7 +132,8 @@ resource "aws_api_gateway_integration" "upload_data_to_lambda" {
   request_parameters = {
     "integration.request.querystring.database"   = "method.request.querystring.database",
     "integration.request.querystring.table"      = "method.request.querystring.table",
-    "integration.request.querystring.contentMD5" = "method.request.querystring.contentMD5"
+    "integration.request.querystring.contentMD5" = "method.request.querystring.contentMD5",
+    "integration.request.path.data-product-name" = "method.request.path.data-product-name",
   }
 }
 
