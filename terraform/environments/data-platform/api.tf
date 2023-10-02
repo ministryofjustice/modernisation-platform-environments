@@ -75,8 +75,7 @@ resource "aws_api_gateway_method" "register_data_product" {
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
 
   request_parameters = {
-    "method.request.header.Authorization" = true,
-    "method.request.body.metadata"        = true
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -88,10 +87,6 @@ resource "aws_api_gateway_integration" "register_data_product_to_lambda" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = module.data_product_create_metadata_lambda.lambda_function_invoke_arn
-
-  request_parameters = {
-    "integration.request.body.metadata" = "method.request.body.metadata"
-  }
 }
 
 # presigned url API endpoint
