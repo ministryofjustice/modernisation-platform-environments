@@ -15,17 +15,18 @@ resource "aws_api_gateway_deployment" "deployment" {
     #       resources will show a difference after the initial implementation.
     #       It will stabilize to only change when resources change afterwards.
     redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.upload_data,
       aws_api_gateway_resource.get_glue_metadata,
       aws_api_gateway_resource.docs,
       aws_api_gateway_resource.data_product,
+      aws_api_gateway_resource.data_product_name,
       aws_api_gateway_resource.register_data_product,
-      aws_api_gateway_method.upload_data_get,
+      aws_api_gateway_resource.ingest_data_for_data_product,
       aws_api_gateway_method.docs,
       aws_api_gateway_method.get_glue_metadata,
       aws_api_gateway_method.register_data_product,
+      aws_api_gateway_method.ingest_data_for_data_product,
       aws_api_gateway_integration.docs_to_lambda,
-      aws_api_gateway_integration.upload_data_to_lambda,
+      aws_api_gateway_integration.ingest_data_for_data_product_to_lambda,
       aws_api_gateway_integration.proxy_to_lambda,
       aws_api_gateway_integration.docs_lambda_root,
       aws_api_gateway_integration.get_glue_metadata,
