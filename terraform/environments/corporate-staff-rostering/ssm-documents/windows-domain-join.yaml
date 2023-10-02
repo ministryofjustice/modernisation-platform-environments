@@ -20,6 +20,10 @@ parameters:
     description: "If over-written, the hostname will be changed to this value. If un-changed the existing hostname will be kept. The new hostname must be 15 characters or less"
     default: "keep-existing"
     maxChars: 15
+  ouPath:
+    type: "String"
+    description: "If not specified, the instance will be joined to the domain's default OU. Example: Specify OUpath in the format MEMBER_SERVERS/APPLICATIONS/PPROD/CSR to join to the CSR OU in the PreProd APPLICATIONS OU in the MEMBER_SERVERS OU."
+    default: "default"
 mainSteps:
   - name: WindowsDomainJoin
     action: aws:runPowerShellScript
@@ -36,6 +40,7 @@ mainSteps:
           $domainJoinPassword = "{{domainJoinPassword}}"
           $newHostname = "{{newHostname}}"
           $domain = "{{domain}}"
+          $ouPath = "{{ouPath}}"
 
           # Check pre-requisites are installed, exit if not
           if (-Not (Get-Module -ListAvailable -Name "ActiveDirectory")) {
@@ -60,6 +65,7 @@ mainSteps:
                 "suffixsearchlist" = @("azure.noms.root", "noms.root");
                 "domaincontroller" = "MGMCW0002.azure.noms.root";
                 "usernameprefix" = "azure";
+                "oudefault" = "CN=Computers";
             };
             "prod" = @{
                 "domain" = "azure.hmpp.root";
@@ -68,8 +74,22 @@ mainSteps:
                 "suffixsearchlist" = @("azure.hmpp.root", "hmpp.root");
                 "domaincontroller" = "PCMCW0011.azure.hmpp.root";
                 "usernameprefix" = "hmpp";
+                "oudefault" = "OU=MEMBER_SERVERS";
             };
           }
+
+          # parse ouPath parameter
+          if (ouPath -eq "default") {
+            $ouPath = $environments[$domain]["oudefault"]
+          } else {
+            $ouPath = ($ou.Split("/") | ForEach-Object { "OU=" + $_ })
+
+            [System.Array]::Reverse($ouPath)
+
+            $ouPath = $ouPath -join ","
+          }
+
+          Write-Host "INFO: Using OUPath $ouPath"
 
           # Set up DNS IP addresses and suffixes
           Write-Host "INFO: Setting DNS Client Server and DNS Client Global Settings for $domain domain"
@@ -110,10 +130,10 @@ mainSteps:
             Write-Host "WARNING: Instance will restart to complete domain join"
             if ($newHostname -eq "keep-existing") {
               Write-Host "INFO: No new hostname supplied, using existing hostname - $hostname"
-              Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -Restart -Verbose
+              Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -OUPath $ouPath -Restart -Verbose
             } else {
               Write-Host "INFO: New hostname supplied, changing hostname to $hostname"
-              Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -NewName $hostname -Restart -Verbose
+              Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -NewName $hostname -OUPath $ouPath -Restart -Verbose
             }
           } else {
             Write-Error "ERROR: Hostname $hostname is already in use"
