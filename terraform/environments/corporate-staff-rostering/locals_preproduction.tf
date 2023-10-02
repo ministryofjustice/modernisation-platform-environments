@@ -163,6 +163,36 @@ locals {
           component   = "web"
         }
       }
+
+      pp-csr-w-1-b = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "PPCWW00001"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}b"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          monitoring              = true
+          vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 129 }
+        }
+        tags = {
+          description = "copy of PPCWW00001 for csr ${local.environment}"
+          os-type     = "Windows"
+          ami         = "PPCWW00001"
+          component   = "web"
+        }
+      }
     }
 
     baseline_ec2_autoscaling_groups = {
