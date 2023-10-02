@@ -240,6 +240,19 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "xray:*"
             ],
             "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "ecs:TagResource",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "ecs:CreateAction": [
+                        "CreateCluster",
+                        "RegisterContainerInstance"
+                    ]
+                }
+            }
         }
     ]
 }
@@ -331,10 +344,10 @@ resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
 
   container_definitions = var.task_definition
 
-  # runtime_platform {
-  #   operating_system_family = "WINDOWS_SERVER_2019_CORE"
+  runtime_platform {
+     operating_system_family = "WINDOWS_SERVER_2019_CORE"
   #   cpu_architecture        = "X86_64"
-  # }
+  }
 
   tags = merge(
     var.tags_common,
