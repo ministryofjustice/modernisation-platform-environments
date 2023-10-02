@@ -29,8 +29,8 @@ parameters:
     description: "If set to true, the instance will be restarted after joining the domain. If set to false, the instance will not be restarted. Default is true."
     default: "true"
     allowedValues:
-      - true
-      - false
+      - "true"
+      - "false"
 mainSteps:
   - name: WindowsDomainJoin
     action: aws:runPowerShellScript
