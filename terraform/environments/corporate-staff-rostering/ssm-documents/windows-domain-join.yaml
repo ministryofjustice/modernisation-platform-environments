@@ -22,7 +22,7 @@ parameters:
     maxChars: 15
   ouPath:
     type: "String"
-    description: "If not specified, the instance will be joined to the domain's default OU. Specify OUpath in the format MEMBER_SERVERS/APPLICATIONS/PPROD/CSR to join to the CSR OU in the PPROD APPLICATIONS OU in the MEMBER_SERVERS OU."
+    description: "If not specified, the instance will be joined to the domain's default OU. Example: Specify OUpath in the format MEMBER_SERVERS/APPLICATIONS/PPROD/CSR to join to the CSR OU in the PreProd APPLICATIONS OU in the MEMBER_SERVERS OU."
     default: "default"
 mainSteps:
   - name: WindowsDomainJoin
