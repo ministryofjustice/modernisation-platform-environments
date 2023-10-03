@@ -122,6 +122,28 @@ locals {
         }
       }
     }
+    management_server = {
+      description = "Security group for management server"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
     ndh_app = {
       description = "Security group for ndh app"
       ingress = {
@@ -137,7 +159,7 @@ locals {
           from_port       = 8080
           to_port         = 8080
           protocol        = "tcp"
-          security_groups = ["public"]
+          security_groups = ["management_server"]
         }
         http8555 = { # from oasys
           description     = "Allow http8555 ingress"
@@ -174,7 +196,7 @@ locals {
           from_port       = 8080
           to_port         = 8080
           protocol        = "tcp"
-          security_groups = ["public"]
+          security_groups = ["management_server"]
         }
         7222 = { # from nomis (XTAG)
           description     = "Allow port 7222 ingress"
