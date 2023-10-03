@@ -1,6 +1,6 @@
 ---
 schemaVersion: "2.2"
-description: "SSM Document for joining Windows EC2 instances to the domain. The instance will be RESTARTED so this is not applicable for ASG's."
+description: "SSM Document for joining Windows EC2 instances to the domain. Moving Computers to a different OU must be done manually on the relevant domain controller."
 parameters:
   domain:
     type: "String"
@@ -20,10 +20,6 @@ parameters:
     description: "If over-written, the hostname will be changed to this value. If un-changed the existing hostname will be kept. The new hostname must be 15 characters or less"
     default: "keep-existing"
     maxChars: 15
-  ouPath:
-    type: "String"
-    description: "If not specified, the instance will be joined to the domain's default OU. Example: Specify OUpath in the format MEMBER_SERVERS/APPLICATIONS/PPROD/CSR to join to the CSR OU in the PreProd APPLICATIONS OU in the MEMBER_SERVERS OU."
-    default: "default"
   restart:
     type: "String"
     description: "If set to true, the instance will be restarted after joining the domain. If set to false, the instance will not be restarted. Default is true."
@@ -47,7 +43,6 @@ mainSteps:
           $domainJoinPassword = "{{domainJoinPassword}}"
           $newHostname = "{{newHostname}}"
           $domain = "{{domain}}"
-          $ouPath = "{{ouPath}}"
           $restart = "{{restart}}"
 
           # Check pre-requisites are installed, exit if not
@@ -65,7 +60,6 @@ mainSteps:
                 "suffixsearchlist" = @("azure.noms.root", "noms.root");
                 "domaincontroller" = "MGMCW0002.azure.noms.root";
                 "usernameprefix" = "azure";
-                "oudefault" = $null;
             };
             "prod" = @{
                 "domain" = "azure.hmpp.root";
@@ -74,22 +68,8 @@ mainSteps:
                 "suffixsearchlist" = @("azure.hmpp.root", "hmpp.root");
                 "domaincontroller" = "PCMCW0011.azure.hmpp.root";
                 "usernameprefix" = "hmpp";
-                "oudefault" = "OU=MEMBER_SERVERS";
             };
           }
-
-          # parse ouPath parameter
-          if ($ouPath -eq "default") {
-            $ouPath = $environments[$domain]["oudefault"]
-          } else {
-            $ouPath = ($ouPath.Split("/") | ForEach-Object { "OU=" + $_ })
-
-            [System.Array]::Reverse($ouPath)
-
-            $ouPath = $ouPath -join ","
-          }
-
-          Write-Host "INFO: Using OUPath $ouPath"
 
           # Set up DNS IP addresses and suffixes
           Write-Host "INFO: Setting DNS Client Server and DNS Client Global Settings for $domain domain"
@@ -137,19 +117,15 @@ mainSteps:
             DomainName = $environments[$domain]["domain"]
             Credential = $credentials
             Verbose = $true
+            Force = $true
           }
 
           # adds new name to parameters if supplied
-          if (-not($newHostname -eq "keep-existing")) {
+          if ($newHostname -eq "keep-existing") {
+            Write-Host "INFO: No new hostname supplied, using existing hostname $env:COMPUTERNAME"
+          } else {
             Write-Host "INFO: New hostname supplied, changing hostname to $newHostname"
             $args.Add("NewName", $newHostname)
-          } else {
-            Write-Host "INFO: No new hostname supplied, using existing hostname $env:COMPUTERNAME"
-          }
-
-          # handles the fact that a default dev/test OU doesn't exist
-          if (-not($ouPath -eq $null)) {
-            $args.Add("OUPath", $ouPath)
           }
 
           # optional restart parameter, mainly for testing, defaults to true
@@ -161,12 +137,12 @@ mainSteps:
             $args.Add("Restart", $false)
           }
 
-          if ( -not (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain)) {
+          if (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain) {
+            Write-Error "ERROR: Hostname $hostname is already in use"
+            exit 1
+          } else {
             Write-Host "INFO: Hostname $hostname is not already a member of the $domain domain, continuing to add"
             Write-Host "INFO: Running Add-Computer with args" @args
             Add-Computer @args
-          } else {
-            Write-Error "ERROR: Hostname $hostname is already in use"
-            exit 1
           }
 
