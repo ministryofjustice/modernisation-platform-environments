@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "amazon_managed_prometheus" {
       "aps:GetLabels",
       "aps:GetMetricMetadata"
     ]
-    resources = [module.managed_prometheus.workspace_arn]
+    resources = [module.managed-service-prometheus.workspace_arn]
   }
 }
 
