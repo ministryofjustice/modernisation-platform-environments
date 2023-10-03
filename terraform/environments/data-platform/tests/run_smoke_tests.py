@@ -43,21 +43,17 @@ print("Uploading data")
 upload_response = requests.post(response_json["URL"]["url"], files=multipart_form_data)
 print(upload_response.status_code, upload_response.text)
 
-print(f"Waiting for {database}.{table} to recreate in athena")
+print(f"Waiting for {database}.{table} to create in athena")
 time.sleep(10)
 
-try:
-    glue.get_table(DatabaseName=database, Name=table)
-    print(f"{database}.{table} recreated in glue")
-except Exception as e:
-    print(e)
-
-# Clean up created table
+# Check for created table
 try:
     glue.get_table(DatabaseName=database, Name=table)
     print(f"{database}.{table} found in glue")
 except Exception as e:
-    print(e)
+    raise e
+
+# Clean up created table
 try:
     glue.delete_table(DatabaseName=database, Name=table)
     print(f"{database}.{table} deleted from glue")
