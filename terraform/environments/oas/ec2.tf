@@ -5,7 +5,7 @@ cd /tmp
 yum -y install sshpass
 yum -y install jq
 
-hostnamectl set-hostname ${local.application_name}.${local.hostname}
+hostnamectl set-hostname ${local.application_name}.${local.application_data.accounts[local.environment].hostname}
 
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
