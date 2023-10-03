@@ -44,6 +44,10 @@ resource "aws_db_instance" "iaps" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database", local.application_name, local.environment)) }
   )
+
+  lifecycle {
+    ignore_changes = [snapshot_identifier]
+  }
 }
 
 resource "aws_ssm_parameter" "iaps_snapshot_data_refresh_id" {
