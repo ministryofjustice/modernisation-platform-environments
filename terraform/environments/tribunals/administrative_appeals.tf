@@ -290,29 +290,13 @@ resource "aws_lb_target_group" "appeals_target_group" {
     healthy_threshold   = "3"
     interval            = "15"
     protocol            = "HTTP"
+    port                = "80"
     unhealthy_threshold = "3"
     matcher             = "200-302"
     timeout             = "5"
   }
 
 }
-
-# resource "aws_lb_listener_rule" "appeals_alb_listener_rule" {
-#   listener_arn = aws_lb_listener.appeals_lb.arn
-#   priority     = 1
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.appeals_target_group.arn
-#   }
-
-#   condition {
-#    path_pattern {
-#       values = ["/"]
-#     }
-#   }
-# }
-
 
 resource "aws_lb_listener" "appeals_lb" {
   depends_on = [
