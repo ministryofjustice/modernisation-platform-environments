@@ -175,9 +175,8 @@ locals {
               "*.nomis.hmpps-development.modernisation-platform.justice.gov.uk",
               "*.nomis.service.justice.gov.uk",
             ])
-            # using port 7777 as Edge takes an age to verify certs, see DSOS-2142
             desktop_shortcuts = join(",", [
-              "QA11R NOMIS|http://c-qa11r.development.nomis.service.justice.gov.uk:7777/forms/frmservlet?config=tag",
+              "QA11R NOMIS|https://c-qa11r.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
             ])
           }))
         })
