@@ -70,6 +70,7 @@ locals {
     migration-web-sg  = local.security_groups.Web-SG-migration
     migration-app-sg  = local.security_groups.App-SG-migration
     domain-controller = local.security_groups.domain-controller-access
+    domain            = local.security_groups.domain
   }
 
   baseline_sns_topics     = {}

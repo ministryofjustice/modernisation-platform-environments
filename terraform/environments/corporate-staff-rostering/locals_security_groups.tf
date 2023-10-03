@@ -26,6 +26,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
+    domain_controllers = module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers,
   }
 
   security_group_cidrs_preprod_prod = {
@@ -57,7 +58,8 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
-
+    domain_controllers = module.ip_addresses.azure_fixngo_ips.prod.domain_controllers,
+    jumpservers        = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
@@ -546,6 +548,43 @@ locals {
         }
       }
     }
+    ############ NEWLY DEFINED SGs ############
+    # db SG also contains it's own domain controller access rules
+    domain = {
+      description = "New security group for domain controller inbound"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        rpc_udp = {
+          description = "135: UDP MS-RPC AD connect ingress from Azure DC"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "UDP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, [for ip in local.security_group_cidrs.domain_controllers : "${ip}/32"])
+        }
+        rpc_tcp = {
+          description = "135: TCP MS-RPC AD connect ingress from Azure DC"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "TCP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, [for ip in local.security_group_cidrs.domain_controllers : "${ip}/32"])
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }    
   }
 }
 
