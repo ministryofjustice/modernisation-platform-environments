@@ -159,7 +159,7 @@ locals {
           from_port       = 8080
           to_port         = 8080
           protocol        = "tcp"
-          security_groups = ["public"]
+          security_groups = ["management_server"]
         }
         http8555 = { # from oasys
           description     = "Allow http8555 ingress"
@@ -196,7 +196,7 @@ locals {
           from_port       = 8080
           to_port         = 8080
           protocol        = "tcp"
-          security_groups = ["public"]
+          security_groups = ["management_server"]
         }
         7222 = { # from nomis (XTAG)
           description     = "Allow port 7222 ingress"

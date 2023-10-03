@@ -81,7 +81,7 @@ locals {
       user_data_raw                 = base64encode(file("./templates/ndh-user-data.yaml"))
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      vpc_security_group_ids = ["private"]
+      vpc_security_group_ids = ["management_server"]
       tags = {
         backup-plan = "daily-and-weekly"
       }
