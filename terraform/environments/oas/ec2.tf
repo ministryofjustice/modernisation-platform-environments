@@ -2,9 +2,31 @@ locals {
   instance-userdata = <<EOF
 #!/bin/bash
 cd /tmp
+yum -y install sshpass
+yum -y install jq
+
+hostnamectl set-hostname ${local.application_name}.${local.hostname}
+
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
+
+mkfs.ext4 /dev/sdb
+mkdir -p /oracle/software
+echo "/dev/sdb /oracle/software ext4 defaults 0 0" >> /etc/fstab
+mount -a
+
+chown oracle:dba /oracle/software
+chown oracle:dba /stage
+chmod -R 777 /stage
+chmod -R 644 /oracle/software
+dd if=/dev/zero of=/root/myswapfile bs=1M count=1024
+chmod 600 /root/myswapfile
+mkswap /root/myswapfile
+swapon /root/myswapfile
+echo "/root/myswapfile swap swap defaults 0 0" >> /etc/fstab
 EOF
 }
 
