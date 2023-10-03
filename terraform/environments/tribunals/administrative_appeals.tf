@@ -279,7 +279,7 @@ resource "aws_lb_target_group" "appeals_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  #target_type          = "instance"
+  target_type          = "instance"
   deregistration_delay = 30
 
   stickiness {
@@ -287,12 +287,11 @@ resource "aws_lb_target_group" "appeals_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "15"
+    healthy_threshold   = "5"
+    interval            = "120"
     protocol            = "HTTP"
-    port                = "80"
-    unhealthy_threshold = "3"
-    matcher             = "200-302"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
     timeout             = "5"
   }
 
