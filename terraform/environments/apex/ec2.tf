@@ -5,6 +5,8 @@ cd /tmp
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
+echo "${aws_efs_file_system.efs.dns_name}:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
+mount -a
 EOF
 }
 
@@ -111,7 +113,7 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 
 resource "aws_iam_role" "ec2_instance_role" {
   name                = "${local.application_name}-role"
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy", "arn:aws:iam::aws:policy/AmazonSSMFullAccess"]
   assume_role_policy  = <<EOF
 {
     "Version": "2012-10-17",
@@ -138,33 +140,50 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      # {
+      #   Action = [
+      #     "ec2:Describe*",
+      #   ]
+      #   Effect   = "Allow"
+      #   Resource = "*"
+      # },
+      # {
+      #   Effect = "Allow",
+      #   Action = [
+      #     "s3:ListBucket",
+      #   ],
+      #   Resource = [
+      #     "arn:aws:s3:::modernisation-platform-software20230224000709766100000001",
+      #     "arn:aws:s3:::modernisation-platform-software20230224000709766100000001/*",
+      #   ]
+      # },
+      # {
+      #   Effect = "Allow",
+      #   Action = [
+      #     "s3:GetObject"
+      #   ],
+      #   Resource = [
+      #     "arn:aws:s3:::modernisation-platform-software20230224000709766100000001/*",
+      #   ]
+      # },
       {
+        Effect = "Allow",
         Action = [
-          "ec2:Describe*",
-        ]
-        Effect   = "Allow"
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:DescribeLogStreams",
+          "logs:PutRetentionPolicy",
+          "logs:PutLogEvents",
+          "ec2:DescribeInstances",
+        ],
         Resource = "*"
       },
       {
         Effect = "Allow",
         Action = [
-          "s3:ListBucket",
+          "ec2:CreateTags"
         ],
-        Resource = [
-          "arn:aws:s3:::modernisation-platform-software20230224000709766100000001",
-          "arn:aws:s3:::modernisation-platform-software20230224000709766100000001/*",
-        ]
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-        ],
-        Resource = [
-          "arn:aws:s3:::modernisation-platform-software20230224000709766100000001/*",
-        ]
+        Resource = "*"
       }
     ]
   })
@@ -197,7 +216,8 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
 resource "aws_route53_record" "apex-db" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.inner.zone_id
-  name     = "${local.application_name}.${data.aws_route53_zone.inner.name}"
+  # name     = "${local.application_name}.${data.aws_route53_zone.inner.name}"
+  name     = "db.${local.application_name}.${data.aws_route53_zone.inner.name}"
   type     = "A"
   ttl      = 900
   records  = [aws_instance.apex_db_instance.private_ip]
