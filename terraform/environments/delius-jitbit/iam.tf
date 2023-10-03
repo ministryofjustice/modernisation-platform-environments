@@ -145,3 +145,46 @@ resource "aws_iam_role_policy_attachment" "task_exec_jitbit_secrets_reader" {
   role       = aws_iam_role.ecs_exec.name
   policy_arn = aws_iam_policy.jitbit_secrets_reader.arn
 }
+
+
+
+resource "aws_iam_role" "jibit_s3" {
+  count              = local.is-development ? 1 : 0
+  name               = "jitbit-s3"
+  assume_role_policy = data.aws_iam_policy_document.ci_secrets_rotator_role.json
+  tags               = local.tags
+}
+
+data "aws_iam_policy_document" "jibit_s3_role" {
+  count = local.is-development ? 1 : 0
+
+  statement {
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    effect = "Allow"
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:sts::142262177450:assumed-role/AWSReservedSSO_modernisation-platform-*/*"
+      ]
+    }
+  }
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "arn:aws:s3:::jitbit-cr-probation-service-justice-gov-uk",
+      "arn:aws:s3:::jitbit-cr-probation-service-justice-gov-uk/jitbit/*",
+    ]
+  }
+}
