@@ -84,6 +84,17 @@ resource "aws_route53_record" "data_platform_technical_documentation" {
   records = ["ministryofjustice.github.io."]
 }
 
+# User Guidance on GitHub Pages
+resource "aws_route53_record" "data_platform_user_guidance" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "user-guidance.data-platform.service.justice.gov.uk"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["ministryofjustice.github.io."]
+}
+
 # PagerDuty Status Page (HTTP Traffic)
 resource "aws_route53_record" "http_traffic_status_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
