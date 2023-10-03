@@ -82,4 +82,5 @@ module "baseline" {
   route53_zones          = lookup(local.environment_config, "baseline_route53_zones", {})
   s3_buckets             = merge(local.baseline_s3_buckets, module.baseline_presets.s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
   security_groups        = local.baseline_security_groups
+  ssm_parameters         = merge(module.baseline_presets.ssm_parameters, lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}))
 }
