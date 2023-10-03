@@ -1,4 +1,4 @@
-#Information Rights Tribunal
+#it Tribunal
 locals {
   it = "it" 
   it_url = "informationrights"
@@ -13,6 +13,40 @@ locals {
   it_source_db_url         = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
   it_source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   it_source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
+  it_user_data = base64encode(templatefile("user_data.sh", {
+    cluster_name = "${local.it}_app_cluster"
+  }))
+  it_task_definition = templatefile("task_definition.json", {
+    app_name            = "${local.it}"
+    #ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
+    #docker_image_tag    = "latest" 
+    #sentry_env          = local.environment
+    awslogs-group       = "${local.it}-ecs-log-group"
+    supportEmail        = "${local.application_data.accounts[local.environment].support_email}"
+    supportTeam         = "${local.application_data.accounts[local.environment].support_team}"
+    CurServer           = "${local.application_data.accounts[local.environment].curserver}"
+
+  })
+  it_ec2_ingress_rules = {
+    "cluster_ec2_lb_ingress_3" = {
+      description     = "Cluster EC2 ingress rule 3"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      cidr_blocks     = []
+      security_groups = [aws_security_group.it_lb_sc.id]
+    }
+  }
+  it_ec2_egress_rules = {
+    "cluster_ec2_lb_egress" = {
+      description     = "Cluster EC2 loadbalancer egress rule"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = []
+    }
+  }
 }
 
 ######################## DMS #############################################
@@ -191,252 +225,6 @@ resource "aws_route53_record" "it_external" {
 #   }
 # }
 
-####################### ECS #########################################
-
-resource "aws_ecs_cluster" "it_cluster" {
-  name = "${local.it}_app_cluster"
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
-}
-
-resource "aws_cloudwatch_log_group" "itFamily_logs" {
-  name = "/ecs/${local.it}Family"
-}
-
-resource "aws_ecs_task_definition" "it_task_definition" {
-  family                   = "${local.it}Family"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  execution_role_arn       = aws_iam_role.it_execution.arn
-  task_role_arn            = aws_iam_role.it_task.arn
-  cpu                      = 1024
-  memory                   = 2048
-  container_definitions = jsonencode([
-    {
-      name      = "${local.it}-container"
-      image     = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
-      cpu       = 1024
-      memory    = 2048
-      essential = true
-      portMappings = [
-        {
-          containerPort = 80
-          protocol      = "tcp"
-          hostPort      = 80
-        }
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.itFamily_logs.name}"
-          awslogs-region        = "eu-west-2"
-          awslogs-stream-prefix = "ecs"
-        }
-      }
-      environment = [
-        {
-          name  = "RDS_HOSTNAME"
-          value = "${local.it_rds_url}"
-        },
-        {
-          name  = "RDS_PORT"
-          value = "${local.it_rds_port}"
-        },
-        {
-          name  = "RDS_USERNAME"
-          value = "${local.it_rds_user}"
-        },
-        {
-          name  = "RDS_PASSWORD"
-          value = "${local.it_rds_password}"
-        },
-        {
-          name  = "DB_NAME"
-          value = "${local.it_db_name}"
-        },
-        {
-          name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
-        },
-        {
-          name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
-        },
-        {
-          name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].curserver}"
-        }#,
-        # {
-        #   name  = "ida:ClientId"
-        #   value = "${local.application_data.accounts[local.environment].client_id}"
-        # }
-      ]
-    }
-  ])
-  runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
-    cpu_architecture        = "X86_64"
-  }
-}
-
-resource "aws_ecs_service" "it_ecs_service" {
-  depends_on = [
-    aws_lb_listener.it_lb
-  ]
-
-  name                              = local.it
-  cluster                           = aws_ecs_cluster.it_cluster.id
-  task_definition                   = aws_ecs_task_definition.it_task_definition.arn
-  launch_type                       = "FARGATE"
-  enable_execute_command            = true
-  desired_count                     = 1
-  health_check_grace_period_seconds = 90
-
-  network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
-    security_groups  = [aws_security_group.it_ecs_service.id]
-    assign_public_ip = true
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.it_target_group.arn
-    container_name   = "${local.it}-container"
-    container_port   = 80
-  }
-
-  deployment_controller {
-    type = "ECS"
-  }
-}
-
-resource "aws_iam_role" "it_execution" {
-  name = "execution-${local.it}"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "execution-${local.it}"
-    },
-  )
-}
-
-resource "aws_iam_role_policy" "it_execution" {
-  name = "execution-${local.it}"
-  role = aws_iam_role.it_execution.id
-
-  policy = <<-EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-           "Action": [
-              "ecr:*",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "secretsmanager:GetSecretValue"
-           ],
-           "Resource": "*",
-           "Effect": "Allow"
-      }
-    ]
-  }
-  EOF
-}
-
-resource "aws_iam_role" "it_task" {
-  name = "task-${local.it}"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "task-${local.it}"
-    },
-  )
-}
-
-resource "aws_iam_role_policy" "it_task" {
-  name = "task-${local.it}"
-  role = aws_iam_role.it_task.id
-
-  policy = <<-EOF
-  {
-   "Version": "2012-10-17",
-   "Statement": [
-     {
-       "Effect": "Allow",
-        "Action": [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "ecr:*",
-          "iam:*",
-          "ec2:*"
-        ],
-       "Resource": "*"
-     }
-   ]
-  }
-  EOF
-}
-
-resource "aws_security_group" "it_ecs_service" {
-  name_prefix = "ecs-service-sg-"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.it_lb_sc.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_ecr_repository" "it-ecr-repo" {
-  name         = "${local.it}-ecr-repo"
-  force_delete = true
-}
-
 ####################### LOAD BALANCER #########################################
 resource "aws_security_group" "it_lb_sc" {
   name        = "${local.it} load balancer security group"
@@ -473,6 +261,7 @@ resource "aws_security_group" "it_lb_sc" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  
 }
 
 resource "aws_lb" "it_lb" {
@@ -490,7 +279,7 @@ resource "aws_lb_target_group" "it_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "ip"
+  #target_type          = "instance"
   deregistration_delay = 30
 
   stickiness {
@@ -501,13 +290,29 @@ resource "aws_lb_target_group" "it_target_group" {
     healthy_threshold   = "3"
     interval            = "15"
     protocol            = "HTTP"
-    port                = "80"
     unhealthy_threshold = "3"
     matcher             = "200-302"
     timeout             = "5"
   }
 
 }
+
+# resource "aws_lb_listener_rule" "it_alb_listener_rule" {
+#   listener_arn = aws_lb_listener.it_lb.arn
+#   priority     = 1
+
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.it_target_group.arn
+#   }
+
+#   condition {
+#    path_pattern {
+#       values = ["/"]
+#     }
+#   }
+# }
+
 
 resource "aws_lb_listener" "it_lb" {
   depends_on = [
@@ -523,5 +328,119 @@ resource "aws_lb_listener" "it_lb" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.it_target_group.arn
+  }
+}
+
+##### EFS #####
+# resource "aws_efs_file_system" "it_app_efs" {
+#   encrypted        = true
+#   kms_key_id       = data.aws_kms_key.ebs_shared.arn
+#   performance_mode = "generalPurpose"
+#   tags = merge(tomap({
+#     "Name"                 = "${local.it}-app-efs"
+#     "volume-attach-host"   = "app",
+#     "volume-attach-device" = "efs://",
+#     "volume-mount-path"    = "/opt/oem/backups"
+#   }), local.tags)
+# }
+
+# resource "aws_efs_mount_target" "it_app_efs" {
+#   file_system_id = aws_efs_file_system.it_app_efs.id
+#   subnet_id      = data.aws_subnet.data_subnets_a.id
+#   security_groups = [
+#     aws_security_group.it_app_efs_sg.id
+#   ]
+# }
+
+# resource "aws_security_group" "it_app_efs_sg" {
+#   name_prefix = "${local.it}-app-efs-sg-"
+#   description = "Allow inbound access from instances"
+#   vpc_id      = data.aws_vpc.shared.id
+
+#   tags = merge(tomap(
+#     { "Name" = "${local.it}-app-efs-sg" }
+#   ), local.tags)
+
+#   ingress {
+#     protocol    = "tcp"
+#     from_port   = 2049
+#     to_port     = 2049
+#     cidr_blocks = [data.aws_vpc.shared.cidr_block]
+#   }
+
+#   egress {
+#     protocol  = "-1"
+#     from_port = 0
+#     to_port   = 0
+#     cidr_blocks = [
+#       "0.0.0.0/0",
+#     ]
+#   }
+
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
+
+####################### ECS #########################################
+
+module "it-ecs" {
+
+  source = "./modules/ecs"
+
+  subnet_set_name           = local.subnet_set_name
+  vpc_all                   = local.vpc_all
+  app_name                  = local.it
+  container_instance_type   = "windows"
+  ami_image_id              = local.application_data.accounts[local.environment].ami_image_id
+  instance_type             = local.application_data.accounts[local.environment].instance_type
+  user_data                 = local.it_user_data
+  key_name                  = ""
+  task_definition           = local.it_task_definition
+  ec2_desired_capacity      = local.application_data.accounts[local.environment].ec2_desired_capacity
+  ec2_max_size              = local.application_data.accounts[local.environment].ec2_max_size
+  ec2_min_size              = local.application_data.accounts[local.environment].ec2_min_size
+  task_definition_volume    = local.application_data.accounts[local.environment].task_definition_volume
+  network_mode              = local.application_data.accounts[local.environment].network_mode
+  server_port               = local.application_data.accounts[local.environment].server_port_1
+  app_count                 = local.application_data.accounts[local.environment].app_count
+  ec2_ingress_rules         = local.it_ec2_ingress_rules
+  ec2_egress_rules          = local.it_ec2_egress_rules
+  lb_tg_arn                 = aws_lb_target_group.it_target_group.arn
+  tags_common               = local.tags
+  appscaling_min_capacity   = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity   = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ec2_scaling_cpu_threshold = local.application_data.accounts[local.environment].ec2_scaling_cpu_threshold
+  ec2_scaling_mem_threshold = local.application_data.accounts[local.environment].ec2_scaling_mem_threshold
+  ecs_scaling_cpu_threshold = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  fsx_subnet_ids            = [data.aws_subnets.shared-public.ids[0]]
+  environment               = local.environment
+  //fsx_vpc_id                = data.aws_vpc.shared.id
+  lb_listener               = aws_lb_listener.it_lb
+}
+
+resource "aws_ecr_repository" "it-ecr-repo" {
+  name         = "${local.it}-ecr-repo"
+  force_delete = true
+}
+
+resource "aws_security_group" "it_ecs_service" {
+  name_prefix = "ecs-service-sg-"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    description     = "Allow traffic on port 80 from load balancer"
+    security_groups = [aws_security_group.it_lb_sc.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
