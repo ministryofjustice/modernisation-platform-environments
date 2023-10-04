@@ -123,7 +123,7 @@ resource "aws_security_group" "sqlserver_db_sc" {
     to_port         = 1433
     protocol        = "tcp"
     description     = "Allows Information Tribunal ECS service to access RDS"
-    security_groups = [aws_security_group.it_ecs_service.id]
+    security_groups = module.it-ecs.cluster_ec2_security_group_id
   }
   egress {
     description = "allow all outbound traffic"

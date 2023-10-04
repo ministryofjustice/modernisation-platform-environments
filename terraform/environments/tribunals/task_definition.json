@@ -16,7 +16,8 @@
       {
         "containerPort" : 80,
         "protocol"      : "tcp",
-        "hostPort"      : 443
+        "hostPort"      : 0,
+        "appProtocol"   : "http"
       }
     ],
     "logConfiguration" : {
