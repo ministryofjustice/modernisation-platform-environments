@@ -32,6 +32,12 @@ resource "aws_vpc_security_group_ingress_rule" "efs_product_inbound" {
   to_port                      = 2049
 }
 
+resource "aws_efs_mount_target" "efs_mount" {
+  file_system_id  = aws_efs_file_system.efs.id
+  subnet_id       = data.aws_subnet.private_subnets_a.id
+  security_groups = [aws_security_group.efs_product.id]
+}
+
 # resource "aws_cloudwatch_metric_alarm" "efs_connection" {
 #   alarm_name          = "${local.application_name}-${local.environment}-efs-connection"
 #   alarm_description   = "If the instance has lost connection with its EFS system, please investigate."
