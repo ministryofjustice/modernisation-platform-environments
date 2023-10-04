@@ -16,14 +16,14 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
-  cpu                      = 1024
-  memory                   = 2048
+  cpu                      = 2048
+  memory                   = 4096
   container_definitions = jsonencode([
     {
       name      = "dacp-container"
       image     = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
-      cpu       = 1024
-      memory    = 2048
+      cpu       = 2048
+      memory    = 4096
       essential = true
       portMappings = [
         {
@@ -150,10 +150,7 @@ resource "aws_iam_role_policy" "app_execution" {
       {
            "Action": [
               "ecr:*",
-              "logs:CreateLogGroup",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "logs:DescribeLogStreams",
+              "logs:*",
               "secretsmanager:GetSecretValue"
            ],
            "Resource": "*",
@@ -202,8 +199,7 @@ resource "aws_iam_role_policy" "app_task" {
      {
        "Effect": "Allow",
         "Action": [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
+          "logs:*",
           "ecr:*",
           "iam:*",
           "ec2:*"
