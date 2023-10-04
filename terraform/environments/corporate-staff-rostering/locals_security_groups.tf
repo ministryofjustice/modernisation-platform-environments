@@ -559,9 +559,9 @@ locals {
       }
     }
     ############ NEWLY DEFINED SGs ############
-    # db SG also contains it's own domain controller access rules
-    domain = {
-      description = "New security group for domain controller inbound"
+
+    load-balancer = {
+      description = "New security group for load-balancer"
       ingress = {
         all-from-self = {
           description = "Allow all ingress to self"
@@ -570,78 +570,41 @@ locals {
           protocol    = -1
           self        = true
         }
-        rpc_udp_domain = {
-          description = "135: UDP MS-RPC AD connect ingress from Azure DC and Jumpserver"
-          from_port   = 135
-          to_port     = 135
-          protocol    = "UDP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
-        }
-        rpc_tcp_domain = {
-          description = "135: TCP MS-RPC AD connect ingress from Azure DC and Jumpserver"
-          from_port   = 135
-          to_port     = 135
+        # IMPORTANT: check if an 'allow all from azure' rule is required, rather than subsequent load-balancer rules
+        /* all-from-fixngo = {
+          description = "Allow all ingress from fixngo"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          cidr_blocks = local.security_group_cidrs.https
+        } */
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
           protocol    = "TCP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          cidr_blocks = local.security_group_cidrs.https
         }
-        netbios_tcp_domain = {
-          description = "137-139: TCP NetBIOS ingress from Azure DC and Jumpserver"
-          from_port   = 137
-          to_port     = 139
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
           protocol    = "TCP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          cidr_blocks = local.security_group_cidrs.https
         }
-        netbios_udp_domain = {
-          description = "137-139: UDP NetBIOS ingress from Azure DC and Jumpserver"
-          from_port   = 137
-          to_port     = 139
-          protocol    = "UDP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
-        }
-        ldap_tcp_domain = {
-          description = "389: TCP Allow LDAP ingress from Azure DC"
-          from_port   = 389
-          to_port     = 389
+        http7770_7771_lb = {
+          description = "Allow http 7770-7771 ingress"
+          from_port   = 7770
+          to_port     = 7771
           protocol    = "TCP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
-          # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
+          cidr_blocks = local.security_group_cidrs.http7xxx
         }
-        ldap_udp_domain = {
-          description = "389: UDP Allow LDAP ingress from Azure DC"
-          from_port   = 389
-          to_port     = 389
-          protocol    = "UDP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
-          # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
-        }
-
-        smb_tcp_domain = {
-          description = "445: TCP SMB ingress from Azure DC"
-          from_port   = 445
-          to_port     = 445
+        http7780_7781_lb = {
+          description = "Allow http 7780-7781 ingress"
+          from_port   = 7780
+          to_port     = 7781
           protocol    = "TCP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
-        }
-        smb_udp_domain = {
-          description = "445: UDP SMB ingress from Azure DC"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "UDP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
-        }
-        rpc_dynamic_udp_domain = {
-          description = "49152-65535: UDP Dynamic Port range"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "UDP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
-        }
-        rpc_dynamic_tcp_domain = {
-          description = "49152-65535: TCP Dynamic Port range"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "TCP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          cidr_blocks = local.security_group_cidrs.http7xxx
         }
       }
       egress = {
@@ -654,7 +617,6 @@ locals {
         }
       }
     }
-
     web = {
       description = "New security group for web-servers"
       ingress = {
@@ -878,8 +840,8 @@ locals {
         }
       }
     }
-    load-balancer = {
-      description = "New security group for load-balancer"
+    domain = {
+      description = "Common Windows security group for fixngo domain(s) access from Jumpservers and Azure DCs"
       ingress = {
         all-from-self = {
           description = "Allow all ingress to self"
@@ -888,49 +850,78 @@ locals {
           protocol    = -1
           self        = true
         }
-        http = {
-          description = "Allow http ingress"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "TCP"
-          security_groups = [
-            "web",
-            "app",
-            "db",
-          ]
-          cidr_blocks = local.security_group_cidrs.https
+        rpc_udp_domain = {
+          description = "135: UDP MS-RPC AD connect ingress from Azure DC and Jumpserver"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "UDP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
-        https = {
-          description = "Allow https ingress"
-          from_port   = 443
-          to_port     = 443
+        rpc_tcp_domain = {
+          description = "135: TCP MS-RPC AD connect ingress from Azure DC and Jumpserver"
+          from_port   = 135
+          to_port     = 135
           protocol    = "TCP"
-          security_groups = [
-            "web",
-            "app",
-            "db",
-          ]
-          cidr_blocks = local.security_group_cidrs.https
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
-        http7770_7771_lb = {
-          description = "Allow http 7770-7771 ingress"
-          from_port   = 7770
-          to_port     = 7771
+        netbios_tcp_domain = {
+          description = "137-139: TCP NetBIOS ingress from Azure DC and Jumpserver"
+          from_port   = 137
+          to_port     = 139
           protocol    = "TCP"
-          security_groups = [
-            "web",
-          ]
-          cidr_blocks = local.security_group_cidrs.http7xxx
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
-        http7780_7781_lb = {
-          description = "Allow http 7780-7781 ingress"
-          from_port   = 7780
-          to_port     = 7781
+        netbios_udp_domain = {
+          description = "137-139: UDP NetBIOS ingress from Azure DC and Jumpserver"
+          from_port   = 137
+          to_port     = 139
+          protocol    = "UDP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+        }
+        ldap_tcp_domain = {
+          description = "389: TCP Allow LDAP ingress from Azure DC"
+          from_port   = 389
+          to_port     = 389
           protocol    = "TCP"
-          security_groups = [
-            "web",
-          ]
-          cidr_blocks = local.security_group_cidrs.http7xxx
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
+        }
+        ldap_udp_domain = {
+          description = "389: UDP Allow LDAP ingress from Azure DC"
+          from_port   = 389
+          to_port     = 389
+          protocol    = "UDP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
+        }
+
+        smb_tcp_domain = {
+          description = "445: TCP SMB ingress from Azure DC"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+        }
+        smb_udp_domain = {
+          description = "445: UDP SMB ingress from Azure DC"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "UDP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+        }
+        rpc_dynamic_udp_domain = {
+          description = "49152-65535: UDP Dynamic Port range"
+          from_port   = 49152
+          to_port     = 65535
+          protocol    = "UDP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+        }
+        rpc_dynamic_tcp_domain = {
+          description = "49152-65535: TCP Dynamic Port range"
+          from_port   = 49152
+          to_port     = 65535
+          protocol    = "TCP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
       }
       egress = {
