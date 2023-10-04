@@ -254,8 +254,7 @@ resource "aws_appautoscaling_policy" "ecs_scaling_policy" {
     metric_aggregation_type = "Average"
 
     step_adjustment {
-      metric_interval_lower_bound = 0
-      metric_interval_upper_bound = 0  # Unspecified upper bound
+      metric_interval_upper_bound = 10
       scaling_adjustment         = 1
     }
   }
