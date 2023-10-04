@@ -75,13 +75,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr] #!ImportValue env-VpcCidr
   }
-  ingress {
-    description = "Ingress from Migration server Security Group - This should be reviewed"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    security_groups = sg-8fddd6e7 #sg-migrationgw
-  }
+  # ingress {
+  #   description = "Ingress from Migration server Security Group - This should be reviewed"
+  #   from_port   = 1521
+  #   to_port     = 1521
+  #   protocol    = "tcp"
+  #   security_groups = sg-8fddd6e7 #sg-migrationgw
+  # }
   ingress {
     description = "Ingress from RC depending on Environment"
     from_port   = 1521
