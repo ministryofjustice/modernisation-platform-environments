@@ -49,7 +49,7 @@ locals {
               "s3:ListBucket",
             ]
             resources = [
-              "arn:aws:s3:::nomis-db-backup-bucket*/*",
+              "arn:aws:s3:::nomis-db-backup-bucket*",
             ]
           },
           {
