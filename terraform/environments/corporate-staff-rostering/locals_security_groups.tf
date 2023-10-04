@@ -1,7 +1,7 @@
 locals {
   security_group_cidrs_devtest = {
     core = module.ip_addresses.azure_fixngo_cidrs.devtest_core
-    ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
+    ssh  = module.ip_addresses.azure_fixngo_cidrs.devtest
     https = flatten([
       "10.0.0.0/8",
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -39,7 +39,7 @@ locals {
       # AllowProdStudioHostingSshInBound from 10.244.0.0/22 not included
       module.ip_addresses.azure_fixngo_cidrs.prod_core,
       module.ip_addresses.azure_fixngo_cidrs.prod, # NOTE: may need removing at some point
-    ]) 
+    ])
     https = flatten([
       "10.0.0.0/8",
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -585,33 +585,33 @@ locals {
           cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
         netbios_tcp_domain = {
-          description     = "137-139: TCP NetBIOS ingress from Azure DC and Jumpserver"
-          from_port       = 137
-          to_port         = 139
-          protocol        = "TCP"
-          cidr_blocks     = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          description = "137-139: TCP NetBIOS ingress from Azure DC and Jumpserver"
+          from_port   = 137
+          to_port     = 139
+          protocol    = "TCP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
         netbios_udp_domain = {
-          description     = "137-139: UDP NetBIOS ingress from Azure DC and Jumpserver"
-          from_port       = 137
-          to_port         = 139
-          protocol        = "UDP"
-          cidr_blocks     = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          description = "137-139: UDP NetBIOS ingress from Azure DC and Jumpserver"
+          from_port   = 137
+          to_port     = 139
+          protocol    = "UDP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
         ldap_tcp_domain = {
-          description     = "389: TCP Allow LDAP ingress from Azure DC"
-          from_port       = 389
-          to_port         = 389
-          protocol        = "TCP"
-          cidr_blocks     = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          description = "389: TCP Allow LDAP ingress from Azure DC"
+          from_port   = 389
+          to_port     = 389
+          protocol    = "TCP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
           # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
         }
         ldap_udp_domain = {
-          description     = "389: UDP Allow LDAP ingress from Azure DC"
-          from_port       = 389
-          to_port         = 389
-          protocol        = "UDP"
-          cidr_blocks     = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          description = "389: UDP Allow LDAP ingress from Azure DC"
+          from_port   = 389
+          to_port     = 389
+          protocol    = "UDP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
           # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
         }
 
@@ -955,25 +955,25 @@ locals {
         }
         # IMPORTANT: check if an 'allow all from load-balancer' rule is required
         echo_core_tcp_db = {
-          description     = "7: Allow ingress from port 7 oem agent echo" # Not sure what this is
-          from_port       = 7
-          to_port         = 7
-          protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.core
+          description = "7: Allow ingress from port 7 oem agent echo" # Not sure what this is
+          from_port   = 7
+          to_port     = 7
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.core
         }
         echo_core_udp_db = {
-          description     = "7: Allow ingress from port 7 oem agent echo" # Not sure what this is
-          from_port       = 7
-          to_port         = 7
-          protocol        = "UDP"
-          cidr_blocks     = local.security_group_cidrs.core
+          description = "7: Allow ingress from port 7 oem agent echo" # Not sure what this is
+          from_port   = 7
+          to_port     = 7
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.core
         }
         ssh-db = {
-          description     = "22: SSH allow ingress"
-          from_port       = 22
-          to_port         = 22
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.ssh
+          description = "22: SSH allow ingress"
+          from_port   = 22
+          to_port     = 22
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.ssh
         }
         rpc_udp_db = {
           description = "135: UDP MS-RPC AD connect ingress from Azure DC and Jumpserver"
@@ -990,11 +990,11 @@ locals {
           cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
         oracle_1521_db = {
-          description = "Allow oracle database 1521 ingress"
-          from_port   = "1521"
-          to_port     = "1521"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_db
+          description     = "Allow oracle database 1521 ingress"
+          from_port       = "1521"
+          to_port         = "1521"
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.oracle_db
           security_groups = ["web", "app"]
         }
         oracleoem_3872_db = {
