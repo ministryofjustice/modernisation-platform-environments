@@ -26,7 +26,8 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
-    domain_controllers = module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers,
+    domain_controllers = module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers
+    jumpservers        = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
   }
 
   security_group_cidrs_preprod_prod = {
@@ -58,8 +59,8 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
-    domain_controllers = module.ip_addresses.azure_fixngo_ips.prod.domain_controllers,
-    jumpservers        = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
+    domain_controllers = module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers
+    jumpservers        = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
@@ -565,14 +566,36 @@ locals {
           from_port   = 135
           to_port     = 135
           protocol    = "UDP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, [for ip in local.security_group_cidrs.domain_controllers : "${ip}/32"])
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          # NOTE: AllowRDPPortForwardingInbound not applied from azurefirewallsubnet = "10.40.165.0/26"
         }
         rpc_tcp = {
           description = "135: TCP MS-RPC AD connect ingress from Azure DC"
           from_port   = 135
           to_port     = 135
           protocol    = "TCP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, [for ip in local.security_group_cidrs.domain_controllers : "${ip}/32"])
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+        }
+        netbios_tcp = {
+          description = "139: TCP NetBIOS ingress from Azure DC"
+          from_port   = 139
+          to_port     = 139
+          protocol    = "TCP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+        }
+        smb_tcp = {
+          description = "445: TCP SMB ingress from Azure DC"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+        }
+        smb_udp = {
+          description = "445: UDP SMB ingress from Azure DC"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "UDP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
       }
       egress = {
@@ -582,6 +605,44 @@ locals {
           to_port     = 0
           protocol    = "-1"
           cidr_blocks = ["0.0.0.0/0"]
+        }
+        
+      }
+    }
+    web = {
+      description = "New security group for web-servers"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        rdp_tcp = {
+          description = "3389: Allow RDP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+          # NOTE: AllowRDPPortForwardingInbound not applied from azurefirewallsubnet = "10.40.165.0/26" on TCP 3389
+        }
+        rdp_udp = {
+          description = "3389: Allow RDP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
         }
       }
     }    

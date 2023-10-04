@@ -47,6 +47,15 @@ locals {
     noms_transit_live_fw_prod       = "52.142.189.118/32"
     noms_transit_live_dr_fw_devtest = "20.90.217.135/32"
     noms_transit_live_dr_fw_prod    = "20.90.217.127/32"
+
+    noms_prod_domain_controller_PCMCW0011 = "10.40.128.196/32"
+    noms_prod_domain_controller_PCMCW0012 = "10.40.0.133/32"
+    noms_prod_domain_controller_pcmcw1011 = "10.40.144.196/32"
+    noms_prod_domain_controller_pcmcw1012 = "10.40.64.133/32"
+
+    noms_devtest_domain_controller_MGMCW0002 = "10.102.0.196/32"
+    noms_devtest_domain_controller_tc_mgt_dc_01 = "10.102.0.199/32"
+    noms_devtest_domain_controller_tc_mgt_dc_02 = "10.102.0.200/32"
   }
 
   noms_live_subnet = {
@@ -154,6 +163,12 @@ locals {
       local.azure_fixngo_cidr.noms_mgmt_dr_vnet,
     ]
 
+    devtest_domain_controllers = [
+      local.azure_fixngo_cidr.noms_devtest_domain_controller_MGMCW0002,
+      local.azure_fixngo_cidr.noms_devtest_domain_controller_tc_mgt_dc_01,
+      local.azure_fixngo_cidr.noms_devtest_domain_controller_tc_mgt_dc_02,
+    ]
+
     devtest_jumpservers = [
       local.noms_mgmt_subnet.nomsmgmt_jumpservers_test,
       local.noms_mgmt_subnet.nomsmgmtjumpservers_test_temp,
@@ -165,6 +180,13 @@ locals {
       local.azure_fixngo_cidr.noms_mgmt_live_vnet,
       local.azure_fixngo_cidr.noms_live_dr_vnet,
       local.azure_fixngo_cidr.noms_mgmt_live_dr_vnet,
+    ]
+
+    prod_domain_controllers = [
+      local.azure_fixngo_cidr.noms_prod_domain_controller_PCMCW0011,
+      local.azure_fixngo_cidr.noms_prod_domain_controller_PCMCW0012,
+      local.azure_fixngo_cidr.noms_prod_domain_controller_pcmcw1011,
+      local.azure_fixngo_cidr.noms_prod_domain_controller_pcmcw1012,
     ]
 
     prod_jumpservers = [
