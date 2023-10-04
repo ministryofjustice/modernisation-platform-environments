@@ -437,6 +437,9 @@ locals {
           { name = "pmis", type = "CNAME", ttl = "300", records = ["10.40.3.133"] },
           { name = "pmis-a", type = "CNAME", ttl = "300", records = ["10.40.3.132"] },
           { name = "pmis-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pnomisapi", type = "CNAME", ttl = "300", records = ["prod-nomis-db-3.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pnomisapi-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-3.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pnomisapi-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
