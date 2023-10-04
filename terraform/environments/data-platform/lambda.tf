@@ -88,6 +88,34 @@ module "data_product_get_glue_metadata_lambda" {
 
 }
 
+module "data_product_landing_to_raw_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
+  application_name               = "data_product_landing_to_raw"
+  tags                           = local.tags
+  description                    = "Lambda to retrieve Glue metadata for a specified table in a database"
+  role_name                      = "landing_to_raw_lambda_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.landing_to_raw_lambda_policy.json
+  function_name                  = "data_product_landing_to_raw_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-landing-to-raw-lambda-ecr-repo:${local.landing_to_raw_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 512
+
+  allowed_triggers = {
+
+    AllowExecutionFromCloudWatch = {
+      action        = "lambda:InvokeFunction"
+      function_name = "data_product_landing_to_raw_${local.environment}"
+      principal     = "events.amazonaws.com"
+      source_arn    = aws_cloudwatch_event_rule.object_created_raw_data.arn
+    }
+  }
+
+}
+
 module "data_product_presigned_url_lambda" {
   source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.0.1"
   application_name               = "data_product_presigned_url"
@@ -105,11 +133,11 @@ module "data_product_presigned_url_lambda" {
   memory_size  = 512
 
   environment_variables = {
-    RAW_DATA_BUCKET     = module.s3-bucket.bucket.id
-    CURATED_DATA_BUCKET = module.s3-bucket.bucket.id
-    LOG_BUCKET          = module.s3-bucket.bucket.id
-    METADATA_BUCKET     = module.s3-bucket.bucket.id
-    LANDING_ZONE_BUCKET = module.s3-bucket.bucket.id
+    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
+    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
+    LOG_BUCKET          = module.logs_s3_bucket.bucket.id
+    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
+    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
   }
 
   allowed_triggers = {
@@ -142,11 +170,11 @@ module "data_product_athena_load_lambda" {
 
   environment_variables = {
     ENVIRONMENT         = local.environment
-    RAW_DATA_BUCKET     = module.s3-bucket.bucket.id
-    CURATED_DATA_BUCKET = module.s3-bucket.bucket.id
-    LOG_BUCKET          = module.s3-bucket.bucket.id
-    METADATA_BUCKET     = module.s3-bucket.bucket.id
-    LANDING_ZONE_BUCKET = module.s3-bucket.bucket.id
+    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
+    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
+    LOG_BUCKET          = module.logs_s3_bucket.bucket.id
+    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
+    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
   }
 
   allowed_triggers = {
@@ -180,7 +208,7 @@ module "data_product_create_metadata_lambda" {
 
   environment_variables = {
     ENVIRONMENT = local.environment
-    BUCKET_NAME = module.s3-bucket.bucket.id
+    BUCKET_NAME = module.metadata_s3_bucket.bucket.id
   }
 
   allowed_triggers = {
@@ -212,11 +240,11 @@ module "reload_data_product_lambda" {
   memory_size  = 512
 
   environment_variables = {
-    RAW_DATA_BUCKET     = module.s3-bucket.bucket.id
-    CURATED_DATA_BUCKET = module.s3-bucket.bucket.id
-    LOG_BUCKET          = module.s3-bucket.bucket.id
-    METADATA_BUCKET     = module.s3-bucket.bucket.id
-    LANDING_ZONE_BUCKET = module.s3-bucket.bucket.id
+    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
+    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
+    LOG_BUCKET          = module.logs_s3_bucket.bucket.id
+    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
+    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
     ATHENA_LOAD_LAMBDA  = module.data_product_athena_load_lambda.lambda_function_name
   }
 
@@ -239,8 +267,8 @@ module "resync_unprocessed_files_lambda" {
   memory_size  = 512
 
   environment_variables = {
-    RAW_DATA_BUCKET     = module.s3-bucket.bucket.id
-    CURATED_DATA_BUCKET = module.s3-bucket.bucket.id
+    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
+    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
     ATHENA_LOAD_LAMBDA  = module.data_product_athena_load_lambda.lambda_function_name
   }
 

@@ -5,7 +5,7 @@ module "data_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   versioning_enabled = true
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
-  bucket_policy       = [data.aws_iam_policy_document.data_platform_product_bucket_policy_document.json]
+  bucket_policy       = [data.aws_iam_policy_document.data_s3_bucket_policy_document.json]
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
@@ -65,7 +65,7 @@ module "metadata_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   versioning_enabled = true
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
-  bucket_policy       = [data.aws_iam_policy_document.data_platform_product_bucket_policy_document.json]
+  bucket_policy       = [data.aws_iam_policy_document.metadata_s3_bucket_policy_document.json]
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
@@ -125,7 +125,7 @@ module "logs_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   versioning_enabled = true
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
-  bucket_policy       = [data.aws_iam_policy_document.data_platform_product_bucket_policy_document.json]
+  bucket_policy       = [data.aws_iam_policy_document.logs_s3_bucket_policy_document.json]
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
@@ -186,7 +186,7 @@ module "data_landing_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   versioning_enabled = true
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
-  bucket_policy       = [data.aws_iam_policy_document.data_platform_product_bucket_policy_document.json]
+  bucket_policy       = [data.aws_iam_policy_document.data_landing_s3_bucket_policy_document.json]
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
@@ -299,13 +299,18 @@ module "s3_athena_query_results_bucket" { #tfsec:ignore:aws-s3-enable-versioning
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket      = module.s3-bucket.bucket.id
+  bucket      = module.data_s3_bucket.bucket.id
+  eventbridge = true
+}
+
+resource "aws_s3_bucket_notification" "landing_bucket_notification" {
+  bucket      = module.data_landing_s3_bucket.bucket.id
   eventbridge = true
 }
 
 # load the json schema for data product metadata
 resource "aws_s3_object" "object" {
-  bucket                 = module.s3-bucket.bucket.id
+  bucket                 = module.metadata_s3_bucket.bucket.id
   key                    = "data_product_metadata_spec/v1.0.0/moj_data_product_metadata_spec.json"
   source                 = "data-product-metadata-json-schema/v1.0.0/moj_data_product_metadata_spec.json"
   etag                   = filemd5("data-product-metadata-json-schema/v1.0.0/moj_data_product_metadata_spec.json")
