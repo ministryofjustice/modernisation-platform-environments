@@ -421,7 +421,22 @@ locals {
         records = [
           { name = "pnomis", type = "A", ttl = "300", records = ["10.40.3.132"] },
           { name = "pnomis-a", type = "A", ttl = "300", records = ["10.40.3.132"] },
-          { name = "pnomis-b", type = "A", ttl = "300", records = ["10.40.67.132"] },
+          { name = "pnomis-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pndh", type = "A", ttl = "300", records = ["10.40.3.135"] },
+          { name = "pndh-a", type = "A", ttl = "300", records = ["10.40.3.135"] },
+          { name = "pndh-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "por", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "por-a", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "por-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ptrdat", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "ptrdat-a", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "ptrdat-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "paudit", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "paudit-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "paudit-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pmis", type = "CNAME", ttl = "300", records = ["10.40.3.133"] },
+          { name = "pmis-a", type = "CNAME", ttl = "300", records = ["10.40.3.132"] },
+          { name = "pmis-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
