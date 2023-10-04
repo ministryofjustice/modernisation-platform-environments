@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Data Product Table Schema",
+  "description": "Specification for MoJ Data Platform Data Product tables schemas for registering tables in the glue catalog",
+  "type": "object",
+  "required": [
+    "DatabaseName",
+    "TableName",
+    "Columns"
+  ],
+  "definitions": {
+    "additional_col_properties": {
+      "required": [
+          "name",
+          "description"
+      ],
+      "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of a column within your data.",
+            "pattern": "^[a-z0-9_]+$",
+            "example": "my_data_column",
+            "maxLength": 255
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the column that will feed the data catalogue.",
+            "example": "column contains the primary key and relates to a personal identifier autogrenerated by the source database"
+          }
+      },
+      "additionalProperties": true
+    },
+    "int_types": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/additional_col_properties"
+        },
+        {
+          "properties": {
+            "data_type": {
+              "type": "string",
+              "pattern": "^u?(tiny|small|big|)int$",
+              "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
+              "example": "bigint"
+            }
+          }
+        }
+      ]
+    },
+    "number_types": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/additional_col_properties"
+        },
+        {
+          "properties": {
+          "data_type": {
+            "type": "string",
+            "pattern": "^float$|^double$|^decimal\\(\\d{1,2},\\s?\\d{1,2}\\)$",
+            "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
+            "example": "float"
+          }
+        }
+      }]
+    },
+    "string_types": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/additional_col_properties"
+        },
+        {
+          "properties": {
+          "data_type": {
+            "type": "string",
+            "pattern": "^char\\(\\d{1,3}\\)$|^varchar\\(\\d{0,5}\\)$|^string$",
+            "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
+            "example": "string"
+          }
+        }
+      }]
+    },
+    "boolean_types": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/additional_col_properties"
+        },
+        {
+          "properties": {
+          "data_type": {
+            "type": "string",
+            "pattern": "^boolean$",
+            "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
+            "example": "boolean"
+          }
+        }
+      }]
+    },
+    "date_types": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/additional_col_properties"
+        },
+        {
+          "properties": {
+          "data_type": {
+            "type": "string",
+            "pattern": "^date$|^timestamp$",
+            "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
+            "example": "date"
+          }
+        }
+      }]
+    },
+    "struct_types": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/additional_col_properties"
+        },
+        {
+          "properties": {
+          "data_type": {
+            "type": "string",
+            "pattern": "^map_<.+>$|^struct<.+>$",
+            "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
+            "example": "struct<id:string,report_date:date,modified_date:timestamp>"
+          }
+        }
+      }]
+    }
+  },
+  "properties": {
+    "DatabaseName": {
+      "type": "string",
+      "description": "This must be an already registered data product",
+      "pattern": "^[a-z0-9_]+$",
+      "example": "my_data_product"
+    },
+    "TableName": {
+      "type": "string",
+      "description": "The name for your table that you will upload data into.",
+      "pattern": "^[a-z0-9_]+$",
+      "example": "my_data_table",
+      "maxLength": 255
+    },
+    "TableDescription": {
+      "type": "string",
+      "description": "A description of the data contained within the table"
+    },
+    "Columns": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/string_types"
+          },
+          {
+            "$ref": "#/definitions/int_types"
+          },
+          {
+            "$ref": "#/definitions/number_types"
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": true
+}
+
