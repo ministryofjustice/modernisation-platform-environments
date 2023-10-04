@@ -427,7 +427,7 @@ locals {
           { name = "pndh-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "por", type = "CNAME", ttl = "300", records = ["prod-nomis-db-3.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "por-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-3.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "por-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-3.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "por-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "ptrdat", type = "A", ttl = "300", records = ["10.40.3.135"] },
           { name = "ptrdat-a", type = "A", ttl = "300", records = ["10.40.3.135"] },
           { name = "ptrdat-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
