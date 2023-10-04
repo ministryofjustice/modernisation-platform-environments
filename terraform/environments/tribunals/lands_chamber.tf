@@ -1,4 +1,4 @@
-#lands Tribunal
+#Lands Chamber Tribunal
 locals {
   lands = "lands-chamber" 
   lands_url = "landschamber"
@@ -27,14 +27,14 @@ locals {
     CurServer           = "${local.application_data.accounts[local.environment].curserver}"
 
   })
-  lands_ec2_ingress_rules = {
-    "cluster_ec2_lb_ingress_3" = {
-      description     = "Cluster EC2 ingress rule 3"
-      from_port       = 80
-      to_port         = 80
-      protocol        = "tcp"
-      cidr_blocks     = []
-      security_groups = [aws_security_group.lands_lb_sc.id]
+  lands_ec2_ingress_rules = {   
+    "cluster_ec2_lb_ingress_2" = {
+      description     = "Cluster EC2 ingress rule 2"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = []
     }
   }
   lands_ec2_egress_rules = {
@@ -279,7 +279,7 @@ resource "aws_lb_target_group" "lands_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  #target_type          = "instance"
+  target_type          = "instance"
   deregistration_delay = 30
 
   stickiness {
@@ -287,32 +287,15 @@ resource "aws_lb_target_group" "lands_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "15"
+    healthy_threshold   = "2"
+    interval            = "120"
     protocol            = "HTTP"
-    unhealthy_threshold = "3"
-    matcher             = "200-302"
-    timeout             = "5"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "10"
   }
 
 }
-
-# resource "aws_lb_listener_rule" "lands_alb_listener_rule" {
-#   listener_arn = aws_lb_listener.lands_lb.arn
-#   priority     = 1
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.lands_target_group.arn
-#   }
-
-#   condition {
-#    path_pattern {
-#       values = ["/"]
-#     }
-#   }
-# }
-
 
 resource "aws_lb_listener" "lands_lb" {
   depends_on = [
@@ -323,7 +306,7 @@ resource "aws_lb_listener" "lands_lb" {
   load_balancer_arn = aws_lb.lands_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBsecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"
@@ -425,22 +408,3 @@ resource "aws_ecr_repository" "lands-ecr-repo" {
   force_delete = true
 }
 
-resource "aws_security_group" "lands_ecs_service" {
-  name_prefix = "ecs-service-sg-"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.lands_lb_sc.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
