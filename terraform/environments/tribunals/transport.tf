@@ -28,13 +28,13 @@ locals {
 
   })
   transport_ec2_ingress_rules = {
-    "cluster_ec2_lb_ingress_3" = {
-      description     = "Cluster EC2 ingress rule 3"
-      from_port       = 80
-      to_port         = 80
-      protocol        = "tcp"
-      cidr_blocks     = []
-      security_groups = [aws_security_group.transport_lb_sc.id]
+    "cluster_ec2_lb_ingress_2" = {
+      description     = "Cluster EC2 ingress rule 2"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = []
     }
   }
   transport_ec2_egress_rules = {
@@ -279,7 +279,7 @@ resource "aws_lb_target_group" "transport_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  #target_type          = "instance"
+  target_type          = "instance"
   deregistration_delay = 30
 
   stickiness {
@@ -287,31 +287,17 @@ resource "aws_lb_target_group" "transport_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "15"
+    healthy_threshold   = "2"
+    interval            = "120"
     protocol            = "HTTP"
-    unhealthy_threshold = "3"
-    matcher             = "200-302"
-    timeout             = "5"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "10"
   }
 
 }
 
-resource "aws_lb_listener_rule" "transport_alb_listener_rule" {
-  listener_arn = aws_lb_listener.transport_lb.arn
-  priority     = 1
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.transport_target_group.arn
-  }
-
-  condition {
-   path_pattern {
-      values = ["/"]
-    }
-  }
-}
 
 
 resource "aws_lb_listener" "transport_lb" {
