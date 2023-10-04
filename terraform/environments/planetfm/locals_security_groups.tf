@@ -24,7 +24,7 @@ locals {
       }
     }
 
-    Migration_cutover_sg = {
+    migration_cutover = {
       description = "Security group for migrated instances"
       ingress = {
         all-from-self = {
