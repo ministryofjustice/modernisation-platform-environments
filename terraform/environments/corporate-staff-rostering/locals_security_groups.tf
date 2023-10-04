@@ -3,6 +3,7 @@ locals {
     core = module.ip_addresses.azure_fixngo_cidrs.devtest_core
     ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
     https = flatten([
+      "10.0.0.0/8",
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -37,8 +38,10 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
       # AllowProdStudioHostingSshInBound from 10.244.0.0/22 not included
       module.ip_addresses.azure_fixngo_cidrs.prod_core,
+      module.ip_addresses.azure_fixngo_cidrs.prod, # NOTE: may need removing at some point
     ]) 
     https = flatten([
+      "10.0.0.0/8",
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -582,12 +585,36 @@ locals {
           cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
         netbios_tcp_domain = {
-          description = "139: TCP NetBIOS ingress from Azure DC and Jumpserver"
-          from_port   = 139
-          to_port     = 139
-          protocol    = "TCP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          description     = "137-139: TCP NetBIOS ingress from Azure DC and Jumpserver"
+          from_port       = 137
+          to_port         = 139
+          protocol        = "TCP"
+          cidr_blocks     = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
+        netbios_udp_domain = {
+          description     = "137-139: UDP NetBIOS ingress from Azure DC and Jumpserver"
+          from_port       = 137
+          to_port         = 139
+          protocol        = "UDP"
+          cidr_blocks     = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+        }
+        ldap_tcp_domain = {
+          description     = "389: TCP Allow LDAP ingress from Azure DC"
+          from_port       = 389
+          to_port         = 389
+          protocol        = "TCP"
+          cidr_blocks     = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
+        }
+        ldap_udp_domain = {
+          description     = "389: UDP Allow LDAP ingress from Azure DC"
+          from_port       = 389
+          to_port         = 389
+          protocol        = "UDP"
+          cidr_blocks     = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+          # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
+        }
+
         smb_tcp_domain = {
           description = "445: TCP SMB ingress from Azure DC"
           from_port   = 445
@@ -663,6 +690,15 @@ locals {
           protocol        = "UDP"
           security_groups = ["app", "db"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
+        }
+        https_web = {
+          description     = "443: https ingress"
+          from_port       = 443
+          to_port         = 443
+          protocol        = "TCP"
+          cidr_blocks     = ["10.0.0.0/8"]
+          security_groups = ["load-balancer"]
+          # IMPORTANT: this doesn't seem to be part of the existing Azure SG's? NEEDS CHECKING
         }
         smb_tcp_web = {
           description     = "445: TCP SMB allow ingress from app and db servers"
@@ -759,6 +795,7 @@ locals {
           self        = true
         }
         # IMPORTANT: check if an 'allow all from load-balancer' rule is required
+        # IMPORTANT: check whether http/https traffic is still needed? It's in the original but not used at an app level
         rpc_tcp_app = {
           description     = "135: TCP MS-RPC allow ingress from app and db servers"
           from_port       = 135
@@ -850,6 +887,50 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+        }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "TCP"
+          security_groups = [
+            "web",
+            "app",
+            "db",
+          ]
+          cidr_blocks = local.security_group_cidrs.https
+        }
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "TCP"
+          security_groups = [
+            "web",
+            "app",
+            "db",
+          ]
+          cidr_blocks = local.security_group_cidrs.https
+        }
+        http7770_7771_lb = {
+          description = "Allow http 7770-7771 ingress"
+          from_port   = 7770
+          to_port     = 7771
+          protocol    = "TCP"
+          security_groups = [
+            "web",
+          ]
+          cidr_blocks = local.security_group_cidrs.http7xxx
+        }
+        http7780_7781_lb = {
+          description = "Allow http 7780-7781 ingress"
+          from_port   = 7780
+          to_port     = 7781
+          protocol    = "TCP"
+          security_groups = [
+            "web",
+          ]
+          cidr_blocks = local.security_group_cidrs.http7xxx
         }
       }
       egress = {
