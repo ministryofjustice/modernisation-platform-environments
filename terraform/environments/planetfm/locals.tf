@@ -51,6 +51,7 @@ locals {
 
   baseline_security_groups = {
     data-db = local.security_groups.data_db
+    Migration_cutover_sg = local.security_groups.Migration_cutover_sg
   }
 
   baseline_sns_topics     = {}
