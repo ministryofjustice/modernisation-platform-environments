@@ -208,7 +208,7 @@
       "reporting_hub_spark_executor_mem": "26g",
       "reporting_hub_spark_log_level": "WARN",
       "reporting_hub_worker_type": "G.2X",
-      "reporting_hub_num_workers": 4,
+      "reporting_hub_num_workers": 6,
       "reporting_hub_batch_duration_seconds": 40,
       "refresh_job_worker_type": "G.1X",
       "refresh_job_num_workers": 2,
