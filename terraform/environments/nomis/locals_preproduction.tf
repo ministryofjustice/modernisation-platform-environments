@@ -171,6 +171,33 @@ locals {
       })
     }
 
+    baseline_ec2_instances = {
+      preprod-nomis-db-2-a = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
+          nomis-environment = "preprod"
+          description       = "PreProduction NOMIS MIS and Audit database"
+          oracle-sids       = ""
+        })
+        config = merge(local.database_ec2_a.config, {
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
+        instance = merge(local.database_ec2_a.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 512 }
+        })
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
+        })
+      })
+    }
+
     baseline_lbs = {
       private = {
         internal_lb              = true
