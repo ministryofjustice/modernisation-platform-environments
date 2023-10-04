@@ -235,3 +235,28 @@ resource "aws_ecr_repository" "dacp_ecr_repo" {
   name         = "dacp-ecr-repo"
   force_delete = true
 }
+
+resource "aws_appautoscaling_target" "ecs_target" {
+  max_capacity       = 4  # Maximum number of tasks
+  min_capacity       = 1  # Minimum number of tasks
+  resource_id        = "service/${aws_ecs_cluster.dacp_cluster.name}/${aws_ecs_service.dacp_ecs_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "ecs_scaling_policy" {
+  name               = "ecs-scaling-policy"
+  scaling_adjustment = 1
+  cooldown           = 300
+  scale_in_cooldown  = 300
+  scale_out_cooldown = 300
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
+    target_value        = 50  # Target CPU utilization percentage
+  }
+}
+
