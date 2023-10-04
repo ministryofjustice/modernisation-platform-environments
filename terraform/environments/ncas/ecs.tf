@@ -150,10 +150,7 @@ resource "aws_iam_role_policy" "app_execution" {
       {
            "Action": [
               "ecr:*",
-              "logs:CreateLogGroup",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "logs:DescribeLogStreams",
+              "logs:*",
               "secretsmanager:GetSecretValue"
            ],
            "Resource": "*",
@@ -202,8 +199,7 @@ resource "aws_iam_role_policy" "app_task" {
      {
        "Effect": "Allow",
         "Action": [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
+          "logs:*",
           "ecr:*",
           "iam:*",
           "ec2:*"
