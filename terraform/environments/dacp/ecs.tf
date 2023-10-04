@@ -246,17 +246,14 @@ resource "aws_appautoscaling_target" "ecs_target" {
 
 resource "aws_appautoscaling_policy" "ecs_scaling_policy" {
   name               = "ecs-scaling-policy"
-  scaling_adjustment = 1
-  cooldown           = 300
-  scale_in_cooldown  = 300
-  scale_out_cooldown = 300
+  resource_id        = "service/${aws_ecs_cluster.dacp_cluster.name}/${aws_ecs_service.dacp_ecs_service.name}"
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
-    scale_in_cooldown  = 300
-    scale_out_cooldown = 300
-    target_value        = 50  # Target CPU utilization percentage
+    target_value             = 50   # Target CPU utilization percentage
   }
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
 }
 
