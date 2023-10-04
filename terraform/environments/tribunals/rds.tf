@@ -67,7 +67,7 @@ resource "aws_security_group" "sqlserver_db_sc" {
     to_port         = 1433
     protocol        = "tcp"
     description     = "Allows Lands Chamber ECS service to access RDS"
-    security_groups = [aws_security_group.lands_ecs_service.id]
+    security_groups = [module.lands-ecs.cluster_ec2_security_group_id]
   }
   ingress {
     from_port       = 1433
@@ -88,7 +88,7 @@ resource "aws_security_group" "sqlserver_db_sc" {
     to_port         = 1433
     protocol        = "tcp"
     description     = "Allows Land Registration Division ECS service to access RDS"
-    security_groups = [module.lands-ecs.cluster_ec2_security_group_id]
+    security_groups = [aws_security_group.hmlands_ecs_service.id]
   }
   ingress {
     from_port       = 1433
