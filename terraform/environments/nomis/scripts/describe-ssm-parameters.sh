@@ -23,7 +23,15 @@ else
   echo "# Diffs with ssm-parameters/$PROFILE.txt"
   file=$(mktemp)
   echo "$params" > $file
-  diff $file ssm-parameters/$PROFILE.txt
-  rm -f $file
+  if ! (diff $file ssm-parameters/$PROFILE.txt); then
+    rm -f $file
+    echo
+    echo "Update?  Press CTRL-C to cancel"
+    read
+    mv -f ssm-parameters/$PROFILE.txt ssm-parameters/$PROFILE.txt.old
+    echo "$params" > ssm-parameters/$PROFILE.txt
+  else
+    rm -f $file
+  fi
 fi
 

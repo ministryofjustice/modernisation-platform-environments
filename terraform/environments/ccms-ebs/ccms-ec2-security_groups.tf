@@ -66,6 +66,18 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod, local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
 }
 
+#### Temp, Below block seperated out rule due to design of the way rules are looped and restrictions on the limit of AWS rules per SG
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type             = "ingress"
+  description      = "In: Oracle Net Listener for Cloud Platform"
+  protocol         = "tcp"
+  from_port        = 1521
+  to_port          = 1522
+  cidr_blocks      = [local.application_data.accounts[local.environment].cloud_platform_subnet]
+}
+
+
 resource "aws_security_group_rule" "egress_traffic_ebsdb_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
   security_group_id        = aws_security_group.ec2_sg_ebsdb.id

@@ -10,6 +10,24 @@ locals {
     baseline_s3_buckets = {
     }
 
+    baseline_ssm_parameters = {
+      "/oracle/database/T1OASYS"  = local.database_ssm_parameters
+      "/oracle/database/T1OASREP" = local.database_ssm_parameters
+      "/oracle/database/T1AZBIPI" = local.database_ssm_parameters
+      "/oracle/database/T1MISTRN" = local.database_ssm_parameters
+      "/oracle/database/T1ONRSYS" = local.database_ssm_parameters
+      "/oracle/database/T1ONRAUD" = local.database_ssm_parameters
+      "/oracle/database/T1ONRBDS" = local.database_ssm_parameters
+
+      "/oracle/database/T2OASYS"  = local.database_ssm_parameters
+      "/oracle/database/T2OASREP" = local.database_ssm_parameters
+      "/oracle/database/T2AZBIPI" = local.database_ssm_parameters
+      "/oracle/database/T2MISTRN" = local.database_ssm_parameters
+      "/oracle/database/T2ONRSYS" = local.database_ssm_parameters
+      "/oracle/database/T2ONRAUD" = local.database_ssm_parameters
+      "/oracle/database/T2ONRBDS" = local.database_ssm_parameters
+    }
+
     baseline_ec2_instances = {
       ##
       ## T2
