@@ -252,13 +252,8 @@ resource "aws_appautoscaling_policy" "ecs_scaling_policy" {
     adjustment_type         = "ChangeInCapacity"
     cooldown                = 300  # Cooldown period in seconds
     metric_aggregation_type = "Average"
-
-    step_adjustment {
-      metric_interval_lower_bound = 0
-      metric_interval_upper_bound = 10
-      scaling_adjustment         = 1
-    }
   }
+
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
