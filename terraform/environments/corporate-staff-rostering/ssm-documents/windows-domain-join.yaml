@@ -82,13 +82,6 @@ mainSteps:
           $existingSuffixSearchList = (Get-DnsClientGlobalSetting).SuffixSearchList
           $newSuffixSearchList = $environments[$domain]["suffixsearchlist"] + $existingSuffixSearchList
           Set-DnsClientGlobalSetting -SuffixSearchList $newSuffixSearchList
-
-          # set the hostname for 'is hostname already in use' check
-          if ($newHostname -eq "keep-existing") {
-            $hostname = $env:COMPUTERNAME
-          } else {
-            $hostname = $newHostname
-          }
             
           function Get-HostnameInUse {
             param (
@@ -120,12 +113,19 @@ mainSteps:
             Force = $true
           }
 
-          # adds new name to parameters if supplied
+          # adds new name to parameters if supplied & runs the rename step
           if ($newHostname -eq "keep-existing") {
             Write-Host "INFO: No new hostname supplied, using existing hostname $env:COMPUTERNAME"
+            $hostname = $env:COMPUTERNAME
           } else {
             Write-Host "INFO: New hostname supplied, changing hostname to $newHostname"
+            $hostname = $newHostname
+            # append new hostname and option JoinWithNewName to args so Add-Computer will use NewName without needing a reboot
             $args.Add("NewName", $newHostname)
+            $args.Add("Options", "JoinWithNewName" )
+
+            Write-Host "INFO: Renaming EC2 instance to $newHostname"
+            Rename-Computer -NewName $newHostname -Force
           }
 
           # optional restart parameter, mainly for testing, defaults to true
@@ -141,7 +141,7 @@ mainSteps:
             Write-Error "ERROR: Hostname $hostname is already in use"
             exit 1
           } else {
-            Write-Host "INFO: Hostname $hostname is not already a member of the $domain domain, continuing to add"
+            Write-Host "INFO: Hostname $hostname is not already a member of the $domain domain, continuing..."
             Write-Host "INFO: Running Add-Computer with args" @args
             Add-Computer @args
           }
