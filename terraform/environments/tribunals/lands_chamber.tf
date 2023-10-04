@@ -306,7 +306,7 @@ resource "aws_lb_listener" "lands_lb" {
   load_balancer_arn = aws_lb.lands_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBsecurityPolicy-2016-08"
+  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"

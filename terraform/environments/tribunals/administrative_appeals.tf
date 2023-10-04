@@ -407,5 +407,3 @@ resource "aws_ecr_repository" "appeals-ecr-repo" {
   name         = "${local.appeals}-ecr-repo"
   force_delete = true
 }
-
-
