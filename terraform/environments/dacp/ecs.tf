@@ -246,12 +246,19 @@ resource "aws_appautoscaling_target" "ecs_target" {
 
 resource "aws_appautoscaling_policy" "ecs_scaling_policy" {
   name               = "ecs-scaling-policy"
+  policy_type        = "StepScaling"
   resource_id        = "service/${aws_ecs_cluster.dacp_cluster.name}/${aws_ecs_service.dacp_ecs_service.name}"
-  target_tracking_scaling_policy_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 300  # Cooldown period in seconds
+    metric_aggregation_type = "Average"
+    min_adjustment_magnitude = 1
+
+    step_adjustment {
+      metric_interval_lower_bound = 0
+      metric_interval_upper_bound = 10
+      scaling_adjustment         = 1
     }
-    target_value             = 50   # Target CPU utilization percentage
   }
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
