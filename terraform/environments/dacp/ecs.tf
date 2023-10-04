@@ -252,7 +252,6 @@ resource "aws_appautoscaling_policy" "ecs_scaling_policy" {
     adjustment_type         = "ChangeInCapacity"
     cooldown                = 300  # Cooldown period in seconds
     metric_aggregation_type = "Average"
-    min_adjustment_magnitude = 1
 
     step_adjustment {
       metric_interval_lower_bound = 0
