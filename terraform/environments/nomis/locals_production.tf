@@ -433,7 +433,7 @@ locals {
           { name = "ptrdat-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "paudit", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "paudit-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "paudit-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "paudit-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "pmis", type = "CNAME", ttl = "300", records = ["10.40.3.133"] },
           { name = "pmis-a", type = "CNAME", ttl = "300", records = ["10.40.3.132"] },
           { name = "pmis-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
