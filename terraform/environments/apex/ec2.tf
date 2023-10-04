@@ -82,13 +82,13 @@ resource "aws_security_group" "ec2" {
   #   protocol    = "tcp"
   #   security_groups = sg-8fddd6e7 #sg-migrationgw
   # }
-  ingress {
-    description = "Ingress from RC depending on Environment"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = ["172.16.4.0/20"]
-  }
+  # ingress {
+  #   description = "Ingress from RC depending on Environment"
+  #   from_port   = 1521
+  #   to_port     = 1521
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["172.16.4.0/20"]
+  # }
 
   egress {
     description = "Allow AWS SSM Session Manager"
