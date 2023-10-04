@@ -156,6 +156,10 @@ locals {
 
   azure_fixngo_cidrs = {
 
+    devtest_core = [
+      local.noms_test_subnet.noms_test_core,
+    ]
+
     devtest = [
       local.azure_fixngo_cidr.noms_test_vnet,
       local.azure_fixngo_cidr.noms_mgmt_vnet,
@@ -173,6 +177,10 @@ locals {
       local.noms_mgmt_subnet.nomsmgmt_jumpservers_test,
       local.noms_mgmt_subnet.nomsmgmtjumpservers_test_temp,
       local.noms_mgmt_subnet.nomsmgmt_remoteaccess,
+    ]
+
+    prod_core = [
+      local.noms_live_subnet.noms_live_core,
     ]
 
     prod = [
