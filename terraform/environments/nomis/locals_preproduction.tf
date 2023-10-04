@@ -179,7 +179,7 @@ locals {
           oracle-sids       = ""
         })
         config = merge(local.database_ec2_a.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
