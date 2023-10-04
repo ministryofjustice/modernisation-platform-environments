@@ -27,22 +27,14 @@ locals {
     CurServer           = "${local.application_data.accounts[local.environment].curserver}"
 
   })
-  appeals_ec2_ingress_rules = {
-    "cluster_ec2_lb_ingress" = {
-      description = "Cluster EC2 ingress rule"
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_blocks = []
-      security_groups = [aws_security_group.appeals_lb_sc.id]
-    },
+  appeals_ec2_ingress_rules = {   
     "cluster_ec2_lb_ingress_2" = {
-      description     = "Cluster EC2 ingress rule 3"
-      from_port       = 80
-      to_port         = 80
-      protocol        = "tcp"
-      cidr_blocks     = []
-      security_groups = [aws_security_group.appeals_lb_sc.id]
+      description     = "Cluster EC2 ingress rule 2"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = []
     }
   }
   appeals_ec2_egress_rules = {
@@ -295,12 +287,12 @@ resource "aws_lb_target_group" "appeals_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "5"
+    healthy_threshold   = "2"
     interval            = "120"
     protocol            = "HTTP"
     unhealthy_threshold = "2"
     matcher             = "200-499"
-    timeout             = "5"
+    timeout             = "10"
   }
 
 }
@@ -416,22 +408,4 @@ resource "aws_ecr_repository" "appeals-ecr-repo" {
   force_delete = true
 }
 
-resource "aws_security_group" "appeals_ecs_service" {
-  name_prefix = "ecs-service-sg-"
-  vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.appeals_lb_sc.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
