@@ -3,7 +3,7 @@
 # Sample data
 # tags demonstrate inheritance due to merges in the module
 locals {
-  account_config_dev2 = {
+  account_config_test = {
     shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
     private_subnet_ids            = data.aws_subnets.shared-private.ids
     data_subnet_ids               = data.aws_subnets.shared-data.ids
@@ -15,12 +15,13 @@ locals {
     shared_vpc_id                 = data.aws_vpc.shared.id
   }
 
-  environment_config_dev2 = {
+  environment_config_test = {
     migration_environment_vpc_cidr = "10.161.20.0/22"
+    legacy_engineering_vpc_cidr    = "10.161.98.0/25"
     ec2_user_ssh_key               = file("${path.module}/files/.ssh/${terraform.workspace}-dev/ec2-user.pub")
   }
 
-  ldap_config_dev2 = {
+  ldap_config_test = {
     name                        = try(local.ldap_config_lower_environments.name, "ldap")
     migration_source_account_id = local.ldap_config_lower_environments.migration_source_account_id
     migration_lambda_role       = local.ldap_config_lower_environments.migration_lambda_role
@@ -30,7 +31,7 @@ locals {
     efs_backup_retention_period = "30"
   }
 
-  db_config_dev2 = {
+  db_config_test = {
     name           = try(local.db_config_lower_environments.name, "db")
     ami_name_regex = local.db_config_lower_environments.ami_name_regex
     user_data_raw = base64encode(
@@ -102,7 +103,7 @@ locals {
     }
   }
 
-  weblogic_config_dev2 = {
+  weblogic_config_test = {
     name                          = try(local.weblogic_config_lower_environments.name, "weblogic")
     frontend_service_name         = try(local.weblogic_config_lower_environments.frontend_service_name, "weblogic")
     frontend_fully_qualified_name = try(local.weblogic_config_lower_environments.frontend_fully_qualified_name, "${local.application_name}-${local.frontend_service_name}")
@@ -116,10 +117,10 @@ locals {
     db_name                       = "MODNDA"
   }
 
-  delius_db_container_config_dev2 = {
+  delius_db_container_config_test = {
     image_tag            = "5.7.4"
     image_name           = "delius-core-testing-db"
-    fully_qualified_name = "testing-db"
+    fully_qualified_name = "test-db"
     port                 = 1521
     name                 = "MODNDA"
   }

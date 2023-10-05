@@ -31,7 +31,7 @@ module "environment_dev" {
 }
 
 module "environment_test" {
-  #  We're in dev account and dev2 environment, could reference different version
+  #  We're in dev account and test environment, could reference different version
   source = "./modules/environment_all_components"
   count  = local.is-development ? 1 : 0
 
@@ -51,7 +51,7 @@ module "environment_test" {
   db_config                  = local.db_config_test
   weblogic_config            = local.weblogic_config_test
   delius_db_container_config = local.delius_db_container_config_test
-  bastion                    = local.bastion_test
+  bastion                    = local.bastion
 
   account_info = local.account_info
 
