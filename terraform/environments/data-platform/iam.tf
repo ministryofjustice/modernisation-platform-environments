@@ -314,14 +314,14 @@ data "aws_iam_policy_document" "data_landing_s3_bucket_policy_document" {
 
     actions = ["s3:PutObject", "s3:ListBucket"]
 
-    resources = [module.data_s3_bucket.bucket.arn, "${module.data_s3_bucket.bucket.arn}/*"]
+    resources = [module.data_landing_s3_bucket.bucket.arn, "${module.data_landing_s3_bucket.bucket.arn}/*"]
   }
 
   statement {
     sid       = "DenyNonFullControlObjects"
     effect    = "Deny"
     actions   = ["s3:PutObject"]
-    resources = ["${module.data_s3_bucket.bucket.arn}/*"]
+    resources = ["${module.data_landing_s3_bucket.bucket.arn}/*"]
 
     principals {
       identifiers = ["*"]
@@ -352,14 +352,14 @@ data "aws_iam_policy_document" "metadata_s3_bucket_policy_document" {
 
     actions = ["s3:PutObject", "s3:ListBucket"]
 
-    resources = [module.data_s3_bucket.bucket.arn, "${module.data_s3_bucket.bucket.arn}/*"]
+    resources = [module.metadata_s3_bucket.bucket.arn, "${module.metadata_s3_bucket.bucket.arn}/*"]
   }
 
   statement {
     sid       = "DenyNonFullControlObjects"
     effect    = "Deny"
     actions   = ["s3:PutObject"]
-    resources = ["${module.data_s3_bucket.bucket.arn}/*"]
+    resources = ["${module.metadata_s3_bucket.bucket.arn}/*"]
 
     principals {
       identifiers = ["*"]
@@ -390,14 +390,14 @@ data "aws_iam_policy_document" "logs_s3_bucket_policy_document" {
 
     actions = ["s3:PutObject", "s3:ListBucket"]
 
-    resources = [module.data_s3_bucket.bucket.arn, "${module.data_s3_bucket.bucket.arn}/*"]
+    resources = [module.logs_s3_bucket.bucket.arn, "${module.logs_s3_bucket.bucket.arn}/*"]
   }
 
   statement {
     sid       = "DenyNonFullControlObjects"
     effect    = "Deny"
     actions   = ["s3:PutObject"]
-    resources = ["${module.data_s3_bucket.bucket.arn}/*"]
+    resources = ["${module.logs_s3_bucket.bucket.arn}/*"]
 
     principals {
       identifiers = ["*"]
