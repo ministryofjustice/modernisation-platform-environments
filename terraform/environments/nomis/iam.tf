@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "sas_token_rotator_role" {
     }
     condition {
       test     = "StringLike"
-      values   = ["repo:ministryofjustice/dso-modernisation-platform-automation/:*"]
+      values   = ["repo:ministryofjustice/dso-modernisation-platform-automation:*"]
       variable = "token.actions.githubusercontent.com:sub"
     }
   }
