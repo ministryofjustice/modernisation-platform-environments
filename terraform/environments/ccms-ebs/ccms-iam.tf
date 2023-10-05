@@ -167,6 +167,20 @@ resource "aws_iam_policy" "rman_to_s3" {
             "arn:aws:s3:::ccms-ebs-*-dbbackup",
             "arn:aws:s3:::ccms-ebs-*-dbbackup/*"
           ]
+        },
+        {
+          "Sid" : "AccessToLZBuckets",
+          "Effect" : "Allow",
+          "Action" : [
+            "s3:DeleteObject",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:PutObject"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::laa-ccms-inbound-*",
+            "arn:aws:s3:::laa-ccms-outbound-*"
+          ]
         }
       ]
     }
