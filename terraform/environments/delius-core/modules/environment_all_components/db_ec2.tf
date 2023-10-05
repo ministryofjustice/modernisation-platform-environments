@@ -1,5 +1,6 @@
 # Pre-reqs - security groups
 resource "aws_security_group" "db_ec2_instance_sg" {
+  count       = contains(var.components_to_exclude, "db") ? 0 : 1
   name        = format("%s-sg-%s-ec2-instance", var.env_name, var.db_config.name)
   description = "Controls access to db ec2 instance"
   vpc_id      = var.account_info.vpc_id
@@ -9,7 +10,8 @@ resource "aws_security_group" "db_ec2_instance_sg" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_https_out" {
-  security_group_id = aws_security_group.db_ec2_instance_sg.id
+  count             = contains(var.components_to_exclude, "db") ? 0 : 1
+  security_group_id = aws_security_group.db_ec2_instance_sg[0].id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 443
   to_port           = 443
@@ -21,7 +23,8 @@ resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_https_out" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_rman" {
-  security_group_id = aws_security_group.db_ec2_instance_sg.id
+  count             = contains(var.components_to_exclude, "db") ? 0 : 1
+  security_group_id = aws_security_group.db_ec2_instance_sg[0].id
   cidr_ipv4         = var.environment_config.legacy_engineering_vpc_cidr
   from_port         = 1521
   to_port           = 1521
@@ -33,7 +36,8 @@ resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_rman" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
-  security_group_id = aws_security_group.db_ec2_instance_sg.id
+  count             = contains(var.components_to_exclude, "db") ? 0 : 1
+  security_group_id = aws_security_group.db_ec2_instance_sg[0].id
   cidr_ipv4         = var.environment_config.legacy_engineering_vpc_cidr
   from_port         = 1521
   to_port           = 1521
@@ -46,18 +50,20 @@ resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
 
 # Resources associated to the instance
 data "aws_ami" "oracle_db_ami" {
+  count       = contains(var.components_to_exclude, "db") ? 0 : 1
   owners      = [var.platform_vars.environment_management.account_ids["core-shared-services-production"]]
   name_regex  = var.db_config.ami_name_regex
   most_recent = true
 }
 
 resource "aws_instance" "db_ec2_primary_instance" {
+  count = contains(var.components_to_exclude, "db") ? 0 : 1
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   instance_type               = var.db_config.instance.instance_type
-  ami                         = data.aws_ami.oracle_db_ami.id
-  vpc_security_group_ids      = [aws_security_group.db_ec2_instance_sg.id]
+  ami                         = data.aws_ami.oracle_db_ami[0].id
+  vpc_security_group_ids      = [aws_security_group.db_ec2_instance_sg[0].id]
   subnet_id                   = var.account_config.data_subnet_a_id
-  iam_instance_profile        = aws_iam_instance_profile.db_ec2_instanceprofile.name
+  iam_instance_profile        = aws_iam_instance_profile.db_ec2_instanceprofile[0].name
   associate_public_ip_address = false
   monitoring                  = var.db_config.instance.monitoring
   ebs_optimized               = true
@@ -94,12 +100,10 @@ resource "aws_instance" "db_ec2_primary_instance" {
 }
 
 module "ebs_volume" {
-  source = "../ebs_volume"
-  for_each = {
-    for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false
-  }
-  availability_zone = aws_instance.db_ec2_primary_instance.availability_zone
-  instance_id       = aws_instance.db_ec2_primary_instance.id
+  source            = "../ebs_volume"
+  for_each          = contains(var.components_to_exclude, "db") ? [] : { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false }
+  availability_zone = aws_instance.db_ec2_primary_instance[0].availability_zone
+  instance_id       = aws_instance.db_ec2_primary_instance[0].id
   device_name       = each.key
   size              = each.value.volume_size
   iops              = var.db_config.ebs_volumes.iops

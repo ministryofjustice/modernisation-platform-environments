@@ -1,5 +1,6 @@
 # Pre-reqs - IAM role, attachment for SSM usage and instance profile
 data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
+  count = contains(var.components_to_exclude, "db") ? 0 : 1
   statement {
     effect = "Allow"
     actions = [
@@ -14,14 +15,16 @@ data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
 
 
 resource "aws_iam_role" "db_ec2_instance_iam_role" {
+  count              = contains(var.components_to_exclude, "db") ? 0 : 1
   name               = lower(format("%s-%s-ec2_instance", var.env_name, var.db_config.name))
-  assume_role_policy = data.aws_iam_policy_document.db_ec2_instance_iam_assume_policy.json
+  assume_role_policy = data.aws_iam_policy_document.db_ec2_instance_iam_assume_policy[0].json
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-ec2_instance", var.env_name, var.db_config.name)) }
   )
 }
 
 data "aws_iam_policy_document" "business_unit_kms_key_access" {
+  count = contains(var.components_to_exclude, "db") ? 0 : 1
   statement {
     effect = "Allow"
     actions = [
@@ -41,15 +44,17 @@ data "aws_iam_policy_document" "business_unit_kms_key_access" {
 }
 
 resource "aws_iam_policy" "business_unit_kms_key_access" {
+  count  = contains(var.components_to_exclude, "db") ? 0 : 1
   name   = format("%s-%s-business_unit_kms_key_access_policy", var.env_name, var.db_config.name)
   path   = "/"
-  policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
+  policy = data.aws_iam_policy_document.business_unit_kms_key_access[0].json
   tags = merge(local.tags,
     { Name = format("%s-%s-business_unit_kms_key_access_policy", var.env_name, var.db_config.name) }
   )
 }
 
 data "aws_iam_policy_document" "core_shared_services_bucket_access" {
+  count = contains(var.components_to_exclude, "db") ? 0 : 1
   statement {
     effect = "Allow"
     actions = [
@@ -64,15 +69,17 @@ data "aws_iam_policy_document" "core_shared_services_bucket_access" {
 }
 
 resource "aws_iam_policy" "core_shared_services_bucket_access" {
+  count  = contains(var.components_to_exclude, "db") ? 0 : 1
   name   = format("%s-%s-core_shared_services_bucket_access_policy", var.env_name, var.db_config.name)
   path   = "/"
-  policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
+  policy = data.aws_iam_policy_document.core_shared_services_bucket_access[0].json
   tags = merge(local.tags,
     { Name = format("%s-%s-core_shared_services_bucket_access_policy", var.env_name, var.db_config.name) }
   )
 }
 
 data "aws_iam_policy_document" "ec2_access_for_ansible" {
+  count = contains(var.components_to_exclude, "db") ? 0 : 1
   statement {
     effect = "Allow"
     actions = [
@@ -85,38 +92,44 @@ data "aws_iam_policy_document" "ec2_access_for_ansible" {
 }
 
 resource "aws_iam_policy" "ec2_access_for_ansible" {
+  count  = contains(var.components_to_exclude, "db") ? 0 : 1
   name   = format("%s-%s-ec2_access_for_ansible", var.env_name, var.db_config.name)
   path   = "/"
-  policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
+  policy = data.aws_iam_policy_document.ec2_access_for_ansible[0].json
   tags = merge(local.tags,
     { Name = format("%s-%s-ec2_access_for_ansible", var.env_name, var.db_config.name) }
   )
 }
 
 resource "aws_iam_role_policy" "business_unit_kms_key_access" {
+  count  = contains(var.components_to_exclude, "db") ? 0 : 1
   name   = "business_unit_kms_key_access"
-  role   = aws_iam_role.db_ec2_instance_iam_role.name
-  policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
+  role   = aws_iam_role.db_ec2_instance_iam_role[0].name
+  policy = data.aws_iam_policy_document.business_unit_kms_key_access[0].json
 }
 
 resource "aws_iam_role_policy" "core_shared_services_bucket_access" {
+  count  = contains(var.components_to_exclude, "db") ? 0 : 1
   name   = "core_shared_services_bucket_access"
-  role   = aws_iam_role.db_ec2_instance_iam_role.name
-  policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
+  role   = aws_iam_role.db_ec2_instance_iam_role[0].name
+  policy = data.aws_iam_policy_document.core_shared_services_bucket_access[0].json
 }
 
 resource "aws_iam_role_policy" "ec2_access" {
+  count  = contains(var.components_to_exclude, "db") ? 0 : 1
   name   = "ec2_access"
-  role   = aws_iam_role.db_ec2_instance_iam_role.name
-  policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
+  role   = aws_iam_role.db_ec2_instance_iam_role[0].name
+  policy = data.aws_iam_policy_document.ec2_access_for_ansible[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "db_ec2_instance_amazonssmmanagedinstancecore" {
-  role       = aws_iam_role.db_ec2_instance_iam_role.name
+  count      = contains(var.components_to_exclude, "db") ? 0 : 1
+  role       = aws_iam_role.db_ec2_instance_iam_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_instance_profile" "db_ec2_instanceprofile" {
-  name = format("%s-%s-ec2_instance_iam_role", var.env_name, var.db_config.name)
-  role = aws_iam_role.db_ec2_instance_iam_role.name
+  count = contains(var.components_to_exclude, "db") ? 0 : 1
+  name  = format("%s-%s-ec2_instance_iam_role", var.env_name, var.db_config.name)
+  role  = aws_iam_role.db_ec2_instance_iam_role[0].name
 }
