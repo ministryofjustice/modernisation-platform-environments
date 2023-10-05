@@ -26,7 +26,6 @@ locals {
           description             = "Windows Server 2022 for connecting to Azure domain"
           os-type                 = "Windows"
           component               = "test"
-          run_windows_domain_join = "true"
           server-type             = "hmpps-windows_2022"
         }
       }
