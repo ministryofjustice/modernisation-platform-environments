@@ -15,7 +15,7 @@ resource "aws_cloudwatch_event_rule" "object_created_raw_data" {
 }
 
 resource "aws_cloudwatch_event_rule" "object_created_data_landing" {
-  name = "object_created_raw_data"
+  name = "object_created_data_landing"
   tags = local.tags
   event_pattern = jsonencode({
     "source" : ["aws.s3"],
