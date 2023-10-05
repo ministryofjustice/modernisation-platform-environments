@@ -127,11 +127,6 @@ resource "aws_iam_role" "app_execution" {
       "Effect": "Allow",
       "Sid": ""
     },
-    {
-      "Effect": "Allow",
-      "Action": "ecs:ExecuteCommand",
-      "Resource": "*"
-    }
   ]
 }
 EOF
@@ -156,11 +151,7 @@ resource "aws_iam_role_policy" "app_execution" {
            "Action": [
               "ecr:*",
               "logs:*",
-              "secretsmanager:GetSecretValue",
-              "ssmmessages:CreateControlChannel",
-              "ssmmessages:CreateDataChannel",
-              "ssmmessages:OpenControlChannel",
-              "ssmmessages:OpenDataChannel"
+              "secretsmanager:GetSecretValue"
            ],
            "Resource": "*",
            "Effect": "Allow"
@@ -211,7 +202,11 @@ resource "aws_iam_role_policy" "app_task" {
           "logs:*",
           "ecr:*",
           "iam:*",
-          "ec2:*"
+          "ec2:*",
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
         ],
        "Resource": "*"
      }
