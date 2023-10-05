@@ -117,15 +117,16 @@ mainSteps:
           if ($newHostname -eq "keep-existing") {
             Write-Host "INFO: No new hostname supplied, using existing hostname $env:COMPUTERNAME"
             $hostname = $env:COMPUTERNAME
-          } else {
-            Write-Host "INFO: New hostname supplied, changing hostname to $newHostname"
-            $hostname = $newHostname
-            # append new hostname and option JoinWithNewName to args so Add-Computer will use NewName without needing a reboot
-            $args.Add("NewName", $newHostname)
-            $args.Add("Options", "JoinWithNewName" )
-
-            Write-Host "INFO: Renaming EC2 instance to $newHostname"
+          } elseif ($newHostname -ne $env:COMPUTERNAME) {
+            Write-Host "INFO: Renaming EC2 instance to $newHostname and then rebooting"
             Rename-Computer -NewName $newHostname -Force
+            exit 3010 # exit code 3010 means reboot required, ssm document will continue after reboot
+          } elseif ($newHostname -eq $env:COMPUTERNAME) {
+            Write-Host "INFO: Hostname has been succesfully changed to $newHostname"
+            $hostname = $newHostname
+          } else {
+            Write-Error "ERROR: Something went wrong with the hostname parameter"
+            exit 1
           }
 
           # optional restart parameter, mainly for testing, defaults to true

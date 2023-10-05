@@ -171,7 +171,7 @@ locals {
       "/oracle/database/T1NDH"    = local.database_ssm_parameters
       "/oracle/database/T1TRDAT"  = local.database_ssm_parameters
       "/oracle/database/T1CNMAUD" = local.database_ssm_parameters
-      "/oracle/database/T1MIS"    = local.database_ssm_parameters
+      "/oracle/database/T1MIS"    = local.database_mis_ssm_parameters
       "/oracle/database/T1ORSYS"  = local.database_ssm_parameters
       "/oracle/database/T2CNOM"   = local.database_nomis_ssm_parameters
       "/oracle/database/T2NDH"    = local.database_nomis_ssm_parameters
