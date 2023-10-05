@@ -37,10 +37,19 @@ data "aws_iam_policy_document" "sas_token_rotator" {
     effect = "Allow"
     actions = [
       "ssm:PutParameter",
-      "ssm:GetParameter",
     ]
     resources = [
       "arn:aws:ssm:*:*:parameter/azure/*",
+    ]
+  }
+  statement {
+    sid = "EncryptSecrets"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+    ]
+    resources = [
+      data.aws_kms_key.general_shared.key_id,
     ]
   }
 }
