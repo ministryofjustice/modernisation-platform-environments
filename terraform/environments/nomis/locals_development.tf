@@ -61,17 +61,8 @@ locals {
     }
 
     baseline_ssm_parameters = {
-      # NEW
       "/oracle/weblogic/qa11r" = local.weblogic_ssm_parameters
       "/oracle/database/qa11r" = local.database_nomis_ssm_parameters
-
-      # OLD
-      # "dev-nomis-web-a" = local.weblogic_ssm_parameters
-      # "dev-nomis-web-b" = local.weblogic_ssm_parameters
-      # "qa11g-nomis-web-a" = local.weblogic_ssm_parameters
-      # "qa11g-nomis-web-b" = local.weblogic_ssm_parameters
-      "qa11r-nomis-web-a" = local.weblogic_ssm_parameters_old
-      "qa11r-nomis-web-b" = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {
