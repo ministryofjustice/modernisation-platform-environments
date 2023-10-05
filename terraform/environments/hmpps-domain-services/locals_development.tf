@@ -23,10 +23,11 @@ locals {
         autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
-          description = "Windows Server 2022 for connecting to Azure domain"
-          os-type     = "Windows"
-          component   = "test"
-          server-type = "hmpps-windows_2022"
+          description             = "Windows Server 2022 for connecting to Azure domain"
+          os-type                 = "Windows"
+          component               = "test"
+          run_windows_domain_join = "true"
+          server-type             = "hmpps-windows_2022"
         }
       }
 

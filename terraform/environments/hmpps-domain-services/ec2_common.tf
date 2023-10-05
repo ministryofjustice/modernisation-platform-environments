@@ -11,3 +11,11 @@ resource "aws_ssm_document" "windows_domain_join" {
     },
   )
 }
+
+resource "aws_ssm_association" "windowsdomainjoinassociation" {
+    name = aws_ssm_document.windows_domain_join.name
+    targets {
+        key = "tag:run_windows_domain_join"
+        values = ["true"]
+    }
+}
