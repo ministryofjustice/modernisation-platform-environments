@@ -7,6 +7,13 @@ sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
 echo "fs-04977da5fb1325b4b.efs.eu-west-2.amazonaws.com:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
 mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
 EOF
 }
 
