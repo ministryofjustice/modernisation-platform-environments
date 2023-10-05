@@ -39,21 +39,15 @@ module "s3_bucket_oracledb_backups" {
 
 data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
   statement {
-    effect = "Allow"
+    sid     = "allowAccessToOracleDbBackupBucket"
+    effect  = "Allow"
     actions = [
-      "s3:PutObject",
-      "s3:GetObject"
+      "s3:*"
     ]
     resources = [
-      "${module.s3_bucket_oracledb_backups.bucket.arn}*/*"
+      "${module.s3_bucket_oracledb_backups.bucket.arn}",
+      "${module.s3_bucket_oracledb_backups.bucket.arn}/*"
     ]
-  }
-
-  statement {
-    actions = [
-      "s3:ListBucket"
-    ]
-    resources = [module.s3_bucket_oracledb_backups.bucket.arn]
   }
 }
 
