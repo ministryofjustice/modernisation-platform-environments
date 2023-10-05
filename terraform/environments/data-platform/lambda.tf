@@ -110,7 +110,7 @@ module "data_product_landing_to_raw_lambda" {
       action        = "lambda:InvokeFunction"
       function_name = "data_product_landing_to_raw_${local.environment}"
       principal     = "events.amazonaws.com"
-      source_arn    = aws_cloudwatch_event_rule.object_created_raw_data.arn
+      source_arn    = aws_cloudwatch_event_rule.object_created_data_landing.arn
     }
   }
 
