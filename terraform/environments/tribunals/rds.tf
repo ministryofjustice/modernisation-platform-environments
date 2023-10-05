@@ -96,6 +96,7 @@ resource "aws_security_group" "sqlserver_db_sc" {
     protocol        = "tcp"
     description     = "Allows Criminal Injuries ECS service to access RDS"
     security_groups = [module.cicap-ecs.cluster_ec2_security_group_id]
+  }
   ingress {
     from_port       = 1433
     to_port         = 1433
