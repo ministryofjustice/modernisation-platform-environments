@@ -4,7 +4,7 @@ locals {
   compact_curated_job_short_name    = "${local.project}-maintenance-compact-curated"
   compact_domain_job_short_name     = "${local.project}-maintenance-compact-domain"
   compact_raw_job_name              = "${local.compact_raw_job_short_name}-${local.env}"
-  compact_structured_job_name       = "${local.compact_curated_job_short_name}-${local.env}"
+  compact_structured_job_name       = "${local.compact_structured_job_short_name}-${local.env}"
   compact_curated_job_name          = "${local.compact_curated_job_short_name}-${local.env}"
   compact_domain_job_name           = "${local.compact_domain_job_short_name}-${local.env}"
 
