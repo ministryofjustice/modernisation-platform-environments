@@ -202,5 +202,5 @@ variable "bastion" {
 
 variable "components_to_exclude" {
   type    = list(string)
-  default = ["all"]
+  default = []
 }
