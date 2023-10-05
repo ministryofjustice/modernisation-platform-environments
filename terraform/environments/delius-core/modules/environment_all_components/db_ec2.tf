@@ -101,7 +101,7 @@ resource "aws_instance" "db_ec2_primary_instance" {
 
 module "ebs_volume" {
   source            = "../ebs_volume"
-  for_each          = contains(var.components_to_exclude, "db") ? [] : { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false }
+  for_each          = contains(var.components_to_exclude, "db") ? {} : { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false }
   availability_zone = aws_instance.db_ec2_primary_instance[0].availability_zone
   instance_id       = aws_instance.db_ec2_primary_instance[0].id
   device_name       = each.key
