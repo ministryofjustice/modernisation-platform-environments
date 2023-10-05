@@ -78,6 +78,12 @@ locals {
   compact_curated_job_log_level   = local.application_data.accounts[local.environment].compact_curated_job_log_level
   compact_curated_job_schedule    = local.application_data.accounts[local.environment].compact_curated_job_schedule
 
+  # Compact Domain Job
+  compact_domain_job_worker_type = local.application_data.accounts[local.environment].compact_domain_job_worker_type
+  compact_domain_job_num_workers = local.application_data.accounts[local.environment].compact_domain_job_num_workers
+  compact_domain_job_log_level   = local.application_data.accounts[local.environment].compact_domain_job_log_level
+  compact_domain_job_schedule    = local.application_data.accounts[local.environment].compact_domain_job_schedule
+
   # Retention (vacuum) Raw Job
   retention_raw_job_worker_type = local.application_data.accounts[local.environment].retention_raw_job_worker_type
   retention_raw_job_num_workers = local.application_data.accounts[local.environment].retention_raw_job_num_workers
@@ -95,6 +101,12 @@ locals {
   retention_curated_job_num_workers = local.application_data.accounts[local.environment].retention_curated_job_num_workers
   retention_curated_job_log_level   = local.application_data.accounts[local.environment].retention_curated_job_log_level
   retention_curated_job_schedule    = local.application_data.accounts[local.environment].retention_curated_job_schedule
+
+  # Retention (vacuum) Domain Job
+  retention_domain_job_worker_type = local.application_data.accounts[local.environment].retention_domain_job_worker_type
+  retention_domain_job_num_workers = local.application_data.accounts[local.environment].retention_domain_job_num_workers
+  retention_domain_job_log_level   = local.application_data.accounts[local.environment].retention_domain_job_log_level
+  retention_domain_job_schedule    = local.application_data.accounts[local.environment].retention_domain_job_schedule
 
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
