@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "sas_token_rotator" {
       "kms:Encrypt",
     ]
     resources = [
-      data.aws_kms_key.general_shared.key_id,
+      data.aws_kms_key.general_shared.arn,
     ]
   }
 }
