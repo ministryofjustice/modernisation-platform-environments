@@ -6,6 +6,7 @@ module "data_product_docs_lambda" {
   description                    = "Lambda for swagger api docs"
   function_name                  = "data_product_docs_${local.environment}"
   role_name                      = "docs_lambda_role_${local.environment}"
+  policy_json_attached           = true
   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_docs_lambda.json
   create_role                    = true
   reserved_concurrent_executions = 1
@@ -33,6 +34,7 @@ module "data_product_authorizer_lambda" {
   tags                           = local.tags
   description                    = "Lambda for custom API Gateway authorizer"
   role_name                      = "authorizer_lambda_role_${local.environment}"
+  policy_json_attached           = true
   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_authorizer_lambda.json
   function_name                  = "data_product_authorizer_${local.environment}"
   create_role                    = true
@@ -66,6 +68,7 @@ module "data_product_get_glue_metadata_lambda" {
   tags                           = local.tags
   description                    = "Lambda to retrieve Glue metadata for a specified table in a database"
   role_name                      = "get_glue_metadata_lambda_role_${local.environment}"
+  policy_json_attached           = true
   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_get_glue_metadata_lambda.json
   function_name                  = "data_product_get_glue_metadata_${local.environment}"
   create_role                    = true
@@ -94,6 +97,7 @@ module "data_product_landing_to_raw_lambda" {
   tags                           = local.tags
   description                    = "Lambda to retrieve Glue metadata for a specified table in a database"
   role_name                      = "landing_to_raw_lambda_role_${local.environment}"
+  policy_json_attached           = true
   policy_json                    = data.aws_iam_policy_document.landing_to_raw_lambda_policy.json
   function_name                  = "data_product_landing_to_raw_${local.environment}"
   create_role                    = true
@@ -122,6 +126,7 @@ module "data_product_presigned_url_lambda" {
   tags                           = local.tags
   description                    = "Lambda to generate a presigned url for uploading data"
   role_name                      = "presigned_url_lambda_role_${local.environment}"
+  policy_json_attached           = true
   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_presigned_url_lambda.json
   function_name                  = "data_product_presigned_url_${local.environment}"
   create_role                    = true
@@ -158,6 +163,7 @@ module "data_product_athena_load_lambda" {
   tags                           = local.tags
   description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
   role_name                      = "athena_load_lambda_role_${local.environment}"
+  policy_json_attached           = true
   policy_json                    = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
   function_name                  = "data_product_athena_load_${local.environment}"
   create_role                    = true
@@ -196,6 +202,7 @@ module "data_product_create_metadata_lambda" {
   tags                           = local.tags
   description                    = "Lambda to create the first version of a json metadata file for a data product"
   role_name                      = "data_product_metadata_lambda_role_${local.environment}"
+  policy_json_attached           = true
   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_create_metadata_lambda.json
   function_name                  = "data_product_create_metadata_${local.environment}"
   create_role                    = true
@@ -229,6 +236,7 @@ module "reload_data_product_lambda" {
   tags                           = local.tags
   description                    = "Reload the data in a data product from raw history to curated, and recreate the athena tables."
   role_name                      = "reload_data_product_${local.environment}"
+  policy_json_attached           = true
   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_reload_data_product_lambda.json
   function_name                  = "reload_data_product_${local.environment}"
   create_role                    = true
@@ -256,6 +264,7 @@ module "resync_unprocessed_files_lambda" {
   tags                           = local.tags
   description                    = "Retrigger the athena load for extraction timestamps in raw history and not in curated data, for one data product"
   role_name                      = "resync_unprocessed_files_role_${local.environment}"
+  policy_json_attached           = true
   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_resync_unprocessed_files_lambda.json
   function_name                  = "resync_unprocessed_files_${local.environment}"
   create_role                    = true
