@@ -86,18 +86,12 @@ locals {
     }
 
     baseline_ssm_parameters = {
-      # NEW
       "/oracle/weblogic/preprod"  = local.weblogic_ssm_parameters
       "/oracle/database/PPCNOM"   = local.database_nomis_ssm_parameters
       "/oracle/database/PPNDH"    = local.database_ssm_parameters
       "/oracle/database/PPTRDAT"  = local.database_ssm_parameters
       "/oracle/database/PPCNMAUD" = local.database_ssm_parameters
       "/oracle/database/PPMIS"    = local.database_mis_ssm_parameters
-
-      # OLD
-      "/oracle/database/CNOMPP" = local.database_nomis_ssm_parameters
-      "preprod-nomis-web-a"     = local.weblogic_ssm_parameters_old
-      "preprod-nomis-web-b"     = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {
