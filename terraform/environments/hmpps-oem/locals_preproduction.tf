@@ -27,16 +27,6 @@ locals {
           })
         })
       })
-      # preprod-oem-b = merge(local.oem_ec2_default, {
-      #   config = merge(local.oem_ec2_default.config, {
-      #     availability_zone = "eu-west-2b"
-      #   })
-      #   user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
-      #     args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-      #       branch = "main"
-      #     })
-      #   })
-      # })
     }
 
     baseline_route53_zones = {

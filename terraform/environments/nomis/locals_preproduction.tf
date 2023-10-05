@@ -49,7 +49,7 @@ locals {
               "s3:ListBucket",
             ]
             resources = [
-              "arn:aws:s3:::nomis-db-backup-bucket*/*",
+              "arn:aws:s3:::nomis-db-backup-bucket*",
             ]
           },
           {
@@ -92,7 +92,7 @@ locals {
       "/oracle/database/PPNDH"    = local.database_ssm_parameters
       "/oracle/database/PPTRDAT"  = local.database_ssm_parameters
       "/oracle/database/PPCNMAUD" = local.database_ssm_parameters
-      "/oracle/database/PPMIS"    = local.database_ssm_parameters
+      "/oracle/database/PPMIS"    = local.database_mis_ssm_parameters
 
       # OLD
       "/oracle/database/CNOMPP" = local.database_nomis_ssm_parameters
@@ -167,6 +167,34 @@ locals {
               "Preprod NOMIS|https://c.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
             ])
           }))
+        })
+      })
+    }
+
+    baseline_ec2_instances = {
+      preprod-nomis-db-2-a = merge(local.database_ec2_a, {
+        cloudwatch_metric_alarms = {}
+        tags = merge(local.database_ec2_a.tags, {
+          nomis-environment = "preprod"
+          description       = "PreProduction NOMIS MIS and Audit database"
+          oracle-sids       = ""
+        })
+        config = merge(local.database_ec2_a.config, {
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
+        instance = merge(local.database_ec2_a.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 512 }
+        })
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
         })
       })
     }
