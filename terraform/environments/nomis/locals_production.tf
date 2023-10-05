@@ -85,12 +85,12 @@ locals {
       "/oracle/database/PNDH"     = local.database_ssm_parameters
       "/oracle/database/PTRDAT"   = local.database_ssm_parameters
       "/oracle/database/PCNMAUD"  = local.database_ssm_parameters
-      "/oracle/database/PMIS"     = local.database_ssm_parameters
+      "/oracle/database/PMIS"     = local.database_mis_ssm_parameters
       "/oracle/database/DRCNOM"   = local.database_nomis_ssm_parameters
       "/oracle/database/DRNDH"    = local.database_ssm_parameters
       "/oracle/database/DRTRDAT"  = local.database_ssm_parameters
       "/oracle/database/DRCNMAUD" = local.database_ssm_parameters
-      "/oracle/database/DRMIS"    = local.database_ssm_parameters
+      "/oracle/database/DRMIS"    = local.database_mis_ssm_parameters
 
       # OLD
       "/oracle/database/CNOMP" = local.database_nomis_ssm_parameters
@@ -211,6 +211,7 @@ locals {
       })
 
       prod-nomis-db-1-b = merge(local.database_ec2_b, {
+        cloudwatch_metric_alarms = {}
         tags = merge(local.database_ec2_b.tags, {
           nomis-environment = "prod"
           description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
@@ -271,6 +272,7 @@ locals {
       })
 
       prod-nomis-db-2-b = merge(local.database_ec2_b, {
+        cloudwatch_metric_alarms = {}
         tags = merge(local.database_ec2_b.tags, {
           nomis-environment = "prod"
           description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
