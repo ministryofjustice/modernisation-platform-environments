@@ -131,7 +131,7 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
     ]
   }
   statement {
-    sid     = "putToLandingBucket"
+    sid     = "putRawData"
     effect  = "Allow"
     actions = ["s3:PutObject*"]
     resources = [
