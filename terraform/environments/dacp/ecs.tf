@@ -151,10 +151,20 @@ resource "aws_iam_role_policy" "app_execution" {
            "Action": [
               "ecr:*",
               "logs:*",
-              "secretsmanager:GetSecretValue"
+              "secretsmanager:GetSecretValue",
+              "ecs:*"
            ],
            "Resource": "*",
            "Effect": "Allow"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogStream",
+          "logs:DescribeLogStreams",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/ecs/${aws_cloudwatch_log_group.dacpFamily_logs.name}:*"
       }
     ]
   }
@@ -203,6 +213,7 @@ resource "aws_iam_role_policy" "app_task" {
           "ecr:*",
           "iam:*",
           "ec2:*",
+          "ecs:*",
           "ssmmessages:CreateControlChannel",
           "ssmmessages:CreateDataChannel",
           "ssmmessages:OpenControlChannel",
