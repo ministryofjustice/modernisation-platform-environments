@@ -126,7 +126,7 @@ resource "aws_iam_role" "app_execution" {
       },
       "Effect": "Allow",
       "Sid": ""
-    },
+    }
   ]
 }
 EOF
