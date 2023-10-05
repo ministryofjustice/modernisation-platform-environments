@@ -1,19 +1,18 @@
 module "openmetadata_iam_role" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "~> 5.0"
-  
+
   create_role = true
 
-  role_name_prefix = "openmetadata"
+  role_name_prefix  = "openmetadata"
+  role_requires_mfa = false
 
-  provider_url  = local.environment_configuration.apps_tools_eks_oidc_url
+  trusted_role_arns = ["arn:aws:iam::${local.apps_tools_account_id}:root"]
 
-  role_policy_arns = [
+  custom_role_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSQuicksightAthenaAccess",
     module.openmetadata_iam_policy.arn
   ]
-
-  oidc_fully_qualified_subjects = ["system:serviceaccount:openmetadata:airflow"]
 
   tags = local.tags
 }
