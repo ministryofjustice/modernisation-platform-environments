@@ -126,7 +126,17 @@ resource "aws_iam_role" "app_execution" {
       },
       "Effect": "Allow",
       "Sid": ""
-    }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssmmessages:CreateControlChannel",
+        "ssmmessages:CreateDataChannel",
+        "ssmmessages:OpenControlChannel",
+        "ssmmessages:OpenDataChannel"
+      ],
+      "Resource": "*"
+      }
   ]
 }
 EOF
@@ -151,7 +161,8 @@ resource "aws_iam_role_policy" "app_execution" {
            "Action": [
               "ecr:*",
               "logs:*",
-              "secretsmanager:GetSecretValue"
+              "secretsmanager:GetSecretValue",
+              "ecs:*"
            ],
            "Resource": "*",
            "Effect": "Allow"
@@ -202,7 +213,8 @@ resource "aws_iam_role_policy" "app_task" {
           "logs:*",
           "ecr:*",
           "iam:*",
-          "ec2:*"
+          "ec2:*",
+          "ecs:*"
         ],
        "Resource": "*"
      }
@@ -238,7 +250,7 @@ resource "aws_ecr_repository" "dacp_ecr_repo" {
 
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = 4  # Maximum number of tasks
-  min_capacity       = 1  # Minimum number of tasks
+  min_capacity       = 2  # Minimum number of tasks
   resource_id        = "service/${aws_ecs_cluster.dacp_cluster.name}/${aws_ecs_service.dacp_ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
