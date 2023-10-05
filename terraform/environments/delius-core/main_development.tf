@@ -17,6 +17,8 @@ module "environment_dev" {
   app_name      = local.application_name
   platform_vars = local.platform_vars
 
+  components_to_exclude = []
+
   account_config             = local.account_config_dev
   environment_config         = local.environment_config_dev
   ldap_config                = local.ldap_config_dev
