@@ -31,7 +31,7 @@
       "ec2_scaling_mem_threshold": 61,
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80,
-      "instance_type": "m5.large"
+      "instance_type": "t2.nano"
     },
     "test": {
       "example_var": "test-data"
