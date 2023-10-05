@@ -2,13 +2,9 @@ locals {
   security_group_cidrs_devtest = {
     core = module.ip_addresses.azure_fixngo_cidrs.devtest_core
     ssh  = module.ip_addresses.azure_fixngo_cidrs.devtest
-    https = flatten([
-      "10.0.0.0/8",
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
-    ])
+    enduserclient = [
+      "10.0.0.0/8"
+    ]
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
@@ -27,6 +23,7 @@ locals {
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      module.ip_addresses.azure_fixngo_cidrs.devtest_core,
     ])
     domain_controllers = module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers
     jumpservers        = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
@@ -40,13 +37,9 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod_core,
       module.ip_addresses.azure_fixngo_cidrs.prod, # NOTE: may need removing at some point
     ])
-    https = flatten([
-      "10.0.0.0/8",
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
-    ])
+    enduserclient = [
+      "10.0.0.0/8"
+    ]
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
@@ -67,6 +60,7 @@ locals {
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      module.ip_addresses.azure_fixngo_cidrs.prod_core,
     ])
     domain_controllers = module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers
     jumpservers        = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
@@ -576,21 +570,21 @@ locals {
           from_port   = 0
           to_port     = 0
           protocol    = -1
-          cidr_blocks = local.security_group_cidrs.https
+          cidr_blocks = local.security_group_cidrs.enduserclient
         } */
-        http = {
+        http_lb = {
           description = "Allow http ingress"
           from_port   = 80
           to_port     = 80
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.https
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
-        https = {
-          description = "Allow https ingress"
+        https_lb = {
+          description = "Allow enduserclient https ingress"
           from_port   = 443
           to_port     = 443
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.https
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
         http7770_7771_lb = {
           description = "Allow http 7770-7771 ingress"
@@ -633,7 +627,7 @@ locals {
           from_port       = 80
           to_port         = 80
           protocol        = "TCP"
-          cidr_blocks     = ["10.0.0.0/8"]
+          cidr_blocks     = local.security_group_cidrs.enduserclient
           security_groups = ["load-balancer"]
           # NOTE: will need to be changed to point to client access possibly
         }
@@ -654,11 +648,11 @@ locals {
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         https_web = {
-          description     = "443: https ingress"
+          description     = "443: enduserclient https ingress"
           from_port       = 443
           to_port         = 443
           protocol        = "TCP"
-          cidr_blocks     = ["10.0.0.0/8"]
+          cidr_blocks     = local.security_group_cidrs.enduserclient
           security_groups = ["load-balancer"]
           # IMPORTANT: this doesn't seem to be part of the existing Azure SG's? NEEDS CHECKING
         }
@@ -795,7 +789,7 @@ locals {
           from_port   = 2109
           to_port     = 2109
           protocol    = "TCP"
-          cidr_blocks = ["10.0.0.0/8"]
+          cidr_blocks = local.security_group_cidrs.enduserclient
           # IMPORTANT: check if this needs to be changed to include client access
         }
         winrm_app = {
@@ -810,7 +804,7 @@ locals {
           from_port   = 45054
           to_port     = 45054
           protocol    = "TCP"
-          cidr_blocks = ["10.0.0.0/8"]
+          cidr_blocks = local.security_group_cidrs.enduserclient
           # IMPORTANT: check if this needs to be changed to include client access
         }
         rpc_dynamic_udp_app = {
@@ -957,7 +951,7 @@ locals {
           from_port   = 7
           to_port     = 7
           protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.core
+          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
         }
         ssh-db = {
           description = "22: SSH allow ingress"
@@ -965,13 +959,6 @@ locals {
           to_port     = 22
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.ssh
-        }
-        rpc_udp_db = {
-          description = "135: UDP MS-RPC AD connect ingress from Azure DC and Jumpserver"
-          from_port   = 135
-          to_port     = 135
-          protocol    = "UDP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
         rpc_tcp_db = {
           description = "135: TCP MS-RPC AD connect ingress from Azure DC and Jumpserver"
@@ -994,13 +981,6 @@ locals {
           to_port     = "3872"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-        }
-        rpc_dynamic_udp_db = {
-          description = "49152-65535: UDP Dynamic Port range"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "UDP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
         rpc_dynamic_tcp_db = {
           description = "49152-65535: TCP Dynamic Port range"
