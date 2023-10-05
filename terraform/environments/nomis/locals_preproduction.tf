@@ -92,7 +92,7 @@ locals {
       "/oracle/database/PPNDH"    = local.database_ssm_parameters
       "/oracle/database/PPTRDAT"  = local.database_ssm_parameters
       "/oracle/database/PPCNMAUD" = local.database_ssm_parameters
-      "/oracle/database/PPMIS"    = local.database_ssm_parameters
+      "/oracle/database/PPMIS"    = local.database_mis_ssm_parameters
 
       # OLD
       "/oracle/database/CNOMPP" = local.database_nomis_ssm_parameters
@@ -173,6 +173,7 @@ locals {
 
     baseline_ec2_instances = {
       preprod-nomis-db-2-a = merge(local.database_ec2_a, {
+        cloudwatch_metric_alarms = {}
         tags = merge(local.database_ec2_a.tags, {
           nomis-environment = "preprod"
           description       = "PreProduction NOMIS MIS and Audit database"
