@@ -198,3 +198,9 @@ variable "bastion" {
     security_group_id = "default_security_group_id"
   }
 }
+
+
+variable "components_to_deploy" {
+  type    = list(string)
+  default = ["all"]
+}
