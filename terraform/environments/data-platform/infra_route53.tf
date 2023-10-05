@@ -96,7 +96,7 @@ resource "aws_route53_record" "data_platform_user_guidance" {
 }
 
 # Front Door on GitHub Pages
-resource "aws_route53_record" "data_platform_user_guidance" {
+resource "aws_route53_record" "data_platform_front_door" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
 
   zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
