@@ -56,7 +56,7 @@ module "testing_db_service" {
   environment = var.env_name
   namespace   = var.app_name
 
-  security_group_ids = [aws_security_group.weblogic.id]
+  security_group_ids = [aws_security_group.delius_db_security_group.id]
 
   subnet_ids = var.account_config.private_subnet_ids
 
@@ -74,11 +74,11 @@ resource "aws_route53_record" "delius-core-db" {
   name     = "${var.app_name}-${var.env_name}-${var.delius_db_container_config.fully_qualified_name}.${var.account_config.route53_inner_zone_info.name}"
   type     = "A"
   ttl      = 300
-  records  = ["10.26.25.202"]
+  records  = ["10.26.24.243"]
 }
 
 resource "aws_security_group" "delius_db_security_group" {
-  name        = "Delius Core DB"
+  name        = format("%s - Delius Core DB", var.env_name)
   description = "Rules for the delius testing db ecs service"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
@@ -106,10 +106,20 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_i
   security_group_id = aws_security_group.delius_db_security_group.id
   description       = "outbound from the testing db ecs service"
   ip_protocol       = "tcp"
-  to_port           = 443
-  from_port         = 443
+  to_port           = 1521
+  from_port         = 1521
   cidr_ipv4         = "0.0.0.0/0"
 }
+
+resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_weblogic" {
+  security_group_id            = aws_security_group.delius_db_security_group.id
+  description                  = "weblogic to testing db"
+  from_port                    = var.delius_db_container_config.port
+  to_port                      = var.delius_db_container_config.port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.weblogic.id
+}
+
 
 resource "aws_cloudwatch_log_group" "delius_core_testing_db_log_group" {
   name              = format("%s-%s", var.env_name, var.delius_db_container_config.fully_qualified_name)

@@ -2,7 +2,7 @@ locals {
   frontend_url = "${var.app_name}.${var.env_name}.${var.weblogic_config.frontend_url_suffix}"
 }
 resource "aws_security_group" "delius_frontend_alb_security_group" {
-  name        = "Delius Core Frontend Load Balancer"
+  name        = format("%s - Delius Core Frontend Load Balancer", var.env_name)
   description = "controls access to and from delius front-end load balancer"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
