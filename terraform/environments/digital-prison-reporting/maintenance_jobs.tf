@@ -21,7 +21,7 @@ locals {
   raw_zone_nomis_path        = "s3://${module.s3_raw_bucket.bucket_id}/nomis/"
   structured_zone_nomis_path = "s3://${module.s3_structured_bucket.bucket_id}/nomis/"
   curated_zone_nomis_path    = "s3://${module.s3_curated_bucket.bucket_id}/nomis/"
-  domain_zone_nomis_path    = "s3://${module.s3_domain_bucket.bucket_id}/nomis/"
+  domain_zone_root_path      = "s3://${module.s3_domain_bucket.bucket_id}/"
 
   compact_job_class   = "uk.gov.justice.digital.job.CompactionJob"
   retention_job_class = "uk.gov.justice.digital.job.VacuumJob"
@@ -186,7 +186,7 @@ module "glue_compact_domain_job" {
   arguments = {
     "--extra-jars"                = local.glue_jobs_latest_jar_location
     "--class"                     = local.compact_job_class
-    "--dpr.maintenance.root.path" = local.domain_zone_nomis_path
+    "--dpr.maintenance.root.path" = local.domain_zone_root_path
     "--datalake-formats"          = "delta"
     "--dpr.log.level"             = local.compact_domain_job_log_level
   }
@@ -351,7 +351,7 @@ module "glue_retention_domain_job" {
   arguments = {
     "--extra-jars"                = local.glue_jobs_latest_jar_location
     "--class"                     = local.retention_job_class
-    "--dpr.maintenance.root.path" = local.domain_zone_nomis_path
+    "--dpr.maintenance.root.path" = local.domain_zone_root_path
     "--datalake-formats"          = "delta"
     "--dpr.log.level"             = local.retention_domain_job_log_level
   }
