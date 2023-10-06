@@ -26,6 +26,15 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
 }
 
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_service" {
+  security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
+  description                  = "access delius core frontend service from alb"
+  from_port                    = var.weblogic_config.frontend_container_port
+  to_port                      = var.weblogic_config.frontend_container_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.weblogic_service.id
+}
+
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_frontend" {
   # checkov:skip=CKV_AWS_91
