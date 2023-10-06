@@ -25,6 +25,6 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
 
   launch_template {
     id      = "${aws_launch_template.tribunals-all-lt.id}"
-    version = "$$Latest"
+    version = "$Latest"
   }
 }
