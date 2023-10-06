@@ -195,7 +195,6 @@ resource "aws_security_group" "weblogic" {
 resource "aws_vpc_security_group_ingress_rule" "name" {
   security_group_id            = aws_security_group.weblogic.id
   description                  = "Allow traffic from ALB to weblogic task"
-  type                         = "ingress"
   from_port                    = var.weblogic_config.frontend_container_port
   to_port                      = var.weblogic_config.frontend_container_port
   ip_protocol                  = "TCP"
