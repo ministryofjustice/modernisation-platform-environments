@@ -108,6 +108,14 @@ module "data_product_landing_to_raw_lambda" {
   tracing_mode = "Active"
   memory_size  = 512
 
+  environment_variables = {
+    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
+    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
+    LOG_BUCKET          = module.logs_s3_bucket.bucket.id
+    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
+    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
+  }
+
   allowed_triggers = {
 
     AllowExecutionFromCloudWatch = {
