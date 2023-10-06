@@ -121,6 +121,15 @@ resource "aws_security_group" "weblogic_service" {
   }
 }
 
+resource "aws_vpc_security_group_ingress_rule" {
+  security_group_id            = aws_security_group.weblogic_service.id
+  description                  = "weblogic service to db"
+  from_port                    = var.delius_db_container_config.port
+  to_port                      = var.delius_db_container_config.port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.delius_db_security_group.id
+}
+
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_tcp" {
   security_group_id = aws_security_group.weblogic_service.id
   description       = "ingress from ldap server tcp"
