@@ -122,12 +122,11 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
     ]
   }
   statement {
-    sid     = "getFromLandingBucket"
+    sid     = "getLandingData"
     effect  = "Allow"
     actions = ["s3:GetObject*"]
     resources = [
-      "${module.data_landing_s3_bucket.bucket.arn}/*",
-      "${module.data_landing_s3_bucket.bucket.arn}",
+      "${module.data_landing_s3_bucket.bucket.arn}/*"
     ]
   }
   statement {
@@ -136,6 +135,14 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
     actions = ["s3:PutObject*"]
     resources = [
       "${module.data_s3_bucket.bucket.arn}/raw/*"
+    ]
+  }
+  statement {
+    sid     = "listMetadataVersions"
+    effect  = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [
+      "${module.metadata_s3_bucket.bucket.arn}"
     ]
   }
 }
