@@ -78,7 +78,7 @@ resource "aws_route53_record" "delius-core-db" {
 }
 
 resource "aws_security_group" "delius_db_security_group" {
-  name        = "Delius Core DB"
+  name        = format("%s - Delius Core DB", var.env_name)
   description = "Rules for the delius testing db ecs service"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags

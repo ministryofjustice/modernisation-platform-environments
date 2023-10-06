@@ -109,7 +109,7 @@ module "weblogic_service" {
 
 
 resource "aws_security_group" "delius_core_frontend_security_group" {
-  name        = "Delius Core Frontend Weblogic"
+  name        = format("%s - Delius Core Frontend Weblogic", var.env_name)
   description = "Rules for the delius testing frontend ecs service"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
