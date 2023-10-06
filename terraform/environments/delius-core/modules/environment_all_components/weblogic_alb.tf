@@ -31,7 +31,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_f
   from_port                    = var.weblogic_config.frontend_container_port
   to_port                      = var.weblogic_config.frontend_container_port
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.weblogic.id
+  referenced_security_group_id = aws_security_group.weblogic_service.id
   tags                         = local.tags
 }
 

@@ -117,7 +117,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
   from_port                    = var.delius_db_container_config.port
   to_port                      = var.delius_db_container_config.port
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.weblogic.id
+  referenced_security_group_id = aws_security_group.weblogic_service.id
 }
 
 
