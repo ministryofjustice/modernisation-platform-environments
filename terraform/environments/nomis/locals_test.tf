@@ -163,7 +163,6 @@ locals {
     }
 
     baseline_ssm_parameters = {
-      # NEW
       "/oracle/weblogic/t1"       = local.weblogic_ssm_parameters
       "/oracle/weblogic/t2"       = local.weblogic_ssm_parameters
       "/oracle/weblogic/t3"       = local.weblogic_ssm_parameters
@@ -177,39 +176,6 @@ locals {
       "/oracle/database/T2NDH"    = local.database_nomis_ssm_parameters
       "/oracle/database/T2TRDAT"  = local.database_nomis_ssm_parameters
       "/oracle/database/T3CNOM"   = local.database_nomis_ssm_parameters
-
-      # OLD (delete these once all servers have correct ansible code)
-      "/oracle/database/CNOMT1" = local.database_nomis_ssm_parameters
-      "/oracle/database/CNOMT2" = local.database_nomis_ssm_parameters
-      "/oracle/database/CNOMT3" = local.database_nomis_ssm_parameters
-      "t1-nomis-db-1-a/CNOMT1"  = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-a/NDHT1"   = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-a/TRDATT1" = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-a/ORSYST1" = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-b/CNOMT1"  = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-b/NDHT1"   = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-b/TRDATT1" = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-b/ORSYST1" = local.database_instance_ssm_parameters
-      "t1-nomis-db-2-a/MIST1"   = local.database_instance_ssm_parameters
-      "t1-nomis-db-2-b/MIST1"   = local.database_instance_ssm_parameters
-      "t1-nomis-db-2-a"         = local.database_ec2_misload_ssm_parameters
-      "t1-nomis-db-2-b"         = local.database_ec2_misload_ssm_parameters
-      "t1-nomis-web-a"          = local.weblogic_ssm_parameters_old
-      "t1-nomis-web-b"          = local.weblogic_ssm_parameters_old
-      "t1-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
-      "t1-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
-      "t2-nomis-db-1-a/CNOMT2"  = local.database_instance_ssm_parameters
-      "t2-nomis-db-1-a/NDHT2"   = local.database_instance_ssm_parameters
-      "t2-nomis-db-1-a/TRDATT2" = local.database_instance_ssm_parameters
-      "t2-nomis-db-1-b/CNOMT2"  = local.database_instance_ssm_parameters
-      "t2-nomis-db-1-b/NDHT2"   = local.database_instance_ssm_parameters
-      "t2-nomis-db-1-b/TRDATT2" = local.database_instance_ssm_parameters
-      "t2-nomis-web-a"          = local.weblogic_ssm_parameters_old
-      "t2-nomis-web-b"          = local.weblogic_ssm_parameters_old
-      "t2-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
-      "t2-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
-      "t3-nomis-web-a"          = local.weblogic_ssm_parameters_old
-      "t3-nomis-web-b"          = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -446,7 +412,7 @@ locals {
           description         = "T1 NOMIS Audit and MIS database"
           oracle-sids         = "T1MIS T1CNMAUD"
           instance-scheduling = "skip-scheduling"
-          misload-target      = "T1PRWK4DY1B0001.azure.noms.root"
+          misload-dbname      = "T1MIS"
         })
         config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"

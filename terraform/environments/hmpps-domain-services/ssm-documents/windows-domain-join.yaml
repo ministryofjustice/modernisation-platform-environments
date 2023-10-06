@@ -1,0 +1,148 @@
+---
+schemaVersion: "2.2"
+description: "SSM Document for joining Windows EC2 instances to the domain. Moving Computers to a different OU must be done manually on the relevant domain controller."
+parameters:
+  domain:
+    type: "String"
+    default: "dev"
+    description: "Domain to join, either Dev (default) or Prod"
+    allowedValues:
+      - dev
+      - prod
+  domainJoinUsername:
+    type: "String"
+    description: "Username with domain join permissions"
+  domainJoinPassword:
+    type: "String"
+    description: "Password for domain join user"
+  newHostname:
+    type: "String"
+    description: "If over-written, the hostname will be changed to this value. If un-changed the existing hostname will be kept. The new hostname must be 15 characters or less"
+    default: "keep-existing"
+    maxChars: 15
+  restart:
+    type: "String"
+    description: "If set to true, the instance will be restarted after joining the domain. If set to false, the instance will not be restarted. Default is true."
+    default: "true"
+    allowedValues:
+      - "true"
+      - "false"
+mainSteps:
+  - name: WindowsDomainJoin
+    action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
+    inputs:
+      runCommand:
+        - |
+          $ErrorActionPreference = "Stop" # all errors will terminate the script
+
+          $domainJoinUsername = "{{domainJoinUsername}}"
+          $domainJoinPassword = "{{domainJoinPassword}}"
+          $newHostname = "{{newHostname}}"
+          $domain = "{{domain}}"
+          $restart = "{{restart}}"
+
+          # Check pre-requisites are installed, exit if not
+          if (-Not (Get-Module -ListAvailable -Name "ActiveDirectory")) {
+            Write-Error "ERROR: ActiveDirectory module not installed"
+            Write-Error "ERROR: Run 'Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature' via PoweShell as admin to install the ActiveDirectory, then re-run this ssm document"
+            exit 1
+          }
+          # Define environment settings
+          $environments = @{
+            "dev" = @{
+                "domain" = "azure.noms.root";
+                "primarydns" = "10.102.0.196";
+                "serveraddresses" = @("10.102.0.196","10.102.0.200");
+                "suffixsearchlist" = @("azure.noms.root", "noms.root");
+                "domaincontroller" = "MGMCW0002.azure.noms.root";
+                "usernameprefix" = "azure";
+            };
+            "prod" = @{
+                "domain" = "azure.hmpp.root";
+                "primarydns" = "10.40.128.196";
+                "serveraddresses" = @("10.40.128.196","10.40.0.133");
+                "suffixsearchlist" = @("azure.hmpp.root", "hmpp.root");
+                "domaincontroller" = "PCMCW0011.azure.hmpp.root";
+                "usernameprefix" = "hmpp";
+            };
+          }
+
+          # Set up DNS IP addresses and suffixes
+          Write-Host "INFO: Setting DNS Client Server and DNS Client Global Settings for $domain domain"
+
+          # Get the network interface alias
+          $interfaceAlias = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object -ExpandProperty Name
+          Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $environments[$domain]["serveraddresses"]
+
+          # Get existing SuffixSearchList and prepend suffixSearchList
+          $existingSuffixSearchList = (Get-DnsClientGlobalSetting).SuffixSearchList
+          $newSuffixSearchList = $environments[$domain]["suffixsearchlist"] + $existingSuffixSearchList
+          Set-DnsClientGlobalSetting -SuffixSearchList $newSuffixSearchList
+            
+          function Get-HostnameInUse {
+            param (
+              [Parameter(Mandatory=$true)]
+              [string]$hostname,
+              [Parameter(Mandatory=$true)]
+              [System.Management.Automation.PSCredential]$credentials,
+              [Parameter(Mandatory=$true)]
+              [string]$domain
+            )
+
+            $hostnameInUse = Get-ADComputer -Filter 'Name -eq $hostname' -Credential $credentials -Server ($environments[$domain]["domaincontroller"])
+
+            if ($hostnameInUse) {
+              return $true
+            } else {
+              return $false
+            }
+          }
+
+          $secpasswd = ConvertTo-SecureString $domainJoinPassword -AsPlainText -Force
+          $credentials = New-Object System.Management.Automation.PSCredential (($environments[$domain]["usernameprefix"] + "\" + $domainJoinUsername), $secpasswd)
+
+          # splatting Add-Computer parameters to make it easier to read
+          $args = @{
+            DomainName = $environments[$domain]["domain"]
+            Credential = $credentials
+            Verbose = $true
+            Force = $true
+          }
+
+          # adds new name to parameters if supplied & runs the rename step
+          if ($newHostname -eq "keep-existing") {
+            Write-Host "INFO: No new hostname supplied, using existing hostname $env:COMPUTERNAME"
+            $hostname = $env:COMPUTERNAME
+          } elseif ($newHostname -ne $env:COMPUTERNAME) {
+            Write-Host "INFO: Renaming EC2 instance to $newHostname and then rebooting"
+            Rename-Computer -NewName $newHostname -Force
+            exit 3010 # exit code 3010 means reboot required, ssm document will continue after reboot
+          } elseif ($newHostname -eq $env:COMPUTERNAME) {
+            Write-Host "INFO: Hostname has been succesfully changed to $newHostname"
+            $hostname = $newHostname
+          } else {
+            Write-Error "ERROR: Something went wrong with the hostname parameter"
+            exit 1
+          }
+
+          # optional restart parameter, mainly for testing, defaults to true
+          if ($restart -eq "true") {
+            Write-Host "WARNING: Instance will restart to complete domain join"
+            $args.Add("Restart", $true)
+          } else {
+            Write-Host "WARNING: Instance will not be restarted but must be restarted manually to complete domain join operation"
+            $args.Add("Restart", $false)
+          }
+
+          if (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain) {
+            Write-Error "ERROR: Hostname $hostname is already in use"
+            exit 1
+          } else {
+            Write-Host "INFO: Hostname $hostname is not already a member of the $domain domain, continuing..."
+            Write-Host "INFO: Running Add-Computer with args" @args
+            Add-Computer @args
+          }

@@ -79,7 +79,6 @@ locals {
     }
 
     baseline_ssm_parameters = {
-      # NEW
       "/oracle/weblogic/prod"     = local.weblogic_ssm_parameters
       "/oracle/database/PCNOM"    = local.database_nomis_ssm_parameters
       "/oracle/database/PNDH"     = local.database_ssm_parameters
@@ -91,11 +90,6 @@ locals {
       "/oracle/database/DRTRDAT"  = local.database_ssm_parameters
       "/oracle/database/DRCNMAUD" = local.database_ssm_parameters
       "/oracle/database/DRMIS"    = local.database_mis_ssm_parameters
-
-      # OLD
-      "/oracle/database/CNOMP" = local.database_nomis_ssm_parameters
-      "prod-nomis-web-a"       = local.weblogic_ssm_parameters_old
-      "prod-nomis-web-b"       = local.weblogic_ssm_parameters_old
     }
 
     baseline_cloudwatch_log_groups = {
