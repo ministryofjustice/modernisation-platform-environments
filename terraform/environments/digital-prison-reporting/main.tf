@@ -142,6 +142,27 @@ module "kinesis_stream_ingestor" {
   )
 }
 
+module "empty_kinesis_stream_ingestor" {
+  source                    = "./modules/kinesis_stream"
+  create_kinesis_stream     = local.create_kinesis
+  name                      = "empty-kinesis-stream"
+  shard_count               = 1 # Not Valid when ON-DEMAND Mode
+  retention_period          = local.kinesis_retention_hours
+  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
+  enforce_consumer_deletion = false
+  encryption_type           = "KMS"
+  kms_key_id                = local.kinesis_kms_id
+  project_id                = local.project
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "empty-kinesis-stream"
+      Resource_Type = "Kinesis Data Stream"
+    }
+  )
+}
+
 module "kinesis_stream_reconciliation_firehose_s3" {
   source                     = "./modules/kinesis_firehose"
   name                       = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
