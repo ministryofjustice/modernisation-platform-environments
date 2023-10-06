@@ -150,7 +150,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_tcp" {
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_udp" {
   security_group_id = aws_security_group.weblogic_service.id
-  description       = "ingress from ldap server"
+  description       = "ingress from ldap server udp"
   from_port         = local.ldap_port
   to_port           = local.ldap_port
   ip_protocol       = "udp"
@@ -160,7 +160,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_udp" {
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_ldap_tcp" {
   security_group_id = aws_security_group.weblogic_service.id
-  description       = "outbound from weblogic to any secure endpoint"
+  description       = "ldap tcp outbound from weblogic"
   ip_protocol       = "tcp"
   to_port           = local.ldap_port
   from_port         = local.ldap_port
@@ -169,7 +169,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_gro
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_ldap_udp" {
   security_group_id = aws_security_group.weblogic_service.id
-  description       = "outbound from weblogic to any secure endpoint"
+  description       = "ldap udp outbound from weblogic"
   ip_protocol       = "udp"
   to_port           = local.ldap_port
   from_port         = local.ldap_port
@@ -177,23 +177,13 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_gro
 }
 
 resource "aws_vpc_security_group_ingress_rule" "alb_to_weblogic" {
-  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
+  security_group_id            = aws_security_group.weblogic_service.id
   description                  = "load balancer to weblogic frontend"
   from_port                    = var.weblogic_config.frontend_container_port
   to_port                      = var.weblogic_config.frontend_container_port
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
 }
-
-resource "aws_vpc_security_group_egress_rule" "alb_to_weblogic" {
-  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
-  description                  = "weblogic outbound to load balancer"
-  from_port                    = var.weblogic_config.frontend_container_port
-  to_port                      = var.weblogic_config.frontend_container_port
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
-}
-
 
 resource "aws_security_group_rule" "weblogic_allow_all_egress" {
   description       = "Allow all outbound traffic to any IPv4 address on 443"
