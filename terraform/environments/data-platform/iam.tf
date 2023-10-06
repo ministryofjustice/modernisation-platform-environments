@@ -141,9 +141,13 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
     sid     = "listMetadataVersions"
     effect  = "Allow"
     actions = ["s3:ListBucket"]
-    resources = [
-      "${module.metadata_s3_bucket.bucket.arn}"
-    ]
+    resources = [module.metadata_s3_bucket.bucket.arn]
+  }
+  statement {
+    sid     = "getPutCustomLogs"
+    effect  = "Allow"
+    actions = ["s3:GetObject*", "s3:PutObject*"]
+    resources = ["${module.logs_s3_bucket.bucket.arn}/*"]
   }
 }
 
