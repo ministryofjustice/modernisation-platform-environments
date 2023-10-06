@@ -83,7 +83,7 @@ resource "aws_lb_listener" "listener_http" {
 resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   # checkov:skip=CKV_AWS_261
 
-  name                 = format("%s-%s", var.env_name, var.weblogic_config.frontend_fully_qualified_name)
+  name                 = var.weblogic_config.frontend_fully_qualified_name
   port                 = var.weblogic_config.frontend_container_port
   protocol             = "HTTP"
   vpc_id               = var.account_config.shared_vpc_id

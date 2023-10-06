@@ -106,11 +106,11 @@ locals {
   weblogic_config_test = {
     name                          = try(local.weblogic_config_lower_environments.name, "weblogic")
     frontend_service_name         = try(local.weblogic_config_lower_environments.frontend_service_name, "weblogic")
-    frontend_fully_qualified_name = try(local.weblogic_config_lower_environments.frontend_fully_qualified_name, "${local.application_name}-${local.frontend_service_name}")
+    frontend_fully_qualified_name = try(local.weblogic_config_lower_environments.frontend_fully_qualified_name, "${local.application_name}-test-${local.frontend_service_name}")
     frontend_image_tag            = try(local.weblogic_config_lower_environments.frontend_image_tag, "5.7.6")
     frontend_container_port       = try(local.weblogic_config_lower_environments.frontend_container_port, 8080)
     frontend_url_suffix           = try(local.weblogic_config_lower_environments.frontend_url_suffix, "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk")
-    db_service_name               = "testing-db"
+    db_service_name               = "test-db"
     db_fully_qualified_name       = "${local.application_name}-${local.db_service_name}"
     db_image_tag                  = "5.7.4"
     db_port                       = 1521
