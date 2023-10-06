@@ -1,0 +1,7 @@
+{
+  "accounts": {
+    "development": {
+      "example_var": "dev-data"
+    }
+  }
+}
