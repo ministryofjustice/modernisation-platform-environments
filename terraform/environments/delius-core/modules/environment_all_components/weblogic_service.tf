@@ -121,7 +121,7 @@ resource "aws_security_group" "weblogic_service" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "delius_core_weblogic_to_db" {
+resource "aws_vpc_security_group_egress_rule" "delius_core_weblogic_to_db" {
   security_group_id            = aws_security_group.weblogic_service.id
   description                  = "weblogic service to db"
   from_port                    = var.delius_db_container_config.port
