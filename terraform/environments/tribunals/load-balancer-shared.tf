@@ -129,9 +129,9 @@ resource "aws_lb_target_group" "tribunals_target_group" {
 
 resource "aws_lb_listener" "tribunals_lb" {
   depends_on = [
-    aws_acm_certificate.external
+    aws_acm_certificate.appeals_external
   ]
-  certificate_arn   = aws_acm_certificate.external.arn
+  certificate_arn   = aws_acm_certificate.appeals_external.certificate_arn
   load_balancer_arn = aws_lb.tribunals_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
