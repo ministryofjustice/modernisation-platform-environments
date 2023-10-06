@@ -111,15 +111,6 @@ module "weblogic_service" {
   force_new_deployment           = false
 }
 
-
-resource "aws_security_group" "delius_core_frontend_security_group" {
-  name        = format("%s - Delius Core Frontend Weblogic", var.env_name)
-  description = "Rules for the delius weblogic frontend ecs service"
-  vpc_id      = var.account_config.shared_vpc_id
-  tags        = local.tags
-}
-
-
 resource "aws_security_group" "weblogic_service" {
   name        = format("%s - Delius Core Weblogic service", var.env_name)
   description = "Security group for the ${var.env_name} weblogic service"
