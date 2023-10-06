@@ -44,7 +44,7 @@ resource "aws_lb" "delius_core_frontend" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
-  subnets            = var.account_config.private_subnet_ids
+  subnets            = var.account_config.public_subnet_ids
 
   enable_deletion_protection = false
   drop_invalid_header_fields = true
