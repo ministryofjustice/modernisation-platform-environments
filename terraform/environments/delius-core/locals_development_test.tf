@@ -110,7 +110,7 @@ locals {
     frontend_image_tag            = try(local.weblogic_config_lower_environments.frontend_image_tag, "5.7.6")
     frontend_container_port       = try(local.weblogic_config_lower_environments.frontend_container_port, 8080)
     frontend_url_suffix           = try(local.weblogic_config_lower_environments.frontend_url_suffix, "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk")
-    db_service_name               = "test-db"
+    db_service_name               = "testing-db"
     db_fully_qualified_name       = "${local.application_name}-${local.db_service_name}"
     db_image_tag                  = "5.7.4"
     db_port                       = 1521
@@ -120,7 +120,7 @@ locals {
   delius_db_container_config_test = {
     image_tag            = "5.7.4"
     image_name           = "delius-core-testing-db"
-    fully_qualified_name = "test-db"
+    fully_qualified_name = "testing-db"
     port                 = 1521
     name                 = "MODNDA"
   }

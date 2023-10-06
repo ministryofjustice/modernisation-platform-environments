@@ -10,6 +10,10 @@ module "weblogic_container" {
     {
       name  = "LDAP_PORT"
       value = local.ldap_port
+    },
+    {
+      name  = "LDAP_HOST"
+      value = aws_lb.ldap.dns_name
     }
   ]
   secrets = [
@@ -209,7 +213,7 @@ resource "aws_security_group_rule" "weblogic_alb" {
 }
 
 resource "aws_cloudwatch_log_group" "delius_core_frontend_log_group" {
-  name              = format("%s-%s", var.env_name, var.weblogic_config.frontend_fully_qualified_name)
+  name              = var.weblogic_config.frontend_fully_qualified_name
   retention_in_days = 7
   tags              = local.tags
 }

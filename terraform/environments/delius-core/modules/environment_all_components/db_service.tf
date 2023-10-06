@@ -74,7 +74,7 @@ resource "aws_route53_record" "delius-core-db" {
   name     = "${var.app_name}-${var.env_name}-${var.delius_db_container_config.fully_qualified_name}.${var.account_config.route53_inner_zone_info.name}"
   type     = "A"
   ttl      = 300
-  records  = ["10.26.25.202"]
+  records  = ["10.26.24.243"]
 }
 
 resource "aws_security_group" "delius_db_security_group" {
