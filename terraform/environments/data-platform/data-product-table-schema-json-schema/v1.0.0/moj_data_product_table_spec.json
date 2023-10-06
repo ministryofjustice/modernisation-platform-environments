@@ -4,8 +4,6 @@
   "description": "Specification for MoJ Data Platform Data Product tables schemas for registering tables in the glue catalog",
   "type": "object",
   "required": [
-    "DatabaseName",
-    "TableName",
     "Columns"
   ],
   "definitions": {
@@ -129,19 +127,6 @@
     }
   },
   "properties": {
-    "DatabaseName": {
-      "type": "string",
-      "description": "This must be an already registered data product",
-      "pattern": "^[a-z0-9_]+$",
-      "example": "my_data_product"
-    },
-    "TableName": {
-      "type": "string",
-      "description": "The name for your table that you will upload data into.",
-      "pattern": "^[a-z0-9_]+$",
-      "example": "my_data_table",
-      "maxLength": 255
-    },
     "TableDescription": {
       "type": "string",
       "description": "A description of the data contained within the table"
