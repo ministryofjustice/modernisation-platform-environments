@@ -25,10 +25,6 @@ module "weblogic_container" {
       name      = "TEST_MODE"
       valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_test_mode.arn
     },
-    {
-      name      = "LDAP_PRINCIPAL"
-      valueFrom = aws_ssm_parameter.delius_core_ldap_principal.arn
-    },
     { name      = "LDAP_CREDENTIAL"
       valueFrom = aws_secretsmanager_secret.delius_core_ldap_credential.arn
     },
