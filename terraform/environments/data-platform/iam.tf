@@ -147,7 +147,7 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
     sid       = "getMetadataSpec"
     effect    = "Allow"
     actions   = ["s3:GetObject*"]
-    resources = ["${module.metadata_s3_bucket.bucket.arn}/data_product_metadata_spec/*"]
+    resources = ["${module.metadata_s3_bucket.bucket.arn}/*"]
   }
   statement {
     sid       = "getPutCustomLogs"
