@@ -214,7 +214,7 @@ resource "aws_iam_role_policy_attachment" "oracle_licensing_policy" {
 
 # Access to LZ buckets.
 resource "aws_iam_policy" "access_to_lz_buckets" {
-  name        = "oracle_licensing_policy-${local.environment}"
+  name        = "access_to_lz_buckets-${local.environment}"
   description = "Allows licensing metrics to be captured"
 
   policy = jsonencode(
