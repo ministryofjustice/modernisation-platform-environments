@@ -23,6 +23,7 @@ variable "account_config" {
     shared_vpc_cidr               = string
     shared_vpc_id                 = string
     private_subnet_ids            = list(string)
+    public_subnet_ids             = list(string)
     data_subnet_ids               = list(string)
     data_subnet_a_id              = string
     route53_inner_zone_info       = any
