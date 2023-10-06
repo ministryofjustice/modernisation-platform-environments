@@ -192,6 +192,16 @@ resource "aws_security_group" "weblogic" {
   }
 }
 
+resource "aws_vpc_security_group_ingress_rule" "name" {
+  security_group_id            = aws_security_group.weblogic.id
+  description                  = "Allow traffic from ALB to weblogic task"
+  type                         = "ingress"
+  from_port                    = var.weblogic_config.frontend_container_port
+  to_port                      = var.weblogic_config.frontend_container_port
+  protocol                     = "TCP"
+  referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
+}
+
 resource "aws_security_group_rule" "weblogic_allow_all_egress" {
   description       = "Allow all outbound traffic to any IPv4 address"
   type              = "egress"
