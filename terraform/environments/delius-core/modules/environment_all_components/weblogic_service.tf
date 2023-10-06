@@ -170,8 +170,8 @@ resource "aws_vpc_security_group_ingress_rule" "alb_to_weblogic" {
 resource "aws_security_group_rule" "weblogic_allow_all_egress" {
   description       = "Allow all outbound traffic to any IPv4 address on 443"
   type              = "egress"
-  from_port         = 0
-  to_port           = 0
+  from_port         = 443
+  to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.weblogic_service.id
