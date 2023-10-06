@@ -147,13 +147,13 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
     sid       = "getMetadataSpec"
     effect    = "Allow"
     actions   = ["s3:GetObject*"]
-    resources = ["${module.metadata_s3_bucket.bucket.arn}/*"]
+    resources = ["${module.metadata_s3_bucket.bucket.arn}/data_product_metadata_spec/*"]
   }
   statement {
     sid       = "getPutCustomLogs"
     effect    = "Allow"
     actions   = ["s3:GetObject*", "s3:PutObject*"]
-    resources = ["${module.logs_s3_bucket.bucket.arn}/*"]
+    resources = ["${module.logs_s3_bucket.bucket.arn}", "${module.logs_s3_bucket.bucket.arn}/*"]
   }
 }
 
