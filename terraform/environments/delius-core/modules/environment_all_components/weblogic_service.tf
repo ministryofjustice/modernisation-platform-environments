@@ -198,7 +198,7 @@ resource "aws_vpc_security_group_ingress_rule" "name" {
   type                         = "ingress"
   from_port                    = var.weblogic_config.frontend_container_port
   to_port                      = var.weblogic_config.frontend_container_port
-  protocol                     = "TCP"
+  ip_protocol                  = "TCP"
   referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
 }
 
