@@ -36,6 +36,7 @@ variable "account_config" {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
     shared_vpc_id                  = "default_shared_vpc_id"
     private_subnet_ids             = ["default_private_subnet_ids"]
+    public_subnet_ids              = ["default_public_subnet_ids"]
     data_subnet_ids                = ["default_data_subnet_ids"]
     data_subnet_a_id               = "default_data_subnet_id"
     route53_inner_zone_info        = {}
