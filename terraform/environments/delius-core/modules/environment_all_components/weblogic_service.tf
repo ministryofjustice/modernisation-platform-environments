@@ -121,15 +121,6 @@ resource "aws_security_group" "weblogic_service" {
   }
 }
 
-resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_db" {
-  security_group_id            = aws_security_group.weblogic_service.id
-  description                  = "outbound from the testing frontend ecs service to db"
-  ip_protocol                  = "tcp"
-  to_port                      = var.delius_db_container_config.port
-  from_port                    = var.delius_db_container_config.port
-  referenced_security_group_id = aws_security_group.delius_db_security_group.id
-}
-
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_tcp" {
   security_group_id = aws_security_group.weblogic_service.id
   description       = "ingress from ldap server tcp"
