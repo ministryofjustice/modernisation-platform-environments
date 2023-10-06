@@ -46,6 +46,7 @@ resource "aws_security_group" "ec2" {
   description = "APEX DB Server Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
+  # this ingress rule to be added after the ECS has been setup in MP
   # ingress {
   #   description = "database listener port access to ECS security group"
   #   from_port   = 1521
@@ -73,22 +74,8 @@ resource "aws_security_group" "ec2" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr] #!ImportValue env-VpcCidr
+    cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
   }
-  # ingress {
-  #   description = "Ingress from Migration server Security Group - This should be reviewed"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   security_groups = sg-8fddd6e7 #sg-migrationgw
-  # }
-  # ingress {
-  #   description = "Ingress from RC depending on Environment"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["172.16.4.0/20"]
-  # }
 
   egress {
     description = "Allow AWS SSM Session Manager"
@@ -131,41 +118,11 @@ EOF
 }
 
 resource "aws_iam_role_policy" "ec2_instance_policy" {
-  #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-policy"
   role = aws_iam_role.ec2_instance_role.id
-
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      # {
-      #   Action = [
-      #     "ec2:Describe*",
-      #   ]
-      #   Effect   = "Allow"
-      #   Resource = "*"
-      # },
-      # {
-      #   Effect = "Allow",
-      #   Action = [
-      #     "s3:ListBucket",
-      #   ],
-      #   Resource = [
-      #     "arn:aws:s3:::modernisation-platform-software20230224000709766100000001",
-      #     "arn:aws:s3:::modernisation-platform-software20230224000709766100000001/*",
-      #   ]
-      # },
-      # {
-      #   Effect = "Allow",
-      #   Action = [
-      #     "s3:GetObject"
-      #   ],
-      #   Resource = [
-      #     "arn:aws:s3:::modernisation-platform-software20230224000709766100000001/*",
-      #   ]
-      # },
       {
         Effect = "Allow",
         Action = [
@@ -216,7 +173,6 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
 resource "aws_route53_record" "apex-db" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.inner.zone_id
-  # name     = "${local.application_name}.${data.aws_route53_zone.inner.name}"
   name     = "db.${local.application_name}.${data.aws_route53_zone.inner.name}"
   type     = "A"
   ttl      = 900
