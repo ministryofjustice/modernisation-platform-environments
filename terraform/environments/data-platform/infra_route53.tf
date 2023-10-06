@@ -101,9 +101,9 @@ resource "aws_route53_record" "data_platform_front_door" {
 
   zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
   name    = "data-platform.service.justice.gov.uk"
-  type    = "CNAME"
+  type    = "A"
   ttl     = "300"
-  records = ["ministryofjustice.github.io."]
+  records = ["185.199.108.153", "185.199.109.153", "185.199.110.153", "185.199.111.153"]
 }
 
 # PagerDuty Status Page (HTTP Traffic)
