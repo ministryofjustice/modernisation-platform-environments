@@ -12,7 +12,8 @@ resource "aws_launch_template" "tribunals-all-lt" {
   }
   ebs_optimized = true
 
-  vpc_security_group_ids = [aws_security_group.tribunals_lb_sc.id]
+  # try to fix error "Invalid launch template: When a network interface is provided, the security groups must be a part of it"
+  #vpc_security_group_ids = [aws_security_group.tribunals_lb_sc.id]
 
   network_interfaces {
     device_index                = 0
