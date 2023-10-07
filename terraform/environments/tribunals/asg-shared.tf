@@ -12,17 +12,20 @@ resource "aws_launch_template" "tribunals-all-lt" {
   }
   ebs_optimized = true
 
-  network_interfaces {
-    subnet_id = data.aws_subnets.shared-public.ids
-  }
-
   vpc_security_group_ids = [aws_security_group.tribunals_lb_sc.id]
+
+  network_interfaces {
+    device_index                = 0
+    security_groups             = [aws_security_group.tribunals_lb_sc.id]
+    subnet_id                   = data.aws_subnet.public_subnets_a.id
+    delete_on_termination       = true
+  }
 
   user_data = filebase64("ec2-shared-user-data.sh")
 }
 
 resource "aws_autoscaling_group" "tribunals-all-asg" {
-  availability_zones = ["eu-west-2a"]
+  vpc_zone_identifier = data.aws_vpc.shared.id
   desired_capacity   = 1
   max_size           = 1
   min_size           = 1
