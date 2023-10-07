@@ -25,7 +25,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
 }
 
 resource "aws_autoscaling_group" "tribunals-all-asg" {
-  vpc_zone_identifier = data.aws_vpc.shared.id
+  vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
   desired_capacity   = 1
   max_size           = 1
   min_size           = 1
