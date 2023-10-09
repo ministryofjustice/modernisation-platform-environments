@@ -1,6 +1,6 @@
 
 module "data_product_docs_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1.0"
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1"
   application_name               = "data_product_docs"
   tags                           = local.tags
   description                    = "Lambda for swagger api docs"
@@ -28,7 +28,7 @@ module "data_product_docs_lambda" {
 }
 
 module "data_product_authorizer_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1.0"
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1"
   application_name               = "data_product_authorizer"
   tags                           = local.tags
   description                    = "Lambda for custom API Gateway authorizer"
@@ -61,7 +61,7 @@ module "data_product_authorizer_lambda" {
 }
 
 module "data_product_get_glue_metadata_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1.0"
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1"
   application_name               = "data_product_get_glue_metadata"
   tags                           = local.tags
   description                    = "Lambda to retrieve Glue metadata for a specified table in a database"
@@ -89,7 +89,7 @@ module "data_product_get_glue_metadata_lambda" {
 }
 
 module "data_product_presigned_url_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1.0"
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1"
   application_name               = "data_product_presigned_url"
   tags                           = local.tags
   description                    = "Lambda to generate a presigned url for uploading data"
@@ -125,7 +125,7 @@ module "data_product_presigned_url_lambda" {
 }
 
 module "data_product_athena_load_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1.0"
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1"
   application_name               = "data_product_athena_load"
   tags                           = local.tags
   description                    = "Lambda to load and transform raw data products landing in s3. Creates partitioned parquet tables"
@@ -163,7 +163,7 @@ module "data_product_athena_load_lambda" {
 
 
 module "data_product_create_metadata_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1.0"
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1"
   application_name               = "data_product_create_metadata"
   tags                           = local.tags
   description                    = "Lambda to create the first version of a json metadata file for a data product"
@@ -196,7 +196,7 @@ module "data_product_create_metadata_lambda" {
 }
 
 module "reload_data_product_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1.0"
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1"
   application_name               = "reload_data_product"
   tags                           = local.tags
   description                    = "Reload the data in a data product from raw history to curated, and recreate the athena tables."
@@ -223,7 +223,7 @@ module "reload_data_product_lambda" {
 }
 
 module "resync_unprocessed_files_lambda" {
-  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1.0"
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v2.1"
   application_name               = "resync_unprocessed_files"
   tags                           = local.tags
   description                    = "Retrigger the athena load for extraction timestamps in raw history and not in curated data, for one data product"
