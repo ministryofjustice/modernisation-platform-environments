@@ -75,6 +75,7 @@ locals {
     app               = local.security_groups.app
     load-balancer     = local.security_groups.load-balancer
     database          = local.security_groups.database
+    jumpserver        = local.security_groups.jumpserver
   }
 
   baseline_sns_topics     = {}
