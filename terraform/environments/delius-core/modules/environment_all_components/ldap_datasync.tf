@@ -24,5 +24,5 @@ resource "aws_datasync_task" "ldap_refresh_task" {
   destination_location_arn = aws_datasync_location_efs.destination[0].arn
   source_location_arn      = aws_datasync_location_efs.source.arn
 
-  name = "ldap-datasync-task"
+  name = "ldap-datasync-task-push-from-${var.env_name}"
 }
