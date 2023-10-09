@@ -997,7 +997,7 @@ locals {
           from_port   = 445
           to_port     = 445
           protocol    = "UDP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.jumpserver_controllers)
+          cidr_blocks = local.security_group_cidrs.jumpservers
         }
         rpc_dynamic_udp_jumpserver = {
           description = "49152-65535: UDP Dynamic Port rang from Azure Jumpservers"
