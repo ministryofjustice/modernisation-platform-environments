@@ -7,7 +7,7 @@ resource "aws_efs_file_system" "ldap" {
   tags = merge(
     local.tags,
     {
-      Name = "${var.env_name}-ldap-efs"
+      Name = "ldap-efs-${var.env_name}"
     }
   )
 }
@@ -35,10 +35,15 @@ resource "aws_efs_access_point" "ldap" {
 }
 
 resource "aws_security_group" "ldap_efs" {
-  name        = "${var.env_name}-ldap-efs"
+  name        = "ldap-efs-${var.env_name}"
   description = "Allow traffic between ldap service and efs in ${var.env_name}"
   vpc_id      = var.account_info.vpc_id
-  tags        = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "ldap-efs-${var.env_name}"
+    }
+  )
 }
 
 resource "aws_security_group_rule" "efs_ingress" {

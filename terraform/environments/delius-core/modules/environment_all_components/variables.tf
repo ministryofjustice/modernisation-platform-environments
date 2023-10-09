@@ -198,3 +198,8 @@ variable "bastion" {
     security_group_id = "default_security_group_id"
   }
 }
+
+variable "environments_in_account" {
+    type = list(string)
+    default = []
+}

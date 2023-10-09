@@ -27,6 +27,8 @@ module "environment_dev" {
 
   account_info = local.account_info
 
+  environments_in_account = local.delius_environments_per_account.dev
+
   tags = local.tags
 }
 
@@ -54,6 +56,8 @@ module "environment_test" {
   bastion                    = local.bastion
 
   account_info = local.account_info
+
+  environments_in_account = local.delius_environments_per_account.dev
 
   tags = local.tags
 }
