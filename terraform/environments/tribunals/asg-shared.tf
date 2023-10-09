@@ -1,7 +1,17 @@
+locals {
+  app_name                  = "tribunals-shared"
+  instance_role_name        = join("-", [local.app_name, "ec2-instance-role"])
+  instance_profile_name     = join("-", [local.app_name, "ec2-instance-profile"])
+  tags_common               = local.tags
+}
+
 resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix   = "tribunals-all"
   image_id      = "ami-0d20b6fc5007adcb3"
   instance_type = "m5.large"
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_instance_profile
+  }
 
   block_device_mappings {
     device_name = "/dev/sdf"
@@ -11,9 +21,6 @@ resource "aws_launch_template" "tribunals-all-lt" {
     }
   }
   ebs_optimized = true
-
-  # try to fix error "Invalid launch template: When a network interface is provided, the security groups must be a part of it"
-  #vpc_security_group_ids = [aws_security_group.tribunals_lb_sc.id]
 
   network_interfaces {
     device_index                = 0
@@ -35,4 +42,46 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
     id      = "${aws_launch_template.tribunals-all-lt.id}"
     version = "$Latest"
   }
+}
+
+# The role is added to the ec2 instance profile which is added to the launch template
+resource "aws_iam_role" "ec2_instance_role" {
+  name = "ec2-shared-instance-role"
+  tags = merge(
+  local.tags,
+  {
+    Name = local.instance_role_name
+  }
+  )
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = local.instance_profile_name
+  role = aws_iam_role.ec2_instance_role.name
+  tags = merge(
+  local.tags_common,
+  {
+    Name = local.instance_profile_name
+  }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_policy_attachment" {
+  role       = aws_iam_role.ec2_instance_role
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
