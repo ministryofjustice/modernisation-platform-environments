@@ -2,6 +2,7 @@ locals {
   app_name                  = "tribunals-shared"
   instance_role_name        = join("-", [local.app_name, "ec2-instance-role"])
   instance_profile_name     = join("-", [local.app_name, "ec2-instance-profile"])
+  ec2_instance_policy       = join("-", [local.app_name, "ec2-instance-policy"])
   tags_common               = local.tags
 }
 
@@ -14,10 +15,11 @@ resource "aws_launch_template" "tribunals-all-lt" {
   }
 
   block_device_mappings {
-    device_name = "/dev/sdf"
+    device_name = "/dev/sda1"
 
     ebs {
       volume_size = 80
+      volume_type = "gp2"
     }
   }
   ebs_optimized = true
@@ -46,7 +48,7 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
 
 # The role is added to the ec2 instance profile which is added to the launch template
 resource "aws_iam_role" "ec2_instance_role" {
-  name = "ec2-shared-instance-role"
+  name = local.instance_role_name
   tags = merge(
   local.tags,
   {
@@ -81,7 +83,87 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   )
 }
 
-resource "aws_iam_role_policy_attachment" "ec2_policy_attachment" {
+
+resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name = local.ec2_instance_policy
+  tags = merge(
+  local.tags_common,
+  {
+    Name = local.ec2_instance_policy
+  }
+  )
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeTags",
+                "ec2:DescribeInstances",
+                "ecs:CreateCluster",
+                "ecs:DeregisterContainerInstance",
+                "ecs:DiscoverPollEndpoint",
+                "ecs:Poll",
+                "ecs:RegisterContainerInstance",
+                "ecs:StartTelemetrySession",
+                "ecs:UpdateContainerInstancesState",
+                "ecs:Submit*",
+                "ecs:TagResource",
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "ecr:*",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:CreateLogGroup",
+                "logs:DescribeLogStreams",
+                "s3:ListBucket",
+                "s3:*Object*",
+                "kms:Decrypt",
+                "kms:Encrypt",
+                "kms:GenerateDataKey",
+                "kms:ReEncrypt",
+                "kms:GenerateDataKey",
+                "kms:DescribeKey",
+                "xray:PutTraceSegments",
+                "xray:PutTelemetryRecords",
+                "xray:GetSamplingRules",
+                "xray:GetSamplingTargets",
+                "xray:GetSamplingStatisticSummaries",
+                "xray:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "ecs:TagResource",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "ecs:CreateAction": [
+                        "CreateCluster",
+                        "RegisterContainerInstance"
+                    ]
+                }
+            }
+        }
+    ]
+}
+EOF
+}
+resource "aws_iam_role_policy_attachment" "ec2_policy_ssm_core" {
   role       = aws_iam_role.ec2_instance_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_policy_cloudwatch" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_policy_instance_policy" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = aws_iam_policy.ec2_instance_policy.arn
 }
