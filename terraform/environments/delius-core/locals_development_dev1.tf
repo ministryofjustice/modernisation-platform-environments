@@ -23,13 +23,14 @@ locals {
   }
 
   ldap_config_dev = {
-    name                        = try(local.ldap_config_lower_environments.name, "ldap")
-    migration_source_account_id = local.ldap_config_lower_environments.migration_source_account_id
-    migration_lambda_role       = local.ldap_config_lower_environments.migration_lambda_role
-    efs_throughput_mode         = local.ldap_config_lower_environments.efs_throughput_mode
-    efs_provisioned_throughput  = local.ldap_config_lower_environments.efs_provisioned_throughput
-    efs_backup_schedule         = "cron(0 19 * * ? *)",
-    efs_backup_retention_period = "30"
+    name                         = try(local.ldap_config_lower_environments.name, "ldap")
+    migration_source_account_id  = local.ldap_config_lower_environments.migration_source_account_id
+    migration_lambda_role        = local.ldap_config_lower_environments.migration_lambda_role
+    efs_throughput_mode          = local.ldap_config_lower_environments.efs_throughput_mode
+    efs_provisioned_throughput   = local.ldap_config_lower_environments.efs_provisioned_throughput
+    efs_backup_schedule          = "cron(0 19 * * ? *)",
+    efs_backup_retention_period  = "30"
+    efs_datasync_destination_arn = module.environment_test[0].ldap_efs_location
   }
 
   db_config_dev = {
