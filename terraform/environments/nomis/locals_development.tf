@@ -156,7 +156,11 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
           vpc_security_group_ids = ["private-web"]
         })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "main"
+          })
+        })
         tags = {
           description = "For testing our base RHEL6.10 base image"
           ami         = "base_rhel_6_10"
@@ -191,7 +195,7 @@ locals {
         })
         cloudwatch_metric_alarms = {}
         config = merge(local.weblogic_ec2.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2Qa11RWeblogicPolicy",
           ])
@@ -227,7 +231,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "b5c4038616cc2d28056b9fd4e7d9e1388a6f8c29" # 2022-09-04 allow single connection string
+            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
           })
         })
         tags = merge(local.weblogic_ec2.tags, {

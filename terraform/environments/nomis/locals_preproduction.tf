@@ -113,7 +113,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "8cc652b22d51483a5902f04809618cc88516093c" # 2023-09-21 DB_V11.2.1.1.219, nomis web release deployment DB_V11.2.1.1.228
+            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
@@ -132,7 +132,7 @@ locals {
         })
         # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2PreprodWeblogicPolicy",
           ])
@@ -142,7 +142,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "e6cf03433540d764309430077c1cc030df8dddea" # 2023-08-25 weblogic deployments + updated monitoring
+            branch = "main"
           })
         })
         tags = merge(local.weblogic_ec2.tags, {

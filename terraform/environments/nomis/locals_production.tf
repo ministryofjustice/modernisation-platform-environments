@@ -121,7 +121,7 @@ locals {
         })
         cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
           ])
@@ -130,7 +130,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "b13cad848c48c9b7e4b99a253f40b6602206a9d8" # 2023-06-12 update DSOS-1934
+            branch = "main"
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
@@ -159,7 +159,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "2468978f69041b1204ffa3dc55dfb81c1a2ad3e1" # 2023-09-25 new SSM params
+            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
@@ -242,11 +242,6 @@ locals {
         instance = merge(local.database_ec2.instance, {
           instance_type = "r6i.2xlarge"
         })
-        user_data_cloud_init = merge(local.database_ec2.user_data_cloud_init, {
-          args = merge(local.database_ec2.user_data_cloud_init.args, {
-            branch = "65a79b4f16bd3392c7a14ec96687e50871fd7311" # 2023-09-28
-          })
-        })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
           description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
@@ -303,11 +298,6 @@ locals {
         })
         instance = merge(local.database_ec2.instance, {
           instance_type = "r6i.2xlarge"
-        })
-        user_data_cloud_init = merge(local.database_ec2.user_data_cloud_init, {
-          args = merge(local.database_ec2.user_data_cloud_init.args, {
-            branch = "65a79b4f16bd3392c7a14ec96687e50871fd7311" # 2023-09-28
-          })
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
