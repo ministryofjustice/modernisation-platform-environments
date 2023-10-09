@@ -38,6 +38,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
           awslogs-group         = "${aws_cloudwatch_log_group.dacpFamily_logs.name}"
           awslogs-region        = "eu-west-2"
           awslogs-stream-prefix = "ecs"
+          awslogs-create-group  = "true"
         }
       }
       environment = [
