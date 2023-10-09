@@ -90,7 +90,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
   from_port                    = var.delius_db_container_config.port
   to_port                      = var.delius_db_container_config.port
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  referenced_security_group_id = aws_security_group.weblogic_service.id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_bastion" {
@@ -110,16 +110,6 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_i
   from_port         = 443
   cidr_ipv4         = "0.0.0.0/0"
 }
-
-resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_weblogic" {
-  security_group_id            = aws_security_group.delius_db_security_group.id
-  description                  = "weblogic to testing db"
-  from_port                    = var.delius_db_container_config.port
-  to_port                      = var.delius_db_container_config.port
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.weblogic.id
-}
-
 
 resource "aws_cloudwatch_log_group" "delius_core_testing_db_log_group" {
   name              = format("%s-%s", var.env_name, var.delius_db_container_config.fully_qualified_name)
