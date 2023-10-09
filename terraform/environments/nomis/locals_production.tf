@@ -195,7 +195,7 @@ locals {
 
     baseline_ec2_instances = {
       preprod-nomis-db-2 = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = {}
+        cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
           availability_zone = "${local.region}a"
@@ -255,7 +255,7 @@ locals {
           local.fixngo_connection_cloudwatch_metric_alarms
         )
         config = merge(local.database_ec2.config, {
-          availability_zone = "${local.region}b"
+          availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
