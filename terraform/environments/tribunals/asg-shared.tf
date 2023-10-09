@@ -10,7 +10,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
   image_id      = "ami-0d20b6fc5007adcb3"
   instance_type = "m5.large"
   iam_instance_profile {
-    name = aws_iam_instance_profile.ec2_instance_profile
+    name = aws_iam_instance_profile.ec2_instance_profile.name
   }
 
   block_device_mappings {
@@ -82,6 +82,6 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_policy_attachment" {
-  role       = aws_iam_role.ec2_instance_role
+  role       = aws_iam_role.ec2_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
