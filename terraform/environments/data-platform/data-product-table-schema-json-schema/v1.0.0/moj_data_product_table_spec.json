@@ -4,12 +4,13 @@
   "description": "Specification for MoJ Data Platform Data Product tables schemas for registering tables in the glue catalog",
   "type": "object",
   "required": [
-    "Columns"
+    "columns"
   ],
   "definitions": {
     "additional_col_properties": {
       "required": [
           "name",
+          "type",
           "description"
       ],
       "properties": {
@@ -35,7 +36,7 @@
         },
         {
           "properties": {
-            "data_type": {
+            "type": {
               "type": "string",
               "pattern": "^u?(tiny|small|big|)int$",
               "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
@@ -52,7 +53,7 @@
         },
         {
           "properties": {
-          "data_type": {
+          "type": {
             "type": "string",
             "pattern": "^float$|^double$|^decimal\\(\\d{1,2},\\s?\\d{1,2}\\)$",
             "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
@@ -68,7 +69,7 @@
         },
         {
           "properties": {
-          "data_type": {
+          "type": {
             "type": "string",
             "pattern": "^char\\(\\d{1,3}\\)$|^varchar\\(\\d{0,5}\\)$|^varchar$|^string$",
             "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
@@ -84,7 +85,7 @@
         },
         {
           "properties": {
-          "data_type": {
+          "type": {
             "type": "string",
             "pattern": "^boolean$",
             "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
@@ -100,7 +101,7 @@
         },
         {
           "properties": {
-          "data_type": {
+          "type": {
             "type": "string",
             "pattern": "^date$|^timestamp$",
             "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
@@ -116,7 +117,7 @@
         },
         {
           "properties": {
-          "data_type": {
+          "type": {
             "type": "string",
             "pattern": "^map_<.+>$|^struct<.+>$",
             "description": "The data type of the Column. See https://docs.aws.amazon.com/athena/latest/ug/data-types.html",
@@ -127,11 +128,11 @@
     }
   },
   "properties": {
-    "TableDescription": {
+    "tableDescription": {
       "type": "string",
       "description": "A description of the data contained within the table"
     },
-    "Columns": {
+    "columns": {
       "type": "array",
       "items": {
         "oneOf": [
