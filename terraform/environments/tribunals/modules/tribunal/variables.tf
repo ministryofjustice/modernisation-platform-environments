@@ -65,6 +65,9 @@ variable "networking_usiness_unit" {
 variable "vpc_id" {   
 }
 
+variable "shared_public_ids" {   
+}
+
 
 
 

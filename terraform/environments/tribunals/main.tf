@@ -32,6 +32,7 @@ module "tribunal_template" {
   dms_instance_arn = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   networking_usiness_unit = var.networking[0].business-unit
   vpc_id = data.aws_vpc.shared.id
+  shared_public_ids           = data.aws_subnets.shared-public.ids  
 }
 
 # module "administrative_appeals" {

@@ -6,7 +6,7 @@ locals {
   app_db_login_name = var.app_db_login_name
   app_source_db_name = var.app_source_db_name
   app_rds_url               = "${var.app_rds_url}"      
-  app_rds_user              = "${app_rds_user}"
+  app_rds_user              = "${var.app_rds_user}"
   app_rds_port              = var.app_rds_port
   app_rds_password          = "${var.app_rds_password}"
   app_source_db_url         = "${var.app_source_db_url}"
@@ -177,7 +177,7 @@ resource "aws_lb" "app_lb" {
   name                       = "${local.app}-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.app_lb_sc.id]
-  subnets                    = data.aws_subnets.shared-public.ids
+  subnets                    = var.shared_public_ids
   enable_deletion_protection = false
   internal                   = false
   depends_on                 = [aws_security_group.app_lb_sc]
