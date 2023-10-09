@@ -52,7 +52,7 @@ locals {
 
 module "app_dms" {
   source                      = "../dms"
-  replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
+  replication_instance_arn    = var.dms_instance_arn
   replication_task_id         = "${local.app}-migration-task"
   #target_db_instance          = 0
   target_endpoint_id          = "${local.app}-target"
@@ -119,7 +119,7 @@ resource "aws_acm_certificate" "app_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.app_url}.${var.networking[0].business-unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["${local.app_url}.${var.networking_usiness_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = var.environment
   }
@@ -138,7 +138,7 @@ resource "aws_acm_certificate_validation" "app_external" {
 resource "aws_security_group" "app_lb_sc" {
   name        = "${local.app} load balancer security group"
   description = "control access to the ${local.app} load balancer"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description = "allow access on HTTPS for the MOJ VPN"
@@ -187,7 +187,7 @@ resource "aws_lb_target_group" "app_target_group" {
   name                 = "${local.app}-target-group"
   port                 = 80
   protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
+  vpc_id               = var.vpc_id
   target_type          = "instance"
   deregistration_delay = 30
 

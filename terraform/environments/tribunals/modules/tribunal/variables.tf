@@ -56,4 +56,15 @@ variable "vpc_all" {
 variable "tags" {   
 }
 
+variable "dms_instance_arn" {   
+}
+
+variable "networking_usiness_unit" {   
+}
+
+variable "vpc_id" {   
+}
+
+
+
 

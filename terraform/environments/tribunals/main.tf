@@ -29,6 +29,9 @@ module "tribunal_template" {
   subnet_set_name = local.subnet_set_name
   vpc_all = local.vpc_all
   tags = local.tags
+  dms_instance_arn = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
+  networking_usiness_unit = var.networking[0].business-unit
+  vpc_id = data.aws_vpc.shared.id
 }
 
 # module "administrative_appeals" {
