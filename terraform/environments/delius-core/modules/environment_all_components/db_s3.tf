@@ -39,8 +39,8 @@ module "s3_bucket_oracledb_backups" {
 
 data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
   statement {
-    sid     = "allowAccessToOracleDbBackupBucket"
-    effect  = "Allow"
+    sid    = "allowAccessToOracleDbBackupBucket"
+    effect = "Allow"
     actions = [
       "s3:*"
     ]

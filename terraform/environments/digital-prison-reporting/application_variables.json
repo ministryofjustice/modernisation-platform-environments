@@ -148,7 +148,7 @@
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
-      "setup_sonatype_secrets": false      
+      "setup_sonatype_secrets": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -223,7 +223,7 @@
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
-      "setup_sonatype_secrets": false      
+      "setup_sonatype_secrets": false
     },
     "production": {
       "project_short_id": "dpr",
@@ -298,7 +298,7 @@
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
-      "setup_sonatype_secrets": false      
+      "setup_sonatype_secrets": false
     }
   }
 }

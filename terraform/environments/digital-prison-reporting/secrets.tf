@@ -93,7 +93,7 @@ module "pagerduty_integration_key" {
 
 # SonaType Secrets
 module "sonatype_registry_secrets" {
-  count                = local.setup_sonatype_secrets ? 1 : 0
+  count = local.setup_sonatype_secrets ? 1 : 0
 
   source               = "./modules/secrets_manager"
   name                 = "${local.project}-sonatype-registry-${local.environment}"

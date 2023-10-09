@@ -48,22 +48,22 @@ locals {
           from_port       = 3389
           to_port         = 3389
           protocol        = "TCP"
-          cidr_blocks     = ["10.40.50.128/26","10.40.50.64/26","10.40.50.0/26"]
+          cidr_blocks     = ["10.40.50.128/26", "10.40.50.64/26", "10.40.50.0/26"]
           security_groups = []
         }
       }
 
 
       egress = {
-            all = {
-              description     = "Allow all egress"
-              from_port       = 0
-              to_port         = 0
-              protocol        = "-1"
-              cidr_blocks     = ["0.0.0.0/0"]
-              security_groups = []
-            }
-          }
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
 
 
     }
