@@ -118,7 +118,7 @@ module "data_product_presigned_url_lambda" {
       action        = "lambda:InvokeFunction"
       function_name = "data_product_presigned_url_${local.environment}"
       principal     = "apigateway.amazonaws.com"
-      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.upload_data_get.http_method}${aws_api_gateway_resource.upload_data.path}"
+      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.upload_data_for_data_product_table_name.http_method}${aws_api_gateway_resource.upload_data_for_data_product_table_name.path}"
     }
   }
 
