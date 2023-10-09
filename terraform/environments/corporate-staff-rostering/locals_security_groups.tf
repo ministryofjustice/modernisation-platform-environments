@@ -5,6 +5,7 @@ locals {
     enduserclient = [
       "10.0.0.0/8"
     ]
+    # NOTE: REMOVE THIS WHEN MOVE TO NEW SG's
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
@@ -40,6 +41,7 @@ locals {
     enduserclient = [
       "10.0.0.0/8"
     ]
+    # NOTE: REMOVE THIS WHEN MOVE TO NEW SG's
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
@@ -591,14 +593,14 @@ locals {
           from_port   = 7770
           to_port     = 7771
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.http7xxx
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
         http7780_7781_lb = {
           description = "Allow http 7780-7781 ingress"
           from_port   = 7780
           to_port     = 7781
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.http7xxx
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
       }
       egress = {
@@ -699,7 +701,7 @@ locals {
           from_port       = 7770
           to_port         = 7771
           protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.http7xxx
+          cidr_blocks     = local.security_group_cidrs.enduserclient
           security_groups = ["load-balancer"]
           # NOTE: will need to be changed to include client access but load-balancer access allowed in
         }
@@ -708,7 +710,7 @@ locals {
           from_port       = 7780
           to_port         = 7781
           protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.http7xxx
+          cidr_blocks     = local.security_group_cidrs.enduserclient
           security_groups = ["load-balancer"]
           # NOTE: will need to be changed to include client access but load-balancer access allowed in
         }
@@ -944,7 +946,7 @@ locals {
           from_port   = 7
           to_port     = 7
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.core
+          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
         }
         echo_core_udp_db = {
           description = "7: Allow ingress from port 7 oem agent echo" # Not sure what this is
