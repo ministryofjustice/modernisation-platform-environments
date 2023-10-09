@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
-  task_role_arn            = aws_iam_role.app_task.arn
+  task_role_arn            = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskExecutionRole"
   cpu                      = 2048
   memory                   = 4096
   container_definitions = jsonencode([
@@ -162,7 +162,8 @@ resource "aws_iam_role_policy" "app_execution" {
         "Action": [
           "logs:CreateLogStream",
           "logs:DescribeLogStreams",
-          "logs:PutLogEvents"
+          "logs:PutLogEvents",
+          "logs:CreateLogGroup"
         ],
         "Resource": "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.dacpFamily_logs.name}:*"
       }
