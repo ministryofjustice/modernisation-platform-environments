@@ -261,7 +261,7 @@ locals {
         autoscaling_group = merge(local.xtag_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        # cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
         })
@@ -360,7 +360,7 @@ locals {
         autoscaling_group = merge(local.xtag_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        # cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
         })
