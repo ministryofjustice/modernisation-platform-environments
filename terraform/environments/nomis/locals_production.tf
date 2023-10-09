@@ -115,43 +115,57 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
       # NOT-ACTIVE (blue deployment)
-      prod-nomis-web-a = merge(local.weblogic_ec2_a, {
-        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
+      prod-nomis-web-a = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        config = merge(local.weblogic_ec2_a.config, {
-          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
           ])
         })
-        tags = merge(local.weblogic_ec2_a.tags, {
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.xlarge"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "8cc652b22d51483a5902f04809618cc88516093c" # 2023-09-21 DB_V11.2.1.1.219, nomis web release deployment DB_V11.2.1.1.228
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
           nomis-environment    = "prod"
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
           oracle-db-name       = "PCNOM"
+          deployment           = "blue"
         })
       })
 
       # ACTIVE (green deployment)
-      prod-nomis-web-b = merge(local.weblogic_ec2_b, {
-        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
+      prod-nomis-web-b = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        config = merge(local.weblogic_ec2_b.config, {
-          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
           ])
         })
-        user_data_cloud_init = merge(local.weblogic_ec2_b.user_data_cloud_init, {
-          args = merge(local.weblogic_ec2_b.user_data_cloud_init.args, {
+        instance = merge(local.weblogic_ec2.instance, {
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
             branch = "2468978f69041b1204ffa3dc55dfb81c1a2ad3e1" # 2023-09-25 new SSM params
           })
         })
-        tags = merge(local.weblogic_ec2_b.tags, {
+        tags = merge(local.weblogic_ec2.tags, {
           nomis-environment    = "prod"
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
           oracle-db-name       = "PCNOM"
+          deployment           = "green"
         })
       })
 

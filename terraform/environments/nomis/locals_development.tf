@@ -173,44 +173,55 @@ locals {
         })
       })
 
-      qa11r-nomis-web-a = merge(local.weblogic_ec2_a, {
-        config = merge(local.weblogic_ec2_a.config, {
-          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
+      qa11r-nomis-web-a = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 0
+        })
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2Qa11RWeblogicPolicy",
           ])
         })
-        tags = merge(local.weblogic_ec2_a.tags, {
+        instance = merge(local.weblogic_ec2.instance, {
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
           nomis-environment    = "qa11r"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "qa11r"
-        })
-        cloudwatch_metric_alarms = {}
-        user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+          deployment           = "blue"
         })
       })
 
-      qa11r-nomis-web-b = merge(local.weblogic_ec2_b, {
-        config = merge(local.weblogic_ec2_a.config, {
-          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+      qa11r-nomis-web-b = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 1
+        })
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2Qa11RWeblogicPolicy",
           ])
         })
-        tags = merge(local.weblogic_ec2_b.tags, {
+        instance = merge(local.weblogic_ec2.instance, {
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "b5c4038616cc2d28056b9fd4e7d9e1388a6f8c29" # 2022-09-04 allow single connection string
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
           nomis-environment    = "qa11r"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "qa11r"
-        })
-        user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
-          args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-            branch = "b5c4038616cc2d28056b9fd4e7d9e1388a6f8c29" # 2022-09-04 allow single connection string
-          })
-        })
-        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
-          desired_capacity = 1
+          deployment           = "green"
         })
       })
     }
