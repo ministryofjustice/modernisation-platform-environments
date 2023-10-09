@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "ec2amiid": "ami-0a61104fc6eff3a4c",
+      "ec2amiid": "ami-057de645e240e87c1",
       "ec2instancetype": "t3.medium",
       "mp_vpc_cidr": "10.26.56.0/21",
       "lz_shared_nonprod_mgmt_vpc_cidr": "10.200.0.0/20",

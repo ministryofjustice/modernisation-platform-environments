@@ -146,89 +146,89 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
   })
 }
 
-# resource "aws_ebs_volume" "u01-orahome" {
-#   availability_zone = "eu-west-2a"
-#   size              = local.application_data.accounts[local.environment].u01_orahome_size
-#   type              = "gp3"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].u01_orahome_snapshot
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}db-ec2-u01-orahome" },
-#   )
-# }
-# resource "aws_volume_attachment" "u01-orahome" {
-#   device_name = "/dev/sdb"
-#   volume_id   = aws_ebs_volume.u01-orahome.id
-#   instance_id = aws_instance.apex_db_instance.id
-# }
+resource "aws_ebs_volume" "u01-orahome" {
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].u01_orahome_size
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].u01_orahome_snapshot
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}db-ec2-u01-orahome" },
+  )
+}
+resource "aws_volume_attachment" "u01-orahome" {
+  device_name = "/dev/sdb"
+  volume_id   = aws_ebs_volume.u01-orahome.id
+  instance_id = aws_instance.apex_db_instance.id
+}
 
-# resource "aws_ebs_volume" "u02-oradata" {
-#   availability_zone = "eu-west-2a"
-#   size              = local.application_data.accounts[local.environment].u02_oradata_size
-#   type              = "gp3"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].u02_oradata_snapshot
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}db-ec2-u02-oradata" },
-#   )
-# }
-# resource "aws_volume_attachment" "u02-oradata" {
-#   device_name = "/dev/sdc"
-#   volume_id   = aws_ebs_volume.u02-oradata.id
-#   instance_id = aws_instance.apex_db_instance.id
-# }
+resource "aws_ebs_volume" "u02-oradata" {
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].u02_oradata_size
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].u02_oradata_snapshot
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}db-ec2-u02-oradata" },
+  )
+}
+resource "aws_volume_attachment" "u02-oradata" {
+  device_name = "/dev/sdc"
+  volume_id   = aws_ebs_volume.u02-oradata.id
+  instance_id = aws_instance.apex_db_instance.id
+}
 
-# resource "aws_ebs_volume" "u03-redo" {
-#   availability_zone = "eu-west-2a"
-#   size              = local.application_data.accounts[local.environment].u03_redo_size
-#   type              = "gp3"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].u03_redo_snapshot
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}db-ec2-u03-redo" },
-#   )
-# }
-# resource "aws_volume_attachment" "u03-redo" {
-#   device_name = "/dev/sdd"
-#   volume_id   = aws_ebs_volume.u03-redo.id
-#   instance_id = aws_instance.apex_db_instance.id
-# }
+resource "aws_ebs_volume" "u03-redo" {
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].u03_redo_size
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].u03_redo_snapshot
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}db-ec2-u03-redo" },
+  )
+}
+resource "aws_volume_attachment" "u03-redo" {
+  device_name = "/dev/sdd"
+  volume_id   = aws_ebs_volume.u03-redo.id
+  instance_id = aws_instance.apex_db_instance.id
+}
 
-# resource "aws_ebs_volume" "u04-arch" {
-#   availability_zone = "eu-west-2a"
-#   size              = local.application_data.accounts[local.environment].u04_arch_size
-#   type              = "gp3"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].u04_arch_snapshot
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}db-ec2-u04-arch" },
-#   )
-# }
-# resource "aws_volume_attachment" "u04-arch" {
-#   device_name = "/dev/sde"
-#   volume_id   = aws_ebs_volume.u04-arch.id
-#   instance_id = aws_instance.apex_db_instance.id
-# }
+resource "aws_ebs_volume" "u04-arch" {
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].u04_arch_size
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].u04_arch_snapshot
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}db-ec2-u04-arch" },
+  )
+}
+resource "aws_volume_attachment" "u04-arch" {
+  device_name = "/dev/sde"
+  volume_id   = aws_ebs_volume.u04-arch.id
+  instance_id = aws_instance.apex_db_instance.id
+}
 
 resource "aws_route53_record" "apex-db" {
   provider = aws.core-vpc
