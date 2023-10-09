@@ -185,7 +185,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        cloudwatch_metric_alarms = {}
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2T1WeblogicPolicy",
@@ -212,7 +212,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        cloudwatch_metric_alarms = {}
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2T1WeblogicPolicy",
@@ -258,7 +258,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        cloudwatch_metric_alarms = {}
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2T2WeblogicPolicy",
@@ -285,7 +285,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        cloudwatch_metric_alarms = {}
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2T2WeblogicPolicy",
@@ -331,7 +331,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        cloudwatch_metric_alarms = {}
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2T3WeblogicPolicy",
@@ -359,7 +359,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        cloudwatch_metric_alarms = {}
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2T3WeblogicPolicy",
