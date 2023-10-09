@@ -173,10 +173,8 @@ locals {
       "/oracle/database/T1MIS"    = local.database_mis_ssm_parameters
       "/oracle/database/T1ORSYS"  = local.database_ssm_parameters
       "/oracle/database/T2CNOM"   = local.database_nomis_ssm_parameters
-      "/oracle/database/T2NDH"    = local.database_nomis_ssm_parameters
-      "/oracle/database/T2TRDAT"  = local.database_nomis_ssm_parameters
-      # "/oracle/database/T2NDH"    = local.database_ssm_parameters
-      # "/oracle/database/T2TRDAT"  = local.database_ssm_parameters
+      "/oracle/database/T2NDH"    = local.database_ssm_parameters
+      "/oracle/database/T2TRDAT"  = local.database_ssm_parameters
       "/oracle/database/T3CNOM" = local.database_nomis_ssm_parameters
     }
 
@@ -340,7 +338,7 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.xlarge"
+          # instance_type = "t2.xlarge"
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
