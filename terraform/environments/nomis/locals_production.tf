@@ -121,6 +121,7 @@ locals {
         })
         cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
           ])
@@ -148,6 +149,7 @@ locals {
         })
         # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
 
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
@@ -192,151 +194,155 @@ locals {
     }
 
     baseline_ec2_instances = {
-      preprod-nomis-db-2 = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
-          nomis-environment = "preprod"
-          description       = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
-          oracle-sids       = "PPCNMAUD"
-        })
-        config = merge(local.database_ec2_a.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
-          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+      preprod-nomis-db-2 = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
-        instance = merge(local.database_ec2_a.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           # reduce sdc to 1000 when we move into preprod subscription
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 5120 }
         })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "preprod"
+          description       = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
+          oracle-sids       = "PPCNMAUD"
+        })
       })
 
-      prod-nomis-db-1-b = merge(local.database_ec2_b, {
+      prod-nomis-db-1-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = {}
-        tags = merge(local.database_ec2_b.tags, {
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}b"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        user_data_cloud_init = merge(local.database_ec2.user_data_cloud_init, {
+          args = merge(local.database_ec2.user_data_cloud_init.args, {
+            branch = "65a79b4f16bd3392c7a14ec96687e50871fd7311" # 2023-09-28
+          })
+        })
+        tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
           description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
           oracle-sids       = ""
         })
-        config = merge(local.database_ec2_b.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          instance_profile_policies = concat(local.database_ec2_b.config.instance_profile_policies, [
+      })
+
+      prod-nomis-db-2 = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms,
+          local.fixngo_connection_cloudwatch_metric_alarms
+        )
+        config = merge(local.database_ec2.config, {
+          availability_zone = "${local.region}b"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
-        instance = merge(local.database_ec2_b.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        user_data_cloud_init = merge(local.database_ec2_b.user_data_cloud_init, {
-          args = merge(local.database_ec2_b.user_data_cloud_init.args, {
-            branch = "65a79b4f16bd3392c7a14ec96687e50871fd7311" # 2023-09-28
-          })
-        })
-        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 500 }
+          "/dev/sdc" = { label = "app", size = 3000, iops = 9000 }
         })
-        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
-        cloudwatch_metric_alarms = {}
-      })
-
-      prod-nomis-db-2 = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
           nomis-environment         = "prod"
           description               = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
           oracle-sids               = "CNMAUD"
           fixngo-connection-targets = "10.40.0.136 4903 10.40.129.79 22" # fixngo connection alarm
         })
-        config = merge(local.database_ec2_a.config, {
-          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+      })
+
+      prod-nomis-db-2-b = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}b"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
-        instance = merge(local.database_ec2_a.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 3000, iops = 9000 }
+          "/dev/sdc" = { label = "app", size = 500 }
         })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_a.cloudwatch_metric_alarms,
-          local.fixngo_connection_cloudwatch_metric_alarms
-        )
-      })
-
-      prod-nomis-db-2-b = merge(local.database_ec2_b, {
-        cloudwatch_metric_alarms = {}
-        tags = merge(local.database_ec2_b.tags, {
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        user_data_cloud_init = merge(local.database_ec2.user_data_cloud_init, {
+          args = merge(local.database_ec2.user_data_cloud_init.args, {
+            branch = "65a79b4f16bd3392c7a14ec96687e50871fd7311" # 2023-09-28
+          })
+        })
+        tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
           description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
           oracle-sids       = ""
         })
-        config = merge(local.database_ec2_b.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          instance_profile_policies = concat(local.database_ec2_b.config.instance_profile_policies, [
+      })
+
+      prod-nomis-db-3 = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms,
+          local.database_ec2_cloudwatch_metric_alarms_high_priority
+        )
+        config = merge(local.database_ec2.config, {
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
-        instance = merge(local.database_ec2_b.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        user_data_cloud_init = merge(local.database_ec2_b.user_data_cloud_init, {
-          args = merge(local.database_ec2_b.user_data_cloud_init.args, {
-            branch = "65a79b4f16bd3392c7a14ec96687e50871fd7311" # 2023-09-28
-          })
-        })
-        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 500 }
+          "/dev/sdc" = { label = "app", size = 1000 }
         })
-        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
-          data  = { total_size = 4000 }
-          flash = { total_size = 1000 }
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 3000, iops = 3750, throughput = 750 }
+          flash = { total_size = 500 }
         })
-        cloudwatch_metric_alarms = {}
-      })
-
-      prod-nomis-db-3 = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.4xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
           description       = "Production NOMIS HA database to replace Azure PDPDL00062"
           oracle-sids       = "PCNOMHA"
         })
-        config = merge(local.database_ec2_a.config, {
-          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        instance = merge(local.database_ec2_a.instance, {
-          instance_type = "r6i.4xlarge"
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 1000 }
-        })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-          data  = { total_size = 3000, iops = 3750, throughput = 750 }
-          flash = { total_size = 500 }
-        })
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_a.cloudwatch_metric_alarms,
-          local.database_ec2_cloudwatch_metric_alarms_high_priority
-        )
       })
     }
 

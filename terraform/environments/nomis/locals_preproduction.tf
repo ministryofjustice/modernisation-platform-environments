@@ -103,6 +103,7 @@ locals {
         })
         cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2PreprodWeblogicPolicy",
           ])
@@ -131,6 +132,7 @@ locals {
         })
         # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2PreprodWeblogicPolicy",
           ])
@@ -175,29 +177,30 @@ locals {
     }
 
     baseline_ec2_instances = {
-      preprod-nomis-db-2-a = merge(local.database_ec2_a, {
+      preprod-nomis-db-2-a = merge(local.database_ec2, {
         cloudwatch_metric_alarms = {}
-        tags = merge(local.database_ec2_a.tags, {
-          nomis-environment = "preprod"
-          description       = "PreProduction NOMIS MIS and Audit database"
-          oracle-sids       = ""
-        })
-        config = merge(local.database_ec2_a.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        instance = merge(local.database_ec2_a.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 512 }
         })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "preprod"
+          description       = "PreProduction NOMIS MIS and Audit database"
+          oracle-sids       = ""
         })
       })
     }

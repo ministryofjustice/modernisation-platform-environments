@@ -24,33 +24,6 @@ locals {
     }
   }
 
-  # Include this in ec2-instance ssm parameters if using oracle-db-standby-setup role with azure storage account
-  database_azure_ssm_parameters = {
-    prefix = "/database/"
-    parameters = {
-      az_sas_token = { description = "azure sas token for downloading azure DB backups" }
-    }
-  }
-
-  # Include this in ec2-instance ssm parameters if using oracle-db-standby-setup role
-  # The path should include the db_name as defined in ansible db_configs variable
-  database_instance_ssm_parameters = {
-    prefix = "/database/"
-    parameters = {
-      syspassword = {}
-    }
-  }
-
-  # Include these in ec2-instance ssm parameters if using the misload role
-  # paths are /database/<ec2_instance_name>/<each_parameter>
-  database_ec2_misload_ssm_parameters = {
-    prefix = "/database/"
-    parameters = {
-      misloadusername = {}
-      misloadpassword = {}
-    }
-  }
-
   database_cloudwatch_log_metric_filters = {
     rman-backup-status = {
       pattern        = "[month, day, time, hostname, process, message = rman-backup-result, dbname, value]"
@@ -248,37 +221,14 @@ locals {
     }
   }
 
-  database_ec2_default = {
+  database_ec2 = {
 
-    cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
+    # cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
 
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
       ami_owner = "self"
     })
-
-    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      instance_type                = "r6i.xlarge"
-      disable_api_termination      = true
-      metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-      monitoring                   = true
-      vpc_security_group_ids       = ["data-db"]
-      tags = {
-        backup-plan = "daily-and-weekly"
-      }
-    })
-
-    user_data_cloud_init = {
-      args = {
-        branch               = "main"
-        ansible_repo         = "modernisation-platform-configuration-management"
-        ansible_repo_basedir = "ansible"
-        ansible_args         = "--tags ec2provision"
-      }
-      scripts = [
-        "ansible-ec2provision.sh.tftpl",
-      ]
-    }
 
     ebs_volumes = {
       "/dev/sdb" = { label = "app" }   # /u01
@@ -304,14 +254,24 @@ locals {
       }
     }
 
-    route53_records = {
-      create_internal_record = true
-      create_external_record = true
-    }
+    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      instance_type                = "r6i.xlarge"
+      disable_api_termination      = true
+      metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+      monitoring                   = true
+      vpc_security_group_ids       = ["data-db"]
+      tags = {
+        backup-plan = "daily-and-weekly"
+      }
+    })
+
+    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
     ssm_parameters = {
       asm-passwords = {}
     }
+
+    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ansible
 
     tags = {
       ami                  = "nomis_rhel_7_9_oracledb_11_2"
@@ -325,15 +285,4 @@ locals {
       "Patch Group"        = "RHEL"
     }
   }
-
-  database_ec2_a = merge(local.database_ec2_default, {
-    config = merge(local.database_ec2_default.config, {
-      availability_zone = "${local.region}a"
-    })
-  })
-  database_ec2_b = merge(local.database_ec2_default, {
-    config = merge(local.database_ec2_default.config, {
-      availability_zone = "${local.region}b"
-    })
-  })
 }
