@@ -1,0 +1,46 @@
+---
+schemaVersion: "2.2"
+description: "SSM Document to convert MGN-replicated Azure VMs into AWS EC2s. Also baking in necessary configuration to CSR app / web AMIs" 
+parameters:
+mainSteps:
+  - name: UninstallDiscoveryAgent
+    action: aws:runPowerShellScript
+   # precondition:
+     # StringEquals:
+     #   - platformType
+     #   - Windows
+    inputs:
+      runCommand:
+        - |
+          # Check if AWS discovery agent installed
+          if (-Not (Get-Service -Name AWS Discovery Agent)) {
+            Write-Host "AWS Discovery agent not installed, skipping"
+          } else { 
+            wmic product where name='AWS Discovery Agent' call uninstall
+          }
+
+          # Install firefox 
+          # Invoke call to internet 
+          Invoke-WebRequest -URI "https://download.mozilla.org/?product=firefox-esr-next-latest-ssl&os=win64&lang=en-GB" -OutFile "$ENV:TEMP\MozillaFirefox.exe"
+          # Need to invoke the installer
+          Invoke-Item "$ENV:TEMP\MozillaFirefox.exe"
+
+          # Install nmap tool
+          # Invoke call to internet 
+          Invoke-WebRequest -URI "https://nmap.org/download" -OutFile "$ENV:TEMP\nmap.exe"
+          # Need to invoke the installer
+          Invoke-Item "$ENV:TEMP\nmap.exe"
+
+          # Install AD module
+          Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
+
+          # Install EC2LaunchV2
+
+          New-Item -Path "$env:USERPROFILE\Desktop\EC2Launchv2" -ItemType Directory
+          $Url = " https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi/AmazonEC2Launch.msi"
+          $DownloadFile = "$env:USERPROFILE\Desktop\EC2Launchv2\" + $(Split-Path -Path $Url -Leaf)
+          Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
+          msiexec /i "$DownloadFile"
+
+          # verify the install 
+          C:\ProgramData\Amazon\EC2Launch
