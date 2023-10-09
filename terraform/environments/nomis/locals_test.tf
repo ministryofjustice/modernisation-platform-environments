@@ -175,7 +175,7 @@ locals {
       "/oracle/database/T2CNOM"   = local.database_nomis_ssm_parameters
       "/oracle/database/T2NDH"    = local.database_ssm_parameters
       "/oracle/database/T2TRDAT"  = local.database_ssm_parameters
-      "/oracle/database/T3CNOM" = local.database_nomis_ssm_parameters
+      "/oracle/database/T3CNOM"   = local.database_nomis_ssm_parameters
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -382,8 +382,8 @@ locals {
         })
       })
 
-      test-jumpserver-a = merge(local.jumpserver_ec2_default, {
-        config = merge(local.jumpserver_ec2_default.config, {
+      test-jumpserver-a = merge(local.jumpserver_ec2, {
+        config = merge(local.jumpserver_ec2.config, {
           user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
             ie_compatibility_mode_site_list = join(",", [
               "t1-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
