@@ -5,7 +5,7 @@
 resource "aws_ssm_document" "session_manager_settings" {
   #checkov:skip=CKV_AWS_112: "Ensure Session Manager data is encrypted in transit"
   #checkov:skip=CKV_AWS_113: "Ensure Session Manager logs are enabled and encrypted"
-  # Review in DSOS-2229
+  # Review in DSOS-2229
   name            = "SSM-SessionManagerRunShell"
   document_type   = "Session"
   document_format = "JSON"
@@ -325,7 +325,7 @@ resource "aws_iam_role" "cloudwatch-datasource-role" {
 
 data "aws_iam_policy_document" "cloudwatch_datasource" {
   #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
-  # Review in DSOS-2229
+  # Review in DSOS-2229
   statement {
     sid    = "AllowReadingMetricsFromCloudWatch"
     effect = "Allow"
