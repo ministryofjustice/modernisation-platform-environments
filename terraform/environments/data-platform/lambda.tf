@@ -1,4 +1,17 @@
 
+locals {
+  logger_environment_vars = {
+    LOG_BUCKET = module.logs_s3_bucket.bucket.id
+  }
+
+  storage_environment_vars = {
+    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
+    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
+    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
+    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
+  }
+}
+
 module "data_product_docs_lambda" {
   source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
   application_name               = "data_product_docs"
@@ -45,10 +58,10 @@ module "data_product_authorizer_lambda" {
   tracing_mode = "Active"
   memory_size  = 512
 
-  environment_variables = {
+  environment_variables = merge(local.logger_environment_vars, {
     authorizationToken = "placeholder"
     api_resource_arn   = "${aws_api_gateway_rest_api.data_platform.execution_arn}/*/*"
-  }
+  })
 
   allowed_triggers = {
 
@@ -108,13 +121,7 @@ module "data_product_landing_to_raw_lambda" {
   tracing_mode = "Active"
   memory_size  = 512
 
-  environment_variables = {
-    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
-    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
-    LOG_BUCKET          = module.logs_s3_bucket.bucket.id
-    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
-    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
-  }
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
 
   allowed_triggers = {
 
@@ -145,13 +152,7 @@ module "data_product_presigned_url_lambda" {
   tracing_mode = "Active"
   memory_size  = 512
 
-  environment_variables = {
-    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
-    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
-    LOG_BUCKET          = module.logs_s3_bucket.bucket.id
-    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
-    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
-  }
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
 
   allowed_triggers = {
 
@@ -182,14 +183,9 @@ module "data_product_athena_load_lambda" {
   tracing_mode = "Active"
   memory_size  = 512
 
-  environment_variables = {
-    ENVIRONMENT         = local.environment
-    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
-    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
-    LOG_BUCKET          = module.logs_s3_bucket.bucket.id
-    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
-    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
-  }
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars, {
+    ENVIRONMENT = local.environment
+  })
 
   allowed_triggers = {
 
@@ -221,10 +217,10 @@ module "data_product_create_metadata_lambda" {
   tracing_mode = "Active"
   memory_size  = 128
 
-  environment_variables = {
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars, {
     ENVIRONMENT = local.environment
     BUCKET_NAME = module.metadata_s3_bucket.bucket.id
-  }
+  })
 
   allowed_triggers = {
 
@@ -255,14 +251,9 @@ module "reload_data_product_lambda" {
   tracing_mode = "Active"
   memory_size  = 512
 
-  environment_variables = {
-    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
-    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
-    LOG_BUCKET          = module.logs_s3_bucket.bucket.id
-    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
-    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
-    ATHENA_LOAD_LAMBDA  = module.data_product_athena_load_lambda.lambda_function_name
-  }
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars, {
+    ATHENA_LOAD_LAMBDA = module.data_product_athena_load_lambda.lambda_function_name
+  })
 
 }
 
@@ -283,10 +274,8 @@ module "resync_unprocessed_files_lambda" {
   tracing_mode = "Active"
   memory_size  = 512
 
-  environment_variables = {
-    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
-    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
-    ATHENA_LOAD_LAMBDA  = module.data_product_athena_load_lambda.lambda_function_name
-  }
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars, {
+    ATHENA_LOAD_LAMBDA = module.data_product_athena_load_lambda.lambda_function_name
+  })
 
 }
