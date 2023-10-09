@@ -44,6 +44,12 @@ resource "aws_security_group" "ldap_efs" {
       Name = "ldap-efs-${var.env_name}"
     }
   )
+
+  # see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group#recreating-a-security-group
+  lifecycle {
+    create_before_destroy = true
+  }
+
 }
 
 resource "aws_security_group_rule" "efs_ingress" {
