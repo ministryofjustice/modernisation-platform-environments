@@ -719,7 +719,7 @@ locals {
           from_port       = 49152
           to_port         = 65535
           protocol        = "UDP"
-          security_groups = ["app", "db"]
+          security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rpc_dynamic_tcp_web = {
@@ -727,7 +727,7 @@ locals {
           from_port       = 49152
           to_port         = 65535
           protocol        = "TCP"
-          security_groups = ["app", "db"]
+          security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
       }
@@ -783,7 +783,7 @@ locals {
           from_port       = 445
           to_port         = 445
           protocol        = "UDP"
-          security_groups = ["app", "databaseb"]
+          security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         http_2109_csr = {
@@ -814,7 +814,7 @@ locals {
           from_port       = 49152
           to_port         = 65535
           protocol        = "UDP"
-          security_groups = ["app", "databaseb"]
+          security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rpc_dynamic_tcp_app = {
@@ -822,7 +822,7 @@ locals {
           from_port       = 49152
           to_port         = 65535
           protocol        = "TCP"
-          security_groups = ["app", "databaseb"]
+          security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
       }
