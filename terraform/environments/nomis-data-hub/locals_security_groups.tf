@@ -169,6 +169,14 @@ locals {
           security_groups = []
           cidr_blocks     = local.security_group_cidrs.http8555
         }
+        tcp7474 = {
+          description     = "Allow tcp7474 ingress"
+          from_port       = 7474
+          to_port         = 7474
+          protocol        = "tcp"
+          security_groups = ["ndh_ems"]
+          cidr_blocks     = []
+        }
       }
       egress = {
         all = {
@@ -205,6 +213,14 @@ locals {
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.7222
           security_groups = []
+        }
+        tcp7474 = {
+          description     = "Allow tcp7474 ingress"
+          from_port       = 7474
+          to_port         = 7474
+          protocol        = "tcp"
+          security_groups = ["ndh_app"]
+          cidr_blocks     = []
         }
       }
       egress = {

@@ -138,9 +138,9 @@ locals {
     }
   }
 
-  weblogic_ec2_default = {
+  weblogic_ec2 = {
 
-    cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+    # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
 
     # Note: use any availability zone since DB latency does not appear to be an issue
     config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -156,7 +156,8 @@ locals {
     })
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-    autoscaling_group    = module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool
+
+    autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
 
     lb_target_groups = {
       http-7777 = local.weblogic_target_group_http_7777
@@ -171,48 +172,4 @@ locals {
       component   = "web"
     }
   }
-
-  # blue/green deployment
-  # - set cloudwatch_metric_alarms = {} on the dormant deployment
-  # - set desired_capacity = 0 on the dormant deployment unless testing
-  # - use user_data_cloud_init.args.branch to set the ansible code for given deployment
-  # - use load balancer rules defined in the environment specific locals file to switch between deployments
-
-  # blue deployment
-  weblogic_ec2_a = merge(local.weblogic_ec2_default, {
-    config = merge(local.weblogic_ec2_default.config, {
-    })
-    user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
-      args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "b13cad848c48c9b7e4b99a253f40b6602206a9d8" # 2023-06-12 update DSOS-1934
-      })
-    })
-    # autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {})
-    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-      desired_capacity = 0
-    })
-    # cloudwatch_metric_alarms = {}
-    tags = merge(local.weblogic_ec2_default.tags, {
-      deployment = "blue"
-    })
-  })
-
-  # green deployment
-  weblogic_ec2_b = merge(local.weblogic_ec2_default, {
-    config = merge(local.weblogic_ec2_default.config, {
-    })
-    user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
-      args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "e6cf03433540d764309430077c1cc030df8dddea" # 2023-08-25 weblogic deployments + updated monitoring
-      })
-    })
-    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {})
-    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-      desired_capacity = 0
-    })
-    cloudwatch_metric_alarms = {}
-    tags = merge(local.weblogic_ec2_default.tags, {
-      deployment = "green"
-    })
-  })
 }

@@ -25,14 +25,14 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   ip_protocol       = "tcp"
   cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
 }
-resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_frontend_service" {
+
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_service" {
   security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
-  description                  = "access from delius core frontend alb to ecs"
+  description                  = "access delius core frontend service from alb"
   from_port                    = var.weblogic_config.frontend_container_port
   to_port                      = var.weblogic_config.frontend_container_port
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.weblogic.id
-  tags                         = local.tags
+  referenced_security_group_id = aws_security_group.weblogic_service.id
 }
 
 # tfsec:ignore:aws-elb-alb-not-public
@@ -44,7 +44,7 @@ resource "aws_lb" "delius_core_frontend" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
-  subnets            = var.account_config.private_subnet_ids
+  subnets            = var.account_config.public_subnet_ids
 
   enable_deletion_protection = false
   drop_invalid_header_fields = true
@@ -100,7 +100,7 @@ resource "aws_lb_target_group" "delius_core_frontend_target_group" {
     healthy_threshold   = "5"
     interval            = "300"
     protocol            = "HTTP"
-    unhealthy_threshold = "2"
+    unhealthy_threshold = "5"
     matcher             = "200-499"
     timeout             = "5"
   }
