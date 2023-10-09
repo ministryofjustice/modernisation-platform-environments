@@ -154,14 +154,8 @@ variable "ecs_scaling_mem_threshold" {
   description = "The utilised memory threshold for ec2 cluster scaling"
 }
 
-variable "fsx_subnet_ids" {  
-}
-
 variable "environment" {  
 }
-
-# variable "fsx_vpc_id" {  
-# }
 
 variable "lb_listener" {  
 }
