@@ -6,7 +6,15 @@
       "ec2instancetype": "t3.medium",
       "mp_vpc_cidr": "10.26.56.0/21",
       "lz_shared_nonprod_mgmt_vpc_cidr": "10.200.0.0/20",
-      "lz_shared_prod_mgmt_vpc_cidr": "10.200.16.0/20"
+      "lz_shared_prod_mgmt_vpc_cidr": "10.200.16.0/20",
+      "u01_orahome_size": "40",
+      "u01_orahome_snapshot": "snap-0fb84db7af842db4b",
+      "u02_oradata_size": "100",
+      "u02_oradata_snapshot": "snap-002a82aef2628b621",
+      "u03_redo_size": "50",
+      "u03_redo_snapshot": "snap-08499cdd392b9b7dc",
+      "u04_arch_size": "50",
+      "u04_arch_snapshot": "snap-03b6eb947cfe779d8"
     },
     "test": {
       "example_var": "test-data"
