@@ -174,7 +174,7 @@ locals {
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
   # Sonatype Secrets
-  setup_sonatype_secrets             = local.application_data.accounts[local.environment].setup_sonatype_secrets
+  setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
 
   nomis_secrets_placeholder = {
     db_name  = "nomis"
@@ -187,7 +187,7 @@ locals {
   sonatype_secrets_placeholder = {
     user     = "placeholder"
     password = "placeholder"
-  }  
+  }
 
   # Evaluate Redshift Secrets and Populate
   redshift_secrets = {
