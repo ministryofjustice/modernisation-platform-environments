@@ -23,8 +23,8 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
             "Effect": "Allow",
             "Action": [
                 "ec2:DetachVolume",
-				"ec2:AttachVolume",
-				"ec2:DescribeVolumes"
+                "ec2:AttachVolume",
+                "ec2:DescribeVolumes",
                 "ec2:DescribeTags",
                 "ec2:DescribeInstances",
                 "ecs:CreateCluster",
