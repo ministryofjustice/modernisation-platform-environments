@@ -598,6 +598,20 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
 
 data "aws_iam_policy_document" "iam_policy_document_for_create_schema_lambda" {
   source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
+
+  statement {
+    sid    = "s3MetadataAccessPlaceholder"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/*",
+      "${module.s3-bucket.bucket.arn}"
+    ]
+  }
+
   statement {
     sid    = "s3MetadataWrite"
     effect = "Allow"
