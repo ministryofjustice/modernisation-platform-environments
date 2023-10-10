@@ -177,7 +177,7 @@ locals {
           from_port       = 5504
           to_port         = 5504
           protocol        = "TCP"
-          security_groups = ["database","loadbalancer"]
+          security_groups = ["database", "loadbalancer"]
           cidr_blocks     = local.security_group_cidrs.enduserclient # NOTE: this may need to change at some point
         }
         cafm_licensing_7071 = {
