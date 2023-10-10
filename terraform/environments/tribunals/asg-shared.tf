@@ -22,6 +22,9 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
         {
             "Effect": "Allow",
             "Action": [
+                "ec2:DetachVolume",
+				"ec2:AttachVolume",
+				"ec2:DescribeVolumes"
                 "ec2:DescribeTags",
                 "ec2:DescribeInstances",
                 "ecs:CreateCluster",
@@ -33,10 +36,6 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "ecs:UpdateContainerInstancesState",
                 "ecs:Submit*",
                 "ecs:TagResource",
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
                 "ecr:*",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
@@ -50,11 +49,6 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "kms:ReEncrypt",
                 "kms:GenerateDataKey",
                 "kms:DescribeKey",
-                "xray:PutTraceSegments",
-                "xray:PutTelemetryRecords",
-                "xray:GetSamplingRules",
-                "xray:GetSamplingTargets",
-                "xray:GetSamplingStatisticSummaries",
                 "xray:*"
             ],
             "Resource": "*"
@@ -137,6 +131,8 @@ resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix   = "tribunals-all"
   image_id      = "ami-0d20b6fc5007adcb3"
   instance_type = "m5.large"
+  update_default_version = true
+
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_instance_profile.name
   }

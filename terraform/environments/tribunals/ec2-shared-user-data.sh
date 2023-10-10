@@ -25,9 +25,12 @@ if ([string]::IsNullorEmpty($volumeid)) {
 else {
   "Adding volume $volumeid" >> $logFile
   Add-EC2Volume -VolumeId $volumeid -InstanceId $instanceid -Device /dev/xvdf
+  "result of Adding volume is " + $? >> $logfile
 
   # Does the attached volume contain a raw disk?
   $rawdisks = Get-Disk | Where PartitionStyle -eq 'raw'
+
+  "get-disk result is " + $rawdisks >> $logfile
 
   # If not, put the disk online and assign the drive letter
   if ([string]::IsNullorEmpty($rawdisks)) {
