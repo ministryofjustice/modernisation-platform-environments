@@ -163,7 +163,7 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   desired_capacity   = 1
   max_size           = 1
   min_size           = 1
-  name               = app_name
+  name               = local.app_name
 
   launch_template {
     id      = "${aws_launch_template.tribunals-all-lt.id}"
