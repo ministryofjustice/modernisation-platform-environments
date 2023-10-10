@@ -55,76 +55,76 @@ resource "aws_security_group" "sqlserver_db_sc" {
     description     = "Allows DMS to access RDS"
     security_groups = [aws_security_group.vpc_dms_replication_instance_group.id]
   }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Care Standards ECS service to access RDS"
-    security_groups = [module.cares-ecs.cluster_ec2_security_group_id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Lands Chamber ECS service to access RDS"
-    security_groups = [module.lands-ecs.cluster_ec2_security_group_id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Administrative Appeals ECS service to access RDS"
-    security_groups = [module.appeals-ecs.cluster_ec2_security_group_id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Transport ECS service to access RDS"
-    security_groups = [module.transport-ecs.cluster_ec2_security_group_id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Land Registration Division ECS service to access RDS"
-    security_groups = [module.hmlands-ecs.cluster_ec2_security_group_id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Criminal Injuries ECS service to access RDS"
-    security_groups = [module.cicap-ecs.cluster_ec2_security_group_id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Employment Appeals ECS service to access RDS"
-    security_groups = [module.eat-ecs.cluster_ec2_security_group_id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Finance and Tax ECS service to access RDS"
-    security_groups = [module.ftt-ecs.cluster_ec2_security_group_id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Immigration Services ECS service to access RDS"
-    security_groups = [module.imset-ecs.cluster_ec2_security_group_id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows Information Tribunal ECS service to access RDS"
-    security_groups = [module.it-ecs.cluster_ec2_security_group_id]
-  }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Care Standards ECS service to access RDS"
+  #   security_groups = [module.cares-ecs.cluster_ec2_security_group_id]
+  # }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Lands Chamber ECS service to access RDS"
+  #   security_groups = [module.lands-ecs.cluster_ec2_security_group_id]
+  # }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Administrative Appeals ECS service to access RDS"
+  #   security_groups = [module.appeals-ecs.cluster_ec2_security_group_id]
+  # }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Transport ECS service to access RDS"
+  #   security_groups = [module.transport-ecs.cluster_ec2_security_group_id]
+  # }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Land Registration Division ECS service to access RDS"
+  #   security_groups = [module.hmlands-ecs.cluster_ec2_security_group_id]
+  # }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Criminal Injuries ECS service to access RDS"
+  #   security_groups = [module.cicap-ecs.cluster_ec2_security_group_id]
+  # }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Employment Appeals ECS service to access RDS"
+  #   security_groups = [module.eat-ecs.cluster_ec2_security_group_id]
+  # }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Finance and Tax ECS service to access RDS"
+  #   security_groups = [module.ftt-ecs.cluster_ec2_security_group_id]
+  # }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Immigration Services ECS service to access RDS"
+  #   security_groups = [module.imset-ecs.cluster_ec2_security_group_id]
+  # }
+  # ingress {
+  #   from_port       = 1433
+  #   to_port         = 1433
+  #   protocol        = "tcp"
+  #   description     = "Allows Information Tribunal ECS service to access RDS"
+  #   security_groups = [module.it-ecs.cluster_ec2_security_group_id]
+  # }
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
