@@ -51,7 +51,7 @@ locals {
 
   baseline_security_groups = {
     migration_cutover = local.security_groups.migration_cutover
-    # loadbalancer      = local.security_groups.loadbalancer
+    loadbalancer      = local.security_groups.loadbalancer
     web               = local.security_groups.web
     app               = local.security_groups.app
     database          = local.security_groups.database
