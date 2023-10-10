@@ -28,29 +28,6 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_groups = {
-    data_db = {
-      description = "Security group for database servers"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
-
     migration_cutover = {
       description = "Security group for migrated instances"
       ingress = {
@@ -92,6 +69,141 @@ locals {
         }
       }
 
+
+    }
+    loadbalancer = {
+      description = "PlanetFM loadbalancer SG"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http_lb = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        https_lb = {
+          description = "Allow enduserclient https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+    web = {
+      description = "Security group for Windows Web Servers"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        https_web = {
+          description = "443: Allow HTTPS ingress from Azure"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        rdp_tcp_web = {
+          description = "3389: Allow RDP UDP ingress from jumpserver"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+        rdp_udp_web = {
+          description = "3389: Allow RDP UDP ingress from jumpserver"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+    app = {
+      description = "Security group for Windows App Servers"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        rdp_tcp_app = {
+          description = "3389: Allow RDP UDP ingress from jumpserver"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+        rdp_udp_app = {
+          description = "3389: Allow RDP UDP ingress from jumpserver"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+        web_access_cafm_5504 = {
+          description     = "All web access inbound on 5504"
+          from_port       = 5504
+          to_port         = 5504
+          protocol        = "TCP"
+          security_groups = ["database","loadbalancer"]
+          cidr_blocks     = local.security_group_cidrs.enduserclient # NOTE: this may need to change at some point
+        }
+        cafm_licensing_7071 = {
+          description = "All CAFM licensing inbound on 7071"
+          from_port   = 7071
+          to_port     = 7071
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient # NOTE: this may need to change at some point
+        }
+        cafm_licensing_7073 = {
+          description = "All CAFM licensing inbound on 7073"
+          from_port   = 7073
+          to_port     = 7073
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient # NOTE: this may need to change at some point
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
 
     }
     domain = {
