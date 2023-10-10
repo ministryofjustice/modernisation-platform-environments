@@ -41,16 +41,7 @@ variable "app_source_db_password" {
 variable "environment" {   
 }
 
-variable "validation_record_fqdns" {   
-}
-
 variable "application_data" {   
-}
-
-variable "subnet_set_name" {   
-}
-
-variable "vpc_all" {   
 }
 
 variable "tags" {   
@@ -59,15 +50,7 @@ variable "tags" {
 variable "dms_instance_arn" {   
 }
 
-variable "networking_usiness_unit" {   
+variable "task_definition_volume" { 
 }
-
-variable "vpc_id" {   
-}
-
-variable "shared_public_ids" {   
-}
-
-
 
 
