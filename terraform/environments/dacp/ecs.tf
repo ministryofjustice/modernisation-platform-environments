@@ -7,7 +7,7 @@ resource "aws_ecs_cluster" "dacp_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
-  name = "/ecs/deploymentLogs"
+  name = "/aws/events/deploymentLogs"
 }
 
 resource "aws_ecs_task_definition" "dacp_task_definition" {
