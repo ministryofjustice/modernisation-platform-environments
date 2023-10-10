@@ -401,6 +401,7 @@ module "appeals-ecs" {
   environment               = local.environment
   //fsx_vpc_id                = data.aws_vpc.shared.id
   lb_listener               = aws_lb_listener.appeals_lb
+  cluster_name              = aws_ecs_cluster.tribunals_cluster.name
 }
 
 resource "aws_ecr_repository" "appeals-ecr-repo" {

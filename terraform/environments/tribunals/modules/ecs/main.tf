@@ -314,19 +314,23 @@ resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
 
 //ECS cluster
 
-resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "${var.app_name}_app_cluster"
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
+# resource "aws_ecs_cluster" "ecs_cluster" {
+#   name = "${var.app_name}_app_cluster"
+#   setting {
+#     name  = "containerInsights"
+#     value = "enabled"
+#   }
 
-  tags = merge(
-    var.tags_common,
-    {
-      Name = var.app_name
-    }
-  )
+#   tags = merge(
+#     var.tags_common,
+#     {
+#       Name = var.app_name
+#     }
+#   )
+# }
+
+data "aws_ecs_cluster" "ecs_cluster" {
+  cluster_name = var.cluster_name
 }
 
 resource "aws_ecs_task_definition" "windows_ecs_task_definition" {

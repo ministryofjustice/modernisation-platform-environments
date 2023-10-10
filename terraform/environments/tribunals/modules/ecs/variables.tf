@@ -160,6 +160,9 @@ variable "environment" {
 variable "lb_listener" {  
 }
 
+variable "cluster_name" {  
+}
+
 
 
 
