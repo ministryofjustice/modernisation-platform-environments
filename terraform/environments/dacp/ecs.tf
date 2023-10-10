@@ -6,8 +6,8 @@ resource "aws_ecs_cluster" "dacp_cluster" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "dacpFamily_logs" {
-  name = "/ecs/dacpFamily"
+resource "aws_cloudwatch_log_group" "deployment_logs" {
+  name = "/ecs/deploymentLogs"
 }
 
 resource "aws_ecs_task_definition" "dacp_task_definition" {
@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.dacpFamily_logs.name}"
+          awslogs-group         = "${aws_cloudwatch_log_group.deployment_logs.name}"
           awslogs-region        = "eu-west-2"
           awslogs-stream-prefix = "ecs"
         }
@@ -234,4 +234,41 @@ resource "aws_security_group" "ecs_service" {
 resource "aws_ecr_repository" "dacp_ecr_repo" {
   name         = "dacp-ecr-repo"
   force_delete = true
+}
+
+# AWS EventBridge rule
+resource "aws_cloudwatch_event_rule" "ecs_events" {
+  name        = "ecs-events"
+  description = "Capture all ECS events"
+
+  event_pattern = jsonencode({
+    "source" : ["aws.ecs"],
+    "detail" : {
+      "clusterArn" : [aws_ecs_cluster.dacp_cluster.arn]
+    }
+  })
+}
+
+# AWS EventBridge target
+resource "aws_cloudwatch_event_target" "logs" {
+  rule      = aws_cloudwatch_event_rule.ecs_events.name
+  target_id = "send-to-cloudwatch"
+  arn       = aws_cloudwatch_log_group.deployment_logs.arn
+}
+
+# CloudWatch logs error filter metric
+resource "aws_cloudwatch_log_metric_filter" "ecs_errors" {
+  name           = "ECS Errors"
+  pattern        = "{ $.detail.group = \"*\" && $.detail.stopCode = \"TaskFailedToStart\" }"
+  log_group_name = aws_cloudwatch_log_group.deployment_logs.name
+
+  metric_transformation {
+    name      = "ECSErrors"
+    namespace = "ECSEvents"
+    value     = "1"
+    unit      = "Count"
+    dimensions = {
+      group = "$.detail.group"
+    }
+  }
 }
