@@ -251,7 +251,8 @@ resource "aws_cloudwatch_event_rule" "ecs_events" {
 
 # AWS EventBridge target
 resource "aws_cloudwatch_event_target" "logs" {
-  rule      = aws_cloudwatch_event_rule.ecs_events.name
-  target_id = "send-to-cloudwatch"
-  arn       = aws_cloudwatch_log_group.deployment_logs.arn
+  depends_on = [aws_cloudwatch_log_group.deployment_logs]
+  rule       = aws_cloudwatch_event_rule.ecs_events.name
+  target_id  = "send-to-cloudwatch"
+  arn        = aws_cloudwatch_log_group.deployment_logs.arn
 }
