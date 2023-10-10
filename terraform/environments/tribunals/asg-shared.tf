@@ -16,7 +16,7 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
   }
   )
   policy = <<EOF
-  {
+{
     "Version": "2012-10-17",
     "Statement": [
         {
@@ -73,8 +73,8 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
             }
         }
     ]
-  }
-  EOF
+}
+EOF
 }
 
 # Create the IAM role to which the custom and predefined policies will be attached
@@ -88,7 +88,7 @@ resource "aws_iam_role" "ec2_instance_role" {
   }
   )
   assume_role_policy = <<EOF
-  {
+{
     "Version": "2012-10-17",
     "Statement": [
         {
@@ -100,8 +100,8 @@ resource "aws_iam_role" "ec2_instance_role" {
             "Sid": ""
         }
     ]
-  }
-  EOF
+}
+EOF
 }
 
 # Attach the custom policy and predefined policies to the role
