@@ -238,3 +238,11 @@ resource "aws_route53_record" "apex-db" {
   ttl      = 900
   records  = [aws_instance.apex_db_instance.private_ip]
 }
+
+data "local_file" "cloudwatch_agent" {
+  filename = "${path.module}/cloudwatch_agent_config.json"
+}
+
+
+
+
