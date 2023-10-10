@@ -1,6 +1,6 @@
 ---
 schemaVersion: "2.2"
-description: "SSM Document for joining Windows EC2 instances to the domain. The instance will be RESTARTED so this is not applicable for ASG's."
+description: "SSM Document for joining Windows EC2 instances to the domain. Moving Computers to a different OU must be done manually on the relevant domain controller."
 parameters:
   domain:
     type: "String"
@@ -20,6 +20,13 @@ parameters:
     description: "If over-written, the hostname will be changed to this value. If un-changed the existing hostname will be kept. The new hostname must be 15 characters or less"
     default: "keep-existing"
     maxChars: 15
+  restart:
+    type: "String"
+    description: "If set to true, the instance will be restarted after joining the domain. If set to false, the instance will not be restarted. Default is true."
+    default: "true"
+    allowedValues:
+      - "true"
+      - "false"
 mainSteps:
   - name: WindowsDomainJoin
     action: aws:runPowerShellScript
@@ -36,6 +43,7 @@ mainSteps:
           $domainJoinPassword = "{{domainJoinPassword}}"
           $newHostname = "{{newHostname}}"
           $domain = "{{domain}}"
+          $restart = "{{restart}}"
 
           # Check pre-requisites are installed, exit if not
           if (-Not (Get-Module -ListAvailable -Name "ActiveDirectory")) {
@@ -43,14 +51,6 @@ mainSteps:
             Write-Error "ERROR: Run 'Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature' via PoweShell as admin to install the ActiveDirectory, then re-run this ssm document"
             exit 1
           }
-
-          if ($newHostname -eq "keep-existing") {
-            $hostname = $env:COMPUTERNAME
-            Write-Host "INFO: No new hostname supplied, using existing hostname - $hostname"
-          } else {
-            $hostname = $newHostname
-          }
-
           # Define environment settings
           $environments = @{
             "dev" = @{
@@ -105,18 +105,45 @@ mainSteps:
           $secpasswd = ConvertTo-SecureString $domainJoinPassword -AsPlainText -Force
           $credentials = New-Object System.Management.Automation.PSCredential (($environments[$domain]["usernameprefix"] + "\" + $domainJoinUsername), $secpasswd)
 
-          if ( -not (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain)) {
-            Write-Host "INFO: Hostname $hostname is not already a member of the $domain domain, continuing"
-            Write-Host "WARNING: Instance will restart to complete domain join"
-            if ($newHostname -eq "keep-existing") {
-              Write-Host "INFO: No new hostname supplied, using existing hostname - $hostname"
-              Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -Restart -Verbose
-            } else {
-              Write-Host "INFO: New hostname supplied, changing hostname to $hostname"
-              Add-Computer -DomainName $environments[$domain]["domain"] -Credential $credentials -NewName $hostname -Restart -Verbose
-            }
+          # splatting Add-Computer parameters to make it easier to read
+          $args = @{
+            DomainName = $environments[$domain]["domain"]
+            Credential = $credentials
+            Verbose = $true
+            Force = $true
+          }
+
+          # adds new name to parameters if supplied & runs the rename step
+          if ($newHostname -eq "keep-existing") {
+            Write-Host "INFO: No new hostname supplied, using existing hostname $env:COMPUTERNAME"
+            $hostname = $env:COMPUTERNAME
+          } elseif ($newHostname -ne $env:COMPUTERNAME) {
+            Write-Host "INFO: Renaming EC2 instance to $newHostname and then rebooting"
+            Rename-Computer -NewName $newHostname -Force
+            exit 3010 # exit code 3010 means reboot required, ssm document will continue after reboot
+          } elseif ($newHostname -eq $env:COMPUTERNAME) {
+            Write-Host "INFO: Hostname has been succesfully changed to $newHostname"
+            $hostname = $newHostname
           } else {
+            Write-Error "ERROR: Something went wrong with the hostname parameter"
+            exit 1
+          }
+
+          # optional restart parameter, mainly for testing, defaults to true
+          if ($restart -eq "true") {
+            Write-Host "WARNING: Instance will restart to complete domain join"
+            $args.Add("Restart", $true)
+          } else {
+            Write-Host "WARNING: Instance will not be restarted but must be restarted manually to complete domain join operation"
+            $args.Add("Restart", $false)
+          }
+
+          if (Get-HostnameInUse -hostname $hostname -credentials $credentials -domain $domain) {
             Write-Error "ERROR: Hostname $hostname is already in use"
             exit 1
+          } else {
+            Write-Host "INFO: Hostname $hostname is not already a member of the $domain domain, continuing..."
+            Write-Host "INFO: Running Add-Computer with args" @args
+            Add-Computer @args
           }
 

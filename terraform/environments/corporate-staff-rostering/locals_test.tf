@@ -4,6 +4,10 @@ locals {
   # baseline config
   test_config = {
 
+    baseline_ssm_parameters = {
+      "/oracle/database/T3IWFM" = local.database_ssm_parameters
+    }
+
     baseline_ec2_instances = {
       t3-csr-db-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {

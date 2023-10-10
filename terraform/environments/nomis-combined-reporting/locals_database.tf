@@ -1,5 +1,11 @@
 locals {
 
+  database_ssm_parameters = {
+    parameters = {
+      passwords = { description = "database passwords" }
+    }
+  }
+
   database_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.db, {
