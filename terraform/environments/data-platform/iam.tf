@@ -550,6 +550,26 @@ data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lamb
   }
 }
 
+data "aws_iam_policy_document" "iam_policy_document_for_get_schema_lambda" {
+  statement {
+    sid    = "s3LogAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/logs/*"
+    ]
+  }
+  statement {
+    sid       = "LambdaLogGroup"
+    effect    = "Allow"
+    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
+  }
+}
+
 data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files_lambda" {
   source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
 
