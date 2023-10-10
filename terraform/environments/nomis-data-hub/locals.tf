@@ -51,6 +51,7 @@ locals {
       component   = "ndh"
       server-type = "ndh-app"
       monitored   = false
+      instance-scheduling = "skip-scheduling"
     }
   }
 
@@ -70,6 +71,7 @@ locals {
       component   = "ndh"
       server-type = "ndh-ems"
       monitored   = false
+      instance-scheduling = "skip-scheduling"
     }
   }
 
