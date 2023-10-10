@@ -72,7 +72,11 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
         {
           name  = "ida:ClientId"
           value = "${local.application_data.accounts[local.environment].client_id}"
-        }
+        },
+        {
+          name  = "AWS.LogGroup"
+          value = "${local.application_data.accounts[local.environment].AWS.LogGroup}"
+        },
       ]
     }
   ])
