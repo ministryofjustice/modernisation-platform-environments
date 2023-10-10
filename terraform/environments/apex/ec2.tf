@@ -137,6 +137,10 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
           "logs:DescribeLogStreams",
           "logs:PutRetentionPolicy",
           "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "cloudwatch:PutMetricData",
+          "cloudwatch:GetMetricStatistics",
+          "cloudwatch:ListMetrics",
           "ec2:DescribeInstances",
         ],
         Resource = "*"
