@@ -219,7 +219,6 @@ module "data_product_create_metadata_lambda" {
 
   environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars, {
     ENVIRONMENT = local.environment
-    BUCKET_NAME = module.metadata_s3_bucket.bucket.id
   })
 
   allowed_triggers = {
