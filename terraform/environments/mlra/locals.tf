@@ -3,7 +3,7 @@
 locals {
   application_test_url = "https://mlra.laa-development.modernisation-platform.service.justice.gov.uk/mlra/"
 
-  # ECS local variables for ecs-cluster-shared.tf
+  # ECS local variables for ecs.tf
   ec2_ingress_rules = {
     "cluster_ec2_lb_ingress_3" = {
       description     = "Cluster EC2 ingress rule 3"
