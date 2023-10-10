@@ -75,7 +75,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
         },
         {
           name  = "AWS.LogGroup"
-          value = "${local.application_data.accounts[local.environment].AWS.LogGroup}"
+          value = "${local.application_data.accounts[local.environment].aws_log_group}"
         },
       ]
     }
