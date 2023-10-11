@@ -43,9 +43,9 @@ resource "aws_instance" "apex_db_instance" {
   )
 }
 
-# data "local_file" "cloudwatch_agent" {
-#   filename = "${path.module}/cloudwatch_agent_config.json"
-# }
+data "local_file" "cloudwatch_agent" {
+  filename = "${path.module}/cloudwatch_agent_config.json"
+}
 
 data "template_file" "user_data" {
   template = "${file("run.sh")}"
