@@ -23,6 +23,7 @@ variable "account_config" {
     shared_vpc_cidr               = string
     shared_vpc_id                 = string
     private_subnet_ids            = list(string)
+    public_subnet_ids             = list(string)
     data_subnet_ids               = list(string)
     data_subnet_a_id              = string
     route53_inner_zone_info       = any
@@ -35,6 +36,7 @@ variable "account_config" {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
     shared_vpc_id                  = "default_shared_vpc_id"
     private_subnet_ids             = ["default_private_subnet_ids"]
+    public_subnet_ids              = ["default_public_subnet_ids"]
     data_subnet_ids                = ["default_data_subnet_ids"]
     data_subnet_a_id               = "default_data_subnet_id"
     route53_inner_zone_info        = {}
@@ -55,23 +57,24 @@ variable "environment_config" {
 
 variable "ldap_config" {
   type = object({
-    name                        = string
-    migration_source_account_id = string
-    migration_lambda_role       = string
-    efs_throughput_mode         = string
-    efs_provisioned_throughput  = string
-    efs_backup_schedule         = string
-    efs_backup_retention_period = string
-
+    name                         = string
+    migration_source_account_id  = string
+    migration_lambda_role        = string
+    efs_throughput_mode          = string
+    efs_provisioned_throughput   = string
+    efs_backup_schedule          = string
+    efs_backup_retention_period  = string
+    efs_datasync_destination_arn = any
   })
   default = {
-    name                        = "default_name"
-    migration_source_account_id = "default_migration_source_account_id"
-    migration_lambda_role       = "default_migration_lambda_role"
-    efs_throughput_mode         = "default_efs_throughput_mode"
-    efs_provisioned_throughput  = "default_efs_provisioned_throughput"
-    efs_backup_schedule         = "default_efs_backup_schedule"
-    efs_backup_retention_period = "default_efs_backup_retention_period"
+    name                         = "default_name"
+    migration_source_account_id  = "default_migration_source_account_id"
+    migration_lambda_role        = "default_migration_lambda_role"
+    efs_throughput_mode          = "default_efs_throughput_mode"
+    efs_provisioned_throughput   = "default_efs_provisioned_throughput"
+    efs_backup_schedule          = "default_efs_backup_schedule"
+    efs_backup_retention_period  = "default_efs_backup_retention_period"
+    efs_datasync_destination_arn = null
   }
 }
 
@@ -197,4 +200,9 @@ variable "bastion" {
   default = {
     security_group_id = "default_security_group_id"
   }
+}
+
+variable "environments_in_account" {
+  type    = list(string)
+  default = []
 }

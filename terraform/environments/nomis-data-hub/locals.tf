@@ -40,7 +40,7 @@ locals {
       ami_name = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      vpc_security_group_ids       = ["ndh_app"]
+      vpc_security_group_ids = ["ndh_app"]
       tags = {
         backup-plan = "daily-and-weekly"
       }
@@ -51,6 +51,7 @@ locals {
       component   = "ndh"
       server-type = "ndh-app"
       monitored   = false
+      instance-scheduling = "skip-scheduling"
     }
   }
 
@@ -59,7 +60,7 @@ locals {
       ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      vpc_security_group_ids       = ["ndh_ems"]
+      vpc_security_group_ids = ["ndh_ems"]
       tags = {
         backup-plan = "daily-and-weekly"
       }
@@ -70,6 +71,7 @@ locals {
       component   = "ndh"
       server-type = "ndh-ems"
       monitored   = false
+      instance-scheduling = "skip-scheduling"
     }
   }
 

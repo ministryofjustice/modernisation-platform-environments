@@ -16,12 +16,12 @@ resource "aws_security_group" "sg_webgate_lb" {
 
 resource "aws_security_group_rule" "ingress_traffic_webgatelb_443" {
   security_group_id = aws_security_group.sg_webgate_lb.id
-  type             = "ingress"
-  description      = "HTTPS"
-  protocol         = "TCP"
-  from_port        = 443
-  to_port          = 443
-  cidr_blocks      = ["0.0.0.0/0"]
+  type              = "ingress"
+  description       = "HTTPS"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 
@@ -31,12 +31,12 @@ resource "aws_security_group_rule" "ingress_traffic_webgatelb_443" {
 
 resource "aws_security_group_rule" "egress_traffic_webgatelb_80" {
   security_group_id = aws_security_group.sg_webgate_lb.id
-  type             = "egress"
-  description      = "All"
-  protocol         = "TCP"
-  from_port        = 0
-  to_port          = 0
-  cidr_blocks      = ["0.0.0.0/0"]
+  type              = "egress"
+  description       = "All"
+  protocol          = "TCP"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 

@@ -759,9 +759,9 @@ module "dms_fake_data_ingestor" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-dms-fake-data-ingestor-${local.env}"
-      Resource_Type = "DMS Replication"
-      Postgres_Source  = "DPS"
+      Name            = "${local.project}-dms-fake-data-ingestor-${local.env}"
+      Resource_Type   = "DMS Replication"
+      Postgres_Source = "DPS"
     }
   )
 }

@@ -23,7 +23,7 @@ locals {
         })
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
           args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "c958e86e4b1b062ca21d46f7ff204c60377519c5" # 2023-10-04 prod ansible config
+            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2023-10-06
           })
         })
       })

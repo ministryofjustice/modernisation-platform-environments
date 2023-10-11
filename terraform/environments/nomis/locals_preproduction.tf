@@ -86,71 +86,76 @@ locals {
     }
 
     baseline_ssm_parameters = {
-      # NEW
       "/oracle/weblogic/preprod"  = local.weblogic_ssm_parameters
       "/oracle/database/PPCNOM"   = local.database_nomis_ssm_parameters
       "/oracle/database/PPNDH"    = local.database_ssm_parameters
       "/oracle/database/PPTRDAT"  = local.database_ssm_parameters
       "/oracle/database/PPCNMAUD" = local.database_ssm_parameters
       "/oracle/database/PPMIS"    = local.database_mis_ssm_parameters
-
-      # OLD
-      "/oracle/database/CNOMPP" = local.database_nomis_ssm_parameters
-      "preprod-nomis-web-a"     = local.weblogic_ssm_parameters_old
-      "preprod-nomis-web-b"     = local.weblogic_ssm_parameters_old
     }
 
     baseline_ec2_autoscaling_groups = {
       # ACTIVE (blue deployment)
-      preprod-nomis-web-a = merge(local.weblogic_ec2_a, {
-        config = merge(local.weblogic_ec2_a.config, {
-          instance_profile_policies = concat(local.weblogic_ec2_a.config.instance_profile_policies, [
-            "Ec2PreprodWeblogicPolicy",
-          ])
-        })
-        instance = merge(local.weblogic_ec2_a.instance, {
-          instance_type = "t2.xlarge"
-        })
-        user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
-          args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-            branch = "8cc652b22d51483a5902f04809618cc88516093c" # 2023-09-21 DB_V11.2.1.1.219, nomis web release deployment DB_V11.2.1.1.228
-          })
-        })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      preprod-nomis-web-a = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 2
           max_size         = 2
         })
-        tags = merge(local.weblogic_ec2_a.tags, {
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2PreprodWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.xlarge"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
           nomis-environment    = "preprod"
           oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
           oracle-db-name       = "PPCNOM"
+          deployment           = "blue"
         })
       })
 
       # NOT-ACTIVE (green deployment)
-      preprod-nomis-web-b = merge(local.weblogic_ec2_b, {
-        config = merge(local.weblogic_ec2_b.config, {
-          instance_profile_policies = concat(local.weblogic_ec2_b.config.instance_profile_policies, [
+      preprod-nomis-web-b = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 0
+        })
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2PreprodWeblogicPolicy",
           ])
         })
-        instance = merge(local.weblogic_ec2_b.instance, {
+        instance = merge(local.weblogic_ec2.instance, {
           instance_type = "t2.xlarge"
         })
-        tags = merge(local.weblogic_ec2_b.tags, {
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
           nomis-environment    = "preprod"
           oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
           oracle-db-name       = "PPCNOM"
-        })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+          deployment           = "green"
         })
       })
 
-      preprod-jumpserver-a = merge(local.jumpserver_ec2_default, {
-        config = merge(local.jumpserver_ec2_default.config, {
+      preprod-jumpserver-a = merge(local.jumpserver_ec2, {
+        config = merge(local.jumpserver_ec2.config, {
           user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
             ie_compatibility_mode_site_list = join(",", [
               "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
@@ -172,29 +177,30 @@ locals {
     }
 
     baseline_ec2_instances = {
-      preprod-nomis-db-2-a = merge(local.database_ec2_a, {
+      preprod-nomis-db-2-a = merge(local.database_ec2, {
         cloudwatch_metric_alarms = {}
-        tags = merge(local.database_ec2_a.tags, {
-          nomis-environment = "preprod"
-          description       = "PreProduction NOMIS MIS and Audit database"
-          oracle-sids       = ""
-        })
-        config = merge(local.database_ec2_a.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          instance_profile_policies = concat(local.database_ec2_a.config.instance_profile_policies, [
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        instance = merge(local.database_ec2_a.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 512 }
         })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "preprod"
+          description       = "PreProduction NOMIS MIS and Audit database"
+          oracle-sids       = ""
         })
       })
     }

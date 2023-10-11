@@ -8,7 +8,7 @@ locals {
       test-ndh-app-a = local.ndh_app_a
 
       test-ndh-ems-a = local.ndh_ems_a
-    
+
     }
     baseline_ec2_autoscaling_groups = {
       # Example ASG using base image with ansible provisioning
