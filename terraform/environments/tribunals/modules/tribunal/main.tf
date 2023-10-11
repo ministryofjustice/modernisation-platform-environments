@@ -135,5 +135,5 @@ module "app_ecs_task" {
   lb_tg_arn                   = var.lb_tg_arn
   server_port                 = var.server_port
   lb_listener                 = var.lb_listener
-
+  cluster_id                  = var.cluster_id
 }

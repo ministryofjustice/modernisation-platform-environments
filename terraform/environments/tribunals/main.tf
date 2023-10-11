@@ -36,6 +36,7 @@ module "transport" {
   lb_tg_arn                         = aws_lb_target_group.tribunals_target_group.arn
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   lb_listener                       = aws_lb_listener.tribunals_lb
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
 }
 
 # # module "administrative_appeals" {

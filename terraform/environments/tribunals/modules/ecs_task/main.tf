@@ -111,12 +111,23 @@ resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
   policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
 }
 
-###########################################
+# Set up CloudWatch group and log stream and retain logs for 30 days
+resource "aws_cloudwatch_log_group" "cloudwatch_group" {
+  #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
+  name              = "${var.app_name}-ecs-log-group"
+  retention_in_days = 30
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-log-group"
+    }
+  )
+}
 
 resource "aws_ecs_service" "ecs_service" {
   name            = "${var.app_name}"
-  cluster         = aws_ecs_cluster.ecs_cluster.id
-  task_definition = data.aws_ecs_task_definition.task_definition.id
+  cluster         = var.cluster_id
+  task_definition = aws_ecs_task_definition.ecs_task_definition.id
   desired_count   = var.app_count
   launch_type     = "EC2"
 
@@ -134,7 +145,7 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   depends_on = [
-    var.lb_listener, aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
+    var.lb_listener, aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
   ]
 
   tags = merge(

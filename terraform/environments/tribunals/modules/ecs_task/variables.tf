@@ -57,3 +57,6 @@ variable "server_port" {
 
 variable "lb_listener" {  
 }
+
+variable "cluster_id" {  
+}
