@@ -245,4 +245,35 @@ locals {
       }
     ]
   }
+
+  s3_lifecycle_rules = {
+
+    ninety_day_standard_ia_ten_year_expiry = {
+      id      = "ninety_day_standard_ia_ten_year_expiry"
+      enabled = "Enabled"
+      prefix  = ""
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+      transition = [{
+        days          = 90
+        storage_class = "STANDARD_IA"
+      }]
+      expiration = {
+        days = 3650
+      }
+      noncurrent_version_transition = [{
+        days          = 90
+        storage_class = "STANDARD_IA"
+        }, {
+        days          = 365
+        storage_class = "GLACIER"
+      }]
+      noncurrent_version_expiration = {
+        days = 3650
+      }
+    }
+
+  }
 }
