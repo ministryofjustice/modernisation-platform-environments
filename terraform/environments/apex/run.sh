@@ -1,3 +1,4 @@
+ #!/bin/bash
 echo "${aws_efs_file_system.efs.dns_name}:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
 mount -a
 
