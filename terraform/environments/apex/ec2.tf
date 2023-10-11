@@ -22,7 +22,7 @@ resource "aws_instance" "apex_db_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
-  user_data                   = data.template_file.user_data.rendered
+  user_data                   = "${file("run.sh")}"
 
   root_block_device {
     delete_on_termination = false
@@ -45,10 +45,6 @@ resource "aws_instance" "apex_db_instance" {
 
 data "local_file" "cloudwatch_agent" {
   filename = "${path.module}/cloudwatch_agent_config.json"
-}
-
-data "template_file" "user_data" {
-  template = "${file("run.sh")}"
 }
 
 resource "aws_security_group" "ec2" {
