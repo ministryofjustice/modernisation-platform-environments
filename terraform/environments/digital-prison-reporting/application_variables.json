@@ -67,7 +67,7 @@
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
       "enable_dbuilder_apikey": true,
-      "enable_slack_alerts": false,
+      "enable_slack_alerts": true,
       "enable_pagerduty_alerts": false,
       "enable_transfer_component_lambda": true,
       "create_transfer_component_lambda_layer": true,
