@@ -45,9 +45,9 @@ resource "aws_instance" "apex_db_instance" {
   )
 }
 
-# data "local_file" "cloudwatch_agent" {
-#   filename = "${path.module}/cloudwatch_agent_config.json"
-# }
+data "local_file" "cloudwatch_agent" {
+  filename = "${path.module}/cloudwatch_agent_config.json"
+}
 
 resource "aws_security_group" "ec2" {
   name        = local.application_name
