@@ -76,7 +76,7 @@
             },
             {
               "file_path": "//home/oracle/logs/pmon_status_alert.log",
-              "log_group_name": "${local.application_name}-pmon-status-alert-log-test"
+              "log_group_name": "${local.application_name}-pmon-status-alert-log"
             }
           ]
         }
