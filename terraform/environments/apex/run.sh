@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 cd /tmp
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
@@ -16,7 +16,7 @@ echo '{
   "metrics": {
     "aggregation_dimensions": [["InstanceId"]],
     "append_dimensions": {
-      "InstanceId": "${aws:InstanceId}"
+      "InstanceId": "$${aws:InstanceId}"
     },
     "metrics_collected": {
       "cpu": {
