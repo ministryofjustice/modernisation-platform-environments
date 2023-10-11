@@ -575,3 +575,32 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
     resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
   }
 }
+
+data "aws_iam_policy_document" "iam_policy_document_for_create_schema_lambda" {
+  statement {
+    sid       = "ListBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "s3LogAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/logs/*",
+      "${module.s3-bucket.bucket.arn}/metadata/*",
+      "${module.s3-bucket.bucket.arn}/data_product_metadata_spec/*",
+      "${module.s3-bucket.bucket.arn}/data_product_schema_spec/*"
+    ]
+  }
+  statement {
+    sid       = "LambdaLogGroup"
+    effect    = "Allow"
+    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
+  }
+}
