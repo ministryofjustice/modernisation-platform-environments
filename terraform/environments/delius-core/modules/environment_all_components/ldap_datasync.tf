@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "ldap_datasync_role_assume" {
 
     principals {
       type        = "Service"
-      identifiers = ["datasync.amazonaws.com", "backup.amazonaws.com", "efs.amazonaws.com"]
+      identifiers = ["datasync.amazonaws.com", "backup.amazonaws.com"]
     }
   }
 }
