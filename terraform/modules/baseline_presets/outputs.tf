@@ -112,6 +112,11 @@ output "s3_buckets" {
   value       = local.s3_buckets
 }
 
+output "s3_lifecycle_rules" {
+  description = "Map of s3 lifecycle rules that can be used for buckets"
+  value       = local.s3_lifecycle_rules
+}
+
 output "ssm_parameters" {
   description = "Map of common ssm parameters to create"
   value = {
