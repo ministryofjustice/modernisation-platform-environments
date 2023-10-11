@@ -14,7 +14,7 @@ locals {
     http8555 = flatten([
       module.ip_addresses.mp_cidr.development_test
     ])
-    7222 = flatten([
+    tcp7222 = flatten([
       module.ip_addresses.mp_cidr.development_test
     ])
   }
@@ -32,7 +32,7 @@ locals {
     http8555 = flatten([
       module.ip_addresses.mp_cidr.hmpps-preproduction
     ])
-    7222 = flatten([
+    tcp7222 = flatten([
       module.ip_addresses.mp_cidr.hmpps-preproduction
     ])
   }
@@ -50,7 +50,7 @@ locals {
     http8555 = flatten([
       module.ip_addresses.mp_cidr.hmpps-production
     ])
-    7222 = flatten([
+    tcp7222 = flatten([
       module.ip_addresses.mp_cidr.hmpps-production
     ])
   }
@@ -206,12 +206,20 @@ locals {
           protocol        = "tcp"
           security_groups = ["management_server"]
         }
-        7222 = { # from nomis (XTAG)
+        tcp7222 = { # from nomis (XTAG)
           description     = "Allow port 7222 ingress"
           from_port       = 7222
           to_port         = 7222
           protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.7222
+          cidr_blocks     = local.security_group_cidrs.tcp7222
+          security_groups = []
+        }
+        tcp7224 = {
+          description     = "Allow port 7224 ingress"
+          from_port       = 7224
+          to_port         = 7224
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.tcp7222
           security_groups = []
         }
         tcp7474 = {
