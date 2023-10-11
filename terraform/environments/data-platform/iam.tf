@@ -15,6 +15,21 @@ data "aws_iam_policy_document" "log_to_bucket" {
   }
 }
 
+data "aws_iam_policy_document" "read_metadata" {
+  statement {
+    sid    = "s3ReadMetadata"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+    ]
+    resources = [
+      "${module.metadata_s3_bucket.bucket.arn}",
+      "${module.metadata_s3_bucket.bucket.arn}/*"
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "iam_policy_document_for_docs_lambda" {
   statement {
     sid       = "LambdaLogGroup"
@@ -25,7 +40,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_docs_lambda" {
 }
 
 data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json]
+  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
 
   statement {
     sid    = "AllowLambdaToCreateLogGroup"
@@ -118,7 +133,7 @@ data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
 }
 
 data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json]
+  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
 
   statement {
     sid    = "AllowLambdaToCreateLogGroup"
@@ -157,12 +172,6 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
       "${module.data_s3_bucket.bucket.arn}/raw/*"
     ]
   }
-  statement {
-    sid       = "listMetadataVersions"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = [module.metadata_s3_bucket.bucket.arn]
-  }
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_authorizer_lambda" {
@@ -197,7 +206,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json]
+  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
 
   statement {
     sid     = "GetPutDataObject"
@@ -208,17 +217,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
       "${module.logs_s3_bucket.bucket.arn}/logs/*"
     ]
   }
-  statement {
-    sid       = "ListExistingDataProducts"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = [module.metadata_s3_bucket.bucket.arn]
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-      values   = ["metadata/*"]
-    }
-  }
+
   statement {
     sid       = "LambdaLogGroup"
     effect    = "Allow"
@@ -508,7 +507,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" 
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lambda" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json]
+  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
 
   statement {
     sid       = "ListBucket"
@@ -542,7 +541,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lamb
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files_lambda" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json]
+  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
 
   statement {
     sid     = "ListBucket"
