@@ -71,12 +71,8 @@
         "files": {
           "collect_list": [
             {
-              "file_path": "/u01/app/oracle/diag/rdbms/apex_a/APEX/trace/alert_APEX.log",
-              "log_group_name": "${local.application_name}-DB-alert-log"
-            },
-            {
-              "file_path": "/home/oracle/logs/pmon_status_alert.log",
-              "log_group_name": "${local.application_name}-pmon-status-alert-log"
+              "file_path": "/var/log/messages",
+              "log_group_name": "${local.application_name}-EC2"
             }
           ]
         }
