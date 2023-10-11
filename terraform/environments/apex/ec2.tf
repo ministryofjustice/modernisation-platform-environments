@@ -22,7 +22,7 @@ resource "aws_instance" "apex_db_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
-  user_data                   = "${file("run.sh")}"
+  user_data                   = file("${path.module}/run.sh")
 
   root_block_device {
     delete_on_termination = false
