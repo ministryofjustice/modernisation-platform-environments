@@ -44,10 +44,10 @@ data "aws_iam_policy_document" "ldap_datasync_role_access" {
   statement {
     effect = "Allow"
     actions = [
-      "backup:StartRestoreJob",
-      "backup:Get*",
-      "backup:List*"
+      "backup:*",
+      "datasync:*",
+      "elasticfilesystem:*",
     ]
-    resources = ["arn:aws:backup:::*/*"]
+    resources = ["*"]
   }
 }
