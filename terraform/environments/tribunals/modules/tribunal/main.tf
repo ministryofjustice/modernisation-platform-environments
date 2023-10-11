@@ -97,7 +97,7 @@ resource "null_resource" "app_setup_db" {
 }
 
  resource "aws_secretsmanager_secret" "app_db_credentials" {
-  name = "${local.app}-db-credentials"
+  name = "${local.app}-db-credentials-2"
 }
 
 resource "aws_secretsmanager_secret_version" "app_db_credentials_version" {
