@@ -23,12 +23,13 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.data_product_table,
       aws_api_gateway_resource.data_product_table_name,
       aws_api_gateway_resource.upload_data_for_data_product_table_name,
-      aws_api_gateway_resource.create_schema_for_data_product_table_name,
+      aws_api_gateway_resource.schema_for_data_product_table_name,
       aws_api_gateway_method.docs,
       aws_api_gateway_method.get_glue_metadata,
       aws_api_gateway_method.register_data_product,
       aws_api_gateway_method.upload_data_for_data_product_table_name,
       aws_api_gateway_method.create_schema_for_data_product_table_name,
+      aws_api_gateway_method.get_schema_for_data_product_table_name,
       aws_api_gateway_integration.docs_to_lambda,
       aws_api_gateway_integration.upload_data_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.proxy_to_lambda,
@@ -36,6 +37,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_integration.get_glue_metadata,
       aws_api_gateway_integration.register_data_product_to_lambda,
       aws_api_gateway_integration.create_schema_for_data_product_table_name_to_lambda,
+      aws_api_gateway_integration.get_schema_for_data_product_table_name_to_lambda,
     ]))
   }
 
