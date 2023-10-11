@@ -29,6 +29,11 @@ resource "aws_iam_role" "ldap_datasync_role" {
   assume_role_policy = data.aws_iam_policy_document.ldap_datasync_role_assume.json
 }
 
+resource "aws_iam_role_policy" "ldap_refresh_access" {
+  policy = data.aws_iam_policy_document.ldap_datasync_role_access.json
+  role   = aws_iam_role.ldap_datasync_role.name
+}
+
 data "aws_iam_policy_document" "ldap_datasync_role_assume" {
   statement {
     actions = ["sts:AssumeRole"]
