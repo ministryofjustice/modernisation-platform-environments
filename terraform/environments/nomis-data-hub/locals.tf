@@ -47,10 +47,10 @@ locals {
     })
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
     tags = {
-      description         = "RHEL7.9 NDH App"
-      component           = "ndh"
-      server-type         = "ndh-app"
-      monitored           = false
+      description = "RHEL7.9 NDH App"
+      component   = "ndh"
+      server-type = "ndh-app"
+      monitored   = false
       instance-scheduling = "skip-scheduling"
     }
   }
@@ -67,10 +67,10 @@ locals {
     })
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
     tags = {
-      description         = "RHEL7.9 NDH ems"
-      component           = "ndh"
-      server-type         = "ndh-ems"
-      monitored           = false
+      description = "RHEL7.9 NDH ems"
+      component   = "ndh"
+      server-type = "ndh-ems"
+      monitored   = false
       instance-scheduling = "skip-scheduling"
     }
   }
