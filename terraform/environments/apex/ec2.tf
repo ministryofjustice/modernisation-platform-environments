@@ -18,7 +18,7 @@ echo '{
   "metrics": {
     "aggregation_dimensions": [["InstanceId"]],
     "append_dimensions": {
-      "InstanceId": "${aws:InstanceId}"
+      "InstanceId": "$${aws:InstanceId}"
     },
     "metrics_collected": {
       "cpu": {
