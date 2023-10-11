@@ -22,3 +22,29 @@ resource "aws_datasync_task" "ldap_refresh_task" {
 
   name = "ldap-datasync-task-push-from-${var.env_name}"
 }
+
+# iam role for aws backup to assume in the data-refresh pipeline using the aws backup start-restore-job cmd
+resource "aws_iam_role" "ldap_datasync_role" {
+  count              = var.ldap_config.efs_datasync_destination_arn != null ? 1 : 0
+  name               = "ldap-data-refresh-role"
+  assume_role_policy = data.aws_iam_policy_document.ldap_datasync_role.json
+}
+
+data "aws_iam_policy_document" "ldap_datasync_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["datasync.amazonaws.com", "backup.amazonaws.com", "efs.amazonaws.com"]
+    }
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "backup:StartRestoreJob",
+      "backup:Get*",
+      "backup:List*"
+    ]
+  }
+}
