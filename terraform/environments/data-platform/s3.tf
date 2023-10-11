@@ -2,7 +2,7 @@ module "data_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_prefix      = "data-${local.environment}"
-  versioning_enabled = true
+  versioning_enabled = false
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   bucket_policy       = [data.aws_iam_policy_document.data_s3_bucket_policy_document.json]
@@ -62,7 +62,7 @@ module "metadata_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_prefix      = "metadata-${local.environment}"
-  versioning_enabled = true
+  versioning_enabled = false
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   bucket_policy       = [data.aws_iam_policy_document.metadata_s3_bucket_policy_document.json]
@@ -122,7 +122,7 @@ module "logs_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_prefix      = "logs-${local.environment}"
-  versioning_enabled = true
+  versioning_enabled = false
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   bucket_policy       = [data.aws_iam_policy_document.logs_s3_bucket_policy_document.json]
@@ -183,7 +183,7 @@ module "data_landing_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_prefix      = "data-landing-${local.environment}"
-  versioning_enabled = true
+  versioning_enabled = false
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   bucket_policy       = [data.aws_iam_policy_document.data_landing_s3_bucket_policy_document.json]
