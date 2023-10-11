@@ -45,5 +45,6 @@ data "aws_iam_policy_document" "ldap_datasync_role" {
       "backup:Get*",
       "backup:List*"
     ]
+    resources = ["arn:aws:backup:::*/*"]
   }
 }
