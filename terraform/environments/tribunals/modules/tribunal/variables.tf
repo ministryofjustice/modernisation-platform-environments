@@ -85,3 +85,6 @@ variable "lb_listener" {
 
 variable "cluster_id" {
 }
+
+variable "cluster_name" {  
+}

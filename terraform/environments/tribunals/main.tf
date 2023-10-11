@@ -37,6 +37,7 @@ module "transport" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   lb_listener                       = aws_lb_listener.tribunals_lb
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
 }
 
 # # module "administrative_appeals" {

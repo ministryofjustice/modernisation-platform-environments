@@ -136,4 +136,5 @@ module "app_ecs_task" {
   server_port                 = var.server_port
   lb_listener                 = var.lb_listener
   cluster_id                  = var.cluster_id
+  cluster_name                = var.cluster_name
 }
