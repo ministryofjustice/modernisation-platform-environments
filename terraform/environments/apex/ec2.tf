@@ -1,18 +1,18 @@
-locals {
-  instance-userdata = <<EOF
-#!/bin/bash
-cd /tmp
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-sudo systemctl start amazon-ssm-agent
-sudo systemctl enable amazon-ssm-agent
-echo "${aws_efs_file_system.efs.dns_name}:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
-mount -a
+# locals {
+#   instance-userdata = <<EOF
+# #!/bin/bash
+# cd /tmp
+# yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+# sudo systemctl start amazon-ssm-agent
+# sudo systemctl enable amazon-ssm-agent
+# echo "${aws_efs_file_system.efs.dns_name}:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
+# mount -a
 
-# Setting up CloudWatch Agent
-echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:cloudwatch_agent_config.json
-EOF
-}
+# # Setting up CloudWatch Agent
+# echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
+# /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:cloudwatch_agent_config.json
+# EOF
+# }
 
 resource "aws_instance" "apex_db_instance" {
   ami                         = local.application_data.accounts[local.environment].ec2amiid
@@ -24,7 +24,7 @@ resource "aws_instance" "apex_db_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
-  user_data_base64            = base64encode(local.instance-userdata)
+  user_data                   = "${file("run.sh")}"
 
   root_block_device {
     delete_on_termination = false
