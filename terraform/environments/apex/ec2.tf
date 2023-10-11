@@ -7,6 +7,8 @@ sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
 echo "${aws_efs_file_system.efs.dns_name}:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
 mount -a
+
+# Setting up CloudWatch Agent
 mkdir cloudwatch_agent
 cd cloudwatch_agent
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
@@ -45,6 +47,10 @@ resource "aws_instance" "apex_db_instance" {
     { "instance-scheduling" = "skip-scheduling" },
     { "snapshot-with-daily-7-day-retention" = "yes" }
   )
+}
+
+data "local_file" "cloudwatch_agent" {
+  filename = "${path.module}/cloudwatch_agent_config.json"
 }
 
 resource "aws_security_group" "ec2" {
@@ -192,6 +198,9 @@ resource "aws_ebs_volume" "u02-oradata" {
     { "Name" = "${local.application_name}db-ec2-u02-oradata" },
   )
 }
+
+
+
 resource "aws_volume_attachment" "u02-oradata" {
   device_name = "/dev/sdc"
   volume_id   = aws_ebs_volume.u02-oradata.id
@@ -249,9 +258,7 @@ resource "aws_route53_record" "apex-db" {
   records  = [aws_instance.apex_db_instance.private_ip]
 }
 
-data "local_file" "cloudwatch_agent" {
-  filename = "${path.module}/cloudwatch_agent_config.json"
-}
+
 
 
 
