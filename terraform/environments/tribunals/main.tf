@@ -28,6 +28,14 @@ module "transport" {
   tags                              = local.tags
   dms_instance_arn                  = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn  
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  lb_tg_arn                         = aws_lb_target_group.tribunals_target_group.arn
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  lb_listener                       = aws_lb_listener.tribunals_lb
 }
 
 # # module "administrative_appeals" {

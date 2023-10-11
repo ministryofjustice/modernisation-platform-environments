@@ -53,4 +53,32 @@ variable "dms_instance_arn" {
 variable "task_definition_volume" { 
 }
 
+variable "appscaling_min_capacity" {  
+}
 
+variable "appscaling_max_capacity" {  
+}
+
+variable "ecs_scaling_cpu_threshold" {
+}
+
+variable "ecs_scaling_mem_threshold" { 
+}
+
+variable "app_count" {
+  type        = string
+  description = "Number of docker containers to run"
+}
+
+variable "lb_tg_arn" {
+  type        = string
+  description = "Load balancer target group ARN used by ECS service"
+}
+
+variable "server_port" {
+  type        = string
+  description = "The port the containers will be listening on"
+}
+
+variable "lb_listener" {  
+}

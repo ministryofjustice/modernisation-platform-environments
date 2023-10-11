@@ -127,4 +127,13 @@ module "app_ecs_task" {
   task_definition_volume      = var.task_definition_volume
   task_definition             = local.app_task_definition
   tags_common                 = var.tags
+  appscaling_min_capacity     = var.appscaling_min_capacity
+  appscaling_max_capacity     = var.appscaling_max_capacity
+  ecs_scaling_cpu_threshold   = var.ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold   = var.ecs_scaling_mem_threshold
+  app_count                   = var.app_count
+  lb_tg_arn                   = var.lb_tg_arn
+  server_port                 = var.server_port
+  lb_listener                 = var.lb_listener
+
 }
