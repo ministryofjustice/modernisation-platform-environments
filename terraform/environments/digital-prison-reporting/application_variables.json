@@ -73,7 +73,8 @@
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": true,
       "enable_fake_data_dms_replication_task": true,
-      "setup_sonatype_secrets": true
+      "setup_sonatype_secrets": true,
+      "setup_cw_alarms": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -148,7 +149,8 @@
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
-      "setup_sonatype_secrets": false
+      "setup_sonatype_secrets": false,
+      "setup_cw_alarms": true
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -223,7 +225,8 @@
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
-      "setup_sonatype_secrets": false
+      "setup_sonatype_secrets": false,
+      "setup_cw_alarms": true
     },
     "production": {
       "project_short_id": "dpr",
@@ -298,7 +301,8 @@
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
-      "setup_sonatype_secrets": false
+      "setup_sonatype_secrets": false,
+      "setup_cw_alarms": true
     }
   }
 }
