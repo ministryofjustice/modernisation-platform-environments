@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# S3 Bucket for file uploads
+# S3 Bucket for file uploads and other user-generated content
 #------------------------------------------------------------------------------
 #tfsec:ignore:AWS002 tfsec:ignore:AWS098
 resource "aws_s3_bucket" "upload_files" {
@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "upload_files" {
     prevent_destroy = true
   }
 
-  tags = merge(
+  tags = merge (
     local.tags,
     {
       Name = "${local.application_name}-uploads"
@@ -158,59 +158,55 @@ resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
 #-------------------------------------------------------------------------------------------------
 # S3 "landing" bucket for AP data transfer 
 # AP pipelines write to this bucket and the Performance Hub reads files from here. It doesn't
-# need complex retention since files are removed from this bucket once imported.
+# need complex retention or versioning since files are removed from this bucket once imported.
 #-------------------------------------------------------------------------------------------------
-#tfsec:ignore:AWS002 tfsec:ignore:AWS098
-resource "aws_s3_bucket" "ap_landing_bucket" {
-  #checkov:skip=CKV_AWS_18
-  #checkov:skip=CKV_AWS_144
-  #checkov:skip=CKV2_AWS_6
-  bucket = "${local.application_name}-land-${local.environment}"
 
-  lifecycle {
-    prevent_destroy = true
+module "s3-bucket" "ap_landing_bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+
+  bucket_name          = "${local.application_name}-land-${local.environment}"
+  ownership_controls   = "BucketOwnerEnforced"
+
+  versioning_enabled   = false
+  replication_enabled  = false
+
+  providers = {
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
   }
 
-  tags = merge(
+  custom_kms_key = aws_kms_key.s3.arn
+
+  lifecycle_rule = [
+    {
+      id      = "tf-s3-lifecycle-landing"
+      enabled = "Enabled"
+
+      expiration = {
+        days = 30
+      }
+    }
+  ]
+
+  tags = merge (
     local.tags,
     {
-      Name = "${local.application_name}-ap-landing-bucket"
+        Name = "${local.application_name}-ap-landing-bucket"
     }
   )
 }
 
-resource "aws_s3_bucket_acl" "ap_landing_bucket" {
-  bucket = aws_s3_bucket.ap_landing_bucket.id
-  acl    = "private"
+# AP Airflow jobs are expecting certain folders to exists
+resource "aws_s3_object" "prison_incidents" {
+  bucket = module.s3_bucket.ap_landing_bucket.id
+  key    = "prison_incidents/"
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "ap_landing_bucket" {
-  bucket = aws_s3_bucket.ap_landing_bucket.id
-  rule {
-    id     = "tf-s3-lifecycle-landing"
-    status = "Enabled"
-    expiration {
-      days = 30
-    }
-  }
+resource "aws_s3_object" "prison_performance" {
+  bucket = module.s3_bucket.ap_landing_bucket.id
+  key    = "prison_performance/"
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "ap_landing_bucket" {
-  bucket = aws_s3_bucket.ap_landing_bucket.id
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm     = "aws:kms"
-      kms_master_key_id = aws_kms_key.s3.arn
-    }
-  }
-}
-
-resource "aws_s3_bucket_versioning" "ap_landing_bucket" {
-  bucket = aws_s3_bucket.ap_landing_bucket.id
-  versioning_configuration {
-    status = "Disabled"
-  }
-}
 
 #------------------------------------------------------------------------------
 # KMS setup for S3
