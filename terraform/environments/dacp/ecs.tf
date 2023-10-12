@@ -6,8 +6,8 @@ resource "aws_ecs_cluster" "dacp_cluster" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "dacpFamily_logs" {
-  name = "/ecs/dacpFamily"
+resource "aws_cloudwatch_log_group" "deployment_logs" {
+  name = "/aws/events/deploymentLogs"
 }
 
 resource "aws_ecs_task_definition" "dacp_task_definition" {
@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.dacpFamily_logs.name}"
+          awslogs-group         = "${aws_cloudwatch_log_group.deployment_logs.name}"
           awslogs-region        = "eu-west-2"
           awslogs-stream-prefix = "ecs"
         }
@@ -93,7 +93,7 @@ resource "aws_ecs_service" "dacp_ecs_service" {
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 2
-  health_check_grace_period_seconds = 90
+  health_check_grace_period_seconds = 180
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
@@ -234,4 +234,25 @@ resource "aws_security_group" "ecs_service" {
 resource "aws_ecr_repository" "dacp_ecr_repo" {
   name         = "dacp-ecr-repo"
   force_delete = true
+}
+
+# AWS EventBridge rule
+resource "aws_cloudwatch_event_rule" "ecs_events" {
+  name        = "ecs-events"
+  description = "Capture all ECS events"
+
+  event_pattern = jsonencode({
+    "source" : ["aws.ecs"],
+    "detail" : {
+      "clusterArn" : [aws_ecs_cluster.dacp_cluster.arn]
+    }
+  })
+}
+
+# AWS EventBridge target
+resource "aws_cloudwatch_event_target" "logs" {
+  depends_on = [aws_cloudwatch_log_group.deployment_logs]
+  rule       = aws_cloudwatch_event_rule.ecs_events.name
+  target_id  = "send-to-cloudwatch"
+  arn        = aws_cloudwatch_log_group.deployment_logs.arn
 }

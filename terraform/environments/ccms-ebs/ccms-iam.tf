@@ -178,7 +178,6 @@ resource "aws_iam_role_policy_attachment" "rman_to_s3_policy" {
   policy_arn = aws_iam_policy.rman_to_s3.arn
 }
 
-
 # Oracle Licensing policy
 resource "aws_iam_policy" "oracle_licensing" {
   name        = "oracle_licensing_policy-${local.environment}"
@@ -211,4 +210,37 @@ resource "aws_iam_policy" "oracle_licensing" {
 resource "aws_iam_role_policy_attachment" "oracle_licensing_policy" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.oracle_licensing.arn
+}
+
+# Access to LZ buckets.
+resource "aws_iam_policy" "access_to_lz_buckets" {
+  name        = "access_to_lz_buckets-${local.environment}"
+  description = "Allows licensing metrics to be captured"
+
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Sid" : "AccessToLZBuckets",
+          "Effect" : "Allow",
+          "Action" : [
+            "s3:DeleteObject",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:PutObject"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::laa-ccms-inbound-*",
+            "arn:aws:s3:::laa-ccms-outbound-*"
+          ]
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "access_to_lz_buckets_policy" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = aws_iam_policy.access_to_lz_buckets.arn
 }
