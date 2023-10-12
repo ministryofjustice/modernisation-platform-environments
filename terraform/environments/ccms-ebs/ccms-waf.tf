@@ -64,7 +64,6 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
     "52.52.95.213",      // PINGDOM
     "52.52.118.192",     // PINGDOM
     "52.57.132.90",      // PINGDOM
-    "52.59.46.112",      // PINGDOM
     "52.59.147.246",     // PINGDOM
     "52.62.12.49",       // PINGDOM
     "52.63.142.2",       // PINGDOM
