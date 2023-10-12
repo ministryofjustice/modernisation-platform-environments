@@ -1,5 +1,5 @@
 # Alarm - "Redshift Health Status"
-module "dpr_redshift_health_status" {
+module "dpr_redshift_health_status_check" {
   source = "./modules/cw_alarm"
   create_metric_alarm = var.enable_cw_alarm
 
@@ -18,7 +18,7 @@ module "dpr_redshift_health_status" {
 }
 
 # Alarm - "DMS Stop Monitor"
-module "dpr_redshift_health_status" {
+module "dpr_dms_stoptask_check" {
   source = "./modules/cw_alarm"
   create_metric_alarm = var.enable_cw_alarm
 
@@ -43,7 +43,7 @@ module "dpr_redshift_health_status" {
 }
 
 # Alarm - "DMS CPU Utilization Monitor"
-module "dpr_redshift_health_status" {
+module "dpr_dms_cpu_utils_check" {
   source = "./modules/cw_alarm"
   create_metric_alarm = var.enable_cw_alarm
 
