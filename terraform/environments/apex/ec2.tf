@@ -12,7 +12,7 @@ cd /etc
 mkdir cloudwatch_agent
 cd cloudwatch_agent
 echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:cloudwatch_agent_config.json
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/etc/cloudwatch_agent/cloudwatch_agent_config.json
 
 EOF
 }
