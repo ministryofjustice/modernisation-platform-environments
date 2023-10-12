@@ -98,7 +98,7 @@ module "s3_bucket_ldap_data_refresh" {
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
   custom_kms_key      = var.account_config.general_shared_kms_key_arn
-#  bucket_policy_v2    = local.ldap_refresh_bucket_policies
+  #  bucket_policy_v2    = local.ldap_refresh_bucket_policies
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
@@ -106,6 +106,15 @@ module "s3_bucket_ldap_data_refresh" {
 
   tags = local.tags
 }
+
+resource "aws_s3_bucket_public_access_block" "s3_bucket_ldap_data_refresh" {
+  bucket                  = s3_bucket_ldap_data_refresh.bucket.id
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
 #
 #data "aws_iam_policy_document" "datasync_s3_ldap_refresh_access" {
 #  for_each = { for k, v in nonsensitive(var.platform_vars.environment_management.account_ids) : k => v if startswith(k, "delius-core") }
