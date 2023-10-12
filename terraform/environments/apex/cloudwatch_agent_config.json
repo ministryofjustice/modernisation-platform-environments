@@ -73,6 +73,7 @@
             {
               "file_path": "/var/log/messages",
               "log_group_name": "APEX-EC2",
+              "log_stream_name": "{instance_id}",
               "retention_in_days": 90
             }
           ]
