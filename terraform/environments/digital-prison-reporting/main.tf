@@ -17,21 +17,22 @@ module "glue_reporting_hub_job" {
   job_language                  = "scala"
   create_security_configuration = local.create_sec_conf
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-${local.env}/"
-  checkpoint_dir                = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/" // hadoop 3 only supports s3a
+  # Using s3a for checkpoint because to align with Hadoop 3 supports
+  checkpoint_dir                = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  execution_class              = "STANDARD"
-  worker_type                  = local.reporting_hub_worker_type
-  number_of_workers            = local.reporting_hub_num_workers
-  max_concurrent               = 1
-  region                       = local.account_region
-  account                      = local.account_id
-  log_group_retention_in_days  = 1
+  script_location               = local.glue_placeholder_script_location
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  execution_class               = "STANDARD"
+  worker_type                   = local.reporting_hub_worker_type
+  number_of_workers             = local.reporting_hub_num_workers
+  max_concurrent                = 1
+  region                        = local.account_region
+  account                       = local.account_id
+  log_group_retention_in_days   = 1
 
   tags = merge(
     local.all_tags,
@@ -43,29 +44,30 @@ module "glue_reporting_hub_job" {
   )
 
   arguments = {
-    "--extra-jars"                      = local.glue_jobs_latest_jar_location
-    "--job-bookmark-option"             = "job-bookmark-disable"
-    "--class"                           = "uk.gov.justice.digital.job.DataHubJob"
-    "--dpr.kinesis.stream.arn"          = module.kinesis_stream_ingestor.kinesis_stream_arn
-    "--dpr.aws.region"                  = local.account_region
-    "--dpr.curated.s3.path"             = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.batchDurationSeconds"        = local.reporting_hub_batch_duration_seconds
-    "--dpr.add.idle.time.between.reads" = local.reporting_hub_add_idle_time_between_reads
-    "--dpr.raw.s3.path"                 = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"          = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.violations.s3.path"          = "s3://${module.s3_violation_bucket.bucket_id}/"
-    "--enable-metrics"                  = true
-    "--enable-spark-ui"                 = false
-    "--enable-auto-scaling"             = true
-    "--enable-job-insights"             = true
-    "--dpr.aws.dynamodb.endpointUrl"    = "https://dynamodb.${local.account_region}.amazonaws.com"
-    "--dpr.contract.registryName"       = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
-    "--dpr.domain.registry"             = "${local.project}-domain-registry-${local.environment}"
-    "--dpr.domain.target.path"          = "s3://${module.s3_domain_bucket.bucket_id}"
-    "--dpr.domain.catalog.db"           = module.glue_data_domain_database.db_name
-    "--dpr.redshift.secrets.name"       = "${local.project}-redshift-secret-${local.environment}"
-    "--dpr.datamart.db.name"            = "datamart"
-    "--dpr.log.level"                   = local.reporting_hub_log_level
+    "--extra-jars"                         = local.glue_jobs_latest_jar_location
+    "--job-bookmark-option"                = "job-bookmark-disable"
+    "--class"                              = "uk.gov.justice.digital.job.DataHubJob"
+    "--dpr.kinesis.stream.arn"             = module.kinesis_stream_ingestor.kinesis_stream_arn
+    "--dpr.aws.region"                     = local.account_region
+    "--dpr.curated.s3.path"                = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.batchDurationSeconds"           = local.reporting_hub_batch_duration_seconds
+    "--dpr.add.idle.time.between.reads"    = local.reporting_hub_add_idle_time_between_reads
+    "--dpr.idle.time.between.reads.millis" = local.reporting_hub_idle_time_between_reads_in_millis
+    "--dpr.raw.s3.path"                    = "s3://${module.s3_raw_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"             = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.violations.s3.path"             = "s3://${module.s3_violation_bucket.bucket_id}/"
+    "--enable-metrics"                     = true
+    "--enable-spark-ui"                    = false
+    "--enable-auto-scaling"                = true
+    "--enable-job-insights"                = true
+    "--dpr.aws.dynamodb.endpointUrl"       = "https://dynamodb.${local.account_region}.amazonaws.com"
+    "--dpr.contract.registryName"          = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.domain.registry"                = "${local.project}-domain-registry-${local.environment}"
+    "--dpr.domain.target.path"             = "s3://${module.s3_domain_bucket.bucket_id}"
+    "--dpr.domain.catalog.db"              = module.glue_data_domain_database.db_name
+    "--dpr.redshift.secrets.name"          = "${local.project}-redshift-secret-${local.environment}"
+    "--dpr.datamart.db.name"               = "datamart"
+    "--dpr.log.level"                      = local.reporting_hub_log_level
   }
 }
 
