@@ -1,0 +1,250 @@
+#------------------------------------------------------------------------------
+# S3 Bucket for file uploads
+#------------------------------------------------------------------------------
+#tfsec:ignore:AWS002 tfsec:ignore:AWS098
+resource "aws_s3_bucket" "upload_files" {
+  #checkov:skip=CKV_AWS_18
+  #checkov:skip=CKV_AWS_144
+  #checkov:skip=CKV2_AWS_6
+  bucket = "${local.application_name}-uploads-${local.environment}"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-uploads"
+    }
+  )
+}
+
+resource "aws_s3_bucket_acl" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  rule {
+    id     = "tf-s3-lifecycle"
+    status = "Enabled"
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "STANDARD_IA"
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.s3.arn
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_policy" "upload_files_policy" {
+  bucket = aws_s3_bucket.upload_files.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "upload_bucket_policy"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = { AWS = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"] }
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.upload_files.arn,
+          "${aws_s3_bucket.upload_files.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role" "s3_uploads_role" {
+  name               = "${local.application_name}-s3-uploads-role"
+  assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-s3-uploads-role"
+    }
+  )
+}
+
+data "aws_iam_policy_document" "s3-access-policy" {
+  version = "2012-10-17"
+  statement {
+    sid    = ""
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole",
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "rds.amazonaws.com",
+        "ec2.amazonaws.com",
+      ]
+    }
+  }
+}
+
+resource "aws_iam_policy" "s3-uploads-policy" {
+  name   = "${local.application_name}-s3-uploads-policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+          "s3:*"
+      ],
+      "Resource": [
+          "${aws_s3_bucket.upload_files.arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+          "s3:*"
+      ],
+      "Resource": [
+        "${aws_s3_bucket.upload_files.arn}/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetEncryptionConfiguration"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+      "kms:Decrypt"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
+  role       = aws_iam_role.s3_uploads_role.name
+  policy_arn = aws_iam_policy.s3-uploads-policy.arn
+}
+
+#-------------------------------------------------------------------------------------------------
+# S3 "landing" bucket for AP data transfer 
+# AP pipelines write to this bucket and the Performance Hub reads files from here. It doesn't
+# need complex retention since files are removed from this bucket once imported.
+#-------------------------------------------------------------------------------------------------
+#tfsec:ignore:AWS002 tfsec:ignore:AWS098
+resource "aws_s3_bucket" "ap_landing_bucket" {
+  #checkov:skip=CKV_AWS_18
+  #checkov:skip=CKV_AWS_144
+  #checkov:skip=CKV2_AWS_6
+  bucket = "${local.application_name}-land-${local.environment}"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ap-landing-bucket"
+    }
+  )
+}
+
+resource "aws_s3_bucket_acl" "ap_landing_bucket" {
+  bucket = aws_s3_bucket.ap_landing_bucket.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "ap_landing_bucket" {
+  bucket = aws_s3_bucket.ap_landing_bucket.id
+  rule {
+    id     = "tf-s3-lifecycle-landing"
+    status = "Enabled"
+    expiration {
+      days = 30
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "ap_landing_bucket" {
+  bucket = aws_s3_bucket.ap_landing_bucket.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.s3.arn
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "ap_landing_bucket" {
+  bucket = aws_s3_bucket.ap_landing_bucket.id
+  versioning_configuration {
+    status = "Disabled"
+  }
+}
+
+#------------------------------------------------------------------------------
+# KMS setup for S3
+#------------------------------------------------------------------------------
+
+resource "aws_kms_key" "s3" {
+  description         = "Encryption key for s3"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.s3-kms.json
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-s3-kms"
+    }
+  )
+}
+
+resource "aws_kms_alias" "kms-alias" {
+  name          = "alias/s3"
+  target_key_id = aws_kms_key.s3.arn
+}
+
+data "aws_iam_policy_document" "s3-kms" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_109
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
+    }
+  }
+}
