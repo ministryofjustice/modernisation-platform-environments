@@ -97,7 +97,7 @@ module "data_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
       expiration = {
         days = 730
       }
-
+    }
   ]
 
   tags = local.tags
