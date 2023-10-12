@@ -115,7 +115,6 @@ module "s3_bucket_ldap_data_refresh" {
 #  restrict_public_buckets = false
 #}
 
-#
 #data "aws_iam_policy_document" "datasync_s3_ldap_refresh_access" {
 #  for_each = { for k, v in nonsensitive(var.platform_vars.environment_management.account_ids) : k => v if startswith(k, "delius-core") }
 #  statement {
