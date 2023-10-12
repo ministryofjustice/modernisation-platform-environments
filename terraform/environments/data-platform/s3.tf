@@ -191,19 +191,6 @@ module "logs_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
         days = 730
       }
 
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 730
-      }
     }
   ]
 
