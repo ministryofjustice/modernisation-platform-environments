@@ -82,7 +82,7 @@ module "dpr_dms_cpu_utils_check" {
   threshold           = 80
 
   namespace   = "AWS/DMS"
-  metric_name = "HealthStatus"
+  metric_name = "CPUUtilization"
   statistic   = "Average"
 
   alarm_actions = [module.notifications_sns.sns_topic_arn]
