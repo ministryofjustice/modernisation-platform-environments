@@ -80,11 +80,13 @@ locals {
         type        = "AWS"
         identifiers = ["*"]
       }
-      conditions = {
-        test     = "ArnLike"
-        values   = ["arn:aws:iam::${account_id}:role/ldap-data-refresh-role-*"]
-        variable = "aws:PrincipalARN"
-      }
+      conditions = [
+        {
+          test     = "ArnLike"
+          values   = ["arn:aws:iam::${account_id}:role/ldap-data-refresh-role-*"]
+          variable = "aws:PrincipalARN"
+        }
+      ]
     }
   ]
 
