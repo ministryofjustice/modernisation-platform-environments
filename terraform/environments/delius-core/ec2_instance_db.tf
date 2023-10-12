@@ -97,8 +97,8 @@ data "aws_iam_policy_document" "core_shared_services_bucket_access" {
       "s3:GetObject"
     ]
     resources = [
-      "arn:aws:s3:::mod-platform-image-artefact-bucket*/*",
-      "arn:aws:s3:::mod-platform-image-artefact-bucket*"
+      "arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001/*",
+      "arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001"
     ]
   }
 }
