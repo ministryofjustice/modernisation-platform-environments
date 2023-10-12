@@ -3,7 +3,7 @@ module "dpr_redshift_health_status_check" {
   source = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
-  alarm_name          = "dpr-redshift-health-status-alarm"
+  alarm_name          = "dpr-redshift-health-status"
   alarm_description   = "ATTENTION: DPR Redshift HealthStatus Monitor, Please investigate Redshift Errors !"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
@@ -22,7 +22,7 @@ module "dpr_dms_stoptask_check" {
   source = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
-  alarm_name          = "dpr-redshift-health-status-alarm"
+  alarm_name          = "dpr-dms-stop-task"
   alarm_description   = "ATTENTION: DPR DMS Replication Stop Monitor, Please investigate DMS Replication Task Errors !"
   comparison_operator = "GreaterThanThreshold"
   threshold           = 0
@@ -48,7 +48,7 @@ module "dpr_dms_starttask_check" {
   source = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
-  alarm_name          = "dpr-redshift-health-status-alarm"
+  alarm_name          = "dpr-dms-start-task"
   alarm_description   = "ATTENTION: DPR DMS Replication Start Monitor, Please investigate DMS Replication Task Errors !"
   comparison_operator = "GreaterThanThreshold"
   threshold           = 0
@@ -74,7 +74,7 @@ module "dpr_dms_cpu_utils_check" {
   source = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
-  alarm_name          = "dpr-redshift-health-status-alarm"
+  alarm_name          = "dpr-dms-cpu-utilization"
   alarm_description   = "ATTENTION: DPR DMS Instance CPU Monitor, Please investigate High CPU Utilization for DMS Instance !"
   comparison_operator = "GreaterThanThreshold"
   period              = 300
