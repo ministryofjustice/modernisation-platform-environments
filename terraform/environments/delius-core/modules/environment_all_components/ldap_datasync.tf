@@ -78,7 +78,7 @@ locals {
       ]
       principals = {
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${account_id}:role/ldap-data-refresh-role-*"]
+        identifiers = ["*"]
       }
       condition = {
         test     = "ArnLike"
