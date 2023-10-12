@@ -55,4 +55,76 @@ data "aws_iam_policy_document" "ldap_datasync_role_access" {
     ]
     resources = ["*"]
   }
+  statement {
+    sid     = "allowAccessForDataSync"
+    effect  = "Allow"
+    actions = ["s3:*"]
+    resources = [
+      "${module.s3_bucket_ldap_data_refresh.bucket.arn}",
+      "${module.s3_bucket_ldap_data_refresh.bucket.arn}/*",
+    ]
+  }
 }
+
+locals {
+  delius_core_accounts = { for k, v in nonsensitive(var.platform_vars.environment_management.account_ids) : k => v if startswith(k, "delius-core") }
+  ldap_refresh_bucket_policies = [for account_name, account_id in local.delius_core_accounts :
+    {
+      effect  = "Allow"
+      actions = ["s3:*"]
+      resources = [
+        "${module.s3_bucket_ldap_data_refresh.bucket.arn}",
+        "${module.s3_bucket_ldap_data_refresh.bucket.arn}/*",
+      ]
+      principals = {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${account_id}:role/ldap-data-refresh-role-*"]
+      }
+      condition = {
+        test     = "ArnLike"
+        values   = ["arn:aws:iam::${account_id}:role/ldap-data-refresh-role-*"]
+        variable = "aws:PrincipalARN"
+      }
+    }
+  ]
+
+}
+
+
+module "s3_bucket_ldap_data_refresh" {
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  bucket_name         = "${var.env_name}-ldap-data-refresh-incoming"
+  versioning_enabled  = false
+  ownership_controls  = "BucketOwnerEnforced"
+  replication_enabled = false
+  custom_kms_key      = var.account_config.general_shared_kms_key_arn
+  bucket_policy_v2    = local.ldap_refresh_bucket_policies
+
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+
+  tags = local.tags
+}
+#
+#data "aws_iam_policy_document" "datasync_s3_ldap_refresh_access" {
+#  for_each = { for k, v in nonsensitive(var.platform_vars.environment_management.account_ids) : k => v if startswith(k, "delius-core") }
+#  statement {
+#    sid     = "allowAccessForDataSync_${each.key}"
+#    effect  = "Allow"
+#    actions = ["s3:*"]
+#    resources = [
+#      "${module.s3_bucket_ldap_data_refresh.bucket.arn}",
+#      "${module.s3_bucket_ldap_data_refresh.bucket.arn}/*",
+#    ]
+#    principals {
+#      type        = "AWS"
+#      identifiers = ["*"]
+#    }
+#    condition {
+#      test     = "ArnLike"
+#      values   = ["arn:aws:iam::${each.value}:role/ldap-data-refresh-role-*"]
+#      variable = "aws:PrincipalARN"
+#    }
+#  }
+#}
