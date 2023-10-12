@@ -84,6 +84,31 @@ data "aws_iam_policy_document" "ec2_access_for_ansible" {
   }
 }
 
+data "aws_iam_policy_document" "allow_access_to_ssm_parameter_store" {
+  statement {
+    sid     = "AllowAccessToSsmParameterStore"
+    effect  = "Allow"
+    actions = [
+      "ssm:PutParameter"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
+  name   = format("%s-%s-allow_access_to_ssm_parameter_store", var.env_name, var.db_config.name)
+  path   = "/"
+  policy = data.aws_iam_policy_document.allow_access_to_ssm_parameter_store.json
+  tags = merge(local.tags,
+    { Name = format("%s-%s-ec2_access_for_ansible", var.env_name, var.db_config.name) }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "allow_access_to_ssm_parameter_store" {
+  role       = aws_iam_role.db_ec2_instance_iam_role.name
+  policy_arn = aws_iam_policy.allow_access_to_ssm_parameter_store.arn
+}
+
 resource "aws_iam_policy" "ec2_access_for_ansible" {
   name   = format("%s-%s-ec2_access_for_ansible", var.env_name, var.db_config.name)
   path   = "/"
