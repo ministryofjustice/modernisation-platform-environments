@@ -87,3 +87,82 @@ module "dpr_dms_cpu_utils_check" {
 
   alarm_actions = [module.notifications_sns.sns_topic_arn]
 }
+
+# Alarm - "DMS FreeMemory Monitor"
+module "dpr_dms_free_memory_check" {
+  source = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm
+
+  alarm_name          = "dpr-dms-free-memory"
+  alarm_description   = "ATTENTION: DPR DMS Instance FreeMemory Monitor, Please investigate FreeMemory is Below 1Gb DMS Instance !"
+  comparison_operator = "LessThanThreshold"
+  period              = 300
+  evaluation_periods  = 1
+  threshold           = 1000000000
+
+  namespace   = "AWS/DMS"
+  metric_name = "FreeMemory"
+  statistic   = "Average"
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}
+
+# Alarm - "DMS SWAP Usage Monitor"
+# https://repost.aws/knowledge-center/dms-swap-files-consuming-space
+module "dpr_dms_swap_usage_check" {
+  source = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm
+
+  alarm_name          = "dpr-dms-swap-usage"
+  alarm_description   = "ATTENTION: DPR DMS Instance SWAP Usage Monitor, Please investigate SWAP Usage is Above 0.75 Gb for DMS Instance!"
+  comparison_operator = "GreaterThanThreshold"
+  period              = 300
+  evaluation_periods  = 1
+  threshold           = 750000000
+
+  namespace   = "AWS/DMS"
+  metric_name = "SwapUsage"
+  statistic   = "Average"
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}
+
+# Alarm - "DMS Network Transmit Throughput Monitor"
+# https://repost.aws/knowledge-center/dms-swap-files-consuming-space
+module "dpr_dms_network_transmit_throughput" {
+  source = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm
+
+  alarm_name          = "dpr-dms-network-transmit-throughput"
+  alarm_description   = "ATTENTION: DPR DMS Instance Network Throughput Monitor, Please investigate Network Transmit Throughput is below Threshold 1000 Bytes!"
+  comparison_operator = "LessThanThreshold"
+  period              = 300
+  evaluation_periods  = 1
+  threshold           = 10 # 10 Bytes
+
+  namespace   = "AWS/DMS"
+  metric_name = "NetworkTransmitThroughput"
+  statistic   = "Average"
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}
+
+# Alarm - "DMS Network Receive Throughput Monitor"
+# https://repost.aws/knowledge-center/dms-swap-files-consuming-space
+module "dpr_dms_network_receive_throughput" {
+  source = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm
+
+  alarm_name          = "dpr-dms-network-receive-throughput"
+  alarm_description   = "ATTENTION: DPR DMS Instance Network Throughput Monitor, Please investigate Network Receive Throughput is below Threshold 10 Bytes!"
+  comparison_operator = "LessThanThreshold"
+  period              = 300
+  evaluation_periods  = 1
+  threshold           = 10 # 10 Bytes
+
+  namespace   = "AWS/DMS"
+  metric_name = "NetworkReceiveThroughput"
+  statistic   = "Average"
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}
