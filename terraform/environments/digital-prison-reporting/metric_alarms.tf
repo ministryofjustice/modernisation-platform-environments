@@ -26,12 +26,38 @@ module "dpr_dms_stoptask_check" {
   alarm_description   = "ATTENTION: DPR DMS Replication Stop Monitor, Please investigate DMS Replication Task Errors !"
   comparison_operator = "GreaterThanThreshold"
   threshold           = 0
-  period              = 60
+  period              = 30
   evaluation_periods  = 1
 
   dimensions = {
     "Class"    = "None"
     "Resource" = "StopReplicationTask"
+    "Service"  = "Database Migration Service"
+    "Type"     = "API"
+  }
+
+  namespace    = "AWS/Usage"
+  metric_name  = "CallCount"
+  statistic    = "Maximum"
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}
+
+# Alarm - "DMS Start Monitor"
+module "dpr_dms_stoptask_check" {
+  source = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm
+
+  alarm_name          = "dpr-redshift-health-status-alarm"
+  alarm_description   = "ATTENTION: DPR DMS Replication Start Monitor, Please investigate DMS Replication Task Errors !"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 0
+  period              = 30
+  evaluation_periods  = 1
+
+  dimensions = {
+    "Class"    = "None"
+    "Resource" = "StartReplicationTask"
     "Service"  = "Database Migration Service"
     "Type"     = "API"
   }
