@@ -159,7 +159,10 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
   statement {
     sid     = "getLandingData"
     effect  = "Allow"
-    actions = ["s3:GetObject*"]
+    actions = [
+        "s3:GetObject*",
+        "s3:ListBucket",
+    ]
     resources = [
       "${module.data_landing_s3_bucket.bucket.arn}/*"
     ]
