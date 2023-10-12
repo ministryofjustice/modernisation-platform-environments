@@ -14,7 +14,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   from_port         = "443"
   to_port           = "443"
   ip_protocol       = "tcp"
-  cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
+  cidr_ipv4         = "35.176.93.186/32" # Global Protect VPN
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_allowlist" {
@@ -23,7 +23,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   from_port         = "80"
   to_port           = "80"
   ip_protocol       = "tcp"
-  cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
+  cidr_ipv4         = "35.176.93.186/32" # Global Protect VPN
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_service" {
