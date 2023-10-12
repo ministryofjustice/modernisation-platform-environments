@@ -18,16 +18,14 @@
             "type": "string",
             "description": "The name of a column within your data.",
             "pattern": "^[a-z0-9_]+$",
-            "example": "my_data_column",
             "maxLength": 255
           },
           "description": {
             "type": "string",
             "description": "A description of the column that will feed the data catalogue.",
-            "example": "column contains the primary key and relates to a personal identifier autogrenerated by the source database"
           }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     },
     "int_types": {
       "allOf": [
