@@ -53,7 +53,6 @@ module "dpr_dms_cpu_utils_check" {
   period              = 300
   evaluation_periods  = 1
   threshold           = 80
-  period              = 60
 
   namespace   = "AWS/DMS"
   metric_name = "HealthStatus"
