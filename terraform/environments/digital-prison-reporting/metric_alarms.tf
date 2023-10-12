@@ -182,8 +182,8 @@ module "dpr_dms_cdc_source_latency" {
   threshold           = 3600 # 60 mins
 
   dimensions                = {
-    - "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
-    - "ReplicationTaskIdentifier"     = module.dms_nomis_ingestor.dms_replication_task_name
+    "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
+    "ReplicationTaskIdentifier"     = module.dms_nomis_ingestor.dms_replication_task_name
   }
 
   namespace   = "AWS/DMS"
@@ -205,8 +205,8 @@ module "dpr_dms_cdc_target_latency" {
   threshold           = 3600 # 60 mins
 
   dimensions                = {
-    - "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
-    - "ReplicationTaskIdentifier"     = module.dms_nomis_ingestor.dms_replication_task_name
+    "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
+    "ReplicationTaskIdentifier"     = module.dms_nomis_ingestor.dms_replication_task_name
   }
 
   namespace   = "AWS/DMS"
