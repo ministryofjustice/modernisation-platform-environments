@@ -18,7 +18,7 @@
             "type": "string",
             "description": "The name of a column within your data.",
             "pattern": "^[a-z0-9_]+$",
-            "maxLength": 255
+            "maxLength": 128
           },
           "description": {
             "type": "string",
