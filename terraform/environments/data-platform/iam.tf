@@ -219,7 +219,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
   statement {
     sid     = "GetPutDataObject"
     effect  = "Allow"
-    actions = ["s3:GetObject", "s3:PutObject"]
+    actions = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
     resources = [
       "${module.data_s3_bucket.bucket.arn}/raw/*",
       "${module.logs_s3_bucket.bucket.arn}/logs/*"
