@@ -175,7 +175,7 @@ resource "aws_api_gateway_method" "create_schema_for_data_product_table_name" {
   }
 }
 
-# /data-product/{data-product-name}/table/{table-name}/upload lambda integration
+# /data-product/{data-product-name}/table/{table-name}/schema lambda integration
 resource "aws_api_gateway_integration" "create_schema_for_data_product_table_name_to_lambda" {
   http_method             = aws_api_gateway_method.create_schema_for_data_product_table_name.http_method
   resource_id             = aws_api_gateway_resource.create_schema_for_data_product_table_name.id
