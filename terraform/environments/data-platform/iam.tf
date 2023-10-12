@@ -164,7 +164,8 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
         "s3:ListBucket",
     ]
     resources = [
-      "${module.data_landing_s3_bucket.bucket.arn}/*"
+      "${module.data_landing_s3_bucket.bucket.arn}/*",
+      "${module.data_landing_s3_bucket.bucket.arn}",
     ]
   }
   statement {
