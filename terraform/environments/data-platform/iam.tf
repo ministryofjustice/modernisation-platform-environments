@@ -171,9 +171,13 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
   statement {
     sid     = "putRawData"
     effect  = "Allow"
-    actions = ["s3:PutObject*"]
+    actions = [
+        "s3:PutObject*",
+        "s3:ListBucket",
+    ]
     resources = [
-      "${module.data_s3_bucket.bucket.arn}/raw/*"
+      "${module.data_s3_bucket.bucket.arn}/raw/*",
+      "${module.data_s3_bucket.bucket.arn}/raw",
     ]
   }
 }
