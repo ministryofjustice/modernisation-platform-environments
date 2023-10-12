@@ -222,7 +222,9 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
     actions = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
     resources = [
       "${module.data_s3_bucket.bucket.arn}/raw/*",
-      "${module.logs_s3_bucket.bucket.arn}/logs/*"
+      "${module.logs_s3_bucket.bucket.arn}/logs/*",
+      "${module.data_s3_bucket.bucket.arn}/raw",
+      "${module.logs_s3_bucket.bucket.arn}/logs",
     ]
   }
 
@@ -486,8 +488,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" 
     effect  = "Allow"
     actions = ["s3:ListBucket"]
     resources = [
-      module.metadata_s3_bucket.bucket.arn,
-      "${module.metadata_s3_bucket.bucket.arn}/*"
+      module.metadata_s3_bucket.bucket.arn
     ]
   }
 
@@ -521,7 +522,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lamb
     sid       = "ListBucket"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = [module.data_s3_bucket.bucket.arn, "${module.data_s3_bucket.bucket.arn}/*"]
+    resources = [module.data_s3_bucket.bucket.arn]
   }
   statement {
     sid       = "InvokeAthenaLoadLambda"
