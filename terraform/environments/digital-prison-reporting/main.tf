@@ -18,21 +18,21 @@ module "glue_reporting_hub_job" {
   create_security_configuration = local.create_sec_conf
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-${local.env}/"
   # Using s3a for checkpoint because to align with Hadoop 3 supports
-  checkpoint_dir                = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
+  checkpoint_dir   = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
+  spark_event_logs = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
   # Placeholder Script Location
-  script_location               = local.glue_placeholder_script_location
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  execution_class               = "STANDARD"
-  worker_type                   = local.reporting_hub_worker_type
-  number_of_workers             = local.reporting_hub_num_workers
-  max_concurrent                = 1
-  region                        = local.account_region
-  account                       = local.account_id
-  log_group_retention_in_days   = 1
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  execution_class              = "STANDARD"
+  worker_type                  = local.reporting_hub_worker_type
+  number_of_workers            = local.reporting_hub_num_workers
+  max_concurrent               = 1
+  region                       = local.account_region
+  account                      = local.account_id
+  log_group_retention_in_days  = 1
 
   tags = merge(
     local.all_tags,
@@ -85,19 +85,19 @@ module "glue_domain_refresh_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-domain-refresh-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-domain-refresh-${local.env}/"
   # Placeholder Script Location
-  script_location               = local.glue_placeholder_script_location
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   # timeout                       = 1440
-  execution_class               = "FLEX"
-  worker_type                   = local.refresh_job_worker_type
-  number_of_workers             = local.refresh_job_num_workers
-  max_concurrent                = 64
-  region                        = local.account_region
-  account                       = local.account_id
-  log_group_retention_in_days   = 1
+  execution_class             = "FLEX"
+  worker_type                 = local.refresh_job_worker_type
+  number_of_workers           = local.refresh_job_num_workers
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = 1
 
   tags = merge(
     local.all_tags,
@@ -171,7 +171,7 @@ module "glue_registry_avro" {
   source               = "./modules/glue_registry"
   enable_glue_registry = true
   name                 = "${local.project}-glue-registry-avro-${local.env}"
-  tags                 = merge(
+  tags = merge(
     local.all_tags,
     {
       Name          = "${local.project}-glue-registry-avro-${local.env}"
@@ -197,7 +197,7 @@ module "glue_raw_table" {
   # AWS Glue catalog table
   glue_catalog_table_description = "Glue Table for raw data, managed by Terraform."
   glue_catalog_table_table_type  = "EXTERNAL_TABLE"
-  glue_catalog_table_parameters  = {
+  glue_catalog_table_parameters = {
     EXTERNAL              = "TRUE"
     "parquet.compression" = "SNAPPY"
     "classification"      = "parquet"
@@ -259,7 +259,7 @@ module "glue_reconciliation_table" {
   # AWS Glue catalog table
   glue_catalog_table_description = "Glue Table for reconciliation data, managed by Terraform."
   glue_catalog_table_table_type  = "EXTERNAL_TABLE"
-  glue_catalog_table_parameters  = {
+  glue_catalog_table_parameters = {
     EXTERNAL              = "TRUE"
     "parquet.compression" = "SNAPPY"
     "classification"      = "parquet"
@@ -597,9 +597,9 @@ module "ec2_kinesis_agent" {
   ebs_encrypted               = true
   ebs_delete_on_termination   = false
   # s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn # TBC
-  region                      = local.account_region
-  account                     = local.account_id
-  env                         = local.env
+  region  = local.account_region
+  account = local.account_id
+  env     = local.env
 
 
   tags = merge(
@@ -629,19 +629,19 @@ module "datamart" {
   create_subnet_group     = true
   kms_key_arn             = aws_kms_key.redshift-kms-key.arn
   enhanced_vpc_routing    = false
-  subnet_ids              = [
+  subnet_ids = [
     data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id
   ]
-  vpc                     = data.aws_vpc.shared.id
-  cidr                    = [data.aws_vpc.shared.cidr_block, local.cloud_platform_cidr]
-  iam_role_arns           = [aws_iam_role.redshift-role.arn, aws_iam_role.redshift-spectrum-role.arn]
+  vpc           = data.aws_vpc.shared.id
+  cidr          = [data.aws_vpc.shared.cidr_block, local.cloud_platform_cidr]
+  iam_role_arns = [aws_iam_role.redshift-role.arn, aws_iam_role.redshift-spectrum-role.arn]
 
   # Endpoint access - only available when using the ra3.x type, for S3 Simple Service
   create_endpoint_access = false
 
   # Scheduled actions
   create_scheduled_action_iam_role = true
-  scheduled_actions                = {
+  scheduled_actions = {
     pause = {
       name          = "${local.redshift_cluster_name}-pause"
       description   = "Pause cluster every night"
@@ -695,7 +695,7 @@ module "dms_nomis_ingestor" {
   migration_type               = "full-load-and-cdc"
   replication_instance_version = "3.4.7" # Upgrade
   replication_instance_class   = "dms.t3.medium"
-  subnet_ids                   = [
+  subnet_ids = [
     data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
   ]
 
@@ -747,7 +747,7 @@ module "dms_fake_data_ingestor" {
   migration_type               = "full-load-and-cdc"
   replication_instance_version = "3.4.7" # Rollback
   replication_instance_class   = "dms.t3.medium"
-  subnet_ids                   = [
+  subnet_ids = [
     data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
   ]
 
