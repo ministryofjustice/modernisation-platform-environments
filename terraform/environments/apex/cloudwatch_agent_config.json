@@ -72,7 +72,7 @@
           "collect_list": [
             {
               "file_path": "/var/log/messages",
-              "log_group_name": "${local.application_name}-EC2"
+              "log_group_name": "APEX-EC2"
             }
           ]
         }
