@@ -108,7 +108,7 @@ module "s3_bucket_ldap_data_refresh" {
 }
 
 resource "aws_s3_bucket_public_access_block" "s3_bucket_ldap_data_refresh" {
-  bucket                  = s3_bucket_ldap_data_refresh.bucket.id
+  bucket                  = module.s3_bucket_ldap_data_refresh.bucket.id
   block_public_acls       = false
   block_public_policy     = false
   ignore_public_acls      = false
