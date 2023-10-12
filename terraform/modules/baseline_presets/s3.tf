@@ -109,6 +109,7 @@ locals {
         "s3:PutObject",
         "s3:PutObjectAcl",
         "s3:PutObjectTagging",
+        "s3:RestoreObject",
       ]
       principals = {
         type = "AWS"
@@ -142,6 +143,7 @@ locals {
         "s3:PutObject",
         "s3:PutObjectAcl",
         "s3:PutObjectTagging",
+        "s3:RestoreObject",
       ]
       principals = {
         type = "AWS"
@@ -161,6 +163,7 @@ locals {
         "s3:PutObjectAcl",
         "s3:PutObjectTagging",
         "s3:DeleteObject",
+        "s3:RestoreObject",
       ]
       principals = {
         type = "AWS"
@@ -196,6 +199,7 @@ locals {
         "s3:PutObjectTagging",
         "s3:DeleteObject",
         "s3:DeleteObjectVersion",
+        "s3:RestoreObject",
       ]
       principals = {
         type = "AWS"
@@ -227,6 +231,7 @@ locals {
           "s3:PutObject",
           "s3:PutObjectAcl",
           "s3:PutObjectTagging",
+          "s3:RestoreObject",
         ]
       }
     ]
@@ -241,6 +246,7 @@ locals {
           "s3:PutObjectAcl",
           "s3:PutObjectTagging",
           "s3:DeleteObject",
+          "s3:RestoreObject",
         ]
       }
     ]
