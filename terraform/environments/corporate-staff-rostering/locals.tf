@@ -26,7 +26,12 @@ locals {
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    sns_topics               = {}
+    sns_topics = {
+      # TODO: comment this in when MP have implemented the pagerduty integration
+      # pagerduty_integrations = { 
+      #   csr_pagerduty = "csr_alarms"
+      # }
+    }
   }
 
   baseline_acm_certificates       = {}
@@ -78,6 +83,7 @@ locals {
     jumpserver        = local.security_groups.jumpserver
   }
 
-  baseline_sns_topics     = {}
   baseline_ssm_parameters = {}
+
+  baseline_sns_topics = {}
 }
