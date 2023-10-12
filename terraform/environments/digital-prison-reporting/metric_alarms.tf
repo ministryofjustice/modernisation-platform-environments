@@ -27,6 +27,7 @@ module "dpr_dms_stoptask_check" {
   comparison_operator = "GreaterThanThreshold"
   threshold           = 0
   period              = 60
+  evaluation_periods  = 1
 
   dimensions = {
     "Class"    = "None"
