@@ -1,17 +1,3 @@
-
-locals {
-  logger_environment_vars = {
-    LOG_BUCKET = module.logs_s3_bucket.bucket.id
-  }
-
-  storage_environment_vars = {
-    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
-    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
-    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
-    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
-  }
-}
-
 module "data_product_docs_lambda" {
   source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
   application_name               = "data_product_docs"
