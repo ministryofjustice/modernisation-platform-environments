@@ -80,7 +80,7 @@ locals {
         type        = "AWS"
         identifiers = ["*"]
       }
-      condition = {
+      conditions = {
         test     = "ArnLike"
         values   = ["arn:aws:iam::${account_id}:role/ldap-data-refresh-role-*"]
         variable = "aws:PrincipalARN"
@@ -107,13 +107,13 @@ module "s3_bucket_ldap_data_refresh" {
   tags = local.tags
 }
 
-resource "aws_s3_bucket_public_access_block" "s3_bucket_ldap_data_refresh" {
-  bucket                  = module.s3_bucket_ldap_data_refresh.bucket.id
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
+#resource "aws_s3_bucket_public_access_block" "s3_bucket_ldap_data_refresh" {
+#  bucket                  = module.s3_bucket_ldap_data_refresh.bucket.id
+#  block_public_acls       = false
+#  block_public_policy     = false
+#  ignore_public_acls      = false
+#  restrict_public_buckets = false
+#}
 
 #
 #data "aws_iam_policy_document" "datasync_s3_ldap_refresh_access" {
