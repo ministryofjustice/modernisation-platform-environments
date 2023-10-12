@@ -22,7 +22,7 @@
           },
           "description": {
             "type": "string",
-            "description": "A description of the column that will feed the data catalogue.",
+            "description": "A description of the column that will feed the data catalogue."
           }
       },
       "additionalProperties": false
