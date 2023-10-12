@@ -98,7 +98,7 @@ module "s3_bucket_ldap_data_refresh" {
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
   custom_kms_key      = var.account_config.general_shared_kms_key_arn
-  bucket_policy_v2    = local.ldap_refresh_bucket_policies
+#  bucket_policy_v2    = local.ldap_refresh_bucket_policies
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
