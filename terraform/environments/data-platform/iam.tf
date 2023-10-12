@@ -75,6 +75,7 @@ data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
     resources = [
       "${module.data_s3_bucket.bucket.arn}/raw/*",
       "${module.data_s3_bucket.bucket.arn}/fail/*",
+      "${module.data_s3_bucket.bucket.arn}/curated/*",
       "${module.data_s3_bucket.bucket.arn}",
       "${module.s3_athena_query_results_bucket.bucket.arn}",
       "${module.s3_athena_query_results_bucket.bucket.arn}/*"
@@ -157,11 +158,11 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
     ]
   }
   statement {
-    sid     = "getLandingData"
-    effect  = "Allow"
+    sid    = "getLandingData"
+    effect = "Allow"
     actions = [
-        "s3:GetObject*",
-        "s3:ListBucket",
+      "s3:GetObject*",
+      "s3:ListBucket",
     ]
     resources = [
       "${module.data_landing_s3_bucket.bucket.arn}/*",
@@ -169,11 +170,11 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
     ]
   }
   statement {
-    sid     = "putRawData"
-    effect  = "Allow"
+    sid    = "putRawData"
+    effect = "Allow"
     actions = [
-        "s3:PutObject*",
-        "s3:ListBucket",
+      "s3:PutObject*",
+      "s3:ListBucket",
     ]
     resources = [
       "${module.data_s3_bucket.bucket.arn}/raw/*",
@@ -557,9 +558,8 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
     effect  = "Allow"
     actions = ["s3:ListBucket"]
     resources = [
-      module.data_s3_bucket.bucket.arn,
-      "${module.data_s3_bucket.bucket.arn}/raw/*",
-    "${module.data_s3_bucket.bucket.arn}/curated/*"]
+      module.data_s3_bucket.bucket.arn
+    ]
   }
   statement {
     sid       = "InvokeAthenaLoadLambda"
