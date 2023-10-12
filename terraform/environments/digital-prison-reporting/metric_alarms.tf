@@ -1,3 +1,4 @@
+## Redshift ##
 # Alarm - "Redshift Health Status"
 module "dpr_redshift_health_status_check" {
   source = "./modules/cw_alarm"
@@ -17,6 +18,8 @@ module "dpr_redshift_health_status_check" {
   alarm_actions = [module.notifications_sns.sns_topic_arn]
 }
 
+
+## DMS ##
 # Alarm - "DMS Stop Monitor"
 module "dpr_dms_stoptask_check" {
   source = "./modules/cw_alarm"
@@ -162,6 +165,75 @@ module "dpr_dms_network_receive_throughput" {
 
   namespace   = "AWS/DMS"
   metric_name = "NetworkReceiveThroughput"
+  statistic   = "Average"
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}
+
+module "dpr_dms_cdc_source_latency" {
+  source = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm
+
+  alarm_name          = "dpr-dms-cdc-source-latency"
+  alarm_description   = "ATTENTION: P1 Incident: DPR DMS CDC Source Latency, Please investigate CDC Source Latency greater than 60 mins !"
+  comparison_operator = "GreaterThanThreshold"
+  period              = 900
+  evaluation_periods  = 1
+  threshold           = 3600 # 60 mins
+
+  dimensions                = {
+    - "ReplicationInstanceIdentifier" = "dpr-dms-nomis-ingestor-test"
+    - "ReplicationTaskIdentifier"     = "dpr-dms-task-nomis-oracle-kinesis"
+  }
+
+  namespace   = "AWS/DMS"
+  metric_name = "CDCLatencySource"
+  statistic   = "Average"
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}
+
+module "dpr_dms_cdc_source_latency" {
+  source = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm
+
+  alarm_name          = "dpr-dms-cdc-source-latency"
+  alarm_description   = "ATTENTION: P1 Incident: DPR DMS CDC Source Latency, Please investigate CDC Source Latency for Oracle Nomis is greater than 60 mins !"
+  comparison_operator = "GreaterThanThreshold"
+  period              = 900
+  evaluation_periods  = 1
+  threshold           = 3600 # 60 mins
+
+  dimensions                = {
+    - "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
+    - "ReplicationTaskIdentifier"     = module.dms_nomis_ingestor.dms_replication_task_name
+  }
+
+  namespace   = "AWS/DMS"
+  metric_name = "CDCLatencySource"
+  statistic   = "Average"
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}
+
+module "dpr_dms_cdc_target_latency" {
+  source = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm
+
+  alarm_name          = "dpr-dms-cdc-target-latency"
+  alarm_description   = "ATTENTION: P1 Incident: DPR DMS CDC Target Latency, Please investigate CDC Target Latency for Oracle Nomis is greater than 60 mins !"
+  comparison_operator = "GreaterThanThreshold"
+  period              = 900
+  evaluation_periods  = 1
+  threshold           = 3600 # 60 mins
+
+  dimensions                = {
+    - "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
+    - "ReplicationTaskIdentifier"     = module.dms_nomis_ingestor.dms_replication_task_name
+  }
+
+  namespace   = "AWS/DMS"
+  metric_name = "CDCLatencyTarget"
   statistic   = "Average"
 
   alarm_actions = [module.notifications_sns.sns_topic_arn]
