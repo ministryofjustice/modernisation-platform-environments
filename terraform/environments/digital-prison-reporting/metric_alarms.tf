@@ -44,7 +44,7 @@ module "dpr_dms_stoptask_check" {
 }
 
 # Alarm - "DMS Start Monitor"
-module "dpr_dms_stoptask_check" {
+module "dpr_dms_starttask_check" {
   source = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
