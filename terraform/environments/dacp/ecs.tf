@@ -256,20 +256,3 @@ resource "aws_cloudwatch_event_target" "logs" {
   target_id  = "send-to-cloudwatch"
   arn        = aws_cloudwatch_log_group.deployment_logs.arn
 }
-
-# CloudWatch logs error filter metric
-resource "aws_cloudwatch_log_metric_filter" "ecs_errors" {
-  name           = "ECS Errors"
-  pattern        = "{ $.detail.group = \"service:dacp\" && $.detail.stopCode = \"*\" }"
-  log_group_name = aws_cloudwatch_log_group.deployment_logs.name
-
-  metric_transformation {
-    name      = "ECSErrors"
-    namespace = "ECSEvents"
-    value     = "1"
-    unit      = "Count"
-    dimensions = {
-      group = "$.detail.group"
-    }
-  }
-}
