@@ -243,5 +243,7 @@ locals {
     })
   })
 
+  baseline_secretsmanager_secrets = {}
+
   public_key_data = jsondecode(file("./files/bastion_linux.json"))
 }
