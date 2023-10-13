@@ -85,7 +85,7 @@ resource "aws_ecs_service" "dacp_ecs_service" {
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 2
-  health_check_grace_period_seconds = 180
+  health_check_grace_period_seconds = 120
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
