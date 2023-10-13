@@ -26,7 +26,7 @@
             "description": "A description of the column that will feed the data catalogue."
           }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "int_types": {
       "allOf": [
