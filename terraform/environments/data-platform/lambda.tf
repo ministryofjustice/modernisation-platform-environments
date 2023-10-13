@@ -281,20 +281,14 @@ module "data_product_create_schema_lambda" {
   tracing_mode = "Active"
   memory_size  = 128
 
-  environment_variables = {
-    ENVIRONMENT = local.environment
-    BUCKET_NAME = module.s3-bucket.bucket.id
-    METADATA_BUCKET     = module.s3-bucket.bucket.id
-    LOG_BUCKET          = module.s3-bucket.bucket.id
-  }
-
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
   allowed_triggers = {
 
     AllowExecutionFromAPIGateway = {
       action        = "lambda:InvokeFunction"
       function_name = "data_product_create_metadata_${local.environment}"
       principal     = "apigateway.amazonaws.com"
-      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.register_data_product.http_method}${aws_api_gateway_resource.register_data_product.path}"
+      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.create_schema_for_data_product_table_name.http_method}${aws_api_gateway_resource.create_schema_for_data_product_table_name.path}"
     }
   }
 
