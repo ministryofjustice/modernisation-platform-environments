@@ -193,8 +193,7 @@ module "ap_landing_bucket" {
   tags = merge (
     local.tags,
     {
-        Name = "${local.application_name}-ap-landing-bucket",
-        Desciption = "Data being imported from the Analytical Platform gets dropped here, ingested and removed"
+        Name = "${local.application_name}-ap-landing-bucket"
     }
   )
 }
