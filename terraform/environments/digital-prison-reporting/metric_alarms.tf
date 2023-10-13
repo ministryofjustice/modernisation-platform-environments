@@ -87,6 +87,10 @@ module "dpr_dms_cpu_utils_check" {
   evaluation_periods  = 1
   threshold           = 80 # 80% CPU
 
+  dimensions          = {
+    "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
+  }
+
   namespace   = "AWS/DMS"
   metric_name = "CPUUtilization"
   statistic   = "Average"
@@ -106,8 +110,35 @@ module "dpr_dms_free_memory_check" {
   evaluation_periods  = 1
   threshold           = 1000000000 # 1Gb
 
+  dimensions          = {
+    "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
+  }
+
   namespace   = "AWS/DMS"
   metric_name = "FreeMemory"
+  statistic   = "Average"
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}
+
+# Alarm - "DMS FreeableMemory Monitor"
+module "dpr_dms_freeable_memory_check" {
+  source = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm
+
+  alarm_name          = "dpr-dms-freeable-memory"
+  alarm_description   = "ATTENTION: DPR DMS Instance Freeable Memory Monitor, Please investigate low FreeableMemory for Nomis DMS Instance !"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  period              = 300
+  evaluation_periods  = 1
+  threshold           = 1000000000 # 1Gb
+
+  dimensions          = {
+    "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
+  }
+
+  namespace   = "AWS/DMS"
+  metric_name = "FreeableMemory"
   statistic   = "Average"
 
   alarm_actions = [module.notifications_sns.sns_topic_arn]
@@ -125,6 +156,10 @@ module "dpr_dms_swap_usage_check" {
   period              = 300
   evaluation_periods  = 1
   threshold           = 750000000 # 0.75Gb
+
+  dimensions          = {
+    "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
+  }
 
   namespace   = "AWS/DMS"
   metric_name = "SwapUsage"
