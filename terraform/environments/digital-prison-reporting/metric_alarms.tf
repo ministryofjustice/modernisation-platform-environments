@@ -1,5 +1,8 @@
-## Redshift ##
+## Monitoring Amazon Redshift, https://docs.aws.amazon.com/redshift/latest/mgmt/metrics-listing.html
 # Alarm - "Redshift Health Status"
+# Indicates the health of the cluster. Every minute the cluster connects to its database and performs a simple query. 
+# If it is able to perform this operation successfully, the cluster is considered healthy. 
+# Otherwise, the cluster is unhealthy. An unhealthy status can occur when the cluster database is under extremely heavy load or if there is a configuration problem with a database on the cluster.
 module "dpr_redshift_health_status_check" {
   source = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
@@ -7,7 +10,7 @@ module "dpr_redshift_health_status_check" {
   alarm_name          = "dpr-redshift-health-status"
   alarm_description   = "ATTENTION: DPR Redshift HealthStatus Monitor, Please investigate Redshift Errors !"
   comparison_operator = "LessThanThreshold"
-  evaluation_periods  = 1
+  evaluation_periods  = 1 # Boolean
   threshold           = 1
   period              = 60
 
@@ -19,7 +22,7 @@ module "dpr_redshift_health_status_check" {
 }
 
 
-## DMS ##
+## Monitoring AWS DMS tasks, https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Monitoring.html
 # Alarm - "DMS Stop Monitor"
 module "dpr_dms_stoptask_check" {
   source = "./modules/cw_alarm"
@@ -28,7 +31,7 @@ module "dpr_dms_stoptask_check" {
   alarm_name          = "dpr-dms-stop-task"
   alarm_description   = "ATTENTION: DPR DMS Replication Stop Monitor, Please investigate DMS Replication Task Errors !"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 0
+  threshold           = 0 # Boolean
   period              = 30
   evaluation_periods  = 1
 
@@ -54,7 +57,7 @@ module "dpr_dms_starttask_check" {
   alarm_name          = "dpr-dms-start-task"
   alarm_description   = "ATTENTION: DPR DMS Replication Start Monitor, Please investigate DMS Replication Task Errors !"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 0
+  threshold           = 0 # Boolean
   period              = 30
   evaluation_periods  = 1
 
@@ -82,7 +85,7 @@ module "dpr_dms_cpu_utils_check" {
   comparison_operator = "GreaterThanThreshold"
   period              = 300
   evaluation_periods  = 1
-  threshold           = 80
+  threshold           = 80 # 80% CPU
 
   namespace   = "AWS/DMS"
   metric_name = "CPUUtilization"
@@ -101,7 +104,7 @@ module "dpr_dms_free_memory_check" {
   comparison_operator = "LessThanThreshold"
   period              = 300
   evaluation_periods  = 1
-  threshold           = 1000000000
+  threshold           = 1000000000 # 1Gb
 
   namespace   = "AWS/DMS"
   metric_name = "FreeMemory"
@@ -121,7 +124,7 @@ module "dpr_dms_swap_usage_check" {
   comparison_operator = "GreaterThanThreshold"
   period              = 300
   evaluation_periods  = 1
-  threshold           = 750000000
+  threshold           = 750000000 # 0.75Gb
 
   namespace   = "AWS/DMS"
   metric_name = "SwapUsage"
@@ -170,6 +173,10 @@ module "dpr_dms_network_receive_throughput" {
   alarm_actions = [module.notifications_sns.sns_topic_arn]
 }
 
+# DMS, CDCLatencySource
+# The gap, in seconds, between the last event captured from the source endpoint and current system time stamp of the AWS DMS instance. 
+# CDCLatencySource represents the latency between source and replication instance. 
+# High CDCLatencySource means the process of capturing changes from source is delayed.
 module "dpr_dms_cdc_source_latency" {
   source = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
@@ -193,6 +200,9 @@ module "dpr_dms_cdc_source_latency" {
   alarm_actions = [module.notifications_sns.sns_topic_arn]
 }
 
+# DMS, CDCLatencyTarget
+# The gap, in seconds, between the first event timestamp waiting to commit on the target and the current timestamp of the AWS DMS instance. 
+# Target latency is the difference between the replication instance server time and the oldest unconfirmed event id forwarded to a target component. 
 module "dpr_dms_cdc_target_latency" {
   source = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
@@ -212,6 +222,34 @@ module "dpr_dms_cdc_target_latency" {
   namespace   = "AWS/DMS"
   metric_name = "CDCLatencyTarget"
   statistic   = "Average"
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}
+
+# DMS CDCIncomingChanges, 
+# The total number of change events at a point-in-time that are waiting to be applied to the target. 
+# Note that this is not the same as a measure of the transaction change rate of the source endpoint. 
+# A large number for this metric usually indicates AWS DMS is unable to apply captured changes in a timely manner, 
+# thus causing high target latency.
+module "dpr_dms_cdc_incoming_events" {
+  source = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm
+
+  alarm_name          = "dpr-dms-cdc-incoming-events"
+  alarm_description   = "ATTENTION: P1 Incident: DPR DMS CDC Incoming Events Alert, Please investigate CDC Incoming Events are waiting to be applied for Oracle Nomis !"
+  comparison_operator = "GreaterThanThreshold"
+  period              = 60
+  evaluation_periods  = 1
+  threshold           = 100 # 100 events 
+
+  dimensions                = {
+    "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
+    "ReplicationTaskIdentifier"     = module.dms_nomis_ingestor.dms_replication_task_name
+  }
+
+  namespace   = "AWS/DMS"
+  metric_name = "CDCIncomingChanges"
+  statistic   = "Maximum"
 
   alarm_actions = [module.notifications_sns.sns_topic_arn]
 }
