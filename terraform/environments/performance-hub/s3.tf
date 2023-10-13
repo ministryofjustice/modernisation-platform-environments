@@ -201,12 +201,12 @@ module "ap_landing_bucket" {
 
 # AP Airflow jobs are expecting certain folders to exist
 resource "aws_s3_object" "prison_incidents" {
-  bucket = module.ap_landing_bucket.id
+  bucket = module.ap_landing_bucket.bucket.id
   key    = "prison_incidents/"
 }
 
 resource "aws_s3_object" "prison_performance" {
-  bucket = module.ap_landing_bucket.id
+  bucket = module.ap_landing_bucket.bucket.id
   key    = "prison_performance/"
 }
 
