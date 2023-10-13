@@ -49,6 +49,31 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
       "${module.s3_bucket_oracledb_backups.bucket.arn}/*"
     ]
   }
+
+  statement {
+    sid    = "AllowAccessToS3OracleBackups"
+    effect = "Allow"
+    actions = [
+      "s3:Get*",
+      "s3:List*"
+    ]
+    resources = [
+      "arn:aws:s3:::eu-west-2-dlc-${var.env_name}-oracledb-backups",
+      "arn:aws:s3:::eu-west-2-dlc-${var.env_name}-oracledb-backups/*"
+    ]
+  }
+
+  statement {
+    sid    = "listAllBuckets"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "arn:aws:s3:::*"
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "oracledb_backup_bucket_access_policy" {
