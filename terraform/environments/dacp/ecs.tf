@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.wardshipFamily_logs.name}"
+          awslogs-group         = "${aws_cloudwatch_log_group.deployment_logs.name}"
           awslogs-region        = "eu-west-2"
           awslogs-stream-prefix = "ecs"
         }
