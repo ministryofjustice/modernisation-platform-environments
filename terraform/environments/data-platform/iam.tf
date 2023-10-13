@@ -581,7 +581,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_schema_lambda" {
     sid       = "ListBucket"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = [module.s3-bucket.bucket.arn]
+    resources = [module.logs_s3_bucket.bucket.arn,module.metadata_s3_bucket.arn]
   }
   statement {
     sid    = "s3LogAccess"
@@ -591,10 +591,9 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_schema_lambda" {
       "s3:PutObject",
     ]
     resources = [
-      "${module.s3-bucket.bucket.arn}/logs/*",
-      "${module.s3-bucket.bucket.arn}/metadata/*",
-      "${module.s3-bucket.bucket.arn}/data_product_metadata_spec/*",
-      "${module.s3-bucket.bucket.arn}/data_product_schema_spec/*"
+      "${module.logs_s3_bucket.bucket.arn}/logs/*",
+      "${module.metadata_s3_bucket.arn}/*",
+
     ]
   }
   statement {
