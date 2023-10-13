@@ -1,5 +1,7 @@
 #------------------------------------------------------------------------------
 # S3 Bucket for file uploads and other user-generated content
+# (note this code predates the Modernisation Platform S3 module used below
+# for "ap_landing_bucket")
 #------------------------------------------------------------------------------
 #tfsec:ignore:AWS002 tfsec:ignore:AWS098
 resource "aws_s3_bucket" "upload_files" {
@@ -157,8 +159,8 @@ resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
 
 #-------------------------------------------------------------------------------------------------
 # S3 "landing" bucket for AP data transfer 
-# AP pipelines write to this bucket and the Performance Hub reads files from here. It doesn't
-# need complex retention or versioning since files are removed from this bucket once imported.
+# AP pipelines write to this bucket and the Performance Hub reads files from here. It doesn't need
+# complex retention versioning or replication since files are removed from this bucket once imported.
 #-------------------------------------------------------------------------------------------------
 
 module "s3-bucket" "ap_landing_bucket" {
@@ -191,12 +193,13 @@ module "s3-bucket" "ap_landing_bucket" {
   tags = merge (
     local.tags,
     {
-        Name = "${local.application_name}-ap-landing-bucket"
+        Name = "${local.application_name}-ap-landing-bucket",
+        Desciption = "Data being imported from the Analytical Platform gets dropped here, ingested and removed"
     }
   )
 }
 
-# AP Airflow jobs are expecting certain folders to exists
+# AP Airflow jobs are expecting certain folders to exist
 resource "aws_s3_object" "prison_incidents" {
   bucket = module.s3_bucket.ap_landing_bucket.id
   key    = "prison_incidents/"
