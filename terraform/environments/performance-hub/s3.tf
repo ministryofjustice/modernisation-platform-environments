@@ -163,7 +163,7 @@ resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
 # complex retention versioning or replication since files are removed from this bucket once imported.
 #-------------------------------------------------------------------------------------------------
 
-module "s3-bucket" "ap_landing_bucket" {
+module "ap_landing_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_name          = "${local.application_name}-land-${local.environment}"
@@ -201,12 +201,12 @@ module "s3-bucket" "ap_landing_bucket" {
 
 # AP Airflow jobs are expecting certain folders to exist
 resource "aws_s3_object" "prison_incidents" {
-  bucket = module.s3_bucket.ap_landing_bucket.id
+  bucket = module.ap_landing_bucket.id
   key    = "prison_incidents/"
 }
 
 resource "aws_s3_object" "prison_performance" {
-  bucket = module.s3_bucket.ap_landing_bucket.id
+  bucket = module.ap_landing_bucket.id
   key    = "prison_performance/"
 }
 
