@@ -272,6 +272,7 @@ module "data_product_create_schema_lambda" {
   description                    = "Lambda to create the first version of a json schema file for a data product"
   role_name                      = "data_product_schema_lambda_role_${local.environment}"
   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_create_schema_lambda.json
+  policy_json_attached           = true
   function_name                  = "data_product_create_schema_${local.environment}"
   create_role                    = true
   reserved_concurrent_executions = 1
