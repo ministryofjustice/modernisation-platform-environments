@@ -177,6 +177,14 @@ locals {
           security_groups = ["ndh_ems"]
           cidr_blocks     = []
         }
+        all = {
+          description     = "Allow all ingress"
+          from_port       = 0
+          to_port         = 65535
+          protocol        = "-1"
+          security_groups = ["ndh_ems", "management_server"]
+          cidr_blocks     = []
+        }
       }
       egress = {
         all = {
@@ -228,6 +236,14 @@ locals {
           to_port         = 7474
           protocol        = "tcp"
           security_groups = ["ndh_app"]
+          cidr_blocks     = []
+        }
+        all = {
+          description     = "Allow all ingress"
+          from_port       = 0
+          to_port         = 65535
+          protocol        = "-1"
+          security_groups = ["ndh_app", "management_server"]
           cidr_blocks     = []
         }
       }
