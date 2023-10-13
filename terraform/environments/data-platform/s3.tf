@@ -316,7 +316,7 @@ resource "aws_s3_bucket_notification" "landing_bucket_notification" {
 }
 
 # load the json schema for data product metadata
-resource "aws_s3_object" "object" {
+resource "aws_s3_object" "object_metadata" {
   bucket                 = module.metadata_s3_bucket.bucket.id
   key                    = "data_product_metadata_spec/v1.1.0/moj_data_product_metadata_spec.json"
   source                 = "data-product-metadata-json-schema/v1.1.0/moj_data_product_metadata_spec.json"
@@ -324,3 +324,14 @@ resource "aws_s3_object" "object" {
   acl                    = "bucket-owner-full-control"
   server_side_encryption = "AES256"
 }
+
+# load the json schema for data product schema
+resource "aws_s3_object" "object_schema" {
+  bucket                 = module.metadata_s3_bucket.bucket.id
+  key                    = "data_product_schema_spec/v1.0.0/moj_data_product_schema_spec.json"
+  source                 = "data-product-table-schema-json-schema/v1.0.0/moj_data_product_table_spec.json"
+  etag                   = filemd5("data-product-table-schema-json-schema/v1.0.0/moj_data_product_table_spec.json")
+  acl                    = "bucket-owner-full-control"
+  server_side_encryption = "AES256"
+}
+# data-product-table-schema-json-schema/v1.0.0/moj_data_product_table_spec.json
