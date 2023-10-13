@@ -1,13 +1,18 @@
 import base64
 import hashlib
-import requests
-import json
-import boto3
+import sys
 import time
 
-file_path = "test_data.csv"
-database = "test_product5"
-table = "testing"
+import boto3
+import requests
+
+
+filename = "test_data.csv"
+data_product_name = "example_prison_data_product"
+table_name = "testing"
+base_url = "https://hsolkci589.execute-api.eu-west-2.amazonaws.com/development"
+presigned_url = f"/data-product/{data_product_name}/table/{table_name}/upload"
+url = base_url + presigned_url
 glue = boto3.client("glue")
 
 
@@ -22,40 +27,52 @@ def md5_hash_file_contents(file) -> str:
     return contents_md5
 
 
-file_md5_hash = md5_hash_file_contents(file_path)
+file_md5_hash = md5_hash_file_contents(filename)
+
+body = {
+    "filename": filename,
+    "contentMD5": file_md5_hash,
+}
+
+headers = {"authorizationToken": "placeholder"}
 
 # Get presigned url
-response = requests.get(
-    url="https://hsolkci589.execute-api.eu-west-2.amazonaws.com/development/upload_data",
-    params={"database": database, "table": table, "contentMD5": file_md5_hash},
-    headers={"authorizationToken": "placeholder"},
+response = requests.post(
+    url=url,
+    json=body,
+    headers=headers,
 )
-response_json = json.loads(response.text)
+
+if response.status_code != 200:
+    print(f"Error getting presigned url. Status code: {response.status_code}")
+    print(f"Error getting presigned url. Response: {response.text}")
+    print("Exiting...")
+    sys.exit(1)
+
+response_json = response.json()
 post_policy_form_data = response_json["URL"]["fields"]
 multipart_form_data = {
     **post_policy_form_data,
-    "file": (post_policy_form_data["key"], open(file_path, "r")),
+    "file": (post_policy_form_data["key"], open(filename, "r")),
 }
 
 # Upload data
-time.sleep(5)
 print("Uploading data")
 upload_response = requests.post(response_json["URL"]["url"], files=multipart_form_data)
 print(upload_response.status_code, upload_response.text)
-
-print(f"Waiting for {database}.{table} to create in athena")
+print(f"Waiting for {data_product_name}.{table_name} to create in athena")
 time.sleep(10)
 
 # Check for created table
 try:
-    glue.get_table(DatabaseName=database, Name=table)
-    print(f"{database}.{table} found in glue")
+    glue.get_table(DatabaseName=data_product_name, Name=table_name)
+    print(f"{data_product_name}.{table_name} found in glue")
 except Exception as e:
     raise e
 
 # Clean up created table
 try:
-    glue.delete_table(DatabaseName=database, Name=table)
-    print(f"{database}.{table} deleted from glue")
+    glue.delete_table(DatabaseName=data_product_name, Name=table_name)
+    print(f"{data_product_name}.{table_name} deleted from glue")
 except Exception as e:
     raise e
