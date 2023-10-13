@@ -165,7 +165,7 @@ resource "aws_api_gateway_method" "create_schema_for_data_product_table_name" {
   authorization = "CUSTOM"
   authorizer_id = aws_api_gateway_authorizer.authorizer.id
   http_method   = "POST"
-  resource_id   = aws_api_gateway_resource.upload_data_for_data_product_table_name.id
+  resource_id   = aws_api_gateway_resource.create_schema_for_data_product_table_name.id
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
 
   request_parameters = {

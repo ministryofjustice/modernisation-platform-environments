@@ -334,4 +334,3 @@ resource "aws_s3_object" "object_schema" {
   acl                    = "bucket-owner-full-control"
   server_side_encryption = "AES256"
 }
-# data-product-table-schema-json-schema/v1.0.0/moj_data_product_table_spec.json
