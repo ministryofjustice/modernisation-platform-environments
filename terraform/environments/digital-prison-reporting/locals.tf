@@ -58,10 +58,19 @@ locals {
 
   reporting_hub_idle_time_between_reads_in_millis = local.application_data.accounts[local.environment].reporting_hub_idle_time_between_reads_in_millis
 
+  reporting_hub_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_retry_max_attempts
+  reporting_hub_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_min_wait_millis
+  reporting_hub_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_max_wait_millis
+
   # Refresh Job
   refresh_job_worker_type = local.application_data.accounts[local.environment].refresh_job_worker_type
   refresh_job_num_workers = local.application_data.accounts[local.environment].refresh_job_num_workers
   refresh_job_log_level   = local.application_data.accounts[local.environment].refresh_job_log_level
+
+  # Common Maintenance Job settings
+  maintenance_job_retry_max_attempts    = local.application_data.accounts[local.environment].maintenance_job_retry_max_attempts
+  maintenance_job_retry_min_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_min_wait_millis
+  maintenance_job_retry_max_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_max_wait_millis
 
   # Compact Raw Job
   compact_raw_job_worker_type = local.application_data.accounts[local.environment].compact_raw_job_worker_type
