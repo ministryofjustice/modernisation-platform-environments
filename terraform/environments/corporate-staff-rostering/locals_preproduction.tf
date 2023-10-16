@@ -94,7 +94,7 @@ locals {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
           monitoring              = true
-          vpc_security_group_ids  = ["domain", "app"]
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
             backup-plan = "daily-and-weekly"
           }
