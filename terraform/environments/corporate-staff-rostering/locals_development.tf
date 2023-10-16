@@ -204,7 +204,10 @@ locals {
           { name = "dev-csr-db-a", type = "CNAME", ttl = "300", records = ["dev-csr-db-a.corporate-staff-rostering.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
         ]
       }
+      "development.csr.service.justice.gov.uk" = {
+        records = [
+        ]
+      }
     }
-
   }
 }
