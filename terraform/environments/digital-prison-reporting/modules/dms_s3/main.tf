@@ -6,6 +6,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-target" {
   bucket_name             = var.bucket_name
   service_access_role_arn = aws_iam_role.dms-s3-role.arn
   data_format             = "parquet"
+  cdc_path = "cdc"
 
   cdc_max_batch_interval = 10
   include_op_for_full_load = true
