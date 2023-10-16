@@ -166,10 +166,6 @@ locals {
       }
     }
     baseline_route53_zones = {
-      "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
-        records = [
-        ]
-      }
       "test.csr.service.justice.gov.uk" = {
         records = [
         ]

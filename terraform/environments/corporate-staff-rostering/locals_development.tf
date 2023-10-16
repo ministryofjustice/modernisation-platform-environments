@@ -11,7 +11,7 @@ locals {
           availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["data-db"]
+          vpc_security_group_ids = ["database"]
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
@@ -41,7 +41,7 @@ locals {
         })
 
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["migration-app-sg", "domain-controller"]
+          vpc_security_group_ids = ["app", "domain", "jumpserver"]
           instance_type          = "t3.medium"
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
@@ -199,15 +199,6 @@ locals {
 
     }
     baseline_route53_zones = {
-      "hmpps-dev.modernisation-platform.service.justice.gov.uk" = {
-        records = [
-          { name = "dev-csr-db-a", type = "CNAME", ttl = "300", records = ["dev-csr-db-a.corporate-staff-rostering.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
-        ]
-      }
-      "development.csr.service.justice.gov.uk" = {
-        records = [
-        ]
-      }
     }
   }
 }
