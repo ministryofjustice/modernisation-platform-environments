@@ -4,6 +4,8 @@ locals {
   lambda_timeout_in_seconds = 15
   region                    = "eu-west-2"
   account_id                = local.environment_management.account_ids[terraform.workspace]
+  api_auth_token            = jsondecode(data.aws_secretsmanager_secret_version.api_auth.secret_string)["api-auth-token"]
+
 
   # Glue
   glue_default_arguments = {
