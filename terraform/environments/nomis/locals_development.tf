@@ -114,6 +114,7 @@ locals {
           ami         = "base_ol_8_5"
           os-type     = "Linux"
           component   = "test"
+          server-type = "base-ol85"
         }
       }
 
