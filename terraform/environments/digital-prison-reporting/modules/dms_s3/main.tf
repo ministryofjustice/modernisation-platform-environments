@@ -11,7 +11,6 @@ resource "aws_dms_s3_endpoint" "dms-s3-target" {
   cdc_max_batch_interval = 10
   include_op_for_full_load = true
   cdc_inserts_and_updates = true
-  preserve_transactions = true
 
   depends_on = [aws_iam_role_policy.dms-s3-target-policy]
 
