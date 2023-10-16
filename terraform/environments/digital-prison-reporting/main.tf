@@ -322,6 +322,59 @@ module "glue_reconciliation_table" {
   glue_table_depends_on = [module.glue_reconciliation_database.db_name]
 }
 
+module "glue_dms_raw_table" {
+  source                    = "./modules/glue_table"
+  enable_glue_catalog_table = true
+  name                      = "dms-raw"
+
+  # AWS Glue catalog DB
+  glue_catalog_database_name       = module.glue_dms_raw_database.db_name
+  glue_catalog_database_parameters = null
+
+  # AWS Glue catalog table
+  glue_catalog_table_description = "Glue Table for DMS raw data, managed by Terraform."
+  glue_catalog_table_table_type  = "EXTERNAL_TABLE"
+  glue_catalog_table_parameters  = {
+    EXTERNAL              = "TRUE"
+    "parquet.compression" = "SNAPPY"
+    "classification"      = "parquet"
+  }
+  glue_catalog_table_storage_descriptor = {
+
+    location      = "s3://dms-raw/"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    columns = [
+      {
+        columns_name    = "data"
+        columns_type    = "string"
+        columns_comment = "Nested JSON data"
+      },
+      {
+        columns_name    = "metadata"
+        columns_type    = "string"
+        columns_comment = "Common metadata"
+      }
+    ]
+
+    ser_de_info = [
+      {
+        serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+        parameters = {
+          "serialization.format" = 1
+        }
+      }
+    ]
+
+    skewed_info = []
+
+    sort_columns = []
+  }
+  glue_table_depends_on = [module.glue_dms_raw_database.db_name]
+}
+
 
 ##################
 ### S3 Buckets ###
@@ -361,6 +414,26 @@ module "s3_landing_bucket" {
     }
   )
 }
+
+# S3 DMS RAW
+module "s3_dms_raw_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-dms-raw-zone-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-dms-raw-zone-${local.env}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-165"
+    }
+  )
+}
+
 # S3 RAW
 module "s3_raw_bucket" {
   source                    = "./modules/s3_bucket"
@@ -563,6 +636,16 @@ module "glue_reconciliation_database" {
   create_db      = local.create_db
   name           = "reconciliation"
   description    = "Glue Data Catalog - Reconciliation"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for DMS Raw Data
+module "glue_dms_raw_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "dms-raw"
+  description    = "Glue Data Catalog - DMS Raw"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }
@@ -776,6 +859,55 @@ module "dms_fake_data_ingestor" {
       Name            = "${local.project}-dms-fake-data-ingestor-${local.env}"
       Resource_Type   = "DMS Replication"
       Postgres_Source = "DPS"
+    }
+  )
+}
+
+# DMS Nomis Data Collector
+module "dms_nomis_ingestor_s3_target" {
+  source                       = "./modules/dms_s3"
+  setup_dms_instance           = local.setup_dms_instance      # Disable all DMS Resources
+  enable_replication_task      = local.enable_replication_task # Disable Replication Task
+  name                         = "${local.project}-dms-nomis-ingestor-s3-target-${local.env}"
+  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
+  source_engine_name           = "oracle"
+  source_db_name               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
+  source_app_username          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["user"]
+  source_app_password          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["password"]
+  source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
+  source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
+  vpc                          = data.aws_vpc.shared.id
+  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  project_id                   = local.project
+  env                          = local.environment
+  dms_source_name              = "oracle"
+  dms_target_name              = "s3"
+  short_name                   = "nomis"
+  migration_type               = "full-load-and-cdc"
+  replication_instance_version = "3.4.7" # Upgrade
+  replication_instance_class   = "dms.t3.medium"
+  subnet_ids                   = [
+    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
+  ]
+
+  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
+  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
+
+  extra_attributes = "supportResetlog=TRUE"
+
+  bucket_name = module.s3_dms_raw_bucket.bucket_id
+
+  availability_zones = {
+    0 = "eu-west-2a"
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-dms-t3nomis-ingestor-s3-target-${local.env}"
+      Resource_Type = "DMS Replication"
+      Nomis_Source  = "T3"
+      Jira          = "DPR2-165"
     }
   )
 }
