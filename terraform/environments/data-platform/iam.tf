@@ -579,8 +579,28 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
 data "aws_iam_policy_document" "iam_policy_document_for_create_schema_lambda" {
   source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
   statement {
-    sid    = "s3MetadataWrite"
-    effect = "Allow"
+    sid     = "s3MetadataWrite"
+    effect  = "Allow"
+    actions = ["s3:PutObject"]
+    resources = [
+      "${module.metadata_s3_bucket.bucket.arn}/*",
+
+    ]
+  }
+  statement {
+    sid       = "LambdaLogGroup"
+    effect    = "Allow"
+    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
+  }
+}
+
+data "aws_iam_policy_document" "iam_policy_document_for_delete_schema_lambda" {
+  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
+
+  statement {
+    sid     = "s3MetadataWrite"
+    effect  = "Allow"
     actions = ["s3:PutObject"]
     resources = [
       "${module.metadata_s3_bucket.bucket.arn}/*",
