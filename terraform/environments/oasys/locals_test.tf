@@ -28,21 +28,21 @@ locals {
       "/oracle/database/T2ONRBDS" = local.database_ssm_parameters
     }
     baseline_secretsmanager_secrets = {
-      "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_db
-      "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
-      "/oracle/database/T1AZBIPI" = local.secretsmanager_secrets_db
-      "/oracle/database/T1MISTRN" = local.secretsmanager_secrets_db
-      "/oracle/database/T1ONRSYS" = local.secretsmanager_secrets_db
-      "/oracle/database/T1ONRAUD" = local.secretsmanager_secrets_db
-      "/oracle/database/T1ONRBDS" = local.secretsmanager_secrets_db
+      # "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_db
+      # "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
+      # "/oracle/database/T1AZBIPI" = local.secretsmanager_secrets_db
+      # "/oracle/database/T1MISTRN" = local.secretsmanager_secrets_db
+      # "/oracle/database/T1ONRSYS" = local.secretsmanager_secrets_db
+      # "/oracle/database/T1ONRAUD" = local.secretsmanager_secrets_db
+      # "/oracle/database/T1ONRBDS" = local.secretsmanager_secrets_db
 
-      "/oracle/database/T2OASYS"  = local.secretsmanager_secrets_db
-      "/oracle/database/T2OASREP" = local.secretsmanager_secrets_db
-      "/oracle/database/T2AZBIPI" = local.secretsmanager_secrets_db
-      "/oracle/database/T2MISTRN" = local.secretsmanager_secrets_db
-      "/oracle/database/T2ONRSYS" = local.secretsmanager_secrets_db
-      "/oracle/database/T2ONRAUD" = local.secretsmanager_secrets_db
-      "/oracle/database/T2ONRBDS" = local.secretsmanager_secrets_db
+      # "/oracle/database/T2OASYS"  = local.secretsmanager_secrets_db
+      # "/oracle/database/T2OASREP" = local.secretsmanager_secrets_db
+      # "/oracle/database/T2AZBIPI" = local.secretsmanager_secrets_db
+      # "/oracle/database/T2MISTRN" = local.secretsmanager_secrets_db
+      # "/oracle/database/T2ONRSYS" = local.secretsmanager_secrets_db
+      # "/oracle/database/T2ONRAUD" = local.secretsmanager_secrets_db
+      # "/oracle/database/T2ONRBDS" = local.secretsmanager_secrets_db
     }
 
     baseline_ec2_instances = {

@@ -901,7 +901,6 @@ variable "secretsmanager_secrets" {
     }))
   }))
   default = {}
-  sensitive = false
 }
 
 variable "security_groups" {
