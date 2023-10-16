@@ -20,7 +20,7 @@ module "pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.csr_alarms,
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.csr_alarms.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["csr_alarms"]
 }
