@@ -294,4 +294,5 @@ jobs:
           --role-session-name smoketesting-data-platform \
           --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" \
           --output text))
+          export API_AUTH=$(aws secretsmanager get-secret-value --secret-id data-platform-api-auth-token --query 'SecretString' --output text --no-cli-pager)
           pip install -r requirements.txt && python run_smoke_tests.py
