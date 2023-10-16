@@ -86,8 +86,8 @@ data "aws_iam_policy_document" "ec2_access_for_ansible" {
 
 data "aws_iam_policy_document" "allow_access_to_ssm_parameter_store" {
   statement {
-    sid     = "AllowAccessToSsmParameterStore"
-    effect  = "Allow"
+    sid    = "AllowAccessToSsmParameterStore"
+    effect = "Allow"
     actions = [
       "ssm:PutParameter"
     ]

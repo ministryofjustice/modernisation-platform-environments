@@ -53,7 +53,7 @@ locals {
     noms_prod_domain_controller_pcmcw1011 = "10.40.144.196/32"
     noms_prod_domain_controller_pcmcw1012 = "10.40.64.133/32"
 
-    noms_devtest_domain_controller_MGMCW0002 = "10.102.0.196/32"
+    noms_devtest_domain_controller_MGMCW0002    = "10.102.0.196/32"
     noms_devtest_domain_controller_tc_mgt_dc_01 = "10.102.0.199/32"
     noms_devtest_domain_controller_tc_mgt_dc_02 = "10.102.0.200/32"
   }

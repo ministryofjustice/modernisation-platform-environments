@@ -25,7 +25,13 @@
         "metrics_collection_interval": 60,
         "drop_device": true,
         "resources": ["*"],
-        "ignore_file_system_types": ["tmpfs", "devtmpfs", "sysfs", "fuse.s3fs", "nfs4"]
+        "ignore_file_system_types": [
+          "tmpfs",
+          "devtmpfs",
+          "sysfs",
+          "fuse.s3fs",
+          "nfs4"
+        ]
       },
       "diskio": {
         "measurement": [
@@ -67,19 +73,17 @@
     }
   },
   "logs": {
-      "logs_collected": {
-        "files": {
-          "collect_list": [
-            {
-              "file_path": "/var/log/messages",
-              "log_group_name": "APEX-EC2",
-              "log_stream_name": "{instance_id}",
-              "retention_in_days": 90
-
-              
-            }
-          ]
-        }
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/messages",
+            "log_group_name": "APEX-EC2",
+            "log_stream_name": "{instance_id}",
+            "retention_in_days": 90
+          }
+        ]
       }
     }
+  }
 }
