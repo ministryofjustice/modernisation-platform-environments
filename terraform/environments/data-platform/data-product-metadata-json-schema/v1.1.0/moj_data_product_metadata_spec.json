@@ -11,7 +11,8 @@
     "dataProductOwnerDisplayName",
     "email",
     "status",
-    "dpiaRequired"
+    "dpiaRequired",
+    "retentionPeriod"
   ],
   "properties": {
     "name": {
