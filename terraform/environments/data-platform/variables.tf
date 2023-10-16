@@ -37,3 +37,7 @@ variable "landing_to_raw_versions" {
 variable "create_schema_versions" {
   type = map(any)
 }
+
+variable "delete_schema_versions" {
+  type = map(any)
+}

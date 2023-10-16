@@ -34,6 +34,7 @@ locals {
   reload_data_product_version      = lookup(var.reload_data_product_versions, local.environment)
   create_schema_version            = lookup(var.create_schema_versions, local.environment)
   landing_to_raw_version           = lookup(var.landing_to_raw_versions, local.environment)
+  delete_schema_version            = lookup(var.delete_schema_versions, local.environment)
 
   # Environment vars that are used by many lambdas
   logger_environment_vars = {
