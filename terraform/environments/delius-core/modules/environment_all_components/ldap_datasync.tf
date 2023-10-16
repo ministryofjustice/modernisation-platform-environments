@@ -52,6 +52,11 @@ data "aws_iam_policy_document" "ldap_datasync_role_access" {
       "backup:*",
       "datasync:*",
       "elasticfilesystem:*",
+      "ec2:DescribeInstances",
+      "ec2:CreateNetworkInterface",
+      "ec2:AttachNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DeleteNetworkInterface"
     ]
     resources = ["*"]
   }
