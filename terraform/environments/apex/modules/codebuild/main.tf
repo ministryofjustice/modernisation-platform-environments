@@ -47,3 +47,18 @@ data "aws_iam_policy_document" "local-ecr-policy-data" {
     ]
   }
 }
+
+######################################################
+# CodeBuild projects
+######################################################
+
+resource "aws_iam_role" "codebuild_s3" {
+  name               = "${var.app_name}-CodeBuildRole"
+  assume_role_policy = file("${path.module}/codebuild_iam_role.json")
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.app_name}-CodeBuildRole"
+    }
+  )
+}
