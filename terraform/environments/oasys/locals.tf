@@ -223,6 +223,7 @@ locals {
     autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group        = merge(module.baseline_presets.ec2_autoscaling_group.default, {
       desired_capacity    = 2
+      max_size            = 2
     })
     lb_target_groups         = {}
     tags = {
