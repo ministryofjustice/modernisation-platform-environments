@@ -149,7 +149,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
 
   network_interfaces {
     device_index                = 0
-    security_groups             = [aws_security_group.tribunals_lb_sc.id]
+    security_groups             = [aws_security_group.cluster_ec2.id]#[aws_security_group.tribunals_lb_sc.id]
     subnet_id                   = data.aws_subnet.public_subnets_a.id
     delete_on_termination       = true
   }
@@ -169,4 +169,41 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
     id      = "${aws_launch_template.tribunals-all-lt.id}"
     version = "$Latest"
   }
+}
+
+###########################################################################
+
+
+# EC2 Security Group
+# Controls access to the EC2 instances
+
+resource "aws_security_group" "cluster_ec2" {
+  #checkov:skip=CKV_AWS_23
+  name        = "tribunals-cluster-ec2-security-group"
+  description = "controls access to the cluster ec2 instance"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    description = "Cluster EC2 ingress rule"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = []
+  }
+
+  egress {
+    description = "Cluster EC2 loadbalancer egress rule"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  } 
+
+  tags = merge(
+    local.tags_common,
+    {
+      Name = "tribunals-cluster-ec2-security-group"
+    }
+  )
 }
