@@ -770,6 +770,20 @@ locals {
           security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
+        rdp_tcp_app = {
+          description = "3389: Allow RDP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+        rdp_udp_app = {
+          description = "3389: Allow RDP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
         smb_tcp_app = {
           description     = "445: TCP SMB allow ingress from app and db servers"
           from_port       = 445
