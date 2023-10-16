@@ -92,6 +92,31 @@ locals {
         }
       }
 
+      dev-base-ol85 = {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "base_ol_8_5*"
+          availability_zone = null
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-web"]
+        })
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "main"
+          })
+        })
+        tags = {
+          description = "For testing our base OL 8.5 base image"
+          ami         = "base_ol_8_5"
+          os-type     = "Linux"
+          component   = "test"
+        }
+      }
+
       dev-base-rhel85 = {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
