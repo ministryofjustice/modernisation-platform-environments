@@ -4,3 +4,7 @@ resource "aws_secretsmanager_secret" "api_auth" {
   name = "data-platform-api-auth-token"
   tags = local.tags
 }
+
+data "aws_secretsmanager_secret_version" "api_auth" {
+  secret_id = aws_secretsmanager_secret.api_auth.id
+}
