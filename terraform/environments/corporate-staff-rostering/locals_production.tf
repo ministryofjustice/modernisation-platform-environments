@@ -78,5 +78,11 @@ locals {
         }
       }
     }
+    baseline_route53_zones = {
+      "csr.service.justice.gov.uk" = {
+        records = [
+        ]
+      }
+    }
   }
 }
