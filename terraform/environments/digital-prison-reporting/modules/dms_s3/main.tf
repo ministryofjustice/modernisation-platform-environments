@@ -81,6 +81,8 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
 }
 
 resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
+  count = var.setup_dms_instance ? 1 : 0
+
   endpoint_id             = "${var.project_id}-dms-${var.short_name}-s3-target"
   endpoint_type           = "target"
   bucket_name             = var.bucket_name
