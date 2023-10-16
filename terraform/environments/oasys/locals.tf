@@ -221,7 +221,9 @@ locals {
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-    autoscaling_group        = module.baseline_presets.ec2_autoscaling_group.default
+    autoscaling_group        = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      desired_capacity    = 2
+    })
     lb_target_groups         = {}
     tags = {
       backup            = "false" # opt out of mod platform default backup plan
