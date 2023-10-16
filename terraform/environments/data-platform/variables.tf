@@ -33,3 +33,7 @@ variable "reload_data_product_versions" {
 variable "landing_to_raw_versions" {
   type = map(any)
 }
+
+variable "create_schema_versions" {
+  type = map(any)
+}

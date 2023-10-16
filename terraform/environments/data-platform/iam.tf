@@ -7,6 +7,7 @@ data "aws_iam_policy_document" "log_to_bucket" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
+      "s3:ListBucket"
     ]
     resources = [
       "${module.logs_s3_bucket.bucket.arn}",
@@ -479,8 +480,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" 
     effect  = "Allow"
     actions = ["s3:GetObject", "s3:PutObject"]
     resources = [
-      "${module.metadata_s3_bucket.bucket.arn}/metadata/*",
-      "${module.metadata_s3_bucket.bucket.arn}/data_product_metadata_spec/*"
+      "${module.metadata_s3_bucket.bucket.arn}/*"
     ]
   }
 
@@ -568,6 +568,25 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
     resources = [module.data_product_athena_load_lambda.lambda_function_arn]
   }
 
+  statement {
+    sid       = "LambdaLogGroup"
+    effect    = "Allow"
+    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
+  }
+}
+
+data "aws_iam_policy_document" "iam_policy_document_for_create_schema_lambda" {
+  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
+  statement {
+    sid    = "s3MetadataWrite"
+    effect = "Allow"
+    actions = ["s3:PutObject"]
+    resources = [
+      "${module.metadata_s3_bucket.bucket.arn}/*",
+
+    ]
+  }
   statement {
     sid       = "LambdaLogGroup"
     effect    = "Allow"
