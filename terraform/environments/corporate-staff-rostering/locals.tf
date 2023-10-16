@@ -27,10 +27,10 @@ locals {
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     sns_topics = {
-      # TODO: comment this in when MP have implemented the pagerduty integration
-      # pagerduty_integrations = { 
-      #   csr_pagerduty = "csr_alarms"
-      # }
+      # TODO: change this when we have a new csr integration for pagerduty
+      pagerduty_integrations = { 
+        csr_pagerduty = "csr_alarms"
+      }
     }
   }
 
