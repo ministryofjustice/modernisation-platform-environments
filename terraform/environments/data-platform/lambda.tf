@@ -45,7 +45,7 @@ module "data_product_authorizer_lambda" {
   memory_size  = 512
 
   environment_variables = merge(local.logger_environment_vars, {
-    authorizationToken = "placeholder"
+    authorizationToken = local.api_auth_token
     api_resource_arn   = "${aws_api_gateway_rest_api.data_platform.execution_arn}/*/*"
   })
 
