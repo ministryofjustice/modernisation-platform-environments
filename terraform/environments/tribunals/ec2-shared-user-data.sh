@@ -68,5 +68,9 @@ else {
     New-Item -Path $linkPath -ItemType SymbolicLink -Value $targetPath
   }
 }
+
+"Link instance to shared tribunals cluster " + $ecsCluster >> $logFile
+Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]'
+
 "Finished launch.ps1" >> $logFile
 </powershell>
