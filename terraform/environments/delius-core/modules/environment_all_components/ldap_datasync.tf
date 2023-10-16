@@ -60,8 +60,8 @@ data "aws_iam_policy_document" "ldap_datasync_role_access" {
     effect  = "Allow"
     actions = ["s3:*"]
     resources = [
-      "${module.s3_bucket_ldap_data_refresh.bucket.arn}",
-      "${module.s3_bucket_ldap_data_refresh.bucket.arn}/*",
+      "arn:aws:s3:::*-ldap-data-refresh-incoming",
+      "arn:aws:s3:::*-ldap-data-refresh-incoming/*",
     ]
   }
 }
@@ -85,7 +85,8 @@ locals {
           test     = "ArnLike"
           values   = ["arn:aws:iam::${account_id}:role/ldap-data-refresh-role-*"]
           variable = "aws:PrincipalARN"
-        }
+        },
+
       ]
     }
   ]
