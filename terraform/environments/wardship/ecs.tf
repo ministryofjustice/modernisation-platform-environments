@@ -6,8 +6,8 @@ resource "aws_ecs_cluster" "wardship_cluster" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "wardshipFamily_logs" {
-  name = "/ecs/wardshipFamily"
+resource "aws_cloudwatch_log_group" "deployment_logs" {
+  name = "/aws/events/deploymentLogs"
 }
 
 resource "aws_ecs_task_definition" "wardship_task_definition" {
@@ -21,7 +21,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
   container_definitions = jsonencode([
     {
       name      = "wardship-container"
-      image     = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
+      image     = "${aws_ecr_repository.wardship_ecr_repo.repository_url}:latest"
       cpu       = 1024
       memory    = 2048
       essential = true
@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.wardshipFamily_logs.name}"
+          awslogs-group         = "${aws_cloudwatch_log_group.deployment_logs.name}"
           awslogs-region        = "eu-west-2"
           awslogs-stream-prefix = "ecs"
         }
@@ -96,8 +96,8 @@ resource "aws_ecs_service" "wardship_ecs_service" {
   task_definition                   = aws_ecs_task_definition.wardship_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
-  desired_count                     = 1
-  health_check_grace_period_seconds = 90
+  desired_count                     = 2
+  health_check_grace_period_seconds = 180
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
@@ -237,7 +237,28 @@ resource "aws_security_group" "ecs_service" {
   }
 }
 
-resource "aws_ecr_repository" "wardship-ecr-repo" {
+resource "aws_ecr_repository" "wardship_ecr_repo" {
   name         = "wardship-ecr-repo"
   force_delete = true
+}
+
+# AWS EventBridge rule
+resource "aws_cloudwatch_event_rule" "ecs_events" {
+  name        = "ecs-events"
+  description = "Capture all ECS events"
+
+  event_pattern = jsonencode({
+    "source" : ["aws.ecs"],
+    "detail" : {
+      "clusterArn" : [aws_ecs_cluster.wardship_cluster.arn]
+    }
+  })
+}
+
+# AWS EventBridge target
+resource "aws_cloudwatch_event_target" "logs" {
+  depends_on = [aws_cloudwatch_log_group.deployment_logs]
+  rule       = aws_cloudwatch_event_rule.ecs_events.name
+  target_id  = "send-to-cloudwatch"
+  arn        = aws_cloudwatch_log_group.deployment_logs.arn
 }
