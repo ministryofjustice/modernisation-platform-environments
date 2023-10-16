@@ -794,6 +794,20 @@ locals {
           cidr_blocks = local.security_group_cidrs.enduserclient
           # IMPORTANT: check if this needs to be changed to include client access
         }
+        rdp_tcp_app = {
+          description = "3389: Allow RDP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+        rdp_udp_app = {
+          description = "3389: Allow RDP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
         winrm_app = {
           description = "5985-6: Allow WinRM ingress"
           from_port   = 5985
