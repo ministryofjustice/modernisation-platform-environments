@@ -1,6 +1,6 @@
 # a cloudtrail trail to save log files for putObject S3 events in the landing and data
 # buckets
-resource "aws_cloudtrail" "data_put_objects" {
+resource "aws_cloudtrail" "data_s3_put_objects" {
   name                          = "data_platform_s3_putobject_trail_${local.environment}"
   s3_bucket_name                = module.logs_s3_bucket.bucket.id
   
