@@ -3,10 +3,10 @@ module "lambda_backup" {
 
 backup_policy_name = "${local.application_name}-lambda-instance-policy"
 source_file   = ["dbsnapshot.js","deletesnapshots.py"]
-output_path   = ["connectDBFunction.zip","DeleteEBSPendingSnapshots.zip"]
+output_path   = ["snapshotDBFunction.zip","deletesnapshotFunction.zip"]
 filename      = ["snapshotDBFunction", "deletesnapshotFunction"]
-function_name = ["connectDBFunction.zip","DeleteEBSPendingSnapshots.zip"]
-handler       = "snapshot/dbsnapshot.handler"
+function_name = ["snapshotDBFunction","deletesnapshotFunction"]
+handler       = ["snapshot/dbsnapshot.handler","deletesnapshots.lambda_handler"]
 
     tags = merge(
     local.tags,

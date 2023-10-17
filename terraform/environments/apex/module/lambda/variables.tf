@@ -11,29 +11,39 @@ variable "tags" {
 
 variable "filename" {
   type    = list(string)
-  default = ["connectDBFunction.zip", "DeleteEBSPendingSnapshots.zip"]
+  default = ["snapshotDBFunction.zip",
+            "deletesnapshotFunction.zip"
+            ]
 }
 
 variable "source_file" {
   type        = list(string)
   description = "source file for Function"
-  default     = ["dbsnapshot.js","deletesnapshots.py"]
+  default     = ["dbsnapshot.js",
+                "deletesnapshots.py"
+                ]
 }
 
 variable "output_path" {
   type        = list(string)
   description = "source file for Function"
-  default     = ["connectDBFunction.zip","DeleteEBSPendingSnapshots.zip"]
+  default     = ["snapshotDBFunction.zip",
+                "deletesnapshotFunction.zip"
+                ]
 }
 
 variable "function_name" {
-   type        = list(string)
+  type        = list(string)
   description = "Function name"
-  default     = ["snapshotDBFunction","deletesnapshotFunction"]
+  default     = ["snapshotDBFunction",
+                "deletesnapshotFunction"
+                ]
 }
 
 variable "handler" {
-  type        = string
+  type        = list(string)
   description = "Function handler"
-  default     = ""
+  default     = ["snapshot/dbsnapshot.handler",
+                "deletesnapshots.lambda_handler"
+                ]
 }
