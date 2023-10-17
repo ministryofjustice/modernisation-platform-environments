@@ -11,7 +11,7 @@ variable "tags" {
 
 variable "filename" {
   type    = list(string)
-  default = ["snapshotDBFunction", "deletesnapshotFunction"]
+  default = ["connectDBFunction.zip", "DeleteEBSPendingSnapshots.zip"]
 }
 
 variable "source_file" {
@@ -29,7 +29,7 @@ variable "output_path" {
 variable "function_name" {
    type        = list(string)
   description = "Function name"
-  default     = ["connectDBFunction.zip","DeleteEBSPendingSnapshots.zip"]
+  default     = ["snapshotDBFunction","deletesnapshotFunction"]
 }
 
 variable "handler" {
