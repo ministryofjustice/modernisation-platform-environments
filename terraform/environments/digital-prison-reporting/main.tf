@@ -866,8 +866,8 @@ module "dms_fake_data_ingestor" {
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor_s3_target" {
   source                       = "./modules/dms_s3"
-  setup_dms_instance           = false
-  enable_replication_task      = false
+  setup_dms_instance           = true
+  enable_replication_task      = true
   name                         = "${local.project}-dms-nomis-ingestor-s3-target-${local.env}"
   vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
   source_engine_name           = "oracle"
@@ -877,7 +877,6 @@ module "dms_nomis_ingestor_s3_target" {
   source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
   source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
   vpc                          = data.aws_vpc.shared.id
-  s3_write_policy              = module.s3_dms_raw_bucket.bucket_arn
   project_id                   = local.project
   env                          = local.environment
   dms_source_name              = "oracle"

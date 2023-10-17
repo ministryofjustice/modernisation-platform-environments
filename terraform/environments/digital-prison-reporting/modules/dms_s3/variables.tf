@@ -56,8 +56,6 @@ variable "migration_type" {
   description = "DMS Migration Type"
 }
 
-variable "s3_write_policy" {}
-
 variable "availability_zones" {
   default = [
     {
