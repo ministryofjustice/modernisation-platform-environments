@@ -1,13 +1,13 @@
 variable "backup_policy_name" {
   type        = string
   description = "backup iam policy name"
-  default     = null
+  default     = ""
 }
 
 variable "role" {
   type        = string
   description = "role"
-  default     = null
+  default     = ""
 }
 
 variable "tags" {
