@@ -1,7 +1,7 @@
 # a cloudtrail trail to save log files for putObject S3 events in the landing and data
 # buckets
 resource "aws_cloudtrail" "data_put_objects" {
-  name                          = "data_platform_putobject_trail_${local.environment}"
+  name                          = "data_platform_s3_putobject_trail_${local.environment}"
   s3_bucket_name                = module.logs_s3_bucket.bucket.id
   
   # this is needed if monitoring services without a specific region. Don't need for s3
@@ -9,7 +9,6 @@ resource "aws_cloudtrail" "data_put_objects" {
 
   # enabling this would allow detection of modified log files
   enable_log_file_validation    = false
-
   advanced_event_selector {
     name = "Log PutObject events for landing and data S3 buckets"
 
