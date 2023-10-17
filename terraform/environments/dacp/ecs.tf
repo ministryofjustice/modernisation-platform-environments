@@ -6,8 +6,8 @@ resource "aws_ecs_cluster" "dacp_cluster" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "ecs_deployment_logs" {
-  name = "/aws/events/ecsDeploymentLogs"
+resource "aws_cloudwatch_log_group" "deployment_logs" {
+  name = "/aws/events/deploymentLogs"
 }
 
 resource "aws_ecs_task_definition" "dacp_task_definition" {
@@ -243,13 +243,34 @@ resource "aws_cloudwatch_event_rule" "ecs_events" {
 
 # AWS EventBridge target
 resource "aws_cloudwatch_event_target" "logs" {
-  depends_on = [aws_cloudwatch_log_group.ecs_deployment_logs]
+  depends_on = [aws_cloudwatch_log_group.deployment_logs]
   rule       = aws_cloudwatch_event_rule.ecs_events.name
   target_id  = "send-to-cloudwatch"
-  arn        = aws_cloudwatch_log_group.ecs_deployment_logs.arn
+  arn        = aws_cloudwatch_log_group.deployment_logs.arn
 }
 
 resource "aws_cloudwatch_log_stream" "ecs_log_stream" {
   name           = "ecsDeploymentStream"
-  log_group_name = aws_cloudwatch_log_group.ecs_deployment_logs.name
+  log_group_name = aws_cloudwatch_log_group.deployment_logs.name
+}
+
+resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
+  policy_document = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "TrustEventsToStoreLogEvent",
+        "Effect": "Allow",
+        "Principal": {
+          "Service": ["events.amazonaws.com", "delivery.logs.amazonaws.com"]
+        },
+        "Action": [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/*:*"
+      }
+    ]
+  })
+  policy_name     = "TrustEventsToStoreLogEvents"
 }
