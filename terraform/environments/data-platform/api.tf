@@ -190,6 +190,36 @@ resource "aws_api_gateway_integration" "create_schema_for_data_product_table_nam
   }
 }
 
+# /data-product/{data-product-name}/table/{table-name}/schema DELETE method
+resource "aws_api_gateway_method" "delete_schema_for_data_product_table_name" {
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.authorizer.id
+  http_method   = "DELETE"
+  resource_id   = aws_api_gateway_resource.schema_for_data_product_table_name.id
+  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+
+  request_parameters = {
+    "method.request.header.Authorization"   = true,
+    "method.request.path.data-product-name" = true,
+    "method.request.path.table-name"        = true,
+  }
+}
+
+# /data-product/{data-product-name}/table/{table-name}/schema (Delete) lambda integration
+resource "aws_api_gateway_integration" "create_schema_for_data_product_table_name_to_lambda" {
+  http_method             = aws_api_gateway_method.delete_schema_for_data_product_table_name.http_method
+  resource_id             = aws_api_gateway_resource.schema_for_data_product_table_name.id
+  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.data_product_delete_schema_lambda.lambda_function_invoke_arn
+
+  request_parameters = {
+    "integration.request.path.data-product-name" = "method.request.path.data-product-name",
+    "integration.request.path.table-name"        = "method.request.path.table-name",
+  }
+}
+
 # API docs endpoint
 
 resource "aws_api_gateway_resource" "docs" {
