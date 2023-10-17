@@ -2,13 +2,27 @@
 schemaVersion: "2.2"
 description: "SSM Document to convert MGN-replicated Azure VMs into AWS EC2s. Also baking in necessary configuration to CSR app / web AMIs" 
 parameters:
+  InstanceId:
+    type: "String"
+    description: "ID of the MGN replicated server being turned into an AMIs"
+  VolumeId:
+    type: "String"
+    description: "Root volume ID to be snapshotted"
+  SnapshotName:
+    type: "String"
+    description: "Name of the snapshot"
+
 mainSteps:
+  - name: CreateSnapshot
+    action: aws:createSnapshot
+    inputs: 
+      InstanceId: "{{ InstanceId }}"
+      VolumeId: "{{ VolumeId }}"
+      description: "{{ SnapshotName }}"
+    onFailure: Stop
+
   - name: UninstallDiscoveryAgent
     action: aws:runPowerShellScript
-   # precondition:
-     # StringEquals:
-     #   - platformType
-     #   - Windows
     inputs:
       runCommand:
         - |
@@ -19,28 +33,45 @@ mainSteps:
             wmic product where name='AWS Discovery Agent' call uninstall
           }
 
+  - name: InstallFirefoxBrowser
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
           # Install firefox 
           # Invoke call to internet 
           Invoke-WebRequest -URI "https://download.mozilla.org/?product=firefox-esr-next-latest-ssl&os=win64&lang=en-GB" -OutFile "$ENV:TEMP\MozillaFirefox.exe"
           # Need to invoke the installer
           Invoke-Item "$ENV:TEMP\MozillaFirefox.exe"
 
+  - name: InstallNmapTool
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
           # Install nmap tool
           # Invoke call to internet 
           Invoke-WebRequest -URI "https://nmap.org/download" -OutFile "$ENV:TEMP\nmap.exe"
           # Need to invoke the installer
           Invoke-Item "$ENV:TEMP\nmap.exe"
 
+  - name: InstallActiveDirectoryModule
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
           # Install AD module
           Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
 
-          # Install EC2LaunchV2
-
-          New-Item -Path "$env:USERPROFILE\Desktop\EC2Launchv2" -ItemType Directory
-          $Url = " https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi/AmazonEC2Launch.msi"
-          $DownloadFile = "$env:USERPROFILE\Desktop\EC2Launchv2\" + $(Split-Path -Path $Url -Leaf)
-          Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
-          msiexec /i "$DownloadFile"
+  - name: InstallEC2LaunchV2
+    action: aws:runShellScript
+    inputs: 
+      runCommand:
+        - # Download the EC2LaunchV2 installer script
+          - wget https://s3.amazonaws.com/ec2-downloads-windows/SSM-Agent/EC2Launch/latest/install.ps1 -OutFile $env:TEMP\install.ps1         
+        - # Run the installer script
+          - powershell -ExecutionPolicy Bypass -File $env:TEMP\install.ps1
 
           # verify the install 
           C:\ProgramData\Amazon\EC2Launch
+  - name: 
