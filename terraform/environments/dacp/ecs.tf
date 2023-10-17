@@ -8,6 +8,7 @@ resource "aws_ecs_cluster" "dacp_cluster" {
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
   name = "/aws/events/deploymentLogs"
+  retention_in_days = "7"
 }
 
 resource "aws_ecs_task_definition" "dacp_task_definition" {
@@ -247,11 +248,6 @@ resource "aws_cloudwatch_event_target" "logs" {
   rule       = aws_cloudwatch_event_rule.ecs_events.name
   target_id  = "send-to-cloudwatch"
   arn        = aws_cloudwatch_log_group.deployment_logs.arn
-}
-
-resource "aws_cloudwatch_log_stream" "ecs_log_stream" {
-  name           = "ecsDeploymentStream"
-  log_group_name = aws_cloudwatch_log_group.deployment_logs.name
 }
 
 resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
