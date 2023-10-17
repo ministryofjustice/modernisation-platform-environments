@@ -6,8 +6,8 @@ resource "aws_ecs_cluster" "dacp_cluster" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "deployment_logs" {
-  name = "/aws/events/deploymentLogs"
+resource "aws_cloudwatch_log_group" "ecs_deployment_logs" {
+  name = "/aws/events/ecsDeploymentLogs"
 }
 
 resource "aws_ecs_task_definition" "dacp_task_definition" {
@@ -243,8 +243,13 @@ resource "aws_cloudwatch_event_rule" "ecs_events" {
 
 # AWS EventBridge target
 resource "aws_cloudwatch_event_target" "logs" {
-  depends_on = [aws_cloudwatch_log_group.deployment_logs]
+  depends_on = [aws_cloudwatch_log_group.ecs_deployment_logs]
   rule       = aws_cloudwatch_event_rule.ecs_events.name
   target_id  = "send-to-cloudwatch"
-  arn        = aws_cloudwatch_log_group.deployment_logs.arn
+  arn        = aws_cloudwatch_log_group.ecs_deployment_logs.arn
+}
+
+resource "aws_cloudwatch_log_stream" "foo" {
+  name           = "ecsDeploymentStream"
+  log_group_name = aws_cloudwatch_log_group.ecs_deployment_logs.name
 }
