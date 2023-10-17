@@ -6,7 +6,7 @@ module "data_product_docs_lambda" {
   function_name                  = "data_product_docs_${local.environment}"
   role_name                      = "docs_lambda_role_${local.environment}"
   policy_json_attached           = true
-  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_docs_lambda.json
+  policy_json                    = data.aws_iam_policy_document.create_write_lambda_logs.json
   create_role                    = true
   reserved_concurrent_executions = 1
 
@@ -18,10 +18,9 @@ module "data_product_docs_lambda" {
   allowed_triggers = {
 
     AllowExecutionFromAPIGateway = {
-      action        = "lambda:InvokeFunction"
-      function_name = "data_product_docs_${local.environment}"
-      principal     = "apigateway.amazonaws.com"
-      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/*"
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/*"
     }
   }
 
@@ -52,10 +51,9 @@ module "data_product_authorizer_lambda" {
   allowed_triggers = {
 
     AllowExecutionFromAPIGateway = {
-      action        = "lambda:InvokeFunction"
-      function_name = "data_product_authorizer_${local.environment}"
-      principal     = "apigateway.amazonaws.com"
-      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/*"
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/*"
     }
   }
 
@@ -81,10 +79,9 @@ module "data_product_get_glue_metadata_lambda" {
   allowed_triggers = {
 
     AllowExecutionFromAPIGateway = {
-      action        = "lambda:InvokeFunction"
-      function_name = "data_product_get_glue_metadata_${local.environment}"
-      principal     = "apigateway.amazonaws.com"
-      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.get_glue_metadata.http_method}${aws_api_gateway_resource.get_glue_metadata.path}"
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.get_glue_metadata.http_method}${aws_api_gateway_resource.get_glue_metadata.path}"
     }
   }
 
@@ -112,10 +109,9 @@ module "data_product_landing_to_raw_lambda" {
   allowed_triggers = {
 
     AllowExecutionFromCloudWatch = {
-      action        = "lambda:InvokeFunction"
-      function_name = "data_product_landing_to_raw_${local.environment}"
-      principal     = "events.amazonaws.com"
-      source_arn    = aws_cloudwatch_event_rule.object_created_data_landing.arn
+      action     = "lambda:InvokeFunction"
+      principal  = "events.amazonaws.com"
+      source_arn = aws_cloudwatch_event_rule.object_created_data_landing.arn
     }
   }
 
@@ -143,10 +139,9 @@ module "data_product_presigned_url_lambda" {
   allowed_triggers = {
 
     AllowExecutionFromAPIGateway = {
-      action        = "lambda:InvokeFunction"
-      function_name = "data_product_presigned_url_${local.environment}"
-      principal     = "apigateway.amazonaws.com"
-      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.upload_data_for_data_product_table_name.http_method}${aws_api_gateway_resource.upload_data_for_data_product_table_name.path}"
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.upload_data_for_data_product_table_name.http_method}${aws_api_gateway_resource.upload_data_for_data_product_table_name.path}"
     }
   }
 
@@ -176,10 +171,9 @@ module "data_product_athena_load_lambda" {
   allowed_triggers = {
 
     AllowExecutionFromCloudWatch = {
-      action        = "lambda:InvokeFunction"
-      function_name = "data_product_athena_load_${local.environment}"
-      principal     = "events.amazonaws.com"
-      source_arn    = aws_cloudwatch_event_rule.object_created_raw_data.arn
+      action     = "lambda:InvokeFunction"
+      principal  = "events.amazonaws.com"
+      source_arn = aws_cloudwatch_event_rule.object_created_raw_data.arn
     }
   }
 
@@ -210,10 +204,9 @@ module "data_product_create_metadata_lambda" {
   allowed_triggers = {
 
     AllowExecutionFromAPIGateway = {
-      action        = "lambda:InvokeFunction"
-      function_name = "data_product_create_metadata_${local.environment}"
-      principal     = "apigateway.amazonaws.com"
-      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.register_data_product.http_method}${aws_api_gateway_resource.register_data_product.path}"
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.register_data_product.http_method}${aws_api_gateway_resource.register_data_product.path}"
     }
   }
 
@@ -286,11 +279,38 @@ module "data_product_create_schema_lambda" {
   allowed_triggers = {
 
     AllowExecutionFromAPIGateway = {
-      action        = "lambda:InvokeFunction"
-      function_name = "data_product_create_metadata_${local.environment}"
-      principal     = "apigateway.amazonaws.com"
-      source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.create_schema_for_data_product_table_name.http_method}${aws_api_gateway_resource.create_schema_for_data_product_table_name.path}"
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.create_schema_for_data_product_table_name.http_method}${aws_api_gateway_resource.schema_for_data_product_table_name.path}"
     }
   }
+}
 
+module "get_schema_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
+  application_name               = "get_schema"
+  tags                           = local.tags
+  description                    = "Fetch the schema for a table from S3"
+  role_name                      = "get_schema_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_get_schema_lambda.json
+  policy_json_attached           = true
+  function_name                  = "get_schema_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-get-schema-lambda-ecr-repo:${local.get_schema_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 128
+
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+
+  allowed_triggers = {
+
+    AllowExecutionFromAPIGateway = {
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.get_schema_for_data_product_table_name.http_method}${aws_api_gateway_resource.schema_for_data_product_table_name.path}"
+    }
+  }
 }

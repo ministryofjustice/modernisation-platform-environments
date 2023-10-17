@@ -18,20 +18,26 @@ data "aws_iam_policy_document" "log_to_bucket" {
 
 data "aws_iam_policy_document" "read_metadata" {
   statement {
-    sid    = "s3ReadMetadata"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket",
-    ]
+    sid     = "s3ReadMetadata"
+    effect  = "Allow"
+    actions = ["s3:GetObject", "s3:ListBucket"]
     resources = [
+      "${module.metadata_s3_bucket.bucket.arn}/*",
       "${module.metadata_s3_bucket.bucket.arn}",
-      "${module.metadata_s3_bucket.bucket.arn}/*"
     ]
   }
 }
 
-data "aws_iam_policy_document" "iam_policy_document_for_docs_lambda" {
+data "aws_iam_policy_document" "write_metadata" {
+  statement {
+    sid       = "s3WriteMetadata"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["${module.metadata_s3_bucket.bucket.arn}/*"]
+  }
+}
+
+data "aws_iam_policy_document" "create_write_lambda_logs" {
   statement {
     sid       = "LambdaLogGroup"
     effect    = "Allow"
@@ -41,29 +47,12 @@ data "aws_iam_policy_document" "iam_policy_document_for_docs_lambda" {
 }
 
 data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
 
-  statement {
-    sid    = "AllowLambdaToCreateLogGroup"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogGroup"
-    ]
-    resources = [
-      format("arn:aws:logs:eu-west-2:%s:*", data.aws_caller_identity.current.account_id)
-    ]
-  }
-  statement {
-    sid    = "AllowLambdaToWriteLogsToGroup"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ]
-    resources = [
-      format("arn:aws:logs:eu-west-2:%s:*", data.aws_caller_identity.current.account_id)
-    ]
-  }
   statement {
     sid    = "s3Access"
     effect = "Allow"
@@ -135,29 +124,12 @@ data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
 }
 
 data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
 
-  statement {
-    sid    = "AllowLambdaToCreateLogGroup"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogGroup"
-    ]
-    resources = [
-      format("arn:aws:logs:eu-west-2:%s:*", data.aws_caller_identity.current.account_id)
-    ]
-  }
-  statement {
-    sid    = "AllowLambdaToWriteLogsToGroup"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ]
-    resources = [
-      format("arn:aws:logs:eu-west-2:%s:*", data.aws_caller_identity.current.account_id)
-    ]
-  }
   statement {
     sid    = "getLandingData"
     effect = "Allow"
@@ -185,18 +157,17 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_authorizer_lambda" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json]
-
-  statement {
-    sid       = "LambdaLogGroup"
-    effect    = "Allow"
-    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
-  }
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json]
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
   statement {
     sid     = "GlueReadOnly"
     effect  = "Allow"
@@ -207,34 +178,29 @@ data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda
       "arn:aws:glue:${local.region}:${local.account_id}:table/*"
     ]
   }
-  statement {
-    sid       = "LambdaLogGroup"
-    effect    = "Allow"
-    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
-  }
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
 
   statement {
-    sid     = "GetPutDataObject"
-    effect  = "Allow"
-    actions = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+    sid    = "GetPutDataObject"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+    ]
     resources = [
       "${module.data_s3_bucket.bucket.arn}/raw/*",
       "${module.logs_s3_bucket.bucket.arn}/logs/*",
       "${module.data_s3_bucket.bucket.arn}/raw",
       "${module.logs_s3_bucket.bucket.arn}/logs",
     ]
-  }
-
-  statement {
-    sid       = "LambdaLogGroup"
-    effect    = "Allow"
-    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
   }
 }
 
@@ -443,9 +409,15 @@ data "aws_iam_policy_document" "logs_s3_bucket_policy_document" {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
     }
 
-    actions = ["s3:PutObject", "s3:ListBucket"]
+    actions = [
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
 
-    resources = [module.logs_s3_bucket.bucket.arn, "${module.logs_s3_bucket.bucket.arn}/*"]
+    resources = [
+      module.logs_s3_bucket.bucket.arn,
+      "${module.logs_s3_bucket.bucket.arn}/*",
+    ]
   }
 
   statement {
@@ -473,16 +445,12 @@ data "aws_iam_policy_document" "logs_s3_bucket_policy_document" {
 
 # api gateway create data product metdata permissions
 data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json]
-
-  statement {
-    sid     = "GetPutMetadata"
-    effect  = "Allow"
-    actions = ["s3:GetObject", "s3:PutObject"]
-    resources = [
-      "${module.metadata_s3_bucket.bucket.arn}/*"
-    ]
-  }
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.write_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
 
   statement {
     sid     = "ListBucket"
@@ -492,32 +460,14 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_metadata_lambda" 
       module.metadata_s3_bucket.bucket.arn
     ]
   }
-
-  statement {
-    sid    = "AllowLambdaToCreateLogGroup"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogGroup"
-    ]
-    resources = [
-      format("arn:aws:logs:eu-west-2:%s:*", data.aws_caller_identity.current.account_id)
-    ]
-  }
-  statement {
-    sid    = "AllowLambdaToWriteLogsToGroup"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ]
-    resources = [
-      format("arn:aws:logs:eu-west-2:%s:*", data.aws_caller_identity.current.account_id)
-    ]
-  }
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lambda" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
 
   statement {
     sid       = "ListBucket"
@@ -542,16 +492,22 @@ data "aws_iam_policy_document" "iam_policy_document_for_reload_data_product_lamb
       "*"
     ]
   }
-  statement {
-    sid       = "LambdaLogGroup"
-    effect    = "Allow"
-    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
-  }
+}
+
+data "aws_iam_policy_document" "iam_policy_document_for_get_schema_lambda" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files_lambda" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
 
   statement {
     sid     = "ListBucket"
@@ -567,30 +523,13 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
     actions   = ["lambda:InvokeFunction"]
     resources = [module.data_product_athena_load_lambda.lambda_function_arn]
   }
-
-  statement {
-    sid       = "LambdaLogGroup"
-    effect    = "Allow"
-    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
-  }
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_create_schema_lambda" {
-  source_policy_documents = [data.aws_iam_policy_document.log_to_bucket.json, data.aws_iam_policy_document.read_metadata.json]
-  statement {
-    sid    = "s3MetadataWrite"
-    effect = "Allow"
-    actions = ["s3:PutObject"]
-    resources = [
-      "${module.metadata_s3_bucket.bucket.arn}/*",
-
-    ]
-  }
-  statement {
-    sid       = "LambdaLogGroup"
-    effect    = "Allow"
-    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
-  }
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.write_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
 }
