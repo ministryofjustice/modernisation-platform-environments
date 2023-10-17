@@ -44,30 +44,33 @@ module "glue_reporting_hub_job" {
   )
 
   arguments = {
-    "--extra-jars"                         = local.glue_jobs_latest_jar_location
-    "--job-bookmark-option"                = "job-bookmark-disable"
-    "--class"                              = "uk.gov.justice.digital.job.DataHubJob"
-    "--dpr.kinesis.stream.arn"             = module.kinesis_stream_ingestor.kinesis_stream_arn
-    "--dpr.aws.region"                     = local.account_region
-    "--dpr.curated.s3.path"                = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.batchDurationSeconds"           = local.reporting_hub_batch_duration_seconds
-    "--dpr.add.idle.time.between.reads"    = local.reporting_hub_add_idle_time_between_reads
-    "--dpr.idle.time.between.reads.millis" = local.reporting_hub_idle_time_between_reads_in_millis
-    "--dpr.raw.s3.path"                    = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"             = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.violations.s3.path"             = "s3://${module.s3_violation_bucket.bucket_id}/"
-    "--enable-metrics"                     = true
-    "--enable-spark-ui"                    = false
-    "--enable-auto-scaling"                = true
-    "--enable-job-insights"                = true
-    "--dpr.aws.dynamodb.endpointUrl"       = "https://dynamodb.${local.account_region}.amazonaws.com"
-    "--dpr.contract.registryName"          = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
-    "--dpr.domain.registry"                = "${local.project}-domain-registry-${local.environment}"
-    "--dpr.domain.target.path"             = "s3://${module.s3_domain_bucket.bucket_id}"
-    "--dpr.domain.catalog.db"              = module.glue_data_domain_database.db_name
-    "--dpr.redshift.secrets.name"          = "${local.project}-redshift-secret-${local.environment}"
-    "--dpr.datamart.db.name"               = "datamart"
-    "--dpr.log.level"                      = local.reporting_hub_log_level
+    "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--job-bookmark-option"                 = "job-bookmark-disable"
+    "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
+    "--dpr.kinesis.stream.arn"              = module.kinesis_stream_ingestor.kinesis_stream_arn
+    "--dpr.aws.region"                      = local.account_region
+    "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.batchDurationSeconds"            = local.reporting_hub_batch_duration_seconds
+    "--dpr.add.idle.time.between.reads"     = local.reporting_hub_add_idle_time_between_reads
+    "--dpr.idle.time.between.reads.millis"  = local.reporting_hub_idle_time_between_reads_in_millis
+    "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_retry_max_attempts
+    "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_retry_min_wait_millis
+    "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_retry_max_wait_millis
+    "--dpr.raw.s3.path"                     = "s3://${module.s3_raw_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
+    "--enable-metrics"                      = true
+    "--enable-spark-ui"                     = false
+    "--enable-auto-scaling"                 = true
+    "--enable-job-insights"                 = true
+    "--dpr.aws.dynamodb.endpointUrl"        = "https://dynamodb.${local.account_region}.amazonaws.com"
+    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
+    "--dpr.domain.target.path"              = "s3://${module.s3_domain_bucket.bucket_id}"
+    "--dpr.domain.catalog.db"               = module.glue_data_domain_database.db_name
+    "--dpr.redshift.secrets.name"           = "${local.project}-redshift-secret-${local.environment}"
+    "--dpr.datamart.db.name"                = "datamart"
+    "--dpr.log.level"                       = local.reporting_hub_log_level
   }
 }
 

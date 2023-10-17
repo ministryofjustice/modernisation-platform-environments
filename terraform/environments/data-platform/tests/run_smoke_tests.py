@@ -1,11 +1,12 @@
 import base64
 import hashlib
+import json
+import os
 import sys
 import time
 
 import boto3
 import requests
-
 
 filename = "test_data.csv"
 data_product_name = "example_prison_data_product"
@@ -14,6 +15,14 @@ base_url = "https://hsolkci589.execute-api.eu-west-2.amazonaws.com/development"
 presigned_url = f"/data-product/{data_product_name}/table/{table_name}/upload"
 url = base_url + presigned_url
 glue = boto3.client("glue")
+
+try:
+    auth_token = json.loads(os.environ['API_AUTH'])
+    print(auth_token.keys())
+    auth_token = auth_token['auth-token']
+except KeyError:
+    print('API_AUTH environment variable should be set to a json containing auth-token')
+    sys.exit(1)
 
 
 def md5_hash_file_contents(file) -> str:
@@ -34,7 +43,7 @@ body = {
     "contentMD5": file_md5_hash,
 }
 
-headers = {"authorizationToken": "placeholder"}
+headers = {"authorizationToken": auth_token}
 
 # Get presigned url
 response = requests.post(

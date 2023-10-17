@@ -3,23 +3,28 @@
   "title": "Data Product Table Schema",
   "description": "Specification for MoJ Data Platform Data Product tables schemas for registering tables in the glue catalog",
   "type": "object",
-  "required": ["columns"],
+  "required": [
+    "tableDescription",
+    "columns"
+  ],
   "definitions": {
     "additional_col_properties": {
-      "required": ["name", "type", "description"],
+      "required": [
+          "name",
+          "type",
+          "description"
+      ],
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of a column within your data.",
-          "pattern": "^[a-z0-9_]+$",
-          "example": "my_data_column",
-          "maxLength": 255
-        },
-        "description": {
-          "type": "string",
-          "description": "A description of the column that will feed the data catalogue.",
-          "example": "column contains the primary key and relates to a personal identifier autogrenerated by the source database"
-        }
+          "name": {
+            "type": "string",
+            "description": "The name of a column within your data.",
+            "pattern": "^[a-z0-9_]+$",
+            "maxLength": 128
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the column that will feed the data catalogue."
+          }
       },
       "additionalProperties": true
     },
@@ -129,10 +134,12 @@
   "properties": {
     "tableDescription": {
       "type": "string",
-      "description": "A description of the data contained within the table"
+      "description": "A description of the data contained within the table",
+      "example": "this table contains example data for an example data product."
     },
     "columns": {
       "type": "array",
+      "description": "list of objects which relate to columns in your data, each list item will contain, a name of the column, data type of the column and description of the column",
       "items": {
         "oneOf": [
           {
@@ -157,5 +164,5 @@
       }
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }
