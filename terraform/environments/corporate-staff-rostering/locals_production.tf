@@ -91,7 +91,7 @@ locals {
       }
       "pd.csr.service.justice.gov.uk" = {
         records = [
-          # Set to IP of the Azure CSR Production DB in 
+          # Set to IP of the Azure CSR Production DB in PDCDL00013
           { name = "piwfm", type = "A", ttl = "300", records = ["10.40.8.132"] },
         ]
       }
