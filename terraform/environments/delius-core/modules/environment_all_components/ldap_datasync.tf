@@ -63,7 +63,10 @@ data "aws_iam_policy_document" "ldap_datasync_role_access" {
       "kms:DescribeKey",
       "kms:GetPublicKey",
       "kms:ReEncrypt*",
-      "kms:GenerateDataKey"
+      "kms:GenerateDataKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
     ]
     resources = ["*"]
   }
