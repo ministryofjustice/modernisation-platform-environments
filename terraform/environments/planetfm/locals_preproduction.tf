@@ -26,7 +26,7 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description = "copy of PPFWW0005 for csr ${local.environment}"
+          description = "copy of PPFWW0005 for planetfm ${local.environment}"
           os-type     = "Windows"
           ami         = "pp-cafm-w-5-a"
           component   = "web"
