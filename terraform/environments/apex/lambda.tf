@@ -15,6 +15,7 @@ filename      = ["snapshotDBFunction.zip", "deletesnapshotFunction.zip"]
 function_name = ["snapshotDBFunction","deletesnapshotFunction"]
 handler       = ["snapshot/dbsnapshot.handler","deletesnapshots.lambda_handler"]
 role = module.iambackup.backuprole
+runtime = [ "nodejs18.x","Python3.8" ]
 
 
 

@@ -53,3 +53,11 @@ variable "handler" {
                 "deletesnapshots.lambda_handler"
                 ]
 }
+
+variable "runtime" {
+  type        = list(string)
+  description = "Function handler"
+  default     = [""
+                
+                ]
+}
