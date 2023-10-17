@@ -1,3 +1,12 @@
+locals {
+  AllowExecutionFromAPIGateway = {
+    action        = "lambda:InvokeFunction"
+    function_name = "data_product_create_metadata_${local.environment}"
+    principal     = "apigateway.amazonaws.com"
+    source_arn    = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.create_schema_for_data_product_table_name.http_method}${aws_api_gateway_resource.schema_for_data_product_table_name.path}"
+  }
+}
+
 module "data_product_docs_lambda" {
   source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
   application_name               = "data_product_docs"
@@ -310,8 +319,9 @@ module "get_schema_lambda" {
   image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-get-schema-lambda-ecr-repo:${local.get_schema_version}"
   timeout      = 600
   tracing_mode = "Active"
-  memory_size  = 512
+  memory_size  = 128
 
   environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
 
+  allowed_triggers = local.AllowExecutionFromAPIGateway
 }
