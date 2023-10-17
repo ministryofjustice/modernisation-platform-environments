@@ -28,7 +28,7 @@ locals {
       "/oracle/database/T2ONRBDS" = local.database_ssm_parameters
     }
     baseline_secretsmanager_secrets = {
-      # "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_db
+      "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_db
       # "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
       # "/oracle/database/T1AZBIPI" = local.secretsmanager_secrets_db
       # "/oracle/database/T1MISTRN" = local.secretsmanager_secrets_db
