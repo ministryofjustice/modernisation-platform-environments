@@ -94,7 +94,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   include_op_for_full_load = true
   cdc_inserts_and_updates = true
 
-  depends_on = [aws_iam_role_policy.dms-s3-target-policy]
+  depends_on = [aws_iam_policy.dms-s3-target-policy, aws_iam_policy.dms-operator-s3-policy]
 
   tags = {
     Resource_Type = "DMS Target"
