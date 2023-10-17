@@ -40,7 +40,7 @@ resource "aws_security_group" "tribunals_lb_sc" {
 resource "aws_lb" "tribunals_lb" {
   name                       = "tribunals-load-balancer"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tribunals_lb_sc.id, aws_security_group.tribunals_lb_sc_pingdom.id]
+  security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
