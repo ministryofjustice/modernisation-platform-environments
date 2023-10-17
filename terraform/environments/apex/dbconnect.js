@@ -1,7 +1,7 @@
-// Automated backup script
+// CWA automated backup script
 // - Makes call to lambda which connects to EC2 instance and put
 //   DB in backup mode
-// - Runs Oracle SQL scripts as Oracle user
+// - Call Oracle SQL scripts as Oracle user
 //
 //   version: 0.1
 //   auth: phil h

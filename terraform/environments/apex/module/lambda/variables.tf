@@ -1,64 +1,43 @@
 variable "backup_policy_name" {
   type        = string
-  description = "backup iam policy name"
   default     = ""
 }
 
 variable "role" {
   type        = string
-  description = "role"
   default     = ""
 }
 
 variable "tags" {
   type        = map(any)
-  description = "Tags to apply to resources, where applicable"
 }
 
 variable "filename" {
   type    = list(string)
-  default = ["snapshotDBFunction.zip",
-            "deletesnapshotFunction.zip"
-            ]
+  default = [""]
 }
 
 variable "source_file" {
   type        = list(string)
-  description = "source file for Function"
-  default     = ["dbsnapshot.js",
-                "deletesnapshots.py"
-                ]
+  default     = [""]                       
 }
 
 variable "output_path" {
   type        = list(string)
-  description = "source file for Function"
-  default     = ["snapshotDBFunction.zip",
-                "deletesnapshotFunction.zip"
-                ]
+  default     = [""]            
 }
 
 variable "function_name" {
   type        = list(string)
-  description = "Function name"
-  default     = ["snapshotDBFunction",
-                "deletesnapshotFunction"
-                ]
+  default     = [""]
 }
 
 variable "handler" {
   type        = list(string)
-  description = "Function handler"
-  default     = ["snapshot/dbsnapshot.handler",
-                "deletesnapshots.lambda_handler"
-                ]
+  default     = [""]      
 }
 
 variable "runtime" {
   type        = list(string)
-  description = "Function handler"
-  default     = [ "nodejs18.x",
-                  "Python3.8" 
-                ]
-                
+  default     = [ ""]              
 }
