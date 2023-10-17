@@ -1,6 +1,6 @@
 # Create SSM parameter to hold parameter with value to be manually added
 resource "aws_ssm_parameter" "linux-join-ad-account-username" {
-  name        = "Linux Join Domain Service Account Username"
+  name        = "/LinuxJoinDomainServiceAccountUsername"
   type        = "SecureString"
   value       = "INITIAL_VALUE_OVERRIDDEN"
   description = "Username to join linux machines to azure.noms.root domain"
@@ -12,7 +12,7 @@ resource "aws_ssm_parameter" "linux-join-ad-account-username" {
 }
 
 resource "aws_ssm_parameter" "linux-join-ad-account-password" {
-  name        = "Linux Join Domain Service Account Password"
+  name        = "/LinuxJoinDomainServiceAccountPassword"
   type        = "SecureString"
   value       = "INITIAL_VALUE_OVERRIDDEN"
   description = "Password to join linux machines to azure.noms.root domain"
