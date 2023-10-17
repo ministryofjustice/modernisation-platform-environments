@@ -140,8 +140,7 @@
     "BatchApplyEnabled": false,
     "FullLobMode": false,
     "LimitedSizeLobMode": true,
-    "LoadMaxFileSize": 0,
-    "ParallelLoadBufferSize": 1000
+    "LoadMaxFileSize": 0
   },
   "BeforeImageSettings": null,
   "ControlTablesSettings": {
