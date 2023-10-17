@@ -19,7 +19,7 @@ locals {
     principals = {
       type        = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.account_id}:role/ec2-database-*"
+        "arn:aws:iam::${module.environment.account_id}:role/ec2-database-*"
       ]
     }
     resources = ["*"]
@@ -32,7 +32,7 @@ locals {
     principals = {
       type        = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.account_id}:role/ec2-database-*"
+        "arn:aws:iam::${module.environment.account_id}:role/ec2-database-*"
       ]
     }
     resources = ["*"]
