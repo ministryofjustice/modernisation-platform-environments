@@ -85,3 +85,14 @@ resource "aws_lb_listener" "tribunals_lb" {
     target_group_arn = aws_lb_target_group.tribunals_target_group.arn
   }
 }
+
+resource "aws_lb_listener" "tribunals_lb_health" {
+  load_balancer_arn = aws_lb.tribunals_lb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tribunals_target_group.arn
+  }
+}
