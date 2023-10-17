@@ -40,13 +40,13 @@ locals {
 
 
   secretsmanager_secrets_db = {
-    policy = [
-      # local.secret_policy_read_db,
-      # local.secret_policy_write_db,
-    ]
-    secrets = {
-      passwords = {}
-    }
+    # policy = [
+    #   # local.secret_policy_read_db,
+    #   # local.secret_policy_write_db,
+    # ]
+    # secrets = {
+    #   passwords = {}
+    # }
   }
 
 }
