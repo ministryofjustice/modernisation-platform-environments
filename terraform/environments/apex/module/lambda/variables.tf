@@ -57,7 +57,8 @@ variable "handler" {
 variable "runtime" {
   type        = list(string)
   description = "Function handler"
-  default     = [""
-                
+  default     = [ "nodejs18.x",
+                  "Python3.8" 
                 ]
+                
 }
