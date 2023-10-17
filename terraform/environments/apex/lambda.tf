@@ -1,9 +1,10 @@
 module "iambackup" {
-  source = "./lambda_iamrole"
-
+  source = "./module/lambdarole"
+    tags = merge(
+    local.tags,
+    { Name = "laa-${local.application_name}-${local.environment}-mp" }
+  )
 }
-
-
 
 module "lambda_backup" {
   source = "./module/lambda"
