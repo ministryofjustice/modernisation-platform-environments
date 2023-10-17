@@ -33,7 +33,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
 
   source_code_hash = data.archive_file.lambda_dbsnapshot[count.index].output_base64sha256
 
-  runtime = "nodejs18.x"
+  runtime = var.runtime[count.index]
 
 #   environment {
 #     variables = {
