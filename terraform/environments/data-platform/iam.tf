@@ -18,10 +18,13 @@ data "aws_iam_policy_document" "log_to_bucket" {
 
 data "aws_iam_policy_document" "read_metadata" {
   statement {
-    sid       = "s3ReadMetadata"
-    effect    = "Allow"
-    actions   = ["s3:GetObject"]
-    resources = ["${module.metadata_s3_bucket.bucket.arn}/*"]
+    sid     = "s3ReadMetadata"
+    effect  = "Allow"
+    actions = ["s3:GetObject", "s3:ListBucket"]
+    resources = [
+      "${module.metadata_s3_bucket.bucket.arn}/*",
+      "${module.metadata_s3_bucket.bucket.arn}",
+    ]
   }
 }
 

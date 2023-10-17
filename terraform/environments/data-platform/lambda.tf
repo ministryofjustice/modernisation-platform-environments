@@ -302,6 +302,7 @@ module "get_schema_lambda" {
   description                    = "Fetch the schema for a table from S3"
   role_name                      = "get_schema_role_${local.environment}"
   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_get_schema_lambda.json
+  policy_json_attached           = true
   function_name                  = "get_schema_${local.environment}"
   create_role                    = true
   reserved_concurrent_executions = 1
@@ -311,12 +312,6 @@ module "get_schema_lambda" {
   tracing_mode = "Active"
   memory_size  = 512
 
-  environment_variables = {
-    LOG_BUCKET          = module.s3-bucket.bucket.id
-    METADATA_BUCKET     = module.s3-bucket.bucket.id
-    RAW_DATA_BUCKET     = module.s3-bucket.bucket.id
-    CURATED_DATA_BUCKET = module.s3-bucket.bucket.id
-    LANDING_ZONE_BUCKET = module.s3-bucket.bucket.id
-  }
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
 
 }
