@@ -6,7 +6,7 @@ module "data_product_docs_lambda" {
   function_name                  = "data_product_docs_${local.environment}"
   role_name                      = "docs_lambda_role_${local.environment}"
   policy_json_attached           = true
-  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_docs_lambda.json
+  policy_json                    = data.aws_iam_policy_document.create_write_lambda_logs.json
   create_role                    = true
   reserved_concurrent_executions = 1
 
