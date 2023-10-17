@@ -43,7 +43,7 @@ data "aws_iam_policy_document" "sas_token_rotator" {
     ]
   }
   statement {
-    sid = "EncryptSecrets"
+    sid    = "EncryptSecrets"
     effect = "Allow"
     actions = [
       "kms:Encrypt",

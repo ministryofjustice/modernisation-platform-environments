@@ -1,0 +1,17 @@
+name: Enfore do not merge label
+
+on:
+  pull_request:
+    types: [synchronize, opened, reopened, labeled, unlabeled]
+
+jobs:
+  do-not-merge:
+    if: ${{ contains(github.event.*.labels.*.name, 'DO NOT MERGE') }}
+    name: Prevent merging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for label
+        run: |
+          echo "Pull request is labeled as 'DO NOT MERGE'"
+          echo "This workflow fails so that the pull request cannot be merged"
+          exit 1

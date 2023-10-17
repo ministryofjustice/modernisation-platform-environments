@@ -56,7 +56,7 @@ module "testing_db_service" {
   environment = var.env_name
   namespace   = var.app_name
 
-  security_group_ids = [aws_security_group.weblogic.id]
+  security_group_ids = [aws_security_group.delius_db_security_group.id]
 
   subnet_ids = var.account_config.private_subnet_ids
 
@@ -74,11 +74,11 @@ resource "aws_route53_record" "delius-core-db" {
   name     = "${var.app_name}-${var.env_name}-${var.delius_db_container_config.fully_qualified_name}.${var.account_config.route53_inner_zone_info.name}"
   type     = "A"
   ttl      = 300
-  records  = ["10.26.25.202"]
+  records  = ["10.26.26.95"]
 }
 
 resource "aws_security_group" "delius_db_security_group" {
-  name        = "Delius Core DB"
+  name        = format("%s - Delius Core DB", var.env_name)
   description = "Rules for the delius testing db ecs service"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
@@ -90,7 +90,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
   from_port                    = var.delius_db_container_config.port
   to_port                      = var.delius_db_container_config.port
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  referenced_security_group_id = aws_security_group.weblogic_service.id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_bastion" {

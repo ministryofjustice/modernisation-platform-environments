@@ -109,6 +109,7 @@ locals {
         "s3:PutObject",
         "s3:PutObjectAcl",
         "s3:PutObjectTagging",
+        "s3:RestoreObject",
       ]
       principals = {
         type = "AWS"
@@ -142,6 +143,7 @@ locals {
         "s3:PutObject",
         "s3:PutObjectAcl",
         "s3:PutObjectTagging",
+        "s3:RestoreObject",
       ]
       principals = {
         type = "AWS"
@@ -161,6 +163,7 @@ locals {
         "s3:PutObjectAcl",
         "s3:PutObjectTagging",
         "s3:DeleteObject",
+        "s3:RestoreObject",
       ]
       principals = {
         type = "AWS"
@@ -196,6 +199,7 @@ locals {
         "s3:PutObjectTagging",
         "s3:DeleteObject",
         "s3:DeleteObjectVersion",
+        "s3:RestoreObject",
       ]
       principals = {
         type = "AWS"
@@ -227,6 +231,7 @@ locals {
           "s3:PutObject",
           "s3:PutObjectAcl",
           "s3:PutObjectTagging",
+          "s3:RestoreObject",
         ]
       }
     ]
@@ -241,8 +246,40 @@ locals {
           "s3:PutObjectAcl",
           "s3:PutObjectTagging",
           "s3:DeleteObject",
+          "s3:RestoreObject",
         ]
       }
     ]
+  }
+
+  s3_lifecycle_rules = {
+
+    ninety_day_standard_ia_ten_year_expiry = {
+      id      = "ninety_day_standard_ia_ten_year_expiry"
+      enabled = "Enabled"
+      prefix  = ""
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+      transition = [{
+        days          = 90
+        storage_class = "STANDARD_IA"
+      }]
+      expiration = {
+        days = 3650
+      }
+      noncurrent_version_transition = [{
+        days          = 90
+        storage_class = "STANDARD_IA"
+        }, {
+        days          = 365
+        storage_class = "GLACIER"
+      }]
+      noncurrent_version_expiration = {
+        days = 3650
+      }
+    }
+
   }
 }

@@ -16,6 +16,7 @@ locals {
     enable_business_unit_kms_cmks                = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
+    enable_ec2_reduced_ssm_policy                = true
     enable_ec2_self_provision                    = true
     enable_ec2_oracle_enterprise_managed_server  = true
     enable_ec2_user_keypair                      = true
@@ -90,6 +91,9 @@ locals {
         module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
       ]
       iam_policies = module.baseline_presets.s3_iam_policies
+      lifecycle_rule = [
+        module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
+      ]
     }
   }
 

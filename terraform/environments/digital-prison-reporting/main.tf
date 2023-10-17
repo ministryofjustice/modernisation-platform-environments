@@ -17,8 +17,9 @@ module "glue_reporting_hub_job" {
   job_language                  = "scala"
   create_security_configuration = local.create_sec_conf
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-${local.env}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
+  # Using s3a for checkpoint because to align with Hadoop 3 supports
+  checkpoint_dir   = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
+  spark_event_logs = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
   enable_continuous_log_filter = false
@@ -43,28 +44,33 @@ module "glue_reporting_hub_job" {
   )
 
   arguments = {
-    "--extra-jars"                   = local.glue_jobs_latest_jar_location
-    "--job-bookmark-option"          = "job-bookmark-disable"
-    "--class"                        = "uk.gov.justice.digital.job.DataHubJob"
-    "--dpr.kinesis.stream.arn"       = module.kinesis_stream_ingestor.kinesis_stream_arn
-    "--dpr.aws.region"               = local.account_region
-    "--dpr.curated.s3.path"          = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.batchDurationSeconds"     = local.reporting_hub_batch_duration_seconds
-    "--dpr.raw.s3.path"              = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"       = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.violations.s3.path"       = "s3://${module.s3_violation_bucket.bucket_id}/"
-    "--enable-metrics"               = true
-    "--enable-spark-ui"              = false
-    "--enable-auto-scaling"          = true
-    "--enable-job-insights"          = true
-    "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"
-    "--dpr.contract.registryName"    = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
-    "--dpr.domain.registry"          = "${local.project}-domain-registry-${local.environment}"
-    "--dpr.domain.target.path"       = "s3://${module.s3_domain_bucket.bucket_id}"
-    "--dpr.domain.catalog.db"        = module.glue_data_domain_database.db_name
-    "--dpr.redshift.secrets.name"    = "${local.project}-redshift-secret-${local.environment}"
-    "--dpr.datamart.db.name"         = "datamart"
-    "--dpr.log.level"                = local.reporting_hub_log_level
+    "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--job-bookmark-option"                 = "job-bookmark-disable"
+    "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
+    "--dpr.kinesis.stream.arn"              = module.kinesis_stream_ingestor.kinesis_stream_arn
+    "--dpr.aws.region"                      = local.account_region
+    "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.batchDurationSeconds"            = local.reporting_hub_batch_duration_seconds
+    "--dpr.add.idle.time.between.reads"     = local.reporting_hub_add_idle_time_between_reads
+    "--dpr.idle.time.between.reads.millis"  = local.reporting_hub_idle_time_between_reads_in_millis
+    "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_retry_max_attempts
+    "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_retry_min_wait_millis
+    "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_retry_max_wait_millis
+    "--dpr.raw.s3.path"                     = "s3://${module.s3_raw_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
+    "--enable-metrics"                      = true
+    "--enable-spark-ui"                     = false
+    "--enable-auto-scaling"                 = true
+    "--enable-job-insights"                 = true
+    "--dpr.aws.dynamodb.endpointUrl"        = "https://dynamodb.${local.account_region}.amazonaws.com"
+    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
+    "--dpr.domain.target.path"              = "s3://${module.s3_domain_bucket.bucket_id}"
+    "--dpr.domain.catalog.db"               = module.glue_data_domain_database.db_name
+    "--dpr.redshift.secrets.name"           = "${local.project}-redshift-secret-${local.environment}"
+    "--dpr.datamart.db.name"                = "datamart"
+    "--dpr.log.level"                       = local.reporting_hub_log_level
   }
 }
 
@@ -626,10 +632,12 @@ module "datamart" {
   create_subnet_group     = true
   kms_key_arn             = aws_kms_key.redshift-kms-key.arn
   enhanced_vpc_routing    = false
-  subnet_ids              = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
-  vpc                     = data.aws_vpc.shared.id
-  cidr                    = [data.aws_vpc.shared.cidr_block, local.cloud_platform_cidr]
-  iam_role_arns           = [aws_iam_role.redshift-role.arn, aws_iam_role.redshift-spectrum-role.arn]
+  subnet_ids = [
+    data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id
+  ]
+  vpc           = data.aws_vpc.shared.id
+  cidr          = [data.aws_vpc.shared.cidr_block, local.cloud_platform_cidr]
+  iam_role_arns = [aws_iam_role.redshift-role.arn, aws_iam_role.redshift-spectrum-role.arn]
 
   # Endpoint access - only available when using the ra3.x type, for S3 Simple Service
   create_endpoint_access = false
@@ -690,7 +698,9 @@ module "dms_nomis_ingestor" {
   migration_type               = "full-load-and-cdc"
   replication_instance_version = "3.4.7" # Upgrade
   replication_instance_class   = "dms.t3.medium"
-  subnet_ids                   = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  subnet_ids = [
+    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
+  ]
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
@@ -740,7 +750,9 @@ module "dms_fake_data_ingestor" {
   migration_type               = "full-load-and-cdc"
   replication_instance_version = "3.4.7" # Rollback
   replication_instance_class   = "dms.t3.medium"
-  subnet_ids                   = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  subnet_ids = [
+    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
+  ]
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
@@ -759,9 +771,9 @@ module "dms_fake_data_ingestor" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-dms-fake-data-ingestor-${local.env}"
-      Resource_Type = "DMS Replication"
-      Postgres_Source  = "DPS"
+      Name            = "${local.project}-dms-fake-data-ingestor-${local.env}"
+      Resource_Type   = "DMS Replication"
+      Postgres_Source = "DPS"
     }
   )
 }

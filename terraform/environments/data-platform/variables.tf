@@ -29,3 +29,15 @@ variable "resync_unprocessed_files_versions" {
 variable "reload_data_product_versions" {
   type = map(any)
 }
+
+variable "landing_to_raw_versions" {
+  type = map(any)
+}
+
+variable "create_schema_versions" {
+  type = map(any)
+}
+
+variable "get_schema_versions" {
+  type = map(any)
+}

@@ -33,8 +33,8 @@ locals {
   generic_lambda           = "${local.project}-generic-lambda"
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
   # DMS Specific
-  setup_dms_instance      = local.application_data.accounts[local.environment].setup_dms_instance
-  enable_replication_task = local.application_data.accounts[local.environment].enable_dms_replication_task
+  setup_dms_instance                = local.application_data.accounts[local.environment].setup_dms_instance
+  enable_replication_task           = local.application_data.accounts[local.environment].enable_dms_replication_task
   setup_fake_data_dms_instance      = local.application_data.accounts[local.environment].setup_fake_data_dms_instance
   enable_fake_data_replication_task = local.application_data.accounts[local.environment].enable_fake_data_dms_replication_task
   # DataMart Specific
@@ -53,12 +53,24 @@ locals {
   reporting_hub_num_workers  = local.application_data.accounts[local.environment].reporting_hub_num_workers
   reporting_hub_log_level    = local.application_data.accounts[local.environment].reporting_hub_spark_log_level
 
-  reporting_hub_batch_duration_seconds = local.application_data.accounts[local.environment].reporting_hub_batch_duration_seconds
+  reporting_hub_batch_duration_seconds      = local.application_data.accounts[local.environment].reporting_hub_batch_duration_seconds
+  reporting_hub_add_idle_time_between_reads = local.application_data.accounts[local.environment].reporting_hub_add_idle_time_between_reads
+
+  reporting_hub_idle_time_between_reads_in_millis = local.application_data.accounts[local.environment].reporting_hub_idle_time_between_reads_in_millis
+
+  reporting_hub_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_retry_max_attempts
+  reporting_hub_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_min_wait_millis
+  reporting_hub_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_max_wait_millis
 
   # Refresh Job
   refresh_job_worker_type = local.application_data.accounts[local.environment].refresh_job_worker_type
   refresh_job_num_workers = local.application_data.accounts[local.environment].refresh_job_num_workers
   refresh_job_log_level   = local.application_data.accounts[local.environment].refresh_job_log_level
+
+  # Common Maintenance Job settings
+  maintenance_job_retry_max_attempts    = local.application_data.accounts[local.environment].maintenance_job_retry_max_attempts
+  maintenance_job_retry_min_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_min_wait_millis
+  maintenance_job_retry_max_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_max_wait_millis
 
   # Compact Raw Job
   compact_raw_job_worker_type = local.application_data.accounts[local.environment].compact_raw_job_worker_type
@@ -78,6 +90,12 @@ locals {
   compact_curated_job_log_level   = local.application_data.accounts[local.environment].compact_curated_job_log_level
   compact_curated_job_schedule    = local.application_data.accounts[local.environment].compact_curated_job_schedule
 
+  # Compact Domain Job
+  compact_domain_job_worker_type = local.application_data.accounts[local.environment].compact_domain_job_worker_type
+  compact_domain_job_num_workers = local.application_data.accounts[local.environment].compact_domain_job_num_workers
+  compact_domain_job_log_level   = local.application_data.accounts[local.environment].compact_domain_job_log_level
+  compact_domain_job_schedule    = local.application_data.accounts[local.environment].compact_domain_job_schedule
+
   # Retention (vacuum) Raw Job
   retention_raw_job_worker_type = local.application_data.accounts[local.environment].retention_raw_job_worker_type
   retention_raw_job_num_workers = local.application_data.accounts[local.environment].retention_raw_job_num_workers
@@ -95,6 +113,12 @@ locals {
   retention_curated_job_num_workers = local.application_data.accounts[local.environment].retention_curated_job_num_workers
   retention_curated_job_log_level   = local.application_data.accounts[local.environment].retention_curated_job_log_level
   retention_curated_job_schedule    = local.application_data.accounts[local.environment].retention_curated_job_schedule
+
+  # Retention (vacuum) Domain Job
+  retention_domain_job_worker_type = local.application_data.accounts[local.environment].retention_domain_job_worker_type
+  retention_domain_job_num_workers = local.application_data.accounts[local.environment].retention_domain_job_num_workers
+  retention_domain_job_log_level   = local.application_data.accounts[local.environment].retention_domain_job_log_level
+  retention_domain_job_schedule    = local.application_data.accounts[local.environment].retention_domain_job_schedule
 
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
@@ -161,8 +185,11 @@ locals {
   create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
+  # Enable CW alarms
+  enable_cw_alarm = local.application_data.accounts[local.environment].setup_cw_alarms
+
   # Sonatype Secrets
-  setup_sonatype_secrets             = local.application_data.accounts[local.environment].setup_sonatype_secrets
+  setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
 
   nomis_secrets_placeholder = {
     db_name  = "nomis"
@@ -175,7 +202,7 @@ locals {
   sonatype_secrets_placeholder = {
     user     = "placeholder"
     password = "placeholder"
-  }  
+  }
 
   # Evaluate Redshift Secrets and Populate
   redshift_secrets = {

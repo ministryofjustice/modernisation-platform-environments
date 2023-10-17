@@ -4,6 +4,8 @@ locals {
   lambda_timeout_in_seconds = 15
   region                    = "eu-west-2"
   account_id                = local.environment_management.account_ids[terraform.workspace]
+  api_auth_token            = jsondecode(data.aws_secretsmanager_secret_version.api_auth.secret_string)["auth-token"]
+
 
   # Glue
   glue_default_arguments = {
@@ -32,4 +34,19 @@ locals {
   create_metadata_version          = lookup(var.create_metadata_versions, local.environment)
   resync_unprocessed_files_version = lookup(var.resync_unprocessed_files_versions, local.environment)
   reload_data_product_version      = lookup(var.reload_data_product_versions, local.environment)
+  get_schema_version               = lookup(var.get_schema_versions, local.environment)
+  create_schema_version            = lookup(var.create_schema_versions, local.environment)
+  landing_to_raw_version           = lookup(var.landing_to_raw_versions, local.environment)
+
+  # Environment vars that are used by many lambdas
+  logger_environment_vars = {
+    LOG_BUCKET = module.logs_s3_bucket.bucket.id
+  }
+
+  storage_environment_vars = {
+    RAW_DATA_BUCKET     = module.data_s3_bucket.bucket.id
+    CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
+    METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
+    LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
+  }
 }

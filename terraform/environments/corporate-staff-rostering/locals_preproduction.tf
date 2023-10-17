@@ -74,12 +74,42 @@ locals {
         }
 
         tags = {
-          description = "PP CSR DB server"
-          ami         = "base_ol_8_5"
-          os-type     = "Linux"
-          component   = "test"
-          server-type = "csr-db"
+          description         = "PP CSR DB server"
+          ami                 = "base_ol_8_5"
+          os-type             = "Linux"
+          component           = "test"
+          server-type         = "csr-db"
           instance-scheduling = "skip-scheduling"
+        }
+      }
+
+      pp-csr-a-17-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-a-17-a"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        tags = {
+          description = "copy of PPCAW00017 for csr ${local.environment}"
+          os-type     = "Windows"
+          ami         = "pp-csr-a-17-a"
+          component   = "app"
         }
       }
 
@@ -133,35 +163,6 @@ locals {
         }
         tags = {
           description = "copy of PPCWW00008 for csr ${local.environment}"
-          os-type     = "Windows"
-          ami         = "pp-csr-w-8-b"
-          component   = "web"
-        }
-      }
-
-      pp-csr-w-8-b-T = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pp-csr-w-8-b"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
-          ebs_volumes_copy_all_from_ami = false
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.2xlarge"
-          disable_api_termination = true
-          monitoring              = true
-          vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
-          tags = {
-            backup-plan = "daily-and-weekly"
-          }
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 200 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          # description = "copy of PPCWW00008 for csr ${local.environment}"
-          description = "testing group policies in ${local.environment}"
           os-type     = "Windows"
           ami         = "pp-csr-w-8-b"
           component   = "web"
@@ -261,7 +262,7 @@ locals {
     }
 
     baseline_route53_zones = {
-      "hmpps-preproduction.modernisation-platform.service.justice.gov.uk" = {
+      "pp.csr.service.justice.gov.uk" = {
         records = [
         ]
       }
