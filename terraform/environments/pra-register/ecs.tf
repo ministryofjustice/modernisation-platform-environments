@@ -22,7 +22,7 @@ resource "aws_ecs_task_definition" "pra_task_definition" {
   container_definitions = jsonencode([
     {
       name      = "pra-container"
-      image     = "${aws_ecr_repository.ncas_ecr_repo.repository_url}:latest"
+      image     = "${aws_ecr_repository.pra_ecr_repo.repository_url}:latest"
       cpu       = 2048
       memory    = 4096
       essential = true
