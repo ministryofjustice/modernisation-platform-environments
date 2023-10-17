@@ -56,7 +56,14 @@ data "aws_iam_policy_document" "ldap_datasync_role_access" {
       "ec2:CreateNetworkInterface",
       "ec2:AttachNetworkInterface",
       "ec2:DescribeNetworkInterfaces",
-      "ec2:DeleteNetworkInterface"
+      "ec2:DeleteNetworkInterface",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:DescribeKey",
+      "kms:GetPublicKey",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey"
     ]
     resources = ["*"]
   }
