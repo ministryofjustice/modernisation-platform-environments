@@ -1,4 +1,5 @@
-
+# creates database and tables in the glue catalogue for data as a product logs.
+# Meaning logs are queryable via Athena.
 resource "aws_glue_catalog_database" "data_product_logs" {
   name   = "daap_logs"
 }
@@ -187,4 +188,3 @@ resource "aws_glue_catalog_table" "s3_objects" {
 
   }
 }
-
