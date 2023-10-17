@@ -20,20 +20,13 @@ resource "aws_security_group" "tribunals_lb_sc" {
   }
 
   egress {
-    description = "allow all outbound traffic for port 80"
-    from_port   = 80
-    to_port     = 80
+    description = "allow all outbound traffic from the load balancer - needed due to dynamic port mapping on ec2 instance"
+    from_port   = 0
+    to_port     = 0
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  egress {
-    description = "allow all outbound traffic for port 443"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
 //noinspection HILUnresolvedReference
