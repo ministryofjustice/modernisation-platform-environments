@@ -7,7 +7,7 @@ resource "aws_ecs_cluster" "wardship_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
-  name = "/aws/events/deploymentLogs"
+  name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
 }
 
@@ -258,21 +258,21 @@ resource "aws_cloudwatch_event_target" "logs" {
 
 resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
   policy_document = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
-        "Sid": "TrustEventsToStoreLogEvent",
-        "Effect": "Allow",
-        "Principal": {
-          "Service": ["events.amazonaws.com", "delivery.logs.amazonaws.com"]
+        "Sid" : "TrustEventsToStoreLogEvent",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : ["events.amazonaws.com", "delivery.logs.amazonaws.com"]
         },
-        "Action": [
+        "Action" : [
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        "Resource": "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/*:*"
+        "Resource" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/*:*"
       }
     ]
   })
-  policy_name     = "TrustEventsToStoreLogEvents"
+  policy_name = "TrustEventsToStoreLogEvents"
 }
