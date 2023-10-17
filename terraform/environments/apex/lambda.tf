@@ -1,11 +1,10 @@
 module "iambackup" {
-  source = "./module/lambdarole"
+  source = "./module/lambdapolicy"
     tags = merge(
     local.tags,
     { Name = "laa-${local.application_name}-${local.environment}-mp" }
   )
 }
-
 module "lambda_backup" {
   source = "./module/lambda"
 
