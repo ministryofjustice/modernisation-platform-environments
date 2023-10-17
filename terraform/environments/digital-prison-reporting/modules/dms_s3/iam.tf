@@ -50,9 +50,9 @@ EOF
 }
 
 #DMS Role with s3 Write Access
-resource "aws_iam_role_policy_attachment" "dms-kinesis-attachment" {
+resource "aws_iam_role_policy_attachment" "dms-s3-attachment" {
   role       = aws_iam_role.dms-s3-role.name
-  policy_arn = var.s3_write_policy
+  policy_arn = aws_iam_role_policy.dms-s3-target-policy
 }
 
 #DMS Operation s3 target role
@@ -132,5 +132,5 @@ EOF
 #DMS Role with s3 Write Access
 resource "aws_iam_role_policy_attachment" "dms-operator-s3-attachment" {
   role       = aws_iam_role.dms-operator-s3-target-role.name
-  policy_arn = var.s3_write_policy
+  policy_arn = aws_iam_role_policy.dms-operator-s3-policy
 }
