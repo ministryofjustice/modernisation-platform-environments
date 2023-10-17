@@ -4,7 +4,7 @@
 # If it is able to perform this operation successfully, the cluster is considered healthy. 
 # Otherwise, the cluster is unhealthy. An unhealthy status can occur when the cluster database is under extremely heavy load or if there is a configuration problem with a database on the cluster.
 module "dpr_redshift_health_status_check" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-redshift-health-status"
@@ -25,7 +25,7 @@ module "dpr_redshift_health_status_check" {
 ## Monitoring AWS DMS tasks, https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Monitoring.html
 # Alarm - "DMS Stop Monitor"
 module "dpr_dms_stoptask_check" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-stop-task"
@@ -42,16 +42,16 @@ module "dpr_dms_stoptask_check" {
     "Type"     = "API"
   }
 
-  namespace    = "AWS/Usage"
-  metric_name  = "CallCount"
-  statistic    = "Maximum"
+  namespace   = "AWS/Usage"
+  metric_name = "CallCount"
+  statistic   = "Maximum"
 
   alarm_actions = [module.notifications_sns.sns_topic_arn]
 }
 
 # Alarm - "DMS Start Monitor"
 module "dpr_dms_starttask_check" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-start-task"
@@ -68,16 +68,16 @@ module "dpr_dms_starttask_check" {
     "Type"     = "API"
   }
 
-  namespace    = "AWS/Usage"
-  metric_name  = "CallCount"
-  statistic    = "Maximum"
+  namespace   = "AWS/Usage"
+  metric_name = "CallCount"
+  statistic   = "Maximum"
 
   alarm_actions = [module.notifications_sns.sns_topic_arn]
 }
 
 # Alarm - "DMS CPU Utilization Monitor"
 module "dpr_dms_cpu_utils_check" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-cpu-utilization"
@@ -87,7 +87,7 @@ module "dpr_dms_cpu_utils_check" {
   evaluation_periods  = 1
   threshold           = 80 # 80% CPU
 
-  dimensions          = {
+  dimensions = {
     "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
   }
 
@@ -100,7 +100,7 @@ module "dpr_dms_cpu_utils_check" {
 
 # Alarm - "DMS FreeMemory Monitor"
 module "dpr_dms_free_memory_check" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-free-memory"
@@ -110,7 +110,7 @@ module "dpr_dms_free_memory_check" {
   evaluation_periods  = 1
   threshold           = 1000000000 # 1Gb
 
-  dimensions          = {
+  dimensions = {
     "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
   }
 
@@ -123,7 +123,7 @@ module "dpr_dms_free_memory_check" {
 
 # Alarm - "DMS FreeableMemory Monitor"
 module "dpr_dms_freeable_memory_check" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-freeable-memory"
@@ -133,7 +133,7 @@ module "dpr_dms_freeable_memory_check" {
   evaluation_periods  = 1
   threshold           = 1000000000 # 1Gb
 
-  dimensions          = {
+  dimensions = {
     "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
   }
 
@@ -147,7 +147,7 @@ module "dpr_dms_freeable_memory_check" {
 # Alarm - "DMS SWAP Usage Monitor"
 # https://repost.aws/knowledge-center/dms-swap-files-consuming-space
 module "dpr_dms_swap_usage_check" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-swap-usage"
@@ -157,7 +157,7 @@ module "dpr_dms_swap_usage_check" {
   evaluation_periods  = 1
   threshold           = 750000000 # 0.75Gb
 
-  dimensions          = {
+  dimensions = {
     "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
   }
 
@@ -171,7 +171,7 @@ module "dpr_dms_swap_usage_check" {
 # Alarm - "DMS Network Transmit Throughput Monitor"
 # https://repost.aws/knowledge-center/dms-swap-files-consuming-space
 module "dpr_dms_network_transmit_throughput" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-network-transmit-throughput"
@@ -191,7 +191,7 @@ module "dpr_dms_network_transmit_throughput" {
 # Alarm - "DMS Network Receive Throughput Monitor"
 # https://repost.aws/knowledge-center/dms-swap-files-consuming-space
 module "dpr_dms_network_receive_throughput" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-network-receive-throughput"
@@ -213,7 +213,7 @@ module "dpr_dms_network_receive_throughput" {
 # CDCLatencySource represents the latency between source and replication instance. 
 # High CDCLatencySource means the process of capturing changes from source is delayed.
 module "dpr_dms_cdc_source_latency" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-cdc-source-latency"
@@ -223,7 +223,7 @@ module "dpr_dms_cdc_source_latency" {
   evaluation_periods  = 1
   threshold           = 3600 # 60 mins
 
-  dimensions                = {
+  dimensions = {
     "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
     "ReplicationTaskIdentifier"     = module.dms_nomis_ingestor.dms_replication_task_name
   }
@@ -239,7 +239,7 @@ module "dpr_dms_cdc_source_latency" {
 # The gap, in seconds, between the first event timestamp waiting to commit on the target and the current timestamp of the AWS DMS instance. 
 # Target latency is the difference between the replication instance server time and the oldest unconfirmed event id forwarded to a target component. 
 module "dpr_dms_cdc_target_latency" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-cdc-target-latency"
@@ -249,7 +249,7 @@ module "dpr_dms_cdc_target_latency" {
   evaluation_periods  = 1
   threshold           = 3600 # 60 mins
 
-  dimensions                = {
+  dimensions = {
     "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
     "ReplicationTaskIdentifier"     = module.dms_nomis_ingestor.dms_replication_task_name
   }
@@ -267,7 +267,7 @@ module "dpr_dms_cdc_target_latency" {
 # A large number for this metric usually indicates AWS DMS is unable to apply captured changes in a timely manner, 
 # thus causing high target latency.
 module "dpr_dms_cdc_incoming_events" {
-  source = "./modules/cw_alarm"
+  source              = "./modules/cw_alarm"
   create_metric_alarm = local.enable_cw_alarm
 
   alarm_name          = "dpr-dms-cdc-incoming-events"
@@ -277,7 +277,7 @@ module "dpr_dms_cdc_incoming_events" {
   evaluation_periods  = 1
   threshold           = 100 # 100 events 
 
-  dimensions                = {
+  dimensions = {
     "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
     "ReplicationTaskIdentifier"     = module.dms_nomis_ingestor.dms_replication_task_name
   }
