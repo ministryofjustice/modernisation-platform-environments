@@ -44,9 +44,9 @@ locals {
     #   # local.secret_policy_read_db,
     #   # local.secret_policy_write_db,
     # ]
-    # secrets = {
-    #   passwords = {}
-    # }
+    secrets = {
+      passwords = {}
+    }
   }
 
 }
