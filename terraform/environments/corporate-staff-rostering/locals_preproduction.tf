@@ -272,6 +272,8 @@ locals {
     baseline_route53_zones = {
       "pp.csr.service.justice.gov.uk" = {
         records = [
+          # Set to IP of the Azure CSR PP DB in PPCDL00019
+          { name = "ppiwfm", type = "A", ttl = "300", records = ["10.40.42.132"] },
         ]
       }
     }
