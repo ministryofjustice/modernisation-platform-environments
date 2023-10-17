@@ -9,30 +9,27 @@ variable "tags" {
   description = "Tags to apply to resources, where applicable"
 }
 
+variable "filename" {
+  type    = list(string)
+  default = ["snapshotDBFunction", "deletesnapshotFunction"]
+}
+
 variable "source_file" {
   type        = list(string)
   description = "source file for Function"
-  default     = [""]
-}
-
-variable "filename" {
-  type        = list(string)
-  description = "Function filename"
-  default     = [""]
+  default     = ["dbsnapshot.js","deletesnapshots.py"]
 }
 
 variable "output_path" {
   type        = list(string)
-  description = "Function filename"
-  default     = [""]
+  description = "source file for Function"
+  default     = ["connectDBFunction.zip","DeleteEBSPendingSnapshots.zip"]
 }
-
-
 
 variable "function_name" {
    type        = list(string)
   description = "Function name"
-  default     = [""]
+  default     = ["connectDBFunction.zip","DeleteEBSPendingSnapshots.zip"]
 }
 
 variable "handler" {
