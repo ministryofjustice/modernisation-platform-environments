@@ -22,7 +22,6 @@ locals {
     production    = local.production_config
   }
 
-  account_id         = local.environment_management.account_ids[terraform.workspace]
   environment_config = local.accounts[local.environment]
 
   region            = "eu-west-2"
