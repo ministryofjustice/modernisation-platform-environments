@@ -10,27 +10,29 @@ variable "tags" {
 }
 
 variable "source_file" {
-  type        = string
+  type        = list(string)
   description = "source file for Function"
-  default     = ""
-}
-
-variable "output_path" {
-  type        = string
-  description = "output path to zip file Function"
-  default     = ""
+  default     = [""]
 }
 
 variable "filename" {
-  type        = string
+  type        = list(string)
   description = "Function filename"
-  default     = ""
+  default     = [""]
 }
 
+variable "output_path" {
+  type        = list(string)
+  description = "Function filename"
+  default     = [""]
+}
+
+
+
 variable "function_name" {
-  type        = string
-  description = "Function function name"
-  default     = ""
+   type        = list(string)
+  description = "Function name"
+  default     = [""]
 }
 
 variable "handler" {

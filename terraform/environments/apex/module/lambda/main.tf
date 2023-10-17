@@ -61,9 +61,10 @@ resource "aws_iam_role_policy_attachment" "backuppolicyattachment" {
 }
 
 data "archive_file" "lambda_dbsnapshot" {
+  count = 2
   type        = "zip"
-  source_file = var.source_file
-  output_path = var.output_path
+  source_file = var.source_file[count.index]
+  output_path = var.output_path[count.index]
 }
 
 # data "archive_file" "lambda_dbconnect" {
@@ -82,9 +83,9 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   # If the file is not in the current working directory you will need to include a
   # path.module in the filename.
 
-  count         =
-  filename      = var.filename
-  function_name = var.function_name
+  count         = 2
+  filename      = var.filename[count.index]
+  function_name = var.function_name[count.index]
   role          = aws_iam_role.backuplambdarole.arn
   handler       = var.handler
 
