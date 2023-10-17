@@ -124,7 +124,7 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
   source_policy_documents = [
     data.aws_iam_policy_document.log_to_bucket.json,
     data.aws_iam_policy_document.read_metadata.json,
-    data.data.aws_iam_policy_document.create_write_lambda_logs.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
   ]
 
   statement {
