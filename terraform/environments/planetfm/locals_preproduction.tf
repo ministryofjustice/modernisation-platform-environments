@@ -13,7 +13,7 @@ locals {
           ebs_volumes_copy_all_from_ami = false
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.large"
+          instance_type           = "t3.large"
           disable_api_termination = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
