@@ -34,6 +34,7 @@ locals {
   create_metadata_version          = lookup(var.create_metadata_versions, local.environment)
   resync_unprocessed_files_version = lookup(var.resync_unprocessed_files_versions, local.environment)
   reload_data_product_version      = lookup(var.reload_data_product_versions, local.environment)
+  get_schema_version               = lookup(var.get_schema_versions, local.environment)
   create_schema_version            = lookup(var.create_schema_versions, local.environment)
   landing_to_raw_version           = lookup(var.landing_to_raw_versions, local.environment)
 

@@ -186,7 +186,7 @@ locals {
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
   # Enable CW alarms
-  enable_cw_alarm  = local.application_data.accounts[local.environment].setup_cw_alarms
+  enable_cw_alarm = local.application_data.accounts[local.environment].setup_cw_alarms
 
   # Sonatype Secrets
   setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
