@@ -22,8 +22,8 @@ locals {
           }
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 100 }
         }
         tags = {
           description = "copy of PPFWW0005 for planetfm ${local.environment}"
