@@ -32,15 +32,11 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-
-########## Transport Tribunals ###################
-
-// ACM Public Certificate
-resource "aws_acm_certificate" "transport_external" {
+resource "aws_acm_certificate" "external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.transport_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -49,6 +45,24 @@ resource "aws_acm_certificate" "transport_external" {
     create_before_destroy = true
   }
 }
+
+
+########## Transport Tribunals ###################
+
+// ACM Public Certificate
+# resource "aws_acm_certificate" "transport_external" {
+#   domain_name       = "modernisation-platform.service.justice.gov.uk"
+#   validation_method = "DNS"
+
+#   subject_alternative_names = ["${local.transport_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+#   tags = {
+#     Environment = local.environment
+#   }
+
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
 // Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "transport_external" {
@@ -68,19 +82,19 @@ resource "aws_route53_record" "transport_external" {
 ########## Administrative Appeals ###################
 
 // ACM Public Certificate
-resource "aws_acm_certificate" "appeals_external" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
-  validation_method = "DNS"
+# resource "aws_acm_certificate" "appeals_external" {
+#   domain_name       = "modernisation-platform.service.justice.gov.uk"
+#   validation_method = "DNS"
 
-  subject_alternative_names = ["${local.appeals_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-  tags = {
-    Environment = local.environment
-  }
+#   subject_alternative_names = ["${local.appeals_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+#   tags = {
+#     Environment = local.environment
+#   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
 // Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "appeals_external" {
