@@ -56,6 +56,8 @@ variable "migration_type" {
   description = "DMS Migration Type"
 }
 
+variable "s3_write_policy" {}
+
 variable "availability_zones" {
   default = [
     {
@@ -74,8 +76,6 @@ variable "subnet_ids" {
 variable "source_address" {}
 
 variable "vpc" {}
-
-variable "kinesis_stream_policy" {}
 
 variable "availability_zone" {
   default = null
@@ -141,11 +141,6 @@ variable "target_db_port" {
   default     = 5432
 }
 
-variable "target_engine" {
-  default     = "kinesis"
-  description = "Engine type, example values mysql, postgres"
-}
-
 variable "target_engine_version" {
   description = "Engine version"
   default     = "9.3.14"
@@ -184,11 +179,6 @@ variable "target_storage_encrypted" {
 #  description = "Username to access the target database"
 #}
 
-variable "kinesis_settings" {
-  type        = map(any)
-  description = "Configuration block for Kinesis settings"
-  default     = null
-}
 #--------------------------------------------------------------
 # DMS source config
 #--------------------------------------------------------------

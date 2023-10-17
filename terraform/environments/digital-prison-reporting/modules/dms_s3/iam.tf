@@ -17,10 +17,6 @@ resource "aws_iam_role" "dms-s3-role" {
   ]
 }
 EOF
-
-  tags = {
-    Jira = "DPR2-165"
-  }
 }
 
 # Attach s3 target operation policy to the role
@@ -35,25 +31,28 @@ resource "aws_iam_role_policy" "dms-s3-target-policy" {
         {
             "Effect": "Allow",
             "Action": [
-                "s3:PutObject",
-                "s3:DeleteObject",
-                "s3:PutObjectTagging"
+                "s3:*",
+                "kms:*"
             ],
-            "Resource": [
-                "arn:aws:s3::*:dpr-*/*",
-                "arn:aws:s3::*:dpr-*"
-            ]
+            "Resource": "*"
         },
         {
             "Effect": "Allow",
             "Action": [
-                "s3:ListBucket"
+                "s3:*",
+                "kms:*"
             ],
             "Resource": "*"
         }
     ]
 }
 EOF
+}
+
+#DMS Role with s3 Write Access
+resource "aws_iam_role_policy_attachment" "dms-kinesis-attachment" {
+  role       = aws_iam_role.dms-s3-role.name
+  policy_arn = var.s3_write_policy
 }
 
 #DMS Operation s3 target role
@@ -128,4 +127,10 @@ resource "aws_iam_role_policy" "dms-operator-s3-policy" {
     ]
 }
 EOF
+}
+
+#DMS Role with s3 Write Access
+resource "aws_iam_role_policy_attachment" "dms-operator-s3-attachment" {
+  role       = aws_iam_role.dms-operator-s3-target-role.name
+  policy_arn = var.s3_write_policy
 }
