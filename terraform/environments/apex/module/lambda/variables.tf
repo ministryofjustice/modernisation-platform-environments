@@ -4,6 +4,12 @@ variable "backup_policy_name" {
   default     = null
 }
 
+variable "role" {
+  type        = string
+  description = "role"
+  default     = null
+}
+
 variable "tags" {
   type        = map(any)
   description = "Tags to apply to resources, where applicable"

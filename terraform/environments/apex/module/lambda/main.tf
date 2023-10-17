@@ -1,8 +1,5 @@
 
-module "iambackup" {
-  source = "./lamdda_iamrole"
 
-}
 
 
 data "archive_file" "lambda_dbsnapshot" {
@@ -31,7 +28,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   count         = 2
   filename      = var.filename[count.index]
   function_name = var.function_name[count.index]
-  role          = m
+  role          = var.role
   handler       = var.handler[count.index]
 
   source_code_hash = data.archive_file.lambda_dbsnapshot[count.index].output_base64sha256
