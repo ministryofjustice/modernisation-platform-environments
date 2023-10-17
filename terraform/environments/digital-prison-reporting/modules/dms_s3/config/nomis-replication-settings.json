@@ -136,7 +136,6 @@
     "SupportLobs": true,
     "LobChunkSize": 64,
     "TaskRecoveryTableEnabled": false,
-    "ParallelLoadThreads": 8,
     "LobMaxSize": 32,
     "BatchApplyEnabled": false,
     "FullLobMode": false,
