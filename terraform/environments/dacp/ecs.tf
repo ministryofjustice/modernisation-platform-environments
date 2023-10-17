@@ -249,7 +249,7 @@ resource "aws_cloudwatch_event_target" "logs" {
   arn        = aws_cloudwatch_log_group.ecs_deployment_logs.arn
 }
 
-resource "aws_cloudwatch_log_stream" "foo" {
+resource "aws_cloudwatch_log_stream" "ecs_log_stream" {
   name           = "ecsDeploymentStream"
   log_group_name = aws_cloudwatch_log_group.ecs_deployment_logs.name
 }
