@@ -140,7 +140,8 @@
     "BatchApplyEnabled": false,
     "FullLobMode": false,
     "LimitedSizeLobMode": true,
-    "LoadMaxFileSize": 0
+    "LoadMaxFileSize": 0,
+    "MaxFileSize": 200000
   },
   "BeforeImageSettings": null,
   "ControlTablesSettings": {
