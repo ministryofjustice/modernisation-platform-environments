@@ -36,7 +36,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
 ########## Transport Tribunals ###################
 
 // ACM Public Certificate
-resource "aws_acm_certificate" "external" {
+resource "aws_acm_certificate" "transport_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
@@ -51,7 +51,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 // Route53 DNS record for directing traffic to the service
-resource "aws_route53_record" "external" {
+resource "aws_route53_record" "transport_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -68,7 +68,7 @@ resource "aws_route53_record" "external" {
 ########## Administrative Appeals ###################
 
 // ACM Public Certificate
-resource "aws_acm_certificate" "external" {
+resource "aws_acm_certificate" "appeals_external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
@@ -83,7 +83,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 // Route53 DNS record for directing traffic to the service
-resource "aws_route53_record" "external" {
+resource "aws_route53_record" "appeals_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
