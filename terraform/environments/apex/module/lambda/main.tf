@@ -1,71 +1,9 @@
-data "aws_iam_policy_document" "assume_role" {
-  statement {
-    effect = "Allow"
 
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com","ssm.amazonaws.com"]
-    }
+module "iambackup" {
+  source = "./lamdda_iamrole"
 
-    actions = ["sts:AssumeRole"]
-  }
 }
 
-resource "aws_iam_role" "backuplambdarole" {
-  name               = "backuplambdarole"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-}
-
-data "aws_iam_role" "existbackuplambdarole" {
-  name = aws_iam_role.backuplambdarole.arn
-}
-
-resource "aws_iam_policy" "backuplambdapolicy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name = var.backup_policy_name
-  tags = var.tags
-  policy = <<EOF
-{
-    "Version" : "2012-10-17",
-    "Statement": [
-        {
-            "Action": [
-                "lambda:InvokeFunction",
-                "ec2:CreateNetworkInterface",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DeleteNetworkInterface",
-                "ec2:DescribeSecurityGroups",
-                "ec2:CreateSnapshot",
-                "ec2:DeleteSnapshot",
-                "ec2:DescribeSubnets",
-                "ec2:DescribeVpcs",
-                "ec2:DescribeInstances",
-                "ec2:DescribeAddresses",
-                "ec2:DescribeInstanceStatus",
-                "ec2:DescribeVolumes",
-                "ec2:DescribeSnapshots",
-                "ec2:CreateTags",
-                "s3:*",
-                "ssm:*",
-                "ses:*",
-                "logs:*",
-                "cloudwatch:*",
-                "sts:AssumeRole"
-            ],
-            "Resource": "*",
-            "Effect": "Allow"
-        }
-    ]
-}
-EOF
-}
-data "aws_iam_policy" "exist-backuplambdapolicy" {
-  name = aws_iam_policy.backuplambdapolicy.arn
-}
-
-resource "aws_iam_role_policy_attachment" "backuppolicyattachment" {
-  role       = aws_iam_role.backuplambdarole.name
-  policy_arn = data.aws_iam_policy.exist-backuplambdapolicy.name
-}
 
 data "archive_file" "lambda_dbsnapshot" {
   count = 2
@@ -93,7 +31,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   count         = 2
   filename      = var.filename[count.index]
   function_name = var.function_name[count.index]
-  role          = data.aws_iam_role.existbackuplambdarole.name
+  role          = m
   handler       = var.handler[count.index]
 
   source_code_hash = data.archive_file.lambda_dbsnapshot[count.index].output_base64sha256

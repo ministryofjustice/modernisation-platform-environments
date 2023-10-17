@@ -1,3 +1,10 @@
+module "iambackup" {
+  source = "./lambda_iamrole"
+
+}
+
+
+
 module "lambda_backup" {
   source = "./module/lambda"
 
@@ -7,6 +14,10 @@ output_path   = ["snapshotDBFunction.zip","deletesnapshotFunction.zip"]
 filename      = ["snapshotDBFunction", "deletesnapshotFunction"]
 function_name = ["snapshotDBFunction","deletesnapshotFunction"]
 handler       = ["snapshot/dbsnapshot.handler","deletesnapshots.lambda_handler"]
+role = module.iambackup.backuprole
+
+
+
 
     tags = merge(
     local.tags,
