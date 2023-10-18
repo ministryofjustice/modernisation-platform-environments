@@ -84,6 +84,7 @@ locals {
         }
       }
       "" = {
+        postfix = ""
         secrets = {
           account_ids = {}
           ec2-user_pem = {}
