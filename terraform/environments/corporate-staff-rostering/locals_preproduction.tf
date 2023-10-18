@@ -276,7 +276,7 @@ locals {
           { name = "ppiwfm", type = "A", ttl = "300", records = ["10.40.42.132"] },
           { name = "ppiwfm-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
           { name = "ppiwfm-b", type = "CNAME", ttl = "300", records = ["pp-csr-db-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "r3", type = "CNAME", ttl = "300", records = "pp-csr-w-5-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk" }
+          { name = "r3", type = "CNAME", ttl = "300", records = ["pp-csr-w-5-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
     }
