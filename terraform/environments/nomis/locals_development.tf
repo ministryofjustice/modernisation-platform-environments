@@ -106,7 +106,7 @@ locals {
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "nomis/DSOS-2093/monitoring-improvements"
+            branch = "main"
           })
         })
         tags = {
@@ -132,7 +132,7 @@ locals {
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "nomis/DSOS-2093/monitoring-improvements"
+            branch = "main"
           })
         })
         tags = {
@@ -158,7 +158,7 @@ locals {
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "nomis/DSOS-2093/monitoring-improvements"
+            branch = "main"
           })
         })
         tags = {
@@ -184,7 +184,7 @@ locals {
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "nomis/DSOS-2093/monitoring-improvements"
+            branch = "main"
           })
         })
         tags = {
@@ -257,7 +257,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
+            branch = "main"
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
