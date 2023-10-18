@@ -131,6 +131,6 @@ resource "aws_route53_record" "db_ec2_primary_instance" {
   zone_id  = var.account_config.route53_inner_zone_info.zone_id
   name     = "${var.app_name}-${var.env_name}-oracle_db.${var.account_config.route53_inner_zone_info.name}"
   type     = "CNAME"
-  # ttl      = 300
+  ttl      = 300
   records  = [aws_instance.db_ec2_primary_instance.private_dns]
 }
