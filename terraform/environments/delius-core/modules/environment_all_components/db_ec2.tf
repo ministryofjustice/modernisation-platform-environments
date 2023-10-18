@@ -112,16 +112,25 @@ module "ebs_volume" {
   ]
 }
 
+# resource "aws_route53_record" "db_ec2_primary_instance" {
+#   provider = aws.core-vpc
+#   zone_id  = var.account_config.route53_inner_zone_info.zone_id
+#   name     = "${var.app_name}-${var.env_name}-oracle_db.${var.account_config.route53_inner_zone_info.name}"
+#   type     = "A"
+
+#   alias {
+#     name                   = aws_instance.db_ec2_primary_instance.private_dns
+#     zone_id                = var.account_config.route53_inner_zone_info.zone_id
+#     evaluate_target_health = true # Could be true or false based on https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-values-alias.html#rrsets-values-alias-evaluate-target-health
+#   }
+# }
+
+
 resource "aws_route53_record" "db_ec2_primary_instance" {
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone_info.zone_id
-  # name     = "${var.env_name}.db_ec2.${var.account_info.application_name}"
   name     = "${var.app_name}-${var.env_name}-oracle_db.${var.account_config.route53_inner_zone_info.name}"
-  type     = "A"
-
-  alias {
-    name                   = aws_instance.db_ec2_primary_instance.private_dns
-    zone_id                = var.account_config.route53_inner_zone_info.zone_id
-    evaluate_target_health = true # Could be true or false based on https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-values-alias.html#rrsets-values-alias-evaluate-target-health
-  }
+  type     = "CNAME"
+  # ttl      = 300
+  records  = [aws_instance.db_ec2_primary_instance.private_dns]
 }
