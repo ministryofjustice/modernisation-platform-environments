@@ -90,9 +90,11 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   data_format             = "parquet"
   cdc_path = "cdc"
 
-  cdc_max_batch_interval = 10
+  max_file_size            = 200000
+  cdc_max_batch_interval   = 10
   include_op_for_full_load = true
-  cdc_inserts_and_updates = true
+  cdc_inserts_and_updates  = true
+  glue_catalog_generation  = true
 
   depends_on = [aws_iam_policy.dms-s3-target-policy, aws_iam_policy.dms-operator-s3-policy]
 
