@@ -37,14 +37,14 @@ resource "aws_cloudwatch_event_rule" "mon_sun" {
 resource "aws_cloudwatch_event_target" "check_mon_sun" {
     count = 3
     rule = aws_cloudwatch_event_rule.mon_sun.name
-    arn = module.lambda_backup[count.index].lambda_function
+    arn = module.lambda_backup.lambda_function
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_mon_sun" {
     count = 3
     statement_id = "AllowExecutionFromCloudWatch"
     action = "lambda:InvokeFunction"
-    function_name = module.lambda_backup[count.index].lambda_function_name
+    function_name = module.lambda_backup.lambda_function_name
     principal = "events.amazonaws.com"
     source_arn = aws_cloudwatch_event_rule.mon_sun.arn
 }
