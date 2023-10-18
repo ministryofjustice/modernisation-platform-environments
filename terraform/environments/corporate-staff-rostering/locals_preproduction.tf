@@ -111,6 +111,10 @@ locals {
           ami         = "pp-csr-a-17-a"
           component   = "app"
         }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
       }
 
       pp-csr-w-7-b = {
@@ -199,11 +203,11 @@ locals {
         }
       }
 
-      pp-csr-w-5-b = {
+      pp-csr-w-5-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "PPCWW00005"
           ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
+          availability_zone             = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
@@ -223,8 +227,12 @@ locals {
         tags = {
           description = "copy of PPCWW00005 for csr ${local.environment}"
           os-type     = "Windows"
-          ami         = "pp-csr-w-5-b"
+          ami         = "PPCWW00005"
           component   = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
         }
       }
 
