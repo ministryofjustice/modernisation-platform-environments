@@ -43,6 +43,54 @@ locals {
       "/oracle/database/T2ONRSYS" = local.secretsmanager_secrets_db
       "/oracle/database/T2ONRAUD" = local.secretsmanager_secrets_db
       "/oracle/database/T2ONRBDS" = local.secretsmanager_secrets_db
+      
+      "/database/t1/T1OASYS" = {
+        secrets = {
+          apex_listenerpassword = {}
+          apex_public_userpassword = {}
+          apex_rest_publicpassword = {}
+        }
+      }
+      "/database/t2/T2OASYS" = {
+        secrets = {
+          apex_listenerpassword = {}
+          apex_public_userpassword = {}
+          apex_rest_publicpassword = {}
+        }
+      }
+      "/database/t2-oasys-db-a/T2BIPINF" = {
+        secrets = {
+          systempassword = {}
+        }
+      }
+      "/ec2/t1-oasys-db-a" = {
+        secrets = {
+          asm-passwords = {}
+        }
+      }
+      "/ec2/t2-oasys-db-a" = {
+        secrets = {
+          asm-passwords = {}
+        }
+      }
+      "/weblogic/test-oasys-bip-b" = {
+        secrets = {
+          admin_password = {}
+          admin_username = {}
+          biplatformpassword = {}
+          db_username = {}
+          mdspassword = {}
+          syspassword = {}
+        }
+      }
+      "" = {
+        secrets = {
+          account_ids = {}
+          ec2-user_pem = {}
+          environment_management_arn = {}
+          modernisation_platform_account_id = {}
+        }
+      }
     }
 
     baseline_ec2_instances = {
