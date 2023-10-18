@@ -52,6 +52,21 @@ data "aws_iam_policy_document" "ldap_datasync_role_access" {
       "backup:*",
       "datasync:*",
       "elasticfilesystem:*",
+      "ec2:DescribeInstances",
+      "ec2:CreateNetworkInterface",
+      "ec2:AttachNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DeleteNetworkInterface",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:DescribeKey",
+      "kms:GetPublicKey",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
     ]
     resources = ["*"]
   }
@@ -60,8 +75,8 @@ data "aws_iam_policy_document" "ldap_datasync_role_access" {
     effect  = "Allow"
     actions = ["s3:*"]
     resources = [
-      "${module.s3_bucket_ldap_data_refresh.bucket.arn}",
-      "${module.s3_bucket_ldap_data_refresh.bucket.arn}/*",
+      "arn:aws:s3:::*-ldap-data-refresh-incoming",
+      "arn:aws:s3:::*-ldap-data-refresh-incoming/*",
     ]
   }
 }
