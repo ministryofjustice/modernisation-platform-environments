@@ -36,13 +36,13 @@ resource "aws_cloudwatch_event_rule" "mon_sun" {
 }
 
 resource "aws_cloudwatch_event_target" "check_mon_sun" {
-    count = 3
+    count = 1
     rule = aws_cloudwatch_event_rule.mon_sun.name
     arn = "${aws_lambda_function.snapshotDBFunction[0].arn}"
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_mon_sun" {
-    count = 3
+    count = 1
     statement_id = "AllowExecutionFromCloudWatch"
     action = "lambda:InvokeFunction"
     function_name = aws_lambda_function.snapshotDBFunction[0].function_name
