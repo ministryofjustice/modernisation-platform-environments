@@ -13,9 +13,9 @@ source_file   = local.dbsourcefiles
 output_path   = local.zipfiles
 filename      = local.zipfiles
 function_name = local.functions
-handler       = [local.local.dbsnaphandler, local.local.deletesnaphandler, local.local.connecthandler]
+handler       = local.handlers
 role = module.iambackup.backuprole
-runtime = [ local.nodejsversion, local.local.pythonversion, local.local.nodejsversion ]
+runtime = local.runtime
 
 
 

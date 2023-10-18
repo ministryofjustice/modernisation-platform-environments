@@ -11,13 +11,10 @@ locals {
  functions = var.function_name
 
   #Handlers
-  dbsnaphandler= "snapshot/dbsnapshot.handler"
-  deletesnaphandler= "deletesnapshots.lambda_handler"
-  connecthandler= "ssh/dbconnect.handler"
+  handlers = var.handler
 
   #Runtime
-  nodejsversion= "nodejs18.x"
-  pythonversion= "python3.8"
+  runtime = var.runtime
 
 
 
