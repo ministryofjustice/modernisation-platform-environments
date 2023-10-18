@@ -191,6 +191,16 @@ resource "aws_security_group" "cluster_ec2" {
     security_groups = [aws_security_group.tribunals_lb_sc.id]
   }
 
+  ingress {
+    protocol    = "tcp"
+    description = "Allow traffic from bastion"
+    from_port   = 0
+    to_port     = 0
+    security_groups = [
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
   egress {
     description = "Cluster EC2 loadbalancer egress rule"
     from_port   = 0

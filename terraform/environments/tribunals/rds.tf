@@ -55,6 +55,15 @@ resource "aws_security_group" "sqlserver_db_sc" {
     description     = "Allows DMS to access RDS"
     security_groups = [aws_security_group.vpc_dms_replication_instance_group.id]
   }
+  ingress {
+    protocol    = "tcp"
+    description = "Allow PSQL traffic from bastion"
+    from_port   = 1433
+    to_port     = 1433
+    security_groups = [
+      module.bastion_linux.bastion_security_group
+    ]
+  }
   # ingress {
   #   from_port       = 1433
   #   to_port         = 1433
