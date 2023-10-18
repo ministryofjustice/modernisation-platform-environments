@@ -140,16 +140,13 @@
     "BatchApplyEnabled": false,
     "FullLobMode": false,
     "LimitedSizeLobMode": true,
-    "LoadMaxFileSize": 0,
-    "MaxFileSize": 200000,
-    "GlueCatalogGeneration": true,
-    "CdcMaxBatchInterval": 30
+    "LoadMaxFileSize": 0
   },
   "BeforeImageSettings": null,
   "ControlTablesSettings": {
     "historyTimeslotInMinutes": 5,
     "HistoryTimeslotInMinutes": 5,
-    "StatusTableEnabled": false,
+    "StatusTableEnabled": true,
     "SuspendedTablesTableEnabled": false,
     "HistoryTableEnabled": false,
     "ControlSchema": "",
