@@ -41,3 +41,7 @@ variable "create_schema_versions" {
 variable "get_schema_versions" {
   type = map(any)
 }
+
+variable "delete_table_for_data_product_versions" {
+  type = map(any)
+}

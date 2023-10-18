@@ -30,6 +30,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_method.upload_data_for_data_product_table_name,
       aws_api_gateway_method.create_schema_for_data_product_table_name,
       aws_api_gateway_method.get_schema_for_data_product_table_name,
+      aws_api_gateway_method.delete_table_for_data_product,
       aws_api_gateway_integration.docs_to_lambda,
       aws_api_gateway_integration.upload_data_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.proxy_to_lambda,
@@ -38,6 +39,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_integration.register_data_product_to_lambda,
       aws_api_gateway_integration.create_schema_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.get_schema_for_data_product_table_name_to_lambda,
+      aws_api_gateway_integration.delete_table_for_data_product_to_lambda,
     ]))
   }
 
@@ -182,7 +184,7 @@ resource "aws_api_gateway_method" "create_schema_for_data_product_table_name" {
   }
 }
 
-# /data-product/{data-product-name}/table/{table-name}/schema lambda integration
+# /data-product/{data-product-name}/table/{table-name}/schema (create schema) lambda integration
 resource "aws_api_gateway_integration" "create_schema_for_data_product_table_name_to_lambda" {
   http_method             = aws_api_gateway_method.create_schema_for_data_product_table_name.http_method
   resource_id             = aws_api_gateway_resource.schema_for_data_product_table_name.id
@@ -212,7 +214,7 @@ resource "aws_api_gateway_method" "get_schema_for_data_product_table_name" {
   }
 }
 
-# /data-product/{data-product-name}/table/{table-name}/schema lambda integration
+# /data-product/{data-product-name}/table/{table-name}/schema (get schema) lambda integration
 resource "aws_api_gateway_integration" "get_schema_for_data_product_table_name_to_lambda" {
   http_method             = aws_api_gateway_method.get_schema_for_data_product_table_name.http_method
   resource_id             = aws_api_gateway_resource.schema_for_data_product_table_name.id
@@ -220,6 +222,36 @@ resource "aws_api_gateway_integration" "get_schema_for_data_product_table_name_t
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = module.get_schema_lambda.lambda_function_invoke_arn
+
+  request_parameters = {
+    "integration.request.path.data-product-name" = "method.request.path.data-product-name",
+    "integration.request.path.table-name"        = "method.request.path.table-name",
+  }
+}
+
+# /data-product/{data-product-name}/table/{table-name} DELETE method
+resource "aws_api_gateway_method" "delete_table_for_data_product" {
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.authorizer.id
+  http_method   = "DELETE"
+  resource_id   = aws_api_gateway_resource.data_product_table_name.id
+  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+
+  request_parameters = {
+    "method.request.header.Authorization"   = true,
+    "method.request.path.data-product-name" = true,
+    "method.request.path.table-name"        = true,
+  }
+}
+
+# /data-product/{data-product-name}/table/{table-name} (delete table and data) lambda integration
+resource "aws_api_gateway_integration" "delete_table_for_data_product_to_lambda" {
+  http_method             = aws_api_gateway_method.delete_table_for_data_product.http_method
+  resource_id             = aws_api_gateway_resource.data_product_table_name.id
+  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.delete_table_for_data_product_lambda.lambda_function_invoke_arn
 
   request_parameters = {
     "integration.request.path.data-product-name" = "method.request.path.data-product-name",
