@@ -243,7 +243,7 @@ locals {
         # cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_*"
-          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
             "Ec2T1WeblogicPolicy",
           ])
         })
@@ -267,7 +267,7 @@ locals {
         cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
-          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
             "Ec2T1WeblogicPolicy",
           ])
         })
@@ -348,7 +348,7 @@ locals {
         # cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_*"
-          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
             "Ec2T2WeblogicPolicy",
           ])
         })
@@ -372,7 +372,7 @@ locals {
         cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
-          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
             "Ec2T2WeblogicPolicy",
           ])
         })
