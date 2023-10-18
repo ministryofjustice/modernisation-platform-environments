@@ -141,7 +141,9 @@
     "FullLobMode": false,
     "LimitedSizeLobMode": true,
     "LoadMaxFileSize": 0,
-    "MaxFileSize": 200000
+    "MaxFileSize": 200000,
+    "GlueCatalogGeneration": true,
+    "CdcMaxBatchInterval": 30
   },
   "BeforeImageSettings": null,
   "ControlTablesSettings": {
