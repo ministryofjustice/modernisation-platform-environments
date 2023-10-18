@@ -3,7 +3,6 @@
 resource "aws_cloudtrail" "data_s3_put_objects" {
   name                          = "data_platform_s3_putobject_trail_${local.environment}"
   s3_bucket_name                = module.logs_s3_bucket.bucket.id
-  depends_on                    = [aws_s3_bucket_policy.logs_s3_bucket_policy_document]
   
   # this is needed if monitoring services without a specific region. Don't need for s3
   include_global_service_events = false

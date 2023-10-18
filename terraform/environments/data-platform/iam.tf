@@ -400,25 +400,25 @@ data "aws_iam_policy_document" "metadata_s3_bucket_policy_document" {
 }
 
 data "aws_iam_policy_document" "logs_s3_bucket_policy_document" {
-  statement {
-    sid    = "AllowPutFromCiUser"
-    effect = "Allow"
+  # statement {
+  #   sid    = "AllowPutFromCiUser"
+  #   effect = "Allow"
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
-    }
+  #   principals {
+  #     type        = "AWS"
+  #     identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
+  #   }
 
-    actions = [
-      "s3:PutObject",
-      "s3:ListBucket"
-    ]
+  #   actions = [
+  #     "s3:PutObject",
+  #     "s3:ListBucket"
+  #   ]
 
-    resources = [
-      module.logs_s3_bucket.bucket.arn,
-      "${module.logs_s3_bucket.bucket.arn}/*",
-    ]
-  }
+  #   resources = [
+  #     module.logs_s3_bucket.bucket.arn,
+  #     "${module.logs_s3_bucket.bucket.arn}/*",
+  #   ]
+  # }
 
   statement {
     sid    = "AllowPutFromCloudtrail"
@@ -476,26 +476,26 @@ data "aws_iam_policy_document" "logs_s3_bucket_policy_document" {
     }
   }
 
-  statement {
-    sid       = "DenyNonFullControlObjects"
-    effect    = "Deny"
-    actions   = ["s3:PutObject"]
-    resources = ["${module.logs_s3_bucket.bucket.arn}/*"]
+  # statement {
+  #   sid       = "DenyNonFullControlObjects"
+  #   effect    = "Deny"
+  #   actions   = ["s3:PutObject"]
+  #   resources = ["${module.logs_s3_bucket.bucket.arn}/*"]
 
-    principals {
-      identifiers = ["*"]
-      type        = "AWS"
-    }
+  #   principals {
+  #     identifiers = ["*"]
+  #     type        = "AWS"
+  #   }
 
-    condition {
-      test     = "StringNotEquals"
-      variable = "s3:x-amz-acl"
+  #   condition {
+  #     test     = "StringNotEquals"
+  #     variable = "s3:x-amz-acl"
 
-      values = [
-        "bucket-owner-full-control"
-      ]
-    }
-  }
+  #     values = [
+  #       "bucket-owner-full-control"
+  #     ]
+  #   }
+  # }
 
 }
 
@@ -588,8 +588,4 @@ data "aws_iam_policy_document" "iam_policy_document_for_create_schema_lambda" {
     data.aws_iam_policy_document.write_metadata.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
   ]
-}
-
-output "cloudtrail_policy" {
-  value = data.aws_iam_policy_document.logs_s3_bucket_policy_document.json
 }
