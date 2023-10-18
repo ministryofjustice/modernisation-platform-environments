@@ -53,10 +53,10 @@ elif [[ $MODE == "safe" ]]; then
         echo "No change"
       else
         echo "Change from $oldvalue to $newvalue"
-        echo aws secretsmanager put-secret-value --secret-id $param --secret-string "$value" --profile $PROFILE >&2
+        echo aws secretsmanager put-secret-value --secret-id $param --secret-string "$newvalue" --profile $PROFILE >&2
         echo Press RETURN to put-parameters, CTRL-C to cancel
         read
-        aws secretsmanager put-secret-value --secret-id $param --secret-string "$value" --profile $PROFILE
+        aws secretsmanager put-secret-value --secret-id $param --secret-string "$newvalue" --profile $PROFILE
       fi
     fi
   done
