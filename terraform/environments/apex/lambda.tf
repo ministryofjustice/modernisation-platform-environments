@@ -28,23 +28,3 @@ runtime = local.runtime
 }
 
 
-resource "aws_cloudwatch_event_rule" "mon_sun" {
-    name = "${local.application_name}-createSnapshotRule-LWN8E1LNHFJR"
-    description = "Fires every five minutes"
-    schedule_expression = "0 2 ? * MON-SUN *"
-}
-
-resource "aws_cloudwatch_event_target" "check_mon_sun" {
-    count = 3
-    rule = aws_cloudwatch_event_rule.mon_sun.name
-    arn = module.lambda_backup.lambda_function
-}
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_mon_sun" {
-    count = 3
-    statement_id = "AllowExecutionFromCloudWatch"
-    action = "lambda:InvokeFunction"
-    function_name = module.lambda_backup.lambda_function_name
-    principal = "events.amazonaws.com"
-    source_arn = aws_cloudwatch_event_rule.mon_sun.arn
-}
