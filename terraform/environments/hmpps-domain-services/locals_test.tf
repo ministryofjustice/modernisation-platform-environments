@@ -5,7 +5,7 @@ locals {
   test_config = {
 
     baseline_ssm_parameters = {
-      "/join_domain_service_account" = local.service_account_ssm_passwords
+      "/join_domain_linux_service_account" = local.linux_service_account_ssm_passwords
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -35,7 +35,7 @@ locals {
 }
 
 locals {
-  service_account_ssm_passwords = {
+  linux_service_account_ssm_passwords = {
     parameters = {
       passwords = {}
     }
