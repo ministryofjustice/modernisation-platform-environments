@@ -9,13 +9,13 @@ module "lambda_backup" {
   source = "./module/lambda"
 
 backup_policy_name = "${local.application_name}-lambda-instance-policy"
-source_file   = ["dbsnapshot.js","deletesnapshots.py","dbconnect.js"]
-output_path   = ["snapshotDBFunction.zip","deletesnapshotFunction.zip","connectDBFunction.zip"]
-filename      = ["snapshotDBFunction.zip", "deletesnapshotFunction.zip","connectDBFunction.zip"]
-function_name = ["snapshotDBFunction","deletesnapshotFunction","connectDBFunction"]
-handler       = ["snapshot/dbsnapshot.handler","deletesnapshots.lambda_handler","ssh/dbconnect.handler"]
+source_file   = local.dbsourcefiles
+output_path   = local.zipfiles
+filename      = local.zipfiles
+function_name = local.functions
+handler       = [local.local.dbsnaphandler, local.local.deletesnaphandler, local.local.connecthandler]
 role = module.iambackup.backuprole
-runtime = [ "nodejs18.x","python3.8","nodejs18.x"]
+runtime = [ local.nodejsversion, local.local.pythonversion, local.local.nodejsversion ]
 
 
 
