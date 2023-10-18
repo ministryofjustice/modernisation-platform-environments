@@ -214,7 +214,7 @@ locals {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
           monitoring              = true
-          vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
             backup-plan = "daily-and-weekly"
           }
