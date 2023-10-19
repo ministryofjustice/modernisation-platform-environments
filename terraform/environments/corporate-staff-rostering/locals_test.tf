@@ -168,6 +168,7 @@ locals {
     baseline_route53_zones = {
       "test.csr.service.justice.gov.uk" = {
         records = [
+          { name = "t3iwfm", type = "CNAME", ttl = "300", records = ["t3-csr-db-a.corporate-staff-rostering.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
     }

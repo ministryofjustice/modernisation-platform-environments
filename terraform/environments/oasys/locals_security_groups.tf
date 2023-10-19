@@ -256,7 +256,7 @@ locals {
           cidr_blocks = local.security_group_cidrs.oracle_db
           security_groups = [
             "private_lb",
-            # "private-jumpserver",
+            "bip",
             # "private-web",
             # "bastion-linux",
           ]

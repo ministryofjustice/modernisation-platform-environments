@@ -27,6 +27,72 @@ locals {
       "/oracle/database/T2ONRAUD" = local.database_ssm_parameters
       "/oracle/database/T2ONRBDS" = local.database_ssm_parameters
     }
+    baseline_secretsmanager_secrets = {
+      "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_db
+      "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
+      "/oracle/database/T1AZBIPI" = local.secretsmanager_secrets_db
+      "/oracle/database/T1MISTRN" = local.secretsmanager_secrets_db
+      "/oracle/database/T1ONRSYS" = local.secretsmanager_secrets_db
+      "/oracle/database/T1ONRAUD" = local.secretsmanager_secrets_db
+      "/oracle/database/T1ONRBDS" = local.secretsmanager_secrets_db
+
+      "/oracle/database/T2OASYS"  = local.secretsmanager_secrets_db
+      "/oracle/database/T2OASREP" = local.secretsmanager_secrets_db
+      "/oracle/database/T2AZBIPI" = local.secretsmanager_secrets_db
+      "/oracle/database/T2MISTRN" = local.secretsmanager_secrets_db
+      "/oracle/database/T2ONRSYS" = local.secretsmanager_secrets_db
+      "/oracle/database/T2ONRAUD" = local.secretsmanager_secrets_db
+      "/oracle/database/T2ONRBDS" = local.secretsmanager_secrets_db
+      
+      "/database/t1/T1OASYS" = {
+        secrets = {
+          apex_listenerpassword = {}
+          apex_public_userpassword = {}
+          apex_rest_publicpassword = {}
+        }
+      }
+      "/database/t2/T2OASYS" = {
+        secrets = {
+          apex_listenerpassword = {}
+          apex_public_userpassword = {}
+          apex_rest_publicpassword = {}
+        }
+      }
+      "/database/t2-oasys-db-a/T2BIPINF" = {
+        secrets = {
+          systempassword = {}
+        }
+      }
+      "/ec2/t1-oasys-db-a" = {
+        secrets = {
+          asm-passwords = {}
+        }
+      }
+      "/ec2/t2-oasys-db-a" = {
+        secrets = {
+          asm-passwords = {}
+        }
+      }
+      "/weblogic/test-oasys-bip-b" = {
+        secrets = {
+          admin_password = {}
+          admin_username = {}
+          biplatformpassword = {}
+          db_username = {}
+          mdspassword = {}
+          syspassword = {}
+        }
+      }
+      "" = {
+        postfix = ""
+        secrets = {
+          account_ids = {}
+          ec2-user_pem = {}
+          environment_management_arn = {}
+          modernisation_platform_account_id = {}
+        }
+      }
+    }
 
     baseline_ec2_instances = {
       ##

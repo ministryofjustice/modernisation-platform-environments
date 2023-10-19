@@ -421,6 +421,62 @@ data "aws_iam_policy_document" "logs_s3_bucket_policy_document" {
   }
 
   statement {
+    sid    = "AllowPutFromCloudtrail"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "${module.logs_s3_bucket.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
+    ]
+    
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+
+      values = [
+        "bucket-owner-full-control"
+      ]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+
+      values   = [aws_cloudtrail.data_s3_put_objects.arn]
+    }
+  }
+
+  statement {
+    sid    = "AWSCloudTrailAclCheck"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+
+    resources = [module.logs_s3_bucket.bucket.arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+
+      values   = [aws_cloudtrail.data_s3_put_objects.arn]
+    }
+  }
+
+  statement {
     sid       = "DenyNonFullControlObjects"
     effect    = "Deny"
     actions   = ["s3:PutObject"]

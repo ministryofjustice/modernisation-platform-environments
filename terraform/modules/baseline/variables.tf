@@ -690,26 +690,6 @@ variable "lbs" {
       })), {})
       tags = optional(map(string), {})
     })), {})
-    lb_target_groups = optional(map(object({
-      port                 = optional(number)
-      deregistration_delay = optional(number)
-      health_check = optional(object({
-        enabled             = optional(bool)
-        interval            = optional(number)
-        healthy_threshold   = optional(number)
-        matcher             = optional(string)
-        path                = optional(string)
-        port                = optional(number)
-        timeout             = optional(number)
-        unhealthy_threshold = optional(number)
-      }))
-      stickiness = optional(object({
-        enabled         = optional(bool)
-        type            = string
-        cookie_duration = optional(number)
-        cookie_name     = optional(string)
-      }))
-    })), {})
     tags = optional(map(string), {})
   }))
   default = {}
