@@ -118,6 +118,6 @@ module "pagerduty_core_alerts" {
     module.pagerduty_sns
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [module.pagerduty_sns.sns_topic_name]
+  sns_topics                = [module.pagerduty_sns.sns_topic]
   pagerduty_integration_key = local.pagerduty_integration_keys["dpr_nonprod_alarms"]
 }
