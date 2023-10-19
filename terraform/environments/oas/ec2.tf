@@ -1,11 +1,5 @@
-locals {
-  instance-userdata = <<EOF
-#!/bin/bash
-cd /tmp
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-sudo systemctl start amazon-ssm-agent
-sudo systemctl enable amazon-ssm-agent
-EOF
+data "local_file" "userdata" {
+  filename = "userdata.sh"
 }
 
 resource "aws_instance" "oas_app_instance" {
@@ -18,7 +12,7 @@ resource "aws_instance" "oas_app_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
-  user_data_base64            = base64encode(local.instance-userdata)
+  user_data                   = base64encode(data.local_file.userdata.content)
 
   root_block_device {
     delete_on_termination = false
