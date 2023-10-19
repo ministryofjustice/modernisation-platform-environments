@@ -78,3 +78,46 @@ PATTERN
 
   depends_on = [module.notifications_sns]
 }
+
+# Pager duty integration
+
+# Notification SNS
+# Specific to PagerDuty and Slack - Not used at the moment 
+module "pagerduty_sns" {
+  source         = "./modules/notifications/sns"
+  sns_topic_name = "${local.project}-pagerduty-topic-${local.environment}"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name = "${local.project}-pagerduty-topic-${local.environment}"
+      Jira = "DPR2-116",
+      Dept = "Digital-Prison-Reporting"
+    }
+  )
+}
+
+# Get the map of pagerduty integration keys from the modernisation platform account
+data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+}
+
+# Add a local to get the keys
+locals {
+  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+}
+
+# link the sns topic to the service
+module "pagerduty_core_alerts" {
+  depends_on = [
+    module.pagerduty_sns
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [module.pagerduty_sns.sns_topic_name]
+  pagerduty_integration_key = local.pagerduty_integration_keys["dpr_nonprod_alarms"]
+}
