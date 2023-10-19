@@ -114,7 +114,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "resources_sse" {
 }
 
 data "template_file" "s3_resource_bucket_policy" {
-  template = "${file("${path.module}/s3_bucket_policy.json.tpl")}"
+  template = file("${path.module}/s3_bucket_policy.json.tpl")
 
   vars = {
     account_id = var.account_id,
