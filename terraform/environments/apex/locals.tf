@@ -2,21 +2,14 @@
 locals {
   #js FIles
   dbsourcefiles = var.source_file
- 
-  
   #ZIP FILES Below
   zipfiles = var.output_path
-
   #Functions
  functions = var.function_name
-
   #Handlers
   handlers = var.handler
-
   #Runtime
   runtime = var.runtime
 
-
-
-
+  application_test_url = "https://apex.laa-development.modernisation-platform.service.justice.gov.uk/apex/"
 }
