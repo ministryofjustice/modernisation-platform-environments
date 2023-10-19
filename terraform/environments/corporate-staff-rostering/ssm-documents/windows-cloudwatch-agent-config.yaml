@@ -23,5 +23,5 @@ mainSteps:
         action: configure
         mode: ec2
         optionalConfigurationSource: ssm
-        optionalConfigurationLocation: cloud-watch-config-windows
-        optionalRestart: yes
+        optionalConfigurationLocation: "cloud-watch-config-windows"
+        optionalRestart: "yes"
