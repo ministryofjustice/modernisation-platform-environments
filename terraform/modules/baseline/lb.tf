@@ -1,6 +1,36 @@
 locals {
+  # flatten instance target_groups
+  instance_target_group_list = flatten([
+    for lb_key, lb_value in var.lbs : [
+      for tg_key, tg_value in lb_value.instance_target_groups : {
+        key   = tg_key
+        value = tg_value
+      }
+    ]
+  ])
+  instance_target_groups = {
+    for item in local.instance_target_group_list : item.key => item.value
+  }
+
+  # flatten instance target_groups attachments
+  instance_target_group_attachment_list = flatten([
+    for lb_key, lb_value in var.lbs : [
+      for tg_key, tg_value in lb_value.instance_target_groups : [
+        for attachment in tg_value.attachments : {
+          key = "${lb_key}-${tg_key}-${attachment.ec2_instance_name}"
+          value = merge(attachment, {
+            target_group_key = tg_key
+          })
+        }
+      ]
+    ]
+  ])
+  instance_target_group_attachments = {
+    for item in local.instance_target_group_attachment_list : item.key => item.value
+  }
+
   # flatten the load balancer listeners
-  lb_listener_list = [
+  lb_listener_list = flatten([
     for lb_key, lb_value in var.lbs : [
       for listener_key, listener_value in lb_value.listeners : {
         key = "${lb_key}-${listener_key}"
@@ -9,8 +39,56 @@ locals {
         })
       }
     ]
-  ]
-  lb_listeners = { for item in flatten(local.lb_listener_list) : item.key => item.value }
+  ])
+  lb_listeners = {
+    for item in local.lb_listener_list : item.key => item.value
+  }
+}
+
+resource "aws_lb_target_group" "instance" {
+  for_each = local.instance_target_groups
+
+  name                 = each.key
+  port                 = each.value.port
+  protocol             = each.value.protocol
+  target_type          = "instance"
+  deregistration_delay = each.value.deregistration_delay
+  vpc_id               = var.environment.vpc.id
+
+  dynamic "health_check" {
+    for_each = each.value.health_check != null ? [each.value.health_check] : []
+    content {
+      enabled             = health_check.value.enabled
+      interval            = health_check.value.interval
+      healthy_threshold   = health_check.value.healthy_threshold
+      matcher             = health_check.value.matcher
+      path                = health_check.value.path
+      port                = health_check.value.port
+      timeout             = health_check.value.timeout
+      unhealthy_threshold = health_check.value.unhealthy_threshold
+    }
+  }
+  dynamic "stickiness" {
+    for_each = each.value.stickiness != null ? [each.value.stickiness] : []
+    content {
+      enabled         = stickiness.value.enabled
+      type            = stickiness.value.type
+      cookie_duration = stickiness.value.cookie_duration
+      cookie_name     = stickiness.value.cookie_name
+    }
+  }
+
+  tags = merge(var.tags, {
+    Name = each.key
+  })
+}
+
+resource "aws_lb_target_group_attachment" "instance" {
+  for_each = local.instance_target_group_attachments
+
+  target_group_arn = aws_lb_target_group.instance[each.value.target_group_key].arn
+  target_id        = module.ec2_instance[each.value.ec2_instance_name].aws_instance.id
+  port             = each.value.port
 }
 
 # following AWS terraform naming convention here aws_lb, aws_lb_listener, so lbs.tf and lb_listeners.tf.
@@ -60,6 +138,7 @@ module "lb_listener" {
   load_balancer = module.lb[each.value.lb_application_name].load_balancer
   existing_target_groups = merge(
     local.asg_target_groups,
+    aws_lb_target_group.instance,
     var.lbs[each.value.lb_application_name].existing_target_groups
   )
   port                      = each.value.port

@@ -224,7 +224,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
+            branch = "main"
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
@@ -243,6 +243,9 @@ locals {
         # cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_*"
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+            "Ec2T1WeblogicPolicy",
+          ])
         })
         user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
           args = merge(local.xtag_ec2.user_data_cloud_init.args, {
@@ -264,10 +267,13 @@ locals {
         cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+            "Ec2T1WeblogicPolicy",
+          ])
         })
         user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
           args = merge(local.xtag_ec2.user_data_cloud_init.args, {
-            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
+            branch = "main"
           })
         })
         tags = merge(local.xtag_ec2.tags, {
@@ -323,7 +329,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
+            branch = "main"
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
@@ -342,6 +348,9 @@ locals {
         # cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_*"
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+            "Ec2T2WeblogicPolicy",
+          ])
         })
         user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
           args = merge(local.xtag_ec2.user_data_cloud_init.args, {
@@ -363,10 +372,13 @@ locals {
         cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+            "Ec2T2WeblogicPolicy",
+          ])
         })
         user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
           args = merge(local.xtag_ec2.user_data_cloud_init.args, {
-            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
+            branch = "main"
           })
         })
         tags = merge(local.xtag_ec2.tags, {
@@ -424,7 +436,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
+            branch = "main"
           })
         })
         tags = merge(local.weblogic_ec2.tags, {

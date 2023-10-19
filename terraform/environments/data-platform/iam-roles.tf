@@ -4,7 +4,7 @@ module "openmetadata_iam_role" {
 
   create_role = true
 
-  role_name_prefix  = "openmetadata"
+  role_name         = "openmetadata"
   role_requires_mfa = false
 
   trusted_role_arns = ["arn:aws:iam::${local.environment_configuration.apps_tools_account_id}:root"]

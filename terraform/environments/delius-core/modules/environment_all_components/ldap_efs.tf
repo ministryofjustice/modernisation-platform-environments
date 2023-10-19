@@ -61,6 +61,15 @@ resource "aws_security_group_rule" "efs_ingress" {
   security_group_id        = aws_security_group.ldap_efs.id
 }
 
+resource "aws_security_group_rule" "efs_ingress_vpc" {
+  type              = "ingress"
+  from_port         = 2049
+  to_port           = 2049
+  protocol          = "tcp"
+  cidr_blocks       = [var.account_config.shared_vpc_cidr]
+  security_group_id = aws_security_group.ldap_efs.id
+}
+
 resource "aws_security_group_rule" "efs_egress" {
   type              = "egress"
   from_port         = 0

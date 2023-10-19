@@ -83,6 +83,40 @@ locals {
         }
       }
 
+      pp-csr-a-17-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-a-17-a"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        tags = {
+          description = "copy of PPCAW00017 for csr ${local.environment}"
+          os-type     = "Windows"
+          ami         = "pp-csr-a-17-a"
+          component   = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
       pp-csr-w-7-b = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "pp-csr-w-7-b"
@@ -139,35 +173,6 @@ locals {
         }
       }
 
-      pp-csr-w-8-b-T = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pp-csr-w-8-b"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
-          ebs_volumes_copy_all_from_ami = false
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.2xlarge"
-          disable_api_termination = true
-          monitoring              = true
-          vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
-          tags = {
-            backup-plan = "daily-and-weekly"
-          }
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 200 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          # description = "copy of PPCWW00008 for csr ${local.environment}"
-          description = "testing group policies in ${local.environment}"
-          os-type     = "Windows"
-          ami         = "pp-csr-w-8-b"
-          component   = "web"
-        }
-      }
-
       pp-csr-w-1-b = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "PPCWW00001"
@@ -198,18 +203,18 @@ locals {
         }
       }
 
-      pp-csr-w-5-b = {
+      pp-csr-w-5-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "PPCWW00005"
           ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
+          availability_zone             = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
           monitoring              = true
-          vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -222,8 +227,12 @@ locals {
         tags = {
           description = "copy of PPCWW00005 for csr ${local.environment}"
           os-type     = "Windows"
-          ami         = "pp-csr-w-5-b"
+          ami         = "PPCWW00005"
           component   = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
         }
       }
 
@@ -261,8 +270,13 @@ locals {
     }
 
     baseline_route53_zones = {
-      "hmpps-preproduction.modernisation-platform.service.justice.gov.uk" = {
+      "pp.csr.service.justice.gov.uk" = {
         records = [
+          # Set to IP of the Azure CSR PP DB in PPCDL00019
+          { name = "ppiwfm", type = "A", ttl = "300", records = ["10.40.42.132"] },
+          { name = "ppiwfm-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
+          { name = "ppiwfm-b", type = "CNAME", ttl = "300", records = ["pp-csr-db-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "r3", type = "CNAME", ttl = "300", records = ["pp-csr-w-5-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
     }

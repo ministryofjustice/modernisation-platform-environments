@@ -22,6 +22,10 @@ locals {
           module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy,
         ]
       }
+      syscon-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+      }
     }
 
     baseline_acm_certificates = {
@@ -89,6 +93,32 @@ locals {
           description = "For testing official RedHat RHEL7.9 image"
           os-type     = "Linux"
           component   = "test"
+        }
+      }
+
+      dev-base-ol85 = {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "base_ol_8_5*"
+          availability_zone = null
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-web"]
+        })
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "main"
+          })
+        })
+        tags = {
+          description = "For testing our base OL 8.5 base image"
+          ami         = "base_ol_8_5"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "base-ol85"
         }
       }
 
@@ -231,7 +261,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "085f630e04fcfe3b521d0f7f698188df849ccb7e" # 2022-10-06 ssm changes
+            branch = "main"
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
