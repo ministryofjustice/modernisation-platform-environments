@@ -58,8 +58,8 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
       "s3:List*"
     ]
     resources = [
-      "arn:aws:s3:::eu-west-2-dlc-${var.env_name}-oracledb-backups",
-      "arn:aws:s3:::eu-west-2-dlc-${var.env_name}-oracledb-backups/*"
+      "arn:aws:s3:::eu-west-2-dmd-mis-${var.env_name}-oracledb-backups",
+      "arn:aws:s3:::eu-west-2-dmd-mis-${var.env_name}-oracledb-backups/*"
     ]
   }
 
