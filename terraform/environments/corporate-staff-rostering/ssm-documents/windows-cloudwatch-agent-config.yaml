@@ -5,6 +5,7 @@ parameters:
   optionalConfigurationLocation:
     description: name of ssm parameter that contains the CW Agent config
     type: String
+    default: "cloud-watch-config-windows"
 mainSteps:
   - name: installCWAgent
     action: aws:runDocument
@@ -23,5 +24,5 @@ mainSteps:
         action: configure
         mode: ec2
         optionalConfigurationSource: ssm
-        optionalConfigurationLocation: "cloud-watch-config-windows"
+        optionalConfigurationLocation: "{{ optionalConfigurationLocation }}"
         optionalRestart: "yes"
