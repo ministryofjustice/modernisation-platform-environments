@@ -96,6 +96,39 @@ data "aws_iam_policy_document" "local-ecr-policy-data" {
 }
 
 ######################################################
+# S3 Resource Bucket for Codebuild
+######################################################
+
+resource "aws_s3_bucket" "codebuild_resources" {
+  bucket = "laa-${var.app_name}-management-resourcebucket"
+  # force_destroy = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "resources_sse" {
+  bucket = aws_s3_bucket.codebuild_resources.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+data "template_file" "s3_resource_bucket_policy" {
+  template = "${file("${path.module}/s3_bucket_policy.json.tpl")}"
+
+  vars = {
+    account_id = var.account_id,
+    s3_resource_name = aws_s3_bucket.codebuild_resources.id,
+    codebuild_role_name = aws_iam_role.codebuild_s3.id
+  }
+}
+
+resource "aws_s3_bucket_policy" "allow_access_from_codebuild" {
+  bucket = aws_s3_bucket.codebuild_resources.id
+  policy = data.template_file.s3_resource_bucket_policy.rendered
+}
+
+######################################################
 # CodeBuild projects
 ######################################################
 
