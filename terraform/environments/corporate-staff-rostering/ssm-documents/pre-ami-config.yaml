@@ -11,8 +11,31 @@ parameters:
   SnapshotName:
     type: "String"
     description: "Name of the snapshot"
+  AMIName:
+    type: "String"
+    description: "Name of the AMI being created"
 
 mainSteps:
+  - name: getRootVolumeSpace
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
+          - $rootVolume = Get-WmiObject -Query "SELECT * FROM Win32_LogicalDisk WHERE DeviceID = 'C:'"
+          - $availableSpaceGB = [math]::Round(($rootVolume.FreeSpace / 1GB), 2)
+          - Write-Output "Available space on the C drive is $availableSpaceGB"
+
+  - name: spaceAvailable
+    action: aws:runPowerShellScript
+    inputs: 
+      runCommand:
+        - |
+          - $totalSpaceGB = [math]::Round(($rootVolume.Size / 1GB), 2)
+          - $availablePercentage = [math]::Round((($availableSpaceGB / $totalSpaceGB) * 100), 2)
+          - Write-Output "Available space on the root volume (C:) is $availablePercentage% of the total space" 
+
+# add a step that stops the process if the available space is less than 50%
+
   - name: CreateSnapshot
     action: aws:createSnapshot
     inputs: 
@@ -21,57 +44,125 @@ mainSteps:
       description: "{{ SnapshotName }}"
     onFailure: Stop
 
+  - name: stopDiscoveryAgent
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
+          - Stop-Service -Name 'AWSDiscoveryService' -ErrorAction SilentlyContinue
+
   - name: UninstallDiscoveryAgent
     action: aws:runPowerShellScript
     inputs:
       runCommand:
         - |
-          # Check if AWS discovery agent installed
-          if (-Not (Get-Service -Name AWS Discovery Agent)) {
-            Write-Host "AWS Discovery agent not installed, skipping"
-          } else { 
-            wmic product where name='AWS Discovery Agent' call uninstall
-          }
+          - if (Test-Path 'C:\Program Files\Amazon\Amazon AppStream\aws-discovery-agent\uninstall.exe') {
+          -   Start-Process 'C:\Program Files\Amazon\Amazon AppStream\aws-discovery-agent\uninstall.exe' -ArgumentList '/S' -Wait
+          - } elseif (Test-Path 'C:\Program Files\AWS\AWS Discovery Agent\uninstall.exe') {
+          -   Start-Process 'C:\Program Files\AWS\AWS Discovery Agent\uninstall.exe' -ArgumentList '/S' -Wait
+          - } else {
+          -   Write-Host "AWS Discovery Agent not found for uninstallation."
+          - }
+
+  - name: verifyUninstallation
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
+          - if (-not (Test-Path 'C:\Program Files\Amazon\Amazon AppStream\aws-discovery-agent\uninstall.exe') -and -not (Test-Path 'C:\Program Files\AWS\AWS Discovery Agent\uninstall.exe')) {
+          -   Write-Host "AWS Discovery Agent is successfully uninstalled."
+          - } else {
+          -   Write-Host "AWS Discovery Agent uninstallation may have failed."
+          - }
+    onFailure: Stop
 
   - name: InstallFirefoxBrowser
     action: aws:runPowerShellScript
     inputs:
       runCommand:
         - |
-          # Install firefox 
-          # Invoke call to internet 
-          Invoke-WebRequest -URI "https://download.mozilla.org/?product=firefox-esr-next-latest-ssl&os=win64&lang=en-GB" -OutFile "$ENV:TEMP\MozillaFirefox.exe"
-          # Need to invoke the installer
-          Invoke-Item "$ENV:TEMP\MozillaFirefox.exe"
+          - Invoke-WebRequest -URI "https://download.mozilla.org/?product=firefox-esr-next-latest-ssl&os=win64&lang=en-GB" -OutFile "$ENV:TEMP\MozillaFirefox.exe"
+          - Invoke-Item "$ENV:TEMP\MozillaFirefox.exe"
 
   - name: InstallNmapTool
     action: aws:runPowerShellScript
     inputs:
       runCommand:
         - |
-          # Install nmap tool
-          # Invoke call to internet 
-          Invoke-WebRequest -URI "https://nmap.org/download" -OutFile "$ENV:TEMP\nmap.exe"
-          # Need to invoke the installer
-          Invoke-Item "$ENV:TEMP\nmap.exe"
+          - Invoke-WebRequest -URI "https://nmap.org/download" -OutFile "$ENV:TEMP\nmap.exe"
+          - Invoke-Item "$ENV:TEMP\nmap.exe"
+
+  - name: checkADModulePresent
+    action: aws:runPowerShellScript
+    inputs: 
+      runCommand:
+      - |
+        - $module = Get-Module -ListAvailable -Name ActiveDirectory
+        - if (-not $module) {
+        -   Write-Error "Active Directory module is not installed. Installing..." 
+        - }
 
   - name: InstallActiveDirectoryModule
     action: aws:runPowerShellScript
     inputs:
       runCommand:
         - |
-          # Install AD module
           Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
 
   - name: InstallEC2LaunchV2
-    action: aws:runShellScript
+    action: aws:runPowerShellScript
     inputs: 
       runCommand:
-        - # Download the EC2LaunchV2 installer script
+        - |
           - wget https://s3.amazonaws.com/ec2-downloads-windows/SSM-Agent/EC2Launch/latest/install.ps1 -OutFile $env:TEMP\install.ps1         
-        - # Run the installer script
           - powershell -ExecutionPolicy Bypass -File $env:TEMP\install.ps1
+  
+  - name: verifyInstallation
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
+          - if (Get-Service -Name EC2Launch | Where-Object {$_.Status -eq 'Running'}) {
+            - Write-Output "EC2LaunchV2 driver installed and running successfully."
+          - } else {
+            - Write-Output "EC2LaunchV2 driver installation or service startup failed."
+          - }
 
-          # verify the install 
-          C:\ProgramData\Amazon\EC2Launch
-  - name: 
+  - name: stopInstance
+    action: aws:changeInstanceState
+    inputs: 
+      instaneID: "{{ InstanceId }}"
+      desiredState: stopped
+
+  - name: createImage
+    action: aws:createImage
+    inputs:
+      InstanceId: "{{ InstanceId }}"
+      name: "{{ AMIName }}"
+      description: AMI created from "{{ InstanceId }}"
+      noReboot: true
+
+      # BlockDeviceMappings to exclude specific EBS volumes - check if this is needed
+      # blockDeviceMappings:
+      #   - deviceName: /dev/sdb   # Replace with the device name of the volume to exclude
+      #     noDevice: true
+
+  - name: outputImageId
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |  
+          - Write-Output "Image ID: $ImageId"
+
+  - name: waitForAMI
+    action: aws:waitForImages
+    inputs:
+      imageIds: ["{{ createImage.ImageId }}"]
+      state: available
+      maxResults: 1
+
+  - name: startInstance
+    action: aws:changeInstanceState
+    inputs:
+      instanceId: "{{ InstanceId }}"
+      desiredState: running
