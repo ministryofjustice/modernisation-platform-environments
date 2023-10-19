@@ -22,7 +22,6 @@ locals {
     production    = local.production_config
   }
 
-  account_id         = local.environment_management.account_ids[terraform.workspace]
   environment_config = local.accounts[local.environment]
 
   region            = "eu-west-2"
@@ -96,12 +95,6 @@ locals {
     stickiness = {
       enabled = true
       type    = "lb_cookie"
-    }
-  }
-
-  database_ssm_parameters = {
-    parameters = {
-      passwords = { description = "database passwords" }
     }
   }
 
@@ -227,7 +220,10 @@ locals {
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-    autoscaling_group        = module.baseline_presets.ec2_autoscaling_group.default
+    autoscaling_group        = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      desired_capacity    = 2
+      max_size            = 2
+    })
     lb_target_groups         = {}
     tags = {
       backup            = "false" # opt out of mod platform default backup plan
@@ -248,6 +244,8 @@ locals {
       availability_zone = "${local.region}b"
     })
   })
+
+  baseline_secretsmanager_secrets = {}
 
   public_key_data = jsondecode(file("./files/bastion_linux.json"))
 }
