@@ -189,7 +189,7 @@ configure_cwagent(){
             }
         }
     }
-    EOL
+EOL
 }
 
 # Restart CloudWatch Agent
