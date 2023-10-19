@@ -62,6 +62,15 @@ locals {
   reporting_hub_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_min_wait_millis
   reporting_hub_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_max_wait_millis
 
+  # Reporting Hub Batch Job
+  reporting_hub_batch_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_batch_job_worker_type
+  reporting_hub_batch_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_batch_job_num_workers
+  reporting_hub_batch_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_batch_job_log_level
+
+  reporting_hub_batch_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_attempts
+  reporting_hub_batch_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_min_wait_millis
+  reporting_hub_batch_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_wait_millis
+
   # Refresh Job
   refresh_job_worker_type = local.application_data.accounts[local.environment].refresh_job_worker_type
   refresh_job_num_workers = local.application_data.accounts[local.environment].refresh_job_num_workers
