@@ -128,9 +128,9 @@ resource "aws_instance" "s609693lo6vw103" {
   }
 }
 
-resource "aws_instance" "TestServer1" {
+resource "aws_instance" "s609693lo6vw110" {
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-009f58789421bafd6"
+  ami                    = "ami-0d8e82a3d7fda95e0"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -143,7 +143,9 @@ resource "aws_instance" "TestServer1" {
   }
 
   tags = {
-    Name = "TestServer1"
+    Name = "s609693lo6vw110"
+    patch_group = "dev_win_patch"
+    backup      = true
   }
 }
 
@@ -606,7 +608,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
 
 resource "aws_instance" "docker-build-server" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0b026d11830afcbac"
+  ami                    = "ami-050d499cfdd1ff7d4"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
