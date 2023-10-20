@@ -27,7 +27,6 @@ data "aws_acm_certificate" "WAM_UAT_ALB" {
   count    = local.is-preproduction == true ? 1 : 0
   domain   = "wamuat.ppud.justice.gov.uk"
   statuses = ["ISSUED"]
-  most_recent = true
 }
 
 # ACM certificate for PPUD Training ALB
