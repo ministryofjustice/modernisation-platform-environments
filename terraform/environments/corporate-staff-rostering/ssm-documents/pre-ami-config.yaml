@@ -16,6 +16,14 @@ parameters:
     description: "Name of the AMI being created"
 
 mainSteps:
+  - name: CreateSnapshot
+    action: aws:createSnapshot
+    inputs: 
+      InstanceId: "{{ InstanceId }}"
+      VolumeId: "{{ VolumeId }}"
+      description: "{{ SnapshotName }}"
+    onFailure: Stop
+
   - name: getRootVolumeSpace
     action: aws:runPowerShellScript
     inputs:
@@ -34,15 +42,17 @@ mainSteps:
           - $availablePercentage = [math]::Round((($availableSpaceGB / $totalSpaceGB) * 100), 2)
           - Write-Output "Available space on the root volume (C:) is $availablePercentage% of the total space" 
 
-# add a step that stops the process if the available space is less than 50%
-
-  - name: CreateSnapshot
-    action: aws:createSnapshot
-    inputs: 
-      InstanceId: "{{ InstanceId }}"
-      VolumeId: "{{ VolumeId }}"
-      description: "{{ SnapshotName }}"
+  - name: extendDiskStop
+    action: aws:runPowerShellScript
+    maxAttempts: 1
     onFailure: Stop
+    inputs: 
+      runCommand:
+        - |
+          - if ($availablePercentage% -lt 50) {
+          -   Write-Output "Available disk space is less than 50%. Stopping doc execution."
+          -   Exit 1
+          - }
 
   - name: stopDiscoveryAgent
     action: aws:runPowerShellScript
