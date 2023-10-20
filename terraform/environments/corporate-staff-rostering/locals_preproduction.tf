@@ -23,6 +23,7 @@ locals {
           vpc_security_group_ids       = ["data-db"]
           tags = {
             backup-plan = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
 
@@ -79,7 +80,6 @@ locals {
           os-type             = "Linux"
           component           = "test"
           server-type         = "csr-db"
-          instance-scheduling = "skip-scheduling"
         }
       }
 
