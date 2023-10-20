@@ -12,10 +12,10 @@ locals {
   app_source_db_url         = "${var.app_source_db_url}"
   app_source_db_user        = "${var.app_source_db_user}"
   app_source_db_password    = "${var.app_source_db_password}"
-  app_user_data = base64encode(templatefile("user_data.sh", {
+  app_user_data = base64encode(templatefile("../scripts/user_data.sh", {
     cluster_name = "${local.app}_app_cluster"
   }))
-  app_task_definition = templatefile("task_definition.json", {
+  app_task_definition = templatefile("../scripts/task_definition.json", {
     app_name            = "${local.app}"
     #ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
     #docker_image_tag    = "latest" 
