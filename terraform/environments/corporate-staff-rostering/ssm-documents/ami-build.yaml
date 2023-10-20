@@ -22,7 +22,6 @@ mainSteps:
       InstanceId: "{{ InstanceId }}"
       VolumeId: "{{ VolumeId }}"
       description: "{{ SnapshotName }}"
-    onFailure: Stop
 
   - name: getRootVolumeSpace
     action: aws:runPowerShellScript
