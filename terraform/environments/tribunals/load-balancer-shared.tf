@@ -58,7 +58,7 @@ resource "aws_lb_target_group" "tribunals_target_group" {
     protocol            = "HTTP"
     unhealthy_threshold = "3"
     matcher             = "200-499"
-    timeout             = "5"
+    timeout             = "10"
   }
 
 }
