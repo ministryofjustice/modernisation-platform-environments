@@ -181,7 +181,7 @@ configure_cwagent(){
             }
         }
     }
-    ' > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    ' > cloudwatch_agent_config.json
 }
 
 # Restart CloudWatch Agent
