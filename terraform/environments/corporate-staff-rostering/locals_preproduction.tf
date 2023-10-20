@@ -97,6 +97,7 @@ locals {
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
             backup-plan = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
         ebs_volumes = {
@@ -131,6 +132,7 @@ locals {
           vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
           tags = {
             backup-plan = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
         ebs_volumes = {
@@ -159,6 +161,7 @@ locals {
           vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
           tags = {
             backup-plan = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
         ebs_volumes = {
@@ -187,6 +190,7 @@ locals {
           vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
           tags = {
             backup-plan = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
         ebs_volumes = {
@@ -217,6 +221,7 @@ locals {
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
             backup-plan = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
         ebs_volumes = {
