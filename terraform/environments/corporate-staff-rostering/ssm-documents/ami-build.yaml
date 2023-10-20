@@ -17,11 +17,13 @@ parameters:
 
 mainSteps:
   - name: CreateSnapshot
-    action: aws:createSnapshot
+    action: aws:runDocument
     inputs: 
-      InstanceId: "{{ InstanceId }}"
-      VolumeId: "{{ VolumeId }}"
-      description: "{{ SnapshotName }}"
+      documentType: SSMDocument
+      documentPath: AWS-CreateSnapshot
+      documentParameters:
+        VolumeId: "{{ VolumeId }}"
+        description: "{{ SnapshotName }}"
     onFailure: Abort
 
   - name: getRootVolumeSpace
@@ -162,7 +164,7 @@ mainSteps:
         - |  
           Write-Output "Image ID: $ImageId"
 
-  - name: waitForAMI
+  - name: waitForAMI # update this
     action: aws:waitForImages
     inputs:
       imageIds: ["{{ createImage.ImageId }}"]
