@@ -1,19 +1,19 @@
 ---
 schemaVersion: "2.2"
-description: "SSM Document to convert MGN-replicated Azure VMs into AWS EC2s. Also baking in necessary configuration to CSR app / web AMIs" 
+description: "SSM Document to convert an Azure VM into an AWS AMI." 
 parameters:
   InstanceId:
     type: "String"
-    description: "ID of the MGN replicated server being turned into an AMIs"
+    description: "ID of the MGN replicated Azure server"
   VolumeId:
     type: "String"
     description: "Root volume ID to be snapshotted"
   SnapshotName:
     type: "String"
-    description: "Name of the snapshot"
+    description: "Name of the resultant snapshot"
   AMIName:
     type: "String"
-    description: "Name of the AMI being created"
+    description: "Name of the AMI being built"
 
 mainSteps:
   - name: CreateSnapshot
