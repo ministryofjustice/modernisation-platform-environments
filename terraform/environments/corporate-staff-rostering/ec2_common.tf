@@ -25,3 +25,17 @@ resource "aws_ssm_document" "windows_domain_join" {
     },
   )
 }
+
+resource "aws_ssm_document" "cloud_watch_agent" {
+  name            = "windows-cloudwatch-agent-config"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/windows-cloudwatch-agent-config.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "windows-cloudwatch-agent-config"
+    },
+  )
+}

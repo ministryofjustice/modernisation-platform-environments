@@ -199,6 +199,12 @@ resource "aws_cloudwatch_log_group" "SQL-Server-Logs" {
   retention_in_days = 365
 }
 
+resource "aws_cloudwatch_log_group" "Anti-Virus-Logs" {
+  count             = local.is-production == true ? 1 : 0
+  name              = "Anti-Virus-Logs"
+  retention_in_days = 365
+}
+
 #Metric Filters
 
 resource "aws_cloudwatch_log_metric_filter" "ServiceStatus-Running" {
