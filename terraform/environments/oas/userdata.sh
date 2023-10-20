@@ -26,6 +26,9 @@ mkswap /root/myswapfile
 swapon /root/myswapfile
 echo "/root/myswapfile swap swap defaults 0 0" >> /etc/fstab
 
+yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum install -y collectd
+
 ntp_config(){
     local RHEL=\$(cat /etc/redhat-release | cut -d. -f1 | awk '{print \$NF}')
     local SOURCE=169.254.169.123
@@ -56,13 +59,6 @@ ntp_config(){
     esac
 }
 
-# Retrieve instance ID and store it in a file
-aws_instance_id=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-echo -n "\$aws_instance_id" > /tmp/instance_id.txt
-
-# Read instance ID from the file
-INSTANCE_ID=\$(cat /tmp/instance_id.txt)
-
 enable_ebs_udev(){
     curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/ebsnvme-id > /sbin/ebsnvme-id
     curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/ec2nvme-nsid > /sbin/ec2nvme-nsid
@@ -77,125 +73,121 @@ enable_ebs_udev(){
 
 # Configure CloudWatch Agent
 configure_cwagent(){
-    yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    yum install -y collectd
-
-    cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json << 'EOL'
-    {
-        "metrics": {
-            "append_dimensions": {
-                "ImageId": "\${local.application_data.accounts[local.environment].ec2amiid}",
-                "InstanceId": "\${INSTANCE_ID}",
-                "InstanceType": "\${local.application_data.accounts[local.environment].ec2instancetype}"
-            },
-            "metrics_collected": {
-                "collectd": {
-                    "metrics_aggregation_interval": 60
-                },
-                "cpu": {
-                    "measurement": [
-                        "cpu_usage_idle",
-                        "cpu_usage_iowait",
-                        "cpu_usage_user",
-                        "cpu_usage_system"
-                    ],
-                    "metrics_collection_interval": 60,
-                    "totalcpu": false
-                },
-                "disk": {
-                    "measurement": [
-                        "used_percent",
-                        "inodes_free"
-                    ],
-                    "metrics_collection_interval": 60,
-                    "resources": [
-                        "*"
-                    ],
-                    "drop_device": true,
-                    "ignore_file_system_types": [
-                        "tmpfs",
-                        "devtmpfs",
-                        "sysfs",
-                        "fuse.s3fs",
-                        "nfs4"
-                    ]
-                },
-                "diskio": {
-                    "measurement": [
-                        "io_time",
-                        "write_bytes",
-                        "read_bytes",
-                        "writes",
-                        "reads"
-                    ],
-                    "metrics_collection_interval": 60,
-                    "resources": [
-                        "*"
-                    ]
-                },
-                "mem": {
-                    "measurement": [
-                        "mem_used_percent"
-                    ],
-                    "metrics_collection_interval": 60
-                },
-                "net": {
-                    "measurement": [
-                        "net_drop_in",
-                        "net_drop_out",
-                        "net_err_in",
-                        "net_err_out"
-                    ],
-                    "metrics_collection_interval": 60
-                },
-                "netstat": {
-                    "measurement": [
-                        "tcp_established",
-                        "tcp_time_wait"
-                    ],
-                    "metrics_collection_interval": 60
-                },
-                "statsd": {
-                    "metrics_aggregation_interval": 60,
-                    "metrics_collection_interval": 60,
-                    "service_address": ":8125"
-                },
-                "swap": {
-                    "measurement": [
-                        "swap_used_percent"
-                    ],
-                    "metrics_collection_interval": 60
-                }
-            }
+    cd /home
+    echo '{
+    "metrics": {
+        "append_dimensions": {
+            "ImageId": "${local.application_data.accounts[local.environment].ec2amiid}",
+            "InstanceId": "$${aws:InstanceId}",
+            "InstanceType": "${local.application_data.accounts[local.environment].ec2instancetype}"
         },
-        "logs": {
-            "logs_collected": {
-                "files": {
-                    "collect_list": [
-                        {
-                            "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/bi_server1.log",
-                            "log_group_name": "${local.application_name}-bi_server1"
-                        },
-                        {
-                            "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/bi_server1-diagnostic.log",
-                            "log_group_name": "${local.application_name}-bi_server1-diagnostic"
-                        },
-                        {
-                            "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/jbips.log",
-                            "log_group_name": "${local.application_name}-jbips"
-                        }
-                    ]
-                }
+        "metrics_collected": {
+            "collectd": {
+                "metrics_aggregation_interval": 60
+            },
+            "cpu": {
+                "measurement": [
+                    "cpu_usage_idle",
+                    "cpu_usage_iowait",
+                    "cpu_usage_user",
+                    "cpu_usage_system"
+                ],
+                "metrics_collection_interval": 60,
+                "totalcpu": false
+            },
+            "disk": {
+                "measurement": [
+                    "used_percent",
+                    "inodes_free"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [
+                    "*"
+                ],
+                "drop_device": true,
+                "ignore_file_system_types": [
+                    "tmpfs",
+                    "devtmpfs",
+                    "sysfs",
+                    "fuse.s3fs",
+                    "nfs4"
+                ]
+            },
+            "diskio": {
+                "measurement": [
+                    "io_time",
+                    "write_bytes",
+                    "read_bytes",
+                    "writes",
+                    "reads"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [
+                    "*"
+                ]
+            },
+            "mem": {
+                "measurement": [
+                    "mem_used_percent"
+                ],
+                "metrics_collection_interval": 60
+            },
+            "net": {
+                "measurement": [
+                    "net_drop_in",
+                    "net_drop_out",
+                    "net_err_in",
+                    "net_err_out"
+                ],
+                "metrics_collection_interval": 60
+            },
+            "netstat": {
+                "measurement": [
+                    "tcp_established",
+                    "tcp_time_wait"
+                ],
+                "metrics_collection_interval": 60
+            },
+            "statsd": {
+                "metrics_aggregation_interval": 60,
+                "metrics_collection_interval": 60,
+                "service_address": ":8125"
+            },
+            "swap": {
+                "measurement": [
+                    "swap_used_percent"
+                ],
+                "metrics_collection_interval": 60
+            }
+        }
+    },
+    "logs": {
+        "logs_collected": {
+            "files": {
+                "collect_list": [
+                    {
+                        "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/bi_server1.log",
+                        "log_group_name": "${local.application_name}-bi_server1"
+                    },
+                    {
+                        "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/bi_server1-diagnostic.log",
+                        "log_group_name": "${local.application_name}-bi_server1-diagnostic"
+                    },
+                    {
+                        "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/jbips.log",
+                        "log_group_name": "${local.application_name}-jbips"
+                    }
+                ]
             }
         }
     }
-EOL
+    ' > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
 }
 
 # Restart CloudWatch Agent
 restart_cwagent(){
     amazon-cloudwatch-agent-ctl -a stop
-    amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+    amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/cloudwatch_agent_config.json -s
 }
 
 # Call the functions
