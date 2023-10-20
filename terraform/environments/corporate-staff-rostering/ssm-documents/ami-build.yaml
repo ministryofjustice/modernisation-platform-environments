@@ -79,7 +79,8 @@ mainSteps:
     inputs:
       runCommand:
         - |
-          if (-not (Test-Path 'C:\Program Files\Amazon\Amazon AppStream\aws-discovery-agent\uninstall.exe') -and -not (Test-Path 'C:\Program Files\AWS\AWS Discovery Agent\uninstall.exe')) {
+          if (-not (Test-Path 'C:\Program Files\Amazon\Amazon AppStream\aws-discovery-agent\uninstall.exe') -and -not (Test-Path 'C:\Program Files\AWS\AWS Discovery Agent\uninstall.exe')) 
+          {
             Write-Host "AWS Discovery Agent is successfully uninstalled."
           } else {
             Write-Host "AWS Discovery Agent uninstallation may have failed."
