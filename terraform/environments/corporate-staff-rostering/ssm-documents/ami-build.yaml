@@ -22,6 +22,7 @@ mainSteps:
       InstanceId: "{{ InstanceId }}"
       VolumeId: "{{ VolumeId }}"
       description: "{{ SnapshotName }}"
+    onFailure: Abort
 
   - name: getRootVolumeSpace
     action: aws:runPowerShellScript
@@ -44,7 +45,6 @@ mainSteps:
   - name: extendDiskStop
     action: aws:runPowerShellScript
     maxAttempts: 1
-    onFailure: Stop
     inputs: 
       runCommand:
         - |
@@ -52,6 +52,7 @@ mainSteps:
             Write-Output "Available disk space is less than 50%. Stopping doc execution."
             Exit 1
           }
+    onFailure: Abort
 
   - name: stopDiscoveryAgent
     action: aws:runPowerShellScript
@@ -84,7 +85,7 @@ mainSteps:
           } else {
             Write-Host "AWS Discovery Agent uninstallation may have failed."
           }
-    onFailure: Stop
+    onFailure: Abort
 
   - name: InstallFirefoxBrowser
     action: aws:runPowerShellScript
