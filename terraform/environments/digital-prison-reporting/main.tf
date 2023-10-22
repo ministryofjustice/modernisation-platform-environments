@@ -120,6 +120,7 @@ module "glue_reporting_hub_batch_job" {
     "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
     "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
     "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_batch_job_retry_max_attempts
     "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_batch_job_retry_min_wait_millis
     "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_batch_job_retry_max_wait_millis
