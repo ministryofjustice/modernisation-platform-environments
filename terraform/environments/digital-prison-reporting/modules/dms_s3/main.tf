@@ -93,7 +93,6 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   max_file_size            = 128000
   cdc_max_batch_interval   = 10
   cdc_inserts_and_updates  = true
-  preserve_transactions    = true
 
   depends_on = [aws_iam_policy.dms-s3-target-policy, aws_iam_policy.dms-operator-s3-policy]
 
