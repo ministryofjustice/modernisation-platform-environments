@@ -128,6 +128,61 @@ module "glue_reporting_hub_batch_job" {
   }
 }
 
+# Glue Job, Reporting Hub CDC
+module "glue_reporting_hub_cdc_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-reporting-hub-cdc-${local.env}"
+  short_name                    = "${local.project}-reporting-hub-cdc"
+  command_type                  = "glueetl"
+  description                   = "Monitors the reporting hub for table changes and applies them to domains"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  # Using s3a for checkpoint because to align with Hadoop 3 supports
+  checkpoint_dir                = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-cdc-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-cdc-${local.env}/"
+  # Placeholder Script Location
+  script_location               = local.glue_placeholder_script_location
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  additional_policies           = module.dms_nomis_ingestor_s3_target.dms_s3_iam_policy_admin_arn
+  # timeout                       = 1440
+  execution_class               = "FLEX"
+  worker_type                   = local.reporting_hub_cdc_job_worker_type
+  number_of_workers             = local.reporting_hub_cdc_job_num_workers
+  max_concurrent                = 64
+  region                        = local.account_region
+  account                       = local.account_id
+  log_group_retention_in_days   = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-reporting-hub-cdc-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-165"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--class"                               = "uk.gov.justice.digital.job.DataHubCdcJob"
+    "--datalake-formats"                    = "delta"
+    "--dpr.aws.region"                      = local.account_region
+    "--dpr.raw.s3.path"                     = "s3://${module.s3_dms_raw_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
+    "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_cdc_job_retry_max_attempts
+    "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_cdc_job_retry_min_wait_millis
+    "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_cdc_job_retry_max_wait_millis
+    "--dpr.log.level"                       = local.reporting_hub_cdc_job_log_level
+  }
+}
+
 # Glue Job, Domain Refresh
 module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
