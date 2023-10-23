@@ -90,7 +90,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   data_format             = "parquet"
   cdc_path = "cdc"
 
-  max_file_size            = 128000
+  max_file_size            = 126000
   cdc_max_batch_interval   = 10
   cdc_inserts_and_updates  = true
 
