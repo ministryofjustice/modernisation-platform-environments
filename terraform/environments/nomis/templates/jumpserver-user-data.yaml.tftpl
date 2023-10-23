@@ -246,6 +246,7 @@ tasks:
         type: powershell
         runAs: admin
         # Hide shutdown and restart buttons in start menu
+        # Test comment
         content: |-
           $registryStartMenuPath = "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\Start\"
           if(Test-Path -Path $registryStartMenuPath){
