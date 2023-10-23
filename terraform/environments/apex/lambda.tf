@@ -8,7 +8,7 @@ module "iambackup" {
 }
 module "lambda_backup" {
   source = "./modules/lambda"
-
+security_grp_name = "${local.application_name}-${local.environment}-lambdaSecurityGroup"
 backup_policy_name = "${local.application_name}-lambda-instance-policy"
 source_file   = local.dbsourcefiles
 output_path   = local.zipfiles
@@ -17,8 +17,6 @@ function_name = local.functions
 handler       = local.handlers
 role = module.iambackup.backuprole
 runtime = local.runtime
-
-
 
 
     tags = merge(

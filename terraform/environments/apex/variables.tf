@@ -27,3 +27,8 @@ variable "runtime" {
   type        = list(any)
   default     = [ "nodejs18.x","python3.8","nodejs18.x"]            
 }
+
+variable "security_grp_name" {
+  type = string
+  default = ""
+}

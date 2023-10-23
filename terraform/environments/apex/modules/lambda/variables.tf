@@ -41,3 +41,8 @@ variable "runtime" {
   type        = list(string)
   default     = [ ""]              
 }
+
+variable "security_grp_name" {
+  type = string
+  default = ""
+}
