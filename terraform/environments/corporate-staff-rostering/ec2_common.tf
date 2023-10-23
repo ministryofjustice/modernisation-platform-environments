@@ -40,7 +40,8 @@ resource "aws_ssm_document" "cloud_watch_agent" {
   )
 }
 
-resource "aws_ssm_document" "ami_build" {
+# commented out for now as this currently returns an error on apply
+/* resource "aws_ssm_document" "ami_build" {
   name            = "ami-build"
   document_type   = "Automation"
   document_format = "YAML"
@@ -52,4 +53,4 @@ resource "aws_ssm_document" "ami_build" {
       Name = "ami-build"
     },
   )
-}
+} */
