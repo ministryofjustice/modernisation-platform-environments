@@ -94,6 +94,7 @@ mainSteps:
     inputs:
       runCommand:
         - |
+          # update invoke to use Start-BitsTransfer if slow
           Invoke-WebRequest -URI "https://download.mozilla.org/?product=firefox-esr-next-latest-ssl&os=win64&lang=en-GB" -OutFile "$ENV:TEMP\MozillaFirefox.exe"
           Invoke-Item "$ENV:TEMP\MozillaFirefox.exe"
 
@@ -102,6 +103,7 @@ mainSteps:
     inputs:
       runCommand:
         - |
+          # update invoke to use Start-BitsTransfer if slow
           Invoke-WebRequest -URI "https://nmap.org/download" -OutFile "$ENV:TEMP\nmap.exe"
           Invoke-Item "$ENV:TEMP\nmap.exe"
 
@@ -127,8 +129,9 @@ mainSteps:
     inputs: 
       runCommand:
         - |
-           Invoke-WebRequest -URI https://s3.amazonaws.com/ec2-downloads-windows/SSM-Agent/EC2Launch/latest/install.ps1 -OutFile $env:TEMP\install.ps1         
-           powershell -ExecutionPolicy Bypass -File $env:TEMP\install.ps1
+          # update invoke to use Start-BitsTransfer if slow
+          Invoke-WebRequest -URI https://s3.amazonaws.com/ec2-downloads-windows/SSM-Agent/EC2Launch/latest/install.ps1 -OutFile $env:TEMP\install.ps1         
+          powershell -ExecutionPolicy Bypass -File $env:TEMP\install.ps1
   
   - name: verifyInstallation
     action: aws:runPowerShellScript
