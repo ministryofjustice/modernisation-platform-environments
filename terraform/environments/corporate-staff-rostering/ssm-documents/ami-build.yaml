@@ -141,18 +141,18 @@ mainSteps:
             Write-Output "EC2LaunchV2 driver installation or service startup failed."
           }
 
-  # - name: stopInstance
-  #   action: aws:changeInstanceState
-  #   inputs: 
-  #     InstaneIDs: "{{ InstanceId }}"
-  #     DesiredState: stopped
-
   - name: stopInstance
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          Stop-EC2Instance -InstanceId $InstanceId
+    action: aws:changeInstanceState
+    inputs: 
+      InstaneIDs: "{{ InstanceId }}"
+      DesiredState: stopped
+
+  # - name: stopInstance
+  #   action: aws:runPowerShellScript
+  #   inputs:
+  #     runCommand:
+  #       - |
+  #         Stop-EC2Instance -InstanceId $InstanceId
 
 
   - name: createImage
@@ -177,15 +177,16 @@ mainSteps:
       state: available
       maxResults: 1
 
-  # - name: startInstance
-  #   action: aws:changeInstanceState
-  #   inputs:
-  #     instanceId: "{{ InstanceId }}"
-  #     desiredState: running
-
   - name: startInstance
-    action: aws:runPowerShellScript
+    action: aws:changeInstanceState
     inputs:
-      runCommand:
-        - |
-          Start-EC2Instance -InstanceId $InstanceId
+      instanceId: "{{ InstanceId }}"
+      desiredState: running
+
+
+  # - name: startInstance
+  #   action: aws:runPowerShellScript
+  #   inputs:
+  #     runCommand:
+  #       - |
+  #         Start-EC2Instance -InstanceId $InstanceId
