@@ -1077,6 +1077,13 @@ locals {
           protocol    = "TCP"
           cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
         }
+        rpc_udp_db = {
+          description = "135: UDP MS-RPC AD connect ingress from Azure DC and Jumpserver"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "UDP"
+          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+        }
         oracle_1521_db = {
           description     = "Allow oracle database 1521 ingress"
           from_port       = "1521"
