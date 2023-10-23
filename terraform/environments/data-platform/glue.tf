@@ -1,17 +1,17 @@
 # creates database and tables in the glue catalogue for data as a product logs.
 # Meaning logs are queryable via Athena.
 resource "aws_glue_catalog_database" "data_product_logs" {
-  name   = "daap_logs"
+  name = "daap_logs"
 }
 
 resource "aws_glue_catalog_table" "lambdas" {
   name          = "lambdas"
   database_name = aws_glue_catalog_database.data_product_logs.name
-  table_type = "EXTERNAL_TABLE"
+  table_type    = "EXTERNAL_TABLE"
 
   parameters = {
-    EXTERNAL              = "TRUE"
-    comment               = "table for logs from the python daap lambda functions"
+    EXTERNAL = "TRUE"
+    comment  = "table for logs from the python daap lambda functions"
 
   }
 
@@ -75,9 +75,9 @@ resource "aws_glue_catalog_table" "s3_objects" {
   table_type = "EXTERNAL_TABLE"
 
   parameters = {
-    EXTERNAL              = "TRUE"
-    classification        = "cloudtrail"
-    comment               = "CloudTrail table for logs from the data and landing data buckets"
+    EXTERNAL       = "TRUE"
+    classification = "cloudtrail"
+    comment        = "CloudTrail table for logs from the data and landing data buckets"
 
   }
 

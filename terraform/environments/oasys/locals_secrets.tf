@@ -10,14 +10,14 @@ locals {
     "arn:aws:iam::${module.environment.account_id}:role/ec2-database-*"
   ]
 
-  
+
   secret_policy_write_db = {
     effect = "Allow"
     actions = [
       "secretsmanager:PutSecretValue",
     ]
     principals = {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::${module.environment.account_id}:role/ec2-database-*"
       ]
@@ -30,7 +30,7 @@ locals {
       "secretsmanager:GetSecretValue",
     ]
     principals = {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::${module.environment.account_id}:role/ec2-database-*"
       ]
