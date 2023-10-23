@@ -28,6 +28,7 @@ locals {
           description = "For testing connection to Azure domain"
           os-type     = "Linux"
           component   = "test"
+          server-type = local.application_name
         }
       }
     }
