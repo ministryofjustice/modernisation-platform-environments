@@ -142,27 +142,23 @@ mainSteps:
           }
 
   - name: stopInstance
-    action: aws:changeInstanceState
-    inputs: 
-      InstaneIDs: "{{ InstanceId }}"
-      DesiredState: stopped
-
-  # - name: stopInstance
-  #   action: aws:runPowerShellScript
-  #   inputs:
-  #     runCommand:
-  #       - |
-  #         Stop-EC2Instance -InstanceId $InstanceId
-
+    action: aws:runDocument
+    inputs:
+      documentName: SSMDocument
+      documentPath: AWS-StopEC2Instance
+      documentParameters:
+        instanceID: "{{ InstanceId }}"
 
   - name: createImage
-    action: aws:createImage
+    action: aws:runDocument
     inputs:
-      InstanceId: "{{ InstanceId }}"
-      name: "{{ AMIName }}"
-      description: AMI created from "{{ InstanceId }}"
-      noReboot: true
-
+      documentName: SSMDocument
+      documentPath: AWS-CreateImage
+      documentParameters:
+        instanceID: "{{ InstanceId }}"
+        imageName: "{{ AMIName }}"
+    onFailure: Abort
+ 
   - name: outputImageId
     action: aws:runPowerShellScript
     inputs:
@@ -171,22 +167,23 @@ mainSteps:
           Write-Output "Image ID: $ImageId"
 
   - name: waitForAMI
-    action: aws:waitForImages
+    action: aws:runPowerShellScript
     inputs:
-      imageIds: ["{{ createImage.ImageId }}"]
-      state: available
-      maxResults: 1
-
+      runCommand:
+        - |
+          $amiId = "{{ createAmi.Outputs.ImageId }}"
+          $amiState = Get-EC2Image -ImageIds $amiId | Select-Object -ExpandProperty State
+          while ($amiState -ne "available") {
+             Write-Output "AMI is not available yet. Current state: $amiState"
+             Start-Sleep -Seconds 60
+             $amiState = Get-EC2Image -ImageIds $amiId | Select-Object -ExpandProperty State
+          }
+          Write-Output "AMI ($amiId) is now available."
+      
   - name: startInstance
-    action: aws:changeInstanceState
+    action: aws:runDocument
     inputs:
-      instanceId: "{{ InstanceId }}"
-      desiredState: running
-
-
-  # - name: startInstance
-  #   action: aws:runPowerShellScript
-  #   inputs:
-  #     runCommand:
-  #       - |
-  #         Start-EC2Instance -InstanceId $InstanceId
+      documentName: SSMDocument
+      documentPath: AWS-StartEC2Instance
+      documentParameters:
+        instanceID: "{{ InstanceId }}"
