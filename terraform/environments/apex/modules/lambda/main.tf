@@ -39,7 +39,7 @@ resource "aws_cloudwatch_event_target" "check_mon_sun" {
     count = 1
     rule = aws_cloudwatch_event_rule.mon_sun.name
     arn = "${aws_lambda_function.snapshotDBFunction[0].arn}"
-    input = {"appname": "apex Database Server"}
+    input =jsonencode({"appname": "apex Database Server"})
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_mon_sun" {
