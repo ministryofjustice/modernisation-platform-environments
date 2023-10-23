@@ -10,7 +10,7 @@ data "archive_file" "lambda_dbsnapshot" {
 resource "aws_security_group" "lambdasg" {
   name        = var.security_grp_name
   description = "APEX Lambda Security Group"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.vpc_id
 
 
   egress {
@@ -38,7 +38,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   }
    vpc_config {
     security_group_ids = [aws_security_group.lambdasg.id]
-    subnet_ids = data.aws_subnet.private_subnets_a.id
+    subnet_ids = var.subnet_ids
   }
  
 }
