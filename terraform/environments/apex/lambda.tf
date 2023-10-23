@@ -1,5 +1,5 @@
 module "iambackup" {
-  source = "./module/lambdapolicy"
+  source = "./modules/lambdapolicy"
     backup_policy_name = "laa-${local.application_name}-${local.environment}-policy"
     tags = merge(
     local.tags,
@@ -7,7 +7,7 @@ module "iambackup" {
   )
 }
 module "lambda_backup" {
-  source = "./module/lambda"
+  source = "./modules/lambda"
 
 backup_policy_name = "${local.application_name}-lambda-instance-policy"
 source_file   = local.dbsourcefiles

@@ -1,5 +1,5 @@
 module "s3_bucket_lambda" {
-  source = "./module/s3"
+  source = "./modules/s3"
 
   bucket_name = "laa-${local.application_name}-${local.environment}-mp" # Added suffix -mp to the name as it must be unique from the existing bucket in LZ
   # bucket_prefix not used in case bucket name get referenced as part of EC2 AMIs
