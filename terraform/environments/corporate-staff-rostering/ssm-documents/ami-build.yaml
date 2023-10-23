@@ -97,8 +97,6 @@ mainSteps:
           Invoke-WebRequest -URI "https://download.mozilla.org/?product=firefox-esr-next-latest-ssl&os=win64&lang=en-GB" -OutFile "$ENV:TEMP\MozillaFirefox.exe"
           Invoke-Item "$ENV:TEMP\MozillaFirefox.exe"
 
-# wireshark
-
   - name: InstallNmapTool
     action: aws:runPowerShellScript
     inputs:
@@ -137,17 +135,25 @@ mainSteps:
     inputs:
       runCommand:
         - |
-           if (Get-Service -Name EC2Launch | Where-Object {$_.Status -eq 'Running'}) {
-             Write-Output "EC2LaunchV2 driver installed and running successfully."
-           } else {
-             Write-Output "EC2LaunchV2 driver installation or service startup failed."
-           }
+          if (Get-Service -Name EC2Launch | Where-Object {$_.Status -eq 'Running'}) {
+            Write-Output "EC2LaunchV2 driver installed and running successfully."
+          } else {
+            Write-Output "EC2LaunchV2 driver installation or service startup failed."
+          }
+
+  # - name: stopInstance
+  #   action: aws:changeInstanceState
+  #   inputs: 
+  #     InstaneIDs: "{{ InstanceId }}"
+  #     DesiredState: stopped
 
   - name: stopInstance
-    action: aws:changeInstanceState
-    inputs: 
-      instaneID: "{{ InstanceId }}"
-      desiredState: stopped
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
+          Stop-EC2Instance -InstanceId $InstanceId
+
 
   - name: createImage
     action: aws:createImage
@@ -164,15 +170,22 @@ mainSteps:
         - |  
           Write-Output "Image ID: $ImageId"
 
-  - name: waitForAMI # update this
+  - name: waitForAMI
     action: aws:waitForImages
     inputs:
       imageIds: ["{{ createImage.ImageId }}"]
       state: available
       maxResults: 1
 
+  # - name: startInstance
+  #   action: aws:changeInstanceState
+  #   inputs:
+  #     instanceId: "{{ InstanceId }}"
+  #     desiredState: running
+
   - name: startInstance
-    action: aws:changeInstanceState
+    action: aws:runPowerShellScript
     inputs:
-      instanceId: "{{ InstanceId }}"
-      desiredState: running
+      runCommand:
+        - |
+          Start-EC2Instance -InstanceId $InstanceId
