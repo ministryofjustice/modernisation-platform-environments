@@ -43,7 +43,7 @@ resource "aws_ssm_document" "cloud_watch_agent" {
 # commented out for now as this currently returns an error on apply
 /* resource "aws_ssm_document" "ami_build" {
   name            = "ami-build"
-  document_type   = "Automation"
+  document_type   = "Command"
   document_format = "YAML"
   content         = file("./ssm-documents/ami-build.yaml")
 
