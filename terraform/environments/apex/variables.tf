@@ -49,7 +49,7 @@ variable "lamdbabucketname" {
   default = ""
 }
 
-variable "key" {
-  type = list(string)
-  default = ["dbsnapshot.zip"]
-}
+# variable "key" {
+#   type = list(string)
+#   default = ["dbsnapshot.zip"]
+# }

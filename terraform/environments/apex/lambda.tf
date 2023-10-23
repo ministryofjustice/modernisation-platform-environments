@@ -27,14 +27,14 @@ security_grp_name = "${local.application_name}-${local.environment}-lambdaSecuri
 backup_policy_name = "${local.application_name}-lambda-instance-policy"
 source_file   = local.dbsourcefiles
 output_path   = local.zipfiles
-filename      = local.zipfiles
+# filename      = local.zipfiles
 function_name = local.functions
 handler       = local.handlers
 role = module.iambackup.backuprole
 runtime = local.runtime
 subnet_ids = [data.aws_subnet.private_subnets_a.id]
 lamdbabucketname = "laa-${local.application_name}-${local.environment}-mp"
-# key = local.key
+key = local.zipfiles
 
 
 

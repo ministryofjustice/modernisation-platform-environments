@@ -11,7 +11,7 @@ locals {
   #Runtime
   runtime = var.runtime
 
-  key = var.key
+  # key = var.key
 
   application_test_url = "https://apex.laa-development.modernisation-platform.service.justice.gov.uk/apex/"
 }

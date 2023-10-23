@@ -26,14 +26,14 @@ data "archive_file" "lambda_dbsnapshot" {
 
 resource "aws_lambda_function" "snapshotDBFunction" {
   count         = 1
-  filename      = var.filename[count.index]
+  # filename      = var.filename[count.index]
   function_name = var.function_name[count.index]
   role          = var.role
   handler       = var.handler[count.index]
   source_code_hash = data.archive_file.lambda_dbsnapshot[count.index].output_base64sha256
   runtime = var.runtime[count.index]
   s3_bucket = var.lamdbabucketname
-  # s3_key = var.key[count.index]
+  s3_key = var.filename[count.index]
   
   environment {
     variables = {
