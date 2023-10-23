@@ -61,7 +61,7 @@ variable "lamdbabucketname" {
   default = ""
 }
 
-# variable "key" {
-#   type = list(string)
-#   default = [""]
-# }
+variable "key" {
+  type = list(string)
+  default = [""]
+}
