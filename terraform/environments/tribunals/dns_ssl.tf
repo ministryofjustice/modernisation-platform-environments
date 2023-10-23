@@ -37,7 +37,8 @@ resource "aws_acm_certificate" "external" {
   validation_method = "DNS"
 
   subject_alternative_names = [
-    "${local.transport_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    "${local.transport_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+    "${local.appeals_url}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   ]
   tags = {
     Environment = local.environment
