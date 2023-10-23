@@ -97,8 +97,6 @@ mainSteps:
           Invoke-WebRequest -URI "https://download.mozilla.org/?product=firefox-esr-next-latest-ssl&os=win64&lang=en-GB" -OutFile "$ENV:TEMP\MozillaFirefox.exe"
           Invoke-Item "$ENV:TEMP\MozillaFirefox.exe"
 
-# wireshark
-
   - name: InstallNmapTool
     action: aws:runPowerShellScript
     inputs:
@@ -146,8 +144,8 @@ mainSteps:
   - name: stopInstance
     action: aws:changeInstanceState
     inputs: 
-      instaneID: "{{ InstanceId }}"
-      desiredState: stopped
+      InstaneIDs: "{{ InstanceId }}"
+      DesiredState: stopped
 
   - name: createImage
     action: aws:createImage
@@ -164,7 +162,7 @@ mainSteps:
         - |  
           Write-Output "Image ID: $ImageId"
 
-  - name: waitForAMI # update this
+  - name: waitForAMI
     action: aws:waitForImages
     inputs:
       imageIds: ["{{ createImage.ImageId }}"]
