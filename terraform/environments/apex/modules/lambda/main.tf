@@ -25,7 +25,7 @@ data "archive_file" "lambda_dbsnapshot" {
 
 
 resource "aws_lambda_function" "snapshotDBFunction" {
-  count         = 3
+  count         = 1
   # filename      = var.filename[count.index]
   function_name = var.function_name[count.index]
   role          = var.role
