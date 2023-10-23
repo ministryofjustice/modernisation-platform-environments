@@ -62,6 +62,6 @@ variable "lamdbabucketname" {
 }
 
 variable "key" {
-  type = string
-  default = ""
+  type = list(string)
+  default = [""]
 }

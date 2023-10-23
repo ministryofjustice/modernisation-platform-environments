@@ -32,7 +32,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   handler       = var.handler[count.index]
   source_code_hash = data.archive_file.lambda_dbsnapshot[count.index].output_base64sha256
   runtime = var.runtime[count.index]
-  s3_bucket = var.lamdbabucketname[count.index]
+  s3_bucket = var.lamdbabucketname
   s3_key = var.key[count.index]
   
   environment {
