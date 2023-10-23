@@ -602,9 +602,3 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 -- PostgreSQL database dump complete
 --
-
-COPY dbo."Users" ("UserID", "Name", "DisplayName", "LastActive", "RoleStrength") FROM stdin;
-1	mark.butler1@justice.gov.uk	Mark Butler	2022-10-27 11:37:49.454005	100
-2	matthew.searle@justice.gov.uk	Matthew Searle	2023-04-24 08:49:16.478398	100
-3	mateusz.kolakowski@justice.gov.uk	Mateusz Kolakowski	\N	100
-\.
