@@ -51,7 +51,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
 resource "aws_cloudwatch_event_rule" "mon_sun" {
     name = "laa-createSnapshotRule-LWN8E1LNHFJR"
     description = "Fires every five minutes"
-    schedule_expression = "cron(32 14 ? * MON-SUN *)"
+    schedule_expression = "cron(15 17 ? * MON-SUN *)"
     
     
 }
