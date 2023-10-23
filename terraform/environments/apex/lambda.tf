@@ -34,7 +34,7 @@ role = module.iambackup.backuprole
 runtime = local.runtime
 subnet_ids = [data.aws_subnet.private_subnets_a.id]
 lamdbabucketname = "laa-${local.application_name}-${local.environment}-mp"
-key = local.key
+# key = local.key
 
 
 
