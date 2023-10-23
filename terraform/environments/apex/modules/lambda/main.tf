@@ -17,7 +17,7 @@ resource "aws_security_group" "lambdasg" {
 }
 
 data "archive_file" "lambda_dbsnapshot" {
-  count = 1
+  count = 3
   type        = "zip"
   source_file = var.source_file[count.index]
   output_path = var.output_path[count.index]
@@ -25,7 +25,7 @@ data "archive_file" "lambda_dbsnapshot" {
 
 
 resource "aws_lambda_function" "snapshotDBFunction" {
-  count         = 1
+  count         = 3
   # filename      = var.filename[count.index]
   function_name = var.function_name[count.index]
   role          = var.role
