@@ -112,20 +112,6 @@ module "ebs_volume" {
   ]
 }
 
-# resource "aws_route53_record" "db_ec2_primary_instance" {
-#   provider = aws.core-vpc
-#   zone_id  = var.account_config.route53_inner_zone_info.zone_id
-#   name     = "${var.app_name}-${var.env_name}-oracle_db.${var.account_config.route53_inner_zone_info.name}"
-#   type     = "A"
-
-#   alias {
-#     name                   = aws_instance.db_ec2_primary_instance.private_dns
-#     zone_id                = var.account_config.route53_inner_zone_info.zone_id
-#     evaluate_target_health = true # Could be true or false based on https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-values-alias.html#rrsets-values-alias-evaluate-target-health
-#   }
-# }
-
-
 resource "aws_route53_record" "db_ec2_primary_instance" {
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone_info.zone_id
@@ -133,4 +119,44 @@ resource "aws_route53_record" "db_ec2_primary_instance" {
   type     = "CNAME"
   ttl      = 300
   records  = [aws_instance.db_ec2_primary_instance.private_dns]
+}
+
+resource "aws_security_group" "delius_db_security_group" {
+  name        = format("%s - Delius Core DB", var.env_name)
+  description = "Rules for the delius testing db ecs service"
+  vpc_id      = var.account_config.shared_vpc_id
+  tags        = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_private_subnets" {
+  security_group_id            = aws_security_group.delius_db_security_group.id
+  description                  = "weblogic to testing db"
+  from_port                    = var.delius_db_container_config.port
+  to_port                      = var.delius_db_container_config.port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.weblogic_service.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_bastion" {
+  security_group_id            = aws_security_group.delius_db_security_group.id
+  description                  = "bastion to testing db"
+  from_port                    = var.delius_db_container_config.port
+  to_port                      = var.delius_db_container_config.port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = var.bastion.security_group_id
+}
+
+resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_internet" {
+  security_group_id = aws_security_group.delius_db_security_group.id
+  description       = "outbound from the testing db ecs service"
+  ip_protocol       = "tcp"
+  to_port           = 443
+  from_port         = 443
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_cloudwatch_log_group" "delius_core_testing_db_log_group" {
+  name              = format("%s-%s", var.env_name, var.delius_db_container_config.fully_qualified_name)
+  retention_in_days = 7
+  tags              = local.tags
 }

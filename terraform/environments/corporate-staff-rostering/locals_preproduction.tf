@@ -22,7 +22,8 @@ locals {
           monitoring                   = true
           vpc_security_group_ids       = ["data-db"]
           tags = {
-            backup-plan = "daily-and-weekly"
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
 
@@ -74,12 +75,11 @@ locals {
         }
 
         tags = {
-          description         = "PP CSR DB server"
-          ami                 = "base_ol_8_5"
-          os-type             = "Linux"
-          component           = "test"
-          server-type         = "csr-db"
-          instance-scheduling = "skip-scheduling"
+          description = "PP CSR DB server"
+          ami         = "base_ol_8_5"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "csr-db"
         }
       }
 
@@ -96,7 +96,8 @@ locals {
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
-            backup-plan = "daily-and-weekly"
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
         ebs_volumes = {
@@ -130,7 +131,8 @@ locals {
           monitoring              = true
           vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
           tags = {
-            backup-plan = "daily-and-weekly"
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
         ebs_volumes = {
@@ -158,7 +160,8 @@ locals {
           monitoring              = true
           vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
           tags = {
-            backup-plan = "daily-and-weekly"
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
         ebs_volumes = {
@@ -186,7 +189,8 @@ locals {
           monitoring              = true
           vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
           tags = {
-            backup-plan = "daily-and-weekly"
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
         ebs_volumes = {
@@ -216,7 +220,8 @@ locals {
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
-            backup-plan = "daily-and-weekly"
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
           }
         })
         ebs_volumes = {

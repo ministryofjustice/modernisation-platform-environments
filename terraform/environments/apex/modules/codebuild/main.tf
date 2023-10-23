@@ -117,8 +117,8 @@ data "template_file" "s3_resource_bucket_policy" {
   template = file("${path.module}/s3_bucket_policy.json.tpl")
 
   vars = {
-    account_id = var.account_id,
-    s3_resource_name = aws_s3_bucket.codebuild_resources.id,
+    account_id          = var.account_id,
+    s3_resource_name    = aws_s3_bucket.codebuild_resources.id,
     codebuild_role_name = aws_iam_role.codebuild_s3.id
   }
 }

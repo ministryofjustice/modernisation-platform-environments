@@ -7,7 +7,7 @@ resource "aws_ecs_cluster" "tipstaff_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
-  name = "/aws/events/deploymentLogs"
+  name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
 }
 
