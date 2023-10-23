@@ -18,7 +18,7 @@ function_name = local.functions
 handler       = local.handlers
 role = module.iambackup.backuprole
 runtime = local.runtime
-subnet_ids = data.aws_subnet.private_subnets_a.id
+subnet_ids = [data.aws_subnet.private_subnets_a.id]
 
 
     tags = merge(
