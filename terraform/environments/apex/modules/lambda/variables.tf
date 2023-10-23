@@ -55,3 +55,13 @@ variable "vpc_id" {
   type = string
   default = ""
 }
+
+variable "lamdbabucketname" {
+  type = string
+  default = ""
+}
+
+variable "key" {
+  type = string
+  default = ""
+}

@@ -42,3 +42,17 @@ variable "vpc_id" {
   type = string
   default = ""
 }
+
+variable "tags" {
+  type        = map(any)
+}
+
+variable "lamdbabucketname" {
+  type = string
+  default = ""
+}
+
+variable "key" {
+  type = string
+  default = ""
+}

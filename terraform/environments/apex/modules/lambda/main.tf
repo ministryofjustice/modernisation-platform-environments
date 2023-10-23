@@ -40,7 +40,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
     security_group_ids = [aws_security_group.lambdasg.id]
     subnet_ids = var.subnet_ids
   }
- 
+ tags = var.tags
 }
 
 resource "aws_cloudwatch_event_rule" "mon_sun" {
