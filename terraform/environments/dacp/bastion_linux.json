@@ -1,7 +1,8 @@
 {
   "keys": {
     "development": {
-      "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark.butler@hmcts.net"
+      "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark.butler@hmcts.net",
+      "mkolakowski": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDQoxnBVp1gZ/f7jJS5uojIi6ddHkHgKMEzPcAtBKh7P mateusz.kolakowski@justice.gov.uk"
     },
     "preproduction": {
       "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark.butler@hmcts.net"
