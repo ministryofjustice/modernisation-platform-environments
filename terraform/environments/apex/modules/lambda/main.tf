@@ -1,11 +1,5 @@
 
 
-data "archive_file" "lambda_dbsnapshot" {
-  count = 3
-  type        = "zip"
-  source_file = var.source_file[count.index]
-  output_path = var.output_path[count.index]
-}
 
 resource "aws_security_group" "lambdasg" {
   name        = var.security_grp_name
@@ -22,6 +16,14 @@ resource "aws_security_group" "lambdasg" {
   }
 }
 
+data "archive_file" "lambda_dbsnapshot" {
+  count = 3
+  type        = "zip"
+  source_file = var.source_file[count.index]
+  output_path = var.output_path[count.index]
+}
+
+
 resource "aws_lambda_function" "snapshotDBFunction" {
   count         = 3
   filename      = var.filename[count.index]
@@ -30,6 +32,9 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   handler       = var.handler[count.index]
   source_code_hash = data.archive_file.lambda_dbsnapshot[count.index].output_base64sha256
   runtime = var.runtime[count.index]
+  s3_bucket = var.lamdbabucketname
+  s3_key = var.key
+  
   environment {
     variables = {
       LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
@@ -47,6 +52,7 @@ resource "aws_cloudwatch_event_rule" "mon_sun" {
     name = "laa-createSnapshotRule-LWN8E1LNHFJR"
     description = "Fires every five minutes"
     schedule_expression = "cron(32 14 ? * MON-SUN *)"
+    
     
 }
 
