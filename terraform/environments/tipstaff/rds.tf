@@ -60,3 +60,23 @@ data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
 
+resource "null_resource" "setup_db" {
+  count = local.is-development ? 1 : 0
+
+  depends_on = [aws_db_instance.tipstaff_db]
+
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
+
+    environment = {
+      DB_HOSTNAME          = aws_db_instance.tipstaff_db.address
+      DB_NAME              = aws_db_instance.tipstaff_db.db_name
+      TIPSTAFF_DB_USERNAME = aws_db_instance.tipstaff_db.username
+      TIPSTAFF_DB_PASSWORD = random_password.password.result
+    }
+  }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
