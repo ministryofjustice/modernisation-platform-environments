@@ -19,14 +19,18 @@ locals {
     enable_ec2_self_provision                    = true
     enable_ec2_oracle_enterprise_managed_server  = true
     enable_ec2_user_keypair                      = true
-    cloudwatch_metric_alarms                     = {}
+    cloudwatch_metric_alarms_default_actions     = ["csr_pagerduty"]
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    sns_topics               = {}
+    sns_topics = {
+      pagerduty_integrations = {
+        csr_pagerduty = "csr_alarms"
+      }
+    }
   }
 
   baseline_acm_certificates       = {}
@@ -78,6 +82,8 @@ locals {
     jumpserver        = local.security_groups.jumpserver
   }
 
-  baseline_sns_topics     = {}
   baseline_ssm_parameters = {}
+
+  baseline_sns_topics = {}
+
 }

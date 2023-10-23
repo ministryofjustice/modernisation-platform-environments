@@ -39,7 +39,7 @@ locals {
           user_data_raw                 = base64encode(file("./templates/test-user-data.yaml"))
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
         })
-
+        cloudwatch_metric_alarms = local.app_ec2_cloudwatch_metric_alarms
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["app", "domain", "jumpserver"]
           instance_type          = "t3.medium"
