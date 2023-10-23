@@ -83,6 +83,8 @@ data "http" "myip" {
 }
 
 resource "null_resource" "setup_db" {
+  count = local.is-development ? 0 : 1
+
   depends_on = [aws_db_instance.ncas_db]
 
   provisioner "local-exec" {
@@ -116,6 +118,28 @@ resource "null_resource" "setup_source_rds_security_group" {
       RDS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["ACCESS_KEY"]
       RDS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SECRET_KEY"]
       RDS_SOURCE_ACCOUNT_REGION     = "eu-west-2"
+    }
+  }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
+
+// Sets up empty database for Development environment
+resource "null_resource" "setup_dev_db" {
+  count = local.is-development ? 1 : 0
+
+  depends_on = [aws_db_instance.ncas_db]
+
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
+
+    environment = {
+      DB_HOSTNAME      = aws_db_instance.ncas_db.address
+      DB_NAME          = aws_db_instance.ncas_db.db_name
+      NCAS_DB_USERNAME = aws_db_instance.ncas_db.username
+      NCAS_DB_PASSWORD = random_password.password.result
     }
   }
   triggers = {
