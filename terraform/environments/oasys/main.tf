@@ -83,5 +83,5 @@ module "baseline" {
   s3_buckets             = merge(local.baseline_s3_buckets, module.baseline_presets.s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
   security_groups        = local.baseline_security_groups
   ssm_parameters         = merge(module.baseline_presets.ssm_parameters, lookup(local.environment_config, "baseline_ssm_parameters", {}))
-  secretsmanager_secrets = merge(local.baseline_secretsmanager_secrets,  lookup(local.environment_config, "baseline_secretsmanager_secrets", {}))
+  secretsmanager_secrets = merge(local.baseline_secretsmanager_secrets, lookup(local.environment_config, "baseline_secretsmanager_secrets", {}))
 }
