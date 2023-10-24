@@ -5,7 +5,7 @@
 -- Dumped from database version 14.7
 -- Dumped by pg_dump version 15.3
 
--- Started on 2023-10-24 10:46:16 BST
+-- Started on 2023-10-24 16:06:45 BST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,7 +19,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 5 (class 2615 OID 16405)
+-- TOC entry 5 (class 2615 OID 25034)
 -- Name: dbo; Type: SCHEMA; Schema: -; Owner: dbadmin
 --
 
@@ -39,7 +39,7 @@ ALTER SCHEMA dbo OWNER TO dbadmin;
 ALTER SCHEMA public OWNER TO dbadmin;
 
 --
--- TOC entry 210 (class 1259 OID 16406)
+-- TOC entry 210 (class 1259 OID 25035)
 -- Name: adgroups_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -58,7 +58,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 211 (class 1259 OID 16407)
+-- TOC entry 211 (class 1259 OID 25036)
 -- Name: ADGroups; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -72,7 +72,7 @@ CREATE TABLE dbo."ADGroups" (
 ALTER TABLE dbo."ADGroups" OWNER TO dbadmin;
 
 --
--- TOC entry 212 (class 1259 OID 16411)
+-- TOC entry 212 (class 1259 OID 25040)
 -- Name: actions_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -87,7 +87,7 @@ CREATE SEQUENCE dbo.actions_seq
 ALTER TABLE dbo.actions_seq OWNER TO dbadmin;
 
 --
--- TOC entry 213 (class 1259 OID 16412)
+-- TOC entry 213 (class 1259 OID 25041)
 -- Name: Actions; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -100,7 +100,7 @@ CREATE TABLE dbo."Actions" (
 ALTER TABLE dbo."Actions" OWNER TO dbadmin;
 
 --
--- TOC entry 214 (class 1259 OID 16416)
+-- TOC entry 214 (class 1259 OID 25045)
 -- Name: audit_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -115,7 +115,7 @@ CREATE SEQUENCE dbo.audit_seq
 ALTER TABLE dbo.audit_seq OWNER TO dbadmin;
 
 --
--- TOC entry 215 (class 1259 OID 16417)
+-- TOC entry 215 (class 1259 OID 25046)
 -- Name: Audits; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -133,7 +133,7 @@ CREATE TABLE dbo."Audits" (
 ALTER TABLE dbo."Audits" OWNER TO dbadmin;
 
 --
--- TOC entry 216 (class 1259 OID 16421)
+-- TOC entry 216 (class 1259 OID 25050)
 -- Name: bulkimports_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -148,7 +148,7 @@ CREATE SEQUENCE dbo.bulkimports_seq
 ALTER TABLE dbo.bulkimports_seq OWNER TO dbadmin;
 
 --
--- TOC entry 217 (class 1259 OID 16422)
+-- TOC entry 217 (class 1259 OID 25051)
 -- Name: BulkImports; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -165,7 +165,7 @@ CREATE TABLE dbo."BulkImports" (
 ALTER TABLE dbo."BulkImports" OWNER TO dbadmin;
 
 --
--- TOC entry 218 (class 1259 OID 16428)
+-- TOC entry 218 (class 1259 OID 25057)
 -- Name: changes_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -180,7 +180,7 @@ CREATE SEQUENCE dbo.changes_seq
 ALTER TABLE dbo.changes_seq OWNER TO dbadmin;
 
 --
--- TOC entry 219 (class 1259 OID 16429)
+-- TOC entry 219 (class 1259 OID 25058)
 -- Name: Changes; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -196,7 +196,7 @@ CREATE TABLE dbo."Changes" (
 ALTER TABLE dbo."Changes" OWNER TO dbadmin;
 
 --
--- TOC entry 220 (class 1259 OID 16435)
+-- TOC entry 220 (class 1259 OID 25064)
 -- Name: companies_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -211,7 +211,7 @@ CREATE SEQUENCE dbo.companies_seq
 ALTER TABLE dbo.companies_seq OWNER TO dbadmin;
 
 --
--- TOC entry 221 (class 1259 OID 16436)
+-- TOC entry 221 (class 1259 OID 25065)
 -- Name: Companies; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -236,7 +236,7 @@ CREATE TABLE dbo."Companies" (
 ALTER TABLE dbo."Companies" OWNER TO dbadmin;
 
 --
--- TOC entry 222 (class 1259 OID 16442)
+-- TOC entry 222 (class 1259 OID 25071)
 -- Name: courts_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -251,7 +251,7 @@ CREATE SEQUENCE dbo.courts_seq
 ALTER TABLE dbo.courts_seq OWNER TO dbadmin;
 
 --
--- TOC entry 223 (class 1259 OID 16443)
+-- TOC entry 223 (class 1259 OID 25072)
 -- Name: Courts; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -266,7 +266,7 @@ CREATE TABLE dbo."Courts" (
 ALTER TABLE dbo."Courts" OWNER TO dbadmin;
 
 --
--- TOC entry 224 (class 1259 OID 16447)
+-- TOC entry 224 (class 1259 OID 25076)
 -- Name: deletereasons_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -281,7 +281,7 @@ CREATE SEQUENCE dbo.deletereasons_seq
 ALTER TABLE dbo.deletereasons_seq OWNER TO dbadmin;
 
 --
--- TOC entry 225 (class 1259 OID 16448)
+-- TOC entry 225 (class 1259 OID 25077)
 -- Name: DeleteReasons; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -297,7 +297,7 @@ CREATE TABLE dbo."DeleteReasons" (
 ALTER TABLE dbo."DeleteReasons" OWNER TO dbadmin;
 
 --
--- TOC entry 226 (class 1259 OID 16452)
+-- TOC entry 226 (class 1259 OID 25081)
 -- Name: divisions_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -312,7 +312,7 @@ CREATE SEQUENCE dbo.divisions_seq
 ALTER TABLE dbo.divisions_seq OWNER TO dbadmin;
 
 --
--- TOC entry 227 (class 1259 OID 16453)
+-- TOC entry 227 (class 1259 OID 25082)
 -- Name: Divisions; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -328,7 +328,7 @@ CREATE TABLE dbo."Divisions" (
 ALTER TABLE dbo."Divisions" OWNER TO dbadmin;
 
 --
--- TOC entry 228 (class 1259 OID 16457)
+-- TOC entry 228 (class 1259 OID 25086)
 -- Name: judges_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -343,7 +343,7 @@ CREATE SEQUENCE dbo.judges_seq
 ALTER TABLE dbo.judges_seq OWNER TO dbadmin;
 
 --
--- TOC entry 229 (class 1259 OID 16458)
+-- TOC entry 229 (class 1259 OID 25087)
 -- Name: Judges; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -358,7 +358,7 @@ CREATE TABLE dbo."Judges" (
 ALTER TABLE dbo."Judges" OWNER TO dbadmin;
 
 --
--- TOC entry 230 (class 1259 OID 16462)
+-- TOC entry 230 (class 1259 OID 25091)
 -- Name: neutralcitations_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -373,7 +373,7 @@ CREATE SEQUENCE dbo.neutralcitations_seq
 ALTER TABLE dbo.neutralcitations_seq OWNER TO dbadmin;
 
 --
--- TOC entry 231 (class 1259 OID 16463)
+-- TOC entry 231 (class 1259 OID 25092)
 -- Name: NeutralCitations; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -403,7 +403,7 @@ CREATE TABLE dbo."NeutralCitations" (
 ALTER TABLE dbo."NeutralCitations" OWNER TO dbadmin;
 
 --
--- TOC entry 232 (class 1259 OID 16468)
+-- TOC entry 232 (class 1259 OID 25097)
 -- Name: Roles; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -416,7 +416,7 @@ CREATE TABLE dbo."Roles" (
 ALTER TABLE dbo."Roles" OWNER TO dbadmin;
 
 --
--- TOC entry 233 (class 1259 OID 16471)
+-- TOC entry 233 (class 1259 OID 25100)
 -- Name: users_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -431,7 +431,7 @@ CREATE SEQUENCE dbo.users_seq
 ALTER TABLE dbo.users_seq OWNER TO dbadmin;
 
 --
--- TOC entry 234 (class 1259 OID 16472)
+-- TOC entry 234 (class 1259 OID 25101)
 -- Name: Users; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -447,7 +447,7 @@ CREATE TABLE dbo."Users" (
 ALTER TABLE dbo."Users" OWNER TO dbadmin;
 
 --
--- TOC entry 235 (class 1259 OID 16478)
+-- TOC entry 235 (class 1259 OID 25107)
 -- Name: __MigrationHistory; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -462,7 +462,7 @@ CREATE TABLE dbo."__MigrationHistory" (
 ALTER TABLE dbo."__MigrationHistory" OWNER TO dbadmin;
 
 --
--- TOC entry 4372 (class 0 OID 16407)
+-- TOC entry 4372 (class 0 OID 25036)
 -- Dependencies: 211
 -- Data for Name: ADGroups; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
@@ -473,7 +473,7 @@ COPY dbo."ADGroups" ("ADGroupID", "Name", "RoleStrength") FROM stdin;
 
 
 --
--- TOC entry 4374 (class 0 OID 16412)
+-- TOC entry 4374 (class 0 OID 25041)
 -- Dependencies: 213
 -- Data for Name: Actions; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
@@ -486,18 +486,19 @@ COPY dbo."Actions" ("ActionID", "Name") FROM stdin;
 
 
 --
--- TOC entry 4376 (class 0 OID 16417)
+-- TOC entry 4376 (class 0 OID 25046)
 -- Dependencies: 215
 -- Data for Name: Audits; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
 COPY dbo."Audits" ("AuditID", "Date", "UserID", "ObjPrimaryKey", "RootPrimaryKey", "ActionID", "Object") FROM stdin;
 1	2014-05-06 12:15:37.777	1	1	\N	1	User
+2	2023-10-24 14:43:28.82514	0	5	\N	1	NeutralCitation
 \.
 
 
 --
--- TOC entry 4378 (class 0 OID 16422)
+-- TOC entry 4378 (class 0 OID 25051)
 -- Dependencies: 217
 -- Data for Name: BulkImports; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
@@ -507,7 +508,7 @@ COPY dbo."BulkImports" ("BulkImportID", "Uploaded", "Filename", "CompanyID", "Up
 
 
 --
--- TOC entry 4380 (class 0 OID 16429)
+-- TOC entry 4380 (class 0 OID 25058)
 -- Dependencies: 219
 -- Data for Name: Changes; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
@@ -518,18 +519,17 @@ COPY dbo."Changes" ("ChangeID", "AuditID", "ColumnName", "Was", "Now") FROM stdi
 
 
 --
--- TOC entry 4382 (class 0 OID 16436)
+-- TOC entry 4382 (class 0 OID 25065)
 -- Dependencies: 221
 -- Data for Name: Companies; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
 COPY dbo."Companies" ("CompanyID", "Name", "Add1", "Add2", "Add3", "Add4", "Add5", "Postcode", "DX", "Phone", "Fax", "Email1", "Email2", "Active") FROM stdin;
-1	Test Company Number 1	Fiction Place	6-9 Fiction Road	Fake Street	London	E1 1BT	DX London/Fake Street 410	T 020 8078 3100	F 020 8942 7975	info@testcompany.com	esther@testcompany.com	t
 \.
 
 
 --
--- TOC entry 4384 (class 0 OID 16443)
+-- TOC entry 4384 (class 0 OID 25072)
 -- Dependencies: 223
 -- Data for Name: Courts; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
@@ -543,7 +543,7 @@ COPY dbo."Courts" ("CourtID", "Name", "Acronym", "Active") FROM stdin;
 
 
 --
--- TOC entry 4386 (class 0 OID 16448)
+-- TOC entry 4386 (class 0 OID 25077)
 -- Dependencies: 225
 -- Data for Name: DeleteReasons; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
@@ -557,7 +557,7 @@ COPY dbo."DeleteReasons" (id, "Description", "Deactivated", "deactivatedOn", "de
 
 
 --
--- TOC entry 4388 (class 0 OID 16453)
+-- TOC entry 4388 (class 0 OID 25082)
 -- Dependencies: 227
 -- Data for Name: Divisions; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
@@ -578,25 +578,38 @@ COPY dbo."Divisions" ("DivisionID", "CourtID", "Acronym", "Name", "Active") FROM
 8	1	KB	King's Bench	t
 \.
 
+
 --
--- TOC entry 4390 (class 0 OID 16458)
+-- TOC entry 4390 (class 0 OID 25087)
 -- Dependencies: 229
 -- Data for Name: Judges; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
 COPY dbo."Judges" ("JudgeID", "Name", "Active", "Archive") FROM stdin;
-1	Lloyd J	f	t
-2	Ouseley J	f	t
-3	SHELTON, HHJ	t	f
-5	hhj knows	f	t
-6	Lj Thomas, Griffiths williams	f	t
-7	DEPUTY DISTRICT JUDGE DAVEY	f	t
-9	richards / silber j	f	t
-10	Curtis	f	t
+1	Murdock J	t	f
+2	Parker J	t	f
+3	Watson, HHJ	t	f
+5	hhj Wayne	t	f
+6	Lj Stacy, Hank Wilfred	t	f
+7	DEPUTY DISTRICT JUDGE DEREK	t	f
+9	richards / reed j	t	f
+10	Curtis	t	f
 \.
 
+
 --
--- TOC entry 4393 (class 0 OID 16468)
+-- TOC entry 4392 (class 0 OID 25092)
+-- Dependencies: 231
+-- Data for Name: NeutralCitations; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
+--
+
+COPY dbo."NeutralCitations" ("NeutralCitationID", "CitationNumber", "Party1Name", "Party2Name", "JudgmentYear", "CourtID", "DivisionID", "CaseNumber", "ContractedNumber", "JudgeID", "JudgmentDate", "CreatedByID", "CreatedOn", "Deleted", "DeletedReasonID", "DeletedOn", "DeletedByID", "BulkImportID", "Retention") FROM stdin;
+5	1	MURPHY	\N	2023	1	1	\N	\N	2	2023-10-02 00:00:00	3	2023-10-24 14:43:28.712342	f	\N	\N	\N	\N	f
+\.
+
+
+--
+-- TOC entry 4393 (class 0 OID 25097)
 -- Dependencies: 232
 -- Data for Name: Roles; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
@@ -609,22 +622,9 @@ COPY dbo."Roles" (strength, "Detail") FROM stdin;
 100	SSG
 \.
 
---
--- TOC entry 4392 (class 0 OID 16463)
--- Dependencies: 231
--- Data for Name: NeutralCitations; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
---
-
-
-COPY dbo."NeutralCitations" ("NeutralCitationID", "CitationNumber", "Party1Name", "Party2Name", "JudgmentYear", "CourtID", "DivisionID", "CaseNumber", "ContractedNumber", "JudgeID", "JudgmentDate", "CreatedByID", "CreatedOn", "Deleted", "DeletedReasonID", "DeletedOn", "DeletedByID", "BulkImportID", "Retention") FROM stdin;
-1	1	Maven	Rook	2002	1	6	FD 01 A00247	FD01A00247	2	2006-01-14 00:00:00	1	2006-01-14 00:00:00	f	\N	\N	\N	\N	f
-2	2	Upberry	Sec of State for Flying	2005	1	1	CO2878 2005	CO28782401	2	2005-01-11 00:00:00	1	2005-01-14 00:00:00	f	\N	\N	\N	\N	f
-3	3	Lazer Jones	2004	1	8	01/TLQ/0799	01ERQ0788	2	2004-01-18 00:00:00	1	2004-01-15 00:00:00	f	\N	\N	\N	\N	f
-4	4	Bourne	Unknown	2009	1	6	BB99D00056	BB99D00056	3	2009-01-15 00:00:00	1	2009-01-15 00:00:00	f	\N	\N	\N	\N	f
-\.
 
 --
--- TOC entry 4395 (class 0 OID 16472)
+-- TOC entry 4395 (class 0 OID 25101)
 -- Dependencies: 234
 -- Data for Name: Users; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
@@ -633,13 +633,13 @@ COPY dbo."Users" ("UserID", "Name", "DisplayName", "LastActive", "RoleStrength")
 0	Migrated Record	Migrated Record	\N	0
 1	mark.butler1@justice.gov.uk	Mark Butler	2023-07-25 15:27:25.061769	100
 2	jamil.qurashi@justice.gov.uk	Jamil Qurashi	2023-05-30 12:51:39.681253	100
-3	matthew.searle@justice.gov.uk	Matthew Searle	2023-10-17 09:03:16.690994	100
-4	mateusz.kolakowski@justice.gov.uk	Mateusz Kolakowski	2023-10-17 14:13:40.121206	100
+4	mateusz.kolakowski@justice.gov.uk	Mateusz Kolakowski	2023-10-24 14:43:56.082008	100
+3	matthew.searle@justice.gov.uk	Matthew Searle	2023-10-24 14:49:21.302146	100
 \.
 
 
 --
--- TOC entry 4396 (class 0 OID 16478)
+-- TOC entry 4396 (class 0 OID 25107)
 -- Dependencies: 235
 -- Data for Name: __MigrationHistory; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
@@ -674,7 +674,7 @@ SELECT pg_catalog.setval('dbo.adgroups_seq', 1, true);
 -- Name: audit_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
-SELECT pg_catalog.setval('dbo.audit_seq', 1, true);
+SELECT pg_catalog.setval('dbo.audit_seq', 2, true);
 
 
 --
@@ -746,7 +746,7 @@ SELECT pg_catalog.setval('dbo.judges_seq', 1, true);
 -- Name: neutralcitations_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
-SELECT pg_catalog.setval('dbo.neutralcitations_seq', 4, true);
+SELECT pg_catalog.setval('dbo.neutralcitations_seq', 5, true);
 
 
 --
@@ -759,7 +759,7 @@ SELECT pg_catalog.setval('dbo.users_seq', 4, true);
 
 
 --
--- TOC entry 4205 (class 2606 OID 16487)
+-- TOC entry 4205 (class 2606 OID 25116)
 -- Name: ADGroups ADGroups_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -768,7 +768,7 @@ ALTER TABLE ONLY dbo."ADGroups"
 
 
 --
--- TOC entry 4207 (class 2606 OID 16489)
+-- TOC entry 4207 (class 2606 OID 25118)
 -- Name: Actions Actions_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -777,7 +777,7 @@ ALTER TABLE ONLY dbo."Actions"
 
 
 --
--- TOC entry 4209 (class 2606 OID 16491)
+-- TOC entry 4209 (class 2606 OID 25120)
 -- Name: Audits Audits_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -786,7 +786,7 @@ ALTER TABLE ONLY dbo."Audits"
 
 
 --
--- TOC entry 4211 (class 2606 OID 16493)
+-- TOC entry 4211 (class 2606 OID 25122)
 -- Name: BulkImports BulkImports_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -795,7 +795,7 @@ ALTER TABLE ONLY dbo."BulkImports"
 
 
 --
--- TOC entry 4213 (class 2606 OID 16495)
+-- TOC entry 4213 (class 2606 OID 25124)
 -- Name: Changes Changes_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -804,7 +804,7 @@ ALTER TABLE ONLY dbo."Changes"
 
 
 --
--- TOC entry 4215 (class 2606 OID 16497)
+-- TOC entry 4215 (class 2606 OID 25126)
 -- Name: Companies Companies_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -813,7 +813,7 @@ ALTER TABLE ONLY dbo."Companies"
 
 
 --
--- TOC entry 4217 (class 2606 OID 16499)
+-- TOC entry 4217 (class 2606 OID 25128)
 -- Name: Courts Courts_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -822,7 +822,7 @@ ALTER TABLE ONLY dbo."Courts"
 
 
 --
--- TOC entry 4219 (class 2606 OID 16501)
+-- TOC entry 4219 (class 2606 OID 25130)
 -- Name: DeleteReasons DeleteReasons_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -831,7 +831,7 @@ ALTER TABLE ONLY dbo."DeleteReasons"
 
 
 --
--- TOC entry 4221 (class 2606 OID 16503)
+-- TOC entry 4221 (class 2606 OID 25132)
 -- Name: Divisions Divisions_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -840,7 +840,7 @@ ALTER TABLE ONLY dbo."Divisions"
 
 
 --
--- TOC entry 4223 (class 2606 OID 16505)
+-- TOC entry 4223 (class 2606 OID 25134)
 -- Name: Judges Judges_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -849,7 +849,7 @@ ALTER TABLE ONLY dbo."Judges"
 
 
 --
--- TOC entry 4225 (class 2606 OID 16507)
+-- TOC entry 4225 (class 2606 OID 25136)
 -- Name: NeutralCitations NeutralCitations_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -858,7 +858,7 @@ ALTER TABLE ONLY dbo."NeutralCitations"
 
 
 --
--- TOC entry 4231 (class 2606 OID 16509)
+-- TOC entry 4231 (class 2606 OID 25138)
 -- Name: __MigrationHistory PK_dbo.__MigrationHistory; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -867,7 +867,7 @@ ALTER TABLE ONLY dbo."__MigrationHistory"
 
 
 --
--- TOC entry 4227 (class 2606 OID 16511)
+-- TOC entry 4227 (class 2606 OID 25140)
 -- Name: Roles Roles_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -876,7 +876,7 @@ ALTER TABLE ONLY dbo."Roles"
 
 
 --
--- TOC entry 4229 (class 2606 OID 16513)
+-- TOC entry 4229 (class 2606 OID 25142)
 -- Name: Users Users_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -892,3 +892,11 @@ ALTER TABLE ONLY dbo."Users"
 
 REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+-- Completed on 2023-10-24 16:06:48 BST
+
+--
+-- PostgreSQL database dump complete
+--
+
