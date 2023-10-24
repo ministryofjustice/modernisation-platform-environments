@@ -3,17 +3,25 @@
 #   *.laa-test.modernisation-platform.service.justice.gov.uk
 #   *.laa-preproduction.modernisation-platform.service.justice.gov.uk
 
-resource "aws_acm_certificate" "external" {
-  count = local.is-production ? 0 : 1
-
+resource "aws_acm_certificate" "laa_cert" {
+  domain_name       = format("%s-%s.modernisation-platform.service.justice.gov.uk", "laa", local.environment)
   validation_method = "DNS"
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+
   subject_alternative_names = [
-    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "agatedev1-upgrade", var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "agatedev2-upgrade", var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-app1-upgrade", var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-app2-upgrade", var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-db-upgrade", var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-upgrade", var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "clamav-upgrade", var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "portal-ag-upgrade", var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "wgatedev1-upgrade", var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "wgatedev2-upgrade", var.networking[0].business-unit, local.environment)
   ]
 
   tags = merge(local.tags,
-    { Environment = local.environment }
+    { Name = lower(format("%s-%s-certificate", local.application_name, local.environment)) }
   )
 
   lifecycle {
@@ -21,42 +29,28 @@ resource "aws_acm_certificate" "external" {
   }
 }
 
+resource "aws_acm_certificate_validation" "laa_cert" {
+  certificate_arn         = aws_acm_certificate.laa_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.laa_cert_validation : record.fqdn]
+  timeouts {
+    create = "10m"
+  }
+}
 
-
-## Validation 
-resource "aws_route53_record" "external_validation" {
-  depends_on = [
-//    aws_instance.ec2_oracle_ebs
-  ]
-
-  provider = aws.core-network-services
-
+resource "aws_route53_record" "laa_cert_validation" {
+  provider = aws.core-vpc
   for_each = {
-    for dvo in local.cert_opts : dvo.domain_name => {
+    for dvo in aws_acm_certificate.laa_cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
     }
   }
+
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = local.cert_zone_id
-}
-
-resource "aws_acm_certificate_validation" "external" {
-  count = local.is-production ? 1 : 1
-
-  depends_on = [
-    aws_route53_record.external_validation
-  ]
-
-  certificate_arn         = local.cert_arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
-
-  timeouts {
-    create = "10m"
-  }
+  zone_id         = data.aws_route53_zone.external.zone_id
 }
