@@ -73,8 +73,8 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   source_code_hash = data.archive_file.dbsnapshot_file.output_base64sha256
   runtime = local.snapshotDBFunctionruntime
   # filename = local.snapshotDBFunctionfilename
-  layers = aws_lambda_layer_version.lambda_layer.compatible_runtimes
-  s3_bucket = "laa-${local.application_name}-${local.environment}-mp"
+  layers = [aws_lambda_layer_version.lambda_layer.arn]
+  s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.snapshotDBFunctionfilename
   
   environment {
@@ -100,7 +100,7 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
   source_code_hash = data.archive_file.deletesnapshot_file.output_base64sha256
   # filename = local.deletesnapshotFunctionfilename
   runtime = local.deletesnapshotFunctionruntime
-  s3_bucket = "laa-${local.application_name}-${local.environment}-mp"
+  s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.deletesnapshotFunctionfilename
   
   environment {
@@ -127,7 +127,7 @@ resource "aws_lambda_function" "connectDBFunction" {
   source_code_hash = data.archive_file.dbconnect_file.output_base64sha256
   runtime = local.connectDBFunctionruntime
   # filename = local.connectDBFunctionfilename
-  layers = aws_lambda_layer_version.lambda_layer.compatible_runtimes
+  layers = [aws_lambda_layer_version.lambda_layer.arn]
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.connectDBFunctionfilename
   
