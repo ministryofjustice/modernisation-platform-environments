@@ -45,20 +45,11 @@ output "acm_certificate_arn" {
 }
 
 output "acm_certificate_validation_dns" {
-  for_each = {
-    for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
-      value = dvo.resource_record_name
-  }
-}
-
+  value = [for dvo in aws_acm_certificate.external.domain_validation_options : dvo.resource_record_name]
 }
 
 output "acm_certificate_validation_route53" {
-  for_each = {
-    for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
-      value = dvo.resource_record_value
-    }
-  }
+  value = [for dvo in aws_acm_certificate.external.domain_validation_options : dvo.resource_record_value]
 }
 
 //// Route53 DNS records for certificate validation
