@@ -116,7 +116,8 @@ module "glue_reporting_hub_batch_job" {
     "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
     "--datalake-formats"                    = "delta"
     "--dpr.aws.region"                      = local.account_region
-    "--dpr.raw.s3.path"                     = "s3://${module.s3_dms_raw_bucket.bucket_id}/"
+    # Using s3a scheme for raw path to enable Hadoop list the files in the bucket
+    "--dpr.raw.s3.path"                     = "s3a://${module.s3_dms_raw_bucket.bucket_id}/"
     "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
     "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
@@ -134,7 +135,7 @@ module "glue_reporting_hub_cdc_job" {
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-cdc-${local.env}"
   short_name                    = "${local.project}-reporting-hub-cdc"
-  command_type                  = "glueetl"
+  command_type                  = "gluestreaming"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
@@ -148,11 +149,9 @@ module "glue_reporting_hub_cdc_job" {
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
   additional_policies           = module.dms_nomis_ingestor_s3_target.dms_s3_iam_policy_admin_arn
-  # timeout                       = 1440
-  execution_class               = "FLEX"
   worker_type                   = local.reporting_hub_cdc_job_worker_type
   number_of_workers             = local.reporting_hub_cdc_job_num_workers
-  max_concurrent                = 64
+  max_concurrent                = 1
   region                        = local.account_region
   account                       = local.account_id
   log_group_retention_in_days   = 1
