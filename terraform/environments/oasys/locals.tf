@@ -104,7 +104,7 @@ locals {
       ami_owner                 = "self"
       availability_zone         = "${local.region}a"
       instance_profile_policies = flatten([
-        module.baseline_presets.ec2_instance.config.db,
+        module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
         "Ec2OracleEnterpriseManagerPolicy"
       ])
     })
