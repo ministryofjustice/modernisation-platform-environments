@@ -579,6 +579,23 @@ COPY dbo."Divisions" ("DivisionID", "CourtID", "Acronym", "Name", "Active") FROM
 \.
 
 --
+-- TOC entry 4390 (class 0 OID 16458)
+-- Dependencies: 229
+-- Data for Name: Judges; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
+--
+
+COPY dbo."Judges" ("JudgeID", "Name", "Active", "Archive") FROM stdin;
+1	Lloyd J	f	t
+2	Ouseley J	f	t
+3	SHELTON, HHJ	t	f
+5	hhj knows	f	t
+6	Lj Thomas, Griffiths williams	f	t
+7	DEPUTY DISTRICT JUDGE DAVEY	f	t
+9	richards / silber j	f	t
+10	Curtis	f	t
+\.
+
+--
 -- TOC entry 4393 (class 0 OID 16468)
 -- Dependencies: 232
 -- Data for Name: Roles; Type: TABLE DATA; Schema: dbo; Owner: dbadmin

@@ -8,5 +8,5 @@ echo "Schema = $SCHEMA"
 if [ "$SCHEMA" == "dbo" ]; then 
     echo "The Schema dbo is already present in the database"
 else 
-    psql -h ${DB_HOSTNAME} -p 5432 -U $NCAS_DB_USERNAME -d $DB_NAME -c "\i ncasdb_empty.sql;";
+    psql -h ${DB_HOSTNAME} -p 5432 -U $NCAS_DB_USERNAME -d $DB_NAME -c "\i ncas_dummydata.sql;";
 fi
