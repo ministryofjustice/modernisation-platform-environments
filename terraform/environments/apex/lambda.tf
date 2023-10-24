@@ -59,7 +59,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   handler       = local.snapshotDBFunctionhandler
   source_code_hash = data.archive_file.dbsnapshot_file.output_base64sha256
   runtime = local.snapshotDBFunctionruntime
-  s3_bucket = module.s3_bucket_lambda.lambdabucketname
+  # s3_bucket = module.s3_bucket_lambda.lambdabucketname
   # s3_key = local.snapshotDBFunctionfilename
   
   environment {
@@ -84,7 +84,7 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
   handler       = local.deletesnapshotFunctionhandler
   source_code_hash = data.archive_file.deletesnapshot_file.output_base64sha256
   runtime = local.deletesnapshotFunctionruntime
-  s3_bucket = module.s3_bucket_lambda.lambdabucketname
+  # s3_bucket = module.s3_bucket_lambda.lambdabucketname
   # s3_key = local.deletesnapshotFunctionfilename
   
   environment {
@@ -110,7 +110,7 @@ resource "aws_lambda_function" "connectDBFunction" {
   handler       = local.connectDBFunctionhandler
   source_code_hash = data.archive_file.dbconnect_file.output_base64sha256
   runtime = local.connectDBFunctionruntime
-  s3_bucket = module.s3_bucket_lambda.lambdabucketname
+  # s3_bucket = module.s3_bucket_lambda.lambdabucketname
   # s3_key = local.connectDBFunctionfilename
   
   environment {
