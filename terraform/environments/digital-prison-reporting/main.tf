@@ -118,9 +118,9 @@ module "glue_reporting_hub_batch_job" {
     "--dpr.aws.region"                      = local.account_region
     # Using s3a scheme for raw path to enable Hadoop list the files in the bucket
     "--dpr.raw.s3.path"                     = "s3a://${module.s3_dms_raw_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
-    "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"              = "s3://${module.s3_dms_structured_bucket.bucket_id}/"
+    "--dpr.violations.s3.path"              = "s3://${module.s3_dms_violation_bucket.bucket_id}/"
+    "--dpr.curated.s3.path"                 = "s3://${module.s3_dms_curated_bucket.bucket_id}/"
     "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
     "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_batch_job_retry_max_attempts
     "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_batch_job_retry_min_wait_millis
@@ -140,7 +140,7 @@ module "glue_reporting_hub_cdc_job" {
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   # Using s3a for checkpoint because to align with Hadoop 3 supports
-  checkpoint_dir                = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
+  checkpoint_dir                = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-cdc-${local.env}/"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-cdc-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-cdc-${local.env}/"
   # Placeholder Script Location
@@ -171,9 +171,9 @@ module "glue_reporting_hub_cdc_job" {
     "--datalake-formats"                    = "delta"
     "--dpr.aws.region"                      = local.account_region
     "--dpr.raw.s3.path"                     = "s3://${module.s3_dms_raw_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
-    "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"              = "s3://${module.s3_dms_structured_bucket.bucket_id}/"
+    "--dpr.violations.s3.path"              = "s3://${module.s3_dms_violation_bucket.bucket_id}/"
+    "--dpr.curated.s3.path"                 = "s3://${module.s3_dms_curated_bucket.bucket_id}/"
     "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
     "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_cdc_job_retry_max_attempts
     "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_cdc_job_retry_min_wait_millis
@@ -577,6 +577,25 @@ module "s3_structured_bucket" {
   )
 }
 
+# S3 DMS Structured
+module "s3_dms_structured_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-dms-structured-zone-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-dms-structured-zone-${local.env}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-165"
+    }
+  )
+}
+
 # S3 Curated
 module "s3_curated_bucket" {
   source                    = "./modules/s3_bucket"
@@ -591,6 +610,25 @@ module "s3_curated_bucket" {
     {
       Name          = "${local.project}-curated-zone-${local.env}"
       Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# S3 DMS Curated
+module "s3_dms_curated_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-dms-curated-zone-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-dms-curated-zone-${local.env}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-165"
     }
   )
 }
@@ -645,6 +683,25 @@ module "s3_violation_bucket" {
     {
       Name          = "${local.project}-violation-${local.environment}"
       Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# S3 DMS Violation Zone Bucket
+module "s3_dms_violation_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-dms-violation-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-dms-violation-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-165"
     }
   )
 }
@@ -717,6 +774,16 @@ module "glue_raw_zone_database" {
   aws_region     = local.account_region
 }
 
+# Glue Database Catalog for DMS Raw Zone
+module "glue_dms_raw_zone_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "dms_raw"
+  description    = "Glue Data Catalog - DMS Raw Zone"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
 # Glue Database Catalog for Data Domain
 module "glue_structured_zone_database" {
   source         = "./modules/glue_database"
@@ -727,11 +794,31 @@ module "glue_structured_zone_database" {
   aws_region     = local.account_region
 }
 
+# Glue Database Catalog for DMS Structured Zone
+module "glue_dms_structured_zone_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "dms_structured"
+  description    = "Glue Data Catalog - DMS Structured Zone"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
 # Glue Database Catalog for Data Domain
 module "glue_curated_zone_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
   name           = "curated"
+  description    = "Glue Data Catalog - Curated Zone"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for DMS Curated Zone
+module "glue_dms_curated_zone_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "dms_curated"
   description    = "Glue Data Catalog - Curated Zone"
   aws_account_id = local.account_id
   aws_region     = local.account_region
@@ -973,8 +1060,8 @@ module "dms_fake_data_ingestor" {
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor_s3_target" {
   source                       = "./modules/dms_s3"
-  setup_dms_instance           = true
-  enable_replication_task      = true
+  setup_dms_instance           = false
+  enable_replication_task      = false
   name                         = "${local.project}-dms-nomis-ingestor-s3-target-${local.env}"
   vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
   source_engine_name           = "oracle"
