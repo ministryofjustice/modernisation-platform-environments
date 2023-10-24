@@ -100,9 +100,13 @@ locals {
 
   database_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name          = "oasys_oracle_db_release_2023-06-26T10-16-03.670Z"
-      ami_owner         = "self"
-      availability_zone = "${local.region}a"
+      ami_name                  = "oasys_oracle_db_release_2023-06-26T10-16-03.670Z"
+      ami_owner                 = "self"
+      availability_zone         = "${local.region}a"
+      instance_profile_policies = flatten([
+        module.baseline_presets.ec2_instance.config.db,
+        module.baseline_presets.iam_policies.Ec2OracleEnterpriseManagerPolicy
+      ])
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
       tags = {
