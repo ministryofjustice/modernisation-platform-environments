@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.23
+-- Dumped from database version 14.7
 -- Dumped by pg_dump version 15.2
 
--- Started on 2023-10-23 16:26:01 BST
+-- Started on 2023-10-24 14:34:16 BST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,7 +19,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 8 (class 2615 OID 69520)
+-- TOC entry 5 (class 2615 OID 27617)
 -- Name: dbo; Type: SCHEMA; Schema: -; Owner: dbadmin
 --
 
@@ -29,7 +29,7 @@ CREATE SCHEMA dbo;
 ALTER SCHEMA dbo OWNER TO dbadmin;
 
 --
--- TOC entry 7 (class 2615 OID 2200)
+-- TOC entry 6 (class 2615 OID 2200)
 -- Name: public; Type: SCHEMA; Schema: -; Owner: dbadmin
 --
 
@@ -39,7 +39,7 @@ ALTER SCHEMA dbo OWNER TO dbadmin;
 ALTER SCHEMA public OWNER TO dbadmin;
 
 --
--- TOC entry 260 (class 1255 OID 70163)
+-- TOC entry 269 (class 1255 OID 27618)
 -- Name: insert_fm(); Type: FUNCTION; Schema: dbo; Owner: dbadmin
 --
 
@@ -91,7 +91,7 @@ $$;
 ALTER FUNCTION dbo.insert_fm() OWNER TO dbadmin;
 
 --
--- TOC entry 245 (class 1255 OID 70165)
+-- TOC entry 270 (class 1255 OID 27619)
 -- Name: tri_dataseq_proc(); Type: FUNCTION; Schema: dbo; Owner: dbadmin
 --
 
@@ -115,7 +115,7 @@ $$;
 ALTER FUNCTION dbo.tri_dataseq_proc() OWNER TO dbadmin;
 
 --
--- TOC entry 246 (class 1255 OID 70167)
+-- TOC entry 271 (class 1255 OID 27620)
 -- Name: tri_insassignddate_proc(); Type: FUNCTION; Schema: dbo; Owner: dbadmin
 --
 
@@ -135,7 +135,7 @@ $$;
 ALTER FUNCTION dbo.tri_insassignddate_proc() OWNER TO dbadmin;
 
 --
--- TOC entry 247 (class 1255 OID 70169)
+-- TOC entry 272 (class 1255 OID 27621)
 -- Name: upd_works_proc(); Type: FUNCTION; Schema: dbo; Owner: dbadmin
 --
 
@@ -155,7 +155,7 @@ $$;
 ALTER FUNCTION dbo.upd_works_proc() OWNER TO dbadmin;
 
 --
--- TOC entry 222 (class 1259 OID 70068)
+-- TOC entry 210 (class 1259 OID 27622)
 -- Name: alerts_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -171,8 +171,10 @@ ALTER TABLE dbo.alerts_seq OWNER TO dbadmin;
 
 SET default_tablespace = '';
 
+SET default_table_access_method = heap;
+
 --
--- TOC entry 198 (class 1259 OID 69886)
+-- TOC entry 211 (class 1259 OID 27623)
 -- Name: Alerts; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -189,7 +191,7 @@ CREATE TABLE dbo."Alerts" (
 ALTER TABLE dbo."Alerts" OWNER TO dbadmin;
 
 --
--- TOC entry 223 (class 1259 OID 70070)
+-- TOC entry 212 (class 1259 OID 27627)
 -- Name: auditeventdatarows_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -204,7 +206,7 @@ CREATE SEQUENCE dbo.auditeventdatarows_seq
 ALTER TABLE dbo.auditeventdatarows_seq OWNER TO dbadmin;
 
 --
--- TOC entry 199 (class 1259 OID 69891)
+-- TOC entry 213 (class 1259 OID 27628)
 -- Name: AuditEventDataRows; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -220,7 +222,7 @@ CREATE TABLE dbo."AuditEventDataRows" (
 ALTER TABLE dbo."AuditEventDataRows" OWNER TO dbadmin;
 
 --
--- TOC entry 224 (class 1259 OID 70072)
+-- TOC entry 214 (class 1259 OID 27634)
 -- Name: auditeventdescriptions_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -235,7 +237,7 @@ CREATE SEQUENCE dbo.auditeventdescriptions_seq
 ALTER TABLE dbo.auditeventdescriptions_seq OWNER TO dbadmin;
 
 --
--- TOC entry 200 (class 1259 OID 69899)
+-- TOC entry 215 (class 1259 OID 27635)
 -- Name: AuditEventDescriptions; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -248,7 +250,7 @@ CREATE TABLE dbo."AuditEventDescriptions" (
 ALTER TABLE dbo."AuditEventDescriptions" OWNER TO dbadmin;
 
 --
--- TOC entry 241 (class 1259 OID 70113)
+-- TOC entry 216 (class 1259 OID 27639)
 -- Name: auditevents_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -263,7 +265,7 @@ CREATE SEQUENCE dbo.auditevents_seq
 ALTER TABLE dbo.auditevents_seq OWNER TO dbadmin;
 
 --
--- TOC entry 201 (class 1259 OID 69904)
+-- TOC entry 217 (class 1259 OID 27640)
 -- Name: AuditEvents; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -280,7 +282,7 @@ CREATE TABLE dbo."AuditEvents" (
 ALTER TABLE dbo."AuditEvents" OWNER TO dbadmin;
 
 --
--- TOC entry 225 (class 1259 OID 70074)
+-- TOC entry 218 (class 1259 OID 27644)
 -- Name: courtimportmaps_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -295,7 +297,7 @@ CREATE SEQUENCE dbo.courtimportmaps_seq
 ALTER TABLE dbo.courtimportmaps_seq OWNER TO dbadmin;
 
 --
--- TOC entry 202 (class 1259 OID 69909)
+-- TOC entry 219 (class 1259 OID 27645)
 -- Name: CourtImportMaps; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -313,7 +315,7 @@ CREATE TABLE dbo."CourtImportMaps" (
 ALTER TABLE dbo."CourtImportMaps" OWNER TO dbadmin;
 
 --
--- TOC entry 226 (class 1259 OID 70076)
+-- TOC entry 220 (class 1259 OID 27649)
 -- Name: courts_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -328,7 +330,7 @@ CREATE SEQUENCE dbo.courts_seq
 ALTER TABLE dbo.courts_seq OWNER TO dbadmin;
 
 --
--- TOC entry 203 (class 1259 OID 69914)
+-- TOC entry 221 (class 1259 OID 27650)
 -- Name: Courts; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -357,7 +359,7 @@ CREATE TABLE dbo."Courts" (
 ALTER TABLE dbo."Courts" OWNER TO dbadmin;
 
 --
--- TOC entry 227 (class 1259 OID 70078)
+-- TOC entry 222 (class 1259 OID 27656)
 -- Name: dasearchcriterias_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -372,7 +374,7 @@ CREATE SEQUENCE dbo.dasearchcriterias_seq
 ALTER TABLE dbo.dasearchcriterias_seq OWNER TO dbadmin;
 
 --
--- TOC entry 204 (class 1259 OID 69922)
+-- TOC entry 223 (class 1259 OID 27657)
 -- Name: DASearchCriterias; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -405,7 +407,7 @@ CREATE TABLE dbo."DASearchCriterias" (
 ALTER TABLE dbo."DASearchCriterias" OWNER TO dbadmin;
 
 --
--- TOC entry 228 (class 1259 OID 70080)
+-- TOC entry 224 (class 1259 OID 27663)
 -- Name: datypes_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -420,7 +422,7 @@ CREATE SEQUENCE dbo.datypes_seq
 ALTER TABLE dbo.datypes_seq OWNER TO dbadmin;
 
 --
--- TOC entry 206 (class 1259 OID 69938)
+-- TOC entry 225 (class 1259 OID 27664)
 -- Name: DATypes; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -436,7 +438,7 @@ CREATE TABLE dbo."DATypes" (
 ALTER TABLE dbo."DATypes" OWNER TO dbadmin;
 
 --
--- TOC entry 229 (class 1259 OID 70082)
+-- TOC entry 226 (class 1259 OID 27668)
 -- Name: datauploads_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -451,7 +453,7 @@ CREATE SEQUENCE dbo.datauploads_seq
 ALTER TABLE dbo.datauploads_seq OWNER TO dbadmin;
 
 --
--- TOC entry 205 (class 1259 OID 69930)
+-- TOC entry 227 (class 1259 OID 27669)
 -- Name: DataUploads; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -471,7 +473,7 @@ CREATE TABLE dbo."DataUploads" (
 ALTER TABLE dbo."DataUploads" OWNER TO dbadmin;
 
 --
--- TOC entry 242 (class 1259 OID 70117)
+-- TOC entry 228 (class 1259 OID 27675)
 -- Name: deletedreasons_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -486,7 +488,7 @@ CREATE SEQUENCE dbo.deletedreasons_seq
 ALTER TABLE dbo.deletedreasons_seq OWNER TO dbadmin;
 
 --
--- TOC entry 207 (class 1259 OID 69943)
+-- TOC entry 229 (class 1259 OID 27676)
 -- Name: DeletedReasons; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -502,7 +504,7 @@ CREATE TABLE dbo."DeletedReasons" (
 ALTER TABLE dbo."DeletedReasons" OWNER TO dbadmin;
 
 --
--- TOC entry 230 (class 1259 OID 70084)
+-- TOC entry 230 (class 1259 OID 27680)
 -- Name: faqs_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -517,7 +519,7 @@ CREATE SEQUENCE dbo.faqs_seq
 ALTER TABLE dbo.faqs_seq OWNER TO dbadmin;
 
 --
--- TOC entry 208 (class 1259 OID 69948)
+-- TOC entry 231 (class 1259 OID 27681)
 -- Name: FAQs; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -532,7 +534,7 @@ CREATE TABLE dbo."FAQs" (
 ALTER TABLE dbo."FAQs" OWNER TO dbadmin;
 
 --
--- TOC entry 231 (class 1259 OID 70086)
+-- TOC entry 232 (class 1259 OID 27687)
 -- Name: parties_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -547,7 +549,7 @@ CREATE SEQUENCE dbo.parties_seq
 ALTER TABLE dbo.parties_seq OWNER TO dbadmin;
 
 --
--- TOC entry 209 (class 1259 OID 69956)
+-- TOC entry 233 (class 1259 OID 27688)
 -- Name: Parties; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -564,7 +566,7 @@ CREATE TABLE dbo."Parties" (
 ALTER TABLE dbo."Parties" OWNER TO dbadmin;
 
 --
--- TOC entry 243 (class 1259 OID 70119)
+-- TOC entry 234 (class 1259 OID 27692)
 -- Name: proceedings_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -579,7 +581,7 @@ CREATE SEQUENCE dbo.proceedings_seq
 ALTER TABLE dbo.proceedings_seq OWNER TO dbadmin;
 
 --
--- TOC entry 210 (class 1259 OID 69961)
+-- TOC entry 235 (class 1259 OID 27693)
 -- Name: Proceedings; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -599,7 +601,7 @@ CREATE TABLE dbo."Proceedings" (
 ALTER TABLE dbo."Proceedings" OWNER TO dbadmin;
 
 --
--- TOC entry 244 (class 1259 OID 70121)
+-- TOC entry 236 (class 1259 OID 27697)
 -- Name: resultparties_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -614,7 +616,7 @@ CREATE SEQUENCE dbo.resultparties_seq
 ALTER TABLE dbo.resultparties_seq OWNER TO dbadmin;
 
 --
--- TOC entry 211 (class 1259 OID 69966)
+-- TOC entry 237 (class 1259 OID 27698)
 -- Name: ResultParties; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -630,7 +632,7 @@ CREATE TABLE dbo."ResultParties" (
 ALTER TABLE dbo."ResultParties" OWNER TO dbadmin;
 
 --
--- TOC entry 232 (class 1259 OID 70092)
+-- TOC entry 238 (class 1259 OID 27702)
 -- Name: resultproceedings_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -645,7 +647,7 @@ CREATE SEQUENCE dbo.resultproceedings_seq
 ALTER TABLE dbo.resultproceedings_seq OWNER TO dbadmin;
 
 --
--- TOC entry 212 (class 1259 OID 69971)
+-- TOC entry 239 (class 1259 OID 27703)
 -- Name: ResultProceedings; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -664,7 +666,7 @@ CREATE TABLE dbo."ResultProceedings" (
 ALTER TABLE dbo."ResultProceedings" OWNER TO dbadmin;
 
 --
--- TOC entry 233 (class 1259 OID 70094)
+-- TOC entry 240 (class 1259 OID 27707)
 -- Name: resultsearches_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -679,7 +681,7 @@ CREATE SEQUENCE dbo.resultsearches_seq
 ALTER TABLE dbo.resultsearches_seq OWNER TO dbadmin;
 
 --
--- TOC entry 213 (class 1259 OID 69976)
+-- TOC entry 241 (class 1259 OID 27708)
 -- Name: ResultSearches; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -696,7 +698,7 @@ CREATE TABLE dbo."ResultSearches" (
 ALTER TABLE dbo."ResultSearches" OWNER TO dbadmin;
 
 --
--- TOC entry 214 (class 1259 OID 69981)
+-- TOC entry 242 (class 1259 OID 27712)
 -- Name: Roles; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -709,7 +711,7 @@ CREATE TABLE dbo."Roles" (
 ALTER TABLE dbo."Roles" OWNER TO dbadmin;
 
 --
--- TOC entry 234 (class 1259 OID 70096)
+-- TOC entry 243 (class 1259 OID 27715)
 -- Name: salutations_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -724,7 +726,7 @@ CREATE SEQUENCE dbo.salutations_seq
 ALTER TABLE dbo.salutations_seq OWNER TO dbadmin;
 
 --
--- TOC entry 215 (class 1259 OID 69986)
+-- TOC entry 244 (class 1259 OID 27716)
 -- Name: Salutations; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -740,7 +742,7 @@ CREATE TABLE dbo."Salutations" (
 ALTER TABLE dbo."Salutations" OWNER TO dbadmin;
 
 --
--- TOC entry 235 (class 1259 OID 70098)
+-- TOC entry 245 (class 1259 OID 27720)
 -- Name: templates_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -755,7 +757,7 @@ CREATE SEQUENCE dbo.templates_seq
 ALTER TABLE dbo.templates_seq OWNER TO dbadmin;
 
 --
--- TOC entry 216 (class 1259 OID 69991)
+-- TOC entry 246 (class 1259 OID 27721)
 -- Name: Templates; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -773,7 +775,7 @@ CREATE TABLE dbo."Templates" (
 ALTER TABLE dbo."Templates" OWNER TO dbadmin;
 
 --
--- TOC entry 236 (class 1259 OID 70100)
+-- TOC entry 247 (class 1259 OID 27727)
 -- Name: tracestatus_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -788,7 +790,7 @@ CREATE SEQUENCE dbo.tracestatus_seq
 ALTER TABLE dbo.tracestatus_seq OWNER TO dbadmin;
 
 --
--- TOC entry 217 (class 1259 OID 70000)
+-- TOC entry 248 (class 1259 OID 27728)
 -- Name: TraceStatus; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -801,7 +803,7 @@ CREATE TABLE dbo."TraceStatus" (
 ALTER TABLE dbo."TraceStatus" OWNER TO dbadmin;
 
 --
--- TOC entry 237 (class 1259 OID 70102)
+-- TOC entry 249 (class 1259 OID 27732)
 -- Name: uniontypes_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -816,7 +818,7 @@ CREATE SEQUENCE dbo.uniontypes_seq
 ALTER TABLE dbo.uniontypes_seq OWNER TO dbadmin;
 
 --
--- TOC entry 219 (class 1259 OID 70020)
+-- TOC entry 250 (class 1259 OID 27733)
 -- Name: UnionTypes; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -829,7 +831,7 @@ CREATE TABLE dbo."UnionTypes" (
 ALTER TABLE dbo."UnionTypes" OWNER TO dbadmin;
 
 --
--- TOC entry 238 (class 1259 OID 70104)
+-- TOC entry 251 (class 1259 OID 27739)
 -- Name: unions_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -844,7 +846,7 @@ CREATE SEQUENCE dbo.unions_seq
 ALTER TABLE dbo.unions_seq OWNER TO dbadmin;
 
 --
--- TOC entry 218 (class 1259 OID 70012)
+-- TOC entry 252 (class 1259 OID 27740)
 -- Name: Unions; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -870,7 +872,7 @@ CREATE TABLE dbo."Unions" (
 ALTER TABLE dbo."Unions" OWNER TO dbadmin;
 
 --
--- TOC entry 239 (class 1259 OID 70106)
+-- TOC entry 253 (class 1259 OID 27746)
 -- Name: users_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -885,7 +887,7 @@ CREATE SEQUENCE dbo.users_seq
 ALTER TABLE dbo.users_seq OWNER TO dbadmin;
 
 --
--- TOC entry 220 (class 1259 OID 70028)
+-- TOC entry 254 (class 1259 OID 27747)
 -- Name: Users; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -901,7 +903,7 @@ CREATE TABLE dbo."Users" (
 ALTER TABLE dbo."Users" OWNER TO dbadmin;
 
 --
--- TOC entry 240 (class 1259 OID 70108)
+-- TOC entry 255 (class 1259 OID 27751)
 -- Name: works_seq; Type: SEQUENCE; Schema: dbo; Owner: dbadmin
 --
 
@@ -916,7 +918,7 @@ CREATE SEQUENCE dbo.works_seq
 ALTER TABLE dbo.works_seq OWNER TO dbadmin;
 
 --
--- TOC entry 221 (class 1259 OID 70033)
+-- TOC entry 256 (class 1259 OID 27752)
 -- Name: Works; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -943,7 +945,7 @@ CREATE TABLE dbo."Works" (
 ALTER TABLE dbo."Works" OWNER TO dbadmin;
 
 --
--- TOC entry 197 (class 1259 OID 69869)
+-- TOC entry 257 (class 1259 OID 27758)
 -- Name: __MigrationHistory; Type: TABLE; Schema: dbo; Owner: dbadmin
 --
 
@@ -958,8 +960,8 @@ CREATE TABLE dbo."__MigrationHistory" (
 ALTER TABLE dbo."__MigrationHistory" OWNER TO dbadmin;
 
 --
--- TOC entry 4019 (class 0 OID 69886)
--- Dependencies: 198
+-- TOC entry 4467 (class 0 OID 27623)
+-- Dependencies: 211
 -- Data for Name: Alerts; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -968,8 +970,8 @@ COPY dbo."Alerts" ("AlertID", "Live", "EventStart", "RaisedHours", "WarnStart", 
 
 
 --
--- TOC entry 4020 (class 0 OID 69891)
--- Dependencies: 199
+-- TOC entry 4469 (class 0 OID 27628)
+-- Dependencies: 213
 -- Data for Name: AuditEventDataRows; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -978,8 +980,8 @@ COPY dbo."AuditEventDataRows" ("idAuditData", "idAuditEvent", "ColumnName", "Was
 
 
 --
--- TOC entry 4021 (class 0 OID 69899)
--- Dependencies: 200
+-- TOC entry 4471 (class 0 OID 27635)
+-- Dependencies: 215
 -- Data for Name: AuditEventDescriptions; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -992,8 +994,8 @@ COPY dbo."AuditEventDescriptions" ("idAuditEventDescription", "AuditDescription"
 
 
 --
--- TOC entry 4022 (class 0 OID 69904)
--- Dependencies: 201
+-- TOC entry 4473 (class 0 OID 27640)
+-- Dependencies: 217
 -- Data for Name: AuditEvents; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1002,8 +1004,8 @@ COPY dbo."AuditEvents" ("idAuditEvent", "EventDate", "UserID", "idAuditEventDesc
 
 
 --
--- TOC entry 4023 (class 0 OID 69909)
--- Dependencies: 202
+-- TOC entry 4475 (class 0 OID 27645)
+-- Dependencies: 219
 -- Data for Name: CourtImportMaps; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1017,8 +1019,8 @@ COPY dbo."CourtImportMaps" ("CourtImportMapID", "FamilyManCourtName", "FamilyMan
 
 
 --
--- TOC entry 4024 (class 0 OID 69914)
--- Dependencies: 203
+-- TOC entry 4477 (class 0 OID 27650)
+-- Dependencies: 221
 -- Data for Name: Courts; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1031,23 +1033,19 @@ COPY dbo."Courts" ("CourtID", "CourtCode", "CourtName", "AddressLine1", "Address
 
 
 --
--- TOC entry 4025 (class 0 OID 69922)
--- Dependencies: 204
+-- TOC entry 4479 (class 0 OID 27657)
+-- Dependencies: 223
 -- Data for Name: DASearchCriterias; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
 COPY dbo."DASearchCriterias" ("DASearchCriteriaID", "ApplicantName", "ApplicantAddr1", "ApplicantAddr2", "ApplicantAddr3", "ApplicantAddr4", "ApplicantPostCode", "SolicitorsRef", "AForename", "ASurname", "BForename", "BSurname", "WeddingDate", "DecreeDate", "DARegistry", "DASearchBeginYear", "DASearchFinalYear", "CourtID", "OPCSID", "WorkID", "Certified", "UnionTypeID") FROM stdin;
-1	B Doe,Southend cc	\N	\N	\N	\N	\N	\N	Alexander Doe	Gillian Doe	\N	\N	\N	\N	\N	\N	\N	6	f	\N
-2	John Doe	\N	\N	\N	\N	\N	\N	John Graham	Doe	\N	\N	\N	\N	\N	\N	\N	\N	\N	7	f	\N
-3	Moira Doe Was Solicitors	133 Praed Street	DX 38754 Paddington	\N	\N	\N	\N	Ian George Francis	Karsten	\N	\N	\N	\N	\N	2000	2002	\N	\N	8	f	\N
-4	Moira Doe Was Solicitors	133 Praed Street	DX 38754	\N	\N	\N	\N	Dennis William	Sheehan	\N	\N	\N	\N	\N	2005	2007	\N	\N	9	f	\N
-5	Jason Doe	19 Cedar Park	Carrickfergus	County Antrim	Northern Ireland	BT38 8DU	\N	Jason	Doe	\N	\N	\N	\N	\N	2007	2013	\N	\N	10	f	\N
+57342	John Doe	\N	\N	\N	\N	\N	\N	John	Doe	\N	\N	\N	\N	\N	\N	\N	\N	\N	57785	f	\N
 \.
 
 
 --
--- TOC entry 4027 (class 0 OID 69938)
--- Dependencies: 206
+-- TOC entry 4481 (class 0 OID 27664)
+-- Dependencies: 225
 -- Data for Name: DATypes; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1060,8 +1058,8 @@ COPY dbo."DATypes" ("DATypeID", "DATypeLetter", "Description", "StartYear", "End
 
 
 --
--- TOC entry 4026 (class 0 OID 69930)
--- Dependencies: 205
+-- TOC entry 4483 (class 0 OID 27669)
+-- Dependencies: 227
 -- Data for Name: DataUploads; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1076,8 +1074,8 @@ COPY dbo."DataUploads" ("DataUploadID", "UploadStarted", "UploadedBy", "FileName
 
 
 --
--- TOC entry 4028 (class 0 OID 69943)
--- Dependencies: 207
+-- TOC entry 4485 (class 0 OID 27676)
+-- Dependencies: 229
 -- Data for Name: DeletedReasons; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1086,8 +1084,8 @@ COPY dbo."DeletedReasons" ("deletedReasonID", "Detail", active, deactivated, "de
 
 
 --
--- TOC entry 4029 (class 0 OID 69948)
--- Dependencies: 208
+-- TOC entry 4487 (class 0 OID 27681)
+-- Dependencies: 231
 -- Data for Name: FAQs; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1103,8 +1101,8 @@ COPY dbo."FAQs" ("faqID", "loggedInUser", question, answer) FROM stdin;
 
 
 --
--- TOC entry 4030 (class 0 OID 69956)
--- Dependencies: 209
+-- TOC entry 4489 (class 0 OID 27688)
+-- Dependencies: 233
 -- Data for Name: Parties; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1118,8 +1116,8 @@ COPY dbo."Parties" ("PartyID", "ProceedingID", "Forename", "Surname", "OPCSID", 
 
 
 --
--- TOC entry 4031 (class 0 OID 69961)
--- Dependencies: 210
+-- TOC entry 4491 (class 0 OID 27693)
+-- Dependencies: 235
 -- Data for Name: Proceedings; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1133,8 +1131,8 @@ COPY dbo."Proceedings" ("ProceedingID", "MarriageDate", "DADate", "CourtID", "Ca
 
 
 --
--- TOC entry 4032 (class 0 OID 69966)
--- Dependencies: 211
+-- TOC entry 4493 (class 0 OID 27698)
+-- Dependencies: 237
 -- Data for Name: ResultParties; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1148,8 +1146,8 @@ COPY dbo."ResultParties" ("ResultPartyID", "ResultProceedingID", "Forename", "Su
 
 
 --
--- TOC entry 4033 (class 0 OID 69971)
--- Dependencies: 212
+-- TOC entry 4495 (class 0 OID 27703)
+-- Dependencies: 239
 -- Data for Name: ResultProceedings; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1163,8 +1161,8 @@ COPY dbo."ResultProceedings" ("ResultProceedingID", "MarriageDate", "DADate", "C
 
 
 --
--- TOC entry 4034 (class 0 OID 69976)
--- Dependencies: 213
+-- TOC entry 4497 (class 0 OID 27708)
+-- Dependencies: 241
 -- Data for Name: ResultSearches; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1174,12 +1172,13 @@ COPY dbo."ResultSearches" ("ResultSearchID", "DASearchCriteriaID", "ResultProcee
 3	2	1	2	2546011	2013-11-01 12:14:08.907
 4	3	2	2	3910249	2013-11-01 12:36:52.127
 5	4	3	2	3194474	\N
+58160	57342	\N	1	\N	\N
 \.
 
 
 --
--- TOC entry 4035 (class 0 OID 69981)
--- Dependencies: 214
+-- TOC entry 4498 (class 0 OID 27712)
+-- Dependencies: 242
 -- Data for Name: Roles; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1195,8 +1194,8 @@ COPY dbo."Roles" (strength, "Detail") FROM stdin;
 
 
 --
--- TOC entry 4036 (class 0 OID 69986)
--- Dependencies: 215
+-- TOC entry 4500 (class 0 OID 27716)
+-- Dependencies: 244
 -- Data for Name: Salutations; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1206,8 +1205,8 @@ COPY dbo."Salutations" ("salutationID", "Detail", active, deactivated, "deactiva
 
 
 --
--- TOC entry 4037 (class 0 OID 69991)
--- Dependencies: 216
+-- TOC entry 4502 (class 0 OID 27721)
+-- Dependencies: 246
 -- Data for Name: Templates; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1224,8 +1223,8 @@ COPY dbo."Templates" ("templateID", "Discriminator", "templateName", "templateXM
 
 
 --
--- TOC entry 4038 (class 0 OID 70000)
--- Dependencies: 217
+-- TOC entry 4504 (class 0 OID 27728)
+-- Dependencies: 248
 -- Data for Name: TraceStatus; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1236,8 +1235,8 @@ COPY dbo."TraceStatus" ("TraceStatusID", "Description") FROM stdin;
 
 
 --
--- TOC entry 4040 (class 0 OID 70020)
--- Dependencies: 219
+-- TOC entry 4506 (class 0 OID 27733)
+-- Dependencies: 250
 -- Data for Name: UnionTypes; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1249,8 +1248,8 @@ COPY dbo."UnionTypes" ("UnionTypeID", "Description") FROM stdin;
 
 
 --
--- TOC entry 4039 (class 0 OID 70012)
--- Dependencies: 218
+-- TOC entry 4508 (class 0 OID 27740)
+-- Dependencies: 252
 -- Data for Name: Unions; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1259,37 +1258,35 @@ COPY dbo."Unions" ("UnionID", "DataUploadID", "DAEvent", "Error", "ErrorDate", "
 
 
 --
--- TOC entry 4041 (class 0 OID 70028)
--- Dependencies: 220
+-- TOC entry 4510 (class 0 OID 27747)
+-- Dependencies: 254
 -- Data for Name: Users; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
 COPY dbo."Users" ("UserID", "Name", "DisplayName", "LastActive", "RoleStrength") FROM stdin;
 85	mark.butler1@justice.gov.uk	Mark Butler	2023-01-16 17:42:01.598116	100
 83	jamil.qurashi@justice.gov.uk	Jamil Quarashi	2021-12-14 14:00:00	100
-87	mateusz.kolakowski@justice.gov.uk	Mateusz Kolakowski	2023-08-21 12:52:51.180426	100
 86	matthew.searle@justice.gov.uk	Matthew Searle	2023-07-12 09:00:48.190186	100
+87	mateusz.kolakowski@justice.gov.uk	Mateusz Kolakowski	2023-10-24 13:33:28.450893	100
 \.
 
 
 --
--- TOC entry 4042 (class 0 OID 70033)
--- Dependencies: 221
+-- TOC entry 4512 (class 0 OID 27752)
+-- Dependencies: 256
 -- Data for Name: Works; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
 COPY dbo."Works" ("workID", "daNO", "Year", "ReceivedBySection", "DAInititial", "DASurname", "Applicant", "DATypeID", "AssignedOn", "AssignedToUserID", "ReturnedToSupervisor", "Filed", "TraceStatusID", "OtherInfo", "FurtherAssignedToUserID", "ReCheckID") FROM stdin;
-1	1	2013	2013-11-01 00:00:00	Richard	Doe 	Sheila Doe,Pension Service	3	2013-11-08 00:00:00	12	2016-02-29 15:20:35.32	\N	2	\N	\N	\N
-2	2	2013	2013-11-01 00:00:00	Syed Kali Doe 	Sheila Doe,Pension Service	3	\N	\N	\N	\N	\N	\N	\N	\N
-3	3	2013	2013-11-01 00:00:00	Mervyn	Doe	Sheila Doe,Pension Service	4	2013-11-08 16:00:32.72	12	2013-11-08 16:02:50.34	\N	2	\N	\N	\N
-4	4	2013	2013-11-01 00:00:00	Jian	Doe	Sheila Doe,Pension Service	4	2013-11-08 16:03:32.08	12	2013-11-08 16:08:26.387	\N	2	\N	\N	\N
-5	5	2013	2013-11-01 00:00:00	Gabriel Doe	Alaneme	Sheila Doe, Pension Service	4	2013-11-08 00:00:00	12	2013-11-08 00:00:00	\N	2	\N	\N	\N
+57783	1	2023	2023-10-11 00:00:00	test	test	test	1	\N	\N	\N	\N	\N	\N	\N	\N
+57784	2	2023	2023-10-11 00:00:00	doe	doe	doe	1	\N	\N	\N	\N	\N	\N	\N	\N
+57785	3	2023	2023-09-12 00:00:00	John	Doe	John Doe	2	2023-08-15 00:00:00	87	2023-10-25 00:00:00	2023-10-30 00:00:00	1	\N	86	1
 \.
 
 
 --
--- TOC entry 4018 (class 0 OID 69869)
--- Dependencies: 197
+-- TOC entry 4513 (class 0 OID 27758)
+-- Dependencies: 257
 -- Data for Name: __MigrationHistory; Type: TABLE DATA; Schema: dbo; Owner: dbadmin
 --
 
@@ -1299,8 +1296,8 @@ COPY dbo."__MigrationHistory" ("MigrationId", "ContextKey", "Model", "ProductVer
 
 
 --
--- TOC entry 4072 (class 0 OID 0)
--- Dependencies: 222
+-- TOC entry 4520 (class 0 OID 0)
+-- Dependencies: 210
 -- Name: alerts_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1308,8 +1305,8 @@ SELECT pg_catalog.setval('dbo.alerts_seq', 1, false);
 
 
 --
--- TOC entry 4073 (class 0 OID 0)
--- Dependencies: 223
+-- TOC entry 4521 (class 0 OID 0)
+-- Dependencies: 212
 -- Name: auditeventdatarows_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1317,8 +1314,8 @@ SELECT pg_catalog.setval('dbo.auditeventdatarows_seq', 1, false);
 
 
 --
--- TOC entry 4074 (class 0 OID 0)
--- Dependencies: 224
+-- TOC entry 4522 (class 0 OID 0)
+-- Dependencies: 214
 -- Name: auditeventdescriptions_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1326,8 +1323,8 @@ SELECT pg_catalog.setval('dbo.auditeventdescriptions_seq', 4, true);
 
 
 --
--- TOC entry 4075 (class 0 OID 0)
--- Dependencies: 241
+-- TOC entry 4523 (class 0 OID 0)
+-- Dependencies: 216
 -- Name: auditevents_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1335,8 +1332,8 @@ SELECT pg_catalog.setval('dbo.auditevents_seq', 1, false);
 
 
 --
--- TOC entry 4076 (class 0 OID 0)
--- Dependencies: 225
+-- TOC entry 4524 (class 0 OID 0)
+-- Dependencies: 218
 -- Name: courtimportmaps_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1344,8 +1341,8 @@ SELECT pg_catalog.setval('dbo.courtimportmaps_seq', 332, true);
 
 
 --
--- TOC entry 4077 (class 0 OID 0)
--- Dependencies: 226
+-- TOC entry 4525 (class 0 OID 0)
+-- Dependencies: 220
 -- Name: courts_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1353,17 +1350,17 @@ SELECT pg_catalog.setval('dbo.courts_seq', 303, true);
 
 
 --
--- TOC entry 4078 (class 0 OID 0)
--- Dependencies: 227
+-- TOC entry 4526 (class 0 OID 0)
+-- Dependencies: 222
 -- Name: dasearchcriterias_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
-SELECT pg_catalog.setval('dbo.dasearchcriterias_seq', 57341, true);
+SELECT pg_catalog.setval('dbo.dasearchcriterias_seq', 57342, true);
 
 
 --
--- TOC entry 4079 (class 0 OID 0)
--- Dependencies: 229
+-- TOC entry 4527 (class 0 OID 0)
+-- Dependencies: 226
 -- Name: datauploads_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1371,8 +1368,8 @@ SELECT pg_catalog.setval('dbo.datauploads_seq', 59, true);
 
 
 --
--- TOC entry 4080 (class 0 OID 0)
--- Dependencies: 228
+-- TOC entry 4528 (class 0 OID 0)
+-- Dependencies: 224
 -- Name: datypes_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1380,8 +1377,8 @@ SELECT pg_catalog.setval('dbo.datypes_seq', 4, true);
 
 
 --
--- TOC entry 4081 (class 0 OID 0)
--- Dependencies: 242
+-- TOC entry 4529 (class 0 OID 0)
+-- Dependencies: 228
 -- Name: deletedreasons_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1389,7 +1386,7 @@ SELECT pg_catalog.setval('dbo.deletedreasons_seq', 1, false);
 
 
 --
--- TOC entry 4082 (class 0 OID 0)
+-- TOC entry 4530 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: faqs_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
@@ -1398,8 +1395,8 @@ SELECT pg_catalog.setval('dbo.faqs_seq', 7, true);
 
 
 --
--- TOC entry 4083 (class 0 OID 0)
--- Dependencies: 231
+-- TOC entry 4531 (class 0 OID 0)
+-- Dependencies: 232
 -- Name: parties_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1407,8 +1404,8 @@ SELECT pg_catalog.setval('dbo.parties_seq', 10994474, true);
 
 
 --
--- TOC entry 4084 (class 0 OID 0)
--- Dependencies: 243
+-- TOC entry 4532 (class 0 OID 0)
+-- Dependencies: 234
 -- Name: proceedings_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1416,8 +1413,8 @@ SELECT pg_catalog.setval('dbo.proceedings_seq', 4950955, true);
 
 
 --
--- TOC entry 4085 (class 0 OID 0)
--- Dependencies: 244
+-- TOC entry 4533 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: resultparties_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1425,8 +1422,8 @@ SELECT pg_catalog.setval('dbo.resultparties_seq', 109093, true);
 
 
 --
--- TOC entry 4086 (class 0 OID 0)
--- Dependencies: 232
+-- TOC entry 4534 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: resultproceedings_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1434,17 +1431,17 @@ SELECT pg_catalog.setval('dbo.resultproceedings_seq', 48122, true);
 
 
 --
--- TOC entry 4087 (class 0 OID 0)
--- Dependencies: 233
+-- TOC entry 4535 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: resultsearches_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
-SELECT pg_catalog.setval('dbo.resultsearches_seq', 58159, true);
+SELECT pg_catalog.setval('dbo.resultsearches_seq', 58160, true);
 
 
 --
--- TOC entry 4088 (class 0 OID 0)
--- Dependencies: 234
+-- TOC entry 4536 (class 0 OID 0)
+-- Dependencies: 243
 -- Name: salutations_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1452,8 +1449,8 @@ SELECT pg_catalog.setval('dbo.salutations_seq', 1, true);
 
 
 --
--- TOC entry 4089 (class 0 OID 0)
--- Dependencies: 235
+-- TOC entry 4537 (class 0 OID 0)
+-- Dependencies: 245
 -- Name: templates_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1461,8 +1458,8 @@ SELECT pg_catalog.setval('dbo.templates_seq', 8, true);
 
 
 --
--- TOC entry 4090 (class 0 OID 0)
--- Dependencies: 236
+-- TOC entry 4538 (class 0 OID 0)
+-- Dependencies: 247
 -- Name: tracestatus_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1470,8 +1467,8 @@ SELECT pg_catalog.setval('dbo.tracestatus_seq', 2, true);
 
 
 --
--- TOC entry 4091 (class 0 OID 0)
--- Dependencies: 238
+-- TOC entry 4539 (class 0 OID 0)
+-- Dependencies: 251
 -- Name: unions_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1479,8 +1476,8 @@ SELECT pg_catalog.setval('dbo.unions_seq', 21600, true);
 
 
 --
--- TOC entry 4092 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 4540 (class 0 OID 0)
+-- Dependencies: 249
 -- Name: uniontypes_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1488,8 +1485,8 @@ SELECT pg_catalog.setval('dbo.uniontypes_seq', 3, true);
 
 
 --
--- TOC entry 4093 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 4541 (class 0 OID 0)
+-- Dependencies: 253
 -- Name: users_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
@@ -1497,16 +1494,16 @@ SELECT pg_catalog.setval('dbo.users_seq', 81, true);
 
 
 --
--- TOC entry 4094 (class 0 OID 0)
--- Dependencies: 240
+-- TOC entry 4542 (class 0 OID 0)
+-- Dependencies: 255
 -- Name: works_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
-SELECT pg_catalog.setval('dbo.works_seq', 57782, true);
+SELECT pg_catalog.setval('dbo.works_seq', 57785, true);
 
 
 --
--- TOC entry 3846 (class 2606 OID 69890)
+-- TOC entry 4274 (class 2606 OID 27773)
 -- Name: Alerts Alerts_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1515,7 +1512,7 @@ ALTER TABLE ONLY dbo."Alerts"
 
 
 --
--- TOC entry 3848 (class 2606 OID 69898)
+-- TOC entry 4276 (class 2606 OID 27775)
 -- Name: AuditEventDataRows AuditEventDataRows_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1524,7 +1521,7 @@ ALTER TABLE ONLY dbo."AuditEventDataRows"
 
 
 --
--- TOC entry 3850 (class 2606 OID 69903)
+-- TOC entry 4278 (class 2606 OID 27777)
 -- Name: AuditEventDescriptions AuditEventDescriptions_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1533,7 +1530,7 @@ ALTER TABLE ONLY dbo."AuditEventDescriptions"
 
 
 --
--- TOC entry 3852 (class 2606 OID 69908)
+-- TOC entry 4280 (class 2606 OID 27779)
 -- Name: AuditEvents AuditEvents_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1542,7 +1539,7 @@ ALTER TABLE ONLY dbo."AuditEvents"
 
 
 --
--- TOC entry 3854 (class 2606 OID 69913)
+-- TOC entry 4282 (class 2606 OID 27781)
 -- Name: CourtImportMaps CourtImportMaps_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1551,7 +1548,7 @@ ALTER TABLE ONLY dbo."CourtImportMaps"
 
 
 --
--- TOC entry 3856 (class 2606 OID 69921)
+-- TOC entry 4284 (class 2606 OID 27783)
 -- Name: Courts Courts_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1560,7 +1557,7 @@ ALTER TABLE ONLY dbo."Courts"
 
 
 --
--- TOC entry 3858 (class 2606 OID 69929)
+-- TOC entry 4286 (class 2606 OID 27785)
 -- Name: DASearchCriterias DASearchCriterias_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1569,7 +1566,7 @@ ALTER TABLE ONLY dbo."DASearchCriterias"
 
 
 --
--- TOC entry 3862 (class 2606 OID 69942)
+-- TOC entry 4288 (class 2606 OID 27787)
 -- Name: DATypes DATypes_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1578,7 +1575,7 @@ ALTER TABLE ONLY dbo."DATypes"
 
 
 --
--- TOC entry 3860 (class 2606 OID 69937)
+-- TOC entry 4290 (class 2606 OID 27789)
 -- Name: DataUploads DataUploads_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1587,7 +1584,7 @@ ALTER TABLE ONLY dbo."DataUploads"
 
 
 --
--- TOC entry 3864 (class 2606 OID 69947)
+-- TOC entry 4292 (class 2606 OID 27792)
 -- Name: DeletedReasons DeletedReasons_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1596,7 +1593,7 @@ ALTER TABLE ONLY dbo."DeletedReasons"
 
 
 --
--- TOC entry 3866 (class 2606 OID 69955)
+-- TOC entry 4294 (class 2606 OID 27794)
 -- Name: FAQs FAQs_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1605,7 +1602,7 @@ ALTER TABLE ONLY dbo."FAQs"
 
 
 --
--- TOC entry 3844 (class 2606 OID 69876)
+-- TOC entry 4322 (class 2606 OID 27796)
 -- Name: __MigrationHistory PK_dbo.__MigrationHistory; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1614,7 +1611,7 @@ ALTER TABLE ONLY dbo."__MigrationHistory"
 
 
 --
--- TOC entry 3868 (class 2606 OID 69960)
+-- TOC entry 4296 (class 2606 OID 27798)
 -- Name: Parties Parties_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1623,7 +1620,7 @@ ALTER TABLE ONLY dbo."Parties"
 
 
 --
--- TOC entry 3870 (class 2606 OID 69965)
+-- TOC entry 4298 (class 2606 OID 27800)
 -- Name: Proceedings Proceedings_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1632,7 +1629,7 @@ ALTER TABLE ONLY dbo."Proceedings"
 
 
 --
--- TOC entry 3872 (class 2606 OID 69970)
+-- TOC entry 4300 (class 2606 OID 27802)
 -- Name: ResultParties ResultParties_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1641,7 +1638,7 @@ ALTER TABLE ONLY dbo."ResultParties"
 
 
 --
--- TOC entry 3874 (class 2606 OID 69975)
+-- TOC entry 4302 (class 2606 OID 27804)
 -- Name: ResultProceedings ResultProceedings_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1650,7 +1647,7 @@ ALTER TABLE ONLY dbo."ResultProceedings"
 
 
 --
--- TOC entry 3876 (class 2606 OID 69980)
+-- TOC entry 4304 (class 2606 OID 27806)
 -- Name: ResultSearches ResultSearches_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1659,7 +1656,7 @@ ALTER TABLE ONLY dbo."ResultSearches"
 
 
 --
--- TOC entry 3878 (class 2606 OID 69985)
+-- TOC entry 4306 (class 2606 OID 27808)
 -- Name: Roles Roles_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1668,7 +1665,7 @@ ALTER TABLE ONLY dbo."Roles"
 
 
 --
--- TOC entry 3880 (class 2606 OID 69990)
+-- TOC entry 4308 (class 2606 OID 27810)
 -- Name: Salutations Salutations_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1677,7 +1674,7 @@ ALTER TABLE ONLY dbo."Salutations"
 
 
 --
--- TOC entry 3882 (class 2606 OID 69998)
+-- TOC entry 4310 (class 2606 OID 27812)
 -- Name: Templates Templates_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1686,7 +1683,7 @@ ALTER TABLE ONLY dbo."Templates"
 
 
 --
--- TOC entry 3884 (class 2606 OID 70005)
+-- TOC entry 4312 (class 2606 OID 27814)
 -- Name: TraceStatus TraceStatus_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1695,7 +1692,7 @@ ALTER TABLE ONLY dbo."TraceStatus"
 
 
 --
--- TOC entry 3888 (class 2606 OID 70027)
+-- TOC entry 4314 (class 2606 OID 27816)
 -- Name: UnionTypes UnionTypes_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1704,7 +1701,7 @@ ALTER TABLE ONLY dbo."UnionTypes"
 
 
 --
--- TOC entry 3886 (class 2606 OID 70019)
+-- TOC entry 4316 (class 2606 OID 27818)
 -- Name: Unions Unions_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1713,7 +1710,7 @@ ALTER TABLE ONLY dbo."Unions"
 
 
 --
--- TOC entry 3890 (class 2606 OID 70032)
+-- TOC entry 4318 (class 2606 OID 27820)
 -- Name: Users Users_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1722,7 +1719,7 @@ ALTER TABLE ONLY dbo."Users"
 
 
 --
--- TOC entry 3892 (class 2606 OID 70040)
+-- TOC entry 4320 (class 2606 OID 27822)
 -- Name: Works Works_pkey; Type: CONSTRAINT; Schema: dbo; Owner: dbadmin
 --
 
@@ -1731,40 +1728,40 @@ ALTER TABLE ONLY dbo."Works"
 
 
 --
--- TOC entry 3893 (class 2620 OID 70164)
+-- TOC entry 4323 (class 2620 OID 27823)
 -- Name: DataUploads insert_fm; Type: TRIGGER; Schema: dbo; Owner: dbadmin
 --
 
-CREATE TRIGGER insert_fm AFTER UPDATE ON dbo."DataUploads" FOR EACH ROW EXECUTE PROCEDURE dbo.insert_fm();
+CREATE TRIGGER insert_fm AFTER UPDATE ON dbo."DataUploads" FOR EACH ROW EXECUTE FUNCTION dbo.insert_fm();
 
 
 --
--- TOC entry 3894 (class 2620 OID 70166)
+-- TOC entry 4324 (class 2620 OID 27824)
 -- Name: Works tri_dataseq; Type: TRIGGER; Schema: dbo; Owner: dbadmin
 --
 
-CREATE TRIGGER tri_dataseq AFTER INSERT ON dbo."Works" FOR EACH ROW EXECUTE PROCEDURE dbo.tri_dataseq_proc();
+CREATE TRIGGER tri_dataseq AFTER INSERT ON dbo."Works" FOR EACH ROW EXECUTE FUNCTION dbo.tri_dataseq_proc();
 
 
 --
--- TOC entry 3895 (class 2620 OID 70168)
+-- TOC entry 4325 (class 2620 OID 27825)
 -- Name: Works tri_insassignddate; Type: TRIGGER; Schema: dbo; Owner: dbadmin
 --
 
-CREATE TRIGGER tri_insassignddate AFTER INSERT ON dbo."Works" FOR EACH ROW EXECUTE PROCEDURE dbo.tri_insassignddate_proc();
+CREATE TRIGGER tri_insassignddate AFTER INSERT ON dbo."Works" FOR EACH ROW EXECUTE FUNCTION dbo.tri_insassignddate_proc();
 
 
 --
--- TOC entry 3896 (class 2620 OID 70170)
+-- TOC entry 4326 (class 2620 OID 27826)
 -- Name: Works upd_works; Type: TRIGGER; Schema: dbo; Owner: dbadmin
 --
 
-CREATE TRIGGER upd_works AFTER UPDATE ON dbo."Works" FOR EACH ROW EXECUTE PROCEDURE dbo.upd_works_proc();
+CREATE TRIGGER upd_works AFTER UPDATE ON dbo."Works" FOR EACH ROW EXECUTE FUNCTION dbo.upd_works_proc();
 
 
 --
--- TOC entry 4071 (class 0 OID 0)
--- Dependencies: 7
+-- TOC entry 4519 (class 0 OID 0)
+-- Dependencies: 6
 -- Name: SCHEMA public; Type: ACL; Schema: -; Owner: dbadmin
 --
 
@@ -1772,7 +1769,7 @@ REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2023-10-23 16:28:08 BST
+-- Completed on 2023-10-24 14:34:32 BST
 
 --
 -- PostgreSQL database dump complete
