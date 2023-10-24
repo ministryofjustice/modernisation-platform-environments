@@ -181,6 +181,9 @@ locals {
     ssm_parameters = {
       asm-passwords = {}
     }
+    secretsmanager_secrets = {
+      asm-passwords = {}
+    }
     # Example target group setup below
     lb_target_groups = {}
     tags = {

@@ -74,3 +74,31 @@ Modernisation Platform
 ### **How to resolve specific issues:**
 
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
+
+
+/oracle/database/../passwords #####
+oracle-restore-point
+oracle-recovery-catalog
+oracle-oms-setup
+oracle-db-standby-setup
+
+# /oracle/oem/passwords
+# oracle-oms-setup
+
+# /oracle/database/.../weblogic-passwords
+# nomis-release-deployment
+# nomis-weblogic
+# nomis-xtag-weblogic
+
+# /oracle/database/.../misload-config
+# nomis-misload
+
+/ec2/.../asm-passwords #########
+oracle-oem-agent-setup
+oracle-19c ####
+oracle-11g
+
+# /oracle/weblogic/../passwords
+# nomis-xtag-weblogic
+# nomis-weblogic
+# nomis-xtag-weblogic

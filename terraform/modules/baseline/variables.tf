@@ -342,6 +342,10 @@ variable "ec2_instances" {
       }))
       value = optional(string)
     })))
+    secretsmanager_secrets = optional(map(object({
+      description = optional(string)
+      kms_key_id  = optional(string, "general")
+    })))
     route53_records = optional(object({
       create_internal_record = bool
       create_external_record = bool
