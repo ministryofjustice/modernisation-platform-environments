@@ -45,11 +45,11 @@ output "acm_certificate_arn" {
 }
 
 output "acm_certificate_validation_dns" {
-  value = aws_acm_certificate.external.domain_validation_options.0.resource_record_name
+  value = aws_acm_certificate.external.domain_validation_options[0].resource_record_name
 }
 
 output "acm_certificate_validation_route53" {
-  value = aws_acm_certificate.external.domain_validation_options.0.resource_record_value
+  value = aws_acm_certificate.external.domain_validation_options[0].resource_record_value
 }
 
 //// Route53 DNS records for certificate validation
