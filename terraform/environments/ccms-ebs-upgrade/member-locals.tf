@@ -25,7 +25,5 @@ locals {
     data.aws_subnet.public_subnets_c.id
   ]
 
-  cert_opts    = aws_acm_certificate.external[0].domain_validation_options
-  cert_arn     = aws_acm_certificate.external[0].arn
   cert_zone_id = data.aws_route53_zone.network-services.zone_id
 }
