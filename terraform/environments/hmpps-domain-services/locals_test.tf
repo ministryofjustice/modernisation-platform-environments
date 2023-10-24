@@ -30,7 +30,7 @@ locals {
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing connection to Azure domain"
-          ami         = "base_rhel_8_5"
+          ami         = "${local.application_name}_rhel_8_5"
           os-type     = "Linux"
           component   = "test"
           server-type = local.application_name
