@@ -16,26 +16,26 @@ locals {
   dbsnapshot_source_file = "dbsnapshot.js"
   deletesnapshot_source_file = "deletesnapshots.py"
   dbconnect_source_file = "dbconnect.js"
-  dbsnapshot_output_path = "snapshotDBFunction.zip"
-  deletesnapshot_output_path = "deletesnapshotFunction.zip"
-  dbconnect_output_path = "connectDBFunction.zip"
+  dbsnapshot_output_path = "dbsnapshot.zip"
+  deletesnapshot_output_path = "deletesnapshots.zip"
+  dbconnect_output_path = "dbconnect.zip"
 
   snapshotDBFunctionname = "snapshotDBFunction"
   snapshotDBFunctionhandler = "snapshot/dbsnapshot.handler"
   snapshotDBFunctionruntime = "nodejs18.x"
-  snapshotDBFunctionfilename = "snapshotDBFunction.zip"
+  snapshotDBFunctionfilename = "dbsnapshot.zip"
 
 
   deletesnapshotFunctionname = "deletesnapshotFunction"
   deletesnapshotFunctionhandler = "deletesnapshots.lambda_handler"
   deletesnapshotFunctionruntime = "python3.8"
-  deletesnapshotFunctionfilename = "deletesnapshotFunction.zip"
+  deletesnapshotFunctionfilename = "deletesnapshots.zip"
 
 
   connectDBFunctionname = "connectDBFunction"
   connectDBFunctionhandler = "ssh/dbconnect.handler"
   connectDBFunctionruntime = "nodejs18.x"
-  connectDBFunctionfilename = "connectDBFunction.zip"
+  connectDBFunctionfilename = "dbconnect.zip"
 
 
 
