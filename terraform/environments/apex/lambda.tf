@@ -53,15 +53,29 @@ data "archive_file" "dbconnect_file" {
 }
 
 
+
+resource "aws_lambda_layer_version" "lambda_layer" {
+  # filename   = "lambda_layer_payload.zip"
+  layer_name = "SSHNodeJSLayer"
+  description = "A layer to add ssh libs to lambda"
+  license_info = "Apache-2.0"
+  s3_bucket = module.s3_bucket_lambda.lambdabucketname
+  s3_key = "nodejs.zip"
+
+  compatible_runtimes = ["nodejs18.x"]
+}
+
+
 resource "aws_lambda_function" "snapshotDBFunction" {
   function_name = local.snapshotDBFunctionname
   role          = module.iambackup.backuprole
   handler       = local.snapshotDBFunctionhandler
   source_code_hash = data.archive_file.dbsnapshot_file.output_base64sha256
   runtime = local.snapshotDBFunctionruntime
-  filename = local.snapshotDBFunctionfilename
-  # s3_bucket = module.s3_bucket_lambda.lambdabucketname
-  # s3_key = local.snapshotDBFunctionfilename
+  # filename = local.snapshotDBFunctionfilename
+  layers = aws_lambda_layer_version.lambda_layer.compatible_runtimes
+  s3_bucket = module.s3_bucket_lambda.lambdabucketname
+  s3_key = local.snapshotDBFunctionfilename
   
   environment {
     variables = {
@@ -84,10 +98,10 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
   role          = module.iambackup.backuprole
   handler       = local.deletesnapshotFunctionhandler
   source_code_hash = data.archive_file.deletesnapshot_file.output_base64sha256
-  filename = local.deletesnapshotFunctionfilename
+  # filename = local.deletesnapshotFunctionfilename
   runtime = local.deletesnapshotFunctionruntime
-  # s3_bucket = module.s3_bucket_lambda.lambdabucketname
-  # s3_key = local.deletesnapshotFunctionfilename
+  s3_bucket = module.s3_bucket_lambda.lambdabucketname
+  s3_key = local.deletesnapshotFunctionfilename
   
   environment {
     variables = {
@@ -112,9 +126,10 @@ resource "aws_lambda_function" "connectDBFunction" {
   handler       = local.connectDBFunctionhandler
   source_code_hash = data.archive_file.dbconnect_file.output_base64sha256
   runtime = local.connectDBFunctionruntime
-  filename = local.connectDBFunctionfilename
-  # s3_bucket = module.s3_bucket_lambda.lambdabucketname
-  # s3_key = local.connectDBFunctionfilename
+  # filename = local.connectDBFunctionfilename
+  layers = aws_lambda_layer_version.lambda_layer.compatible_runtimes
+  s3_bucket = module.s3_bucket_lambda.lambdabucketname
+  s3_key = local.connectDBFunctionfilename
   
   environment {
     variables = {
