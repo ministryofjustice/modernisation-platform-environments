@@ -620,7 +620,7 @@ COPY dbo."NeutralCitations" ("NeutralCitationID", "CitationNumber", "Party1Name"
 1	1	Maven	Rook	2002	1	6	FD 01 A00247	FD01A00247	5831	2006-01-14 00:00:00	0	2006-01-14 00:00:00	f	\N	\N	\N	\N	f
 2	2	Upberry	Sec of State for Flying	2005	1	1	CO2878 2005	CO28782401	2093	2005-01-11 00:00:00	0	2005-01-14 00:00:00	f	\N	\N	\N	\N	f
 3	3	Lazer Jones	2004	1	8	01/TLQ/0799	01ERQ0788	5224	2004-01-18 00:00:00	0	2004-01-15 00:00:00	f	\N	\N	\N	\N	f
-6	4	Bourne	Unknown	2009	1	6	BB99D00056	BB99D00056	4048	2009-01-15 00:00:00	0	2009-01-15 00:00:00	f	\N	\N	\N	\N	f
+4	4	Bourne	Unknown	2009	1	6	BB99D00056	BB99D00056	4048	2009-01-15 00:00:00	0	2009-01-15 00:00:00	f	\N	\N	\N	\N	f
 \.
 
 --
@@ -746,7 +746,7 @@ SELECT pg_catalog.setval('dbo.judges_seq', 1, true);
 -- Name: neutralcitations_seq; Type: SEQUENCE SET; Schema: dbo; Owner: dbadmin
 --
 
-SELECT pg_catalog.setval('dbo.neutralcitations_seq', 5, true);
+SELECT pg_catalog.setval('dbo.neutralcitations_seq', 4, true);
 
 
 --
