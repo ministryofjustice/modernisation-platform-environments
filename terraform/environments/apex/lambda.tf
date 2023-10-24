@@ -62,7 +62,7 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = "nodejs.zip"
 
-  compatible_runtimes = ["nodejs12.x"]
+  compatible_runtimes = ["nodejs16.x"]
 }
 
 
