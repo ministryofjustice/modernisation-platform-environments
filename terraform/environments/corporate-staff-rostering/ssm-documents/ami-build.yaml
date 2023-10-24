@@ -16,7 +16,7 @@ parameters:
     description: "Name of the AMI being built"
 
 mainSteps:
-  - name: CreateSnapshot
+  - name: CreateSnapshot # rewrite this to use the pre-set tasks rather than call the doc
     action: aws:runDocument
     inputs: 
       documentType: SSMDocument
@@ -24,40 +24,29 @@ mainSteps:
       documentParameters:
         VolumeId: "{{ VolumeId }}"
         description: "{{ SnapshotName }}"
-    onFailure: Abort
+    onFailure: Abort # this needs to fail
 
   - name: getRootVolumeSpace
     action: aws:runPowerShellScript
+    maxAttempts: 1
     inputs:
       runCommand:
         - |
           $rootVolume = Get-WmiObject -Query "SELECT * FROM Win32_LogicalDisk WHERE DeviceID = 'C:'"
           $availableSpaceGB = [math]::Round(($rootVolume.FreeSpace / 1GB), 2)
-          Write-Output "Available space on the C drive is $availableSpaceGB"
-
-  - name: spaceAvailable
-    action: aws:runPowerShellScript
-    inputs: 
-      runCommand:
-        - |
-          $totalSpaceGB = [math]::Round(($rootVolume.Size / 1GB), 2)
+          $totalSpaceGB = [math]::Round(($rootVolume.Size / 1GB), 2) # good 
           $availablePercentage = [math]::Round((($availableSpaceGB / $totalSpaceGB) * 100), 2)
-          Write-Output "Available space on the root volume (C:) is $availablePercentage% of the total space" 
-
-  - name: extendDiskStop
-    action: aws:runPowerShellScript
-    maxAttempts: 1
-    inputs: 
-      runCommand:
-        - |
+          Write-Output "Available space on the C drive is $availableSpaceGB GB, which is $availablePercentage% % of the total space"
           if ($availablePercentage% -lt 50) {
-            Write-Output "Available disk space is less than 50%. Stopping doc execution."
+            Write-Output "Available disk space is less than 50%; stopping AMI build."
             Exit 1
+          } else {
+            Write-Output "Available disk space is more than 50%; Continuing with AMI build"
           }
-    onFailure: Abort
+    onFailure: Abort    
 
   - name: stopDiscoveryAgent
-    action: aws:runPowerShellScript
+    action: aws:runPowerShellScript # run as admin
     inputs:
       runCommand:
         - |
@@ -65,29 +54,21 @@ mainSteps:
 
   - name: UninstallDiscoveryAgent
     action: aws:runPowerShellScript
+    onFailure: Abort  
     inputs:
       runCommand:
         - |
-          if (Test-Path 'C:\Program Files\Amazon\Amazon AppStream\aws-discovery-agent\uninstall.exe') {
-            Start-Process 'C:\Program Files\Amazon\Amazon AppStream\aws-discovery-agent\uninstall.exe' -ArgumentList '/S' -Wait
-          } elseif (Test-Path 'C:\Program Files\AWS\AWS Discovery Agent\uninstall.exe') {
-            Start-Process 'C:\Program Files\AWS\AWS Discovery Agent\uninstall.exe' -ArgumentList '/S' -Wait
+          $output = cmd.exe /c "wmic product where name='AWS Discovery Agent' call uninstall"
+          $outputRegex = "Return value = (\d+)"
+          when ($output -match $outputRegex){
+            $returnValue = [int]$matches[1] 
+          }
+          if ($returnValue -eq 0) {
+            Write-Host "Uninstall of AWS Disovery Agent successful, proceeding..." 
           } else {
-            Write-Host "AWS Discovery Agent not found for uninstallation."
+            Write-Error "Uninstall of AWS Discovery Agent unsuccessful, aborting..."
           }
 
-  - name: verifyUninstallation
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          if (-not (Test-Path 'C:\Program Files\Amazon\Amazon AppStream\aws-discovery-agent\uninstall.exe') -and -not (Test-Path 'C:\Program Files\AWS\AWS Discovery Agent\uninstall.exe')) 
-          {
-            Write-Host "AWS Discovery Agent is successfully uninstalled."
-          } else {
-            Write-Host "AWS Discovery Agent uninstallation may have failed."
-          }
-    onFailure: Abort
 
   - name: InstallFirefoxBrowser
     action: aws:runPowerShellScript
@@ -98,12 +79,12 @@ mainSteps:
           Invoke-WebRequest -URI "https://download.mozilla.org/?product=firefox-esr-next-latest-ssl&os=win64&lang=en-GB" -OutFile "$ENV:TEMP\MozillaFirefox.exe"
           Invoke-Item "$ENV:TEMP\MozillaFirefox.exe"
 
-  - name: InstallNmapTool
+  - name: InstallNmapTool 
     action: aws:runPowerShellScript
     inputs:
       runCommand:
         - |
-          # update invoke to use Start-BitsTransfer if slow
+          # update invoke to use Start-BitsTransfer if slow <<<< need this
           Invoke-WebRequest -URI "https://nmap.org/download" -OutFile "$ENV:TEMP\nmap.exe"
           Invoke-Item "$ENV:TEMP\nmap.exe"
 
