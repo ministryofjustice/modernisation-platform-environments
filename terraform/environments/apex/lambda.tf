@@ -82,7 +82,7 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
   function_name = local.deletesnapshotFunctionname
   role          = module.iambackup.backuprole
   handler       = local.deletesnapshotFunctionhandler
-  source_code_hash = data.archive_file.delesnapshot_file.output_base64sha256
+  source_code_hash = data.archive_file.deletesnapshot_file.output_base64sha256
   runtime = local.deletesnapshotFunctionruntime
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.deletesnapshotFunctionfilename
