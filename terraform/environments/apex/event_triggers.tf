@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_event_rule" "snapshotDBFunctionmon_sun" {
-    name = "laa-createSnapshotRule-LWN8E1LNHFJR"
+    name = "laa-createSnapshotRule-LWN8E1LNHFJR-APEX"
     description = "Fires every five minutes"
     schedule_expression = "cron(10 13 ? * MON-SUN *)"
 }
@@ -20,7 +20,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_mon_sun" {
 
 
 resource "aws_cloudwatch_event_rule" "deletesnapshotFunction_mon_fri" {
-    name = "laa-deletesnapshotRule-LWN8E1LNHFJR"
+    name = "laa-deletesnapshotRule-LWN8E1LNHFJR-APEX"
     description = "Fires every five minutes"
     schedule_expression = "cron(38 09 ? * MON-FRI *)"
 }
