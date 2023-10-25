@@ -38,7 +38,7 @@
       "accessgate_ami_name": "ebs-accessgate-v2_0",
       "ec2_instance_type_mailrelay": "c4.large",
       "mailrelay_ami_id": "ami-0e183a740dfc54442",
-      "key_name": "oracle-base-dev",
+      "key_name": "",
       "lz_aws_account_id_env": "411213865113",
       "lz_aws_subnet_env": "10.202.0.0/20",
       "lz_aws_workspace_nonprod_subnet_env": "10.200.0.0/20",
