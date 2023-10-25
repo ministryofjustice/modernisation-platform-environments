@@ -11,6 +11,7 @@ locals {
         ebs_volumes_copy_all_from_ami = true
         user_data_raw                 = null
         ssm_parameters_prefix         = "ec2/"
+        secretsmanager_secrets_prefix = "ec2/"
         iam_resource_names_prefix     = "ec2-instance"
         instance_profile_policies     = local.iam_policies_ec2_default
       }
