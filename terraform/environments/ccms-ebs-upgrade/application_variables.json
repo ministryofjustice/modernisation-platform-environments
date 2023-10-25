@@ -23,7 +23,7 @@
       "ftp_ami_id": "ami-0d8e665f120c20253",
       "ec2_instance_type_clamav": "c5d.large",
       "clamav_ami_id": "ami-0965b5afb3ac7174e",
-      "ebsdb_ami_id": "ami-07b8dc1b66c170400",
+      "ebsdb_ami_id": "ami-0d4b266f7ae87bbfc",
       "ebsapps_ami_id-1": "ami-0d4b266f7ae87bbfc",
       "ebsapps_ami_id-2": "ami-0d4b266f7ae87bbfc",
       "accessgate_ami_id-1": "ami-0695726199c3e30e5",
