@@ -16,15 +16,30 @@ parameters:
     description: "Name of the AMI being built"
 
 mainSteps:
-  - name: CreateSnapshot # rewrite this to use the pre-set tasks rather than call the doc
-    action: aws:runDocument
-    inputs: 
-      documentType: SSMDocument
-      documentPath: AWS-CreateSnapshot
-      documentParameters:
-        VolumeId: "{{ VolumeId }}"
-        description: "{{ SnapshotName }}"
-    onFailure: Abort # this needs to fail
+  - name: CreateSnapshot 
+    action: aws:executeAWSApi
+    onFailure: Abort 
+    inputs:
+      Service: EC2
+      API: CreateSnapshot
+      VolumeId: "{{ VolumeId }}"
+      Description: "{{ SnapshotName }}"
+    outputs:
+    - Name: Payload
+      Selector: SnapshotId
+      Type: String
+
+  - name: verifySnapshot
+    action: aws:waitForAwsResourceProperty
+    inputs:
+      Service: ec2
+      Api: DescribeSnapshots
+      SnapshotIds: ["{{createSnapshot.Payload}}"]
+      PropertySelector: Snapshots[0].State
+      DesiredValues:
+      - completed
+    outputs:
+    - createSnapshot.Payload
 
   - name: getRootVolumeSpace
     action: aws:runPowerShellScript
@@ -45,129 +60,62 @@ mainSteps:
           }
     onFailure: Abort    
 
-  - name: stopDiscoveryAgent
-    action: aws:runPowerShellScript # run as admin
+  - name: awsDiscoveryAgent
+    action: aws:runPowerShellScript 
     inputs:
       runCommand:
         - |
-          Stop-Service -Name 'AWSDiscoveryService' -ErrorAction SilentlyContinue
-
-  - name: UninstallDiscoveryAgent
-    action: aws:runPowerShellScript
-    onFailure: Abort  
-    inputs:
-      runCommand:
-        - |
-          $output = cmd.exe /c "wmic product where name='AWS Discovery Agent' call uninstall"
-          $outputRegex = "Return value = (\d+)"
-          when ($output -match $outputRegex){
-            $returnValue = [int]$matches[1] 
+          $output = Try {
+          Stop-Service -Name 'AWSDiscoveryService'-ErrorAction Stop 
+          } Catch {
+            $errorOutput = $_.Exception.Message
           }
-          if ($returnValue -eq 0) {
-            Write-Host "Uninstall of AWS Disovery Agent successful, proceeding..." 
+          ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.") {
+            Write-Host "No Discovery Agent installed"
           } else {
-            Write-Error "Uninstall of AWS Discovery Agent unsuccessful, aborting..."
+            cmd.exe /c "wmic product where name='AWS Discovery Agent' call uninstall"
           }
+    onFailure: abort
 
-
-  - name: InstallFirefoxBrowser
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          # update invoke to use Start-BitsTransfer if slow
-          Invoke-WebRequest -URI "https://download.mozilla.org/?product=firefox-esr-next-latest-ssl&os=win64&lang=en-GB" -OutFile "$ENV:TEMP\MozillaFirefox.exe"
-          Invoke-Item "$ENV:TEMP\MozillaFirefox.exe"
-
-  - name: InstallNmapTool 
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          # update invoke to use Start-BitsTransfer if slow <<<< need this
-          Invoke-WebRequest -URI "https://nmap.org/download" -OutFile "$ENV:TEMP\nmap.exe"
-          Invoke-Item "$ENV:TEMP\nmap.exe"
-
-  - name: checkADModulePresent
+  - name: activeDirectoryModulePresent
     action: aws:runPowerShellScript
     inputs: 
       runCommand:
         - |
           $module = Get-Module -ListAvailable -Name ActiveDirectory
           if (-not $module) {
-            Write-Error "Active Directory module is not installed. Installing..." 
-          }
-
-  - name: InstallActiveDirectoryModule
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
+            Write-Host "Active Directory module is not installed, installing now..."
+            Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
+          } else {
+            Write-Host "Active Directory module is already installed." 
 
   - name: InstallEC2LaunchV2
-    action: aws:runPowerShellScript
+    action: aws:configurePackage
     inputs: 
-      runCommand:
-        - |
-          # update invoke to use Start-BitsTransfer if slow
-          Invoke-WebRequest -URI https://s3.amazonaws.com/ec2-downloads-windows/SSM-Agent/EC2Launch/latest/install.ps1 -OutFile $env:TEMP\install.ps1         
-          powershell -ExecutionPolicy Bypass -File $env:TEMP\install.ps1
+      name: AWSEC2Launch-Agent
+      action: install
   
   - name: verifyInstallation
     action: aws:runPowerShellScript
     inputs:
       runCommand:
         - |
-          if (Get-Service -Name EC2Launch | Where-Object {$_.Status -eq 'Running'}) {
+          if (Get-Service -Name "Amazon EC2Launch"| Where-Object {$_.Status -eq 'Running'}) {
             Write-Output "EC2LaunchV2 driver installed and running successfully."
           } else {
             Write-Output "EC2LaunchV2 driver installation or service startup failed."
           }
 
-  - name: stopInstance
-    action: aws:runDocument
-    inputs:
-      documentName: SSMDocument
-      documentPath: AWS-StopEC2Instance
-      documentParameters:
-        instanceID: "{{ InstanceId }}"
-
   - name: createImage
     action: aws:runDocument
+    onFailure: Abort
     inputs:
       documentName: SSMDocument
       documentPath: AWS-CreateImage
       documentParameters:
         instanceID: "{{ InstanceId }}"
         imageName: "{{ AMIName }}"
-    onFailure: Abort
- 
-  - name: outputImageId
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |  
-          Write-Output "Image ID: $ImageId"
-
-  - name: waitForAMI
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          $amiId = "{{ createAmi.Outputs.ImageId }}"
-          $amiState = Get-EC2Image -ImageIds $amiId | Select-Object -ExpandProperty State
-          while ($amiState -ne "available") {
-             Write-Output "AMI is not available yet. Current state: $amiState"
-             Start-Sleep -Seconds 60
-             $amiState = Get-EC2Image -ImageIds $amiId | Select-Object -ExpandProperty State
-          }
-          Write-Output "AMI ($amiId) is now available."
-      
-  - name: startInstance
-    action: aws:runDocument
-    inputs:
-      documentName: SSMDocument
-      documentPath: AWS-StartEC2Instance
-      documentParameters:
-        instanceID: "{{ InstanceId }}"
+    outputs:
+    - Name: Image
+      Selector: ImageId
+      Type: String
