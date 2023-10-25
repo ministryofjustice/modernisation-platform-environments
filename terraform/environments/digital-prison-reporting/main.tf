@@ -167,6 +167,7 @@ module "glue_reporting_hub_cdc_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--job-bookmark-option"                 = "job-bookmark-disable"
     "--class"                               = "uk.gov.justice.digital.job.DataHubCdcJob"
     "--datalake-formats"                    = "delta"
     "--dpr.aws.region"                      = local.account_region
@@ -174,11 +175,21 @@ module "glue_reporting_hub_cdc_job" {
     "--dpr.structured.s3.path"              = "s3://${module.s3_dms_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"              = "s3://${module.s3_dms_violation_bucket.bucket_id}/"
     "--dpr.curated.s3.path"                 = "s3://${module.s3_dms_curated_bucket.bucket_id}/"
-    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
     "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_cdc_job_retry_max_attempts
     "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_cdc_job_retry_min_wait_millis
     "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_cdc_job_retry_max_wait_millis
-    "--dpr.log.level"                       = local.reporting_hub_cdc_job_log_level
+    "--enable-metrics"                      = true
+    "--enable-spark-ui"                     = false
+    "--enable-auto-scaling"                 = true
+    "--enable-job-insights"                 = true
+    "--dpr.aws.dynamodb.endpointUrl"        = "https://dynamodb.${local.account_region}.amazonaws.com"
+    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
+    "--dpr.domain.target.path"              = "s3://${module.s3_domain_bucket.bucket_id}"
+    "--dpr.domain.catalog.db"               = module.glue_data_domain_database.db_name
+    "--dpr.redshift.secrets.name"           = "${local.project}-redshift-secret-${local.environment}"
+    "--dpr.datamart.db.name"                = "datamart"
+    "--dpr.log.level"                       = local.reporting_hub_log_level
   }
 }
 
