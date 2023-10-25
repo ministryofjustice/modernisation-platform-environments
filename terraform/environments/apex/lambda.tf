@@ -62,7 +62,7 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = "nodejs.zip"
 
-  compatible_runtimes = ["nodejs18.x"]
+  compatible_runtimes = ["nodejs16.x"]
 }
 
 
@@ -76,7 +76,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   layers = [aws_lambda_layer_version.lambda_layer.arn]
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.snapshotDBFunctionfilename
-  
+
   environment {
     variables = {
       LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
@@ -102,7 +102,7 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
   runtime = local.deletesnapshotFunctionruntime
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.deletesnapshotFunctionfilename
-  
+
   environment {
     variables = {
       LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
@@ -130,7 +130,7 @@ resource "aws_lambda_function" "connectDBFunction" {
   layers = [aws_lambda_layer_version.lambda_layer.arn]
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.connectDBFunctionfilename
-  
+
   environment {
     variables = {
       LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
