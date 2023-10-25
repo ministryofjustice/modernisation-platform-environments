@@ -95,7 +95,7 @@ mainSteps:
       name: AWSEC2Launch-Agent
       action: install
   
-  - name: verifyInstallation
+  - name: verifyEC2LaunchV2Installation
     action: aws:runPowerShellScript
     inputs:
       runCommand:
@@ -116,6 +116,6 @@ mainSteps:
         instanceID: "{{ InstanceId }}"
         imageName: "{{ AMIName }}"
     outputs:
-    - Name: Image
+    - Name: Image-ID
       Selector: ImageId
       Type: String
