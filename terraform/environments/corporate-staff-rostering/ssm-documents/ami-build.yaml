@@ -39,7 +39,7 @@ mainSteps:
       DesiredValues:
       - completed
     outputs:
-    - createSnapshot.Payload
+      - createSnapshot.Payload
 
   - name: getRootVolumeSpace
     action: aws:runPowerShellScript
