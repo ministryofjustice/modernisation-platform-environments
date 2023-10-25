@@ -287,6 +287,7 @@ variable "ec2_instances" {
       iam_resource_names_prefix     = optional(string, "ec2")
       instance_profile_policies     = list(string)
       ssm_parameters_prefix         = optional(string, "")
+      secretsmanager_secrets_prefix = optional(string, "")
       subnet_name                   = string
       availability_zone             = string
     })
