@@ -11,7 +11,7 @@ resource "aws_acm_certificate_validation" "external" {
 }
 
 resource "aws_route53_record" "external_validation" {
-  provider = aws.core-vpc
+  provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
@@ -25,7 +25,7 @@ resource "aws_route53_record" "external_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
 // Create one Route 53 record for each entry in record names
