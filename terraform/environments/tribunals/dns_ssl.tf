@@ -3,21 +3,34 @@ variable "record_names" {
   default = ["transportappeals", "administrativeappeals"]
 }
 
-# Define a wildcard ACM certificate for sandbox
-resource "aws_acm_certificate" "external" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
-  validation_method = "DNS"
+# ACM certificate validation
+# Just validate on the main domain name record
+resource "aws_acm_certificate_validation" "external" {
+  certificate_arn = aws_acm_certificate.external.arn
+  validation_record_fqdns = [local.domain_name_main[0]]
+}
 
-  subject_alternative_names = [
-    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  ]
-  tags = {
-    Environment = local.environment
-  }
+// Route53 record for Validation of external
+resource "aws_route53_record" "external_validation" {
+  provider = aws.core-network-services
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  allow_overwrite = true
+  name            = local.domain_name_main[0]
+  records         = local.domain_record_main
+  ttl             = 60
+  type            = local.domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+}
+
+resource "aws_route53_record" "external_validation_subdomain" {
+  provider = aws.core-vpc
+
+  allow_overwrite = true
+  name            = local.domain_name_sub[0]
+  records         = local.domain_record_sub
+  ttl             = 60
+  type            = local.domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 // Create one Route 53 record for each entry in record names
@@ -35,9 +48,21 @@ resource "aws_route53_record" "external" {
   }
 }
 
-# ACM certificate validation
-resource "aws_acm_certificate_validation" "example" {
-  certificate_arn = aws_acm_certificate.external.arn
+# Define a wildcard ACM certificate for sandbox
+resource "aws_acm_certificate" "external" {
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  validation_method = "DNS"
+
+  subject_alternative_names = [
+    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  ]
+  tags = {
+    Environment = local.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 output "acm_certificate_arn" {
@@ -50,6 +75,14 @@ output "acm_certificate_validation_dns" {
 
 output "acm_certificate_validation_route53" {
   value = [for dvo in aws_acm_certificate.external.domain_validation_options : dvo.resource_record_value]
+}
+
+output "domain_name_main_0" {
+  value = local.domain_name_main[0]
+}
+
+output "domain_name_sub_0" {
+  value = local.domain_name_sub[0]
 }
 
 //// Route53 DNS records for certificate validation
