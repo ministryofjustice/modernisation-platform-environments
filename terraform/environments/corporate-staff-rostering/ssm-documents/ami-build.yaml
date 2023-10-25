@@ -16,30 +16,49 @@ parameters:
     description: "Name of the AMI being built"
 
 mainSteps:
-  - name: CreateSnapshot 
-    action: aws:executeAWSApi
-    onFailure: Abort 
+  - name: installAWSToolsForPowershell
+    action: aws:runPowerShellScript
     inputs:
-      Service: EC2
-      API: CreateSnapshot
-      VolumeId: "{{ VolumeId }}"
-      Description: "{{ SnapshotName }}"
-    outputs:
-    - Name: Payload
-      Selector: SnapshotId
-      Type: String
+      runCommand:
+        - |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          Import-Module AWSPowerShell - Force
 
-  - name: verifySnapshot
-    action: aws:waitForAwsResourceProperty
+  - name: CreateSnapshot 
+    action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
     inputs:
-      Service: ec2
-      Api: DescribeSnapshots
-      SnapshotIds: ["{{createSnapshot.Payload}}"]
-      PropertySelector: Snapshots[0].State
-      DesiredValues:
-      - completed
-    outputs:
-      - createSnapshot.Payload
+      runCommand:
+        - |
+          $volumeID = "{{VolumeId}}"
+          $snapshotName = "{{SnapshotName}}"
+          New-EC2Snapshot -VolumeID $volumeID -Description $snapshotName
+
+  # - name: CreateSnapshot 
+  #   action: aws:executeAWSApi
+  #   onFailure: exit 
+  #   inputs:
+  #     Service: EC2
+  #     API: CreateSnapshot
+  #     VolumeId: "{{ VolumeId }}"
+  #     Description: "{{ SnapshotName }}"
+  #   outputs:
+  #   - Name: SnapshotID
+  #     Selector: SnapshotId
+  #     Type: String
+
+  # - name: verifySnapshot
+  #   action: aws:waitForAwsResourceProperty
+  #   inputs:
+  #     Service: ec2
+  #     Api: DescribeSnapshots
+  #     SnapshotIds: ["{{createSnapshot.Payload}}"] # references the captured snapshot ID
+  #     PropertySelector: Snapshots[0].State
+  #     DesiredValues:
+  #     - completed
 
   - name: getRootVolumeSpace
     action: aws:runPowerShellScript
@@ -58,7 +77,6 @@ mainSteps:
           } else {
             Write-Output "Available disk space is more than 50%; Continuing with AMI build"
           }
-    onFailure: Abort    
 
   - name: awsDiscoveryAgent
     action: aws:runPowerShellScript 
@@ -72,10 +90,9 @@ mainSteps:
           }
           ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.") {
             Write-Host "No Discovery Agent installed"
-          } else {
+          } elif ($errorOutput -eq $null) {
             cmd.exe /c "wmic product where name='AWS Discovery Agent' call uninstall"
           }
-    onFailure: abort
 
   - name: activeDirectoryModulePresent
     action: aws:runPowerShellScript
@@ -108,7 +125,7 @@ mainSteps:
 
   - name: createImage
     action: aws:createImage
-    onFailure: Abort
+    onFailure: exit
     inputs:
       InstanceID: "{{ InstanceId }}"
       ImageName: "{{ AMIName }}"
