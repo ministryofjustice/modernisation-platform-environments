@@ -20,7 +20,7 @@ locals {
           disable_api_termination      = true
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
           monitoring                   = true
-          vpc_security_group_ids       = ["data-db"]
+          vpc_security_group_ids       = ["database"]
           tags = {
             backup-plan         = "daily-and-weekly"
             instance-scheduling = "skip-scheduling"
@@ -118,22 +118,22 @@ locals {
         }
       }
 
-      pp-csr-w-7-b = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pp-csr-w-7-b"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
-          ebs_volumes_copy_all_from_ami = false
+      pp-csr-w-7-b = merge(local.database_ec2, {
+        config = merge(local.database_ec2.config, {
+          ami_name = "pp-csr-w-7-b"
+          # ami_owner                     = "self"
+          availability_zone = "${local.region}b"
+          # ebs_volumes_copy_all_from_ami = false
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.2xlarge"
-          disable_api_termination = true
-          monitoring              = true
-          vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
-          tags = {
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "m5.2xlarge"
+          # disable_api_termination = true
+          # monitoring              = true
+          vpc_security_group_ids = ["migration-web-sg", "domain-controller"]
+          /* tags = {
             backup-plan         = "daily-and-weekly"
             instance-scheduling = "skip-scheduling"
-          }
+          } */
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -145,7 +145,7 @@ locals {
           ami         = "pp-csr-w-7-b"
           component   = "web"
         }
-      }
+      })
 
       pp-csr-w-8-b = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
