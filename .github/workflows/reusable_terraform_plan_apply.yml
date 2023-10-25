@@ -147,8 +147,8 @@ jobs:
           [[ ${{ inputs.do_state_refresh_on_plan }} == 'true' ]] && tf_args="${tf_args} -refresh=false"
           echo "terraform plan ${tf_args}"
           if [ "${{ inputs.environment }}" = "test" ]; then
-              terraform import 'module.baseline.module.ec2_instance["t1-oasys-db-a"].aws_secretsmanager_secret.placeholder["asm-passwords"]' 'arn:aws:secretsmanager:eu-west-2-1:546088120047:secret:/ec2/t1-oasys-db-a/asm-passwords-yf9d7N'
-              terraform import 'module.baseline.module.ec2_instance["t2-oasys-db-a"].aws_secretsmanager_secret.placeholder["asm-passwords"]' 'arn:aws:secretsmanager:eu-west-2-1:546088120047:secret:/ec2/t2-oasys-db-a/asm-passwords-qKYl9z'
+              terraform import 'module.baseline.module.ec2_instance["t1-oasys-db-a"].aws_secretsmanager_secret.placeholder["asm-passwords"]' 'arn:aws:secretsmanager:eu-west-2:546088120047:secret:/ec2/t1-oasys-db-a/asm-passwords-yf9d7N'
+              terraform import 'module.baseline.module.ec2_instance["t2-oasys-db-a"].aws_secretsmanager_secret.placeholder["asm-passwords"]' 'arn:aws:secretsmanager:eu-west-2:546088120047:secret:/ec2/t2-oasys-db-a/asm-passwords-qKYl9z'
           fi
           terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
           echo "exitcode=${exitcode}"  # 0=clean plan, 1=error, 2=stuff in plan
