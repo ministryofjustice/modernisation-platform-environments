@@ -3,31 +3,31 @@
 #   *.laa-test.modernisation-platform.service.justice.gov.uk
 #   *.laa-preproduction.modernisation-platform.service.justice.gov.uk
 
-resource "aws_acm_certificate" "laa_cert" {
-  domain_name       = format("%s-%s.modernisation-platform.service.justice.gov.uk", "laa", local.environment)
-  validation_method = "DNS"
+# resource "aws_acm_certificate" "laa_cert" {
+#   domain_name       = format("%s-%s.modernisation-platform.service.justice.gov.uk", "laa", local.environment)
+#   validation_method = "DNS"
 
-  subject_alternative_names = [
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "agatedev1-upgrade", var.networking[0].business-unit, local.environment),
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "agatedev2-upgrade", var.networking[0].business-unit, local.environment),
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-app1-upgrade", var.networking[0].business-unit, local.environment),
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-app2-upgrade", var.networking[0].business-unit, local.environment),
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-db-upgrade", var.networking[0].business-unit, local.environment),
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-upgrade", var.networking[0].business-unit, local.environment),
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "clamav-upgrade", var.networking[0].business-unit, local.environment),
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "portal-ag-upgrade", var.networking[0].business-unit, local.environment),
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "wgatedev1-upgrade", var.networking[0].business-unit, local.environment),
-    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "wgatedev2-upgrade", var.networking[0].business-unit, local.environment)
-  ]
+#   subject_alternative_names = [
+#     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "agatedev1-upgrade", var.networking[0].business-unit, local.environment),
+#     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "agatedev2-upgrade", var.networking[0].business-unit, local.environment),
+#     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-app1-upgrade", var.networking[0].business-unit, local.environment),
+#     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-app2-upgrade", var.networking[0].business-unit, local.environment),
+#     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-db-upgrade", var.networking[0].business-unit, local.environment),
+#     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-upgrade", var.networking[0].business-unit, local.environment),
+#     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "clamav-upgrade", var.networking[0].business-unit, local.environment),
+#     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "portal-ag-upgrade", var.networking[0].business-unit, local.environment),
+#     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "wgatedev1-upgrade", var.networking[0].business-unit, local.environment),
+#     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "wgatedev2-upgrade", var.networking[0].business-unit, local.environment)
+#   ]
 
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-certificate", local.application_name, local.environment)) }
-  )
+#   tags = merge(local.tags,
+#     { Name = lower(format("%s-%s-certificate", local.application_name, local.environment)) }
+#   )
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
 # resource "aws_acm_certificate_validation" "laa_cert" {
 #   certificate_arn         = aws_acm_certificate.laa_cert.arn
