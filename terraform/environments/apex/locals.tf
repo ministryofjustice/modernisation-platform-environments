@@ -22,7 +22,7 @@ locals {
 
   snapshotDBFunctionname = "snapshotDBFunction"
   snapshotDBFunctionhandler = "snapshot/dbsnapshot.handler"
-  snapshotDBFunctionruntime = "nodejs16.x"
+  snapshotDBFunctionruntime = "nodejs12.x"
   snapshotDBFunctionfilename = "dbsnapshot.zip"
 
 
@@ -34,7 +34,7 @@ locals {
 
   connectDBFunctionname = "connectDBFunction"
   connectDBFunctionhandler = "ssh/dbconnect.handler"
-  connectDBFunctionruntime = "nodejs16.x"
+  connectDBFunctionruntime = "nodejs12.x"
   connectDBFunctionfilename = "dbconnect.zip"
 
 
