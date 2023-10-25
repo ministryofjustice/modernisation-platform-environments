@@ -107,14 +107,12 @@ mainSteps:
           }
 
   - name: createImage
-    action: aws:runDocument
+    action: aws:createImage
     onFailure: Abort
     inputs:
-      documentName: SSMDocument
-      documentPath: AWS-CreateImage
-      documentParameters:
-        instanceID: "{{ InstanceId }}"
-        imageName: "{{ AMIName }}"
+      InstanceID: "{{ InstanceId }}"
+      ImageName: "{{ AMIName }}"
+      NoReboot: true
     outputs:
     - Name: Image-ID
       Selector: ImageId
