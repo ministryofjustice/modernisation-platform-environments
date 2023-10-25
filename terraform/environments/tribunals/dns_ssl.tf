@@ -72,14 +72,6 @@ output "acm_certificate_validation_route53" {
   value = [for dvo in aws_acm_certificate.external.domain_validation_options : dvo.resource_record_value]
 }
 
-output "domain_name_main_0" {
-  value = local.domain_name_main[0]
-}
-
-output "domain_name_sub_0" {
-  value = local.domain_name_sub[0]
-}
-
 //// Route53 DNS records for certificate validation
 //resource "aws_acm_certificate_validation" "external" {
 //  certificate_arn         = aws_acm_certificate.external.arn
