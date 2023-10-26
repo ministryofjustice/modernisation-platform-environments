@@ -25,15 +25,15 @@ resource "aws_cloudtrail" "data_s3_put_objects" {
       ]
     }
 
-    # field_selector {
-    #   field = "resources.ARN"
+    field_selector {
+      field = "resources.ARN"
 
-    #   # The trailing slash is intentional; do not exclude it.
-    #   starts_with = [
-    #     "${module.data_s3_bucket.bucket.arn}/",
-    #     "${module.data_landing_s3_bucket.bucket.arn}/"
-    #   ]
-    # }
+      # The trailing slash is intentional; do not exclude it.
+      starts_with = [
+        "${module.data_s3_bucket.bucket.arn}/",
+        "${module.data_landing_s3_bucket.bucket.arn}/"
+      ]
+    }
 
     # Remove this if we want to log read events too, like getObject
     field_selector {
