@@ -112,6 +112,7 @@ resource "aws_lb" "dacp_lb" {
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+  drop_invalid_header_fields = true
   depends_on                 = [aws_security_group.dacp_lb_sc, aws_security_group.lb_sc_pingdom]
 }
 
