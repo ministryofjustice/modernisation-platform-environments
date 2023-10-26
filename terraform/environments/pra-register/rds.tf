@@ -48,13 +48,6 @@ resource "aws_security_group" "postgresql_db_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "MOJ Digital VPN access"
-    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
-  }
-  ingress {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
@@ -68,6 +61,17 @@ resource "aws_security_group" "postgresql_db_sc" {
     description = "Allows Github Actions to access RDS"
     cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
   }
+
+  ingress {
+    protocol    = "tcp"
+    description = "Allow PSQL traffic from bastion"
+    from_port   = 5432
+    to_port     = 5432
+    security_groups = [
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
@@ -83,6 +87,8 @@ data "http" "myip" {
 }
 
 resource "null_resource" "setup_db" {
+  count = local.is-development ? 0 : 1
+
   depends_on = [aws_db_instance.pra_db]
 
   provisioner "local-exec" {
@@ -116,6 +122,28 @@ resource "null_resource" "setup_source_rds_security_group" {
       RDS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["ACCESS_KEY"]
       RDS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.get_tactical_products_rds_credentials.secret_string)["SECRET_KEY"]
       RDS_SOURCE_ACCOUNT_REGION     = "eu-west-2"
+    }
+  }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
+
+// Sets up empty database for Development environment
+resource "null_resource" "setup_dev_db" {
+  count = local.is-development ? 1 : 0
+
+  depends_on = [aws_db_instance.pra_db]
+
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
+
+    environment = {
+      DB_HOSTNAME     = aws_db_instance.pra_db.address
+      DB_NAME         = aws_db_instance.pra_db.db_name
+      PRA_DB_USERNAME = aws_db_instance.pra_db.username
+      PRA_DB_PASSWORD = random_password.password.result
     }
   }
   triggers = {

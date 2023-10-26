@@ -334,7 +334,7 @@
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
       "setup_sonatype_secrets": false,
-      "setup_cw_alarms": false
+      "setup_cw_alarms": true
     }
   }
 }
