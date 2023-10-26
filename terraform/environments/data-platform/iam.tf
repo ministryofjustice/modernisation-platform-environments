@@ -446,12 +446,6 @@ data "aws_iam_policy_document" "logs_s3_bucket_policy_document" {
         "bucket-owner-full-control"
       ]
     }
-    # condition {
-    #   test     = "StringEquals"
-    #   variable = "aws:SourceArn"
-
-    #   values = [aws_cloudtrail.data_s3_put_objects.arn]
-    # }
   }
 
   statement {
@@ -469,12 +463,6 @@ data "aws_iam_policy_document" "logs_s3_bucket_policy_document" {
 
     resources = [module.logs_s3_bucket.bucket.arn]
 
-    # condition {
-    #   test     = "StringEquals"
-    #   variable = "aws:SourceArn"
-
-    #   values = [aws_cloudtrail.data_s3_put_objects.arn]
-    # }
   }
 
   statement {
