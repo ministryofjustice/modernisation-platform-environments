@@ -47,7 +47,7 @@ resource "aws_cloudtrail" "data_s3_put_objects" {
     }
   }
 
-  depends_on = [
-    data.aws_iam_policy_document.logs_s3_bucket_policy_document
-  ]
+  # depends_on = [
+  #   data.aws_iam_policy_document.logs_s3_bucket_policy_document
+  # ]
 }
