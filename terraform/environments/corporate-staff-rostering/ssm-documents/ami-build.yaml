@@ -1,6 +1,6 @@
 ---
 schemaVersion: "2.2"
-description: "SSM Document to convert an Azure VM into an AWS AMI." 
+description: "SSM Document to build an AMI from an MGN-replicated Azure VM." 
 parameters:
   InstanceId:
     type: "String"
@@ -16,30 +16,54 @@ parameters:
     description: "Name of the AMI being built"
 
 mainSteps:
-  - name: CreateSnapshot 
-    action: aws:executeAWSApi
-    onFailure: Abort 
+  - name: installAWSToolsForPowershell
+    action: aws:runPowerShellScript
     inputs:
-      Service: EC2
-      API: CreateSnapshot
-      VolumeId: "{{ VolumeId }}"
-      Description: "{{ SnapshotName }}"
-    outputs:
-    - Name: Payload
-      Selector: SnapshotId
-      Type: String
+      runCommand:
+        - |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          Import-Module AWSPowerShell - Force
 
-  - name: verifySnapshot
-    action: aws:waitForAwsResourceProperty
+  - name: activeDirectoryModulePresent
+    action: aws:runPowerShellScript
+    inputs: 
+      runCommand:
+        - |
+          $module = Get-Module -ListAvailable -Name ActiveDirectory
+          if (-not $module) {
+            Write-Host "Active Directory module is not installed, installing now..."
+            Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
+          } else {
+            Write-Host "Active Directory module is already installed." 
+          }
+
+  - name: CreateSnapshot 
+    action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
     inputs:
-      Service: ec2
-      Api: DescribeSnapshots
-      SnapshotIds: ["{{createSnapshot.Payload}}"]
-      PropertySelector: Snapshots[0].State
-      DesiredValues:
-      - completed
-    outputs:
-      - createSnapshot.Payload
+      runCommand:
+        - |
+          $volumeID = "{{VolumeId}}"
+          $snapshotName = "{{SnapshotName}}"
+          $snapshot = New-EC2Snapshot -VolumeID $volumeID -Description $snapshotName
+
+          while ($snapshot.state -eq "pending") {
+            $snapshot = Get-EC2Snapshot -SnapshotID $snapshot.SnapshotID
+            Start-Sleep -Seconds 10
+          }
+          
+          if ($snapshot.state -eq "completed") {
+            Write-Host "Snapshot ID: $($snapshot.SnapshotID)"
+          } elif ($snapshot.state -eq "failed") {
+            Write-Error "Snapshot creation failed; aborting"
+            Exit 1
+          } else {
+            Write-Error "Unexpected error (state: $snapshot.state) in snapshot creation; aborting"
+            Exit 1
+          }
 
   - name: getRootVolumeSpace
     action: aws:runPowerShellScript
@@ -51,14 +75,15 @@ mainSteps:
           $availableSpaceGB = [math]::Round(($rootVolume.FreeSpace / 1GB), 2)
           $totalSpaceGB = [math]::Round(($rootVolume.Size / 1GB), 2) # good 
           $availablePercentage = [math]::Round((($availableSpaceGB / $totalSpaceGB) * 100), 2)
+
           Write-Output "Available space on the C drive is $availableSpaceGB GB, which is $availablePercentage% % of the total space"
+          
           if ($availablePercentage% -lt 50) {
             Write-Output "Available disk space is less than 50%; stopping AMI build."
             Exit 1
           } else {
             Write-Output "Available disk space is more than 50%; Continuing with AMI build"
           }
-    onFailure: Abort    
 
   - name: awsDiscoveryAgent
     action: aws:runPowerShellScript 
@@ -72,22 +97,9 @@ mainSteps:
           }
           ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.") {
             Write-Host "No Discovery Agent installed"
-          } else {
+          } elif ($errorOutput -eq $null) {
             cmd.exe /c "wmic product where name='AWS Discovery Agent' call uninstall"
           }
-    onFailure: abort
-
-  - name: activeDirectoryModulePresent
-    action: aws:runPowerShellScript
-    inputs: 
-      runCommand:
-        - |
-          $module = Get-Module -ListAvailable -Name ActiveDirectory
-          if (-not $module) {
-            Write-Host "Active Directory module is not installed, installing now..."
-            Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
-          } else {
-            Write-Host "Active Directory module is already installed." 
 
   - name: InstallEC2LaunchV2
     action: aws:configurePackage
@@ -104,16 +116,29 @@ mainSteps:
             Write-Output "EC2LaunchV2 driver installed and running successfully."
           } else {
             Write-Output "EC2LaunchV2 driver installation or service startup failed."
+            Exit 1
           }
 
   - name: createImage
-    action: aws:createImage
-    onFailure: Abort
+    action: aws:runPowerShellScript
     inputs:
-      InstanceID: "{{ InstanceId }}"
-      ImageName: "{{ AMIName }}"
-      NoReboot: true
-    outputs:
-    - Name: Image-ID
-      Selector: ImageId
-      Type: String
+      runCommand:
+        - |
+          $instanceID = "{{InstanceId}}"
+          $amiName = "{{AMIName}}"
+          $image = New-EC2Image -InstanceID $instanceID -Name $amiName -NoReboot true 
+
+          while ($image.state -eq "pending") {
+            $image = Get-EC2Image -InstanceID $image.ImageID
+            Start-Sleep -Seconds 30
+          }
+          
+          if ($image.state -eq "completed") {
+            Write-Host "AMI $amiName build complete! Image ID: $($snapshot.SnapshotID)"
+          } elif ($image.state -eq "failed") {
+            Write-Error "AMI creation failed; aborting"
+            Exit 1
+          } else {
+            Write-Error "Unexpected error (state: $image.state) in AMI build; aborting"
+            Exit 1
+          }
