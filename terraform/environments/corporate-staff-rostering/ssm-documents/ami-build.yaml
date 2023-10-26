@@ -22,7 +22,15 @@ mainSteps:
       runCommand:
         - |
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          Import-Module AWSPowerShell - Force
+          Import-Module AWSPowerShell -Force
+
+          $module = Get-Module -ListAvailable -Name AWSPowerShell
+          if (-not $module) {
+            Write-Host "AWS Powershell Toolkit is not installed, installing now..."
+            Import-Module AWSPowerShell -Force
+          } else {
+            Write-Host "AWS Powershell Toolkit is already installed." 
+          }
 
   - name: activeDirectoryModulePresent
     action: aws:runPowerShellScript
@@ -78,11 +86,11 @@ mainSteps:
 
           Write-Output "Available space on the C drive is $availableSpaceGB GB, which is $availablePercentage% % of the total space"
           
-          if ($availablePercentage% -lt 50) {
-            Write-Output "Available disk space is less than 50%; stopping AMI build."
+          if ($availablePercentage -lt 50) {
+            Write-Output "Available disk space is less than 50 %; stopping AMI build."
             Exit 1
           } else {
-            Write-Output "Available disk space is more than 50%; Continuing with AMI build"
+            Write-Output "Available disk space is more than 50 %; Continuing with AMI build"
           }
 
   - name: awsDiscoveryAgent
@@ -97,7 +105,7 @@ mainSteps:
           }
           ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.") {
             Write-Host "No Discovery Agent installed"
-          } elif ($errorOutput -eq $null) {
+          } else {
             cmd.exe /c "wmic product where name='AWS Discovery Agent' call uninstall"
           }
 
@@ -105,7 +113,7 @@ mainSteps:
     action: aws:configurePackage
     inputs: 
       name: AWSEC2Launch-Agent
-      action: install
+      action: Install
   
   - name: verifyEC2LaunchV2Installation
     action: aws:runPowerShellScript
