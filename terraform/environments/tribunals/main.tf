@@ -72,33 +72,37 @@ module "appeals" {
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
 }
 
-# # module "administrative_appeals" {
-# #   source                = "./modules/administrative_appeals"
-# #   application_name      = "ossc"
-# #   environment           = local.environment
-# #   #db_instance_identifier = local.application_data.accounts[local.environment].db_identifier
-# #   rds_url               = "${aws_db_instance.rdsdb.address}"      
-# #   rds_user              = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-# #   rds_password          = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-# #   source_db_url         = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
-# #   source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
-# #   source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
-# #   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
-# # }
-
-# # module "ahmlr" {
-# #   source                = "./modules/ahmlr"
-# #   application_name      = "hmlands"
-# #   environment           = local.environment
-# #   #db_instance_identifier = local.application_data.accounts[local.environment].db_identifier
-# #   rds_url               = "${aws_db_instance.rdsdb.address}"      
-# #   rds_user              = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-# #   rds_password          = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-# #   source_db_url         = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
-# #   source_db_user        = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
-# #   source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
-# #   replication_instance_arn    = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
-# # }
+module "ahmlr" {
+  source                            = "./modules/tribunal"
+  app_name                          = "ahmlr"
+  app_url                           = "ahmlr"
+  sql_migration_path                = "../scripts/administrative_appeals"
+  app_db_name                       = "hmlands"
+  app_db_login_name                 = "hmlands-app"
+  app_source_db_name                = "hmlands"
+  app_rds_url                       = local.rds_url
+  app_rds_user                      = local.rds_user
+  app_rds_port                      = local.rds_port
+  app_rds_password                  = local.rds_password
+  app_source_db_url                 = local.source_db_url
+  app_source_db_user                = local.source_db_user
+  app_source_db_password            = local.source_db_password
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  dms_instance_arn                  = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  lb_tg_arn                         = aws_lb_target_group.tribunals_target_group.arn
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  lb_listener                       = aws_lb_listener.tribunals_lb
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+}
 
 # # module "care_standards" {
 # #   source                = "./modules/care_standards"
