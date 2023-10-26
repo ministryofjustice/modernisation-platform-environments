@@ -131,10 +131,11 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
   ]
 
   statement {
-    sid    = "getLandingData"
+    sid    = "getDeleteLandingData"
     effect = "Allow"
     actions = [
       "s3:GetObject*",
+      "s3:DeleteObject*",
       "s3:ListBucket",
     ]
     resources = [
@@ -196,9 +197,9 @@ data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
       "s3:ListBucket",
     ]
     resources = [
-      "${module.data_s3_bucket.bucket.arn}/raw/*",
+      "${module.data_landing_s3_bucket.bucket.arn}/landing/*",
       "${module.logs_s3_bucket.bucket.arn}/logs/*",
-      "${module.data_s3_bucket.bucket.arn}/raw",
+      "${module.data_landing_s3_bucket.bucket.arn}/landing",
       "${module.logs_s3_bucket.bucket.arn}/logs",
     ]
   }
