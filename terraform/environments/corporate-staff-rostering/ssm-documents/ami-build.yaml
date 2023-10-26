@@ -103,7 +103,7 @@ mainSteps:
           } Catch {
             $errorOutput = $_.Exception.Message
           }
-          ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.") {
+          ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.")
             Write-Host "No Discovery Agent installed"
           } else {
             cmd.exe /c "wmic product where name='AWS Discovery Agent' call uninstall"
