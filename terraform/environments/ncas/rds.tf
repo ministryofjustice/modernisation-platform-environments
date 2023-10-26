@@ -48,13 +48,6 @@ resource "aws_security_group" "postgresql_db_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "MOJ Digital VPN access"
-    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
-  }
-  ingress {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
@@ -67,6 +60,15 @@ resource "aws_security_group" "postgresql_db_sc" {
     protocol    = "tcp"
     description = "Allows Github Actions to access RDS"
     cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
+  }
+  ingress {
+    protocol    = "tcp"
+    description = "Allow PSQL traffic from bastion"
+    from_port   = 5432
+    to_port     = 5432
+    security_groups = [
+      module.bastion_linux.bastion_security_group
+    ]
   }
   egress {
     description = "allow all outbound traffic"
