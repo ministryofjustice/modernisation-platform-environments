@@ -40,7 +40,8 @@ resource "aws_ssm_document" "cloud_watch_agent" {
   )
 }
 
-resource "aws_ssm_document" "ami_build" {
+# comment out ami_build ssm document until it works
+/* resource "aws_ssm_document" "ami_build" {
   name            = "ami-build"
   document_type   = "Command"
   document_format = "YAML"
@@ -52,4 +53,4 @@ resource "aws_ssm_document" "ami_build" {
       Name = "ami-build"
     },
   )
-}
+} */
