@@ -76,7 +76,7 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_groups = {
-    data_db = {
+    /* data_db = {
       description = "Security group for database servers"
       ingress = {
         all-from-self = {
@@ -122,7 +122,7 @@ locals {
         }
       }
 
-    }
+    } */
 
     Web-SG-migration = {
       description = "Security group for web servers"
