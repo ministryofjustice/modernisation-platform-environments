@@ -83,8 +83,8 @@
       "enable_fake_data_dms_replication_task": true,
       "setup_sonatype_secrets": true,
       "setup_cw_alarms": true,
-      "setup_scheduled_action_iam_role": false,
-      "setup_redshift_schedule": false 
+      "setup_scheduled_action_iam_role": true,
+      "setup_redshift_schedule": true 
     },
     "test": {
       "project_short_id": "dpr",
@@ -169,8 +169,8 @@
       "enable_fake_data_dms_replication_task": false,
       "setup_sonatype_secrets": false,
       "setup_cw_alarms": true,
-      "setup_scheduled_action_iam_role": false,
-      "setup_redshift_schedule": false 
+      "setup_scheduled_action_iam_role": true,
+      "setup_redshift_schedule": true 
     },
     "preproduction": {
       "project_short_id": "dpr",
