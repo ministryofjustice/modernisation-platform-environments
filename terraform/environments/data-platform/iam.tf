@@ -477,7 +477,7 @@ data "aws_iam_policy_document" "logs_s3_bucket_policy_document" {
 
       # If the arn is directly referenced there were issues with circular dependencies
       # So the arn is predicted from it's component parts
-      values = ["arn:aws:cloudtrail:${local.region}:${local.account_id}:trail/data_platform_s3_putobject_trail_${local.environment}"]
+      values = [aws_cloudtrail.data_s3_put_objects.arn]
     }
   }
 
