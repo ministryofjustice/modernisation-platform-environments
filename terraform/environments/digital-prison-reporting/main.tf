@@ -148,7 +148,8 @@ module "glue_reporting_hub_cdc_job" {
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
-  additional_policies           = module.dms_nomis_ingestor_s3_target.dms_s3_iam_policy_admin_arn
+  execution_class               = "STANDARD"
+  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   worker_type                   = local.reporting_hub_cdc_job_worker_type
   number_of_workers             = local.reporting_hub_cdc_job_num_workers
   max_concurrent                = 1
@@ -178,6 +179,7 @@ module "glue_reporting_hub_cdc_job" {
     "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_cdc_job_retry_max_attempts
     "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_cdc_job_retry_min_wait_millis
     "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_cdc_job_retry_max_wait_millis
+    "--dpr.batchDurationSeconds"            = local.reporting_hub_batch_duration_seconds
     "--enable-metrics"                      = true
     "--enable-spark-ui"                     = false
     "--enable-auto-scaling"                 = true
