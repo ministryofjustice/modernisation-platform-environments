@@ -46,4 +46,5 @@ resource "aws_cloudtrail" "data_s3_put_objects" {
       equals = ["AWS::S3::Object"]
     }
   }
+
 }
