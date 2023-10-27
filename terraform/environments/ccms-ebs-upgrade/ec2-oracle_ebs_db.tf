@@ -260,6 +260,31 @@ resource "aws_volume_attachment" "diag_att" {
   volume_id   = aws_ebs_volume.diag.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
+
+resource "aws_ebs_volume" "appshare" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_appshare
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "appshare" }
+  )
+}
+
+resource "aws_volume_attachment" "appshare_att" {
+  depends_on = [
+    aws_ebs_volume.appshare
+  ]
+  device_name = "/dev/sdq"
+  volume_id   = aws_ebs_volume.appshare.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
 /*
 ####  This mount was required for golive incident
 ####  Just commenting out, rather than remove - just in case
