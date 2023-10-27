@@ -643,7 +643,8 @@ module "datamart" {
   create_endpoint_access = false
 
   # Scheduled actions
-  create_scheduled_action_iam_role = true
+  create_scheduled_action_iam_role = local.create_scheduled_action_iam_role
+  create_redshift_schedule = local.create_redshift_schedule
   scheduled_actions = {
     pause = {
       name          = "${local.redshift_cluster_name}-pause"
