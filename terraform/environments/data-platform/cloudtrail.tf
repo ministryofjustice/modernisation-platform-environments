@@ -35,16 +35,16 @@ resource "aws_cloudtrail" "data_s3_put_objects" {
       ]
     }
 
-#     # Remove this if we want to log read events too, like getObject
-#     field_selector {
-#       field  = "readOnly"
-#       equals = ["false"]
-#     }
+    # Remove this if we want to log read events too, like getObject
+    field_selector {
+      field  = "readOnly"
+      equals = ["false"]
+    }
 
-#     field_selector {
-#       field  = "resources.type"
-#       equals = ["AWS::S3::Object"]
-#     }
-#   }
+    field_selector {
+      field  = "resources.type"
+      equals = ["AWS::S3::Object"]
+    }
+  }
 
-# }
+}
