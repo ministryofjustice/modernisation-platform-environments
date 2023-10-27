@@ -19,18 +19,6 @@ locals {
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
         })
 
-        user_data_cloud_init = {
-          args = {
-            branch               = "main"
-            ansible_repo         = "modernisation-platform-configuration-management"
-            ansible_repo_basedir = "ansible"
-            ansible_args         = "--tags ec2provision"
-          }
-          scripts = [
-            "ansible-ec2provision.sh.tftpl",
-          ]
-        }
-
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
           "/dev/sdb"  = { label = "app", size = 100 }
