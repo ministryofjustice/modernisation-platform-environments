@@ -82,7 +82,9 @@
       "setup_fake_data_dms_instance": true,
       "enable_fake_data_dms_replication_task": true,
       "setup_sonatype_secrets": true,
-      "setup_cw_alarms": true
+      "setup_cw_alarms": true,
+      "setup_scheduled_action_iam_role": false,
+      "setup_redshift_schedule": false 
     },
     "test": {
       "project_short_id": "dpr",
@@ -166,7 +168,9 @@
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
       "setup_sonatype_secrets": false,
-      "setup_cw_alarms": true
+      "setup_cw_alarms": true,
+      "setup_scheduled_action_iam_role": true,
+      "setup_redshift_schedule": true 
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -250,7 +254,9 @@
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
       "setup_sonatype_secrets": false,
-      "setup_cw_alarms": true
+      "setup_cw_alarms": true,
+      "setup_scheduled_action_iam_role": true,
+      "setup_redshift_schedule": true      
     },
     "production": {
       "project_short_id": "dpr",
@@ -334,7 +340,9 @@
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
       "setup_sonatype_secrets": false,
-      "setup_cw_alarms": true
+      "setup_cw_alarms": true,
+      "setup_scheduled_action_iam_role": false,
+      "setup_redshift_schedule": false
     }
   }
 }

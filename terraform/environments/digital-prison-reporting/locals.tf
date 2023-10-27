@@ -185,6 +185,10 @@ locals {
   create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
+  # Datamart
+  create_scheduled_action_iam_role  = local.application_data.accounts[local.environment].setup_scheduled_action_iam_role
+  create_redshift_schedule          = local.application_data.accounts[local.environment].setup_redshift_schedule
+
   # Enable CW alarms
   enable_cw_alarm = local.application_data.accounts[local.environment].setup_cw_alarms
 
@@ -203,7 +207,7 @@ locals {
     user     = "placeholder"
     password = "placeholder"
   }
-
+  
   # Evaluate Redshift Secrets and Populate
   redshift_secrets = {
     dbClusterIdentifier = "dpr-redshift-${local.project}"
