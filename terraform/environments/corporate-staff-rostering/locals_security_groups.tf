@@ -76,54 +76,6 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_groups = {
-    /* data_db = {
-      description = "Security group for database servers"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        oracle1521 = {
-          description = "Allow oracle database 1521 ingress"
-          from_port   = "1521"
-          to_port     = "1521"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_db
-          security_groups = ["migration-web-sg", "migration-app-sg"
-          ]
-        }
-        ssh = {
-          description     = "Allow SSH ingress"
-          from_port       = 22
-          to_port         = 22
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.ssh
-          security_groups = []
-        }
-        oracle3872 = {
-          description = "Allow oem agent ingress"
-          from_port   = "3872"
-          to_port     = "3872"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-
-    } */
-
     Web-SG-migration = {
       description = "Security group for web servers"
       ingress = {
