@@ -1,6 +1,7 @@
 ---
-schemaVersion: "2.2"
-description: "SSM Document to build an AMI from an MGN-replicated Azure VM." 
+schemaVersion: "0.3"
+description: "SSM Automation to build an AMI from an MGN-replicated Azure VM." 
+assumeRole: "{{ AutomationAssumeRole }}"
 parameters:
   InstanceId:
     type: "String"
@@ -11,11 +12,36 @@ parameters:
   SnapshotName:
     type: "String"
     description: "Name of the resultant snapshot"
-  AMIName:
+  ImageName:
     type: "String"
     description: "Name of the AMI being built"
 
 mainSteps:
+  - name: createSnapshot
+    action: aws:executeAwsApi
+    inputs:
+      Service: ec2
+      Api: CreateSnapshot
+      VolumeId: "{{ VolumeId }}"
+      Description: "{{ SnapshotName }}"
+    outputs:
+    - Name: Payload
+      Selector: SnapshotId
+      Type: String
+  
+  - name: verifySnapshot
+    action: aws:waitForAwsResourceProperty
+    inputs:
+      Service: ec2
+      Api: DescribeSnapshots
+      SnapshotIds: ["{{createSnapshot.Payload}}"]
+      PropertySelector: Snapshots[0].State
+      DesiredValues:
+      - completed
+    outputs:
+    - Name: SnapshotID
+      Selector: createSnapshot.Payload
+
   - name: installAWSToolsForPowershell
     action: aws:runPowerShellScript
     inputs:
@@ -45,34 +71,6 @@ mainSteps:
             Write-Host "Active Directory module is already installed." 
           }
 
-  - name: CreateSnapshot 
-    action: aws:runPowerShellScript
-    precondition:
-      StringEquals:
-        - platformType
-        - Windows
-    inputs:
-      runCommand:
-        - |
-          $volumeID = "{{VolumeId}}"
-          $snapshotName = "{{SnapshotName}}"
-          $snapshot = New-EC2Snapshot -VolumeID $volumeID -Description $snapshotName
-
-          while ($snapshot.state -eq "pending") {
-            $snapshot = Get-EC2Snapshot -SnapshotID $snapshot.SnapshotID
-            Start-Sleep -Seconds 10
-          }
-          
-          if ($snapshot.state -eq "completed") {
-            Write-Host "Snapshot ID: $($snapshot.SnapshotID)"
-          } elif ($snapshot.state -eq "failed") {
-            Write-Error "Snapshot creation failed; aborting"
-            Exit 1
-          } else {
-            Write-Error "Unexpected error (state: $snapshot.state) in snapshot creation; aborting"
-            Exit 1
-          }
-
   - name: getRootVolumeSpace
     action: aws:runPowerShellScript
     maxAttempts: 1
@@ -80,17 +78,17 @@ mainSteps:
       runCommand:
         - |
           $rootVolume = Get-WmiObject -Query "SELECT * FROM Win32_LogicalDisk WHERE DeviceID = 'C:'"
-          $availableSpaceGB = [math]::Round(($rootVolume.FreeSpace / 1GB), 2)
-          $totalSpaceGB = [math]::Round(($rootVolume.Size / 1GB), 2) # good 
-          $availablePercentage = [math]::Round((($availableSpaceGB / $totalSpaceGB) * 100), 2)
+          $availableSpaceGB = [math]::Round(($rootVolume.FreeSpace / 1GB), 4)
+          $totalSpaceGB = [math]::Round(($rootVolume.Size / 1GB), 4) # good 
+          $availablePercentage = [math]::Round((($availableSpaceGB / $totalSpaceGB) * 100), 4)
 
           Write-Output "Available space on the C drive is $availableSpaceGB GB, which is $availablePercentage% % of the total space"
           
-          if ($availablePercentage -lt 50) {
-            Write-Output "Available disk space is less than 50 %; stopping AMI build."
+          if ($availablePercentage -lt 25) {
+            Write-Output "Available disk space is less than 25 %; stopping AMI build."
             Exit 1
           } else {
-            Write-Output "Available disk space is more than 50 %; Continuing with AMI build"
+            Write-Output "Available disk space is more than 25 %; Continuing with AMI build"
           }
 
   - name: awsDiscoveryAgent
@@ -103,7 +101,7 @@ mainSteps:
           } Catch {
             $errorOutput = $_.Exception.Message
           }
-          ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.")
+          ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.") {
             Write-Host "No Discovery Agent installed"
           } else {
             cmd.exe /c "wmic product where name='AWS Discovery Agent' call uninstall"
@@ -128,25 +126,67 @@ mainSteps:
           }
 
   - name: createImage
-    action: aws:runPowerShellScript
+    action: aws:createImage
+    onFailure: Abort
     inputs:
-      runCommand:
-        - |
-          $instanceID = "{{InstanceId}}"
-          $amiName = "{{AMIName}}"
-          $image = New-EC2Image -InstanceID $instanceID -Name $amiName -NoReboot true 
+      InstanceId: "{{ InstanceId }}"
+      ImageName: "{{ ImageName }}"
+      NoReboot: true
+    outputs:
+    - Name: ImageID
+      Selector: createImage.ImageID
 
-          while ($image.state -eq "pending") {
-            $image = Get-EC2Image -InstanceID $image.ImageID
-            Start-Sleep -Seconds 30
-          }
+# https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-action-runcommand.html
+# need to update the powershell tasks to use this differnt action now we're running an automation type doc
+
+  # - name: CreateSnapshot 
+  #   action: aws:runPowerShellScript
+  #   precondition:
+  #     StringEquals:
+  #       - platformType
+  #       - Windows
+  #   inputs:
+  #     runCommand:
+  #       - |
+  #         $volumeID = "{{VolumeId}}"
+  #         $snapshotName = "{{SnapshotName}}"
+  #         $snapshot = New-EC2Snapshot -VolumeID $volumeID -Description $snapshotName
+
+  #         while ($snapshot.state -eq "pending") {
+  #           $snapshot = Get-EC2Snapshot -SnapshotID $snapshot.SnapshotID
+  #           Start-Sleep -Seconds 10
+  #         }
           
-          if ($image.state -eq "completed") {
-            Write-Host "AMI $amiName build complete! Image ID: $($snapshot.SnapshotID)"
-          } elif ($image.state -eq "failed") {
-            Write-Error "AMI creation failed; aborting"
-            Exit 1
-          } else {
-            Write-Error "Unexpected error (state: $image.state) in AMI build; aborting"
-            Exit 1
-          }
+  #         if ($snapshot.state -eq "completed") {
+  #           Write-Host "Snapshot ID: $($snapshot.SnapshotID)"
+  #         } elif ($snapshot.state -eq "failed") {
+  #           Write-Error "Snapshot creation failed; aborting"
+  #           Exit 1
+  #         } else {
+  #           Write-Error "Unexpected error (state: $snapshot.state) in snapshot creation; aborting"
+  #           Exit 1
+  #         }
+  # 
+  # - name: createImage
+  #   action: aws:runPowerShellScript
+  #   inputs:
+  #     runCommand:
+  #       - |
+  #         $instanceID = "{{InstanceId}}"
+  #         $amiName = "{{AMIName}}"
+  #         $image = New-EC2Image -InstanceID $instanceID -Name $amiName -NoReboot true 
+
+  #         while ($image.state -eq "pending") {
+  #           $image = Get-EC2Image -InstanceID $image.ImageID
+  #           Start-Sleep -Seconds 30
+  #         }
+          
+  #         if ($image.state -eq "completed") {
+  #           Write-Host "AMI $amiName build complete! Image ID: $($snapshot.SnapshotID)"
+  #         } elif ($image.state -eq "failed") {
+  #           Write-Error "AMI creation failed; aborting"
+  #           Exit 1
+  #         } else {
+  #           Write-Error "Unexpected error (state: $image.state) in AMI build; aborting"
+  #           Exit 1
+  #         }
