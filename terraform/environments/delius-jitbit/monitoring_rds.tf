@@ -31,10 +31,10 @@ resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
   metric_name         = "FreeableMemory"
   statistic           = "Average"
   period              = "60"
-  evaluation_periods  = "5"
+  evaluation_periods  = "10"
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
-  threshold           = "950000000"
+  threshold           = "800000000"
   treat_missing_data  = "missing"
   comparison_operator = "LessThanThreshold"
 
