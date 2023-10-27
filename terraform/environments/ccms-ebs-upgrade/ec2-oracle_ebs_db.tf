@@ -266,12 +266,13 @@ resource "aws_ebs_volume" "appshare" {
   lifecycle {
     ignore_changes = [kms_key_id]
   }
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_appshare
-  type              = "io2"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  availability_zone    = "eu-west-2a"
+  size                 = local.application_data.accounts[local.environment].ebs_size_ebsdb_appshare
+  type                 = "io2"
+  iops                 = 3000
+  multi_attach_enabled = true
+  encrypted            = true
+  kms_key_id           = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = "appshare" }
   )
