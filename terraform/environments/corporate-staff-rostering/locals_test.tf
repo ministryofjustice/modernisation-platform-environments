@@ -38,6 +38,10 @@ locals {
           }
         })
 
+        ssm_parameters = {
+          asm-passwords = {}
+        }
+
         tags = {
           description = "Test CSR DB server"
           ami         = "base_ol_8_5"
