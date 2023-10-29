@@ -1,0 +1,100 @@
+---
+schemaVersion: "0.3"
+description: "SSM Automation to build an AMI from an MGN-replicated Azure VM." 
+assumeRole: "{{ AutomationAssumeRole }}"
+parameters:
+  InstanceId:
+    type: "String"
+    description: "ID of the MGN replicated Azure server"
+  VolumeId:
+    type: "String"
+    description: "Root volume ID to be snapshotted"
+  SnapshotName:
+    type: "String"
+    description: "Name of the resultant snapshot"
+  ImageName:
+    type: "String"
+    description: "Name of the AMI being built"
+
+mainSteps:
+  - name: createSnapshot
+    action: aws:executeAutomation
+    onFailure: Abort
+    inputs:
+      DocumentName:
+      RuntimeParameters: 
+        VolumeId: 
+        - "{{ VolumeId }}"
+        Description:
+        - "{{ SnapshotName }}"
+
+  - name: amiPowershellScript
+    action: aws:runCommand
+    inputs:
+      DocumentName: ami-build-command
+
+  - name: createImage
+    action: aws:createImage
+    onFailure: Abort
+    inputs:
+      InstanceId: "{{ InstanceId }}"
+      ImageName: "{{ ImageName }}"
+      NoReboot: true
+    outputs:
+    - Name: ImageID
+      Selector: createImage.ImageID
+
+# https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-action-runcommand.html
+# need to update the powershell tasks to use this differnt action now we're running an automation type doc
+
+  # - name: CreateSnapshot 
+  #   action: aws:runPowerShellScript
+  #   precondition:
+  #     StringEquals:
+  #       - platformType
+  #       - Windows
+  #   inputs:
+  #     runCommand:
+  #       - |
+  #         $volumeID = "{{VolumeId}}"
+  #         $snapshotName = "{{SnapshotName}}"
+  #         $snapshot = New-EC2Snapshot -VolumeID $volumeID -Description $snapshotName
+
+  #         while ($snapshot.state -eq "pending") {
+  #           $snapshot = Get-EC2Snapshot -SnapshotID $snapshot.SnapshotID
+  #           Start-Sleep -Seconds 10
+  #         }
+          
+  #         if ($snapshot.state -eq "completed") {
+  #           Write-Host "Snapshot ID: $($snapshot.SnapshotID)"
+  #         } elif ($snapshot.state -eq "failed") {
+  #           Write-Error "Snapshot creation failed; aborting"
+  #           Exit 1
+  #         } else {
+  #           Write-Error "Unexpected error (state: $snapshot.state) in snapshot creation; aborting"
+  #           Exit 1
+  #         }
+  # 
+  # - name: createImage
+  #   action: aws:runPowerShellScript
+  #   inputs:
+  #     runCommand:
+  #       - |
+  #         $instanceID = "{{InstanceId}}"
+  #         $amiName = "{{AMIName}}"
+  #         $image = New-EC2Image -InstanceID $instanceID -Name $amiName -NoReboot true 
+
+  #         while ($image.state -eq "pending") {
+  #           $image = Get-EC2Image -InstanceID $image.ImageID
+  #           Start-Sleep -Seconds 30
+  #         }
+          
+  #         if ($image.state -eq "completed") {
+  #           Write-Host "AMI $amiName build complete! Image ID: $($snapshot.SnapshotID)"
+  #         } elif ($image.state -eq "failed") {
+  #           Write-Error "AMI creation failed; aborting"
+  #           Exit 1
+  #         } else {
+  #           Write-Error "Unexpected error (state: $image.state) in AMI build; aborting"
+  #           Exit 1
+  #         }
