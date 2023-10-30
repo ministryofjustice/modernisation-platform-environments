@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "assume_role" {
 
     principals {
       type        = "Service"
-      identifiers = ["lambda.amazonaws.com","ssm.amazonaws.com"]
+      identifiers = ["lambda.amazonaws.com", "ssm.amazonaws.com"]
     }
 
     actions = ["sts:AssumeRole"]
@@ -19,8 +19,8 @@ resource "aws_iam_role" "backuplambdarole" {
 
 
 resource "aws_iam_policy" "backuplambdapolicy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name = var.backup_policy_name
-  tags = var.tags
+  name   = var.backup_policy_name
+  tags   = var.tags
   policy = <<EOF
 {
     "Version" : "2012-10-17",

@@ -1,7 +1,7 @@
 module "iambackup" {
-  source = "./modules/lambdapolicy"
-    backup_policy_name = "laa-${local.application_name}-${local.environment}-policy"
-    tags = merge(
+  source             = "./modules/lambdapolicy"
+  backup_policy_name = "laa-${local.application_name}-${local.environment}-policy"
+  tags = merge(
     local.tags,
     { Name = "laa-${local.application_name}-${local.environment}-mp" }
   )
@@ -10,7 +10,7 @@ module "iambackup" {
 module "s3_bucket_lambda" {
   source = "./modules/s3"
 
-  bucket_name = "laa-${local.application_name}-${local.environment}-mp" 
+  bucket_name = "laa-${local.application_name}-${local.environment}-mp"
   tags = merge(
     local.tags,
     { Name = "laa-${local.application_name}-${local.environment}-mp" }
@@ -19,7 +19,7 @@ module "s3_bucket_lambda" {
 }
 
 resource "aws_security_group" "lambdasg" {
-  name       = "${local.application_name}-${local.environment}-lambda-security-group"
+  name        = "${local.application_name}-${local.environment}-lambda-security-group"
   description = "APEX Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -53,25 +53,25 @@ data "archive_file" "dbconnect_file" {
 
 
 resource "aws_lambda_layer_version" "lambda_layer" {
-  layer_name = "SSHNodeJSLayer"
-  description = "A layer to add ssh libs to lambda"
+  layer_name   = "SSHNodeJSLayer"
+  description  = "A layer to add ssh libs to lambda"
   license_info = "Apache-2.0"
-  s3_bucket = module.s3_bucket_lambda.lambdabucketname
-  s3_key = local.s3layerkey
+  s3_bucket    = module.s3_bucket_lambda.lambdabucketname
+  s3_key       = local.s3layerkey
 
   compatible_runtimes = [local.compatible_runtimes]
 }
 
 
 resource "aws_lambda_function" "snapshotDBFunction" {
-  function_name = local.snapshotDBFunctionname
-  role          = module.iambackup.backuprole
-  handler       = local.snapshotDBFunctionhandler
+  function_name    = local.snapshotDBFunctionname
+  role             = module.iambackup.backuprole
+  handler          = local.snapshotDBFunctionhandler
   source_code_hash = data.archive_file.dbsnapshot_file.output_base64sha256
-  runtime = local.snapshotDBFunctionruntime
-  layers = [aws_lambda_layer_version.lambda_layer.arn]
-  s3_bucket = module.s3_bucket_lambda.lambdabucketname
-  s3_key = local.snapshotDBFunctionfilename
+  runtime          = local.snapshotDBFunctionruntime
+  layers           = [aws_lambda_layer_version.lambda_layer.arn]
+  s3_bucket        = module.s3_bucket_lambda.lambdabucketname
+  s3_key           = local.snapshotDBFunctionfilename
 
   environment {
     variables = {
@@ -79,9 +79,9 @@ resource "aws_lambda_function" "snapshotDBFunction" {
 
     }
   }
-   vpc_config {
+  vpc_config {
     security_group_ids = [aws_security_group.lambdasg.id]
-    subnet_ids = [data.aws_subnet.private_subnets_a.id]
+    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
   }
   tags = merge(
     local.tags,
@@ -90,13 +90,13 @@ resource "aws_lambda_function" "snapshotDBFunction" {
 }
 
 resource "aws_lambda_function" "deletesnapshotFunction" {
-  function_name = local.deletesnapshotFunctionname
-  role          = module.iambackup.backuprole
-  handler       = local.deletesnapshotFunctionhandler
+  function_name    = local.deletesnapshotFunctionname
+  role             = module.iambackup.backuprole
+  handler          = local.deletesnapshotFunctionhandler
   source_code_hash = data.archive_file.deletesnapshot_file.output_base64sha256
-  runtime = local.deletesnapshotFunctionruntime
-  s3_bucket = module.s3_bucket_lambda.lambdabucketname
-  s3_key = local.deletesnapshotFunctionfilename
+  runtime          = local.deletesnapshotFunctionruntime
+  s3_bucket        = module.s3_bucket_lambda.lambdabucketname
+  s3_key           = local.deletesnapshotFunctionfilename
 
   environment {
     variables = {
@@ -104,9 +104,9 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
 
     }
   }
-   vpc_config {
+  vpc_config {
     security_group_ids = [aws_security_group.lambdasg.id]
-    subnet_ids = [data.aws_subnet.private_subnets_a.id]
+    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
   }
   tags = merge(
     local.tags,
@@ -116,14 +116,14 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
 
 
 resource "aws_lambda_function" "connectDBFunction" {
-  function_name = local.connectDBFunctionname
-  role          = module.iambackup.backuprole
-  handler       = local.connectDBFunctionhandler
+  function_name    = local.connectDBFunctionname
+  role             = module.iambackup.backuprole
+  handler          = local.connectDBFunctionhandler
   source_code_hash = data.archive_file.dbconnect_file.output_base64sha256
-  runtime = local.connectDBFunctionruntime
-  layers = [aws_lambda_layer_version.lambda_layer.arn]
-  s3_bucket = module.s3_bucket_lambda.lambdabucketname
-  s3_key = local.connectDBFunctionfilename
+  runtime          = local.connectDBFunctionruntime
+  layers           = [aws_lambda_layer_version.lambda_layer.arn]
+  s3_bucket        = module.s3_bucket_lambda.lambdabucketname
+  s3_key           = local.connectDBFunctionfilename
 
   environment {
     variables = {
@@ -131,9 +131,9 @@ resource "aws_lambda_function" "connectDBFunction" {
 
     }
   }
-   vpc_config {
+  vpc_config {
     security_group_ids = [aws_security_group.lambdasg.id]
-    subnet_ids = [data.aws_subnet.private_subnets_a.id]
+    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
   }
   tags = merge(
     local.tags,
