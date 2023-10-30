@@ -104,7 +104,7 @@ resource "aws_ebs_volume" "conc_u03" {
 
 resource "aws_volume_attachment" "conc_u03_att" {
   device_name = "/dev/sdj"
-  volume_id   = aws_ebs_volume.conc_u01.id
+  volume_id   = aws_ebs_volume.conc_u03.id
   instance_id = aws_instance.ec2_oracle_conc.id
 }
 
