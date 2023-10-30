@@ -8,6 +8,10 @@ locals {
   source_db_password    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]  
 }
 
+module "ecs_loadbalancer" {
+  source = "modules/ecs_loadbalancer.tf"
+}
+
 module "transport" {
   source                            = "./modules/tribunal"
   app_name                          = "transport"
