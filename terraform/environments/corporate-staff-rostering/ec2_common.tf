@@ -40,16 +40,45 @@ resource "aws_ssm_document" "cloud_watch_agent" {
   )
 }
 
-resource "aws_ssm_document" "ami_build" {
+resource "aws_ssm_document" "ami_build_command" {
   name            = "ami-build"
   document_type   = "Command"
   document_format = "YAML"
-  content         = file("./ssm-documents/ami-build.yaml")
+  content         = file("./ssm-documents/ami-build-command.yaml")
 
   tags = merge(
     local.tags,
     {
-      Name = "ami-build"
+      Name = "ami-build-command"
     },
   )
 }
+
+resource "aws_ssm_document" "ami_build_automation" {
+  name            = "ami-build"
+  document_type   = "Automation"
+  document_format = "YAML"
+  content         = file("./ssm-documents/ami-build-automation.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "ami-build-automation"
+    },
+  )
+}
+
+# WIP
+# resource "aws_ssm_document" "network-testing-tools" {
+#   name            = "network-testing-tools"
+#   document_type   = "Command"
+#   document_format = "YAML"
+#   content         = file("./ssm-documents/network-testing-tools.yaml")
+
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "network-testing-tools"
+#     },
+#   )
+# }
