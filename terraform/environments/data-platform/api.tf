@@ -320,7 +320,7 @@ resource "aws_api_gateway_integration" "update_schema_for_data_product_table_nam
   rest_api_id             = aws_api_gateway_rest_api.data_platform.id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = module.get_schema_lambda.lambda_function_invoke_arn
+  uri                     = module.data_product_update_schema_lambda.lambda_function_invoke_arn
 
   request_parameters = {
     "integration.request.path.data-product-name" = "method.request.path.data-product-name",
