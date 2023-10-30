@@ -41,7 +41,7 @@ resource "aws_ssm_document" "cloud_watch_agent" {
 }
 
 resource "aws_ssm_document" "ami_build_command" {
-  name            = "ami-build"
+  name            = "ami-build-command"
   document_type   = "Command"
   document_format = "YAML"
   content         = file("./ssm-documents/ami-build-command.yaml")
@@ -55,7 +55,7 @@ resource "aws_ssm_document" "ami_build_command" {
 }
 
 resource "aws_ssm_document" "ami_build_automation" {
-  name            = "ami-build"
+  name            = "ami-build-automation"
   document_type   = "Automation"
   document_format = "YAML"
   content         = file("./ssm-documents/ami-build-automation.yaml")
