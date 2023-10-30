@@ -4,7 +4,8 @@ locals {
 
   tribunal_names = [
     "transportappeals",
-    "administrativeappeals"
+    "administrativeappeals",
+    "ahmlr"
   ]
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)

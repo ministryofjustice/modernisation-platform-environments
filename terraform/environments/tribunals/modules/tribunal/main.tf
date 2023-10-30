@@ -96,7 +96,7 @@ resource "null_resource" "app_setup_db" {
   }
 }
 
- resource "aws_secretsmanager_secret" "app_db_credentials" {
+resource "aws_secretsmanager_secret" "app_db_credentials" {
   name = "${local.app}-db-credentials-2"
 }
 
@@ -137,4 +137,10 @@ module "app_ecs_task" {
   lb_listener                 = var.lb_listener
   cluster_id                  = var.cluster_id
   cluster_name                = var.cluster_name
+}
+
+module "app_ecs_loadbalancer" {
+  source                      = "../ecs_loadbalancer"
+  app_name                    = local.app
+  tags_common                 = var.tags
 }

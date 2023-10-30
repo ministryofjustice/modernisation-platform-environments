@@ -1,6 +1,6 @@
 resource "aws_security_group" "tribunals_lb_sc" {
-  name        = "load balancer security group"
-  description = "control access to the load balancer"
+  name        = "${var.app_name}-load-balancer-sg"
+  description = "${var.app_name} control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
@@ -26,12 +26,11 @@ resource "aws_security_group" "tribunals_lb_sc" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
 }
 
 //noinspection HILUnresolvedReference
 resource "aws_lb" "tribunals_lb" {
-  name                       = "tribunals-load-balancer"
+  name                       = "${var.app_name}-tribunals-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
@@ -41,7 +40,7 @@ resource "aws_lb" "tribunals_lb" {
 }
 
 resource "aws_lb_target_group" "tribunals_target_group" {
-  name                 = "tribunals-target-group"
+  name                 = "${var.app_name}-tribunals-target-group"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
