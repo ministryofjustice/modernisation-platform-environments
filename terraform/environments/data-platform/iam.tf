@@ -604,3 +604,14 @@ data "aws_iam_policy_document" "iam_policy_document_for_update_metadata_lambda" 
     data.aws_iam_policy_document.create_write_lambda_logs.json,
   ]
 }
+
+resource "aws_iam_role" "api_gateway_cloud_watch_role" {
+  name               = "data_platform_apigateway_log_${local.environment}"
+  assume_role_policy = data.aws_iam_policy_document.apigateway_trust_policy.json
+  tags               = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatchlogs" {
+  role       = aws_iam_role.api_gateway_cloud_watch_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
