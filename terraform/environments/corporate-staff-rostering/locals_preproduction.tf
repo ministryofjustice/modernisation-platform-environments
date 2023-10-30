@@ -211,7 +211,7 @@ locals {
 
       pp-csr-a-14-b = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pp-csr-a-t14-b"
+          ami_name                      = "pp-csr-a-14-b"
           ami_owner                     = "self"
           availability_zone             = "${local.region}b"
           ebs_volumes_copy_all_from_ami = false
