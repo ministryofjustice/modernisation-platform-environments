@@ -54,7 +54,7 @@ resource "aws_ssm_document" "ami_build_command" {
   )
 }
 
-resource "aws_ssm_document" "ami_build-automation" {
+resource "aws_ssm_document" "ami_build_automation" {
   name            = "ami-build"
   document_type   = "Automation"
   document_format = "YAML"
