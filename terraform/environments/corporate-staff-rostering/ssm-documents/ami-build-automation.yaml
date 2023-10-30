@@ -23,9 +23,9 @@ mainSteps:
       DocumentName: AWS-CreateSnapshot
       RuntimeParameters: 
         VolumeId: 
-        - "{{ VolumeId }}"
+          - "{{ VolumeId }}"
         Description:
-        - "{{ SnapshotName }}"
+          - "{{ SnapshotName }}"
 
   - name: amiPowershellScript
     action: aws:runCommand
