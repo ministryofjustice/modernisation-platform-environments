@@ -10,7 +10,7 @@ module "iambackup" {
 module "s3_bucket_lambda" {
   source = "./modules/s3"
 
-  bucket_name = "laa-${local.application_name}-${local.environment}-mp" 
+  bucket_name = "laa-${local.application_name}-${local.environment}-mp"
   tags = merge(
     local.tags,
     { Name = "laa-${local.application_name}-${local.environment}-mp" }
@@ -29,6 +29,13 @@ resource "aws_security_group" "lambdasg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "inbound ssh access for Lambda"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "ssh"
+    cidr_blocks = local.application_data.accounts[local.environment].mp_vpc_cidr
   }
 }
 
