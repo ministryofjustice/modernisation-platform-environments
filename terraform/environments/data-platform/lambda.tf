@@ -264,7 +264,7 @@ module "data_product_create_schema_lambda" {
   tags                           = local.tags
   description                    = "Lambda to create the first version of a json schema file for a data product"
   role_name                      = "data_product_schema_lambda_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_create_schema_lambda.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_write_metadata_and_schema.json
   policy_json_attached           = true
   function_name                  = "data_product_create_schema_${local.environment}"
   create_role                    = true
@@ -321,7 +321,7 @@ module "data_product_update_metadata_lambda" {
   tags                           = local.tags
   description                    = "Fetch the schema for a table from S3"
   role_name                      = "update_metadata_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_update_metadata_lambda.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_write_metadata_and_schema.json
   policy_json_attached           = true
   function_name                  = "data_product_update_metadata_${local.environment}"
   create_role                    = true
@@ -350,7 +350,7 @@ module "data_product_update_schema_lambda" {
   tags                           = local.tags
   description                    = "Update the schema for a table in a data product"
   role_name                      = "update_schema_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_update_metadata_lambda.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_write_metadata_and_schema.json
   policy_json_attached           = true
   function_name                  = "data_product_update_schema_${local.environment}"
   create_role                    = true
