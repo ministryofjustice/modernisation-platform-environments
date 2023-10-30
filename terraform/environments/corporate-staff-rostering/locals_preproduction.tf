@@ -209,7 +209,7 @@ locals {
         }
       }
 
-      
+
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -239,6 +239,198 @@ locals {
           os-type     = "Windows"
           component   = "Test"
           server-type = "test-windows-server"
+        }
+      }
+    }
+
+    baseline_lbs = {
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = ["load-balancer"]
+
+        instance_target_groups = {
+          web-56-7770 = {
+            port     = 7770
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7770
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+            ]
+          }
+          web-56-7771 = {
+            port     = 7771
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7771
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+            ]
+          }
+          web-56-7780 = {
+            port     = 7780
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7780
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+            ]
+          }
+          web-56-7781 = {
+            port     = 7781
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7781
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+            ]
+          }
+        }
+
+        listeners = {
+          http-80 = {
+            alarm_target_group_names = []
+            port                     = 80
+            protocol                 = "HTTP"
+
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+
+            rules = {
+              web-56-7770 = {
+                priority = 5670
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-56-7770"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r3.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web-56-7771 = {
+                priority = 5671
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-56-7771"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r4.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          }
+          http-7780 = {
+            alarm_target_group_names = []
+            port                     = 7780
+            protocol                 = "HTTP"
+
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+
+            rules = {
+              web-56-7780 = {
+                priority = 5680
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-56-7780"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r3.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          }
+          http-7781 = {
+            alarm_target_group_names = []
+            port                     = 7781
+            protocol                 = "HTTP"
+
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+
+            rules = {
+              web-56-7781 = {
+                priority = 5681
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-56-7781"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r4.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          }
         }
       }
     }
