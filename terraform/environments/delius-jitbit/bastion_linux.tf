@@ -4,7 +4,7 @@ locals {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.1.0"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -30,6 +30,12 @@ module "bastion_linux" {
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = "eu-west-2"
+
+  # custom scaling schedule
+  autoscaling_cron = {
+    "down" : "0 21 * * *",
+    "up" : "0 05 * * *"
+  }
 
   # Tags
   tags_common = local.tags
