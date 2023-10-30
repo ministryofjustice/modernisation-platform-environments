@@ -274,7 +274,7 @@ resource "aws_ebs_volume" "db_home" {
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_home
   type              = "io2"
-  iops              = local.application_data.accounts[local.environment].ebs_default_iops
+  iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
@@ -295,7 +295,7 @@ resource "aws_ebs_volume" "db_temp" {
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_temp
   type              = "io2"
-  iops              = local.application_data.accounts[local.environment].ebs_default_iops
+  iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
