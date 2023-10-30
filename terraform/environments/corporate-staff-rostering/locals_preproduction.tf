@@ -209,7 +209,7 @@ locals {
         }
       }
 
-      pp-csr-a-t14-b = {
+      pp-csr-a-14-b = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "pp-csr-a-t14-b"
           ami_owner                     = "self"
