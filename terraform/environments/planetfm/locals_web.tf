@@ -14,7 +14,7 @@ locals {
       }
     })
     ebs_volumes = {
-      "/dev/sdb"  = { label = "app" }
+      "/dev/sdb" = { label = "app" }
     }
     tags = {
       os-type   = "Windows"

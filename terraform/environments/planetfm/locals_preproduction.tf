@@ -12,7 +12,7 @@ locals {
         instance = merge(local.web_ec2.instance, {
           instance_type = "t3.large"
         })
-        ebs_volumes = merge(local.web_ec2.ebs_volumes,{
+        ebs_volumes = merge(local.web_ec2.ebs_volumes, {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 100 }
         })
