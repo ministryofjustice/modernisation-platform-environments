@@ -1,6 +1,6 @@
 ---
 schemaVersion: "2.2"
-description: "Powershell doc running commands against MGN-replicated Azure VMs." 
+description: "Powershell doc for MGN-replicated Azure VMs." 
 mainSteps:
   - name: installAWSToolsForPowershell
     action: aws:runPowerShellScript
@@ -61,7 +61,7 @@ mainSteps:
           } Catch {
             $errorOutput = $_.Exception.Message
           }
-          ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.") {
+          if ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.") {
             Write-Host "No Discovery Agent installed"
           } else {
             cmd.exe /c "wmic product where name='AWS Discovery Agent' call uninstall"
@@ -69,93 +69,7 @@ mainSteps:
 
   - name: InstallEC2LaunchV2
     action: aws:configurePackage
+    onFailure: Abort
     inputs: 
       name: AWSEC2Launch-Agent
       action: Install
-  
-  - name: verifyEC2LaunchV2Installation
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          if (Get-Service -Name "Amazon EC2Launch"| Where-Object {$_.Status -eq 'Running'}) {
-            Write-Output "EC2LaunchV2 driver installed and running successfully."
-          } else {
-            Write-Output "EC2LaunchV2 driver installation or service startup failed."
-            Exit 1
-          }
-
-  - name: installWireshark
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          $source = "https://1.as.dl.wireshark.org/win64/Wireshark-win64-3.6.0.exe"
-          $filePath = "C:\Wireshark-win64-3.6.0.exe"
-          Start-BitsTransfer -Source $source -Destination $filePath
-          Start-Process -Wait -FilePath $filePath -ArgumentList "/S"
-
-  - name: InstallNmapTool
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          $source = "https://nmap.org/download"
-          $filePath = "$ENV:TEMP\nmap.exe"
-          Start-BitsTransfer -Source $source -Destination $filePath
-          Start-Process -Wait -FilePath $filePath -ArgumentList "/S"
-
-# https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-action-runcommand.html
-# need to update the powershell tasks to use this differnt action now we're running an automation type doc
-
-  # - name: CreateSnapshot 
-  #   action: aws:runPowerShellScript
-  #   precondition:
-  #     StringEquals:
-  #       - platformType
-  #       - Windows
-  #   inputs:
-  #     runCommand:
-  #       - |
-  #         $volumeID = "{{VolumeId}}"
-  #         $snapshotName = "{{SnapshotName}}"
-  #         $snapshot = New-EC2Snapshot -VolumeID $volumeID -Description $snapshotName
-
-  #         while ($snapshot.state -eq "pending") {
-  #           $snapshot = Get-EC2Snapshot -SnapshotID $snapshot.SnapshotID
-  #           Start-Sleep -Seconds 10
-  #         }
-          
-  #         if ($snapshot.state -eq "completed") {
-  #           Write-Host "Snapshot ID: $($snapshot.SnapshotID)"
-  #         } elif ($snapshot.state -eq "failed") {
-  #           Write-Error "Snapshot creation failed; aborting"
-  #           Exit 1
-  #         } else {
-  #           Write-Error "Unexpected error (state: $snapshot.state) in snapshot creation; aborting"
-  #           Exit 1
-  #         }
-  # 
-  # - name: createImage
-  #   action: aws:runPowerShellScript
-  #   inputs:
-  #     runCommand:
-  #       - |
-  #         $instanceID = "{{InstanceId}}"
-  #         $amiName = "{{AMIName}}"
-  #         $image = New-EC2Image -InstanceID $instanceID -Name $amiName -NoReboot true 
-
-  #         while ($image.state -eq "pending") {
-  #           $image = Get-EC2Image -InstanceID $image.ImageID
-  #           Start-Sleep -Seconds 30
-  #         }
-          
-  #         if ($image.state -eq "completed") {
-  #           Write-Host "AMI $amiName build complete! Image ID: $($snapshot.SnapshotID)"
-  #         } elif ($image.state -eq "failed") {
-  #           Write-Error "AMI creation failed; aborting"
-  #           Exit 1
-  #         } else {
-  #           Write-Error "Unexpected error (state: $image.state) in AMI build; aborting"
-  #           Exit 1
-  #         }

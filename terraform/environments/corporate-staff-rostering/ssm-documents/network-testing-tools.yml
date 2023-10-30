@@ -1,0 +1,27 @@
+---
+schemaVersion: "2.2"
+description: "Powershell doc running commands against MGN-replicated Azure VMs." 
+parameters:
+  InstanceId:
+    type: "String"
+    description: "ID of the instance being targetted"
+mainSteps:  
+  - name: installWireshark
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
+          $source = "https://1.eu.dl.wireshark.org/win64/Wireshark-win64-4.0.10.exe"
+          $filePath = "C:\Wireshark-win64-3.6.0.exe"
+          Start-BitsTransfer -Source $source -Destination $filePath
+          Start-Process -Wait -FilePath $filePath -ArgumentList "/S"
+
+  - name: InstallNmapTool
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
+          $source = "https://nmap.org/dist/nmap-7.94-setup.exe"
+          $filePath = "$ENV:TEMP\nmap.exe"
+          Start-BitsTransfer -Source $source -Destination $filePath
+          Start-Process -Wait -FilePath $filePath -ArgumentList "/S"
