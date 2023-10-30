@@ -53,6 +53,8 @@ resource "aws_api_gateway_stage" "default_stage" {
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
   stage_name    = local.environment
 
+  depends_on = [aws_api_gateway_account.api_gateway_account]
+
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.data_platform_api.arn
     format = jsonencode({
