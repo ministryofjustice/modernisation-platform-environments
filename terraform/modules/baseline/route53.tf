@@ -31,7 +31,7 @@ locals {
           zone_key = zone_name
           provider = local.route53_zones[zone_name].provider
           type     = "NS"
-          records  = local.route53_zones[zone_name].name_servers
+          records  = local.route53_zones["${record.name}.${zone_name}"].name_servers
           alias    = null
         })
       }]
