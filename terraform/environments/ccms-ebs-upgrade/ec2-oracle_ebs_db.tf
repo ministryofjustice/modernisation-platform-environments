@@ -36,26 +36,6 @@ resource "aws_instance" "ec2_oracle_ebs" {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
-  /*
-  # Increase the volume size of the root volume
-  root_block_device {
-    volume_type = "gp3"
-    volume_size = 50
-    encrypted   = true
-    tags = merge(local.tags,
-      { Name = "root-block" }
-    )
-  }
-  ebs_block_device {
-    device_name = "/dev/sdc"
-    volume_type = "gp3"
-    volume_size = local.application_data.accounts[local.environment].ebs_size_ebsdb_temp
-    encrypted   = true
-    tags = merge(local.tags,
-      { Name = "temp" }
-    )
-  }
-  */
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-ebsdb", local.application_name, local.environment)) },
@@ -284,6 +264,48 @@ resource "aws_volume_attachment" "appshare_att" {
   ]
   device_name = "/dev/sdq"
   volume_id   = aws_ebs_volume.appshare.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
+resource "aws_ebs_volume" "db_home" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_home
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_default_iops
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "db home" }
+  )
+}
+
+resource "aws_volume_attachment" "db_home_att" {
+  device_name = "/dev/sdr"
+  volume_id   = aws_ebs_volume.db_home.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
+resource "aws_ebs_volume" "db_temp" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_temp
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_default_iops
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "db temp" }
+  )
+}
+
+resource "aws_volume_attachment" "db_temp_att" {
+  device_name = "/dev/sds"
+  volume_id   = aws_ebs_volume.db_temp.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 /*
