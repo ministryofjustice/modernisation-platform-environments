@@ -35,7 +35,7 @@ resource "aws_security_group" "lambdasg" {
     from_port   = 22
     to_port     = 22
     protocol    = "ssh"
-    cidr_blocks = local.application_data.accounts[local.environment].mp_vpc_cidr
+    cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
   }
 }
 
