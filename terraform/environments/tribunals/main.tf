@@ -9,7 +9,7 @@ locals {
 }
 
 module "ecs_loadbalancer" {
-  source = "modules/ecs_loadbalancer.tf"
+  source = "./modules/ecs_loadbalancer"
 }
 
 module "transport" {
