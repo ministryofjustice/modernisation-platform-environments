@@ -34,7 +34,7 @@ resource "aws_security_group" "lambdasg" {
     description = "inbound ssh access for Lambda"
     from_port   = 22
     to_port     = 22
-    protocol    = "ssh"
+    protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
   }
 }
