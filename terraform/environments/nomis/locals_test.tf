@@ -450,7 +450,7 @@ locals {
         })
         ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2T3WeblogicPolicy",
           ])
