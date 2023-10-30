@@ -9,7 +9,11 @@ locals {
 
     baseline_s3_buckets = {
     }
-
+#    baseline_s3_buckets = {
+#      s3-bucket-lb-test = {
+#        iam_policies = module.baseline_presets.s3_iam_policies
+#      }
+#    }
     baseline_ssm_parameters = {
       "/oracle/database/T1OASYS"  = local.database_ssm_parameters
       "/oracle/database/T1OASREP" = local.database_ssm_parameters
@@ -256,6 +260,7 @@ locals {
       # }
 
       public = {
+        existing_bucket_name     = "ec2-image-builder-oasys20230209160430888100000001"
         internal_lb              = false
         access_logs              = false
         force_destroy_bucket     = true
@@ -343,6 +348,7 @@ locals {
         }
       }
       private = {
+        existing_bucket_name     = "ec2-image-builder-oasys20230209160430888100000001"
         internal_lb = true
         access_logs = false
         # s3_versioning            = false
