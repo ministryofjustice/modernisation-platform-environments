@@ -42,5 +42,5 @@ mainSteps:
       ImageName: "{{ ImageName }}"
       NoReboot: true
     outputs:
-    - Name: ImageID
-      Selector: createImage.ImageID
+      - Name: ImageID
+        Selector: createImage.ImageID
