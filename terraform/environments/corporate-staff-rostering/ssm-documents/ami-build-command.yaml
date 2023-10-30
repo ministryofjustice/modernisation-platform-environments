@@ -57,7 +57,7 @@ mainSteps:
       runCommand:
         - |
           $output = Try {
-          Stop-Service -Name 'AWSDiscoveryService'-ErrorAction Stop 
+            Stop-Service -Name 'AWSDiscoveryService'-ErrorAction Stop 
           } Catch {
             $errorOutput = $_.Exception.Message
           }
