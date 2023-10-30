@@ -33,8 +33,8 @@ module "bastion_linux" {
 
   # custom scaling schedule
   autoscaling_cron = {
-    "down" : "0 21 * * *",
-    "up" : "0 05 * * *"
+    "up" : "0 21 * * *",
+    "down" : "0 05 * * *"
   }
 
   # Tags
