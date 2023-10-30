@@ -235,7 +235,7 @@ locals {
         tags = {
           description = "copy of PPCAW00014 for csr ${local.environment}"
           os-type     = "Windows"
-          ami         = "pp-csr-a-t14-b"
+          ami         = "pp-csr-a-14-b"
           component   = "app"
         }
         route53_records = {
