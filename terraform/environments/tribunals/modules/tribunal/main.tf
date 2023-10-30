@@ -139,8 +139,3 @@ module "app_ecs_task" {
   cluster_name                = var.cluster_name
 }
 
-module "app_ecs_loadbalancer" {
-  source                      = "../ecs_loadbalancer"
-  app_name                    = local.app
-  tags_common                 = var.tags
-}
