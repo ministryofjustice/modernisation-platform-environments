@@ -333,7 +333,7 @@ locals {
               unhealthy_threshold = 5
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-2-b" }, # R2
+              { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
           web-56-7770 = {
@@ -354,7 +354,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+              { ec2_instance_name = "pp-csr-w-5-a" },
             ]
           }
           web-12-7771 = {
@@ -371,7 +371,7 @@ locals {
               unhealthy_threshold = 5
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-2-b" }, # R2
+              { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
           web-56-7771 = {
@@ -392,7 +392,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+              { ec2_instance_name = "pp-csr-w-5-a" },
             ]
           }
           web-12-7780 = {
@@ -409,7 +409,7 @@ locals {
               unhealthy_threshold = 5
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-2-b" }, # R2
+              { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
           web-56-7780 = {
@@ -430,7 +430,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+              { ec2_instance_name = "pp-csr-w-5-a" },
             ]
           }
           web-12-7781 = {
@@ -447,7 +447,7 @@ locals {
               unhealthy_threshold = 5
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-2-b" }, # R2
+              { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
           web-56-7781 = {
@@ -468,7 +468,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+              { ec2_instance_name = "pp-csr-w-5-a" },
             ]
           }
         }
