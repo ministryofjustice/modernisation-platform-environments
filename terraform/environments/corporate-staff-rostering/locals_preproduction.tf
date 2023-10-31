@@ -354,6 +354,27 @@ locals {
         security_groups          = ["load-balancer"]
 
         instance_target_groups = {
+          web-12-7770 = {
+            port     = 7770
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7770
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
           web-56-7770 = {
             port     = 7770
             protocol = "HTTP"
@@ -373,6 +394,26 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+            ]
+          }
+          web-12-7771 = {
+            port     = 7771
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7771
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
@@ -395,6 +436,26 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+            ]
+          }
+          web-12-7780 = {
+            port     = 7780
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7780
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
@@ -417,6 +478,26 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+            ]
+          }
+          web-12-7781 = {
+            port     = 7781
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7781
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
@@ -439,7 +520,6 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
-              { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
         }
@@ -460,6 +540,20 @@ locals {
             }
 
             rules = {
+              web-12-7770 = {
+                priority = 1270
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-12-7770"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r1.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7770 = {
                 priority = 5670
                 actions = [{
@@ -470,6 +564,20 @@ locals {
                   host_header = {
                     values = [
                       "r3.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web-12-7771 = {
+                priority = 1271
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-12-7771"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r2.pp.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -505,6 +613,20 @@ locals {
             }
 
             rules = {
+              web-12-7780 = {
+                priority = 1280
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-12-7780"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r1.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7780 = {
                 priority = 5680
                 actions = [{
@@ -536,6 +658,20 @@ locals {
             }
 
             rules = {
+              web-12-7781 = {
+                priority = 1281
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-12-7781"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r2.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7781 = {
                 priority = 5681
                 actions = [{
@@ -566,6 +702,8 @@ locals {
           # { name = "r3", type = "CNAME", ttl = "300", records = ["pp-csr-w-5-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          { name = "r1", type = "A", lbs_map_key = "private" },
+          { name = "r2", type = "A", lbs_map_key = "private" },
           { name = "r3", type = "A", lbs_map_key = "private" },
           { name = "r4", type = "A", lbs_map_key = "private" },
         ]
