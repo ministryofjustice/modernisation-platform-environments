@@ -50,11 +50,8 @@ sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclien
 sudo amazon-linux-extras install postgresql10
 
 # Install SSM Agent
-#!/bin/bash
 cd /tmp
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-sudo systemctl start amazon-ssm-agent
-sudo systemctl enable amazon-ssm-agent
 
 # CLI Install
 echo "Seup AWSCLI V2....."
@@ -149,3 +146,5 @@ fi
 # Start Stream at Start of the EC2
 sudo chkconfig aws-kinesis-agent on
 sudo service aws-kinesis-agent start
+sudo systemctl start amazon-ssm-agent
+sudo systemctl enable amazon-ssm-agent
