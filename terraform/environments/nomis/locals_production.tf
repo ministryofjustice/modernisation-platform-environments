@@ -127,6 +127,7 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.xlarge"
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
@@ -145,7 +146,8 @@ locals {
       # ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.weblogic_ec2, {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 2
+          max_size         = 2
         })
         # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
@@ -156,6 +158,7 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.xlarge"
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
