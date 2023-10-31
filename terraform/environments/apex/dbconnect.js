@@ -89,18 +89,17 @@ async function connSSH(action, appname) {
 
         ssh
           .exec(
-             'sudo su - oracle -c sqlplus / as sysdba',
-       //     'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
-       //       "\n" +
-       //       "alter system switch logfile;" +
-       //       "\n" +
-       //      "alter system switch logfile;" +
-       //       "\n" +
-       //       "alter database begin backup;" +
-       //       "\n" +
-       //       "exit;" +
-       //       "\n" +
-       //       'EOFUM"',
+            'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
+              "\n" +
+              "alter system switch logfile;" +
+              "\n" +
+             "alter system switch logfile;" +
+              "\n" +
+              "alter database begin backup;" +
+              "\n" +
+              "exit;" +
+              "\n" +
+              'EOFUM"',
             {
               pty: true,
               out: console.log.bind(console),
