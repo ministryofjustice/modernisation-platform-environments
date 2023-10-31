@@ -16,3 +16,7 @@ variable "application_data" {
 
 variable "subnets_shared_public_ids" {  
 }
+
+variable "aws_acm_certificate_external" {
+  
+}
