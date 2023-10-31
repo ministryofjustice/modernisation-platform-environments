@@ -30,7 +30,7 @@ resource "aws_security_group" "tribunals_lb_sc" {
 
 //noinspection HILUnresolvedReference
 resource "aws_lb" "tribunals_lb" {
-  name                       = "${var.app_name}-tribunals-load-balancer"
+  name                       = "${var.app_name}-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = var.subnets_shared_public_ids
