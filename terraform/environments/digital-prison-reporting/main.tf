@@ -18,7 +18,7 @@ module "glue_reporting_hub_job" {
   create_security_configuration = local.create_sec_conf
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-${local.env}/"
   # Using s3a for checkpoint because to align with Hadoop 3 supports
-  checkpoint_dir   = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
+  checkpoint_dir   = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
   spark_event_logs = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
@@ -44,7 +44,7 @@ module "glue_reporting_hub_job" {
   )
 
   arguments = {
-    "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-jars"                          = "s3://dpr-artifact-store-test/digital-prison-reporting-jobs-v1.0.12-dev.1+no-domain-refresh.fc4aa1c-all.jar"
     "--job-bookmark-option"                 = "job-bookmark-disable"
     "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
     "--dpr.kinesis.stream.arn"              = module.kinesis_stream_ingestor.kinesis_stream_arn
