@@ -37,6 +37,13 @@ resource "aws_security_group" "lambdasg" {
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
   }
+  ingress {
+    description = "inbound sql net access for Lambda"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
+  }
 }
 
 data "archive_file" "dbsnapshot_file" {
