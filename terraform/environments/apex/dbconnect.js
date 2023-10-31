@@ -89,7 +89,7 @@ async function connSSH(action, appname) {
 
         ssh
           .exec(
-             "sudo su - oracle -c sqlplus / as sysdba",
+             'sudo su - oracle -c sqlplus / as sysdba',
        //     'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
        //       "\n" +
        //       "alter system switch logfile;" +
