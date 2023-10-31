@@ -489,6 +489,20 @@ locals {
             }
 
             rules = {
+              web-12-7770 = {
+                priority = 1270
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-12-7770"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r1.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7770 = {
                 priority = 5670
                 actions = [{
@@ -503,6 +517,20 @@ locals {
                   }
                 }]
               }
+              web-12-7771 = {
+                priority = 1271
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-12-7771"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r2.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7771 = {
                 priority = 5671
                 actions = [{
@@ -512,7 +540,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "r2.pp.csr.service.justice.gov.uk",
+                      "r4.pp.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -534,6 +562,20 @@ locals {
             }
 
             rules = {
+              web-12-7780 = {
+                priority = 1280
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-12-7780"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r1.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7780 = {
                 priority = 5680
                 actions = [{
@@ -565,6 +607,20 @@ locals {
             }
 
             rules = {
+              web-13-7781 = {
+                priority = 1281
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-12-7781"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r2.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7781 = {
                 priority = 5681
                 actions = [{
@@ -574,7 +630,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "r2.pp.csr.service.justice.gov.uk",
+                      "r4.pp.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
