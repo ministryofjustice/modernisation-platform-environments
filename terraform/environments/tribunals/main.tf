@@ -33,9 +33,9 @@ module "transport" {
   ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
   app_count                         = local.application_data.accounts[local.environment].app_count
-  lb_tg_arn                         = aws_lb_target_group.tribunals_target_group.arn
+  lb_tg_arn                         = module.ecs_loadbalancer.tribunals_target_group_arn
   server_port                       = local.application_data.accounts[local.environment].server_port_1
-  lb_listener                       = aws_lb_listener.tribunals_lb
+  lb_listener                       = module.ecs_loadbalancer.tribunals_lb_listener
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
 }
@@ -65,9 +65,9 @@ module "appeals" {
   ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
   app_count                         = local.application_data.accounts[local.environment].app_count
-  lb_tg_arn                         = aws_lb_target_group.tribunals_target_group.arn
+  lb_tg_arn                         = module.ecs_loadbalancer.tribunals_target_group_arn
   server_port                       = local.application_data.accounts[local.environment].server_port_1
-  lb_listener                       = aws_lb_listener.tribunals_lb
+  lb_listener                       = module.ecs_loadbalancer.tribunals_lb_listener
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
 }

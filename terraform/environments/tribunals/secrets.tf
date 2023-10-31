@@ -12,21 +12,6 @@ resource "aws_secretsmanager_secret" "resource_rds_secret" {
   name = "${local.application_data.accounts[local.environment].db_identifier}-credentials"
 }
 
-# resource "aws_secretsmanager_secret_version" "resource_rds_secret_current" {
-#   secret_id     = aws_secretsmanager_secret.resource_rds_secret.id
-#   secret_string = <<EOF
-# {
-#   "username": "",
-#   "password": "",
-#   "engine": "",
-#   "host": "",
-#   "port": "",
-#   "dbClusterIdentifier": "",
-#   "database_name": "master"
-# }
-# EOF
-# }
-
 resource "aws_secretsmanager_secret_version" "resource_rds_secret_current" {
   secret_id     = aws_secretsmanager_secret.resource_rds_secret.id
   secret_string = <<EOF
