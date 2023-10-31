@@ -334,6 +334,7 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
           web-56-7771 = {
@@ -351,6 +352,7 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
           web-56-7780 = {
@@ -368,6 +370,7 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
           web-56-7781 = {
@@ -385,6 +388,7 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
         }
@@ -512,6 +516,7 @@ locals {
         ]
         lb_alias_records = [
           { name = "r3", type = "A", lbs_map_key = "private" },
+          { name = "r4", type = "A", lbs_map_key = "private" },
         ]
       }
     }
