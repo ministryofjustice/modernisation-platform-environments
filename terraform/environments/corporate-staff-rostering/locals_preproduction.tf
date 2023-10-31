@@ -332,6 +332,10 @@ locals {
               timeout             = 5
               unhealthy_threshold = 5
             }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
             attachments = [
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
@@ -369,6 +373,10 @@ locals {
               port                = 7771
               timeout             = 5
               unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-2-b" },
@@ -408,6 +416,10 @@ locals {
               timeout             = 5
               unhealthy_threshold = 5
             }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
             attachments = [
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
@@ -445,6 +457,10 @@ locals {
               port                = 7781
               timeout             = 5
               unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-2-b" },
