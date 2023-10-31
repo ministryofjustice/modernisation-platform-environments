@@ -12,3 +12,10 @@ output "tribunals_lb_listener" {
   description = "LB Listener"
   value       = aws_lb_listener.tribunals_lb
 }
+
+output "tribunals_lb" {
+  description = "LB"
+  value       = aws_lb.tribunals_lb
+}
+
+

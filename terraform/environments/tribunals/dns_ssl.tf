@@ -32,8 +32,8 @@ resource "aws_route53_record" "external" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.tribunals_lb.dns_name
-    zone_id                = aws_lb.tribunals_lb.zone_id
+    name                   = module.ecs_loadbalancer.tribunals_lb.dns_name
+    zone_id                = module.ecs_loadbalancer.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
