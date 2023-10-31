@@ -60,7 +60,6 @@ module "glue_reporting_hub_job" {
     "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
     "--enable-metrics"                      = true
-    "--enable-spark-ui"                     = false
     "--enable-auto-scaling"                 = true
     "--enable-job-insights"                 = true
     "--dpr.aws.dynamodb.endpointUrl"        = "https://dynamodb.${local.account_region}.amazonaws.com"
