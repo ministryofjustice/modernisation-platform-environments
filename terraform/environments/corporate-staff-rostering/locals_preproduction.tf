@@ -607,7 +607,7 @@ locals {
             }
 
             rules = {
-              web-13-7781 = {
+              web-12-7781 = {
                 priority = 1281
                 actions = [{
                   type              = "forward"
@@ -651,8 +651,10 @@ locals {
           # { name = "r3", type = "CNAME", ttl = "300", records = ["pp-csr-w-5-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          { name = "r1", type = "A", lbs_map_key = "private" },
           { name = "r2", type = "A", lbs_map_key = "private" },
           { name = "r3", type = "A", lbs_map_key = "private" },
+          { name = "r4", type = "A", lbs_map_key = "private" },
         ]
       }
     }
