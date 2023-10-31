@@ -32,12 +32,13 @@ module "transport" {
   appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
   ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                         = local.application_data.accounts[local.environment].app_count
-  lb_tg_arn                         = module.ecs_loadbalancer.tribunals_target_group_arn
+  app_count                         = local.application_data.accounts[local.environment].app_count  
   server_port                       = local.application_data.accounts[local.environment].server_port_1
-  lb_listener                       = module.ecs_loadbalancer.tribunals_lb_listener
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name 
+  vpc_shared_id                     = data.aws_vpc.shared.id 
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
 }
 
 module "appeals" {
@@ -64,12 +65,13 @@ module "appeals" {
   appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
   ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                         = local.application_data.accounts[local.environment].app_count
-  lb_tg_arn                         = module.ecs_loadbalancer.tribunals_target_group_arn
+  app_count                         = local.application_data.accounts[local.environment].app_count 
   server_port                       = local.application_data.accounts[local.environment].server_port_1
-  lb_listener                       = module.ecs_loadbalancer.tribunals_lb_listener
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id 
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
 }
 
 /*module "ahmlr" {

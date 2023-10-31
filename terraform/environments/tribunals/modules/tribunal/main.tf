@@ -119,7 +119,7 @@ resource "aws_ecr_repository" "app-ecr-repo" {
   force_delete = true
 }
 
-####################### ECS Task#########################################
+####################### ECS Task #########################################
 
 module "app_ecs_task" {
   source                      = "../ecs_task"
@@ -132,10 +132,21 @@ module "app_ecs_task" {
   ecs_scaling_cpu_threshold   = var.ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold   = var.ecs_scaling_mem_threshold
   app_count                   = var.app_count
-  lb_tg_arn                   = var.lb_tg_arn
+  lb_tg_arn                   = module.ecs_loadbalancer.tribunals_target_group_arn
   server_port                 = var.server_port
-  lb_listener                 = var.lb_listener
+  lb_listener                 = module.ecs_loadbalancer.tribunals_lb_listener
   cluster_id                  = var.cluster_id
   cluster_name                = var.cluster_name
 }
 
+####################### Load Balancer #########################################
+
+module "ecs_loadbalancer" {
+  source                            = "../ecs_loadbalancer"
+  app_name                          = local.app
+  tags_common                       = var.tags
+  vpc_shared_id                     = var.vpc_shared_id
+  application_data                  = var.application_data
+  subnets_shared_public_ids         = var.subnets_shared_public_ids
+  aws_acm_certificate_external      = var.aws_acm_certificate_external
+}

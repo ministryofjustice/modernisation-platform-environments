@@ -120,7 +120,7 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [module.ecs_loadbalancer.tribunals_lb_sc_id]
+    security_groups = [module.transport.tribunals_lb_sc_id, module.appeals.tribunals_lb_sc_id]
   }
 
   egress {

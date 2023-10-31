@@ -189,7 +189,7 @@ resource "aws_security_group" "cluster_ec2" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    security_groups = [module.ecs_loadbalancer.tribunals_lb_sc_id]
+    security_groups = [module.transport.tribunals_lb_sc_id, module.appeals.tribunals_lb_sc_id]
   }
 
   ingress {

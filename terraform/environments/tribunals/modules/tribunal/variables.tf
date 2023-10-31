@@ -70,21 +70,22 @@ variable "app_count" {
   description = "Number of docker containers to run"
 }
 
-variable "lb_tg_arn" {
-  type        = string
-  description = "Load balancer target group ARN used by ECS service"
-}
-
 variable "server_port" {
   type        = string
   description = "The port the containers will be listening on"
-}
-
-variable "lb_listener" {  
 }
 
 variable "cluster_id" {
 }
 
 variable "cluster_name" {  
+}
+
+variable "subnets_shared_public_ids" {  
+}
+
+variable "aws_acm_certificate_external" {  
+}
+
+variable "vpc_shared_id" {  
 }

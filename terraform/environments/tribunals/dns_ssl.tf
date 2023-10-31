@@ -24,16 +24,42 @@ resource "aws_route53_record" "external_validation" {
 }
 
 // Create one Route 53 record for each entry in the list of tribunals (assigned in platform_locals.tf)
-resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
-  count = length(local.tribunal_names)
+# resource "aws_route53_record" "external" {
+#   provider = aws.core-vpc
+#   count = length(local.tribunal_names)
+#   zone_id = data.aws_route53_zone.external.zone_id
+#   name    = "${local.tribunal_names[count.index]}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   type    = "A"
+
+#   alias {
+#     name                   = module.ecs_loadbalancer.tribunals_lb.dns_name
+#     zone_id                = module.ecs_loadbalancer.tribunals_lb.zone_id
+#     evaluate_target_health = true
+#   }
+# }
+
+resource "aws_route53_record" "external_transport" {
+  provider = aws.core-vpc 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.tribunal_names[count.index]}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "transportappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
-    name                   = module.ecs_loadbalancer.tribunals_lb.dns_name
-    zone_id                = module.ecs_loadbalancer.tribunals_lb.zone_id
+    name                   = module.transport.tribunals_lb.dns_name
+    zone_id                = module.transport.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_appeals" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "administrativeappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.appeals.tribunals_lb.dns_name
+    zone_id                = module.appeals.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
