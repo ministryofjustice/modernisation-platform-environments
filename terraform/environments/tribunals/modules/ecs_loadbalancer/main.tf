@@ -1,7 +1,7 @@
 resource "aws_security_group" "tribunals_lb_sc" {
   name        = "${var.app_name}-load-balancer-sg"
   description = "${var.app_name} control access to the load balancer"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.vpc_shared_id
 
   ingress {
     description = "allow all traffic on HTTPS port 443"
@@ -33,7 +33,7 @@ resource "aws_lb" "tribunals_lb" {
   name                       = "${var.app_name}-tribunals-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
-  subnets                    = data.aws_subnets.shared-public.ids
+  subnets                    = var.subnets_shared_public_ids
   enable_deletion_protection = false
   internal                   = false
   depends_on                 = [aws_security_group.tribunals_lb_sc]
@@ -43,7 +43,7 @@ resource "aws_lb_target_group" "tribunals_target_group" {
   name                 = "${var.app_name}-tribunals-target-group"
   port                 = 80
   protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
+  vpc_id               = var.vpc_shared_id
   target_type          = "instance"
   deregistration_delay = 30
 
@@ -68,9 +68,9 @@ resource "aws_lb_listener" "tribunals_lb" {
   ]
   certificate_arn   = aws_acm_certificate.external.arn
   load_balancer_arn = aws_lb.tribunals_lb.arn
-  port              = local.application_data.accounts[local.environment].server_port_2
-  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+  port              = var.application_data.server_port_2
+  protocol          = var.application_data.lb_listener_protocol_2
+  ssl_policy        = var.application_data.lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"
