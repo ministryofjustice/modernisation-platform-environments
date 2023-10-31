@@ -337,8 +337,8 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" },
-              { ec2_instance_name = "pp-csr-w-2-b" },
+              { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+              { ec2_instance_name = "pp-csr-w-2-b" }, # R2
             ]
           }
           web-56-7771 = {
@@ -359,8 +359,8 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" },
-              { ec2_instance_name = "pp-csr-w-2-b" },
+              { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+              { ec2_instance_name = "pp-csr-w-2-b" }, # R2
             ]
           }
           web-56-7780 = {
@@ -381,8 +381,8 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" },
-              { ec2_instance_name = "pp-csr-w-2-b" },
+              { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+              { ec2_instance_name = "pp-csr-w-2-b" }, # R2
             ]
           }
           web-56-7781 = {
@@ -403,8 +403,8 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" },
-              { ec2_instance_name = "pp-csr-w-2-b" },
+              { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+              { ec2_instance_name = "pp-csr-w-2-b" }, # R2
             ]
           }
         }
@@ -448,7 +448,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "r4.pp.csr.service.justice.gov.uk",
+                      "r2.pp.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -510,7 +510,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "r4.pp.csr.service.justice.gov.uk",
+                      "r2.pp.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -531,8 +531,8 @@ locals {
           # { name = "r3", type = "CNAME", ttl = "300", records = ["pp-csr-w-5-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          { name = "r2", type = "A", lbs_map_key = "private" },
           { name = "r3", type = "A", lbs_map_key = "private" },
-          { name = "r4", type = "A", lbs_map_key = "private" },
         ]
       }
     }
