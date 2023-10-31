@@ -2,22 +2,6 @@
 schemaVersion: "2.2"
 description: "Powershell doc for MGN-replicated Azure VMs." 
 mainSteps:
-  - name: installAWSToolsForPowershell
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          Import-Module AWSPowerShell -Force
-
-          $module = Get-Module -ListAvailable -Name AWSPowerShell
-          if (-not $module) {
-            Write-Host "AWS Powershell Toolkit is not installed, installing now..."
-            Import-Module AWSPowerShell -Force
-          } else {
-            Write-Host "AWS Powershell Toolkit is already installed." 
-          }
-
   - name: activeDirectoryModulePresent
     action: aws:runPowerShellScript
     inputs: 
