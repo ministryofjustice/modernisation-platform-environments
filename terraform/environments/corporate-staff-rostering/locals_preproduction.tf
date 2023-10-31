@@ -319,6 +319,23 @@ locals {
         security_groups          = ["load-balancer"]
 
         instance_target_groups = {
+          web-12-7770 = {
+            port     = 7770
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7770
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-2-b" }, # R2
+            ]
+          }
           web-56-7770 = {
             port     = 7770
             protocol = "HTTP"
@@ -338,6 +355,22 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+            ]
+          }
+          web-12-7771 = {
+                        port     = 7771
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7771
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            attachments = [
               { ec2_instance_name = "pp-csr-w-2-b" }, # R2
             ]
           }
@@ -360,6 +393,22 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+            ]
+          }
+          web-12-7780 = {
+            port     = 7780
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7780
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            attachments = [
               { ec2_instance_name = "pp-csr-w-2-b" }, # R2
             ]
           }
@@ -382,6 +431,22 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" }, # R3
+            ]
+          }
+          web-12-7781 = {
+            port     = 7781
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7781
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            attachments = [
               { ec2_instance_name = "pp-csr-w-2-b" }, # R2
             ]
           }
@@ -404,7 +469,6 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" }, # R3
-              { ec2_instance_name = "pp-csr-w-2-b" }, # R2
             ]
           }
         }
