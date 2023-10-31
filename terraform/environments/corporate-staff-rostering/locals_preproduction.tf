@@ -358,7 +358,7 @@ locals {
             ]
           }
           web-12-7771 = {
-                        port     = 7771
+            port     = 7771
             protocol = "HTTP"
             health_check = {
               enabled             = true
