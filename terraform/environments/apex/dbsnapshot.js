@@ -7,7 +7,7 @@
 //   auth: phil h
 /////////////////////////////////////////////////////////////////////
 
-const AWS = require("aws-sdk");
+import { Lambda, EC2 } from "aws-sdk";
 
 //Set date format
 var date_ob = new Date();
@@ -18,10 +18,10 @@ var year = date_ob.getFullYear();
 var date = day + "/" + month + "/" + year;
 
 //lambda object
-let lambda = new AWS.Lambda({ apiVersion: "2015-03-31" });
+let lambda = new Lambda({ apiVersion: "2015-03-31" });
 
 //EC2 object
-let ec2 = new AWS.EC2({ apiVersion: "2014-10-31" });
+let ec2 = new EC2({ apiVersion: "2014-10-31" });
 
 async function invokeLambdaStart(appname) {
   try {
@@ -278,7 +278,7 @@ async function ec2CreateSnapshot2(volume, appname, volume_device, volume_name, d
   return ec2.createSnapshot(params).promise();
 }
 
-exports.handler = async (event, context) => {
+export async function handler(event, context) {
   const appname = event.appname;
   try {
     console.log("Putting DB into Hotbackup mode and taking snapshot");
@@ -300,4 +300,4 @@ exports.handler = async (event, context) => {
   } catch (error) {
     console.error(error);
   }
-};
+}
