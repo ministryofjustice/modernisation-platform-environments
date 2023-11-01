@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_event_rule" "snapshotDBFunctionmon_sun" {
     name = "laa-createSnapshotRule-${local.application_name}-${local.environment}-mp"
     description = "Daily snapshots of Oracle volumes"
-    schedule_expression = "cron(28 17 ? * MON-SUN *)"
+    schedule_expression = "cron(38 17 ? * MON-SUN *)"
 }
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_mon_sun" {
     statement_id = "AllowExecutionFromCloudWatch"
