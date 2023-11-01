@@ -236,7 +236,7 @@ module "glue_temp_domain_refresh_job_prisoner_prisoner" {
 # Establishment Establishment Schedule
 resource "aws_glue_trigger" "temp_domain_refresh_establishment_establishment" {
   name     = "${local.domain_refresh_establishment_establishment}-trigger"
-  schedule = "cron(*/15 06-20 * * MON-FRI)"
+  schedule = "cron(*/15 06-20 * * MON-FRI *)"
   type     = "SCHEDULED"
 
   actions {
@@ -248,7 +248,7 @@ resource "aws_glue_trigger" "temp_domain_refresh_establishment_establishment" {
 # Establishment Living Unit Schedule
 resource "aws_glue_trigger" "temp_domain_refresh_establishment_living_unit" {
   name     = "${local.domain_refresh_establishment_living_unit}-trigger"
-  schedule = "cron(*/15 06-20 * * MON-FRI)"
+  schedule = "cron(*/15 06-20 * * MON-FRI *)"
   type     = "SCHEDULED"
 
   actions {
@@ -260,7 +260,7 @@ resource "aws_glue_trigger" "temp_domain_refresh_establishment_living_unit" {
 # Movements Movements Schedule
 resource "aws_glue_trigger" "temp_domain_refresh_movements_movements" {
   name     = "${local.domain_refresh_movements_movements}-trigger"
-  schedule = "cron(*/15 06-20 * * MON-FRI)"
+  schedule = "cron(*/15 06-20 * * MON-FRI *)"
   type     = "SCHEDULED"
 
   actions {
@@ -273,7 +273,7 @@ resource "aws_glue_trigger" "temp_domain_refresh_movements_movements" {
 # Prisoner Prisoner Schedule
 resource "aws_glue_trigger" "temp_domain_refresh_prisoner_prisoner" {
   name     = "${local.domain_refresh_prisoner_prisoner}-trigger"
-  schedule = "cron(*/15 06-20 * * MON-FRI)"
+  schedule = "cron(*/15 06-20 * * MON-FRI *)"
   type     = "SCHEDULED"
 
   actions {
