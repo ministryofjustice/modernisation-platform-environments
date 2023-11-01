@@ -13,7 +13,7 @@ module "glue_temp_domain_refresh_job_establishment_establishment" {
   short_name                    = local.domain_refresh_establishment_establishment
   command_type                  = "glueetl"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
-  create_security_configuration = local.create_sec_conf
+  security_configuration        = "${local.project}-domain-refresh-sec-config"
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_establishment_establishment}/"
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_establishment_establishment}/"
@@ -69,7 +69,7 @@ module "glue_temp_domain_refresh_job_establishment_living_unit" {
   short_name                    = local.domain_refresh_establishment_living_unit
   command_type                  = "glueetl"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
-  create_security_configuration = local.create_sec_conf
+  security_configuration        = "${local.project}-domain-refresh-sec-config"
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_establishment_living_unit}/"
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_establishment_living_unit}/"
@@ -126,7 +126,7 @@ module "glue_temp_domain_refresh_job_movements_movements" {
   short_name                    = local.domain_refresh_movements_movements
   command_type                  = "glueetl"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
-  create_security_configuration = local.create_sec_conf
+  security_configuration        = "${local.project}-domain-refresh-sec-config"
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_movements_movements}/"
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_movements_movements}/"
@@ -182,7 +182,7 @@ module "glue_temp_domain_refresh_job_prisoner_prisoner" {
   short_name                    = local.domain_refresh_prisoner_prisoner
   command_type                  = "glueetl"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
-  create_security_configuration = local.create_sec_conf
+  security_configuration        = "${local.project}-domain-refresh-sec-config"
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_prisoner_prisoner}/"
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_prisoner_prisoner}/"
