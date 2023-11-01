@@ -9,7 +9,7 @@ module "observability_platform_iam_role" {
   role_requires_mfa = false
 
   trusted_role_arns = [
-    "arn:aws:iam::${local.environment_configuration.development.observability_platform_account_id}:root"
+    "arn:aws:iam::${local.environment_configuration.observability_platform_account_id}:root"
   ]
 
   custom_role_policy_arns = ["arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess"]
