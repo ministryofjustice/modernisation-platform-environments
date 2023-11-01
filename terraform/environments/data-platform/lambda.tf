@@ -379,7 +379,7 @@ module "preview_data_lambda" {
   tags                           = local.tags
   description                    = "Query small sample of data through athena "
   role_name                      = "preview_data_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_preview_data.json
   policy_json_attached           = true
   function_name                  = "preview_data_${local.environment}"
   create_role                    = true
