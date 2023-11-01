@@ -45,3 +45,7 @@ variable "get_schema_versions" {
 variable "update_metadata_versions" {
   type = map(any)
 }
+
+variable "update_schema_versions" {
+  type = map(any)
+}
