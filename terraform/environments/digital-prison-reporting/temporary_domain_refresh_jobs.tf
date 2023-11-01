@@ -240,7 +240,7 @@ resource "aws_glue_trigger" "temp_domain_refresh_establishment_establishment" {
   type     = "SCHEDULED"
 
   actions {
-    job_name = module.glue_temp_domain_refresh_job_establishment_establishment
+    job_name = module.glue_temp_domain_refresh_job_establishment_establishment.name
   }
 }
 
@@ -252,7 +252,7 @@ resource "aws_glue_trigger" "temp_domain_refresh_establishment_living_unit" {
   type     = "SCHEDULED"
 
   actions {
-    job_name = module.glue_temp_domain_refresh_job_establishment_living_unit
+    job_name = module.glue_temp_domain_refresh_job_establishment_living_unit.name
   }
 }
 
@@ -264,7 +264,7 @@ resource "aws_glue_trigger" "temp_domain_refresh_movements_movements" {
   type     = "SCHEDULED"
 
   actions {
-    job_name = module.glue_temp_domain_refresh_job_movements_movements
+    job_name = module.glue_temp_domain_refresh_job_movements_movements.name
   }
 }
 
@@ -277,6 +277,6 @@ resource "aws_glue_trigger" "temp_domain_refresh_prisoner_prisoner" {
   type     = "SCHEDULED"
 
   actions {
-    job_name = module.glue_temp_domain_refresh_job_prisoner_prisoner
+    job_name = module.glue_temp_domain_refresh_job_prisoner_prisoner.name
   }
 }
