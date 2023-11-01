@@ -1,12 +1,12 @@
 locals {
-  domain_refresh_establishment_establishment    = "${local.project}-temp-domain-refresh-establishment-establishment-${local.env}"
-  domain_refresh_establishment_living_unit      = "${local.project}-temp-domain-refresh-establishment-living_unit-${local.env}"
-  domain_refresh_movements_movements            = "${local.project}-temp-domain-refresh-movements-movements-${local.env}"
-  domain_refresh_prisoner_prisoner              = "${local.project}-temp-domain-refresh-prisoner-prisoner-${local.env}"
+  domain_refresh_establishment_establishment    = "${local.project}-temp-refresh-establishment-e-${local.env}"
+  domain_refresh_establishment_living_unit      = "${local.project}-temp-refresh-establishment-lu-${local.env}"
+  domain_refresh_movements_movements            = "${local.project}-temp-refresh-movements-m-${local.env}"
+  domain_refresh_prisoner_prisoner              = "${local.project}-temp-refresh-prisoner-p-${local.env}"
 }
 
 # Glue Job, Domain Refresh establishment/establishment
-module "glue_temp_domain_refresh_job_establishment_establishment" {
+module "glue_temp_refresh_job_establishment_establishment" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = local.domain_refresh_establishment_establishment
@@ -62,7 +62,7 @@ module "glue_temp_domain_refresh_job_establishment_establishment" {
 
 
 # Glue Job, Domain Refresh establishment/living_unit
-module "glue_temp_domain_refresh_job_establishment_living_unit" {
+module "glue_temp_refresh_job_establishment_living_unit" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = local.domain_refresh_establishment_living_unit
@@ -119,7 +119,7 @@ module "glue_temp_domain_refresh_job_establishment_living_unit" {
 
 
 # Glue Job, Domain Refresh movements/movements
-module "glue_temp_domain_refresh_job_movements_movements" {
+module "glue_temp_refresh_job_movements_movements" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = local.domain_refresh_movements_movements
@@ -175,7 +175,7 @@ module "glue_temp_domain_refresh_job_movements_movements" {
 
 
 # Glue Job, Domain Refresh prisoner/prisoner
-module "glue_temp_domain_refresh_job_prisoner_prisoner" {
+module "glue_temp_refresh_job_prisoner_prisoner" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = local.domain_refresh_prisoner_prisoner
@@ -240,7 +240,7 @@ resource "aws_glue_trigger" "temp_domain_refresh_establishment_establishment" {
   type     = "SCHEDULED"
 
   actions {
-    job_name = module.glue_temp_domain_refresh_job_establishment_establishment.name
+    job_name = module.glue_temp_refresh_job_establishment_establishment.name
   }
 }
 
@@ -252,7 +252,7 @@ resource "aws_glue_trigger" "temp_domain_refresh_establishment_living_unit" {
   type     = "SCHEDULED"
 
   actions {
-    job_name = module.glue_temp_domain_refresh_job_establishment_living_unit.name
+    job_name = module.glue_temp_refresh_job_establishment_living_unit.name
   }
 }
 
@@ -264,7 +264,7 @@ resource "aws_glue_trigger" "temp_domain_refresh_movements_movements" {
   type     = "SCHEDULED"
 
   actions {
-    job_name = module.glue_temp_domain_refresh_job_movements_movements.name
+    job_name = module.glue_temp_refresh_job_movements_movements.name
   }
 }
 
@@ -277,6 +277,6 @@ resource "aws_glue_trigger" "temp_domain_refresh_prisoner_prisoner" {
   type     = "SCHEDULED"
 
   actions {
-    job_name = module.glue_temp_domain_refresh_job_prisoner_prisoner.name
+    job_name = module.glue_temp_refresh_job_prisoner_prisoner.name
   }
 }
