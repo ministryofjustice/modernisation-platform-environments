@@ -62,6 +62,8 @@ locals {
   reporting_hub_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_min_wait_millis
   reporting_hub_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_max_wait_millis
 
+  reporting_hub_domain_refresh_enabled = local.application_data.accounts[local.environment].reporting_hub_domain_refresh_enabled
+
   # Refresh Job
   refresh_job_worker_type = local.application_data.accounts[local.environment].refresh_job_worker_type
   refresh_job_num_workers = local.application_data.accounts[local.environment].refresh_job_num_workers

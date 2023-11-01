@@ -234,7 +234,40 @@ locals {
         }
       }
 
-      # pp-csr-a-3-a
+      pp-csr-a-3-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-a-3-a"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        tags = {
+          description       = "Migrated server PPCAW00003"
+          app-config-status = "pending"
+          csr-region        = "Region 6"
+          os-type           = "Windows"
+          ami               = "pp-csr-a-3-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
 
       pp-csr-a-15-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -552,6 +585,42 @@ locals {
         }
       }
 
+      pp-csr-w-4-b = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-w-4-b"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}b"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 129 }
+        }
+        tags = {
+          description       = "Migrated server PPCWW00004"
+          app-config-status = "pending"
+          csr-region        = "Training Server A and B"
+          os-type           = "Windows"
+          ami               = "pp-csr-w-4-b"
+          component         = "trainingab"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
 
     }
 
