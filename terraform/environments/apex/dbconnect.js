@@ -7,7 +7,7 @@
 //   auth: phil h
 /////////////////////////////////////////////////////////////////////
 const SSH = require("simple-ssh");
-const AWS = require("@aws-sdk");
+const AWS = require("aws-sdk");
 //SSM object with temp parms
 const ssm = new AWS.SSM({ apiVersion: "2014-11-06" });
 // Environment variables
