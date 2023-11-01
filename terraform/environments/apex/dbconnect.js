@@ -6,7 +6,7 @@
 //   version: 0.1
 //   auth: phil h
 /////////////////////////////////////////////////////////////////////
-
+import { exec } from 'child_process';
 const SSH = require("simple-ssh");
 const AWS = require("aws-sdk");
 
@@ -81,7 +81,7 @@ async function connSSH(action, appname) {
       user: username,
       key: myKey,
     });
-    const { exec } = require('child_process');
+    // const { exec } = require('child_process');
     const bashCommand =  'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
             "\n" +
             "alter system switch logfile;" +
