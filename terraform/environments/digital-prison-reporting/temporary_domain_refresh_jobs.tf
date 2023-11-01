@@ -271,7 +271,7 @@ resource "aws_glue_trigger" "temp_domain_refresh_movements_movements" {
 
 
 # Prisoner Prisoner Schedule
-resource "aws_glue_trigger" "temp_domain_refresh_movements_movements" {
+resource "aws_glue_trigger" "temp_domain_refresh_prisoner_prisoner" {
   name     = "${local.domain_refresh_prisoner_prisoner}-trigger"
   schedule = "cron(*/15 06-20 * * MON-FRI)"
   type     = "SCHEDULED"
