@@ -419,7 +419,7 @@ locals {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "pp-csr-a-3-a"
           ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
+          availability_zone             = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
