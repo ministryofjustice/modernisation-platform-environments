@@ -81,25 +81,25 @@ async function connSSH(action, appname) {
       user: username,
       key: myKey,
     });
-
+    const { exec } = require('child_process');
+    const bashCommand =  'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
+            "\n" +
+            "alter system switch logfile;" +
+            "\n" +
+            "alter system switch logfile;" +
+            "\n" +
+            "alter database begin backup;" +
+            "\n" +
+            "exit;" +
+            "\n" +
+            'EOFUM"';
     let prom = new Promise(function (resolve, reject) {
       if (action == "begin") {
         console.log("[+] Trying connecting to EC2 ==>> " + address);
         console.log(`[+] Running "begin backup commands" as Oracle`);
 
         ssh
-          .exec(
-            'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
-              "\n" +
-              "alter system switch logfile;" +
-              "\n" +
-             "alter system switch logfile;" +
-              "\n" +
-              "alter database begin backup;" +
-              "\n" +
-              "exit;" +
-              "\n" +
-              'EOFUM"',
+          exec(bashCommand,
             {
               pty: true,
               out: console.log.bind(console),
