@@ -115,7 +115,8 @@ data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
     sid = "AthenaQueryAccess"
     actions = [
       "athena:StartQueryExecution",
-      "athena:GetQueryExecution"
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
     ]
     resources = [
       aws_athena_workgroup.data_product_athena_workgroup.arn

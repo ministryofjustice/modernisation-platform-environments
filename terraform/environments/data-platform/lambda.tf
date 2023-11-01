@@ -373,3 +373,33 @@ module "data_product_update_schema_lambda" {
   }
 }
 
+module "preview_data_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
+  application_name               = "preview_data"
+  tags                           = local.tags
+  description                    = "Query small sample of data through athena "
+  role_name                      = "preview_data_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.athena_load_lambda_function_policy.json
+  policy_json_attached           = true
+  function_name                  = "preview_data_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-query-data-lambda-ecr-repo:${local.preview_data_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 128
+
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+
+  allowed_triggers = {
+
+    AllowExecutionFromAPIGateway = {
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.preview_data_from_data_product.http_method}${aws_api_gateway_resource.data_product_data.path}"
+    }
+  }
+}
+
+
