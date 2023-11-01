@@ -6,10 +6,10 @@
 //   version: 0.1
 //   auth: phil h
 /////////////////////////////////////////////////////////////////////
-const SSH = require("simple-ssh");
-const AWS = require("aws-sdk");
+import SSH from "simple-ssh";
+import { SSM, EC2 } from "aws-sdk";
 //SSM object with temp parms
-const ssm = new AWS.SSM({ apiVersion: "2014-11-06" });
+const ssm = new SSM({ apiVersion: "2014-11-06" });
 // Environment variables
 const pem = "MGMT_EC2_KEY_DEFAULT";
 const username = "ec2-user";
@@ -26,7 +26,7 @@ if (mm < 10) {
 }
 today = dd + "-" + mm + "-" + yyyy;
 //EC2 object
-let ec2 = new AWS.EC2({ apiVersion: "2014-10-31" });
+let ec2 = new EC2({ apiVersion: "2014-10-31" });
 //Get private IP address for EC2 instances tagged with Name:{ appname }
 // May return more than 1 instance if there are multiple instances with the same name
 async function getInstances(appname) {
@@ -136,7 +136,7 @@ async function connSSH(action, appname) {
     }
   }
 }
-exports.handler = async (event, context) => {
+export async function handler(event, context) {
   try {
     console.log("[+} Received event:", JSON.stringify(event, null, 2));
     await connSSH(event.action, event.appname);
@@ -145,4 +145,4 @@ exports.handler = async (event, context) => {
     console.error(error);
     context.fail();
   }
-};
+}
