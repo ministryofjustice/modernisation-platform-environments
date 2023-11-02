@@ -25,7 +25,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.data_product_table_name,
       aws_api_gateway_resource.upload_data_for_data_product_table_name,
       aws_api_gateway_resource.schema_for_data_product_table_name,
-      aws_api_gateway_resource.preview_data_from_data_product,
+      aws_api_gateway_method.preview_data_from_data_product,
       aws_api_gateway_method.docs,
       aws_api_gateway_method.get_glue_metadata,
       aws_api_gateway_method.register_data_product,
@@ -44,7 +44,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_integration.get_schema_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.update_data_product_to_lambda,
       aws_api_gateway_integration.update_schema_for_data_product_table_name_to_lambda,
-      aws_api_gateway_resource.preview_data_from_data_product_lambda,
+      aws_api_gateway_integration.preview_data_from_data_product_lambda,
     ]))
   }
 
@@ -446,7 +446,7 @@ resource "aws_api_gateway_method" "preview_data_from_data_product" {
   authorization = "CUSTOM"
   authorizer_id = aws_api_gateway_authorizer.authorizer.id
   http_method   = "GET"
-  resource_id   = aws_api_gateway_resource.data_product_preview
+  resource_id   = aws_api_gateway_resource.data_product_preview.id
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
 
   request_parameters = {
@@ -458,8 +458,8 @@ resource "aws_api_gateway_method" "preview_data_from_data_product" {
 
 # /data-product/{data-product-name}/table/{table-name}/preview  lambda integration
 resource "aws_api_gateway_integration" "preview_data_from_data_product_lambda" {
-  http_method             = aws_api_gateway_method.preview_data_from_data_product
-  resource_id             = aws_api_gateway_resource.data_product_preview
+  http_method             = aws_api_gateway_method.preview_data_from_data_product.id
+  resource_id             = aws_api_gateway_resource.data_product_preview.id
   rest_api_id             = aws_api_gateway_rest_api.data_platform.id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
