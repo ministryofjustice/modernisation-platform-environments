@@ -354,7 +354,7 @@ locals {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
           monitoring              = true
-          vpc_security_group_ids  = ["web", "domain", "jump-server"]
+          vpc_security_group_ids  = ["web", "domain", "jumpserver"]
           tags = {
             backup-plan         = "daily-and-weekly"
             instance-scheduling = "skip-scheduling"
