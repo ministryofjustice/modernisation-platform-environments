@@ -206,11 +206,6 @@ resource "aws_api_gateway_resource" "schema_for_data_product_table_name" {
   rest_api_id = aws_api_gateway_rest_api.data_platform.id
 }
 
-moved {
-  from = aws_api_gateway_resource.create_schema_for_data_product_table_name
-  to   = aws_api_gateway_resource.schema_for_data_product_table_name
-}
-
 # /data-product/{data-product-name}/table/{table-name}/upload POST method
 resource "aws_api_gateway_method" "upload_data_for_data_product_table_name" {
   authorization = "CUSTOM"
