@@ -13,7 +13,7 @@ locals {
   #Lambda Function creation
   snapshotDBFunctionname = "snapshotDBFunction"
   snapshotDBFunctionhandler = "snapshot/dbsnapshot.handler"
-  snapshotDBFunctionruntime = "nodejs14.x"
+  snapshotDBFunctionruntime = "nodejs18.x"
   snapshotDBFunctionfilename = "dbsnapshot.zip"
 
   deletesnapshotFunctionname = "deletesnapshotFunction"
@@ -23,7 +23,7 @@ locals {
 
   connectDBFunctionname = "connectDBFunction"
   connectDBFunctionhandler = "ssh/dbconnect.handler"
-  connectDBFunctionruntime = "nodejs14.x"
+  connectDBFunctionruntime = "nodejs18.x"
   connectDBFunctionfilename = "dbconnect.zip"
 
   #layer config
