@@ -397,7 +397,7 @@ module "preview_data_lambda" {
     AllowExecutionFromAPIGateway = {
       action     = "lambda:InvokeFunction"
       principal  = "apigateway.amazonaws.com"
-      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.preview_data_from_data_product.http_method}${aws_api_gateway_resource.data_product_data.path}"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.preview_data_from_data_product.http_method}${aws_api_gateway_resource.data_product_preview.path}"
     }
   }
 }
