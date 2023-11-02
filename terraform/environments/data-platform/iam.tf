@@ -611,7 +611,6 @@ data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
     data.aws_iam_policy_document.log_to_bucket.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
   ]
-
   statement {
     sid    = "s3Access"
     effect = "Allow"
