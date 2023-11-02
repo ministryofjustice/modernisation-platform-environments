@@ -20,7 +20,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.data_product,
       aws_api_gateway_resource.register_data_product,
       aws_api_gateway_resource.data_product_name,
-      aws_api_gateway_resource.data_product_data,
+      aws_api_gateway_resource.data_product_preview,
       aws_api_gateway_resource.data_product_table,
       aws_api_gateway_resource.data_product_table_name,
       aws_api_gateway_resource.upload_data_for_data_product_table_name,
@@ -434,7 +434,7 @@ resource "aws_api_gateway_integration" "get_glue_metadata" {
 # Preview data 
 
 # /data-product/{data-product-name}/table/{table-name}/preview resource
-resource "aws_api_gateway_resource" "data_product_data" {
+resource "aws_api_gateway_resource" "data_product_preview" {
   parent_id   = aws_api_gateway_resource.data_product_table_name.id
   path_part   = "preview"
   rest_api_id = aws_api_gateway_rest_api.data_platform.id
@@ -446,7 +446,7 @@ resource "aws_api_gateway_method" "preview_data_from_data_product" {
   authorization = "CUSTOM"
   authorizer_id = aws_api_gateway_authorizer.authorizer.id
   http_method   = "GET"
-  resource_id   = aws_api_gateway_resource.data_product_data
+  resource_id   = aws_api_gateway_resource.data_product_preview
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
 
   request_parameters = {
@@ -459,7 +459,7 @@ resource "aws_api_gateway_method" "preview_data_from_data_product" {
 # /data-product/{data-product-name}/table/{table-name}/preview  lambda integration
 resource "aws_api_gateway_integration" "preview_data_from_data_product_lambda" {
   http_method             = aws_api_gateway_method.preview_data_from_data_product
-  resource_id             = aws_api_gateway_resource.data_product_data
+  resource_id             = aws_api_gateway_resource.data_product_preview
   rest_api_id             = aws_api_gateway_rest_api.data_platform.id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
