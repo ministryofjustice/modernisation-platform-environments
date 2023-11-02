@@ -44,8 +44,9 @@ locals {
   datamart_password = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
 
   # Glue Job parameters
-  glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+  glue_placeholder_script_location          = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
+  glue_jobs_latest_jar_location             = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+  glue_jobs_dev_sandbox_latest_jar_location = "s3://${local.project}-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
   # Reporting Hub Job
   reporting_hub_driver_mem   = local.application_data.accounts[local.environment].reporting_hub_spark_driver_mem
   reporting_hub_executor_mem = local.application_data.accounts[local.environment].reporting_hub_spark_executor_mem

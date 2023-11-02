@@ -112,7 +112,7 @@ module "glue_reporting_hub_batch_job" {
   )
 
   arguments = {
-    "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-jars"                          = local.glue_jobs_dev_sandbox_latest_jar_location
     "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
     "--datalake-formats"                    = "delta"
     "--dpr.aws.region"                      = local.account_region
@@ -167,7 +167,7 @@ module "glue_reporting_hub_cdc_job" {
   )
 
   arguments = {
-    "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-jars"                          = local.glue_jobs_dev_sandbox_latest_jar_location
     "--job-bookmark-option"                 = "job-bookmark-disable"
     "--class"                               = "uk.gov.justice.digital.job.DataHubCdcJob"
     "--datalake-formats"                    = "delta"
