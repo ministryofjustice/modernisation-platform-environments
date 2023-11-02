@@ -83,7 +83,9 @@ locals {
     jumpserver        = local.security_groups.jumpserver
   }
 
-  baseline_ssm_parameters = {}
+  baseline_ssm_parameters = {
+    join_domain = local.join_domain_ssm_parameters
+  }
 
   baseline_sns_topics = {}
 
