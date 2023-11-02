@@ -39,7 +39,6 @@ locals {
   landing_to_raw_version           = lookup(var.landing_to_raw_versions, local.environment)
   update_metadata_version          = lookup(var.update_metadata_versions, local.environment)
   update_schema_version            = lookup(var.update_schema_versions, local.environment)
-  preview_data_version             = lookup(var.preview_data_versions, local.environment)
 
   # Environment vars that are used by many lambdas
   logger_environment_vars = {

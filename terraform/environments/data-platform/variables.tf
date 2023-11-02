@@ -49,8 +49,3 @@ variable "update_metadata_versions" {
 variable "update_schema_versions" {
   type = map(any)
 }
-
-variable "preview_data_versions" {
-  type = map(any)
-}
-

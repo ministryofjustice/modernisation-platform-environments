@@ -20,12 +20,10 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.data_product,
       aws_api_gateway_resource.register_data_product,
       aws_api_gateway_resource.data_product_name,
-      aws_api_gateway_resource.data_product_preview,
       aws_api_gateway_resource.data_product_table,
       aws_api_gateway_resource.data_product_table_name,
       aws_api_gateway_resource.upload_data_for_data_product_table_name,
       aws_api_gateway_resource.schema_for_data_product_table_name,
-      aws_api_gateway_resource.preview_data_from_data_product,
       aws_api_gateway_method.docs,
       aws_api_gateway_method.get_glue_metadata,
       aws_api_gateway_method.register_data_product,
@@ -43,8 +41,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_integration.create_schema_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.get_schema_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.update_data_product_to_lambda,
-      aws_api_gateway_integration.update_schema_for_data_product_table_name_to_lambda,
-      aws_api_gateway_resource.preview_data_from_data_product_lambda,
+      aws_api_gateway_integration.update_schema_for_data_product_table_name_to_lambda
     ]))
   }
 
@@ -204,6 +201,11 @@ resource "aws_api_gateway_resource" "schema_for_data_product_table_name" {
   parent_id   = aws_api_gateway_resource.data_product_table_name.id
   path_part   = "schema"
   rest_api_id = aws_api_gateway_rest_api.data_platform.id
+}
+
+moved {
+  from = aws_api_gateway_resource.create_schema_for_data_product_table_name
+  to   = aws_api_gateway_resource.schema_for_data_product_table_name
 }
 
 # /data-product/{data-product-name}/table/{table-name}/upload POST method
@@ -430,44 +432,3 @@ resource "aws_api_gateway_integration" "get_glue_metadata" {
     "integration.request.querystring.table"    = "method.request.querystring.table"
   }
 }
-
-# Preview data 
-
-# /data-product/{data-product-name}/table/{table-name}/preview resource
-resource "aws_api_gateway_resource" "data_product_preview" {
-  parent_id   = aws_api_gateway_resource.data_product_table_name.id
-  path_part   = "preview"
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
-}
-
-
-# /data-product/{data-product-name}/table/{table-name}/preview GET method
-resource "aws_api_gateway_method" "preview_data_from_data_product" {
-  authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.authorizer.id
-  http_method   = "GET"
-  resource_id   = aws_api_gateway_resource.data_product_preview
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
-
-  request_parameters = {
-    "method.request.header.Authorization"   = true,
-    "method.request.path.data-product-name" = true,
-    "method.request.path.table-name"        = true,
-  }
-}
-
-# /data-product/{data-product-name}/table/{table-name}/preview  lambda integration
-resource "aws_api_gateway_integration" "preview_data_from_data_product_lambda" {
-  http_method             = aws_api_gateway_method.preview_data_from_data_product
-  resource_id             = aws_api_gateway_resource.data_product_preview
-  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = module.preview_data_lambda.lambda_function_invoke_arn
-
-  request_parameters = {
-    "integration.request.path.data-product-name" = "method.request.path.data-product-name",
-    "integration.request.path.table-name"        = "method.request.path.table-name",
-  }
-}
-
