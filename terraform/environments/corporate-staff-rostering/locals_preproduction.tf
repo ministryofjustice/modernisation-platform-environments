@@ -190,7 +190,7 @@ locals {
           app-config-status = "pending"
           csr-region        = "Region 4"
           os-type           = "Windows"
-          ami               = "pp-csr-a-17-a"
+          ami               = "pp-csr-a-18-b"
           component         = "app"
         }
         route53_records = {
@@ -477,7 +477,7 @@ locals {
           app-config-status = "pending"
           csr-region        = "Region 3 and 4"
           os-type           = "Windows"
-          ami               = "PPCWW00006"
+          ami               = "pp-csr-w-6-b"
           component         = "web"
         }
         route53_records = {
