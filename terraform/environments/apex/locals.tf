@@ -28,7 +28,7 @@ locals {
 
   #layer config
   s3layerkey = "nodejs.zip"
-  compatible_runtimes = "nodejs14.x"
+  compatible_runtimes = "nodejs18.x"
 
   application_test_url = "https://apex.laa-development.modernisation-platform.service.justice.gov.uk/apex/"
 }
