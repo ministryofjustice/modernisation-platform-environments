@@ -446,7 +446,7 @@ resource "aws_api_gateway_method" "preview_data_from_data_product" {
   authorization = "CUSTOM"
   authorizer_id = aws_api_gateway_authorizer.authorizer.id
   http_method   = "GET"
-  resource_id   = aws_api_gateway_resource.data_product_preview
+  resource_id   = aws_api_gateway_resource.data_product_preview.id
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
 
   request_parameters = {
