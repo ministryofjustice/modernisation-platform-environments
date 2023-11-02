@@ -621,9 +621,31 @@ data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
     ]
     resources = [
       "${module.data_s3_bucket.bucket.arn}/curated/*",
-      "${module.data_s3_bucket.bucket.arn}",
+      "${module.data_s3_bucket.bucket.arn}"
+    ]
+  }
+  statement {
+    sid    = "s3AthenaAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
       "${module.s3_athena_query_results_bucket.bucket.arn}",
       "${module.s3_athena_query_results_bucket.bucket.arn}/*"
+    ]
+  }
+  statement {
+    sid    = "GluePermissions"
+    effect = "Allow"
+    actions = [
+      "glue:GetPartitions",
+      "glue:GetTable"
+    ]
+    resources = [
+      "*"
     ]
   }
   statement {
