@@ -50,7 +50,7 @@ ansible_group_vars=
 for ((i=0; i<$${#tags[@]}; i++)); do
   tag=($${tags[i]})
   # aws ec2 describe-tags comes out in alphabetical order
-  if [[ $"${tag[1]}" == "database" || "$${tag[1]}" == "delius-environment-name" || "$${tag[1]}" == "environment-name" ]]
+  if [[ $"$${tag[1]}" == "database" || "$${tag[1]}" == "delius-environment-name" || "$${tag[1]}" == "environment-name" ]]
   then
     [ "$${tag[1]}" == "database" ] && database=$${tag[4]}
     [ "$${tag[1]}" == "delius-environment-name" ] && delius_environment_name=$${tag[4]}
