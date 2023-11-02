@@ -8,7 +8,6 @@ locals {
       to_port         = var.security_group_ingress_to_port
       protocol        = var.security_group_ingress_protocol
       prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-      # cidr_blocks     = ["0.0.0.0/0"]
     }
   }
 
