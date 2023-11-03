@@ -33,14 +33,7 @@
         "containerPath": "\\ProgramData\\storage"
       }
     ],
-    "volumes": [
-      {
-        "name": "tribunals-all-storage",
-        "host": {
-          "sourcePath": "/"
-        }
-      }
-    ],
+
     "environment" : [
       {
         "name"  : "supportEmail",

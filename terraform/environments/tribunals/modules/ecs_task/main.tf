@@ -8,6 +8,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
 
   volume {
     name = var.task_definition_volume
+    host_path = "/"
   }
 
   container_definitions = var.task_definition
