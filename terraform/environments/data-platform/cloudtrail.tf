@@ -47,4 +47,9 @@ resource "aws_cloudtrail" "data_s3_put_objects" {
     }
   }
 
+  cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.data_platform_s3_putobject_trail.arn}:*" # CloudTrail requires the Log Stream wildcard
+}
+
+resource "aws_cloudwatch_log_group" "data_platform_s3_putobject_trail" {
+  name = "/aws/cloudtrail/data_platform_s3_putobject_trail_${local.environment}"
 }
