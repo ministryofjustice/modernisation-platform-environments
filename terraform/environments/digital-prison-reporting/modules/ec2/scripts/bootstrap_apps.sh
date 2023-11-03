@@ -47,9 +47,9 @@ sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclien
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-sqlplus-21.8.0.0.0-1.x86_64.rpm
 echo "Oracle Client Libs Installed okay !"
 
-# Install SSM Agent
+# Install SSM Agent, if it is not installed already
 cd /tmp
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+rpm -qa | grep amazon-ssm-agent || yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 echo "SSM Agent Libs Installed okay !"
 
 # Install Postgresql
