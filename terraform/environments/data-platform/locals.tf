@@ -54,7 +54,7 @@ locals {
   }
 
   openmetadata_environment_vars = {
-    OPENMETADATA_JWT = aws_secretsmanager_secret.openmetadata.id
+    OPENMETADATA_JWT_SECRET = aws_secretsmanager_secret.openmetadata.id
     OPENMETADATA_DEV_API_URL = "https://catalogue.apps-tools.development.data-platform.service.justice.gov.uk/api"
   }
 }
