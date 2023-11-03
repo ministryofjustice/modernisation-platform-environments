@@ -63,16 +63,6 @@ locals {
           systempassword = {}
         }
       }
-      "/ec2/t1-oasys-db-a" = {
-        secrets = {
-          asm-passwords = {}
-        }
-      }
-      "/ec2/t2-oasys-db-a" = {
-        secrets = {
-          asm-passwords = {}
-        }
-      }
       "/weblogic/test-oasys-bip-b" = {
         secrets = {
           admin_password     = {}

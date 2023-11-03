@@ -32,7 +32,7 @@ locals {
   ###
   webserver_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                  = "oasys_webserver_release_*"
+      ami_name                  = "oasys_webserver_release_2023-07-02*"
       ssm_parameters_prefix     = "ec2-web/"
       iam_resource_names_prefix = "ec2-web"
       availability_zone         = "${local.region}a"
