@@ -29,8 +29,8 @@
     },
     "mountPoints": [
       {
-        "sourceVolume": "tribunals-all-storage",
-        "containerPath": "c:/ProgramData/storage"
+        "sourceVolume": "tribunals",
+        "containerPath": "c:/ProgramData/storage/${app_name}"
       }
     ],
 

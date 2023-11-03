@@ -8,7 +8,11 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
 
   volume {
     name = var.task_definition_volume
-    host_path = "/"
+    docker_volume_configuration {
+      driver = "local"
+      scope = "shared"
+      autoprovision = true
+    }
   }
 
   container_definitions = var.task_definition
