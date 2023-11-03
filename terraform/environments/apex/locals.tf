@@ -13,7 +13,7 @@ locals {
   #Lambda Function creation
   snapshotDBFunctionname = "snapshotDBFunction"
   snapshotDBFunctionhandler = "snapshot/dbsnapshot.handler"
-  snapshotDBFunctionruntime = "nodejs18.x"
+  snapshotDBFunctionruntime = "nodejs16.x"
   snapshotDBFunctionfilename = "dbsnapshot.zip"
 
   deletesnapshotFunctionname = "deletesnapshotFunction"
@@ -23,12 +23,12 @@ locals {
 
   connectDBFunctionname = "connectDBFunction"
   connectDBFunctionhandler = "ssh/dbconnect.handler"
-  connectDBFunctionruntime = "nodejs18.x"
+  connectDBFunctionruntime = "nodejs16.x"
   connectDBFunctionfilename = "dbconnect.zip"
 
   #layer config
   s3layerkey = "nodejs.zip"
-  compatible_runtimes = "nodejs18.x"
+  compatible_runtimes = "nodejs16.x"
 
   application_test_url = "https://apex.laa-development.modernisation-platform.service.justice.gov.uk/apex/"
 }
