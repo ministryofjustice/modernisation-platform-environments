@@ -54,3 +54,6 @@ variable "preview_data_versions" {
   type = map(any)
 }
 
+variable "delete_table_for_data_product_versions" {
+  type = map(any)
+}
