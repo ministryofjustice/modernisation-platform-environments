@@ -458,7 +458,7 @@ resource "aws_api_gateway_method" "preview_data_from_data_product" {
 
 # /data-product/{data-product-name}/table/{table-name}/preview  lambda integration
 resource "aws_api_gateway_integration" "preview_data_from_data_product_lambda" {
-  http_method             = aws_api_gateway_method.preview_data_from_data_product.id
+  http_method             = aws_api_gateway_method.preview_data_from_data_product.http_method
   resource_id             = aws_api_gateway_resource.data_product_preview.id
   rest_api_id             = aws_api_gateway_rest_api.data_platform.id
   integration_http_method = "POST"
