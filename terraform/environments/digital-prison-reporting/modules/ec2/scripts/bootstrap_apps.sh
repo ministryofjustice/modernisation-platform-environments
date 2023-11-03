@@ -143,7 +143,7 @@ EOF
 chmod 0755 $nomis_portforwarder_script; su -c $nomis_portforwarder_script ssm-user
 fi   
 
-# Start Stream at Start of the EC2
+# Start Stream at Start of the EC2 
 sudo chkconfig aws-kinesis-agent on
 sudo service aws-kinesis-agent start
 sudo systemctl start amazon-ssm-agent
