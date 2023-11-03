@@ -971,6 +971,7 @@ locals {
                   host_header = {
                     values = [
                       "r3.pp.csr.service.justice.gov.uk",
+                      "csrppr3.az.justice.gov.uk",
                     ]
                   }
                 }]
@@ -1072,6 +1073,7 @@ locals {
                   host_header = {
                     values = [
                       "r3.pp.csr.service.justice.gov.uk",
+                      "csrppr3.az.justice.gov.uk",
                     ]
                   }
                 }]
