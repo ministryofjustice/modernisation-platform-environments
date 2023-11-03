@@ -197,9 +197,12 @@ module "data_product_create_metadata_lambda" {
   tracing_mode = "Active"
   memory_size  = 128
 
-  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars, {
-    ENVIRONMENT = local.environment
-  })
+  environment_variables = merge(
+    local.logger_environment_vars,
+    local.storage_environment_vars,
+    local.openmetadata_environment_vars,
+    {ENVIRONMENT = local.environment}
+  )
 
   allowed_triggers = {
 
@@ -275,7 +278,11 @@ module "data_product_create_schema_lambda" {
   tracing_mode = "Active"
   memory_size  = 128
 
-  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+  environment_variables = merge(
+    local.logger_environment_vars,
+    local.storage_environment_vars,
+    local.openmetadata_environment_vars
+  )
   allowed_triggers = {
 
     AllowExecutionFromAPIGateway = {
@@ -332,7 +339,11 @@ module "data_product_update_metadata_lambda" {
   tracing_mode = "Active"
   memory_size  = 128
 
-  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+  environment_variables = merge(
+    local.logger_environment_vars,
+    local.storage_environment_vars,
+    local.openmetadata_environment_vars
+  )
 
   allowed_triggers = {
 
@@ -361,7 +372,11 @@ module "data_product_update_schema_lambda" {
   tracing_mode = "Active"
   memory_size  = 128
 
-  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+  environment_variables = merge(
+    local.logger_environment_vars,
+    local.storage_environment_vars,
+    local.openmetadata_environment_vars
+  )
 
   allowed_triggers = {
 

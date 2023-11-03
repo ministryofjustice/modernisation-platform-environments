@@ -52,4 +52,9 @@ locals {
     METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
     LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
   }
+
+  openmetadata_environment_vars = {
+    OPENMETADATA_JWT = aws_secretsmanager_secret.openmetadata.id
+    OPENMETADATA_DEV_API_URL = "https://catalogue.apps-tools.development.data-platform.service.justice.gov.uk/api"
+  }
 }
