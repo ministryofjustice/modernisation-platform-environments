@@ -18,7 +18,7 @@ resource "aws_s3_bucket" "PPUD" {
     }
   )
 }
-
+#
 
 resource "aws_s3_bucket_acl" "PPUD_ACL" {
   count  = local.is-production == true ? 1 : 0
