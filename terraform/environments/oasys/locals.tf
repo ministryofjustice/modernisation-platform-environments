@@ -32,7 +32,7 @@ locals {
   ###
   webserver_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                  = "oasys_webserver_release_*"
+      ami_name                  = "oasys_webserver_release_2023-07-02*"
       ssm_parameters_prefix     = "ec2-web/"
       iam_resource_names_prefix = "ec2-web"
       availability_zone         = "${local.region}a"
@@ -100,9 +100,13 @@ locals {
 
   database_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name          = "oasys_oracle_db_release_2023-06-26T10-16-03.670Z"
-      ami_owner         = "self"
-      availability_zone = "${local.region}a"
+      ami_name                  = "oasys_oracle_db_release_2023-06-26T10-16-03.670Z"
+      ami_owner                 = "self"
+      availability_zone         = "${local.region}a"
+      instance_profile_policies = flatten([
+        module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
+        "Ec2OracleEnterpriseManagerPolicy"
+      ])
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
       tags = {
@@ -175,6 +179,9 @@ locals {
     }
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
     ssm_parameters = {
+      asm-passwords = {}
+    }
+    secretsmanager_secrets = {
       asm-passwords = {}
     }
     # Example target group setup below
