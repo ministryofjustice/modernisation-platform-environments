@@ -27,7 +27,21 @@
         "awslogs-stream-prefix" : "ecs"
       }
     },
-    "environment" : [      
+    "mountPoints": [
+      {
+        "sourceVolume": "tribunals-ecs-ec2-2c",
+        "containerPath": "\\ProgramData\storage"
+      }
+    ],
+    "volumes": [
+      {
+        "name": "tribunals-ecs-ec2-2c",
+        "host": {
+          "sourcePath": "/"
+        }
+      }
+    ],
+    "environment" : [
       {
         "name"  : "supportEmail",
         "value" : "${supportEmail}"
