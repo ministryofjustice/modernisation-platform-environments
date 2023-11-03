@@ -30,7 +30,7 @@
     "mountPoints": [
       {
         "sourceVolume": "tribunals",
-        "containerPath": "c:/ProgramData/storage/${app_name}"
+        "containerPath": "c:/ProgramData/storage/"
       }
     ],
 
