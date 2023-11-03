@@ -15,6 +15,7 @@ resource "aws_secretsmanager_secret" "openmetadata" {
   tags = local.tags
 }
 
-data "aws_secretsmanager_secret_version" "openmetadata" {
-  secret_id = aws_secretsmanager_secret.openmetadata.id
-}
+## add this in after created
+# data "aws_secretsmanager_secret_version" "openmetadata" {
+#   secret_id = aws_secretsmanager_secret.openmetadata.id
+# }
