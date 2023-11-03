@@ -8,3 +8,13 @@ resource "aws_secretsmanager_secret" "api_auth" {
 data "aws_secretsmanager_secret_version" "api_auth" {
   secret_id = aws_secretsmanager_secret.api_auth.id
 }
+
+# openmeta jwt for api
+resource "aws_secretsmanager_secret" "openmetadata" {
+  name = "data-platform-openmetadata-token"
+  tags = local.tags
+}
+
+data "aws_secretsmanager_secret_version" "openmetadata" {
+  secret_id = aws_secretsmanager_secret.openmetadata.id
+}
