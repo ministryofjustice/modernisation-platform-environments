@@ -29,13 +29,13 @@
     },
     "mountPoints": [
       {
-        "sourceVolume": "tribunals-ecs-ec2-2c",
+        "sourceVolume": "tribunals-all-storage",
         "containerPath": "\\ProgramData\\storage"
       }
     ],
     "volumes": [
       {
-        "name": "tribunals-ecs-ec2-2c",
+        "name": "tribunals-all-storage",
         "host": {
           "sourcePath": "/"
         }
