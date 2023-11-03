@@ -144,6 +144,7 @@ variable "ec2_autoscaling_groups" {
       user_data_raw                 = optional(string)
       iam_resource_names_prefix     = optional(string, "ec2")
       instance_profile_policies     = list(string)
+      secretsmanager_secrets_prefix = optional(string, "")
       ssm_parameters_prefix         = optional(string, "")
       subnet_name                   = optional(string)
       availability_zone             = optional(string)
@@ -232,6 +233,10 @@ variable "ec2_autoscaling_groups" {
         special = optional(bool)
       }))
       value = optional(string)
+    })))
+    secretsmanager_secrets = optional(map(object({
+      description = optional(string)
+      kms_key_id  = optional(string, "general")
     })))
     lb_target_groups = optional(map(object({
       port                 = optional(number)
