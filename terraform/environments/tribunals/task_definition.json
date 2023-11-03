@@ -30,7 +30,7 @@
     "mountPoints": [
       {
         "sourceVolume": "tribunals-ecs-ec2-2c",
-        "containerPath": "\\ProgramData\storage"
+        "containerPath": "\\ProgramData\\storage"
       }
     ],
     "volumes": [
