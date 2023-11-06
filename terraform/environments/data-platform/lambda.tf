@@ -377,7 +377,7 @@ module "preview_data_lambda" {
   source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
   application_name               = "data_product_preview_data"
   tags                           = local.tags
-  description                    = "Query small sample of data through athena "
+  description                    = "Preview small sample of data through athena "
   role_name                      = "preview_data_role_${local.environment}"
   policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_preview_data.json
   policy_json_attached           = true
