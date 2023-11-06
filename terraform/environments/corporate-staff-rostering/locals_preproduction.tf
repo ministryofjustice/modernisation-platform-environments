@@ -64,6 +64,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -89,8 +90,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-a-14-b = {
@@ -103,6 +102,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -128,8 +128,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-a-17-a = {
@@ -142,6 +140,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -167,8 +166,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-a-18-b = {
@@ -206,8 +203,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-a-2-b = {
@@ -220,6 +215,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -243,8 +239,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-a-3-a = {
@@ -257,6 +251,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -280,8 +275,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-a-15-a = {
@@ -294,6 +287,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -319,8 +313,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-a-16-b = {
@@ -333,6 +325,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -358,8 +351,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-w-1-a = {
@@ -372,6 +363,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["web", "domain", "jumpserver"]
           tags = {
@@ -397,8 +389,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-w-2-b = {
@@ -411,6 +401,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -436,8 +427,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-w-5-a = {
@@ -450,6 +439,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -474,8 +464,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-w-6-b = {
@@ -488,6 +476,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -513,8 +502,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-w-7-a = {
@@ -527,6 +514,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -550,8 +538,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-w-8-b = {
@@ -564,6 +550,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -587,8 +574,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
       pp-csr-w-3-a = {
@@ -601,6 +586,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -626,8 +612,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination = true
-        disable_api_stop        = true
       }
 
       pp-csr-w-4-b = {
@@ -640,6 +624,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -665,8 +650,6 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        disable_api_termination  = true
-        disable_api_stop         = true
       }
 
     }
