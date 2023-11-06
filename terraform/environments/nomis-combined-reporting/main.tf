@@ -60,6 +60,10 @@ module "baseline" {
     local.baseline_s3_buckets,
     lookup(local.environment_config, "baseline_s3_buckets", {}),
   )
+  secretsmanager_secrets = merge(
+    local.baseline_secretsmanager_secrets,
+    lookup(local.baseline_environment_config, "baseline_secretsmanager_secrets", {})
+  )
   ec2_instances = merge(
     local.baseline_ec2_instances,
     lookup(local.environment_config, "baseline_ec2_instances", {}),
