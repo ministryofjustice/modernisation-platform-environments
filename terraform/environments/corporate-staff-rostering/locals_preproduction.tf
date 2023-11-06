@@ -17,6 +17,8 @@ locals {
         instance = merge(local.database_ec2.instance, {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+          disable_api_termination      = true
+          disable_api_stop             = true        
         })
 
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
@@ -37,9 +39,6 @@ locals {
             total_size = 100
           }
         })
-
-        disable_api_termination = true
-        disable_api_stop        = true
 
         ssm_parameters = {
           asm-passwords = {}
