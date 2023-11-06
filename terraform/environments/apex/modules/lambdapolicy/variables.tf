@@ -1,8 +1,8 @@
 variable "backup_policy_name" {
-  type        = string
-  default     = null
+  type    = string
+  default = null
 }
 
 variable "tags" {
-  type        = map(any)
+  type = map(any)
 }
