@@ -414,7 +414,7 @@ module "delete_table_for_data_product_lambda" {
   create_role                    = true
   reserved_concurrent_executions = 1
 
-  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-delete-table-for-data-product-lambda-ecr-repo:${local.get_schema_version}"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-delete-table-for-data-product-lambda-ecr-repo:${local.delete_table_for_data_product_version}"
   timeout      = 600
   tracing_mode = "Active"
   memory_size  = 128
