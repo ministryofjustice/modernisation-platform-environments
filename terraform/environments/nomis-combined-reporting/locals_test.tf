@@ -44,9 +44,9 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "/t1-ncr-bip-cmc/passwords"              = local.bip_cmc_secretsmanager_secrets
-      "/t1-ncr-bip/passwords"                  = local.bip_secretsmanager_secrets
-      "/tomcat/passwords"                      = local.tomcat_secretsmanager_secrets
+      "/t1-ncr-bip-cmc"              = local.bip_cmc_secretsmanager_secrets
+      "/t1-ncr-bip"                  = local.bip_secretsmanager_secrets
+      "/t1-ncr-tomcat"               = local.tomcat_secretsmanager_secrets
     }
 
     baseline_ec2_instances = {
