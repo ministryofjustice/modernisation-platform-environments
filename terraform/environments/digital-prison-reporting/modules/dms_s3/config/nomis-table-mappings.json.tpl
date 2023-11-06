@@ -101,6 +101,19 @@
                "type": "string",
                "length": 70
             }
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "870343805",
+            "rule-name": "870343805",
+            "rule-action": "rename",
+            "rule-target": "column",
+            "object-locator": {
+            "schema-name": "%",
+               "table-name": "%"
+               "column-name" : "Op"
+            },
+            "value": "_operation"
         }
     ]
 }

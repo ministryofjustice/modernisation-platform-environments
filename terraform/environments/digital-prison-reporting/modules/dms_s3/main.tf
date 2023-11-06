@@ -46,9 +46,9 @@ resource "aws_dms_replication_task" "dms-replication" {
   table_mappings            = data.template_file.table-mappings.rendered
   replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings.json")
 
-#  lifecycle {
-#    ignore_changes = [replication_task_settings]
-#  }
+  #  lifecycle {
+  #    ignore_changes = [replication_task_settings]
+  #  }
 
   depends_on = [
     aws_dms_replication_instance.dms-s3-target-instance,
@@ -91,10 +91,11 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   cdc_path                         = "cdc"
   timestamp_column_name            = "_timestamp"
   parquet_timestamp_in_millisecond = true
+  include_op_for_full_load         = true
 
-  max_file_size            = 120000
-  cdc_max_batch_interval   = 10
-  cdc_inserts_and_updates  = true
+  max_file_size           = 120000
+  cdc_max_batch_interval  = 10
+  cdc_inserts_and_updates = true
 
   depends_on = [aws_iam_policy.dms-s3-target-policy, aws_iam_policy.dms-operator-s3-policy]
 
