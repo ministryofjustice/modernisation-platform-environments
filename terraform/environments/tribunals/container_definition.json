@@ -46,6 +46,10 @@
       {
         "name"  : "CurServer",
         "value" : "${CurServer}"
+      },
+      {
+        "name"  : "RDS_PASSWORD",
+        "value" : "${rds_password}"
       }
     ]
   }
