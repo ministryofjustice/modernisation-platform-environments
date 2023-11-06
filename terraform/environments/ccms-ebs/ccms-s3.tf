@@ -187,7 +187,7 @@ module "s3-bucket-dbbackup" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
   bucket_name        = local.rsync_bucket_name
-  versioning_enabled = false
+  versioning_enabled = true
   bucket_policy      = [data.aws_iam_policy_document.dbbackup_s3_policy.json]
 
   log_bucket = local.logging_bucket_name
