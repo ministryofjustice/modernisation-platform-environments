@@ -24,7 +24,7 @@ module "transport" {
   app_source_db_url                 = local.source_db_url
   app_source_db_user                = local.source_db_user
   app_source_db_password            = local.source_db_password
-  app_container_definition_image    = local.container_definition_image
+  container_definition_image        = local.container_definition_image
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
@@ -58,7 +58,7 @@ module "appeals" {
   app_source_db_url                 = local.source_db_url
   app_source_db_user                = local.source_db_user
   app_source_db_password            = local.source_db_password
-  app_container_definition_image    = local.container_definition_image
+  container_definition_image        = local.container_definition_image
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
