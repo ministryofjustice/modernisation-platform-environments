@@ -11,6 +11,12 @@ locals {
     }
   }
 
+  tomcat_secretsmanager_secrets = {
+    secrets = {
+      passwords = {}
+    }
+  }
+
   tomcat_target_group_http_7777 = {
     port                 = 7777
     protocol             = "HTTP"
