@@ -62,7 +62,7 @@ module "baseline" {
   )
   secretsmanager_secrets = merge(
     local.baseline_secretsmanager_secrets,
-    lookup(local.baseline_environment_config, "baseline_secretsmanager_secrets", {})
+    lookup(local.environment_config, "baseline_secretsmanager_secrets", {})
   )
   ec2_instances = merge(
     local.baseline_ec2_instances,
