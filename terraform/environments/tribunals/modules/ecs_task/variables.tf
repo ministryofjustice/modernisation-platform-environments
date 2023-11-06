@@ -8,9 +8,9 @@ variable "task_definition_volume" {
   description = "Name of the volume referenced in the sourceVolume parameter of container definition in the mountPoints section"
 }
 
-variable "task_definition" {
+variable "container_definition" {
   type        = string
-  description = "Task definition to be used by the ECS service"
+  description = "Container definition to be used by the ECS service"
 }
 
 variable "tags_common" {

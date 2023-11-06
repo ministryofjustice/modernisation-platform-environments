@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
     }
   }
 
-  container_definitions = var.task_definition
+  container_definitions = var.container_definition
 
   runtime_platform {
      operating_system_family = "WINDOWS_SERVER_2019_CORE"

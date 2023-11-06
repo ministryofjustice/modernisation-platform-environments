@@ -8,7 +8,7 @@
       "-Command"
   ],
     "name"      : "${app_name}-container",
-    "image"     : "mcr.microsoft.com/dotnet/framework/aspnet:4.8",
+    "image"     : "${aws_ecr_repository.app-ecr-repo.repository_url}:latest",
     "cpu"       : 1024,
     "memory"    : 2048,
     "essential" : true,

@@ -15,7 +15,7 @@ locals {
   app_user_data = base64encode(templatefile("user_data.sh", {
     cluster_name = "${local.app}_app_cluster"
   }))
-  app_task_definition = templatefile("task_definition.json", {
+  app_task_definition = templatefile("container_definition.json", {
     app_name            = "${local.app}"
     #ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
     #docker_image_tag    = "latest" 
