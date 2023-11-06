@@ -6,7 +6,6 @@ locals {
   source_db_url                = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
   source_db_user               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   source_db_password           = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
-  container_definition_image   = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
 }
 
 module "transport" {
@@ -24,7 +23,7 @@ module "transport" {
   app_source_db_url                 = local.source_db_url
   app_source_db_user                = local.source_db_user
   app_source_db_password            = local.source_db_password
-  container_definition_image        = local.container_definition_image
+  container_definition_image        = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
@@ -58,7 +57,7 @@ module "appeals" {
   app_source_db_url                 = local.source_db_url
   app_source_db_user                = local.source_db_user
   app_source_db_password            = local.source_db_password
-  container_definition_image        = local.container_definition_image
+  container_definition_image        = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
