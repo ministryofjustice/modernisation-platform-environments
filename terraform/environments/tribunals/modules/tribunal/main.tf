@@ -25,7 +25,7 @@ locals {
     supportTeam                = "${var.application_data.support_team}"
     CurServer                  = "${var.application_data.curserver}"
     container_definition_image = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
-    rds_password               = "${aws_db_instance.rdsdb.password}"
+    rds_password               = "${local.app_rds_password}"
   })
   app_ec2_ingress_rules = {   
     "cluster_ec2_lb_ingress_2" = {
