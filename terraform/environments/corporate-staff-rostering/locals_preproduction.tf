@@ -1209,7 +1209,7 @@ locals {
                 }]
               }
               web-34-7780 = {
-                priority = 1280
+                priority = 3480
                 actions = [{
                   type              = "forward"
                   target_group_name = "web-34-7780"
