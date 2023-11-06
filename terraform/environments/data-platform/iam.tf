@@ -609,6 +609,7 @@ resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatchlogs" {
 data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
   source_policy_documents = [
     data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
   ]
   statement {
@@ -629,6 +630,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
     actions = [
       "s3:GetObject",
       "s3:ListBucket",
+      "s3:PutObject",
       "s3:GetBucketLocation"
     ]
     resources = [
@@ -640,8 +642,11 @@ data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
     sid    = "GluePermissions"
     effect = "Allow"
     actions = [
-      "glue:GetPartitions",
-      "glue:GetTable"
+     	  "glue:GetTable",
+				"glue:GetPartitions",
+				"glue:GetPartition",
+				"glue:GetDatabases",
+				"glue:GetDatabase"
     ]
     resources = [
       "*"
