@@ -57,3 +57,16 @@ mainSteps:
     inputs: 
       name: AWSEC2Launch-Agent
       action: Install
+
+  - name: NewHostName
+    action: aws:runPowerShellScript
+    onFailure: Abort
+    inputs:
+      runCommand: 
+        - $currentHostName = (Get-WmiObject -Class Win32_ComputerSystem).Name
+        - if ($currentName -like '*t*') { Write-Output $currentHostName }
+        - $newHostName = $currentHostName -replace 't', ''
+        - Rename-Computer -NewName $newHostName -Restart
+        - exit 3010
+        - Write-Host "INFO: Hostname has been succesfully changed to $newHostname"
+            $hostname = $newHostname
