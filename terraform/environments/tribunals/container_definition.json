@@ -8,7 +8,7 @@
       "-Command"
   ],
     "name"      : "${app_name}-container",
-    "image"     : "${aws_ecr_repository.app-ecr-repo.repository_url}:latest",
+    "image"     : "${container_definition_image}",
     "cpu"       : 1024,
     "memory"    : 2048,
     "essential" : true,
