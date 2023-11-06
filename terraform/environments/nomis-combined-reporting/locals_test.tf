@@ -43,6 +43,12 @@ locals {
       "/oracle/database/T1BIPAUD" = local.database_ssm_parameters
     }
 
+    baseline_secretsmanager_secrets = {
+      "/t1-ncr-bip-cmc/passwords"              = local.bip_cmc_secretsmanager_secrets
+      "/t1-ncr-bip/passwords"                  = local.bip_secretsmanager_secrets
+      "/tomcat/passwords"                      = local.tomcat_secretsmanager_secrets
+    }
+
     baseline_ec2_instances = {
       t1-ncr-bip-cmc = merge(local.bip_cmc_ec2_default, {
         tags = merge(local.bip_cmc_ec2_default.tags, {
