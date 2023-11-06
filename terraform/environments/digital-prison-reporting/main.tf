@@ -117,7 +117,7 @@ module "glue_reporting_hub_batch_job" {
     "--datalake-formats"                    = "delta"
     "--dpr.aws.region"                      = local.account_region
     # Using s3a scheme for raw path to enable Hadoop list the files in the bucket
-    "--dpr.raw.s3.path"                     = "s3a://${module.s3_dms_raw_bucket.bucket_id}/"
+    "--dpr.raw.s3.path"                     = "s3://${module.s3_dms_raw_bucket.bucket_id}/"
     "--dpr.structured.s3.path"              = "s3://${module.s3_dms_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"              = "s3://${module.s3_dms_violation_bucket.bucket_id}/"
     "--dpr.curated.s3.path"                 = "s3://${module.s3_dms_curated_bucket.bucket_id}/"

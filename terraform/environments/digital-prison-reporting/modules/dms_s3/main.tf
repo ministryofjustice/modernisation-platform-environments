@@ -83,12 +83,14 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
 resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   count = var.setup_dms_instance ? 1 : 0
 
-  endpoint_id             = "${var.project_id}-dms-${var.short_name}-s3-target"
-  endpoint_type           = "target"
-  bucket_name             = var.bucket_name
-  service_access_role_arn = aws_iam_role.dms-s3-role.arn
-  data_format             = "parquet"
-  cdc_path = "cdc"
+  endpoint_id                      = "${var.project_id}-dms-${var.short_name}-s3-target"
+  endpoint_type                    = "target"
+  bucket_name                      = var.bucket_name
+  service_access_role_arn          = aws_iam_role.dms-s3-role.arn
+  data_format                      = "parquet"
+  cdc_path                         = "cdc"
+  timestamp_column_name            = "_timestamp"
+  parquet_timestamp_in_millisecond = true
 
   max_file_size            = 120000
   cdc_max_batch_interval   = 10
