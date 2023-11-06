@@ -38,6 +38,9 @@ locals {
           }
         })
 
+        disable_api_termination = true
+        disable_api_stop        = true
+
         ssm_parameters = {
           asm-passwords = {}
         }
@@ -86,6 +89,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-a-14-b = {
@@ -123,6 +128,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-a-17-a = {
@@ -160,6 +167,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-a-18-b = {
@@ -197,6 +206,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-a-2-b = {
@@ -232,6 +243,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-a-3-a = {
@@ -267,6 +280,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-a-15-a = {
@@ -304,6 +319,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-a-16-b = {
@@ -341,6 +358,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-w-1-a = {
@@ -374,6 +393,12 @@ locals {
           ami               = "PPCWW00001"
           component         = "web"
         }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-w-2-b = {
@@ -411,6 +436,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-w-5-a = {
@@ -447,6 +474,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-w-6-b = {
@@ -484,6 +513,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-w-7-a = {
@@ -515,6 +546,12 @@ locals {
           ami               = "pp-csr-w-7-b"
           component         = "web"
         }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-w-8-b = {
@@ -546,6 +583,12 @@ locals {
           ami               = "pp-csr-w-8-b"
           component         = "web"
         }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
       pp-csr-w-3-a = {
@@ -583,6 +626,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination = true
+        disable_api_stop        = true
       }
 
       pp-csr-w-4-b = {
@@ -620,6 +665,8 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
+        disable_api_termination  = true
+        disable_api_stop         = true
       }
 
     }
