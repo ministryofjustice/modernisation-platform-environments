@@ -110,7 +110,7 @@
             "rule-target": "column",
             "object-locator": {
             "schema-name": "%",
-               "table-name": "%"
+               "table-name": "%",
                "column-name" : "Op"
             },
             "value": "_operation"
