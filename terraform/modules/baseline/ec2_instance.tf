@@ -49,7 +49,7 @@ module "ec2_instance" {
       }
     )
   }
-  secretsmanager_secrets = each.value.secretsmanager_secrets == null ? null : {
+  secretsmanager_secrets = each.value.secretsmanager_secrets == null ? {} : {
     for key, value in each.value.secretsmanager_secrets : key => merge(value,
       value.kms_key_id == null ? { kms_key_id = null } : { kms_key_id = try(var.environment.kms_keys[value.kms_key_id].arn, value.kms_key_id) }
     )
