@@ -46,6 +46,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_integration.update_data_product_to_lambda,
       aws_api_gateway_integration.update_schema_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.preview_data_from_data_product_lambda,
+      aws_api_gateway_integration.delete_table_for_data_product_to_lambda,
     ]))
   }
 
