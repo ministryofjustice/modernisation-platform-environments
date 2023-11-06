@@ -15,7 +15,7 @@ locals {
   app_user_data = base64encode(templatefile("user_data.sh", {
     cluster_name = "${local.app}_app_cluster"
   }))
-  app_task_definition = templatefile("container_definition.json", {
+  app_container_definition = templatefile("container_definition.json", {
     app_name            = "${local.app}"
     #ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
     #docker_image_tag    = "latest" 
@@ -125,7 +125,7 @@ module "app_ecs_task" {
   source                      = "../ecs_task"
   app_name                    = local.app
   task_definition_volume      = var.task_definition_volume
-  task_definition             = local.app_task_definition
+  container_definition        = local.app_container_definition
   tags_common                 = var.tags
   appscaling_min_capacity     = var.appscaling_min_capacity
   appscaling_max_capacity     = var.appscaling_max_capacity
