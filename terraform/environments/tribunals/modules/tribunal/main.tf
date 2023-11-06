@@ -15,17 +15,16 @@ locals {
   app_user_data = base64encode(templatefile("user_data.sh", {
     cluster_name = "${local.app}_app_cluster"
   }))
-  container_definition_image = "${var.container_definition_image}"
   app_container_definition = templatefile("container_definition.json", {
-    app_name            = "${local.app}"
+    app_name                   = "${local.app}"
     #ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
     #docker_image_tag    = "latest" 
     #sentry_env          = local.environment
-    awslogs-group       = "${local.app}-ecs-log-group"
-    supportEmail        = "${var.application_data.support_email}"
-    supportTeam         = "${var.application_data.support_team}"
-    CurServer           = "${var.application_data.curserver}"
-
+    awslogs-group              = "${local.app}-ecs-log-group"
+    supportEmail               = "${var.application_data.support_email}"
+    supportTeam                = "${var.application_data.support_team}"
+    CurServer                  = "${var.application_data.curserver}"
+    container_definition_image = "${var.container_definition_image}"
   })
   app_ec2_ingress_rules = {   
     "cluster_ec2_lb_ingress_2" = {
