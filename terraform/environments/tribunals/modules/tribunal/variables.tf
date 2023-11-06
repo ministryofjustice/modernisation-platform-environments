@@ -89,8 +89,3 @@ variable "aws_acm_certificate_external" {
 
 variable "vpc_shared_id" {  
 }
-
-variable "container_definition_image" {
-  type        = string
-  description = "The container definition image to be used"
-}

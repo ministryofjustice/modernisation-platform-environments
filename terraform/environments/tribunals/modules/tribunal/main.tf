@@ -24,7 +24,7 @@ locals {
     supportEmail               = "${var.application_data.support_email}"
     supportTeam                = "${var.application_data.support_team}"
     CurServer                  = "${var.application_data.curserver}"
-    container_definition_image = "${var.container_definition_image}"
+    container_definition_image = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
   })
   app_ec2_ingress_rules = {   
     "cluster_ec2_lb_ingress_2" = {
