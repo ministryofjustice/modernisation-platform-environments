@@ -11,6 +11,12 @@ locals {
     }
   }
 
+  bip_secretsmanager_secrets = {
+    secrets = {
+      passwords = {}
+    }
+  }
+
   bip_target_group_http_7777 = {
     port                 = 7777
     protocol             = "HTTP"
