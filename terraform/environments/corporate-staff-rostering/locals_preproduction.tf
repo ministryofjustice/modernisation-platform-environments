@@ -17,6 +17,8 @@ locals {
         instance = merge(local.database_ec2.instance, {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+          disable_api_termination      = true
+          disable_api_stop             = true        
         })
 
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
@@ -51,6 +53,82 @@ locals {
         }
       })
 
+      pp-csr-a-13-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-a-13-a"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        tags = {
+          description       = "Migrated server PPCAW00013"
+          app-config-status = "pending"
+          csr-region        = "Region 1"
+          os-type           = "Windows"
+          ami               = "pp-csr-a-13-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pp-csr-a-14-b = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-a-14-b"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}b"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 56 }
+        }
+        tags = {
+          description       = "Migrated server PPCAW00014"
+          app-config-status = "configured"
+          csr-region        = "Region 2"
+          os-type           = "Windows"
+          ami               = "pp-csr-a-14-b"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
       pp-csr-a-17-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "pp-csr-a-17-a"
@@ -61,6 +139,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -75,10 +154,12 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description = "copy of PPCAW00017 for csr ${local.environment}"
-          os-type     = "Windows"
-          ami         = "pp-csr-a-17-a"
-          component   = "app"
+          description       = "Migrated server PPCAW00017"
+          app-config-status = "configured"
+          csr-region        = "Region 3"
+          os-type           = "Windows"
+          ami               = "pp-csr-a-17-a"
+          component         = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -86,131 +167,9 @@ locals {
         }
       }
 
-      pp-csr-w-7-b = {
+      pp-csr-a-18-b = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pp-csr-w-7-b"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
-          ebs_volumes_copy_all_from_ami = false
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.2xlarge"
-          disable_api_termination = true
-          monitoring              = true
-          vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
-          tags = {
-            backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
-          }
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          description = "copy of PPCWW00007 for csr ${local.environment}"
-          os-type     = "Windows"
-          ami         = "pp-csr-w-7-b"
-          component   = "web"
-        }
-      }
-
-      pp-csr-w-8-b = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pp-csr-w-8-b"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
-          ebs_volumes_copy_all_from_ami = false
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.2xlarge"
-          disable_api_termination = true
-          monitoring              = true
-          vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
-          tags = {
-            backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
-          }
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 200 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          description = "copy of PPCWW00008 for csr ${local.environment}"
-          os-type     = "Windows"
-          ami         = "pp-csr-w-8-b"
-          component   = "web"
-        }
-      }
-
-      pp-csr-w-1-b = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "PPCWW00001"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
-          ebs_volumes_copy_all_from_ami = false
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.2xlarge"
-          disable_api_termination = true
-          monitoring              = true
-          vpc_security_group_ids  = ["migration-web-sg", "domain-controller"]
-          tags = {
-            backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
-          }
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-          "/dev/sdc"  = { type = "gp3", size = 129 }
-          "/dev/sdd"  = { type = "gp3", size = 129 }
-        }
-        tags = {
-          description = "copy of PPCWW00001 for csr ${local.environment}"
-          os-type     = "Windows"
-          ami         = "PPCWW00001"
-          component   = "web"
-        }
-      }
-
-      pp-csr-w-5-a = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "PPCWW00005"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}a"
-          ebs_volumes_copy_all_from_ami = false
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.2xlarge"
-          disable_api_termination = true
-          monitoring              = true
-          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
-          tags = {
-            backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
-          }
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-          "/dev/sdc"  = { type = "gp3", size = 129 }
-        }
-        tags = {
-          description = "copy of PPCWW00005 for csr ${local.environment}"
-          os-type     = "Windows"
-          ami         = "PPCWW00005"
-          component   = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      }
-      pp-csr-a-14-b = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pp-csr-a-14-b"
+          ami_name                      = "pp-csr-a-18-b"
           ami_owner                     = "self"
           availability_zone             = "${local.region}b"
           ebs_volumes_copy_all_from_ami = false
@@ -228,20 +187,209 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 128 }
-          "/dev/sdc"  = { type = "gp3", size = 128 }
-          "/dev/sdd"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 56 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description = "copy of PPCAW00014 for csr ${local.environment}"
-          os-type     = "Windows"
-          ami         = "pp-csr-a-14-b"
-          component   = "app"
+          description       = "Migrated server PPCAW00018"
+          app-config-status = "pending"
+          csr-region        = "Region 4"
+          os-type           = "Windows"
+          ami               = "pp-csr-a-18-b"
+          component         = "app"
         }
         route53_records = {
           create_internal_record = true
           create_external_record = true
         }
       }
+
+      pp-csr-a-2-b = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-a-2-b"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}b"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        tags = {
+          description       = "Migrated server PPCAW00002"
+          app-config-status = "pending"
+          csr-region        = "Region 5"
+          os-type           = "Windows"
+          ami               = "pp-csr-a-2-b"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pp-csr-a-3-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-a-3-a"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        tags = {
+          description       = "Migrated server PPCAW00003"
+          app-config-status = "pending"
+          csr-region        = "Region 6"
+          os-type           = "Windows"
+          ami               = "pp-csr-a-3-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pp-csr-a-15-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-a-15-a"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        tags = {
+          description       = "Migrated server PPCAW00015 Training Server A"
+          app-config-status = "pending"
+          csr-region        = "Training Server A"
+          os-type           = "Windows"
+          ami               = "pp-csr-a-15-a"
+          component         = "trainingA"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pp-csr-a-16-b = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-a-16-b"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}b"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        tags = {
+          description       = "Migrated server PPCAW00016 Training Server B"
+          app-config-status = "pending"
+          csr-region        = "Training Server B"
+          os-type           = "Windows"
+          ami               = "pp-csr-a-16-b"
+          component         = "trainingB"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pp-csr-w-1-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "PPCWW00001"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["web", "domain", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 129 }
+        }
+        tags = {
+          description       = "Migrated server PPCWW00001"
+          app-config-status = "pending"
+          csr-region        = "Region 1 and 2"
+          os-type           = "Windows"
+          ami               = "PPCWW00001"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
       pp-csr-w-2-b = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "pp-csr-w-2-b"
@@ -252,6 +400,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -266,10 +415,49 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
-          description = "copy of pp-csr-w-2-b for csr ${local.environment}"
-          os-type     = "Windows"
-          ami         = "pp-csr-w-2-b"
-          component   = "web"
+          description       = "Migrated server PPCWW00002"
+          app-config-status = "configured"
+          csr-region        = "Region 1 and 2"
+          os-type           = "Windows"
+          ami               = "pp-csr-w-2-b"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pp-csr-w-5-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "PPCWW00005"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+        }
+        tags = {
+          description       = "Migrated server PPCWW00005"
+          app-config-status = "configured"
+          csr-region        = "Region 3 and 4"
+          os-type           = "Windows"
+          ami               = "PPCWW00005"
+          component         = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -287,6 +475,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -301,16 +490,167 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
-          description = "copy of pp-csr-w-6-b for csr ${local.environment}"
-          os-type     = "Windows"
-          ami         = "pp-csr-w-6-b"
-          component   = "web"
+          description       = "Migrated server PPCWW00006"
+          app-config-status = "pending"
+          csr-region        = "Region 3 and 4"
+          os-type           = "Windows"
+          ami               = "pp-csr-w-6-b"
+          component         = "web"
         }
         route53_records = {
           create_internal_record = true
           create_external_record = true
         }
       }
+
+      pp-csr-w-7-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-w-7-b"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        tags = {
+          description       = "Migrated server PPCWW00006"
+          app-config-status = "pending"
+          csr-region        = "Region 5 and 6"
+          os-type           = "Windows"
+          ami               = "pp-csr-w-7-b"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pp-csr-w-8-b = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-w-8-b"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}b"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 200 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        tags = {
+          description       = "Migrated server PPCWW00008"
+          app-config-status = "pending"
+          csr-region        = "Region 5 and 6"
+          os-type           = "Windows"
+          ami               = "pp-csr-w-8-b"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pp-csr-w-3-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-w-3-a"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 129 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 56 }
+        }
+        tags = {
+          description       = "Migrated server PPCWW00003"
+          app-config-status = "pending"
+          csr-region        = "Training Server A and B"
+          os-type           = "Windows"
+          ami               = "pp-csr-w-3-a"
+          component         = "trainingab"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pp-csr-w-4-b = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pp-csr-w-4-b"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}b"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.2xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 129 }
+        }
+        tags = {
+          description       = "Migrated server PPCWW00004"
+          app-config-status = "pending"
+          csr-region        = "Training Server A and B"
+          os-type           = "Windows"
+          ami               = "pp-csr-w-4-b"
+          component         = "trainingab"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -372,7 +712,30 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
+              { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+          web-34-7770 = {
+            port     = 7770
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7770
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
             ]
           }
           web-56-7770 = {
@@ -394,6 +757,29 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          web-78-7770 = {
+            port     = 7770
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7770
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-7-a" },
+              { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
           web-12-7771 = {
@@ -414,7 +800,30 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
+              { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+          web-34-7771 = {
+            port     = 7771
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7771
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
             ]
           }
           web-56-7771 = {
@@ -436,6 +845,29 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          web-78-7771 = {
+            port     = 7771
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7771
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-7-a" },
+              { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
           web-12-7780 = {
@@ -456,7 +888,30 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
+              { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+          web-34-7780 = {
+            port     = 7780
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7780
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
             ]
           }
           web-56-7780 = {
@@ -478,6 +933,29 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          web-78-7780 = {
+            port     = 7780
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7780
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-7-a" },
+              { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
           web-12-7781 = {
@@ -498,7 +976,30 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
+              { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+          web-34-7781 = {
+            port     = 7781
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7781
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
             ]
           }
           web-56-7781 = {
@@ -520,6 +1021,29 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          web-78-7781 = {
+            port     = 7781
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7781
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-7-a" },
+              { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
         }
@@ -554,6 +1078,21 @@ locals {
                   }
                 }]
               }
+              web-34-7770 = {
+                priority = 3470
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-34-7770"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "traina.pp.csr.service.justice.gov.uk",
+                      "traina.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7770 = {
                 priority = 5670
                 actions = [{
@@ -564,6 +1103,21 @@ locals {
                   host_header = {
                     values = [
                       "r3.pp.csr.service.justice.gov.uk",
+                      "csrppr3.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web-78-7770 = {
+                priority = 7870
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-78-7770"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r5.pp.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -582,6 +1136,21 @@ locals {
                   }
                 }]
               }
+              web-34-7771 = {
+                priority = 3471
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-34-7771"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "trainb.pp.csr.service.justice.gov.uk",
+                      "trainb.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7771 = {
                 priority = 5671
                 actions = [{
@@ -592,6 +1161,20 @@ locals {
                   host_header = {
                     values = [
                       "r4.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web-78-7771 = {
+                priority = 7871
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-78-7771"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r6.pp.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -627,6 +1210,21 @@ locals {
                   }
                 }]
               }
+              web-34-7780 = {
+                priority = 3480
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-34-7780"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "traina.pp.csr.service.justice.gov.uk",
+                      "traina.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7780 = {
                 priority = 5680
                 actions = [{
@@ -637,6 +1235,21 @@ locals {
                   host_header = {
                     values = [
                       "r3.pp.csr.service.justice.gov.uk",
+                      "csrppr3.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web-78-7780 = {
+                priority = 7880
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-78-7780"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r5.pp.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -672,6 +1285,21 @@ locals {
                   }
                 }]
               }
+              web-34-7781 = {
+                priority = 3481
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-34-7781"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "trainb.pp.csr.service.justice.gov.uk",
+                      "trainb.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7781 = {
                 priority = 5681
                 actions = [{
@@ -682,6 +1310,20 @@ locals {
                   host_header = {
                     values = [
                       "r4.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web-78-7781 = {
+                priority = 7881
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-78-7781"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "r6.pp.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -699,13 +1341,16 @@ locals {
           { name = "ppiwfm", type = "A", ttl = "300", records = ["10.40.42.132"] },
           { name = "ppiwfm-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
           { name = "ppiwfm-b", type = "CNAME", ttl = "300", records = ["pp-csr-db-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          # { name = "r3", type = "CNAME", ttl = "300", records = ["pp-csr-w-5-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "r1", type = "A", lbs_map_key = "private" },
           { name = "r2", type = "A", lbs_map_key = "private" },
           { name = "r3", type = "A", lbs_map_key = "private" },
           { name = "r4", type = "A", lbs_map_key = "private" },
+          { name = "r5", type = "A", lbs_map_key = "private" },
+          { name = "r6", type = "A", lbs_map_key = "private" },
+          { name = "traina", type = "A", lbs_map_key = "private" },
+          { name = "trainb", type = "A", lbs_map_key = "private" },
         ]
       }
     }

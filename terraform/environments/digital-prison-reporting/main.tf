@@ -71,6 +71,7 @@ module "glue_reporting_hub_job" {
     "--dpr.redshift.secrets.name"           = "${local.project}-redshift-secret-${local.environment}"
     "--dpr.datamart.db.name"                = "datamart"
     "--dpr.log.level"                       = local.reporting_hub_log_level
+    "--dpr.domainrefresh.enabled"           = local.reporting_hub_domain_refresh_enabled
   }
 }
 

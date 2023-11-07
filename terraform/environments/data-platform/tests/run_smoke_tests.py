@@ -17,11 +17,10 @@ url = base_url + presigned_url
 glue = boto3.client("glue")
 
 try:
-    auth_token = json.loads(os.environ['API_AUTH'])
-    print(auth_token.keys())
-    auth_token = auth_token['auth-token']
+    auth_token = json.loads(os.environ["API_AUTH"])
+    auth_token = auth_token["auth-token"]
 except KeyError:
-    print('API_AUTH environment variable should be set to a json containing auth-token')
+    print("API_AUTH environment variable should be set to a json containing auth-token")
     sys.exit(1)
 
 

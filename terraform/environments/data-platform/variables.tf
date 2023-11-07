@@ -45,3 +45,15 @@ variable "get_schema_versions" {
 variable "update_metadata_versions" {
   type = map(any)
 }
+
+variable "update_schema_versions" {
+  type = map(any)
+}
+
+variable "preview_data_versions" {
+  type = map(any)
+}
+
+variable "delete_table_for_data_product_versions" {
+  type = map(any)
+}

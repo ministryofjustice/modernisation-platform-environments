@@ -1,14 +1,17 @@
 resource "aws_efs_file_system" "efs" {
   encrypted        = true
-  performance_mode = "generalPurpose"
-  throughput_mode  = "elastic"
-
+  performance_mode = "maxIO"
+  throughput_mode  = "bursting"
 
   tags = merge(
     local.tags,
     { "Name" = "mp-${local.application_name}-efs" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
+
+lifecycle_policy {
+    transition_to_ia = "AFTER_90_DAYS"
+  }
 }
 
 resource "aws_security_group" "efs_product" {
@@ -36,4 +39,12 @@ resource "aws_efs_mount_target" "efs_mount" {
   file_system_id  = aws_efs_file_system.efs.id
   subnet_id       = data.aws_subnet.private_subnets_a.id
   security_groups = [aws_security_group.efs_product.id]
+}
+
+resource "aws_efs_backup_policy" "efs_backup_policy" {
+  file_system_id = aws_efs_file_system.efs.id
+
+  backup_policy {
+    status = "ENABLED"
+  }
 }

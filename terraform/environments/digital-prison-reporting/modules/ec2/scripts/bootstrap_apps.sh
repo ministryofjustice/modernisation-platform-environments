@@ -45,14 +45,17 @@ sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclien
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-tools-21.8.0.0.0-1.x86_64.rpm
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-devel-21.8.0.0.0-1.x86_64.rpm
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-sqlplus-21.8.0.0.0-1.x86_64.rpm
+echo "Oracle Client Libs Installed okay !"
+
+# Install SSM Agent, if it is not installed already
+cd /tmp
+rpm -qa | grep amazon-ssm-agent || yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+echo "SSM Agent Libs Installed okay !"
 
 # Install Postgresql
 sudo amazon-linux-extras install postgresql10
 
-# Install SSM Agent
-#cd /tmp
-#sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-
+# CLI Install
 echo "Seup AWSCLI V2....."
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
@@ -142,6 +145,8 @@ EOF
 chmod 0755 $nomis_portforwarder_script; su -c $nomis_portforwarder_script ssm-user
 fi   
 
-# Start Stream at Start of the EC2
+# Start Stream at Start of the EC2 
 sudo chkconfig aws-kinesis-agent on
 sudo service aws-kinesis-agent start
+sudo systemctl start amazon-ssm-agent
+sudo systemctl enable amazon-ssm-agent

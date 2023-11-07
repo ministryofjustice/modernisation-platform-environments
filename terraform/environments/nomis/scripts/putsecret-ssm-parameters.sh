@@ -29,7 +29,7 @@ if [[ $MODE == "force" ]]; then
       echo aws secretsmanager put-secret-value --secret-id $param --secret-string "$value" --profile $PROFILE >&2
     fi
   done
-  echo Press RETURN to put-parameters, CTRL-C to cancel
+  echo Press RETURN to put secrets, CTRL-C to cancel
   read
 
   for param in $params; do
@@ -54,7 +54,7 @@ elif [[ $MODE == "safe" ]]; then
       else
         echo "Change from $oldvalue to $newvalue"
         echo aws secretsmanager put-secret-value --secret-id $param --secret-string "$newvalue" --profile $PROFILE >&2
-        echo Press RETURN to put-parameters, CTRL-C to cancel
+        echo Press RETURN to put secrets, CTRL-C to cancel
         read
         aws secretsmanager put-secret-value --secret-id $param --secret-string "$newvalue" --profile $PROFILE
       fi

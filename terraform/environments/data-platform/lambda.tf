@@ -264,7 +264,7 @@ module "data_product_create_schema_lambda" {
   tags                           = local.tags
   description                    = "Lambda to create the first version of a json schema file for a data product"
   role_name                      = "data_product_schema_lambda_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_create_schema_lambda.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_write_metadata_and_schema.json
   policy_json_attached           = true
   function_name                  = "data_product_create_schema_${local.environment}"
   create_role                    = true
@@ -321,7 +321,7 @@ module "data_product_update_metadata_lambda" {
   tags                           = local.tags
   description                    = "Fetch the schema for a table from S3"
   role_name                      = "update_metadata_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_update_metadata_lambda.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_write_metadata_and_schema.json
   policy_json_attached           = true
   function_name                  = "data_product_update_metadata_${local.environment}"
   create_role                    = true
@@ -343,3 +343,91 @@ module "data_product_update_metadata_lambda" {
     }
   }
 }
+
+module "data_product_update_schema_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
+  application_name               = "data_product_update_schema"
+  tags                           = local.tags
+  description                    = "Update the schema for a table in a data product"
+  role_name                      = "update_schema_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_write_metadata_and_schema.json
+  policy_json_attached           = true
+  function_name                  = "data_product_update_schema_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-update-schema-lambda-ecr-repo:${local.update_schema_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 128
+
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+
+  allowed_triggers = {
+
+    AllowExecutionFromAPIGateway = {
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.update_schema_for_data_product_table_name.http_method}${aws_api_gateway_resource.schema_for_data_product_table_name.path}"
+    }
+  }
+}
+
+module "preview_data_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
+  application_name               = "data_product_preview_data"
+  tags                           = local.tags
+  description                    = "Preview small sample of data through athena "
+  role_name                      = "preview_data_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_preview_data.json
+  policy_json_attached           = true
+  function_name                  = "data_product_preview_data_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-preview-data-lambda-ecr-repo:${local.preview_data_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 128
+
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+
+  allowed_triggers = {
+
+    AllowExecutionFromAPIGateway = {
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.preview_data_from_data_product.http_method}${aws_api_gateway_resource.data_product_preview.path}"
+    }
+  }
+}
+
+module "delete_table_for_data_product_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
+  application_name               = "delete_table"
+  tags                           = local.tags
+  description                    = "Delete table and data for a data product"
+  role_name                      = "delete_table_for_data_product_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_delete_table_for_data_product_lambda.json
+  policy_json_attached           = true
+  function_name                  = "delete_table_for_data_product_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-delete-table-for-data-product-lambda-ecr-repo:${local.delete_table_for_data_product_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 128
+
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+
+  allowed_triggers = {
+
+    AllowExecutionFromAPIGateway = {
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.delete_table_for_data_product.http_method}${aws_api_gateway_resource.data_product_table_name.path}"
+    }
+  }
+}
+

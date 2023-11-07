@@ -586,17 +586,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_resync_unprocessed_files
   }
 }
 
-data "aws_iam_policy_document" "iam_policy_document_for_create_schema_lambda" {
-  source_policy_documents = [
-    data.aws_iam_policy_document.log_to_bucket.json,
-    data.aws_iam_policy_document.read_metadata.json,
-    data.aws_iam_policy_document.write_metadata.json,
-    data.aws_iam_policy_document.create_write_lambda_logs.json,
-  ]
-}
-
-
-data "aws_iam_policy_document" "iam_policy_document_for_update_metadata_lambda" {
+data "aws_iam_policy_document" "iam_policy_document_for_write_metadata_and_schema" {
   source_policy_documents = [
     data.aws_iam_policy_document.log_to_bucket.json,
     data.aws_iam_policy_document.read_metadata.json,
@@ -614,4 +604,72 @@ resource "aws_iam_role" "api_gateway_cloud_watch_role" {
 resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatchlogs" {
   role       = aws_iam_role.api_gateway_cloud_watch_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
+
+data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
+  statement {
+    sid    = "s3Access"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "${module.data_s3_bucket.bucket.arn}/curated/*",
+      "${module.data_s3_bucket.bucket.arn}"
+    ]
+  }
+  statement {
+    sid    = "s3AthenaAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${module.s3_athena_query_results_bucket.bucket.arn}",
+      "${module.s3_athena_query_results_bucket.bucket.arn}/*"
+    ]
+  }
+  statement {
+    sid    = "GluePermissions"
+    effect = "Allow"
+    actions = [
+     	  "glue:GetTable",
+				"glue:GetPartitions",
+				"glue:GetPartition",
+				"glue:GetDatabases",
+				"glue:GetDatabase"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    sid = "AthenaQueryAccess"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+    ]
+    resources = [
+      aws_athena_workgroup.data_product_athena_workgroup.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_product_lambda" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.write_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
 }
