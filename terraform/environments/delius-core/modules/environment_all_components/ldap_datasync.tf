@@ -56,19 +56,24 @@ data "aws_iam_policy_document" "ldap_datasync_role_access" {
       "ec2:CreateNetworkInterface",
       "ec2:AttachNetworkInterface",
       "ec2:DescribeNetworkInterfaces",
-      "ec2:DeleteNetworkInterface",
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:DescribeKey",
-      "kms:GetPublicKey",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey",
-      "kms:CreateGrant",
-      "kms:ListGrants",
-      "kms:RevokeGrant"
+      "ec2:DeleteNetworkInterface"
     ]
     resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:ListGrants",
+      "kms:GenerateDataKey",
+      "kms:Encrypt",
+      "kms:DescribeKey",
+      "kms:Decrypt",
+      "kms:CreateGrant",
+      "kms:ReEncryptTo",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKeyWithoutPlaintext"
+    ]
+    resources = [var.account_config.general_shared_kms_key_arn]
   }
   statement {
     sid     = "allowAccessForDataSync"
