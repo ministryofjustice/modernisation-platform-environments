@@ -51,33 +51,33 @@ locals {
       example-test-1 = {
         tags = {
           server-type = "private"
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+          description = "Standalone EC2 NGINX Server for DOM1 Networking Test"
           monitored   = false
           os-type     = "Linux"
-          component   = "ndh"
+          component   = "test"
           environment = "test"
         }
         ebs_volumes = {
-          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
+          "/dev/xvda" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
-        ami_name  = "RHEL-7.9_HVM-*"
-        ami_owner = "309956199498"
+        ami_name  = "amzn2-ami-hvm*"
+        ami_owner = "amazon"
       }
-      example-test-2 = {
-        tags = {
-          server-type = "private"
-          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
-          monitored   = false
-          os-type     = "Linux"
-          component   = "ndh"
-          environment = "test"
-        }
-        ebs_volumes = {
-          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
-        }
-        ami_name  = "RHEL-7.9_HVM-*"
-        ami_owner = "309956199498"
-      }
+      # example-test-2 = {
+      #   tags = {
+      #     server-type = "private"
+      #     description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+      #     monitored   = false
+      #     os-type     = "Linux"
+      #     component   = "ndh"
+      #     environment = "test"
+      #   }
+      #   ebs_volumes = {
+      #     "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
+      #   }
+      #   ami_name  = "RHEL-7.9_HVM-*"
+      #   ami_owner = "309956199498"
+      # }
     }
     ec2_test_autoscaling_groups = {
       dev-rh-rhel79 = {

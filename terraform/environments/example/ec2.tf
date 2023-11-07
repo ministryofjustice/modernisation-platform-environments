@@ -34,7 +34,8 @@ module "ec2_test_instance" {
   tags                     = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup       = local.environment_management.account_ids
   cloudwatch_metric_alarms = {}
-}
+  user_data_raw            = filebase64("${path.module}/install_nginx.sh")
+  }
 
 # EC2 Sec Group
 resource "aws_security_group" "example_ec2_sg" {
@@ -68,14 +69,14 @@ resource "aws_security_group_rule" "egress_traffic" {
   source_security_group_id = aws_security_group.example_ec2_sg.id
 }
 
-resource "aws_security_group_rule" "ingress_traffic_icmp_from_cp" {
-  description       = "Allowing ping from CP"
-  from_port         = 8 //Echo Request
-  protocol          = "ICMP"
+resource "aws_security_group_rule" "egress_traffic_to_interface_endpoints" {
+  description       = "Allow 443 egress to interface endpoints"
+  from_port         = 443 
+  protocol          = "TCP"
   security_group_id = aws_security_group.example_ec2_sg.id
-  to_port           = 0
-  type              = "ingress"
-  cidr_blocks       = ["172.20.0.0/16"] //Cloud Platform
+  to_port           = 443
+  type              = "egress"
+  source_security_group_id = "sg-0bf782c36d1c458cd" //991589384446 / sg-0bf782c36d1c458cd
 }
 
 #  Build EC2 "example-ec2"
@@ -129,7 +130,8 @@ data "aws_iam_policy_document" "ec2_common_combined" {
 # create list of common managed policies that can be attached to ec2 instance profiles
 locals {
   ec2_common_managed_policies = [
-    aws_iam_policy.ec2_common_policy.arn
+    aws_iam_policy.ec2_common_policy.arn,
+    data.aws_iam_policy.required-policy.arn
   ]
   instance = {
     disable_api_termination      = false
@@ -139,6 +141,10 @@ locals {
     metadata_options_http_tokens = "required"
     vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
   }
+}
+
+data "aws_iam_policy" "required-policy" {
+  name = "AmazonSSMManagedInstanceCore"
 }
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
