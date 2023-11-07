@@ -85,7 +85,6 @@ data "http" "myip" {
 }
 
 resource "null_resource" "setup_db" {
-  count = local.is-development ? 0 : 1
 
   depends_on = [aws_db_instance.ncas_db]
 
