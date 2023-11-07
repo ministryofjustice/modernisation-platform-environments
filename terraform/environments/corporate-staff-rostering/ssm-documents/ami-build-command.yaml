@@ -2,7 +2,7 @@
 schemaVersion: "2.2"
 description: "Powershell doc for MGN-replicated Azure VMs." 
 mainSteps:
-  - name: NewHostName
+  - name: newHostName
     action: aws:runPowerShellScript
     onFailure: Abort
     inputs:
