@@ -79,18 +79,17 @@ variable "ldap_config" {
 }
 
 variable "db_config" {
-  type = object({
-    name           = string
+  type = map(object({
     ami_name_regex = string
-    user_data_raw  = optional(string, null)
+    user_data_raw  = optional(string)
     instance = object({
-      associate_public_ip_address  = optional(bool, false)
-      disable_api_termination      = bool
-      instance_type                = string
-      metadata_endpoint_enabled    = optional(string, "enabled")
-      metadata_options_http_tokens = optional(string, "required")
-      monitoring                   = optional(bool, true)
-      ebs_block_device_inline      = optional(bool, false)
+      associate_public_ip_address  = optional(bool)
+      disable_api_termination      = optional(bool, false)
+      instance_type                = optional(string)
+      metadata_endpoint_enabled    = optional(string)
+      metadata_options_http_tokens = optional(string)
+      monitoring                   = optional(bool)
+      ebs_block_device_inline      = optional(bool)
       vpc_security_group_ids       = list(string)
       private_dns_name_options = optional(object({
         enable_resource_name_dns_aaaa_record = optional(bool)
@@ -110,36 +109,37 @@ variable "db_config" {
       ebs_non_root_volumes = map(object({
         volume_type = optional(string)
         volume_size = optional(string)
-        no_device   = optional(bool, false)
+        no_device   = optional(bool)
       }))
     }))
     route53_records = object({
       create_internal_record = bool
       create_external_record = bool
     })
-  })
+  }))
   default = {
-    name           = "name_example"
-    ami_name_regex = "ami_name_example"
-    user_data_raw  = "user_data_raw_example"
-    instance = {
-      associate_public_ip_address  = false
-      disable_api_termination      = false
-      instance_type                = "instance_type_example"
-      metadata_endpoint_enabled    = "enabled"
-      metadata_options_http_tokens = "required"
-      monitoring                   = true
-      ebs_block_device_inline      = false
-      vpc_security_group_ids       = []
-      private_dns_name_options = {
-        enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = false
-        hostname_type                        = "hostname_type_example"
+    primary = {
+      ami_name_regex = "ami_name_example"
+      user_data_raw  = "user_data_raw_example"
+      instance = {
+        associate_public_ip_address  = false
+        disable_api_termination      = false
+        instance_type                = "instance_type_example"
+        metadata_endpoint_enabled    = "enabled"
+        metadata_options_http_tokens = "required"
+        monitoring                   = true
+        ebs_block_device_inline      = false
+        vpc_security_group_ids       = []
+        private_dns_name_options = {
+          enable_resource_name_dns_aaaa_record = false
+          enable_resource_name_dns_a_record    = false
+          hostname_type                        = "hostname_type_example"
+        }
       }
-    }
-    route53_records = {
-      create_internal_record = false
-      create_external_record = false
+      route53_records = {
+        create_internal_record = false
+        create_external_record = false
+      }
     }
   }
 }

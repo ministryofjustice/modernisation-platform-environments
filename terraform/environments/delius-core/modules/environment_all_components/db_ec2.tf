@@ -51,18 +51,20 @@ data "aws_ami" "oracle_db_ami" {
   most_recent = true
 }
 
-resource "aws_instance" "db_ec2_primary_instance" {
+resource "aws_instance" "db_ec2_instance" {
+  for_each = var.db_config
+
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
-  instance_type               = var.db_config.instance.instance_type
+  instance_type               = each.value.instance.instance_type
   ami                         = data.aws_ami.oracle_db_ami.id
   vpc_security_group_ids      = [aws_security_group.db_ec2_instance_sg.id, aws_security_group.delius_db_security_group.id]
   subnet_id                   = var.account_config.data_subnet_a_id
   iam_instance_profile        = aws_iam_instance_profile.db_ec2_instanceprofile.name
   associate_public_ip_address = false
-  monitoring                  = var.db_config.instance.monitoring
+  monitoring                  = each.value.instance.monitoring
   ebs_optimized               = true
   key_name                    = aws_key_pair.environment_ec2_user_key_pair.key_name
-  user_data_base64            = var.db_config.user_data_raw
+  user_data_base64            = each.value.user_data_raw
 
   metadata_options {
     http_endpoint = "enabled"
@@ -70,24 +72,24 @@ resource "aws_instance" "db_ec2_primary_instance" {
   }
 
   root_block_device {
-    volume_type = var.db_config.ebs_volumes.root_volume.volume_type
-    volume_size = var.db_config.ebs_volumes.root_volume.volume_size
-    iops        = var.db_config.ebs_volumes.iops
-    throughput  = var.db_config.ebs_volumes.throughput
+    volume_type = each.value.ebs_volumes.root_volume.volume_type
+    volume_size = each.value.ebs_volumes.root_volume.volume_size
+    iops        = each.value.ebs_volumes.iops
+    throughput  = each.value.ebs_volumes.throughput
     encrypted   = true
-    kms_key_id  = var.db_config.ebs_volumes.kms_key_id
+    kms_key_id  = each.value.ebs_volumes.kms_key_id
     tags        = local.tags
   }
 
   dynamic "ephemeral_block_device" {
-    for_each = { for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == true }
+    for_each = { for k, v in each.value.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == true }
     content {
       device_name = ephemeral_block_device.key
       no_device   = true
     }
   }
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-1", var.env_name, var.db_config.name)) },
+    { Name = lower(format("%s-%s-1", var.env_name, each.value.name)) },
     { server-type = "delius_core_db" },
     { database = "delius_primarydb" }
   )
