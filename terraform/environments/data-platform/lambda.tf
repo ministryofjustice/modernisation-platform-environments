@@ -431,3 +431,46 @@ module "delete_table_for_data_product_lambda" {
   }
 }
 
+module "data_product_push_to_catalogue_lambda" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
+  application_name               = "data_product_push_to_catalogue"
+  tags                           = local.tags
+  description                    = "Pushes metadata to openmetadata catalogue"
+  role_name                      = "push_to_catalogue_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.read_openmetadata_secrets.json
+  policy_json_attached           = true
+  function_name                  = "data_product_push_to_catalogue_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-push-to-catalogue-lambda-ecr-repo:${local.push_to_catalogue_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 128
+
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars, local.openmetadata_environment_vars)
+
+  allowed_triggers = {
+
+    AllowExecutionFromLambda = {
+      action     = "lambda:InvokeFunction"
+      principal  = "lambda.amazonaws.com"
+      source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_create_metadata_${local.environment}"
+    }
+    AllowExecutionFromLambda = {
+      action     = "lambda:InvokeFunction"
+      principal  = "lambda.amazonaws.com"
+      source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_create_schema_${local.environment}"
+    }
+    AllowExecutionFromLambda = {
+      action     = "lambda:InvokeFunction"
+      principal  = "lambda.amazonaws.com"
+      source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_update_schema_${local.environment}"
+    }
+    AllowExecutionFromLambda = {
+      action     = "lambda:InvokeFunction"
+      principal  = "lambda.amazonaws.com"
+      source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_update_metadata_${local.environment}"
+    }
+  }
+}

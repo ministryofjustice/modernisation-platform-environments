@@ -16,6 +16,14 @@ data "aws_iam_policy_document" "log_to_bucket" {
   }
 }
 
+data "aws_iam_policy_document" "read_openmetadata_secrets" {
+  statement {
+    sid     = "openmetdataSecretsManager"
+    effect  = "Allow"
+    actions = ["secretsmanager:GetSecretValue"]
+    resources = [aws_secretsmanager_secret.openmetadata.id]
+  }
+}
 data "aws_iam_policy_document" "read_metadata" {
   statement {
     sid     = "s3ReadMetadata"
