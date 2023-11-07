@@ -2,6 +2,25 @@
 schemaVersion: "2.2"
 description: "Powershell doc for MGN-replicated Azure VMs." 
 mainSteps:
+  - name: NewHostName
+    action: aws:runPowerShellScript
+    onFailure: Abort
+    inputs:
+      runCommand: 
+        - | 
+         $currentHostName = hostname
+         if ($currentHostName -like '*t*') { 
+           Write-Output $currentHostName 
+         $newHostName = $currentHostName -replace 't', ''
+         Rename-Computer -NewName $newHostname -Force
+         exit 3010
+         Write-Host "INFO: Hostname has been succesfully changed to $newHostname"
+            $currentHostName = $newHostname
+         } else {
+           Write-Host "Hostname looks good, continue"
+         }
+         hostname
+         
   - name: activeDirectoryModulePresent
     action: aws:runPowerShellScript
     inputs: 
