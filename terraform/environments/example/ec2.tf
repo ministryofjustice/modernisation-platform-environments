@@ -76,7 +76,7 @@ resource "aws_security_group_rule" "egress_traffic_to_interface_endpoints" {
   security_group_id = aws_security_group.example_ec2_sg.id
   to_port           = 443
   type              = "egress"
-  source_security_group_id = "sg-0bf782c36d1c458cd" //991589384446 / sg-0bf782c36d1c458cd
+  source_security_group_id = "sg-0bf782c36d1c458cd"
 }
 
 #  Build EC2 "example-ec2"
