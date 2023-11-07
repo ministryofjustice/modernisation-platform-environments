@@ -15,12 +15,11 @@ mainSteps:
          Rename-Computer -NewName $newHostname -Force
          exit 3010
          Write-Host "INFO: Hostname has been succesfully changed to $newHostname"
-            $currentHostName = $newHostname
          } else {
            Write-Host "Hostname looks good, continue"
          }
          hostname
-         
+
   - name: activeDirectoryModulePresent
     action: aws:runPowerShellScript
     inputs: 
