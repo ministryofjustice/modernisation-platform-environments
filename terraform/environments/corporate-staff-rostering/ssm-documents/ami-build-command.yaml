@@ -16,7 +16,7 @@ mainSteps:
            exit 3010
            Write-Host "INFO: Hostname has been succesfully changed to $newHostname"
          } else {
-             Write-Host "Hostname looks good, continue"
+           Write-Host "Hostname looks good, continue"
          }
          hostname
 
