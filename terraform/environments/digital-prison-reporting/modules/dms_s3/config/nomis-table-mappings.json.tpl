@@ -65,42 +65,6 @@
             },
             "rule-action": "include",
             "filters": []
-        },
-        {
-            "rule-type": "transformation",
-            "rule-id": "870343803",
-            "rule-name": "870343803",
-            "rule-action": "add-column",
-            "rule-target": "column",
-            "object-locator": {
-              "schema-name": "%",
-              "table-name": "%"
-            },
-            "rule-action": "add-column",
-            "value":"_source",
-            "expression": "$AR_M_SOURCE_SCHEMA",
-            "data-type": {
-               "type": "string",
-               "length": 50
-            }
-        },
-        {
-            "rule-type": "transformation",
-            "rule-id": "870343804",
-            "rule-name": "870343804",
-            "rule-action": "add-column",
-            "rule-target": "column",
-            "object-locator": {
-              "schema-name": "%",
-              "table-name": "%"
-            },
-            "rule-action": "add-column",
-            "value":"_table",
-            "expression": "$AR_M_SOURCE_TABLE_NAME",
-            "data-type": {
-               "type": "string",
-               "length": 70
-            }
         }
     ]
 }
