@@ -101,6 +101,9 @@ locals {
       "/oracle/database/DRCNMAUD" = local.database_ssm_parameters
       "/oracle/database/DRMIS"    = local.database_mis_ssm_parameters
     }
+    baseline_secretsmanager_secrets = {
+      "/oracle/database/PCNMAUD" = local.database_secretsmanager_secrets
+    }
 
     baseline_cloudwatch_log_groups = {
       session-manager-logs = {

@@ -98,6 +98,9 @@ locals {
       "/oracle/database/PPCNMAUD" = local.database_ssm_parameters
       "/oracle/database/PPMIS"    = local.database_mis_ssm_parameters
     }
+    baseline_secretsmanager_secrets = {
+      "/oracle/database/PPCNMAUD" = local.database_secretsmanager_secrets
+    }
 
     baseline_ec2_autoscaling_groups = {
       # ACTIVE (blue deployment)
