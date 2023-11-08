@@ -2,7 +2,7 @@
 schemaVersion: "2.2"
 description: "Powershell doc for MGN-replicated Azure VMs." 
 mainSteps:
-  - name: NewHostName
+  - name: newHostName
     action: aws:runPowerShellScript
     onFailure: Abort
     inputs:
@@ -46,14 +46,14 @@ mainSteps:
 
           Write-Output "Available space on the C drive is $availableSpaceGB GB, which is $availablePercentage% % of the total space"
           
-          if ($availablePercentage -lt 25) {
-            Write-Output "Available disk space is less than 25 %; stopping AMI build."
+          if ($availablePercentage -gt 25) {
+            Write-Output "Available disk space is more than 25 %; continuing AMI build."
             Exit 1
           } else {
-            Write-Output "Available disk space is more than 25 %; Continuing with AMI build"
+            Write-Output "Available disk space is less than 25 %; disk needs to be extended. Aborting AMI build"
           }
 
-  - name: awsDiscoveryAgent
+  - name: uninstallAwsDiscoveryAgent
     action: aws:runPowerShellScript 
     inputs:
       runCommand:
