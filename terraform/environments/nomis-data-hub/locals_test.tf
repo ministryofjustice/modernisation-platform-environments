@@ -82,8 +82,10 @@ locals {
         records = [
           { name = "t1-app", type = "A", ttl = 300, records = ["10.101.3.196"] },
           { name = "t1-ems", type = "A", ttl = 300, records = ["10.101.3.197"] },
-          { name = "t2-app", type = "A", ttl = 300, records = ["10.101.33.196"] },
-          { name = "t2-ems", type = "A", ttl = 300, records = ["10.101.33.197"] },
+          #         { name = "t2-app", type = "A", ttl = 300, records = ["10.101.33.196"] },#azure
+          { name = "t2-app", type = "A", ttl = 300, records = ["10.26.8.186"] }, #aws
+          #         { name = "t2-ems", type = "A", ttl = 300, records = ["10.101.33.197"] },#azure
+          { name = "t2-ems", type = "A", ttl = 300, records = ["10.26.8.11"] }, #aws
         ]
       }
     }
