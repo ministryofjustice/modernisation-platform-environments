@@ -151,7 +151,7 @@ variable "ec2_autoscaling_groups" {
     })
     instance = object({
       disable_api_termination      = bool
-      disable_api_stop             = bool
+      disable_api_stop             = option(bool, false)
       instance_type                = string
       key_name                     = string
       monitoring                   = optional(bool, true)
@@ -299,7 +299,7 @@ variable "ec2_instances" {
     })
     instance = object({
       disable_api_termination      = bool
-      disable_api_stop             = bool
+      disable_api_stop             = option(bool, false)
       instance_type                = string
       key_name                     = string
       monitoring                   = optional(bool, true)
