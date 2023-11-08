@@ -94,6 +94,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
   }
+  ingress {
+    description = "inbound ssh access for Lambda"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
+  }
 
   egress {
     description = "Allow AWS SSM Session Manager"

@@ -8,12 +8,16 @@ locals {
     cloudwatch_metric_alarms_dbnames_misload = []
 
     baseline_s3_buckets = {
+      nomis-audit-archives = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+        lifecycle_rule = [
+          module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
+        ]
+      }
       nomis-db-backup-bucket = {
         custom_kms_key = module.environment.kms_keys["general"].arn
         iam_policies   = module.baseline_presets.s3_iam_policies
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
-        ]
       }
     }
 
@@ -50,6 +54,7 @@ locals {
             ]
             resources = [
               "arn:aws:s3:::nomis-db-backup-bucket*",
+              "arn:aws:s3:::nomis-audit-archives*",
             ]
           },
           {
@@ -92,6 +97,9 @@ locals {
       "/oracle/database/PPTRDAT"  = local.database_ssm_parameters
       "/oracle/database/PPCNMAUD" = local.database_ssm_parameters
       "/oracle/database/PPMIS"    = local.database_mis_ssm_parameters
+    }
+    baseline_secretsmanager_secrets = {
+      "/oracle/database/PPCNMAUD" = local.database_secretsmanager_secrets
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -276,6 +284,9 @@ locals {
           { name = "ppnomis", type = "A", ttl = "300", records = ["10.40.37.132"] },
           { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
           { name = "ppnomis-b", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppaudit", type = "CNAME", ttl = "300", records = ["ppaudit-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "ppaudit-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppaudit-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },

@@ -5,6 +5,11 @@ locals {
       passwords = { description = "database passwords" }
     }
   }
+  database_secretsmanager_secrets = {
+    secrets = {
+      passwords = { description = "database passwords" }
+    }
+  }
 
   database_ec2_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,

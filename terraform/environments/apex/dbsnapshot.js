@@ -7,7 +7,7 @@
 //   auth: phil h
 /////////////////////////////////////////////////////////////////////
 
-const AWS = require("aws-sdk");
+const AWS = require("@aws-sdk/client-ec2");
 
 //Set date format
 var date_ob = new Date();

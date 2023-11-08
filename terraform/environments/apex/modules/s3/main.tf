@@ -26,3 +26,9 @@ resource "aws_s3_bucket_public_access_block" "default" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_versioning" "laa-lambda-backup-versioning" {
+  bucket = aws_s3_bucket.laa-lambda-backup.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}

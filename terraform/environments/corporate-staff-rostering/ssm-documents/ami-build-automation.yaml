@@ -7,7 +7,7 @@ parameters:
     description: "ID of the MGN replicated Azure server"
   VolumeId:
     type: "String"
-    description: "Root volume ID to be snapshotted"
+    description: "Root volume ID dev/sda1"
   SnapshotName:
     type: "String"
     description: "Name of the resultant snapshot"

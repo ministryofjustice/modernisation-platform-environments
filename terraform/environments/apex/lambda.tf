@@ -10,7 +10,7 @@ module "iambackup" {
 module "s3_bucket_lambda" {
   source = "./modules/s3"
 
-  bucket_name = "laa-${local.application_name}-${local.environment}-mp" 
+  bucket_name = "laa-${local.application_name}-${local.environment}-mp"
   tags = merge(
     local.tags,
     { Name = "laa-${local.application_name}-${local.environment}-mp" }
@@ -72,6 +72,9 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   layers = [aws_lambda_layer_version.lambda_layer.arn]
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.snapshotDBFunctionfilename
+  memory_size = 350
+  timeout = 300
+  
 
   environment {
     variables = {
@@ -124,6 +127,8 @@ resource "aws_lambda_function" "connectDBFunction" {
   layers = [aws_lambda_layer_version.lambda_layer.arn]
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.connectDBFunctionfilename
+  memory_size = 350
+  timeout = 300
 
   environment {
     variables = {
