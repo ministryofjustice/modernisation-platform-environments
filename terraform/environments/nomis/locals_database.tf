@@ -23,6 +23,11 @@ locals {
       passwords = { description = "database passwords" }
     }
   }
+  database_secretsmanager_secrets = {
+    secrets = {
+      passwords = { description = "database passwords" }
+    }
+  }
 
   database_cloudwatch_log_metric_filters = {
     rman-backup-status = {
