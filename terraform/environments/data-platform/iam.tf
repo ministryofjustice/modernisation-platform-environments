@@ -533,6 +533,26 @@ resource "aws_iam_role" "api_gateway_cloud_watch_role" {
   tags               = local.tags
 }
 
+data "aws_iam_policy_document" "cloudtrail_policy" {
+  statement {
+    sid    = "cloudtrailToCloudwatch"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "arn:aws:logs:${local.region}:${local.account_id}:log-group:${aws_cloudwatch_log_group.data_platform_s3_putobject_trail.name}:log-stream:${local.account_id}_CloudTrail_${local.region}*",
+    ]
+  }
+}
+
+resource "aws_iam_role" "cloud_trail_cloud_watch_role" {
+  name               = "data_platform_cloudtrail_log_${local.environment}"
+  assume_role_policy = data.aws_iam_policy_document.cloudtrail_policy.json
+  tags               = local.tags
+}
+
 resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatchlogs" {
   role       = aws_iam_role.api_gateway_cloud_watch_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
