@@ -8,12 +8,16 @@ locals {
     cloudwatch_metric_alarms_dbnames_misload = []
 
     baseline_s3_buckets = {
+      nomis-audit-archives = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies = module.baseline_presets.s3_iam_policies
+        lifecycle_rule = [
+          module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
+        ]
+      }
       nomis-db-backup-bucket = {
         custom_kms_key = module.environment.kms_keys["general"].arn
         iam_policies   = module.baseline_presets.s3_iam_policies
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
-        ]
       }
     }
 
@@ -50,6 +54,7 @@ locals {
             ]
             resources = [
               "arn:aws:s3:::nomis-db-backup-bucket*",
+              "arn:aws:s3:::nomis-audit-archives*",
             ]
           },
           {
