@@ -78,33 +78,55 @@ resource "aws_security_group_rule" "egress_traffic_to_interface_endpoints" {
   type              = "egress"
   source_security_group_id = "sg-0bf782c36d1c458cd"
 }
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}
+resource "aws_security_group_rule" "egress_traffic_to_s3" {
+  description       = "Allow 443 egress to interface endpoints"
+  from_port         = 443 
+  protocol          = "TCP"
+  security_group_id = aws_security_group.example_ec2_sg.id
+  to_port           = 443
+  type              = "egress"
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
+}
+
+resource "aws_security_group_rule" "egress_traffic_to_everywhere" {
+  description       = "Allow 443 egress to everywhere"
+  from_port         = 443 
+  protocol          = "TCP"
+  security_group_id = aws_security_group.example_ec2_sg.id
+  to_port           = 443
+  type              = "egress"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
 
 #  Build EC2 "example-ec2"
-resource "aws_instance" "develop" {
-  #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
-  # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type          = local.application_data.accounts[local.environment].instance_type
-  ami                    = local.application_data.accounts[local.environment].ami_image_id
-  vpc_security_group_ids = [aws_security_group.example_ec2_sg.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-  monitoring             = true
-  ebs_optimized          = true
+# resource "aws_instance" "develop" {
+#   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
+#   # Specify the instance type and ami to be used (this is the Amazon free tier option)
+#   instance_type          = local.application_data.accounts[local.environment].instance_type
+#   ami                    = local.application_data.accounts[local.environment].ami_image_id
+#   vpc_security_group_ids = [aws_security_group.example_ec2_sg.id]
+#   subnet_id              = data.aws_subnet.private_subnets_a.id
+#   monitoring             = true
+#   ebs_optimized          = true
 
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
-  # Increase the volume size of the root volume
-  root_block_device {
-    volume_type = "gp3"
-    volume_size = 20
-    encrypted   = true
-  }
-  tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-example", local.application_name, local.environment)) }
-  )
-  depends_on = [aws_security_group.example_ec2_sg]
-}
+#   metadata_options {
+#     http_endpoint = "enabled"
+#     http_tokens   = "required"
+#   }
+#   # Increase the volume size of the root volume
+#   root_block_device {
+#     volume_type = "gp3"
+#     volume_size = 20
+#     encrypted   = true
+#   }
+#   tags = merge(local.tags,
+#     { Name = lower(format("ec2-%s-%s-example", local.application_name, local.environment)) }
+#   )
+#   depends_on = [aws_security_group.example_ec2_sg]
+# }
 
 # create single managed policy
 resource "aws_iam_policy" "ec2_common_policy" {
@@ -187,26 +209,26 @@ resource "aws_kms_key" "ec2" {
   )
 }
 
-resource "aws_ebs_volume" "ebs_volume" {
-  availability_zone = "${local.application_data.accounts[local.environment].region}a"
-  type              = "gp3"
-  size              = 50
-  throughput        = 200
-  encrypted         = true
-  kms_key_id        = aws_kms_key.ec2.arn
-  tags = {
-    Name = "ebs-data-volume"
-  }
+# resource "aws_ebs_volume" "ebs_volume" {
+#   availability_zone = "${local.application_data.accounts[local.environment].region}a"
+#   type              = "gp3"
+#   size              = 50
+#   throughput        = 200
+#   encrypted         = true
+#   kms_key_id        = aws_kms_key.ec2.arn
+#   tags = {
+#     Name = "ebs-data-volume"
+#   }
 
-  depends_on = [aws_instance.develop, aws_kms_key.ec2]
-}
+#   depends_on = [aws_instance.develop, aws_kms_key.ec2]
+# }
 
-# Attach to the EC2
-resource "aws_volume_attachment" "mountvolumetoec2" {
-  device_name = "/dev/sdb"
-  instance_id = aws_instance.develop.id
-  volume_id   = aws_ebs_volume.ebs_volume.id
-}
+# # Attach to the EC2
+# resource "aws_volume_attachment" "mountvolumetoec2" {
+#   device_name = "/dev/sdb"
+#   instance_id = aws_instance.develop.id
+#   volume_id   = aws_ebs_volume.ebs_volume.id
+# }
 
 #### This file can be used to store data specific to the member account ####
 data "aws_iam_policy_document" "ebs-kms" {

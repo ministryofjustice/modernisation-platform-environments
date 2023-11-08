@@ -48,7 +48,7 @@ locals {
 
     ec2_test_instances = {
       # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
-      example-test-1 = {
+      nginx_server = {
         tags = {
           server-type = "private"
           description = "Standalone EC2 NGINX Server for DOM1 Networking Test"
@@ -113,22 +113,22 @@ locals {
       protocol        = "tcp"
       cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = []
-    },
-    "cluster_ec2_bastion_ingress" = {
-      description     = "Cluster EC2 bastion ingress rule"
-      from_port       = 3389
-      to_port         = 3389
-      protocol        = "tcp"
-      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-      security_groups = []
     }
   }
 
   loadbalancer_egress_rules = {
-    "cluster_ec2_lb_egress" = {
+    "cluster_ec2_lb_egress_https" = {
       description     = "Cluster EC2 loadbalancer egress rule"
       from_port       = 443
       to_port         = 443
+      protocol        = "tcp"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = []
+    },
+    "cluster_ec2_lb_egress_http" = {
+      description     = "Cluster EC2 loadbalancer egress rule"
+      from_port       = 80
+      to_port         = 80
       protocol        = "tcp"
       cidr_blocks     = ["0.0.0.0/0"]
       security_groups = []

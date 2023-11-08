@@ -1,6 +1,6 @@
 # Load balancer build using the module
 module "lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v3.1.2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=main"
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
@@ -10,7 +10,7 @@ module "lb_access_logs_enabled" {
   #existing_bucket_name               = "my-bucket-name"
   force_destroy_bucket       = true # enables destruction of logging bucket
   application_name           = local.application_name
-  public_subnets             = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  public_subnets             = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id] // private subnets
   loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
   loadbalancer_egress_rules  = local.loadbalancer_egress_rules
   tags                       = local.tags
@@ -18,6 +18,7 @@ module "lb_access_logs_enabled" {
   region                     = "eu-west-2"
   enable_deletion_protection = false
   idle_timeout               = 60
+  internal_lb                = true // create internal facing ALB
 }
 
 # Create the target group
@@ -40,5 +41,24 @@ resource "aws_lb_target_group" "target_group_module" {
     unhealthy_threshold = "2"
     matcher             = "200-499"
     timeout             = "5"
+  }
+}
+
+# Register nginx instance to target group
+resource "aws_lb_target_group_attachment" "register_nginx_server" {
+  target_group_arn = aws_lb_target_group.target_group_module.arn
+  target_id        = module.ec2_test_instance["nginx_server"].aws_instance.id 
+  port             = 80
+}
+
+# Create Listener
+resource "aws_lb_listener" "nginx_listener" {
+  load_balancer_arn = module.lb_access_logs_enabled.load_balancer_arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.target_group_module.arn
   }
 }
