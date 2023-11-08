@@ -283,7 +283,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
   namespace           = "ECS/ContainerInsights"
   period              = "120"
   statistic           = "Average"
-  threshold           = "80"
+  threshold           = "5"
   alarm_description   = "This metric checks if CPU utilization is high"
   dimensions = {
     ClusterName = aws_ecs_cluster.ncas_cluster.name
@@ -298,7 +298,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
   namespace           = "ECS/ContainerInsights"
   period              = "120"
   statistic           = "Average"
-  threshold           = "80"
+  threshold           = "5"
   alarm_description   = "This metric checks if memory utilization is high"
   dimensions = {
     ClusterName = aws_ecs_cluster.ncas_cluster.name
