@@ -7,6 +7,9 @@ locals {
     baseline_ssm_parameters = {
       "/oracle/database/PPIWFM" = local.database_ssm_parameters
     }
+    baseline_secretsmanager_secrets = {
+      "/oracle/database/PPIWFM" = local.database_secretsmanager_secrets
+    }
 
     baseline_ec2_instances = {
       pp-csr-db-a = merge(local.database_ec2, {
@@ -18,7 +21,7 @@ locals {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
           disable_api_termination      = true
-          disable_api_stop             = true        
+          disable_api_stop             = true
         })
 
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
