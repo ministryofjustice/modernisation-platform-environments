@@ -10,7 +10,7 @@ locals {
     baseline_s3_buckets = {
       nomis-audit-archives = {
         custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies = module.baseline_presets.s3_iam_policies
+        iam_policies   = module.baseline_presets.s3_iam_policies
         lifecycle_rule = [
           module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
         ]
@@ -281,6 +281,9 @@ locals {
           { name = "ppnomis", type = "A", ttl = "300", records = ["10.40.37.132"] },
           { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
           { name = "ppnomis-b", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppaudit", type = "CNAME", ttl = "300", records = ["ppaudit-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "ppaudit-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppaudit-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
