@@ -69,6 +69,8 @@ locals {
     }
   }
 
+  baseline_secretsmanager_secrets = {}
+
   baseline_security_groups = {
     migration-web-sg  = local.security_groups.Web-SG-migration
     migration-app-sg  = local.security_groups.App-SG-migration

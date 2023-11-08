@@ -7,6 +7,9 @@ locals {
     baseline_ssm_parameters = {
       "/oracle/database/PPIWFM" = local.database_ssm_parameters
     }
+    baseline_secretsmanager_secrets = {
+      "/oracle/database/PPIWFM" = local.database_secretsmanager_secrets
+    }
 
     baseline_ec2_instances = {
       pp-csr-db-a = merge(local.database_ec2, {
