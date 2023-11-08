@@ -274,3 +274,33 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
   })
   policy_name = "TrustEventsToStoreLogEvents"
 }
+
+resource "aws_cloudwatch_metric_alarm" "cpu_high" {
+  alarm_name          = "cpu_high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = "120"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "This metric checks if CPU utilization is high"
+  dimensions = {
+    ClusterName = aws_ecs_cluster.ncas_cluster.name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "memory_high" {
+  alarm_name          = "memory_high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "MemoryUtilization"
+  namespace           = "AWS/ECS"
+  period              = "120"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "This metric checks if memory utilization is high"
+  dimensions = {
+    ClusterName = aws_ecs_cluster.ncas_cluster.name
+  }
+}
