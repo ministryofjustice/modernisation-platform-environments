@@ -76,7 +76,7 @@ locals {
         iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
-
+    #when changing the ems entries in prod or t2, also stop and start xtag to reconnect it.
     baseline_route53_zones = {
       "test.ndh.nomis.service.justice.gov.uk" = {
         records = [
