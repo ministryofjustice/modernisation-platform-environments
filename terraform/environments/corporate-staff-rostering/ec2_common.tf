@@ -68,17 +68,16 @@ resource "aws_ssm_document" "ami_build_automation" {
   )
 }
 
-# WIP
-# resource "aws_ssm_document" "network-testing-tools" {
-#   name            = "network-testing-tools"
-#   document_type   = "Command"
-#   document_format = "YAML"
-#   content         = file("./ssm-documents/network-testing-tools.yaml")
+resource "aws_ssm_document" "network-testing-tools" {
+  name            = "network-testing-tools"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/network-testing-tools.yaml")
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "network-testing-tools"
-#     },
-#   )
-# }
+  tags = merge(
+    local.tags,
+    {
+      Name = "network-testing-tools"
+    },
+  )
+}

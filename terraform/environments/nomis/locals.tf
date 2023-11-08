@@ -85,16 +85,6 @@ locals {
     s3-bucket = {
       iam_policies = module.baseline_presets.s3_iam_policies
     }
-    nomis-audit-archives = {
-      custom_kms_key = module.environment.kms_keys["general"].arn
-      bucket_policy_v2 = [
-        module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
-      ]
-      iam_policies = module.baseline_presets.s3_iam_policies
-      lifecycle_rule = [
-        module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
-      ]
-    }
   }
 
   baseline_secretsmanager_secrets = {}

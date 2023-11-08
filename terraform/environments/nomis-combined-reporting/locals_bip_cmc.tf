@@ -10,6 +10,13 @@ locals {
       lcm_password         = { description = "LCM Password" }
     }
   }
+
+  bip_cmc_secretsmanager_secrets = {
+    secrets = {
+      passwords = {}
+    }
+  }
+
   bip_cmc_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {

@@ -1088,6 +1088,7 @@ locals {
                   host_header = {
                     values = [
                       "traina.pp.csr.service.justice.gov.uk",
+                      "traina.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -1145,6 +1146,7 @@ locals {
                   host_header = {
                     values = [
                       "trainb.pp.csr.service.justice.gov.uk",
+                      "trainb.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -1218,6 +1220,7 @@ locals {
                   host_header = {
                     values = [
                       "traina.pp.csr.service.justice.gov.uk",
+                      "traina.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -1292,6 +1295,7 @@ locals {
                   host_header = {
                     values = [
                       "trainb.pp.csr.service.justice.gov.uk",
+                      "trainb.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
