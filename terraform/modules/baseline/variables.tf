@@ -854,7 +854,7 @@ variable "secretsmanager_secrets" {
   #   my_db1_1 = local.my_database_secrets
   #   my_db2_2 = local.my_database_secrets
   # }
-  # Will create SSM params as follows
+  # Will create secretsmanager secrets as follows
   # /database/my_db1_1/asm_password
   # /database/my_db1_1/sys_password
   # /database/my_db2_2/asm_password

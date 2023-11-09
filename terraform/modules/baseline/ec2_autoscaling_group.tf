@@ -15,7 +15,7 @@ module "ec2_autoscaling_group" {
 
   for_each = var.ec2_autoscaling_groups
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=secretsmanager-compatibility"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -47,6 +47,7 @@ module "ec2_autoscaling_group" {
   user_data_raw                 = each.value.config.user_data_raw
   user_data_cloud_init          = each.value.user_data_cloud_init
   ssm_parameters_prefix         = each.value.config.ssm_parameters_prefix
+  secretsmanager_secrets_prefix = each.value.config.secretsmanager_secrets_prefix
   iam_resource_names_prefix     = each.value.config.iam_resource_names_prefix
 
   # add KMS Key Ids if they are referenced by name
@@ -56,6 +57,12 @@ module "ec2_autoscaling_group" {
         kms_key_id = null } : {
         kms_key_id = try(var.environment.kms_keys[value.kms_key_id].arn, value.kms_key_id)
       }
+    )
+  }
+
+  secretsmanager_secrets = each.value.secretsmanager_secrets == null ? {} : {
+    for key, value in each.value.secretsmanager_secrets : key => merge(value,
+      value.kms_key_id == null ? { kms_key_id = null } : { kms_key_id = try(var.environment.kms_keys[value.kms_key_id].arn, value.kms_key_id) }
     )
   }
 
