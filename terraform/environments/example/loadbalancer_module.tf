@@ -1,6 +1,6 @@
 # Load balancer build using the module
 module "lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=main"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=f1d5f9dfc2df68f01ba46ec1dd0ab5377a0db6e9" # v3.3.1
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
