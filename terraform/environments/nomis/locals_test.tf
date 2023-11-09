@@ -80,6 +80,16 @@ locals {
               "arn:aws:ssm:*:*:parameter/oracle/database/*T1/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/T1*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
+            ]
           }
         ]
       }
@@ -97,6 +107,16 @@ locals {
               "arn:aws:ssm:*:*:parameter/oracle/database/*T2/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/T2*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
+            ]
           }
         ]
       }
@@ -113,6 +133,16 @@ locals {
               "arn:aws:ssm:*:*:parameter/azure/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/*T3/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/T3*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/*",
             ]
           }
         ]
