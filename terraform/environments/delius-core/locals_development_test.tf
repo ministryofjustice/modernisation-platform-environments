@@ -33,89 +33,97 @@ locals {
     efs_datasync_destination_arn = null
   }
 
-  db_config_test = {
-    primary = {
-      name           = try(local.db_config_lower_environments.name, "db")
-      ami_name_regex = local.db_config_lower_environments.ami_name_regex
-      user_data_raw = base64encode(
-        templatefile(
-          "${path.module}/templates/userdata.sh.tftpl",
-          {
-            branch               = local.db_config.user_data_param.branch
-            ansible_repo         = local.db_config.user_data_param.ansible_repo
-            ansible_repo_basedir = local.db_config.user_data_param.ansible_repo_basedir
-            ansible_args         = local.db_config.user_data_param.ansible_args
-          }
-        )
+  db_config_test = [{
+    name           = "primary-db"
+    ami_name_regex = local.db_config_lower_environments.ami_name_regex
+    user_data_raw = base64encode(
+      templatefile(
+        "${path.module}/templates/userdata.sh.tftpl",
+        {
+          branch               = local.db_config.user_data_param.branch
+          ansible_repo         = local.db_config.user_data_param.ansible_repo
+          ansible_repo_basedir = local.db_config.user_data_param.ansible_repo_basedir
+          ansible_args         = local.db_config.user_data_param.ansible_args
+        }
       )
-      instance = merge(local.db_config_lower_environments.instance, {
-        instance_type = "r6i.xlarge"
-        monitoring    = false
-      })
+    )
 
-      ebs_volumes = {
-        kms_key_id = data.aws_kms_key.ebs_shared.arn
-        tags       = local.tags
-        iops       = 3000
-        throughput = 125
-        root_volume = {
-          volume_type = "gp3"
-          volume_size = 30
-        }
-        ebs_non_root_volumes = {
-          "/dev/sdb" = {
-            # /u01 oracle app disk
-            volume_type = "gp3"
-            volume_size = 200
-          }
-          "/dev/sdc" = {
-            # /u02 oracle app disk
-            volume_type = "gp3"
-            volume_size = 100
-          }
-          "/dev/sds" = {
-            # swap disk
-            volume_type = "gp3"
-            volume_size = 4
-          }
-          "/dev/sde" = {
-            # oracle asm disk DATA01
-            volume_type = "gp3"
-            volume_size = 500
-          }
-          "/dev/sdf" = {
-            # oracle asm disk DATA02
-            no_device = true
-          }
-          "/dev/sdg" = {
-            # oracle asm disk DATA03
-            no_device = true
-          }
-          "/dev/sdh" = {
-            # oracle asm disk DATA04
-            no_device = true
-          }
-          "/dev/sdi" = {
-            # oracle asm disk DATA05
-            no_device = true
-          }
-          "/dev/sdj" = {
-            # oracle asm disk FLASH01
-            volume_type = "gp3"
-            volume_size = 500
-          }
-          "/dev/sdk" = {
-            # oracle asm disk FLASH02
-            no_device = true
-          }
-        }
+    instance = {
+      instance_type           = "r6i.xlarge"
+      monitoring              = false
+      vpc_security_group_ids  = []
+      disable_api_termination = true
+    }
+
+    ebs_volumes = {
+      kms_key_id = data.aws_kms_key.ebs_shared.arn
+      tags       = local.tags
+      iops       = 3000
+      throughput = 125
+      root_volume = {
+        volume_type = "gp3"
+        volume_size = 30
+        no_device   = false
       }
-      route53_records = {
-        create_internal_record = true
-        create_external_record = false
+      ebs_non_root_volumes = {
+        "/dev/sdb" = {
+          # /u01 oracle app disk
+          volume_type = "gp3"
+          volume_size = 200
+          no_device   = false
+        }
+        "/dev/sdc" = {
+          # /u02 oracle app disk
+          volume_type = "gp3"
+          volume_size = 100
+          no_device   = false
+        }
+        "/dev/sds" = {
+          # swap disk
+          volume_type = "gp3"
+          volume_size = 4
+          no_device   = false
+        }
+        "/dev/sde" = {
+          # oracle asm disk DATA01
+          volume_type = "gp3"
+          volume_size = 500
+          no_device   = false
+        }
+        "/dev/sdf" = {
+          # oracle asm disk DATA02
+          no_device = true
+        }
+        "/dev/sdg" = {
+          # oracle asm disk DATA03
+          no_device = true
+        }
+        "/dev/sdh" = {
+          # oracle asm disk DATA04
+          no_device = true
+        }
+        "/dev/sdi" = {
+          # oracle asm disk DATA05
+          no_device = true
+        }
+        "/dev/sdj" = {
+          # oracle asm disk FLASH01
+          volume_type = "gp3"
+          volume_size = 500
+          no_device   = false
+        }
+        "/dev/sdk" = {
+          # oracle asm disk FLASH02
+          no_device = true
+        }
       }
     }
-  }
+    route53_records = {
+      create_internal_record = true
+      create_external_record = false
+    }
+    }
+  ]
 
   weblogic_config_test = {
     name                          = try(local.weblogic_config_lower_environments.name, "weblogic")
