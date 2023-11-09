@@ -338,7 +338,7 @@ resource "aws_ecs_service" "ecs_service" {
   desired_count   = var.app_count
 
   capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.mlra.name
+    capacity_provider = aws_ecs_capacity_provider.apex.name
     weight            = 1
   }
 
