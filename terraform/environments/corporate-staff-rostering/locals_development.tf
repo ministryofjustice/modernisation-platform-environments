@@ -37,6 +37,7 @@ locals {
           ami_owner                     = "374269020027"
           ebs_volumes_copy_all_from_ami = false
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
+          user_data_raw = base64encode(file("./templates/user-data.yaml"))
         })
         cloudwatch_metric_alarms = local.app_ec2_cloudwatch_metric_alarms
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
