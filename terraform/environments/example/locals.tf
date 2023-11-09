@@ -106,10 +106,18 @@ data "aws_kms_key" "default_ebs" {
 # Loadbalancer vars
 locals {
   loadbalancer_ingress_rules = {
-    "cluster_ec2_lb_ingress" = {
+    "cluster_ec2_lb_ingress_http" = {
       description     = "Cluster EC2 loadbalancer ingress rule"
       from_port       = 80
       to_port         = 80
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = []
+    },
+    "cluster_ec2_lb_ingress_https" = {
+      description     = "Cluster EC2 loadbalancer ingress rule"
+      from_port       = 443
+      to_port         = 443
       protocol        = "tcp"
       cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = []
