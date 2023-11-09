@@ -46,14 +46,18 @@ resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
 
 # Resources associated to the instance
 data "aws_ami" "oracle_db_ami" {
-  for_each    = var.db_config
+  for_each = {
+    for item in var.db_config : item.name => item
+  }
   owners      = [var.platform_vars.environment_management.account_ids["core-shared-services-production"]]
   name_regex  = each.value.ami_name_regex
   most_recent = true
 }
 
 resource "aws_instance" "db_ec2_instance" {
-  for_each = var.db_config
+  for_each = {
+    for item in var.db_config : item.name => item
+  }
 
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   instance_type               = each.value.instance.instance_type
@@ -96,57 +100,65 @@ resource "aws_instance" "db_ec2_instance" {
   )
 }
 
-#module "ebs_volume_primary" {
-#  source = "../ebs_volume"
-#  for_each = {
-#    for k, v in var.db_config.primary.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false
-#  }
-#  availability_zone = aws_instance.db_ec2_instance["primary"].availability_zone
-#  instance_id       = aws_instance.db_ec2_instance["primary"].id
-#  device_name       = each.key
-#  size              = each.value.volume_size
-#  iops              = var.db_config["primary"].ebs_volumes.iops
-#  throughput        = var.db_config["primary"].ebs_volumes.throughput
-#  tags              = local.tags
-#  kms_key_id        = var.db_config["primary"].ebs_volumes.kms_key_id
-#  depends_on = [
-#    aws_instance.db_ec2_instance
-#  ]
-#}
+locals {
+  flattened_ebs_volumes = flatten([
+    for db_config_instance in var.db_config :
+    [
+      for key, ebs_non_root_volumes in db_config_instance.ebs_volumes.ebs_non_root_volumes :
+      {
+        key                  = "${db_config_instance.name}-${key}"
+        index_name           = db_config_instance.name
+        ebs_config           = db_config_instance.ebs_volumes
+        ebs_non_root_volumes = ebs_non_root_volumes
+      } if ebs_non_root_volumes.no_device == false
+    ]
+  ])
+}
+
+module "ebs_volume_primary" {
+  source = "../ebs_volume"
+  for_each = {
+    for entry in local.flattened_ebs_volumes :
+    entry.key => entry
+  }
+  availability_zone = aws_instance.db_ec2_instance[each.value.index_name].availability_zone
+  instance_id       = aws_instance.db_ec2_instance[each.value.index_name].id
+  device_name       = each.key
+  size              = each.value.ebs_non_root_volumes.volume_size
+  iops              = each.value.ebs_config.iops
+  throughput        = each.value.ebs_config.throughput
+  tags              = local.tags
+  kms_key_id        = each.value.ebs_config.kms_key_id
+  depends_on = [
+    aws_instance.db_ec2_instance
+  ]
+}
 
 #module "ebs_volume_standby" {
 #  source = "../ebs_volume"
 #  for_each = {
-#          flatten(
-#    for k, v in var.db_config : k => v if v.no_device == false
+#    for k, v in var.db_config.standby.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false
 #  }
 #  availability_zone = aws_instance.db_ec2_instance["standby"].availability_zone
 #  instance_id       = aws_instance.db_ec2_instance["standby"].id
 #  device_name       = each.key
 #  size              = each.value.volume_size
 #  iops              = var.db_config.standby.ebs_volumes.iops
-#  throughput        = var.db_config["standby"].ebs_volumes.throughput
+#  throughput        = var.db_config.standby.ebs_volumes.throughput
 #  tags              = local.tags
-#  kms_key_id        = var.db_config["standby"].ebs_volumes.kms_key_id
-#
+#  kms_key_id        = var.db_config.standby.ebs_volumes.kms_key_id
 #  depends_on = [
 #    aws_instance.db_ec2_instance
 #  ]
 #}
 
-output "keys" {
-  value = keys(var.db_config)
-}
-
-output "volumes" {
-  value = var.db_config.*.name
-}
-
 resource "aws_route53_record" "db_ec2_instance" {
-  for_each = var.db_config
+  for_each = {
+    for item in var.db_config : item.name => item
+  }
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone_info.zone_id
-  name     = each.key == "primary" ? "${var.app_name}-${var.env_name}-oracle_db.${var.account_config.route53_inner_zone_info.name}" : "${var.app_name}-${var.env_name}-${each.key}-oracle_db.${var.account_config.route53_inner_zone_info.name}"
+  name     = each.key == "primary-db" ? "${var.app_name}-${var.env_name}-oracle_db.${var.account_config.route53_inner_zone_info.name}" : "${var.app_name}-${var.env_name}-${each.key}-oracle_db.${var.account_config.route53_inner_zone_info.name}"
   type     = "CNAME"
   ttl      = 300
   records  = [aws_instance.db_ec2_instance[each.key].private_dns]

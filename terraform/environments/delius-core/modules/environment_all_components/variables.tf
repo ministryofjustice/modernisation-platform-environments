@@ -79,7 +79,7 @@ variable "ldap_config" {
 }
 
 variable "db_config" {
-  type = map(
+  type = list(
     object(
       {
         name           = string

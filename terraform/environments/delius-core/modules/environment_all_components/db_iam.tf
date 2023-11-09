@@ -14,7 +14,7 @@ data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
 
 
 resource "aws_iam_role" "db_ec2_instance_iam_role" {
-  name               = lower(format("%s-ec2_instance", var.env_name))
+  name               = lower(format("%s-delius-db-ec2_instance", var.env_name))
   assume_role_policy = data.aws_iam_policy_document.db_ec2_instance_iam_assume_policy.json
   tags = merge(local.tags,
     { Name = lower(format("%s-delius-db-ec2_instance", var.env_name)) }
