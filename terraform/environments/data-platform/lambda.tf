@@ -452,25 +452,30 @@ module "data_product_push_to_catalogue_lambda" {
 
   allowed_triggers = {
 
-    AllowExecutionFromLambda1 = {
+    AllowExecutionFromCreateMetadataLambda = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
       source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_create_metadata_${local.environment}"
     }
-    AllowExecutionFromLambda2 = {
+    AllowExecutionFromCreateSchemaLambda = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
       source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_create_schema_${local.environment}"
     }
-    AllowExecutionFromLambda3 = {
+    AllowExecutionFromUpdateSchemaLambda = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
       source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_update_schema_${local.environment}"
     }
-    AllowExecutionFromLambda4 = {
+    AllowExecutionFromUpdateMetadataLambda = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
       source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_update_metadata_${local.environment}"
+    }
+    AllowExecutionFromDeleteTableLambda = {
+      action     = "lambda:InvokeFunction"
+      principal  = "lambda.amazonaws.com"
+      source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:delete_table_for_data_product_${local.environment}"
     }
   }
 }
