@@ -64,6 +64,7 @@ resource "aws_lambda_layer_version" "lambda_layer" {
 
 
 resource "aws_lambda_function" "snapshotDBFunction" {
+  description = "Snapshot volumes for Oracle EC2"
   function_name = local.snapshotDBFunctionname
   role          = module.iambackup.backuprole
   handler       = local.snapshotDBFunctionhandler
@@ -72,8 +73,8 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   layers = [aws_lambda_layer_version.lambda_layer.arn]
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.snapshotDBFunctionfilename
-  memory_size = 350
-  timeout = 300
+  memory_size = 128
+  timeout = 900
   
 
   environment {
@@ -93,6 +94,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
 }
 
 resource "aws_lambda_function" "deletesnapshotFunction" {
+  description = "Clean up script to delete old unused snapshots"
   function_name = local.deletesnapshotFunctionname
   role          = module.iambackup.backuprole
   handler       = local.deletesnapshotFunctionhandler
@@ -100,6 +102,8 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
   runtime = local.deletesnapshotFunctionruntime
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.deletesnapshotFunctionfilename
+  memory_size = 1024
+  timeout = 900
 
   environment {
     variables = {
@@ -119,6 +123,7 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
 
 
 resource "aws_lambda_function" "connectDBFunction" {
+  description = "SSH to the DB EC2"
   function_name = local.connectDBFunctionname
   role          = module.iambackup.backuprole
   handler       = local.connectDBFunctionhandler
@@ -127,8 +132,8 @@ resource "aws_lambda_function" "connectDBFunction" {
   layers = [aws_lambda_layer_version.lambda_layer.arn]
   s3_bucket = module.s3_bucket_lambda.lambdabucketname
   s3_key = local.connectDBFunctionfilename
-  memory_size = 350
-  timeout = 300
+  memory_size = 128
+  timeout = 900
 
   environment {
     variables = {
