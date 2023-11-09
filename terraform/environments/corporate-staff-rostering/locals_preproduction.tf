@@ -11,11 +11,44 @@ locals {
       "/oracle/database/PPIWFM" = local.database_secretsmanager_secrets
     }
 
+    baseline_iam_policies = {
+      Ec2PreprodDatabasePolicy = {
+        description = "Permissions required for Preprod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/*PP/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/PP*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ec2_instances = {
       pp-csr-db-a = merge(local.database_ec2, {
         config = merge(local.database_ec2.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
         })
         instance = merge(local.database_ec2.instance, {
           instance_type                = "r6i.xlarge"
