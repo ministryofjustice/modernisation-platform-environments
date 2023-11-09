@@ -211,9 +211,9 @@ locals {
 
   bip_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                      = "oasys_bip_release_2023-06-08T15-17-45.964Z"
-      iam_resource_names_prefix     = "ec2"
-      availability_zone             = "${local.region}a"
+      ami_name                  = "oasys_bip_release_2023-06-08T15-17-45.964Z"
+      iam_resource_names_prefix = "ec2"
+      availability_zone         = "${local.region}a"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.xlarge"
@@ -238,7 +238,6 @@ locals {
       "weblogic/db_username"        = {}
       "weblogic/mdspassword"        = {}
       "weblogic/syspassword"        = {}
-      }
     }
     tags = {
       backup            = "false" # opt out of mod platform default backup plan
