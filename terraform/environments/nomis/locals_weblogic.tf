@@ -7,21 +7,7 @@ locals {
     }
   }
 
-  weblogic_secretsmanager_secrets_policy = [{
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-    ]
-    principals = {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${module.environment.account_id}:role/ec2-weblogic-*",
-      ]
-    }
-    resources = ["*"]
-  }]
   weblogic_secretsmanager_secrets = {
-    # policy = local.weblogic_secretsmanager_secrets_policy
     secrets = {
       passwords = { description = "weblogic passwords" }
       rms       = { description = "combined reporting secrets" }

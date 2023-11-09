@@ -24,35 +24,19 @@ locals {
     }
   }
 
-  database_secretsmanager_secrets_policy = [{
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-    ]
-    principals = {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${module.environment.account_id}:role/ec2-database-*",
-      ]
-    }
-    resources = ["*"]
-  }]
   database_nomis_secretsmanager_secrets = {
-    # policy = local.database_secretsmanager_secrets_policy
     secrets = {
       passwords          = { description = "database passwords" }
       weblogic-passwords = { description = "passwords available to weblogic servers" }
     }
   }
   database_mis_secretsmanager_secrets = {
-    # policy = local.database_secretsmanager_secrets_policy
     secrets = {
       passwords      = { description = "database passwords" }
       misload-config = { description = "misload username, password and hostname" }
     }
   }
   database_secretsmanager_secrets = {
-    # policy = local.database_secretsmanager_secrets_policy
     secrets = {
       passwords = { description = "database passwords" }
     }
