@@ -68,6 +68,16 @@ locals {
               "arn:aws:ssm:*:*:parameter/oracle/database/*PP/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/PP*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
+            ]
           }
         ]
       }
