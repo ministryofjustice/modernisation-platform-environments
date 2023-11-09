@@ -7,7 +7,7 @@ resource "aws_wafv2_web_acl" "ncas_web_acl" {
   }
 
   rule {
-    name     = "RateLimit"
+    name     = "AWSManagedRulesCommonRuleSet"
     priority = 1
 
     action {
@@ -15,22 +15,22 @@ resource "aws_wafv2_web_acl" "ncas_web_acl" {
     }
 
     statement {
-      rate_based_statement {
-        aggregate_key_type = "IP"
-        limit              = 500
+      managed_rule_group_statement {
+        name        = "	AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
       }
     }
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "RateLimit"
+      metric_name                = "AWSManagedRulesCommonRuleSetMetrics"
       sampled_requests_enabled   = true
     }
   }
 
   visibility_config {
-    cloudwatch_metrics_enabled = false
+    cloudwatch_metrics_enabled = true
     metric_name                = "ncas-web-acl"
-    sampled_requests_enabled   = false
+    sampled_requests_enabled   = true
   }
 }
