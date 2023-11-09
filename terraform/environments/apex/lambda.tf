@@ -27,7 +27,10 @@ resource "aws_s3_object" "provision_files" {
 }
 
 
-
+resource "time_sleep" "wait_for_provision_files" {
+  create_duration = "100s"
+  depends_on = [ aws_s3_object.provision_files ]
+}
 
 resource "aws_security_group" "lambdasg" {
   name       = "${local.application_name}-${local.environment}-lambda-security-group"
@@ -86,6 +89,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   s3_key = local.snapshotDBFunctionfilename
   memory_size = 128
   timeout = 900
+  
   
 
   environment {
@@ -161,4 +165,6 @@ resource "aws_lambda_function" "connectDBFunction" {
     { Name = "laa-${local.application_name}-${local.environment}-lambda-connect-mp" }
   )
 }
+
+
 
