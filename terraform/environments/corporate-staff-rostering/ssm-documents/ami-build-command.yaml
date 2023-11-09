@@ -46,11 +46,11 @@ mainSteps:
 
           Write-Output "Available space on the C drive is $availableSpaceGB GB, which is $availablePercentage% % of the total space"
           
-          if ($availablePercentage -gt 25) {
-            Write-Output "Available disk space is more than 25 %; continuing AMI build."
+          if ($availablePercentage -lt 25) {
+            Write-Output "Available disk space is less than 25 %; stopping AMI build."
             Exit 1
           } else {
-            Write-Output "Available disk space is less than 25 %; disk needs to be extended. Aborting AMI build"
+            Write-Output "Available disk space is more than 25 %; Continuing with AMI build"
           }
 
   - name: uninstallAwsDiscoveryAgent
