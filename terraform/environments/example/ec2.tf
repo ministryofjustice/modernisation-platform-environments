@@ -91,12 +91,22 @@ resource "aws_security_group_rule" "egress_traffic_to_s3" {
   prefix_list_ids   = [data.aws_prefix_list.s3.id]
 }
 
-resource "aws_security_group_rule" "egress_traffic_to_everywhere" {
+resource "aws_security_group_rule" "egress_https_traffic_to_everywhere" {
   description       = "Allow 443 egress to everywhere"
   from_port         = 443 
   protocol          = "TCP"
   security_group_id = aws_security_group.example_ec2_sg.id
   to_port           = 443
+  type              = "egress"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "egress_http_traffic_to_everywhere" {
+  description       = "Allow 80 egress to everywhere"
+  from_port         = 80 
+  protocol          = "TCP"
+  security_group_id = aws_security_group.example_ec2_sg.id
+  to_port           = 80
   type              = "egress"
   cidr_blocks       = ["0.0.0.0/0"]
 }
