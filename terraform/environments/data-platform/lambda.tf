@@ -445,11 +445,11 @@ module "data_product_push_to_catalogue_lambda" {
   tags                           = local.tags
   description                    = "Pushes metadata to openmetadata catalogue"
   role_name                      = "push_to_catalogue_role_${local.environment}"
-  policy_json                    = data.aws_iam_policy_document.read_openmetadata_secrets.json
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_push_to_catalogue_lambda.json
   policy_json_attached           = true
   function_name                  = "data_product_push_to_catalogue_${local.environment}"
   create_role                    = true
-  reserved_concurrent_executions = 1
+  reserved_concurrent_executions = 100
 
   image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-push-to-catalogue-lambda-ecr-repo:${local.push_to_catalogue_version}"
   timeout      = 600
@@ -463,27 +463,27 @@ module "data_product_push_to_catalogue_lambda" {
     AllowExecutionFromCreateMetadataLambda = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
-      source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_create_metadata_${local.environment}"
+      source_arn = module.data_product_create_metadata_lambda.lambda_function_arn
     }
     AllowExecutionFromCreateSchemaLambda = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
-      source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_create_schema_${local.environment}"
+      source_arn = module.data_product_create_schema_lambda.lambda_function_arn
     }
     AllowExecutionFromUpdateSchemaLambda = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
-      source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_update_schema_${local.environment}"
+      source_arn = module.data_product_update_schema_lambda.lambda_function_arn
     }
     AllowExecutionFromUpdateMetadataLambda = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
-      source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_update_metadata_${local.environment}"
+      source_arn = module.data_product_update_metadata_lambda.lambda_function_arn
     }
     AllowExecutionFromDeleteTableLambda = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
-      source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:delete_table_for_data_product_${local.environment}"
+      source_arn = module.delete_table_for_data_product_lambda.lambda_function_arn
     }
   }
 }
