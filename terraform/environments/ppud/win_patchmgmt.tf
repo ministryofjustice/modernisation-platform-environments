@@ -23,7 +23,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     }
     patch_filter {
       key    = "CLASSIFICATION"
-      values = ["CriticalUpdates", "SecurityUpdates","Updates","UpdateRollups"]
+      values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups"]
     }
 
     patch_filter {

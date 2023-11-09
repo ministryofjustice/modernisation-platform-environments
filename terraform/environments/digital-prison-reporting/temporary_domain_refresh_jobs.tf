@@ -1,23 +1,23 @@
 locals {
-  domain_refresh_establishment_establishment    = "${local.project}-temp-refresh-establishment-e-${local.env}"
-  domain_refresh_establishment_living_unit      = "${local.project}-temp-refresh-establishment-lu-${local.env}"
-  domain_refresh_movements_movements            = "${local.project}-temp-refresh-movements-m-${local.env}"
-  domain_refresh_prisoner_prisoner              = "${local.project}-temp-refresh-prisoner-p-${local.env}"
+  domain_refresh_establishment_establishment = "${local.project}-temp-refresh-establishment-e-${local.env}"
+  domain_refresh_establishment_living_unit   = "${local.project}-temp-refresh-establishment-lu-${local.env}"
+  domain_refresh_movements_movements         = "${local.project}-temp-refresh-movements-m-${local.env}"
+  domain_refresh_prisoner_prisoner           = "${local.project}-temp-refresh-prisoner-p-${local.env}"
 }
 
 # Glue Job, Domain Refresh establishment/establishment
 module "glue_temp_refresh_job_establishment_establishment" {
-  source                        = "./modules/glue_job"
-  create_job                    = local.create_job
-  name                          = local.domain_refresh_establishment_establishment
-  short_name                    = local.domain_refresh_establishment_establishment
-  command_type                  = "glueetl"
-  description                   = "Monitors the reporting hub for table changes and applies them to domains"
-  security_configuration        = "${local.project}-domain-refresh-sec-config"
-  job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_establishment_establishment}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_establishment_establishment}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.domain_refresh_establishment_establishment}/"
+  source                 = "./modules/glue_job"
+  create_job             = local.create_job
+  name                   = local.domain_refresh_establishment_establishment
+  short_name             = local.domain_refresh_establishment_establishment
+  command_type           = "glueetl"
+  description            = "Monitors the reporting hub for table changes and applies them to domains"
+  security_configuration = "${local.project}-domain-refresh-sec-config"
+  job_language           = "scala"
+  temp_dir               = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_establishment_establishment}/"
+  checkpoint_dir         = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_establishment_establishment}/"
+  spark_event_logs       = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.domain_refresh_establishment_establishment}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
   enable_continuous_log_filter = false
@@ -63,17 +63,17 @@ module "glue_temp_refresh_job_establishment_establishment" {
 
 # Glue Job, Domain Refresh establishment/living_unit
 module "glue_temp_refresh_job_establishment_living_unit" {
-  source                        = "./modules/glue_job"
-  create_job                    = local.create_job
-  name                          = local.domain_refresh_establishment_living_unit
-  short_name                    = local.domain_refresh_establishment_living_unit
-  command_type                  = "glueetl"
-  description                   = "Monitors the reporting hub for table changes and applies them to domains"
-  security_configuration        = "${local.project}-domain-refresh-sec-config"
-  job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_establishment_living_unit}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_establishment_living_unit}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.domain_refresh_establishment_living_unit}/"
+  source                 = "./modules/glue_job"
+  create_job             = local.create_job
+  name                   = local.domain_refresh_establishment_living_unit
+  short_name             = local.domain_refresh_establishment_living_unit
+  command_type           = "glueetl"
+  description            = "Monitors the reporting hub for table changes and applies them to domains"
+  security_configuration = "${local.project}-domain-refresh-sec-config"
+  job_language           = "scala"
+  temp_dir               = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_establishment_living_unit}/"
+  checkpoint_dir         = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_establishment_living_unit}/"
+  spark_event_logs       = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.domain_refresh_establishment_living_unit}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
   enable_continuous_log_filter = false
@@ -120,17 +120,17 @@ module "glue_temp_refresh_job_establishment_living_unit" {
 
 # Glue Job, Domain Refresh movements/movements
 module "glue_temp_refresh_job_movements_movements" {
-  source                        = "./modules/glue_job"
-  create_job                    = local.create_job
-  name                          = local.domain_refresh_movements_movements
-  short_name                    = local.domain_refresh_movements_movements
-  command_type                  = "glueetl"
-  description                   = "Monitors the reporting hub for table changes and applies them to domains"
-  security_configuration        = "${local.project}-domain-refresh-sec-config"
-  job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_movements_movements}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_movements_movements}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.domain_refresh_movements_movements}/"
+  source                 = "./modules/glue_job"
+  create_job             = local.create_job
+  name                   = local.domain_refresh_movements_movements
+  short_name             = local.domain_refresh_movements_movements
+  command_type           = "glueetl"
+  description            = "Monitors the reporting hub for table changes and applies them to domains"
+  security_configuration = "${local.project}-domain-refresh-sec-config"
+  job_language           = "scala"
+  temp_dir               = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_movements_movements}/"
+  checkpoint_dir         = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_movements_movements}/"
+  spark_event_logs       = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.domain_refresh_movements_movements}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
   enable_continuous_log_filter = false
@@ -176,17 +176,17 @@ module "glue_temp_refresh_job_movements_movements" {
 
 # Glue Job, Domain Refresh prisoner/prisoner
 module "glue_temp_refresh_job_prisoner_prisoner" {
-  source                        = "./modules/glue_job"
-  create_job                    = local.create_job
-  name                          = local.domain_refresh_prisoner_prisoner
-  short_name                    = local.domain_refresh_prisoner_prisoner
-  command_type                  = "glueetl"
-  description                   = "Monitors the reporting hub for table changes and applies them to domains"
-  security_configuration        = "${local.project}-domain-refresh-sec-config"
-  job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_prisoner_prisoner}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_prisoner_prisoner}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.domain_refresh_prisoner_prisoner}/"
+  source                 = "./modules/glue_job"
+  create_job             = local.create_job
+  name                   = local.domain_refresh_prisoner_prisoner
+  short_name             = local.domain_refresh_prisoner_prisoner
+  command_type           = "glueetl"
+  description            = "Monitors the reporting hub for table changes and applies them to domains"
+  security_configuration = "${local.project}-domain-refresh-sec-config"
+  job_language           = "scala"
+  temp_dir               = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.domain_refresh_prisoner_prisoner}/"
+  checkpoint_dir         = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.domain_refresh_prisoner_prisoner}/"
+  spark_event_logs       = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.domain_refresh_prisoner_prisoner}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
   enable_continuous_log_filter = false
