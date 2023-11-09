@@ -14,10 +14,10 @@ data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
 
 
 resource "aws_iam_role" "db_ec2_instance_iam_role" {
-  name               = lower(format("%s-%s-ec2_instance", var.env_name, var.db_config.name))
+  name               = lower(format("%s-ec2_instance", var.env_name))
   assume_role_policy = data.aws_iam_policy_document.db_ec2_instance_iam_assume_policy.json
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-ec2_instance", var.env_name, var.db_config.name)) }
+    { Name = lower(format("%s-delius-db-ec2_instance", var.env_name)) }
   )
 }
 
@@ -41,11 +41,11 @@ data "aws_iam_policy_document" "business_unit_kms_key_access" {
 }
 
 resource "aws_iam_policy" "business_unit_kms_key_access" {
-  name   = format("%s-%s-business_unit_kms_key_access_policy", var.env_name, var.db_config.name)
+  name   = format("%s-delius-db-business_unit_kms_key_access_policy", var.env_name)
   path   = "/"
   policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
   tags = merge(local.tags,
-    { Name = format("%s-%s-business_unit_kms_key_access_policy", var.env_name, var.db_config.name) }
+    { Name = format("%s-delius-db-business_unit_kms_key_access_policy", var.env_name) }
   )
 }
 
@@ -64,11 +64,11 @@ data "aws_iam_policy_document" "core_shared_services_bucket_access" {
 }
 
 resource "aws_iam_policy" "core_shared_services_bucket_access" {
-  name   = format("%s-%s-core_shared_services_bucket_access_policy", var.env_name, var.db_config.name)
+  name   = format("%s-delius-db-core_shared_services_bucket_access_policy", var.env_name)
   path   = "/"
   policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
   tags = merge(local.tags,
-    { Name = format("%s-%s-core_shared_services_bucket_access_policy", var.env_name, var.db_config.name) }
+    { Name = format("%s-delius-db-core_shared_services_bucket_access_policy", var.env_name) }
   )
 }
 
@@ -96,11 +96,11 @@ data "aws_iam_policy_document" "allow_access_to_ssm_parameter_store" {
 }
 
 resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
-  name   = format("%s-%s-allow_access_to_ssm_parameter_store", var.env_name, var.db_config.name)
+  name   = format("%s-delius-db-allow_access_to_ssm_parameter_store", var.env_name)
   path   = "/"
   policy = data.aws_iam_policy_document.allow_access_to_ssm_parameter_store.json
   tags = merge(local.tags,
-    { Name = format("%s-%s-ec2_access_for_ansible", var.env_name, var.db_config.name) }
+    { Name = format("%s-delius-db-ec2_access_for_ansible", var.env_name) }
   )
 }
 
@@ -110,11 +110,11 @@ resource "aws_iam_role_policy_attachment" "allow_access_to_ssm_parameter_store" 
 }
 
 resource "aws_iam_policy" "ec2_access_for_ansible" {
-  name   = format("%s-%s-ec2_access_for_ansible", var.env_name, var.db_config.name)
+  name   = format("%s-delius-db-ec2_access_for_ansible", var.env_name)
   path   = "/"
   policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
   tags = merge(local.tags,
-    { Name = format("%s-%s-ec2_access_for_ansible", var.env_name, var.db_config.name) }
+    { Name = format("%s-delius-db-ec2_access_for_ansible", var.env_name) }
   )
 }
 
@@ -142,6 +142,6 @@ resource "aws_iam_role_policy_attachment" "db_ec2_instance_amazonssmmanagedinsta
 }
 
 resource "aws_iam_instance_profile" "db_ec2_instanceprofile" {
-  name = format("%s-%s-ec2_instance_iam_role", var.env_name, var.db_config.name)
+  name = format("%s-delius-db-ec2_instance_iam_role", var.env_name)
   role = aws_iam_role.db_ec2_instance_iam_role.name
 }

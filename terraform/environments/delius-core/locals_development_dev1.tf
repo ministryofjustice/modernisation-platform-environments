@@ -35,7 +35,7 @@ locals {
 
   db_config_dev = {
     primary = {
-      name           = try(local.db_config_lower_environments.name, "primary-db")
+      name           = "primary-db"
       ami_name_regex = local.db_config_lower_environments.ami_name_regex
       user_data_raw = base64encode(
         templatefile(
@@ -50,8 +50,10 @@ locals {
       )
 
       instance = {
-        instance_type = "r6i.xlarge"
-        monitoring    = false
+        instance_type           = "r6i.xlarge"
+        monitoring              = false
+        vpc_security_group_ids  = []
+        disable_api_termination = true
       }
 
       ebs_volumes = {
@@ -62,27 +64,32 @@ locals {
         root_volume = {
           volume_type = "gp3"
           volume_size = 30
+          no_device   = false
         }
         ebs_non_root_volumes = {
           "/dev/sdb" = {
             # /u01 oracle app disk
             volume_type = "gp3"
             volume_size = 200
+            no_device   = false
           }
           "/dev/sdc" = {
             # /u02 oracle app disk
             volume_type = "gp3"
             volume_size = 100
+            no_device   = false
           }
           "/dev/sds" = {
             # swap disk
             volume_type = "gp3"
             volume_size = 4
+            no_device   = false
           }
           "/dev/sde" = {
             # oracle asm disk DATA01
             volume_type = "gp3"
             volume_size = 500
+            no_device   = false
           }
           "/dev/sdf" = {
             # oracle asm disk DATA02
@@ -104,6 +111,7 @@ locals {
             # oracle asm disk FLASH01
             volume_type = "gp3"
             volume_size = 500
+            no_device   = false
           }
           "/dev/sdk" = {
             # oracle asm disk FLASH02
@@ -117,7 +125,7 @@ locals {
       }
     }
     standby = {
-      name           = try(local.db_config_lower_environments.name, "standby-db")
+      name           = "standby-db"
       ami_name_regex = local.db_config_lower_environments.ami_name_regex
       user_data_raw = base64encode(
         templatefile(
@@ -130,9 +138,12 @@ locals {
           }
         )
       )
+
       instance = {
-        instance_type = "r6i.xlarge"
-        monitoring    = false
+        instance_type           = "r6i.xlarge"
+        monitoring              = false
+        vpc_security_group_ids  = []
+        disable_api_termination = true
       }
 
       ebs_volumes = {
@@ -149,21 +160,25 @@ locals {
             # /u01 oracle app disk
             volume_type = "gp3"
             volume_size = 200
+            no_device   = false
           }
           "/dev/sdc" = {
             # /u02 oracle app disk
             volume_type = "gp3"
             volume_size = 100
+            no_device   = false
           }
           "/dev/sds" = {
             # swap disk
             volume_type = "gp3"
             volume_size = 4
+            no_device   = false
           }
           "/dev/sde" = {
             # oracle asm disk DATA01
             volume_type = "gp3"
             volume_size = 500
+            no_device   = false
           }
           "/dev/sdf" = {
             # oracle asm disk DATA02
@@ -185,6 +200,7 @@ locals {
             # oracle asm disk FLASH01
             volume_type = "gp3"
             volume_size = 500
+            no_device   = false
           }
           "/dev/sdk" = {
             # oracle asm disk FLASH02

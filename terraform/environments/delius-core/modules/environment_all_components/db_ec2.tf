@@ -1,10 +1,10 @@
 # Pre-reqs - security groups
 resource "aws_security_group" "db_ec2_instance_sg" {
-  name        = format("%s-sg-%s-ec2-instance", var.env_name, var.db_config.name)
+  name        = format("%s-sg-delius-db-ec2-instance", var.env_name)
   description = "Controls access to db ec2 instance"
   vpc_id      = var.account_info.vpc_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-sg-%s-ec2-instance", var.env_name, var.db_config.name)) }
+    { Name = lower(format("%s-sg-delius-db-ec2-instance", var.env_name)) }
   )
 }
 
@@ -46,8 +46,9 @@ resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
 
 # Resources associated to the instance
 data "aws_ami" "oracle_db_ami" {
+  for_each    = var.db_config
   owners      = [var.platform_vars.environment_management.account_ids["core-shared-services-production"]]
-  name_regex  = var.db_config.ami_name_regex
+  name_regex  = each.value.ami_name_regex
   most_recent = true
 }
 
@@ -56,7 +57,7 @@ resource "aws_instance" "db_ec2_instance" {
 
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   instance_type               = each.value.instance.instance_type
-  ami                         = data.aws_ami.oracle_db_ami.id
+  ami                         = data.aws_ami.oracle_db_ami[each.key].id
   vpc_security_group_ids      = [aws_security_group.db_ec2_instance_sg.id, aws_security_group.delius_db_security_group.id]
   subnet_id                   = var.account_config.data_subnet_a_id
   iam_instance_profile        = aws_iam_instance_profile.db_ec2_instanceprofile.name
@@ -89,38 +90,66 @@ resource "aws_instance" "db_ec2_instance" {
     }
   }
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-1", var.env_name, each.value.name)) },
+    { Name = lower(format("%s-%s-1", var.env_name, each.key)) },
     { server-type = "delius_core_db" },
     { database = "delius_primarydb" }
   )
 }
 
-module "ebs_volume" {
-  source = "../ebs_volume"
-  for_each = {
-    for k, v in var.db_config.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false
-  }
-  availability_zone = aws_instance.db_ec2_primary_instance.availability_zone
-  instance_id       = aws_instance.db_ec2_primary_instance.id
-  device_name       = each.key
-  size              = each.value.volume_size
-  iops              = var.db_config.ebs_volumes.iops
-  throughput        = var.db_config.ebs_volumes.throughput
-  tags              = local.tags
-  kms_key_id        = var.db_config.ebs_volumes.kms_key_id
+#module "ebs_volume_primary" {
+#  source = "../ebs_volume"
+#  for_each = {
+#    for k, v in var.db_config.primary.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false
+#  }
+#  availability_zone = aws_instance.db_ec2_instance["primary"].availability_zone
+#  instance_id       = aws_instance.db_ec2_instance["primary"].id
+#  device_name       = each.key
+#  size              = each.value.volume_size
+#  iops              = var.db_config["primary"].ebs_volumes.iops
+#  throughput        = var.db_config["primary"].ebs_volumes.throughput
+#  tags              = local.tags
+#  kms_key_id        = var.db_config["primary"].ebs_volumes.kms_key_id
+#  depends_on = [
+#    aws_instance.db_ec2_instance
+#  ]
+#}
 
-  depends_on = [
-    aws_instance.db_ec2_primary_instance
-  ]
+#module "ebs_volume_standby" {
+#  source = "../ebs_volume"
+#  for_each = {
+#          flatten(
+#    for k, v in var.db_config : k => v if v.no_device == false
+#  }
+#  availability_zone = aws_instance.db_ec2_instance["standby"].availability_zone
+#  instance_id       = aws_instance.db_ec2_instance["standby"].id
+#  device_name       = each.key
+#  size              = each.value.volume_size
+#  iops              = var.db_config.standby.ebs_volumes.iops
+#  throughput        = var.db_config["standby"].ebs_volumes.throughput
+#  tags              = local.tags
+#  kms_key_id        = var.db_config["standby"].ebs_volumes.kms_key_id
+#
+#  depends_on = [
+#    aws_instance.db_ec2_instance
+#  ]
+#}
+
+output "keys" {
+  value = keys(var.db_config)
 }
 
-resource "aws_route53_record" "db_ec2_primary_instance" {
+output "volumes" {
+  value = var.db_config.*.name
+}
+
+resource "aws_route53_record" "db_ec2_instance" {
+  for_each = var.db_config
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone_info.zone_id
-  name     = "${var.app_name}-${var.env_name}-oracle_db.${var.account_config.route53_inner_zone_info.name}"
+  name     = each.key == "primary" ? "${var.app_name}-${var.env_name}-oracle_db.${var.account_config.route53_inner_zone_info.name}" : "${var.app_name}-${var.env_name}-${each.key}-oracle_db.${var.account_config.route53_inner_zone_info.name}"
   type     = "CNAME"
   ttl      = 300
-  records  = [aws_instance.db_ec2_primary_instance.private_dns]
+  records  = [aws_instance.db_ec2_instance[each.key].private_dns]
 }
 
 resource "aws_security_group" "delius_db_security_group" {
