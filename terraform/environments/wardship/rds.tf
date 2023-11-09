@@ -85,7 +85,7 @@ data "http" "myip" {
 }
 
 resource "null_resource" "setup_db" {
-  count = local.is-development ? 0 : 1
+  count      = local.is-development ? 0 : 1
   depends_on = [aws_db_instance.wardship_db]
 
   provisioner "local-exec" {
@@ -137,8 +137,8 @@ resource "null_resource" "setup_dev_db" {
     command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
 
     environment = {
-      DB_HOSTNAME      = aws_db_instance.wardship_db.address
-      DB_NAME          = aws_db_instance.wardship_db.db_name
+      DB_HOSTNAME          = aws_db_instance.wardship_db.address
+      DB_NAME              = aws_db_instance.wardship_db.db_name
       WARDSHIP_DB_USERNAME = aws_db_instance.wardship_db.username
       WARDSHIP_DB_PASSWORD = random_password.password.result
     }

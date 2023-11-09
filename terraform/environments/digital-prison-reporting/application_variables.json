@@ -85,7 +85,7 @@
       "setup_sonatype_secrets": true,
       "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
-      "setup_redshift_schedule": true 
+      "setup_redshift_schedule": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -172,7 +172,7 @@
       "setup_sonatype_secrets": false,
       "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
-      "setup_redshift_schedule": true 
+      "setup_redshift_schedule": true
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -259,7 +259,7 @@
       "setup_sonatype_secrets": false,
       "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
-      "setup_redshift_schedule": true      
+      "setup_redshift_schedule": true
     },
     "production": {
       "project_short_id": "dpr",

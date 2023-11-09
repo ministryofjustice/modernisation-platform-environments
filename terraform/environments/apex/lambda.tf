@@ -1,7 +1,7 @@
 module "iambackup" {
-  source = "./modules/lambdapolicy"
-    backup_policy_name = "laa-${local.application_name}-${local.environment}-policy"
-    tags = merge(
+  source             = "./modules/lambdapolicy"
+  backup_policy_name = "laa-${local.application_name}-${local.environment}-policy"
+  tags = merge(
     local.tags,
     { Name = "laa-${local.application_name}-${local.environment}-mp" }
   )
@@ -33,7 +33,7 @@ resource "time_sleep" "wait_for_provision_files" {
 }
 
 resource "aws_security_group" "lambdasg" {
-  name       = "${local.application_name}-${local.environment}-lambda-security-group"
+  name        = "${local.application_name}-${local.environment}-lambda-security-group"
   description = "APEX Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -68,17 +68,18 @@ data "archive_file" "dbconnect_file" {
 
 
 resource "aws_lambda_layer_version" "lambda_layer" {
-  layer_name = "SSHNodeJSLayer"
-  description = "A layer to add ssh libs to lambda"
+  layer_name   = "SSHNodeJSLayer"
+  description  = "A layer to add ssh libs to lambda"
   license_info = "Apache-2.0"
-  s3_bucket = module.s3_bucket_lambda.lambdabucketname
-  s3_key = local.s3layerkey
+  s3_bucket    = module.s3_bucket_lambda.lambdabucketname
+  s3_key       = local.s3layerkey
 
   compatible_runtimes = [local.compatible_runtimes]
 }
 
 
 resource "aws_lambda_function" "snapshotDBFunction" {
+
   description = "Snapshot volumes for Oracle EC2"
   function_name = local.snapshotDBFunctionname
   role          = module.iambackup.backuprole
@@ -92,17 +93,18 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   timeout = 900
   depends_on = [ time_sleep.wait_for_provision_files ]
   
-  
 
+
+  
   environment {
     variables = {
       LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
 
     }
   }
-   vpc_config {
+  vpc_config {
     security_group_ids = [aws_security_group.lambdasg.id]
-    subnet_ids = [data.aws_subnet.private_subnets_a.id]
+    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
   }
   tags = merge(
     local.tags,
@@ -111,6 +113,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
 }
 
 resource "aws_lambda_function" "deletesnapshotFunction" {
+
   description = "Clean up script to delete old unused snapshots"
   function_name = local.deletesnapshotFunctionname
   role          = module.iambackup.backuprole
@@ -123,15 +126,16 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
   timeout = 900
   depends_on = [ time_sleep.wait_for_provision_files ]
 
+
   environment {
     variables = {
       LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
 
     }
   }
-   vpc_config {
+  vpc_config {
     security_group_ids = [aws_security_group.lambdasg.id]
-    subnet_ids = [data.aws_subnet.private_subnets_a.id]
+    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
   }
   tags = merge(
     local.tags,
@@ -141,6 +145,7 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
 
 
 resource "aws_lambda_function" "connectDBFunction" {
+
   description = "SSH to the DB EC2"
   function_name = local.connectDBFunctionname
   role          = module.iambackup.backuprole
@@ -154,15 +159,17 @@ resource "aws_lambda_function" "connectDBFunction" {
   timeout = 900
   depends_on = [ time_sleep.wait_for_provision_files ]
 
+
+
   environment {
     variables = {
       LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
 
     }
   }
-   vpc_config {
+  vpc_config {
     security_group_ids = [aws_security_group.lambdasg.id]
-    subnet_ids = [data.aws_subnet.private_subnets_a.id]
+    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
   }
   tags = merge(
     local.tags,

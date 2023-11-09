@@ -3,12 +3,46 @@ locals {
 
   # baseline config
   production_config = {
+
+    baseline_iam_policies = {
+      Ec2ProdDatabasePolicy = {
+        description = "Permissions required for prod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/*P/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/P*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/*",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ec2_instances = {
       pd-csr-db-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           ami_owner         = "self"
           availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type                = "r6i.xlarge"
