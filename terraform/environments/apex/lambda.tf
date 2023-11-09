@@ -72,7 +72,10 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   layers           = [aws_lambda_layer_version.lambda_layer.arn]
   s3_bucket        = module.s3_bucket_lambda.lambdabucketname
   s3_key           = local.snapshotDBFunctionfilename
+  memory_size      = 350
+  timeout          = 300
 
+  
   environment {
     variables = {
       LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
@@ -124,6 +127,8 @@ resource "aws_lambda_function" "connectDBFunction" {
   layers           = [aws_lambda_layer_version.lambda_layer.arn]
   s3_bucket        = module.s3_bucket_lambda.lambdabucketname
   s3_key           = local.connectDBFunctionfilename
+  memory_size = 350
+  timeout = 300
 
   environment {
     variables = {

@@ -49,4 +49,6 @@ locals {
     }
   }
   environment_config = local.environment_configs[local.environment]
+
+  baseline_secretsmanager_secrets = {}
 }

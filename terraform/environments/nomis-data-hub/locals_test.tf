@@ -76,14 +76,16 @@ locals {
         iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
-
+    #when changing the ems entries in prod or t2, also stop and start xtag to reconnect it.
     baseline_route53_zones = {
       "test.ndh.nomis.service.justice.gov.uk" = {
         records = [
           { name = "t1-app", type = "A", ttl = 300, records = ["10.101.3.196"] },
           { name = "t1-ems", type = "A", ttl = 300, records = ["10.101.3.197"] },
-          { name = "t2-app", type = "A", ttl = 300, records = ["10.101.33.196"] },
-          { name = "t2-ems", type = "A", ttl = 300, records = ["10.101.33.197"] },
+          { name = "t2-app", type = "A", ttl = 300, records = ["10.101.33.196"] },#azure
+          #{ name = "t2-app", type = "A", ttl = 300, records = ["10.26.8.186"] }, #aws
+          { name = "t2-ems", type = "A", ttl = 300, records = ["10.101.33.197"] },#azure
+          #{ name = "t2-ems", type = "A", ttl = 300, records = ["10.26.8.11"] }, #aws
         ]
       }
     }

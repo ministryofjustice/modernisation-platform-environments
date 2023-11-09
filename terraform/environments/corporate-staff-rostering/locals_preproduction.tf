@@ -7,6 +7,9 @@ locals {
     baseline_ssm_parameters = {
       "/oracle/database/PPIWFM" = local.database_ssm_parameters
     }
+    baseline_secretsmanager_secrets = {
+      "/oracle/database/PPIWFM" = local.database_secretsmanager_secrets
+    }
 
     baseline_ec2_instances = {
       pp-csr-db-a = merge(local.database_ec2, {
@@ -17,6 +20,8 @@ locals {
         instance = merge(local.database_ec2.instance, {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+          disable_api_termination      = true
+          disable_api_stop             = true
         })
 
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
@@ -61,6 +66,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -98,6 +104,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -135,6 +142,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -209,6 +217,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -244,6 +253,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -279,6 +289,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -316,6 +327,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
@@ -353,6 +365,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["web", "domain", "jumpserver"]
           tags = {
@@ -374,6 +387,10 @@ locals {
           ami               = "PPCWW00001"
           component         = "web"
         }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
       }
 
       pp-csr-w-2-b = {
@@ -386,6 +403,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -423,6 +441,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -459,6 +478,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -496,6 +516,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -515,6 +536,10 @@ locals {
           ami               = "pp-csr-w-7-b"
           component         = "web"
         }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
       }
 
       pp-csr-w-8-b = {
@@ -527,6 +552,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -546,6 +572,10 @@ locals {
           ami               = "pp-csr-w-8-b"
           component         = "web"
         }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
       }
 
       pp-csr-w-3-a = {
@@ -558,6 +588,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -595,6 +626,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "web", "jumpserver"]
           tags = {
@@ -687,6 +719,28 @@ locals {
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
+          web-34-7770 = {
+            port     = 7770
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7770
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
           web-56-7770 = {
             port     = 7770
             protocol = "HTTP"
@@ -751,6 +805,28 @@ locals {
             attachments = [
               { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+          web-34-7771 = {
+            port     = 7771
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7771
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
             ]
           }
           web-56-7771 = {
@@ -819,6 +895,28 @@ locals {
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
           }
+          web-34-7780 = {
+            port     = 7780
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7780
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
           web-56-7780 = {
             port     = 7780
             protocol = "HTTP"
@@ -883,6 +981,28 @@ locals {
             attachments = [
               { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+          web-34-7781 = {
+            port     = 7781
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7781
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
             ]
           }
           web-56-7781 = {
@@ -961,6 +1081,21 @@ locals {
                   }
                 }]
               }
+              web-34-7770 = {
+                priority = 3470
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-34-7770"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "traina.pp.csr.service.justice.gov.uk",
+                      "traina.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7770 = {
                 priority = 5670
                 actions = [{
@@ -1000,6 +1135,21 @@ locals {
                   host_header = {
                     values = [
                       "r2.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web-34-7771 = {
+                priority = 3471
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-34-7771"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "trainb.pp.csr.service.justice.gov.uk",
+                      "trainb.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -1059,6 +1209,21 @@ locals {
                   host_header = {
                     values = [
                       "r1.pp.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web-34-7780 = {
+                priority = 3480
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-34-7780"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "traina.pp.csr.service.justice.gov.uk",
+                      "traina.csr.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -1123,6 +1288,21 @@ locals {
                   }
                 }]
               }
+              web-34-7781 = {
+                priority = 3481
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-34-7781"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "trainb.pp.csr.service.justice.gov.uk",
+                      "trainb.csr.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-56-7781 = {
                 priority = 5681
                 actions = [{
@@ -1164,7 +1344,6 @@ locals {
           { name = "ppiwfm", type = "A", ttl = "300", records = ["10.40.42.132"] },
           { name = "ppiwfm-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
           { name = "ppiwfm-b", type = "CNAME", ttl = "300", records = ["pp-csr-db-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          # { name = "r3", type = "CNAME", ttl = "300", records = ["pp-csr-w-5-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "r1", type = "A", lbs_map_key = "private" },
@@ -1173,6 +1352,8 @@ locals {
           { name = "r4", type = "A", lbs_map_key = "private" },
           { name = "r5", type = "A", lbs_map_key = "private" },
           { name = "r6", type = "A", lbs_map_key = "private" },
+          { name = "traina", type = "A", lbs_map_key = "private" },
+          { name = "trainb", type = "A", lbs_map_key = "private" },
         ]
       }
     }

@@ -19,6 +19,14 @@ locals {
     ]
 
     baseline_s3_buckets = {
+      nomis-audit-archives = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+
       nomis-db-backup-bucket = {
         custom_kms_key = module.environment.kms_keys["general"].arn
         iam_policies   = module.baseline_presets.s3_iam_policies
@@ -72,6 +80,16 @@ locals {
               "arn:aws:ssm:*:*:parameter/oracle/database/*T1/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/T1*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
+            ]
           }
         ]
       }
@@ -89,6 +107,16 @@ locals {
               "arn:aws:ssm:*:*:parameter/oracle/database/*T2/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/T2*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
+            ]
           }
         ]
       }
@@ -105,6 +133,16 @@ locals {
               "arn:aws:ssm:*:*:parameter/azure/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/*T3/*",
               "arn:aws:ssm:*:*:parameter/oracle/database/T3*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/*",
             ]
           }
         ]

@@ -151,6 +151,7 @@ variable "ec2_autoscaling_groups" {
     })
     instance = object({
       disable_api_termination      = bool
+      disable_api_stop             = optional(bool, false)
       instance_type                = string
       key_name                     = string
       monitoring                   = optional(bool, true)
@@ -298,6 +299,7 @@ variable "ec2_instances" {
     })
     instance = object({
       disable_api_termination      = bool
+      disable_api_stop             = optional(bool, false)
       instance_type                = string
       key_name                     = string
       monitoring                   = optional(bool, true)
@@ -880,7 +882,6 @@ variable "secretsmanager_secrets" {
     recovery_window_in_days = optional(number, 0)
     secrets = map(object({
       description = optional(string)
-      type        = optional(string, "SecureString")
       file        = optional(string)
       kms_key_id  = optional(string)
       random = optional(object({

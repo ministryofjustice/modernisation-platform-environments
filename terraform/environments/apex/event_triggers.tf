@@ -1,7 +1,8 @@
 resource "aws_cloudwatch_event_rule" "snapshotDBFunctionmon_sun" {
-  name                = "laa-createSnapshotRule-${local.application_name}-${local.environment}-mp"
-  description         = "Daily snapshots of Oracle volumes"
-  schedule_expression = "cron(00 04 ? * MON-SUN *)"
+  name = "laa-createSnapshotRule-${local.application_name}-${local.environment}-mp"
+  description = "Daily snapshots of Oracle volumes"
+  schedule_expression = "cron(51 14 ? * MON-SUN *)"
+
 }
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_mon_sun" {
   statement_id  = "AllowExecutionFromCloudWatch"
@@ -39,4 +40,3 @@ resource "aws_cloudwatch_event_target" "deletesnapshotFunctioncheck_mon_fri" {
   arn   = aws_lambda_function.deletesnapshotFunction.arn
   input = jsonencode({ "appname" : "apex Database Server" })
 }
-

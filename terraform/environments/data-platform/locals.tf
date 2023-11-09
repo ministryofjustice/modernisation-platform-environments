@@ -41,6 +41,7 @@ locals {
   update_schema_version                 = lookup(var.update_schema_versions, local.environment)
   preview_data_version                  = lookup(var.preview_data_versions, local.environment)
   delete_table_for_data_product_version = lookup(var.delete_table_for_data_product_versions, local.environment)
+  push_to_catalogue_version             = lookup(var.push_to_catalogue_versions, local.environment)
 
   # Environment vars that are used by many lambdas
   logger_environment_vars = {
@@ -52,5 +53,10 @@ locals {
     CURATED_DATA_BUCKET = module.data_s3_bucket.bucket.id
     METADATA_BUCKET     = module.metadata_s3_bucket.bucket.id
     LANDING_ZONE_BUCKET = module.data_landing_s3_bucket.bucket.id
+  }
+
+    openmetadata_environment_vars = {
+    OPENMETADATA_JWT_SECRET_ARN = aws_secretsmanager_secret.openmetadata.id
+    OPENMETADATA_DEV_API_URL = "https://catalogue.apps-tools.development.data-platform.service.justice.gov.uk/api"
   }
 }

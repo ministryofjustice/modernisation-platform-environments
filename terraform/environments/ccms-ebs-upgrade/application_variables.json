@@ -1,7 +1,145 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "short_env": "dev",
+      "dns": "laa-development",
+      "ses_domain_identity": "dev.legalservices.gov.uk",
+      "instance-scheduling": "skip-scheduling",
+      "ec2_oracle_instance_type_ebsdb_test": "x2iedn.8xlarge",
+      "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
+      "ec2_oracle_instance_cores_ebsdb": "8",
+      "ec2_oracle_instance_threads_ebsdb": "2",
+      "ec2_oracle_instance_type_ebsconc": "m5d.4xlarge",
+      "ec2_oracle_instance_cores_ebsconc": "8",
+      "ec2_oracle_instance_threads_ebsconc": "2",
+      "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
+      "ec2_oracle_instance_cores_ebsapps": "4",
+      "ec2_oracle_instance_threads_ebsapps": "2",
+      "ec2_oracle_instance_type_webgate": "m5d.large",
+      "ec2_oracle_instance_cores_webgate": "1",
+      "ec2_oracle_instance_threads_webgate": "2",
+      "ec2_oracle_instance_type_accessgate": "m5d.xlarge",
+      "ec2_oracle_instance_cores_accessgate": "2",
+      "ec2_oracle_instance_threads_accessgate": "2",
+      "ami_owner": "self",
+      "ec2_instance_type_ftp": "c5d.large",
+      "ftp_ami_id": "ami-0d8e665f120c20253",
+      "ec2_instance_type_clamav": "c5d.large",
+      "clamav_ami_id": "ami-0965b5afb3ac7174e",
+      "ebsdb_ami_id": "ami-0d4b266f7ae87bbfc",
+      "ebsconc_ami_id": "ami-0d4b266f7ae87bbfc",
+      "ebsapps_ami_id-1": "ami-0d4b266f7ae87bbfc",
+      "ebsapps_ami_id-2": "ami-0d4b266f7ae87bbfc",
+      "accessgate_ami_id-1": "ami-0695726199c3e30e5",
+      "accessgate_ami_id-2": "ami-0695726199c3e30e5",
+      "webgate_ami_id-1": "ami-0e398cd57c81356a7",
+      "webgate_ami_id-2": "ami-0e398cd57c81356a7",
+      "restored_db_image": "ami-0df5f31cae1c86635",
+      "orace_base_prereqs_ami_name": "Oracle79-prereqs-v2_0",
+      "orace_db_ami_name": "Oracle79-prereqs-v1_8",
+      "orace_db_dr_ami_name": "EBSDB-DR-test",
+      "webgate_ami_name": "ebs-webgate-v2_0",
+      "accessgate_ami_name": "ebs-accessgate-v2_0",
+      "ec2_instance_type_mailrelay": "c4.large",
+      "mailrelay_ami_id": "ami-0e183a740dfc54442",
+      "key_name": "",
+      "lz_aws_account_id_env": "411213865113",
+      "lz_aws_subnet_env": "10.202.0.0/20",
+      "lz_aws_workspace_nonprod_subnet_env": "10.200.0.0/20",
+      "lz_aws_workspace_prod_subnet_env": "10.200.16.0/20",
+      "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
+      "lz_aws_appstream_subnet_a_b": "10.200.32.0/23",
+      "cloud_platform_subnet": "172.20.0.0/16",
+      "lz_ftp_bucket_environment": "development",
+      "lz_domain_name": "*.dev.legalservices.gov.uk",
+      "mp_aws_subnet_env": "10.200.0.0/20",
+      "ebs_default_iops": 12000,
+      "webgate_no_instances": 2,
+      "webgate_default_iops": 3000,
+      "webgate_u01_size": 100,
+      "webgate_dns_prefix": "wgatedev",
+      "accessgate_no_instances": 2,
+      "accessgate_default_iops": 3000,
+      "accessgate_u01_size": 150,
+      "accessgate_dns_prefix": "agatedev",
+      "ebsapps_no_instances": 2,
+      "ebsapps_default_iops": 3000,
+      "ebsapps_exhome_size": 100,
+      "ebsapps_u01_size": 200,
+      "ebsapps_u03_size": 200,
+      "ebsapps_stage_size": 100,
+      "tg_apps_port": 8000,
+      "ebs_size_ebsdb_home": 100,
+      "ebs_size_ebsdb_temp": 100,
+      "ebs_size_ebsdb_exhome": 100,
+      "ebs_size_ebsdb_u01": 300,
+      "ebs_size_ebsdb_arch": 500,
+      "ebs_size_ebsdb_dbf": 11000,
+      "ebs_size_ebsdb_dbf_dr": 8000,
+      "ebs_size_ebsdb_redoA": 100,
+      "ebs_size_ebsdb_redoB": 50,
+      "ebs_size_ebsdb_techst": 100,
+      "ebs_size_ebsdb_backup": 8000,
+      "ebs_size_ebsdb_diag": 50,
+      "ebs_size_ebsdb_appshare": 100,
+      "ebs_default_iops_test": 9000,
+      "dbf_device": "nvme5n1",
+      "dbf_path": "/CCMS/EBS/dbf",
+      "ebs_type_ebsdb_backup": "gp3",
+      "ebs_size_ebsconc_exhome": 100,
+      "ebs_size_ebsconc_u01": 200,
+      "ebs_size_ebsconc_u03": 200,
+      "ebs_size_ebsconc_home": 100,
+      "ebs_size_ebsconc_stage": 100,
+      "ebs_size_ebsconc_temp": 100
+    }
+  },
+  "webgate_ebs": {
+    "u01": {
+      "mapping": "u01",
+      "type": "io2",
+      "device_name": "/dev/sdh"
+    }
+  },
+  "cloudwatch_ec2": {
+    "cpu": {
+      "eval_periods": 1,
+      "period": 60,
+      "threshold": 80
+    },
+    "mem": {
+      "eval_periods": 2,
+      "period": 60,
+      "threshold": 10
+    },
+    "disk": {
+      "eval_periods": 2,
+      "period": 60,
+      "threshold": 80,
+      "threshold_dbf": 90
+    },
+    "iowait": {
+      "eval_periods": 6,
+      "period": 60,
+      "threshold": 90
+    },
+    "insthc": {
+      "eval_periods": 3,
+      "period": 60,
+      "threshold": 1
+    },
+    "syshc": {
+      "eval_periods": 3,
+      "period": 60,
+      "threshold": 1
+    }
+  },
+  "cw_log_groups": {
+    "cwagent-var-log-messages": {
+      "retention_days": 30
+    },
+    "cwagent-var-log-secure": {
+      "retention_days": 90
     }
   }
 }
