@@ -16,6 +16,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 100 }
         }
+        cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.web_ec2.tags, {
           description = "copy of PPFWW0005 for planetfm ${local.environment}"
           ami         = "pp-cafm-w-5-a"
