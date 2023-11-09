@@ -23,7 +23,7 @@ module "lb_access_logs_enabled" {
 
 # Create the target group
 resource "aws_lb_target_group" "target_group_module" {
-  name                 = "${local.application_name}-tg-mlb-${local.environment}"
+  name                 = "${local.application_name}-tg-mlb-${local.environment}-HTTP"
   port                 = local.application_data.accounts[local.environment].server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -44,6 +44,28 @@ resource "aws_lb_target_group" "target_group_module" {
   }
 }
 
+resource "aws_lb_target_group" "target_group_module_HTTPS" {
+  name                 = "${local.application_name}-tg-mlb-${local.environment}-HTTPS"
+  port                 = "443"
+  protocol             = "HTTPS"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "instance"
+  deregistration_delay = 30
+
+  stickiness {
+    type = "lb_cookie"
+  }
+  #checkov:skip=CKV_AWS_261: "health_check defined below, but not picked up"
+  health_check {
+    healthy_threshold   = "5"
+    interval            = "120"
+    protocol            = "HTTPS"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "5"
+  }
+}
+
 # Register nginx instance to target group
 resource "aws_lb_target_group_attachment" "register_nginx_server_http" {
   target_group_arn = aws_lb_target_group.target_group_module.arn
@@ -52,7 +74,7 @@ resource "aws_lb_target_group_attachment" "register_nginx_server_http" {
 }
 
 resource "aws_lb_target_group_attachment" "register_nginx_server_https" {
-  target_group_arn = aws_lb_target_group.target_group_module.arn
+  target_group_arn = aws_lb_target_group.target_group_module_HTTPS.arn
   target_id        = module.ec2_test_instance["nginx_server"].aws_instance.id 
   port             = 443
 }
@@ -78,6 +100,6 @@ resource "aws_lb_listener" "nginx_listener_https" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.target_group_module.arn
+    target_group_arn = aws_lb_target_group.target_group_module_HTTPS.arn
   }
 }
