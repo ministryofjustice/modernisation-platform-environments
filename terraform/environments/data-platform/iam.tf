@@ -16,6 +16,14 @@ data "aws_iam_policy_document" "log_to_bucket" {
   }
 }
 
+data "aws_iam_policy_document" "read_openmetadata_secrets" {
+  statement {
+    sid     = "openmetdataSecretsManager"
+    effect  = "Allow"
+    actions = ["secretsmanager:GetSecretValue"]
+    resources = [aws_secretsmanager_secret.openmetadata.id]
+  }
+}
 data "aws_iam_policy_document" "read_metadata" {
   statement {
     sid     = "s3ReadMetadata"
@@ -251,20 +259,6 @@ resource "aws_iam_role_policy_attachment" "attach_allow_invoke_authoriser_lambda
 # TO BE REMOVED
 data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
   statement {
-    sid    = "AllowPutFromCiUser"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
-    }
-
-    actions = ["s3:PutObject", "s3:ListBucket"]
-
-    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
-  }
-
-  statement {
     sid       = "DenyNonFullControlObjects"
     effect    = "Deny"
     actions   = ["s3:PutObject"]
@@ -287,20 +281,6 @@ data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
 }
 
 data "aws_iam_policy_document" "data_s3_bucket_policy_document" {
-  statement {
-    sid    = "AllowPutFromCiUser"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
-    }
-
-    actions = ["s3:PutObject", "s3:ListBucket"]
-
-    resources = [module.data_s3_bucket.bucket.arn, "${module.data_s3_bucket.bucket.arn}/*"]
-  }
-
   statement {
     sid       = "DenyNonFullControlObjects"
     effect    = "Deny"
@@ -326,20 +306,6 @@ data "aws_iam_policy_document" "data_s3_bucket_policy_document" {
 
 data "aws_iam_policy_document" "data_landing_s3_bucket_policy_document" {
   statement {
-    sid    = "AllowPutFromCiUser"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
-    }
-
-    actions = ["s3:PutObject", "s3:ListBucket"]
-
-    resources = [module.data_landing_s3_bucket.bucket.arn, "${module.data_landing_s3_bucket.bucket.arn}/*"]
-  }
-
-  statement {
     sid       = "DenyNonFullControlObjects"
     effect    = "Deny"
     actions   = ["s3:PutObject"]
@@ -364,20 +330,6 @@ data "aws_iam_policy_document" "data_landing_s3_bucket_policy_document" {
 
 data "aws_iam_policy_document" "metadata_s3_bucket_policy_document" {
   statement {
-    sid    = "AllowPutFromCiUser"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
-    }
-
-    actions = ["s3:PutObject", "s3:ListBucket"]
-
-    resources = [module.metadata_s3_bucket.bucket.arn, "${module.metadata_s3_bucket.bucket.arn}/*"]
-  }
-
-  statement {
     sid       = "DenyNonFullControlObjects"
     effect    = "Deny"
     actions   = ["s3:PutObject"]
@@ -401,26 +353,6 @@ data "aws_iam_policy_document" "metadata_s3_bucket_policy_document" {
 }
 
 data "aws_iam_policy_document" "logs_s3_bucket_policy_document" {
-  statement {
-    sid    = "AllowPutFromCiUser"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
-    }
-
-    actions = [
-      "s3:PutObject",
-      "s3:ListBucket"
-    ]
-
-    resources = [
-      module.logs_s3_bucket.bucket.arn,
-      "${module.logs_s3_bucket.bucket.arn}/*",
-    ]
-  }
-
   statement {
     sid    = "AllowPutFromCloudtrail"
     effect = "Allow"

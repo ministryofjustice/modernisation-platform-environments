@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "local-ecr-policy-data" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.account_id}:role/${var.app_name}-CodeBuildRole", "arn:aws:iam::${var.account_id}:user/cicd-member-user"]
+      identifiers = ["arn:aws:iam::${var.account_id}:role/${var.app_name}-CodeBuildRole"]
     }
 
     actions = [

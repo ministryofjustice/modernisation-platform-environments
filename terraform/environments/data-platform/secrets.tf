@@ -14,8 +14,3 @@ resource "aws_secretsmanager_secret" "openmetadata" {
   name = "data-platform-openmetadata-token"
   tags = local.tags
 }
-
-## add this in after created
-# data "aws_secretsmanager_secret_version" "openmetadata" {
-#   secret_id = aws_secretsmanager_secret.openmetadata.id
-# }
