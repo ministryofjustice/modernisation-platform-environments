@@ -28,7 +28,7 @@ resource "aws_s3_object" "provision_files" {
 
 
 resource "time_sleep" "wait_for_provision_files" {
-  create_duration = "100s"
+  create_duration = "200s"
   depends_on = [ aws_s3_object.provision_files ]
 }
 
@@ -56,6 +56,7 @@ data "archive_file" "deletesnapshot_file" {
   type        = "zip"
   source_file = local.deletesnapshot_source_file
   output_path = local.deletesnapshot_output_path
+  
 }
 
 data "archive_file" "dbconnect_file" {
@@ -89,6 +90,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   s3_key = local.snapshotDBFunctionfilename
   memory_size = 128
   timeout = 900
+  depends_on = [ time_sleep.wait_for_provision_files ]
   
   
 
@@ -119,6 +121,7 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
   s3_key = local.deletesnapshotFunctionfilename
   memory_size = 1024
   timeout = 900
+  depends_on = [ time_sleep.wait_for_provision_files ]
 
   environment {
     variables = {
@@ -149,6 +152,7 @@ resource "aws_lambda_function" "connectDBFunction" {
   s3_key = local.connectDBFunctionfilename
   memory_size = 128
   timeout = 900
+  depends_on = [ time_sleep.wait_for_provision_files ]
 
   environment {
     variables = {
