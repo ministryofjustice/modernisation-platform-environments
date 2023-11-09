@@ -7,17 +7,24 @@ locals {
     }
   }
 
-  weblogic_ssm_parameters_old = {
-    prefix = "/weblogic/"
-    parameters = {
-      admin_username     = { description = "weblogic admin username" }
-      admin_password     = { description = "weblogic admin password" }
-      db_username        = { description = "nomis database username" }
-      db_password        = { description = "nomis database password" }
-      db_tagsar_username = { description = "nomis database tag username" }
-      db_tagsar_password = { description = "nomis database tag password" }
-      rms_hosts          = { description = "combined reporting host list" }
-      rms_key            = { description = "combined reporting rms key" }
+  weblogic_secretsmanager_secrets_policy = [{
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+    principals = {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${module.environment.account_id}:role/ec2-weblogic-*",
+      ]
+    }
+    resources = ["*"]
+  }]
+  weblogic_secretsmanager_secrets = {
+    policy = local.weblogic_secretsmanager_secrets_policy
+    secrets = {
+      passwords = { description = "weblogic passwords" }
+      rms       = { description = "combined reporting secrets" }
     }
   }
 
