@@ -38,21 +38,21 @@ locals {
     resources = ["*"]
   }]
   database_nomis_secretsmanager_secrets = {
-    policy = local.database_secretsmanager_secrets_policy
+    # policy = local.database_secretsmanager_secrets_policy
     secrets = {
       passwords          = { description = "database passwords" }
       weblogic-passwords = { description = "passwords available to weblogic servers" }
     }
   }
   database_mis_secretsmanager_secrets = {
-    policy = local.database_secretsmanager_secrets_policy
+    # policy = local.database_secretsmanager_secrets_policy
     secrets = {
       passwords      = { description = "database passwords" }
       misload-config = { description = "misload username, password and hostname" }
     }
   }
   database_secretsmanager_secrets = {
-    policy = local.database_secretsmanager_secrets_policy
+    # policy = local.database_secretsmanager_secrets_policy
     secrets = {
       passwords = { description = "database passwords" }
     }

@@ -21,7 +21,7 @@ locals {
     resources = ["*"]
   }]
   weblogic_secretsmanager_secrets = {
-    policy = local.weblogic_secretsmanager_secrets_policy
+    # policy = local.weblogic_secretsmanager_secrets_policy
     secrets = {
       passwords = { description = "weblogic passwords" }
       rms       = { description = "combined reporting secrets" }
