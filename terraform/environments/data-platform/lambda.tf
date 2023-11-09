@@ -452,22 +452,22 @@ module "data_product_push_to_catalogue_lambda" {
 
   allowed_triggers = {
 
-    AllowExecutionFromLambda = {
+    AllowExecutionFromLambda1 = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
       source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_create_metadata_${local.environment}"
     }
-    AllowExecutionFromLambda = {
+    AllowExecutionFromLambda2 = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
       source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_create_schema_${local.environment}"
     }
-    AllowExecutionFromLambda = {
+    AllowExecutionFromLambda3 = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
       source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_update_schema_${local.environment}"
     }
-    AllowExecutionFromLambda = {
+    AllowExecutionFromLambda4 = {
       action     = "lambda:InvokeFunction"
       principal  = "lambda.amazonaws.com"
       source_arn = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_update_metadata_${local.environment}"
