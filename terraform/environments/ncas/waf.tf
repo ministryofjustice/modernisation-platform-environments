@@ -16,7 +16,7 @@ resource "aws_wafv2_web_acl" "ncas_web_acl" {
 
     statement {
       managed_rule_group_statement {
-        name        = "	AWSManagedRulesCommonRuleSet"
+        name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
       }
     }
