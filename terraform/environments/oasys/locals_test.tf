@@ -98,7 +98,7 @@ locals {
       "t2-${local.application_name}-db-b" = merge(local.database_b, {
         user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "secretsmanagersecrets-for-oracle19c"
+            branch = "main"
           })
         })
         tags = merge(local.database_b.tags, {
