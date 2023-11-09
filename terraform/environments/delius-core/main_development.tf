@@ -61,3 +61,7 @@ module "environment_test" {
 
   tags = local.tags
 }
+
+output "output_dev" {
+  value = module.environment_dev
+}

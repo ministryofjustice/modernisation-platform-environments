@@ -79,69 +79,129 @@ variable "ldap_config" {
 }
 
 variable "db_config" {
-  type = map(object({
-    ami_name_regex = string
-    user_data_raw  = optional(string)
-    instance = object({
-      associate_public_ip_address  = optional(bool, false)
-      disable_api_termination      = bool
-      instance_type                = string
-      metadata_endpoint_enabled    = optional(string, "enabled")
-      metadata_options_http_tokens = optional(string, "required")
-      monitoring                   = optional(bool, true)
-      ebs_block_device_inline      = optional(bool, false)
-      vpc_security_group_ids       = list(string)
-      private_dns_name_options = optional(object({
-        enable_resource_name_dns_aaaa_record = optional(bool)
-        enable_resource_name_dns_a_record    = optional(bool)
-        hostname_type                        = string
-      }))
-    })
-    ebs_volumes = optional(object({
-      kms_key_id = string
-      tags       = map(string)
-      iops       = number
-      throughput = number
-      root_volume = object({
-        volume_type = string
-        volume_size = number
-      })
-      ebs_non_root_volumes = map(object({
-        volume_type = optional(string)
-        volume_size = optional(string)
-        no_device   = optional(bool)
-      }))
-    }))
-    route53_records = object({
-      create_internal_record = bool
-      create_external_record = bool
-    })
-  }))
-  default = {
-    primary = {
-      ami_name_regex = "ami_name_example"
-      user_data_raw  = "user_data_raw_example"
-      instance = {
-        associate_public_ip_address  = false
-        disable_api_termination      = false
-        instance_type                = "instance_type_example"
-        metadata_endpoint_enabled    = "enabled"
-        metadata_options_http_tokens = "required"
-        monitoring                   = true
-        ebs_block_device_inline      = false
-        vpc_security_group_ids       = []
-        private_dns_name_options = {
-          enable_resource_name_dns_aaaa_record = false
-          enable_resource_name_dns_a_record    = false
-          hostname_type                        = "hostname_type_example"
-        }
+  type = map(
+    object(
+      {
+        name           = string
+        ami_name_regex = string
+        user_data_raw  = optional(string)
+        instance = object({
+          associate_public_ip_address  = optional(bool, false)
+          disable_api_termination      = bool
+          instance_type                = string
+          metadata_endpoint_enabled    = optional(string, "enabled")
+          metadata_options_http_tokens = optional(string, "required")
+          monitoring                   = optional(bool, true)
+          ebs_block_device_inline      = optional(bool, false)
+          vpc_security_group_ids       = list(string)
+          private_dns_name_options = optional(object({
+            enable_resource_name_dns_aaaa_record = optional(bool)
+            enable_resource_name_dns_a_record    = optional(bool)
+            hostname_type                        = string
+          }))
+        })
+        ebs_volumes = optional(object({
+          kms_key_id = string
+          tags       = map(string)
+          iops       = number
+          throughput = number
+          root_volume = object({
+            volume_type = string
+            volume_size = number
+          })
+          ebs_non_root_volumes = map(object({
+            volume_type = optional(string)
+            volume_size = optional(string)
+            no_device   = optional(bool)
+          }))
+        }))
+        route53_records = object({
+          create_internal_record = bool
+          create_external_record = bool
+        })
       }
-      route53_records = {
-        create_internal_record = false
-        create_external_record = false
-      }
-    }
-  }
+    )
+  )
+  #  default = {
+  #    primary = {
+  #      ami_name_regex = "ami_name_example"
+  #      user_data_raw  = "user_data_raw_example"
+  #      instance = {
+  #        associate_public_ip_address  = false
+  #        disable_api_termination      = false
+  #        instance_type                = "instance_type_example"
+  #        metadata_endpoint_enabled    = "enabled"
+  #        metadata_options_http_tokens = "required"
+  #        monitoring                   = true
+  #        ebs_block_device_inline      = false
+  #        vpc_security_group_ids       = []
+  #        private_dns_name_options = {
+  #          enable_resource_name_dns_aaaa_record = false
+  #          enable_resource_name_dns_a_record    = false
+  #          hostname_type                        = "hostname_type_example"
+  #        }
+  #      }
+  #      ebs_volumes = {
+  #        kms_key_id = "id"
+  #        tags       = { "key" = "value" }
+  #        iops       = 3000
+  #        throughput = 125
+  #        root_volume = {
+  #          volume_type = "gp3"
+  #          volume_size = 30
+  #        }
+  #        ebs_non_root_volumes = {
+  #          "/dev/sdb" = {
+  #            volume_type = "gp3"
+  #            volume_size = 200
+  #          }
+  #        }
+  #      }
+  #      route53_records = {
+  #        create_internal_record = false
+  #        create_external_record = false
+  #      }
+  #    }
+  #    standby = {
+  #      ami_name_regex = "ami_name_example"
+  #      user_data_raw  = "user_data_raw_example"
+  #      instance = {
+  #        associate_public_ip_address  = false
+  #        disable_api_termination      = false
+  #        instance_type                = "instance_type_example"
+  #        metadata_endpoint_enabled    = "enabled"
+  #        metadata_options_http_tokens = "required"
+  #        monitoring                   = true
+  #        ebs_block_device_inline      = false
+  #        vpc_security_group_ids       = []
+  #        private_dns_name_options = {
+  #          enable_resource_name_dns_aaaa_record = false
+  #          enable_resource_name_dns_a_record    = false
+  #          hostname_type                        = "hostname_type_example"
+  #        }
+  #      }
+  #      ebs_volumes = {
+  #        kms_key_id = "id"
+  #        tags       = { "key" = "value" }
+  #        iops       = 3000
+  #        throughput = 125
+  #        root_volume = {
+  #          volume_type = "gp3"
+  #          volume_size = 30
+  #        }
+  #        ebs_non_root_volumes = {
+  #          "/dev/sdb" = {
+  #            volume_type = "gp3"
+  #            volume_size = 200
+  #          }
+  #        }
+  #      }
+  #      route53_records = {
+  #        create_internal_record = false
+  #        create_external_record = false
+  #      }
+  #    }
+  #  }
 }
 
 variable "weblogic_config" {
