@@ -533,7 +533,20 @@ resource "aws_iam_role" "api_gateway_cloud_watch_role" {
   tags               = local.tags
 }
 
-data "aws_iam_policy_document" "cloudtrail_policy" {
+data "aws_iam_policy_document" "cloudtrail_assume_role_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+data "aws_iam_policy_document" "cloudtrail_cloudwatch_policy" {
   statement {
     sid    = "cloudtrailToCloudwatch"
     effect = "Allow"
@@ -547,10 +560,20 @@ data "aws_iam_policy_document" "cloudtrail_policy" {
   }
 }
 
-resource "aws_iam_role" "cloud_trail_cloud_watch_role" {
+resource "aws_iam_policy" "cloudtrail_cloudwatch_policy" {
+  name   = "data_platform_cloudtrail_cloudwatch_policy_${local.environment}"
+  policy = data.aws_iam_policy_document.cloudtrail_cloudwatch_policy.json
+}
+
+resource "aws_iam_role" "cloudtrail_cloudwatch_role" {
   name               = "data_platform_cloudtrail_log_${local.environment}"
-  assume_role_policy = data.aws_iam_policy_document.cloudtrail_policy.json
+  assume_role_policy = data.aws_iam_policy_document.cloudtrail_assume_role_policy.json
   tags               = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "cloudtrail_cloudwatch" {
+  role       = aws_iam_role.cloudtrail_cloudwatch_role.id
+  policy_arn = aws_iam_policy.cloudtrail_cloudwatch_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatchlogs" {
