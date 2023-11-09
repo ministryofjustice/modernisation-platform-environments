@@ -198,7 +198,7 @@ module "data_product_create_metadata_lambda" {
   memory_size  = 128
 
   environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars, {
-    ENVIRONMENT = local.environment
+    ENVIRONMENT = local.environment, PUSH_TO_CATALOGUE_LAMBDA_ARN = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_push_to_catalogue_${local.environment}"
   })
 
   allowed_triggers = {
@@ -275,7 +275,9 @@ module "data_product_create_schema_lambda" {
   tracing_mode = "Active"
   memory_size  = 128
 
-  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars,
+    { PUSH_TO_CATALOGUE_LAMBDA_ARN = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_push_to_catalogue_${local.environment}" }
+  )
   allowed_triggers = {
 
     AllowExecutionFromAPIGateway = {
@@ -332,7 +334,9 @@ module "data_product_update_metadata_lambda" {
   tracing_mode = "Active"
   memory_size  = 128
 
-  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars,
+    { PUSH_TO_CATALOGUE_LAMBDA_ARN = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_push_to_catalogue_${local.environment}" }
+  )
 
   allowed_triggers = {
 
@@ -361,7 +365,9 @@ module "data_product_update_schema_lambda" {
   tracing_mode = "Active"
   memory_size  = 128
 
-  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars,
+    { PUSH_TO_CATALOGUE_LAMBDA_ARN = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_push_to_catalogue_${local.environment}" }
+  )
 
   allowed_triggers = {
 
@@ -419,7 +425,9 @@ module "delete_table_for_data_product_lambda" {
   tracing_mode = "Active"
   memory_size  = 128
 
-  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars,
+    { PUSH_TO_CATALOGUE_LAMBDA_ARN = "arn:aws:lambda:${local.region}:${local.account_id}:function:data_product_push_to_catalogue_${local.environment}" }
+  )
 
   allowed_triggers = {
 
