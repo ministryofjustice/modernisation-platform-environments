@@ -7,14 +7,14 @@
 //   auth: phil h
 /////////////////////////////////////////////////////////////////////
 
-const AWS = require("@aws-sdk/client-ec2");
+const AWS = require("aws-sdk");
 
 //Set date format
 var date_ob = new Date();
 var day = ("0" + date_ob.getDate()).slice(-2);
 var month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
 var year = date_ob.getFullYear();
-
+   
 var date = day + "/" + month + "/" + year;
 
 //lambda object
@@ -176,9 +176,9 @@ async function ec2CreateSnapshot(volume, appname, volume_device, volume_name, da
             Key: "Application",
             Value: appname
           },
-          {
+          { 
             Key: "Date",
-            Value: date
+            Value: date 
           },
           {
             Key: "dlm:snapshot-with:volume-hourly-35-day-retention",
@@ -259,9 +259,9 @@ async function ec2CreateSnapshot2(volume, appname, volume_device, volume_name, d
             Key: "Application",
             Value: appname
           },
-          {
+          { 
             Key: "Date",
-            Value: date
+            Value: date 
           },
           {
             Key: "dlm:snapshot-with:volume-hourly-35-day-retention",
