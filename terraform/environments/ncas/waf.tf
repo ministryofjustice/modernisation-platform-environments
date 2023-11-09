@@ -7,7 +7,7 @@ resource "aws_wafv2_web_acl" "ncas_web_acl" {
   }
 
   rule {
-    name     = "AWSManagedRulesCommonRuleSet"
+    name     = "common-rule-set"
     priority = 1
 
     action {
