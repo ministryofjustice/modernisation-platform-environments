@@ -10,8 +10,8 @@ resource "aws_wafv2_web_acl" "ncas_web_acl" {
     name     = "common-rule-set"
     priority = 1
 
-    action {
-      block {}
+    override_action {
+      count {}
     }
 
     statement {
