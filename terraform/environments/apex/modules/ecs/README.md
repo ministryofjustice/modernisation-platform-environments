@@ -7,8 +7,11 @@ This `ecs` local Terraform module is taken from the MP provided module - <https:
 ## Usage
 
 ```hcl
-module "apex-ecs" {
+
+module "mlra-ecs" {
+
   source = "./modules/ecs"
+
   subnet_set_name           = local.subnet_set_name
   vpc_all                   = local.vpc_all
   app_name                  = local.application_name
@@ -35,7 +38,9 @@ module "apex-ecs" {
   ec2_scaling_mem_threshold = local.application_data.accounts[local.environment].ec2_scaling_mem_threshold
   ecs_scaling_cpu_threshold = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+
 }
+
 ```
 
 <!-- BEGIN_TF_DOCS -->
