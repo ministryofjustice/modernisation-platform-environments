@@ -18,6 +18,17 @@ module "s3_bucket_lambda" {
 
 }
 
+resource "aws_s3_object" "provision_files" {
+  bucket = "laa-${local.application_name}-${local.environment}-mp"
+  for_each = fileset("./zipfiles/", "**")
+  key = each.value
+  source = "./zipfiles/${each.value}"
+  content_type = each.value
+}
+
+
+
+
 resource "aws_security_group" "lambdasg" {
   name       = "${local.application_name}-${local.environment}-lambda-security-group"
   description = "APEX Lambda Security Group"
