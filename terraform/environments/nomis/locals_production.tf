@@ -114,7 +114,17 @@ locals {
       "/oracle/database/DRMIS"    = local.database_mis_ssm_parameters
     }
     baseline_secretsmanager_secrets = {
-      "/oracle/database/PCNMAUD" = local.database_secretsmanager_secrets
+      "/oracle/weblogic/prod"     = local.weblogic_secretsmanager_secrets
+      "/oracle/database/PCNOM"    = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/PNDH"     = local.database_secretsmanager_secrets
+      "/oracle/database/PTRDAT"   = local.database_secretsmanager_secrets
+      "/oracle/database/PCNMAUD"  = local.database_secretsmanager_secrets
+      "/oracle/database/PMIS"     = local.database_mis_secretsmanager_secrets
+      "/oracle/database/DRCNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/DRNDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/DRTRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/DRCNMAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/DRMIS"    = local.database_mis_secretsmanager_secrets
     }
 
     baseline_cloudwatch_log_groups = {

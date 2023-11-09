@@ -215,6 +215,21 @@ locals {
       "/oracle/database/T2TRDAT"  = local.database_ssm_parameters
       "/oracle/database/T3CNOM"   = local.database_nomis_ssm_parameters
     }
+    baseline_secretsmanager_secrets = {
+      "/oracle/weblogic/t1"       = local.weblogic_secretsmanager_secrets
+      "/oracle/weblogic/t2"       = local.weblogic_secretsmanager_secrets
+      "/oracle/weblogic/t3"       = local.weblogic_secretsmanager_secrets
+      "/oracle/database/T1CNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/T1NDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/T1TRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/T1CNMAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/T1MIS"    = local.database_mis_secretsmanager_secrets
+      "/oracle/database/T1ORSYS"  = local.database_secretsmanager_secrets
+      "/oracle/database/T2CNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/T2NDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/T2TRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/T3CNOM"   = local.database_nomis_secretsmanager_secrets
+    }
 
     baseline_ec2_autoscaling_groups = {
 

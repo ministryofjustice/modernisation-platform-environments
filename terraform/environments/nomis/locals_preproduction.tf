@@ -109,7 +109,12 @@ locals {
       "/oracle/database/PPMIS"    = local.database_mis_ssm_parameters
     }
     baseline_secretsmanager_secrets = {
+      "/oracle/weblogic/preprod"  = local.weblogic_secretsmanager_secrets
+      "/oracle/database/PPCNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/PPNDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/PPTRDAT"  = local.database_secretsmanager_secrets
       "/oracle/database/PPCNMAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/PPMIS"    = local.database_mis_secretsmanager_secrets
     }
 
     baseline_ec2_autoscaling_groups = {
