@@ -150,6 +150,44 @@ locals {
         }
       }
 
+      pd-csr-w-3-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pd-csr-w-3-a"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.4xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 112 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        tags = {
+          description       = "Migrated server PDCWW00003"
+          app-config-status = "configured"
+          csr-region        = "Region 3 and 4"
+          os-type           = "Windows"
+          ami               = "pd-csr-w-3-a"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
     }
     baseline_route53_zones = {
       "csr.service.justice.gov.uk" = {
