@@ -20,6 +20,7 @@ locals {
     enable_oracle_secure_web                     = true
     enable_ec2_put_parameter                     = false
     enable_ec2_user_keypair                      = true
+    cloudwatch_metric_alarms_default_actions     = ["planetfm_pagerduty"]
     cloudwatch_metric_alarms                     = {}
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
@@ -27,7 +28,11 @@ locals {
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    sns_topics               = {}
+    sns_topics = {
+      pagerduty_integrations = {
+        planetfm_pagerduty = "planetfm_alarms"
+      }
+    }
   }
 
   baseline_acm_certificates         = {}
