@@ -276,12 +276,12 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
-  count               = local.is-development ? 0 : 1
+  # count               = local.is-development ? 0 : 1
   alarm_name          = "ecs-cpu-utilization-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
-  metric_name         = "CpuUtilized"
-  namespace           = "ECS/ContainerInsights"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
   period              = "120"
   statistic           = "Average"
   threshold           = "80"
@@ -293,12 +293,12 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
-  count               = local.is-development ? 0 : 1
+  # count               = local.is-development ? 0 : 1
   alarm_name          = "ecs-memory-utilization-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
-  metric_name         = "MemoryUtilized"
-  namespace           = "ECS/ContainerInsights"
+  metric_name         = "MemoryUtilization"
+  namespace           = "AWS/ECS"
   period              = "120"
   statistic           = "Average"
   threshold           = "80"
@@ -310,7 +310,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
 }
 
 resource "aws_sns_topic" "ncas_utilisation_alarm" {
-  count = local.is-development ? 0 : 1
+  # count = local.is-development ? 0 : 1
   name  = "ncas_utilisation_alarm"
 }
 
