@@ -276,6 +276,7 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
+  count               = local.is-development ? 0 : 1
   alarm_name          = "ecs-cpu-utilization-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
@@ -292,6 +293,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
+  count               = local.is-development ? 0 : 1
   alarm_name          = "ecs-memory-utilization-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
@@ -308,6 +310,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
 }
 
 resource "aws_sns_topic" "ncas_utilisation_alarm" {
+  count               = local.is-development ? 0 : 1
   name = "ncas_utilisation_alarm"
 }
 
@@ -315,25 +318,40 @@ resource "aws_sns_topic" "ncas_utilisation_alarm" {
 
 # Get the map of pagerduty integration keys from the modernisation platform account
 data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+  count               = local.is-development ? 0 : 1
   provider = aws.modernisation-platform
   name     = "pagerduty_integration_keys"
 }
 data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+  count               = local.is-development ? 0 : 1
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
 }
 
 # Add a local to get the keys
 locals {
+  count               = local.is-development ? 0 : 1
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
 }
 
-# link the sns topic to the service
+# link the sns topic to the service - preprod
 module "pagerduty_core_alerts" {
+  count               = local.is-preproduction ? 1 : 0
   depends_on = [
     aws_sns_topic.ncas_utilisation_alarm
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.ncas_utilisation_alarm.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["ncas_non_prod_alarms"]
+}
+
+# link the sns topic to the service - prod
+module "pagerduty_core_alerts" {
+  count               = local.is-production ? 1 : 0
+  depends_on = [
+    aws_sns_topic.ncas_utilisation_alarm
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.ncas_utilisation_alarm.name]
+  pagerduty_integration_key = local.pagerduty_integration_keys["ncas_prod_alarms"]
 }
