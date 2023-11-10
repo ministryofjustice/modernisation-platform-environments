@@ -651,6 +651,17 @@ locals {
         ]
         security_groups = ["private-lb"]
         access_logs     = false
+
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "private-alb"
+            }
+          }
+        }
       }
 
       # AWS doesn't let us call it internal
@@ -661,6 +672,11 @@ locals {
         idle_timeout             = 3600
         subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private-lb"]
+        lb_target_groups = {
+          private-alb = {
+            port = 80
+          }
+        }
 
         listeners = {
           http = local.weblogic_lb_listeners.http
