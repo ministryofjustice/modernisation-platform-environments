@@ -116,7 +116,6 @@ module "glue_reporting_hub_batch_job" {
     "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
     "--datalake-formats"                    = "delta"
     "--dpr.aws.region"                      = local.account_region
-    # Using s3a scheme for raw path to enable Hadoop list the files in the bucket
     "--dpr.raw.s3.path"                     = "s3://${module.s3_dms_raw_bucket.bucket_id}/"
     "--dpr.structured.s3.path"              = "s3://${module.s3_dms_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"              = "s3://${module.s3_dms_violation_bucket.bucket_id}/"
@@ -139,8 +138,7 @@ module "glue_reporting_hub_cdc_job" {
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  # Using s3a for checkpoint because to align with Hadoop 3 supports
-  checkpoint_dir                = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-cdc-${local.env}/"
+  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-cdc-${local.env}/"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-cdc-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-cdc-${local.env}/"
   # Placeholder Script Location
