@@ -231,7 +231,7 @@ locals {
       #   }
       #   idle_timeout    = 60 # 60 is default
       #   security_groups = [] # no security groups for network load balancers
-      #   public_subnets  = module.environment.subnets["public"].ids
+      #   subnets         = module.environment.subnets["public"].ids
       #   tags            = local.tags
       #   listeners = {
       #     https = {
@@ -254,7 +254,7 @@ locals {
         }
         idle_timeout    = 60 # 60 is default
         security_groups = ["public_lb"]
-        public_subnets  = module.environment.subnets["public"].ids
+        subnets         = module.environment.subnets["public"].ids
         tags            = local.tags
 
         listeners = {
@@ -341,7 +341,7 @@ locals {
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is default
         security_groups          = ["private_lb"]
-        public_subnets           = module.environment.subnets["private"].ids
+        subnets                  = module.environment.subnets["private"].ids
         tags                     = local.tags
         listeners = {
           https = {

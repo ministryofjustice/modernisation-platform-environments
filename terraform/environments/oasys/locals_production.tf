@@ -36,7 +36,7 @@ locals {
         idle_timeout             = "60"
         internal_lb              = true
         security_groups          = ["private_lb"]
-        public_subnets           = module.environment.subnets["private"].ids
+        subnets                  = module.environment.subnets["private"].ids
         existing_target_groups   = {}
         tags                     = local.tags
         listeners = {
