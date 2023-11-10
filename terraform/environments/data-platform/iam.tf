@@ -18,9 +18,9 @@ data "aws_iam_policy_document" "log_to_bucket" {
 
 data "aws_iam_policy_document" "read_openmetadata_secrets" {
   statement {
-    sid     = "openmetdataSecretsManager"
-    effect  = "Allow"
-    actions = ["secretsmanager:GetSecretValue"]
+    sid       = "openmetdataSecretsManager"
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
     resources = [aws_secretsmanager_secret.openmetadata.id]
   }
 }
@@ -172,23 +172,6 @@ data "aws_iam_policy_document" "iam_policy_document_for_authorizer_lambda" {
   ]
 }
 
-data "aws_iam_policy_document" "iam_policy_document_for_get_glue_metadata_lambda" {
-  source_policy_documents = [
-    data.aws_iam_policy_document.log_to_bucket.json,
-    data.aws_iam_policy_document.create_write_lambda_logs.json,
-  ]
-  statement {
-    sid     = "GlueReadOnly"
-    effect  = "Allow"
-    actions = ["glue:GetTable", "glue:GetTables", "glue:GetDatabase", "glue:GetDatabases"]
-    resources = [
-      "arn:aws:glue:${local.region}:${local.account_id}:catalog",
-      "arn:aws:glue:${local.region}:${local.account_id}:database/*",
-      "arn:aws:glue:${local.region}:${local.account_id}:table/*"
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
   source_policy_documents = [
     data.aws_iam_policy_document.log_to_bucket.json,
@@ -255,30 +238,6 @@ resource "aws_iam_role_policy_attachment" "attach_allow_invoke_authoriser_lambda
 }
 
 # S3 policy
-
-# TO BE REMOVED
-data "aws_iam_policy_document" "data_platform_product_bucket_policy_document" {
-  statement {
-    sid       = "DenyNonFullControlObjects"
-    effect    = "Deny"
-    actions   = ["s3:PutObject"]
-    resources = ["${module.s3-bucket.bucket.arn}/*"]
-
-    principals {
-      identifiers = ["*"]
-      type        = "AWS"
-    }
-
-    condition {
-      test     = "StringNotEquals"
-      variable = "s3:x-amz-acl"
-
-      values = [
-        "bucket-owner-full-control"
-      ]
-    }
-  }
-}
 
 data "aws_iam_policy_document" "data_s3_bucket_policy_document" {
   statement {
@@ -617,11 +576,11 @@ data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
     sid    = "GluePermissions"
     effect = "Allow"
     actions = [
-     	  "glue:GetTable",
-				"glue:GetPartitions",
-				"glue:GetPartition",
-				"glue:GetDatabases",
-				"glue:GetDatabase"
+      "glue:GetTable",
+      "glue:GetPartitions",
+      "glue:GetPartition",
+      "glue:GetDatabases",
+      "glue:GetDatabase"
     ]
     resources = [
       "*"
