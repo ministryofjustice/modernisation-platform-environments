@@ -411,6 +411,20 @@ locals {
           protocol    = -1
           self        = true
         }
+        rdp_tcp_app = {
+          description = "3389: Allow RDP UDP ingress from jumpserver"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+        rdp_udp_app = {
+          description = "3389: Allow RDP UDP ingress from jumpserver"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
       }
       egress = {
         all = {
