@@ -43,6 +43,18 @@ locals {
   lb_listeners = {
     for item in local.lb_listener_list : item.key => item.value
   }
+
+  alb_target_groups_list = flatten([
+    for lb_key, lb_value in module.lb : [
+      for tg_key, tg_value in lb_value.alb_target_groups : [{
+        key   = tg_key
+        value = tg_value
+      }]
+    ]
+  ])
+  alb_target_groups = {
+    for item in local.alb_target_groups_list : item.key => item.value
+  }
 }
 
 resource "aws_lb_target_group" "instance" {
@@ -117,10 +129,10 @@ module "lb" {
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
   ]
 
-  subnets        = each.value.subnets
-  region         = var.environment.region
-  vpc_all        = var.environment.vpc_name
-  tags           = merge(local.tags, each.value.tags)
+  subnets = each.value.subnets
+  region  = var.environment.region
+  vpc_all = var.environment.vpc_name
+  tags    = merge(local.tags, each.value.tags)
 
   depends_on = [
     module.ec2_autoscaling_group, # ensure ASG target groups are created first
@@ -136,11 +148,14 @@ module "lb_listener" {
   business_unit = var.environment.business_unit
   environment   = var.environment.environment
   load_balancer = module.lb[each.value.lb_application_name].load_balancer
+
   existing_target_groups = merge(
     local.asg_target_groups,
+    local.alb_target_groups,
     aws_lb_target_group.instance,
-    var.lbs[each.value.lb_application_name].existing_target_groups
+    var.lbs[each.value.lb_application_name].existing_target_groups,
   )
+
   port                      = each.value.port
   protocol                  = each.value.protocol
   ssl_policy                = each.value.ssl_policy
