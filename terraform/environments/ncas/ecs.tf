@@ -286,8 +286,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
   statistic           = "Average"
   threshold           = "80"
   alarm_description   = "This metric checks if CPU utilization is high - threshold set to 80%"
-  # alarm_actions       = [aws_sns_topic.ncas_utilisation_alarm[0].arn]
-  alarm_actions       = [aws_sns_topic.ncas_utilisation_alarm.arn]
+  alarm_actions       = [aws_sns_topic.ncas_utilisation_alarm[0].arn]
   dimensions = {
     ClusterName = aws_ecs_cluster.ncas_cluster.name
   }
@@ -304,7 +303,6 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
   statistic           = "Average"
   threshold           = "1600"
   alarm_description   = "This metric checks if memory utilization is high - threshold set to 1600MB"
-  # alarm_actions       = [aws_sns_topic.ncas_utilisation_alarm[0].arn]
   alarm_actions       = [aws_sns_topic.ncas_utilisation_alarm.arn]
   dimensions = {
     ClusterName = aws_ecs_cluster.ncas_cluster.name
@@ -312,7 +310,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
 }
 
 resource "aws_sns_topic" "ncas_utilisation_alarm" {
-  # count = local.is-development ? 0 : 1
+  count = local.is-development ? 0 : 1
   name  = "ncas_utilisation_alarm"
 }
 
@@ -334,23 +332,23 @@ locals {
 }
 
 # link the sns topic to the service - preprod
-# module "pagerduty_core_alerts_non_prod" {
-#   count = local.is-preproduction ? 1 : 0
-#   depends_on = [
-#     aws_sns_topic.ncas_utilisation_alarm
-#   ]
-#   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-#   sns_topics                = [aws_sns_topic.ncas_utilisation_alarm[0].name]
-#   pagerduty_integration_key = local.pagerduty_integration_keys["ncas_non_prod_alarms"]
-# }
+module "pagerduty_core_alerts_non_prod" {
+  count = local.is-preproduction ? 1 : 0
+  depends_on = [
+    aws_sns_topic.ncas_utilisation_alarm
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.ncas_utilisation_alarm[0].name]
+  pagerduty_integration_key = local.pagerduty_integration_keys["ncas_non_prod_alarms"]
+}
 
-# # link the sns topic to the service - prod
-# module "pagerduty_core_alerts_prod" {
-#   count = local.is-production ? 1 : 0
-#   depends_on = [
-#     aws_sns_topic.ncas_utilisation_alarm
-#   ]
-#   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-#   sns_topics                = [aws_sns_topic.ncas_utilisation_alarm[0].name]
-#   pagerduty_integration_key = local.pagerduty_integration_keys["ncas_prod_alarms"]
-# }
+# link the sns topic to the service - prod
+module "pagerduty_core_alerts_prod" {
+  count = local.is-production ? 1 : 0
+  depends_on = [
+    aws_sns_topic.ncas_utilisation_alarm
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.ncas_utilisation_alarm[0].name]
+  pagerduty_integration_key = local.pagerduty_integration_keys["ncas_prod_alarms"]
+}
