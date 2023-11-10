@@ -556,7 +556,7 @@ variable "lbs" {
   type = map(object({
     enable_delete_protection = optional(bool, false)
     force_destroy_bucket     = optional(bool, false)
-    idle_timeout             = string
+    idle_timeout             = optional(string)
     internal_lb              = optional(bool, false)
     access_logs              = optional(bool, true)
     load_balancer_type       = optional(string, "application")
@@ -610,11 +610,6 @@ variable "lbs" {
         cookie_duration = optional(number)
         cookie_name     = optional(string)
       }))
-      attachments = optional(list(object({
-        target_id         = string
-        port              = optional(number)
-        availability_zone = optional(string)
-      })), [])
     })), {})
     listeners = optional(map(object({
       alarm_target_group_names  = optional(list(string), [])
