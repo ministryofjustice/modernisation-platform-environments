@@ -34,7 +34,7 @@ locals {
   }
 
   db_config_test = [{
-    name           = "primary-db"
+    name           = "primarydb"
     ami_name_regex = local.db_config_lower_environments.ami_name_regex
     user_data_raw = base64encode(
       templatefile(
