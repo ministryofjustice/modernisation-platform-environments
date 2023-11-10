@@ -639,30 +639,6 @@ locals {
     }
 
     baseline_lbs = {
-      test = {
-        internal_lb              = true
-        enable_delete_protection = false
-        load_balancer_type       = "network"
-        force_destroy_bucket     = true
-        idle_timeout             = 3600
-        subnets = [
-          module.environment.subnet["private"]["eu-west-2a"].id,
-          module.environment.subnet["private"]["eu-west-2b"].id,
-        ]
-        security_groups = ["private-lb"]
-        access_logs     = false
-
-        listeners = {
-          http = {
-            port     = 80
-            protocol = "TCP"
-            default_action = {
-              type              = "forward"
-              target_group_name = "private-alb"
-            }
-          }
-        }
-      }
 
       # AWS doesn't let us call it internal
       private = {
@@ -672,11 +648,6 @@ locals {
         idle_timeout             = 3600
         subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private-lb"]
-        lb_target_groups = {
-          private-alb = {
-            port = 80
-          }
-        }
 
         listeners = {
           http = local.weblogic_lb_listeners.http
