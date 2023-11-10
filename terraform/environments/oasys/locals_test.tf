@@ -28,51 +28,30 @@ locals {
       "/oracle/database/T2ONRBDS" = local.database_ssm_parameters
     }
     baseline_secretsmanager_secrets = {
+      # NEW
       "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_db
+      "/oracle/database/T1OASYS/apex-passwords" = local.secretsmanager_secrets_db
       "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
       "/oracle/database/T1AZBIPI" = local.secretsmanager_secrets_db
+      "/oracle/database/T2AZBIPI/bip-passwords" = local.secretsmanager_secrets_db
       "/oracle/database/T1MISTRN" = local.secretsmanager_secrets_db
       "/oracle/database/T1ONRSYS" = local.secretsmanager_secrets_db
       "/oracle/database/T1ONRAUD" = local.secretsmanager_secrets_db
       "/oracle/database/T1ONRBDS" = local.secretsmanager_secrets_db
 
       "/oracle/database/T2OASYS"  = local.secretsmanager_secrets_db
+      "/oracle/database/T1OASYS/apex-passwords" = local.secretsmanager_secrets_db
       "/oracle/database/T2OASREP" = local.secretsmanager_secrets_db
       "/oracle/database/T2AZBIPI" = local.secretsmanager_secrets_db
+      "/oracle/database/T2AZBIPI/bip-passwords" = local.secretsmanager_secrets_db
       "/oracle/database/T2MISTRN" = local.secretsmanager_secrets_db
       "/oracle/database/T2ONRSYS" = local.secretsmanager_secrets_db
       "/oracle/database/T2ONRAUD" = local.secretsmanager_secrets_db
       "/oracle/database/T2ONRBDS" = local.secretsmanager_secrets_db
 
-      "/database/t1/T1OASYS" = {
-        secrets = {
-          apex_listenerpassword    = {}
-          apex_public_userpassword = {}
-          apex_rest_publicpassword = {}
-        }
-      }
-      "/database/t2/T2OASYS" = {
-        secrets = {
-          apex_listenerpassword    = {}
-          apex_public_userpassword = {}
-          apex_rest_publicpassword = {}
-        }
-      }
-      "/database/t2-oasys-db-a/T2BIPINF" = {
-        secrets = {
-          systempassword = {}
-        }
-      }
-      "/weblogic/test-oasys-bip-b" = {
-        secrets = {
-          admin_password     = {}
-          admin_username     = {}
-          biplatformpassword = {}
-          db_username        = {}
-          mdspassword        = {}
-          syspassword        = {}
-        }
-      }
+      "/oracle/bip/t1/passwords" = local.secretsmanager_secrets_db
+      "/oracle/bip/t2/passwords" = local.secretsmanager_secrets_db
+
       "" = {
         postfix = ""
         secrets = {
@@ -80,6 +59,38 @@ locals {
           ec2-user_pem                      = {}
           environment_management_arn        = {}
           modernisation_platform_account_id = {}
+        }
+      }
+
+      # OLD AND WILL BE REPLACED
+
+      "/database/t1/T1OASYS" = {
+        secrets = {
+          apex_listenerpassword    = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+          apex_public_userpassword = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+          apex_rest_publicpassword = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+        }
+      }
+      "/database/t2/T2OASYS" = {
+        secrets = {
+          apex_listenerpassword    = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+          apex_public_userpassword = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+          apex_rest_publicpassword = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+        }
+      }
+      "/database/t2-oasys-db-a/T2BIPINF" = {
+        secrets = {
+          systempassword = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
+        }
+      }
+      "/weblogic/test-oasys-bip-b" = {
+        secrets = {
+          admin_password     = {} # -> /oracle/bip/t2/passwords { weblogic: admin_pass }
+          admin_username     = {} # just have in ansible defaults , username is always weblogic
+          biplatformpassword = {} # ->  /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
+          db_username        = {} # put in ansible defaults, but can't find
+          mdspassword        = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
+          syspassword        = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
         }
       }
     }
