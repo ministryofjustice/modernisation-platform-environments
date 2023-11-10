@@ -695,7 +695,6 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*" # Microsoft Windows Server 2022 Base
           ami_owner                     = "754260907303"
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/test-user-data.yaml"))
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
         })
 
@@ -726,7 +725,7 @@ locals {
         enable_delete_protection = false
         force_destroy_bucket     = true
         idle_timeout             = 3600
-        public_subnets           = module.environment.subnets["private"].ids
+        subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["load-balancer"]
 
         instance_target_groups = {

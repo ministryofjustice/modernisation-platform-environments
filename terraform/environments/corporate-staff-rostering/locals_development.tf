@@ -36,8 +36,8 @@ locals {
           ami_name                      = "base_windows_server_2012_r2_release_2023-*"
           ami_owner                     = "374269020027"
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/test-user-data.yaml"))
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
+          user_data_raw                 = base64encode(file("./templates/user-data.yaml"))
         })
         cloudwatch_metric_alarms = local.app_ec2_cloudwatch_metric_alarms
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {

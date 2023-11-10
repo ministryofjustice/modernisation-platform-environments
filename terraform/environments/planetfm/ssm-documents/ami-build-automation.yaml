@@ -1,0 +1,46 @@
+---
+schemaVersion: "0.3"
+description: "SSM Automation to build an AMI from an MGN-replicated Azure VM." 
+parameters:
+  InstanceId:
+    type: "String"
+    description: "ID of the MGN replicated Azure server"
+  VolumeId:
+    type: "String"
+    description: "Root volume ID dev/sda1"
+  SnapshotName:
+    type: "String"
+    description: "Name of the resultant snapshot"
+  ImageName:
+    type: "String"
+    description: "Name of the AMI being built"
+
+mainSteps:
+  - name: createSnapshot
+    action: aws:executeAutomation
+    onFailure: Abort
+    inputs:
+      DocumentName: AWS-CreateSnapshot
+      RuntimeParameters: 
+        VolumeId: 
+          - "{{ VolumeId }}"
+        Description:
+          - "{{ SnapshotName }}"
+
+  - name: amiPowershellScript
+    action: aws:runCommand
+    inputs:
+      DocumentName: ami-build-command
+      InstanceIds:
+        - '{{ InstanceId }}'
+
+  - name: createImage
+    action: aws:createImage
+    onFailure: Abort
+    inputs:
+      InstanceId: "{{ InstanceId }}"
+      ImageName: "{{ ImageName }}"
+      NoReboot: true
+    outputs:
+      - Name: ImageID
+        Selector: createImage.ImageID
