@@ -138,7 +138,7 @@ locals {
         }
         tags = {
           description       = "Migrated server PDCWW00002"
-          app-config-status = "configured"
+          app-config-status = "pending"
           csr-region        = "Region 1 and 2"
           os-type           = "Windows"
           ami               = "pd-csr-w-2-b"
@@ -176,7 +176,7 @@ locals {
         }
         tags = {
           description       = "Migrated server PDCWW00003"
-          app-config-status = "configured"
+          app-config-status = "pending"
           csr-region        = "Region 3 and 4"
           os-type           = "Windows"
           ami               = "pd-csr-w-3-a"
@@ -214,7 +214,7 @@ locals {
         }
         tags = {
           description       = "Migrated server PDCAW00007"
-          app-config-status = "configured"
+          app-config-status = "pending"
           csr-region        = "Region 1"
           os-type           = "Windows"
           ami               = "pd-csr-a-7-a"
