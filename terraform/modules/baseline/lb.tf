@@ -117,7 +117,7 @@ module "lb" {
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
   ]
 
-  public_subnets = each.value.public_subnets
+  subnets        = each.value.subnets
   region         = var.environment.region
   vpc_all        = var.environment.vpc_name
   tags           = merge(local.tags, each.value.tags)

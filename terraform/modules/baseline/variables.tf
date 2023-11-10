@@ -561,7 +561,7 @@ variable "lbs" {
     access_logs              = optional(bool, true)
     load_balancer_type       = optional(string, "application")
     security_groups          = list(string)
-    public_subnets           = list(string)
+    subnets                  = list(string)
     instance_target_groups = optional(map(object({
       port                 = optional(number)
       protocol             = optional(string)
