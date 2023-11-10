@@ -90,6 +90,6 @@ EOF
 }
 
 # IAM user for uploads & content bucket
-resource "aws_iam_user" "uploaduser" {
-    name = "uploaduser"
-}
+# resource "aws_iam_user" "uploaduser" {
+#     name = "uploaduser"
+# }

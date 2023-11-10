@@ -69,7 +69,6 @@ resource "aws_s3_bucket_policy" "upload_files_policy" {
     Statement = [
       {
         Effect    = "Allow"
-        Principal = { AWS = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/uploaduser"] }
         actions = [
           "s3:GetObject",
           "s3:PutObject",
