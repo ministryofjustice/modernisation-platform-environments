@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////////////////////////
 
 const SSH = require("simple-ssh");
-const AWS = require("@aws-sdk/client-ec2");
+const AWS = require("aws-sdk");
 
 //SSM object with temp parms
 const ssm = new AWS.SSM({ apiVersion: "2014-11-06" });

@@ -3,12 +3,46 @@ locals {
 
   # baseline config
   production_config = {
+
+    baseline_iam_policies = {
+      Ec2ProdDatabasePolicy = {
+        description = "Permissions required for prod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+              "ssm:PutParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/*P/*",
+              "arn:aws:ssm:*:*:parameter/oracle/database/P*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/*",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ec2_instances = {
       pd-csr-db-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           ami_owner         = "self"
           availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type                = "r6i.xlarge"
@@ -77,6 +111,83 @@ locals {
           backup      = "false" # opt out of mod platform default backup plan
         }
       }
+
+      pd-csr-w-2-b = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pd-csr-w-2-b"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}b"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.4xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 112 }
+        }
+        tags = {
+          description       = "Migrated server PDCWW00002"
+          app-config-status = "configured"
+          csr-region        = "Region 1 and 2"
+          os-type           = "Windows"
+          ami               = "pd-csr-w-2-b"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pd-csr-w-3-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pd-csr-w-3-a"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.4xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 112 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        tags = {
+          description       = "Migrated server PDCWW00003"
+          app-config-status = "configured"
+          csr-region        = "Region 3 and 4"
+          os-type           = "Windows"
+          ami               = "pd-csr-w-3-a"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
     }
     baseline_route53_zones = {
       "csr.service.justice.gov.uk" = {

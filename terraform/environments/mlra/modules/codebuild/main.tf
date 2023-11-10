@@ -134,7 +134,7 @@ resource "aws_codebuild_project" "app-build" {
   name          = "${var.app_name}-app-build"
   description   = "Project to build the ${var.app_name} java application and xray docker images"
   build_timeout = 20
-  service_role = aws_iam_role.codebuild_s3.arn
+  service_role  = aws_iam_role.codebuild_s3.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -199,7 +199,7 @@ resource "aws_codebuild_project" "selenium" {
   name          = "${var.app_name}-selenium-test"
   description   = "Project to test the Java application ${var.app_name}"
   build_timeout = 20
-  service_role = aws_iam_role.codebuild_s3.arn
+  service_role  = aws_iam_role.codebuild_s3.arn
 
   artifacts {
     type = "NO_ARTIFACTS"

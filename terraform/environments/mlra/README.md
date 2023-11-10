@@ -22,9 +22,9 @@ Also used for assessing if defendants are entitled to legal aid for criminal cas
 
 <!--  The URL(s) of the service’s production environment, and test environments if possible-->
 
-Production - https://maat-libra-administration-tool.service.justice.gov.uk/mlra/
+Production - <https://maat-libra-administration-tool.service.justice.gov.uk/mlra/>
 
-Also https://mlra.legalservices.gov.uk/mlra/ redirects to the above URL. This is hosted in the LAA Landing Zone.
+Also <https://mlra.legalservices.gov.uk/mlra/> redirects to the above URL. This is hosted in the LAA Landing Zone.
 
 ### **Incident response hours:**
 
@@ -36,13 +36,13 @@ Also https://mlra.legalservices.gov.uk/mlra/ redirects to the above URL. This is
 
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
-#laa-crime-apps is the slack channel for raising any issues with the product team.
+# laa-crime-apps is the slack channel for raising any issues with the product team.
 
 ### **Service team contact:**
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 
-#laa-crime-apps.
+# laa-crime-apps.
 
 ### **Hosting environment:**
 
@@ -57,7 +57,7 @@ Modernisation Platform
 
 <!--  If you can, provide links to the service’s monitoring dashboard(s), health checks, documentation (ideally describing how to run/work with the service), and main GitHub repository. -->
 
-https://github.com/ministryofjustice/laa-mlra-application
+<https://github.com/ministryofjustice/laa-mlra-application>
 
 ### **Expected speed and frequency of releases:**
 
@@ -81,15 +81,15 @@ LAA Digital will classify any outage of the entire application as a P1 incident.
 
 <!-- Describe how incidents that page a person on call are responded to. How long are out-of-hours responders expected to spend trying to resolve issues before they stop working, put the service into maintenance mode, and hand the issue to in-hours support? -->
 
-Out of hours for specific needs such as a release that requires sys admin input are agreed in advance with the product team. 
+Out of hours for specific needs such as a release that requires sys admin input are agreed in advance with the product team.
 
 ### **Consumers of this service:**
 
 <!-- List which other services (with links to their runbooks) rely on this service. If your service is considered a platform, these may be too numerous to reasonably list. -->
 
-MLRA connects to Infox - which is the LAA's interface between MLRA & HMCTS' Libra system - https://github.com/ministryofjustice/laa-infoX-application
+MLRA connects to Infox - which is the LAA's interface between MLRA & HMCTS' Libra system - <https://github.com/ministryofjustice/laa-infoX-application>
 
-Also MLRA uses MAAT DB for all of it's data storage - https://github.com/ministryofjustice/laa-maat-database
+Also MLRA uses MAAT DB for all of it's data storage - <https://github.com/ministryofjustice/laa-maat-database>
 
 ### **Services consumed by this:**
 

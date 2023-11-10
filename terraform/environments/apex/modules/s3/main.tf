@@ -1,7 +1,19 @@
 resource "aws_s3_bucket" "laa-lambda-backup" {
-bucket        = var.bucket_name
-tags = var.tags
+  bucket = var.bucket_name
+  tags   = var.tags
 }
+
+
+resource "aws_s3_object" "provision_files" {
+  bucket = aws_s3_bucket.laa-lambda-backup.id
+  for_each = fileset("./zipfiles/", "**")
+  key = each.value
+  source = "./zipfiles/${each.value}"
+  content_type = each.value
+}
+
+
+
 
 resource "aws_s3_bucket_ownership_controls" "default" {
   bucket = aws_s3_bucket.laa-lambda-backup.id
