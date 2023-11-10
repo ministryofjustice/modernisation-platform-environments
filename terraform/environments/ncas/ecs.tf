@@ -276,7 +276,7 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
-  # count               = local.is-development ? 0 : 1
+  count               = local.is-development ? 0 : 1
   alarm_name          = "ecs-cpu-utilization-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
@@ -293,7 +293,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
-  # count               = local.is-development ? 0 : 1
+  count               = local.is-development ? 0 : 1
   alarm_name          = "ecs-memory-utilization-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
@@ -303,7 +303,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
   statistic           = "Average"
   threshold           = "1600"
   alarm_description   = "This metric checks if memory utilization is high - threshold set to 1600MB"
-  alarm_actions       = [aws_sns_topic.ncas_utilisation_alarm.arn]
+  alarm_actions       = [aws_sns_topic.ncas_utilisation_alarm[0].arn]
   dimensions = {
     ClusterName = aws_ecs_cluster.ncas_cluster.name
   }
