@@ -69,8 +69,12 @@ resource "aws_s3_bucket_policy" "upload_files_policy" {
     Statement = [
       {
         Effect    = "Allow"
-        Principal = { AWS = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"] }
-        Action    = "s3:*"
+        Principal = { AWS = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/uploaduser"] }
+        actions = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ]
         Resource = [
           aws_s3_bucket.upload_files.arn,
           "${aws_s3_bucket.upload_files.arn}/*",
@@ -242,7 +246,7 @@ data "aws_iam_policy_document" "s3-kms" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
   }
 }
