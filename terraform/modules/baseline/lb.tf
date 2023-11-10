@@ -44,16 +44,16 @@ locals {
     for item in local.lb_listener_list : item.key => item.value
   }
 
-  alb_target_groups_list = flatten([
+  lb_target_groups_list = flatten([
     for lb_key, lb_value in module.lb : [
-      for tg_key, tg_value in lb_value.alb_target_groups : [{
+      for tg_key, tg_value in lb_value.lb_target_groups : [{
         key   = tg_key
         value = tg_value
       }]
     ]
   ])
-  alb_target_groups = {
-    for item in local.alb_target_groups_list : item.key => item.value
+  lb_target_groups = {
+    for item in local.lb_target_groups_list : item.key => item.value
   }
 }
 
@@ -151,7 +151,7 @@ module "lb_listener" {
 
   existing_target_groups = merge(
     local.asg_target_groups,
-    local.alb_target_groups,
+    local.lb_target_groups,
     aws_lb_target_group.instance,
     var.lbs[each.value.lb_application_name].existing_target_groups,
   )
