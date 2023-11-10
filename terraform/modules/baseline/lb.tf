@@ -97,7 +97,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v3.3.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=csr_DSOS-2387_miscellaneous-fixes"
 
   providers = {
     aws.bucket-replication = aws
@@ -111,7 +111,7 @@ module "lb" {
   internal_lb                = each.value.internal_lb
   load_balancer_type         = each.value.load_balancer_type
   lb_target_groups           = each.value.lb_target_groups
-  access_logs                = lookup(each.value, "access_logs", true)
+  access_logs                = each.value.access_logs
 
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg

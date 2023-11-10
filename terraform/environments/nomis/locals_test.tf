@@ -639,6 +639,17 @@ locals {
     }
 
     baseline_lbs = {
+      test = {
+        internal_lb              = true
+        enable_delete_protection = false
+        load_balancer_type       = "network"
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = ["private-lb"]
+        access_logs              = false
+      }
+
       # AWS doesn't let us call it internal
       private = {
         internal_lb              = true
