@@ -645,9 +645,12 @@ locals {
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         idle_timeout             = 3600
-        public_subnets           = module.environment.subnets["private"].ids
-        security_groups          = ["private-lb"]
-        access_logs              = false
+        subnets = [
+          module.environment.subnet["private"]["eu-west-2a"].id,
+          module.environment.subnet["private"]["eu-west-2b"].id,
+        ]
+        security_groups = ["private-lb"]
+        access_logs     = false
       }
 
       # AWS doesn't let us call it internal
@@ -656,7 +659,7 @@ locals {
         enable_delete_protection = false
         force_destroy_bucket     = true
         idle_timeout             = 3600
-        public_subnets           = module.environment.subnets["private"].ids
+        subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private-lb"]
 
         listeners = {
