@@ -330,7 +330,6 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 
 # Add a local to get the keys
 locals {
-  count                      = local.is-development ? 0 : 1
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys[0].secret_string)
 }
 
