@@ -43,6 +43,18 @@ locals {
   lb_listeners = {
     for item in local.lb_listener_list : item.key => item.value
   }
+
+  lb_target_groups_list = flatten([
+    for lb_key, lb_value in module.lb : [
+      for tg_key, tg_value in lb_value.lb_target_groups : [{
+        key   = tg_key
+        value = tg_value
+      }]
+    ]
+  ])
+  lb_target_groups = {
+    for item in local.lb_target_groups_list : item.key => item.value
+  }
 }
 
 resource "aws_lb_target_group" "instance" {
@@ -97,7 +109,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v3.3.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=2e3dd3c3bc37e59fb89ab2bcb733aea8d627fa1d"
 
   providers = {
     aws.bucket-replication = aws
@@ -111,16 +123,16 @@ module "lb" {
   internal_lb                = each.value.internal_lb
   load_balancer_type         = each.value.load_balancer_type
   lb_target_groups           = each.value.lb_target_groups
-  access_logs                = lookup(each.value, "access_logs", true)
+  access_logs                = each.value.access_logs
 
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
   ]
 
-  public_subnets = each.value.public_subnets
-  region         = var.environment.region
-  vpc_all        = var.environment.vpc_name
-  tags           = merge(local.tags, each.value.tags)
+  subnets = each.value.subnets
+  region  = var.environment.region
+  vpc_all = var.environment.vpc_name
+  tags    = merge(local.tags, each.value.tags)
 
   depends_on = [
     module.ec2_autoscaling_group, # ensure ASG target groups are created first
@@ -136,11 +148,14 @@ module "lb_listener" {
   business_unit = var.environment.business_unit
   environment   = var.environment.environment
   load_balancer = module.lb[each.value.lb_application_name].load_balancer
+
   existing_target_groups = merge(
     local.asg_target_groups,
+    local.lb_target_groups,
     aws_lb_target_group.instance,
-    var.lbs[each.value.lb_application_name].existing_target_groups
+    var.lbs[each.value.lb_application_name].existing_target_groups,
   )
+
   port                      = each.value.port
   protocol                  = each.value.protocol
   ssl_policy                = each.value.ssl_policy
