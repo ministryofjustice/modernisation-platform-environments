@@ -34,7 +34,7 @@ locals {
   }
 
   db_config_dev = [{
-    name           = "standby-db"
+    name           = "primarydb"
     ami_name_regex = local.db_config_lower_environments.ami_name_regex
     user_data_raw = base64encode(
       templatefile(
@@ -123,7 +123,7 @@ locals {
     }
     },
     {
-      name           = "primary-db"
+      name           = "standbydb1"
       ami_name_regex = local.db_config_lower_environments.ami_name_regex
       user_data_raw = base64encode(
         templatefile(

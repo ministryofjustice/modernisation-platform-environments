@@ -94,9 +94,9 @@ resource "aws_instance" "db_ec2_instance" {
     }
   }
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-1", var.env_name, each.key)) },
+    { Name = lower(format("%s-delius-db-%s", var.env_name, index(var.db_config, each.value) + 1)) },
     { server-type = "delius_core_db" },
-    { database = "delius_primarydb" }
+    { database = "delius_${each.value.name}" }
   )
 }
 
