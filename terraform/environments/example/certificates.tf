@@ -60,6 +60,22 @@ resource "aws_route53_record" "example_core_vpc" {
   }
 }
 
+# Another record for my internal example-lb
+resource "aws_route53_record" "core_vpc_a_record" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "example"
+  type     = "A"
+
+  alias {
+    name                   = module.lb_access_logs_enabled.load_balancer_dns_name
+    zone_id                = module.lb_access_logs_enabled.load_balancer_zone_id
+    evaluate_target_health = true
+  }
+}
+
+
+
 # Build loadbalancer
 #tfsec:ignore:aws-elb-alb-not-public as the external lb needs to be public.
 resource "aws_lb" "certificate_example_lb" {
