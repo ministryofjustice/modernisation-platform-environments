@@ -310,33 +310,33 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
 }
 
 resource "aws_sns_topic" "ncas_utilisation_alarm" {
-  count               = local.is-development ? 0 : 1
-  name = "ncas_utilisation_alarm"
+  count = local.is-development ? 0 : 1
+  name  = "ncas_utilisation_alarm"
 }
 
 # Pager duty integration
 
 # Get the map of pagerduty integration keys from the modernisation platform account
 data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
-  count               = local.is-development ? 0 : 1
+  count    = local.is-development ? 0 : 1
   provider = aws.modernisation-platform
   name     = "pagerduty_integration_keys"
 }
 data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
-  count               = local.is-development ? 0 : 1
+  count     = local.is-development ? 0 : 1
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
 }
 
 # Add a local to get the keys
 locals {
-  count               = local.is-development ? 0 : 1
+  count                      = local.is-development ? 0 : 1
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
 }
 
 # link the sns topic to the service - preprod
-module "pagerduty_core_alerts" {
-  count               = local.is-preproduction ? 1 : 0
+module "pagerduty_core_alerts_non_prod" {
+  count = local.is-preproduction ? 1 : 0
   depends_on = [
     aws_sns_topic.ncas_utilisation_alarm
   ]
@@ -346,8 +346,8 @@ module "pagerduty_core_alerts" {
 }
 
 # link the sns topic to the service - prod
-module "pagerduty_core_alerts" {
-  count               = local.is-production ? 1 : 0
+module "pagerduty_core_alerts_prod" {
+  count = local.is-production ? 1 : 0
   depends_on = [
     aws_sns_topic.ncas_utilisation_alarm
   ]
