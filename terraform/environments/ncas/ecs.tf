@@ -318,19 +318,17 @@ resource "aws_sns_topic" "ncas_utilisation_alarm" {
 
 # Get the map of pagerduty integration keys from the modernisation platform account
 data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
-  count    = local.is-development ? 0 : 1
   provider = aws.modernisation-platform
   name     = "pagerduty_integration_keys"
 }
 data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
-  count     = local.is-development ? 0 : 1
   provider  = aws.modernisation-platform
-  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys[0].id
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
 }
 
 # Add a local to get the keys
 locals {
-  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys[0].secret_string)
+  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
 }
 
 # link the sns topic to the service - preprod
