@@ -285,6 +285,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
   statistic           = "Average"
   threshold           = "5"
   alarm_description   = "This metric checks if CPU utilization is high"
+  alarm_actions       = [aws_sns_topic.ncas_utilisation_alarm.arn]
   dimensions = {
     ClusterName = aws_ecs_cluster.ncas_cluster.name
   }
@@ -300,7 +301,39 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
   statistic           = "Average"
   threshold           = "5"
   alarm_description   = "This metric checks if memory utilization is high"
+  alarm_actions       = [aws_sns_topic.ncas_utilisation_alarm.arn]
   dimensions = {
     ClusterName = aws_ecs_cluster.ncas_cluster.name
   }
+}
+
+resource "aws_sns_topic" "ncas_utilisation_alarm" {
+  name = "ncas_utilisation_alarm"
+}
+
+# Pager duty integration
+
+# Get the map of pagerduty integration keys from the modernisation platform account
+data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+}
+
+# Add a local to get the keys
+locals {
+  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+}
+
+# link the sns topic to the service
+module "pagerduty_core_alerts" {
+  depends_on = [
+    aws_sns_topic.ncas_utilisation_alarm
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.ncas_utilisation_alarm.name]
+  pagerduty_integration_key = local.pagerduty_integration_keys["ncas_non_prod_alarms"]
 }
