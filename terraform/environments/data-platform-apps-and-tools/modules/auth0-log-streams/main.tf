@@ -64,7 +64,7 @@ resource "aws_cloudwatch_event_bus" "this" {
 resource "aws_cloudwatch_log_group" "this" {
   name = local.cloudwatch_log_group_name
 
-  kms_key_id        = module.kms_key.key_arn
+  # kms_key_id        = module.kms_key.key_arn
   retention_in_days = var.retention_in_days
 }
 
