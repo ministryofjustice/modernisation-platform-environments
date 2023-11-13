@@ -98,17 +98,17 @@
           "stop_check": {
             "enable": true,
             "threshold": 0,
-            "period": 60
+            "period": 30
           },
           "start_check": {
             "enable": true,
-            "threshold": 1,
+            "threshold": 0,
             "period": 30
           },
           "cpu_check": {
             "enable": true,
             "threshold": 80,
-            "period": 30
+            "period": 300
           },
           "freemem_check": {
             "enable": true,
@@ -251,17 +251,17 @@
           "stop_check": {
             "enable": true,
             "threshold": 0,
-            "period": 60
+            "period": 30
           },
           "start_check": {
             "enable": true,
-            "threshold": 1,
+            "threshold": 0,
             "period": 30
           },
           "cpu_check": {
             "enable": true,
             "threshold": 80,
-            "period": 30
+            "period": 300
           },
           "freemem_check": {
             "enable": true,
@@ -406,17 +406,17 @@
           "stop_check": {
             "enable": true,
             "threshold": 0,
-            "period": 60
+            "period": 30
           },
           "start_check": {
             "enable": true,
-            "threshold": 1,
+            "threshold": 0,
             "period": 30
           },
           "cpu_check": {
             "enable": true,
             "threshold": 80,
-            "period": 30
+            "period": 300
           },
           "freemem_check": {
             "enable": true,
@@ -559,17 +559,17 @@
           "stop_check": {
             "enable": true,
             "threshold": 0,
-            "period": 60
+            "period": 30
           },
           "start_check": {
             "enable": true,
-            "threshold": 1,
+            "threshold": 0,
             "period": 30
           },
           "cpu_check": {
             "enable": true,
             "threshold": 80,
-            "period": 30
+            "period": 300
           },
           "freemem_check": {
             "enable": true,
