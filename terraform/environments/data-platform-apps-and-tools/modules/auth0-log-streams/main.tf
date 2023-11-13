@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_cloudwatch_log_resource_policy" "this" {
-  policy_name     = "events-to-cloudwatch-logs"
+  policy_name     = var.name
   policy_document = data.aws_iam_policy_document.this.json
 }
 
