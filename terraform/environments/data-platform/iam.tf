@@ -47,7 +47,7 @@ data "aws_iam_policy_document" "write_metadata" {
     sid       = "InvokePushToCatalogueLambda"
     effect    = "Allow"
     actions   = ["lambda:InvokeFunction"]
-    resources = [module.data_product_push_to_catalogue_lambda.lambda_function_arn]    
+    resources = [module.data_product_push_to_catalogue_lambda.lambda_function_arn]
   }
 }
 
@@ -612,6 +612,49 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_pr
     data.aws_iam_policy_document.write_metadata.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
   ]
+
+  statement {
+    sid    = "s3ListDeleteRawFailCurated"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObjects",
+      "s3:ListObjectsv2",
+    ]
+    resources = [
+      "${module.data_s3_bucket.bucket.arn}/raw/*",
+      "${module.data_s3_bucket.bucket.arn}/fail/*",
+      "${module.data_s3_bucket.bucket.arn}/curated/*",
+      "${module.data_s3_bucket.bucket.arn}/raw",
+      "${module.data_s3_bucket.bucket.arn}/fail",
+      "${module.data_s3_bucket.bucket.arn}/curated",
+    ]
+  }
+
+  statement {
+    sid    = "s3ListDeleteSchema"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:ListObjectsv2",
+      "s3:CopyObject"
+    ]
+    resources = [
+      "${module.metadata_s3_bucket.bucket.arn}/*",
+      "${module.metadata_s3_bucket.bucket.arn}"
+    ]
+  }
+
+  statement {
+    sid    = "GlueGetTableDeleteTable"
+    effect = "Allow"
+    actions = [
+      "glue:DeleteTable",
+      "glue:GetTables"
+    ]
+    resources = [
+      "*"
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_push_to_catalogue_lambda" {
@@ -620,4 +663,55 @@ data "aws_iam_policy_document" "iam_policy_document_for_push_to_catalogue_lambda
     data.aws_iam_policy_document.read_openmetadata_secrets.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
   ]
+}
+
+data "aws_iam_policy_document" "iam_policy_document_for_delete_data_product_lambda" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_metadata.json,
+    data.aws_iam_policy_document.write_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
+
+  statement {
+    sid    = "s3ListDeleteRawFailCurated"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObjects",
+      "s3:ListObjectsv2",
+    ]
+    resources = [
+      "${module.data_s3_bucket.bucket.arn}/raw/*",
+      "${module.data_s3_bucket.bucket.arn}/fail/*",
+      "${module.data_s3_bucket.bucket.arn}/curated/*",
+      "${module.data_s3_bucket.bucket.arn}/raw",
+      "${module.data_s3_bucket.bucket.arn}/fail",
+      "${module.data_s3_bucket.bucket.arn}/curated",
+    ]
+  }
+
+  statement {
+    sid    = "s3ListDeleteMetadata"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObjects",
+      "s3:ListObjectsv2",
+    ]
+    resources = [
+      "${module.metadata_s3_bucket.bucket.arn}/*",
+      "${module.metadata_s3_bucket.bucket.arn}"
+    ]
+  }
+
+  statement {
+    sid    = "GlueGetDeleteDatabase"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:DeleteDatabase",
+    ]
+    resources = [
+      "*"
+    ]
+  }
 }
