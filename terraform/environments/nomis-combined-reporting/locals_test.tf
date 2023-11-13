@@ -131,6 +131,14 @@ locals {
       }
     }
     baseline_route53_zones = {
+      "test.reporting.nomis.az.justice.gov.uk" = {
+        lb_alias_records = [
+          # T1
+          { name = "t1-ncr-bip-cmc", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-bip", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-tomcat", type = "A", lbs_map_key = "private" },
+        ]
+      }
       "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
           # T1 BIP
