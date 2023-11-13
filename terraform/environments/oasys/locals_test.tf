@@ -104,8 +104,8 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/bip/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/bip-passwords",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/bip-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/bip-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/bip-*",
             ]
           }
         ]
