@@ -193,6 +193,9 @@ locals {
       # })
 
       "test-${local.application_name}-bip-b" = merge(local.bip_b, {
+        autoscaling_group = merge(local.bip_b.autoscaling_group, {
+          desired_capacity = 1
+        })
         autoscaling_schedules = {}
         tags = merge(local.bip_b.tags, {
           bip-db-name       = "T2BIPINF"
