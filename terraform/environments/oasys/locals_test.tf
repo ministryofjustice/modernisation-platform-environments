@@ -195,9 +195,10 @@ locals {
       "test-${local.application_name}-bip-b" = merge(local.bip_b, {
         autoscaling_schedules = {}
         tags = merge(local.bip_b.tags, {
-          oracle-db-hostname-a = "t2-oasys-db-a"
-          oracle-db-hostname-b = "t2-oasys-db-b"
-          oracle-db-name       = "T2BIPINF"
+          bip-db-name       = "T2BIPINF"
+          bip-db-hostname   = "t2-oasys-db-a"
+          oasys-db-name     = "T2OASYS"
+          oasys-db-hostname = "t2-oasys-db-a"
         })
       })
 
