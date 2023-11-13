@@ -153,9 +153,9 @@ module "dpr_dms_swap_usage_check" {
   alarm_name          = "dpr-dms-nomis-swap-usage"
   alarm_description   = "ATTENTION: DPR DMS Instance SWAP Usage Monitor, Please investigate SWAP Usage is Above 0.75 Gb for DMS Instance!"
   comparison_operator = "GreaterThanThreshold"
-  period              = local.period__dms_swapusage_check 
+  period              = local.period_dms_swapusage_check 
   evaluation_periods  = 1
-  threshold           = local.thrld__dms_swapusage_check # 0.75Gb
+  threshold           = local.thrld_dms_swapusage_check # 0.75Gb
 
   dimensions = {
     "ReplicationInstanceIdentifier" = module.dms_nomis_ingestor.dms_instance_name
