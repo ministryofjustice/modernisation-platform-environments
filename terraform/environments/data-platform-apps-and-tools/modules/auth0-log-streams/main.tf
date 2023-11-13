@@ -56,6 +56,11 @@ module "kms_key" {
   tags = var.tags
 }
 
+resource "aws_cloudwatch_event_bus" "this" {
+  name              = data.aws_cloudwatch_event_source.this.name
+  event_source_name = data.aws_cloudwatch_event_source.this.name
+}
+
 resource "aws_cloudwatch_log_group" "this" {
   name = local.cloudwatch_log_group_name
 
@@ -65,7 +70,7 @@ resource "aws_cloudwatch_log_group" "this" {
 
 resource "aws_cloudwatch_event_rule" "this" {
   name           = var.name
-  event_bus_name = var.event_source_name
+  event_bus_name = aws_cloudwatch_event_bus.this.name
 
   event_pattern = jsonencode({
     source = [{
