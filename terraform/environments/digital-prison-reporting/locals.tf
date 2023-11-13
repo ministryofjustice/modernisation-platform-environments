@@ -193,6 +193,18 @@ locals {
 
   # Enable CW alarms
   enable_cw_alarm = local.application_data.accounts[local.environment].setup_cw_alarms
+  enable_redshift_health_check = local.application_data.accounts[local.environment].enable_redshift_health_check
+  enable_dms_stop_check = local.application_data.accounts[local.environment].enable_dms_stop_check
+  enable_dms_start_check = local.application_data.accounts[local.environment].enable_dms_start_check
+  enable_dms_cpu_check = local.application_data.accounts[local.environment].enable_dms_cpu_check
+  enable_dms_freemem_check = local.application_data.accounts[local.environment].enable_dms_freemem_check
+  enable_dms_freeablemem_check = local.application_data.accounts[local.environment].enable_dms_freeablemem_check
+  enable_dms_swapusage_check = local.application_data.accounts[local.environment].enable_dms_swapusage_check
+  enable_dms_network_trans_tp_check = local.application_data.accounts[local.environment].enable_dms_network_trans_tp_check
+  enable_dms_network_rec_tp_check = local.application_data.accounts[local.environment].enable_dms_network_rec_tp_check
+  enable_dms_cdc_src_lat_check = local.application_data.accounts[local.environment].enable_dms_cdc_src_lat_check
+  enable_dms_cdc_targ_lat_check = local.application_data.accounts[local.environment].enable_dms_cdc_targ_lat_check
+  enable_dms_cdc_inc_events_check = local.application_data.accounts[local.environment].enable_dms_cdc_inc_events_check
 
   # Sonatype Secrets
   setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets

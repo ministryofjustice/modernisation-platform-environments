@@ -85,7 +85,19 @@
       "setup_sonatype_secrets": true,
       "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
-      "setup_redshift_schedule": true
+      "setup_redshift_schedule": true,
+      "enable_redshift_health_check": false,
+      "enable_dms_stop_check": false,
+      "enable_dms_start_check": false,
+      "enable_dms_cpu_check": false,
+      "enable_dms_freemem_check": false,
+      "enable_dms_freeablemem_check": false,
+      "enable_dms_swapusage_check": false,
+      "enable_dms_network_trans_tp_check": false,
+      "enable_dms_network_rec_tp_check": false,
+      "enable_dms_cdc_src_lat_check": false,
+      "enable_dms_cdc_targ_lat_check": false,
+      "enable_dms_cdc_inc_events_check": false
     },
     "test": {
       "project_short_id": "dpr",
@@ -172,7 +184,19 @@
       "setup_sonatype_secrets": false,
       "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
-      "setup_redshift_schedule": true
+      "setup_redshift_schedule": true,
+      "enable_redshift_health_check": true,
+      "enable_dms_stop_check": true,
+      "enable_dms_start_check": true,
+      "enable_dms_cpu_check": true,
+      "enable_dms_freemem_check": true,
+      "enable_dms_freeablemem_check": true,
+      "enable_dms_swapusage_check": true,
+      "enable_dms_network_trans_tp_check": true,
+      "enable_dms_network_rec_tp_check": true,
+      "enable_dms_cdc_src_lat_check": true,
+      "enable_dms_cdc_targ_lat_check": true,
+      "enable_dms_cdc_inc_events_check": true      
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -259,7 +283,19 @@
       "setup_sonatype_secrets": false,
       "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
-      "setup_redshift_schedule": true
+      "setup_redshift_schedule": true,
+      "enable_redshift_health_check": true,
+      "enable_dms_stop_check": true,
+      "enable_dms_start_check": true,
+      "enable_dms_cpu_check": true,
+      "enable_dms_freemem_check": true,
+      "enable_dms_freeablemem_check": true,
+      "enable_dms_swapusage_check": true,
+      "enable_dms_network_trans_tp_check": true,
+      "enable_dms_network_rec_tp_check": true,
+      "enable_dms_cdc_src_lat_check": true,
+      "enable_dms_cdc_targ_lat_check": true,
+      "enable_dms_cdc_inc_events_check": true       
     },
     "production": {
       "project_short_id": "dpr",
@@ -346,7 +382,19 @@
       "setup_sonatype_secrets": false,
       "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": false,
-      "setup_redshift_schedule": false
+      "setup_redshift_schedule": false,
+      "enable_redshift_health_check": true,
+      "enable_dms_stop_check": true,
+      "enable_dms_start_check": true,
+      "enable_dms_cpu_check": true,
+      "enable_dms_freemem_check": true,
+      "enable_dms_freeablemem_check": true,
+      "enable_dms_swapusage_check": true,
+      "enable_dms_network_trans_tp_check": true,
+      "enable_dms_network_rec_tp_check": true,
+      "enable_dms_cdc_src_lat_check": true,
+      "enable_dms_cdc_targ_lat_check": true,
+      "enable_dms_cdc_inc_events_check": true      
     }
   }
 }
