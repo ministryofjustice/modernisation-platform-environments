@@ -29,7 +29,7 @@ locals {
       ses_domain_identity            = "apps-tools.data-platform.service.justice.gov.uk"
       auth0_log_streams = {
         "alpha-analytics-moj" = {
-          event_source_name = "aws.partner/auth0.com/alpha-analytics-moj-e03aeb05-4c4e-4b55-9c7e-7929526f3181/auth0.logs"
+          event_source_name = "aws.partner/auth0.com/alpha-analytics-moj-5246b1ce-4ea2-45ab-9c2d-1414d6ff608a/auth0.logs"
         }
         "ministryofjustice-data-platform" = {
           event_source_name = "aws.partner/auth0.com/alpha-analytics-moj-5246b1ce-4ea2-45ab-9c2d-1414d6ff608a/auth0.logs"
