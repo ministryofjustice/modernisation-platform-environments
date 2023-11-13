@@ -135,7 +135,6 @@ module "ebs_volumes" {
   ]
 }
 
-
 resource "aws_route53_record" "db_ec2_instance" {
   for_each = {
     for item in var.db_config : item.name => item
