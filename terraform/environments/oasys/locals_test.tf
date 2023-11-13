@@ -32,6 +32,7 @@ locals {
       "/oracle/database/T1OASYS"                = local.secretsmanager_secrets_oasys_db
       "/oracle/database/T1OASREP"               = local.secretsmanager_secrets_db
       "/oracle/database/T1AZBIPI"               = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T1BIPINF"               = local.secretsmanager_secrets_bip_db
       "/oracle/database/T1MISTRN"               = local.secretsmanager_secrets_db
       "/oracle/database/T1ONRSYS"               = local.secretsmanager_secrets_db
       "/oracle/database/T1ONRAUD"               = local.secretsmanager_secrets_db
@@ -40,6 +41,7 @@ locals {
       "/oracle/database/T2OASYS"                = local.secretsmanager_secrets_oasys_db
       "/oracle/database/T2OASREP"               = local.secretsmanager_secrets_db
       "/oracle/database/T2AZBIPI"               = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T2BIPINF"               = local.secretsmanager_secrets_bip_db
       "/oracle/database/T2MISTRN"               = local.secretsmanager_secrets_db
       "/oracle/database/T2ONRSYS"               = local.secretsmanager_secrets_db
       "/oracle/database/T2ONRAUD"               = local.secretsmanager_secrets_db
