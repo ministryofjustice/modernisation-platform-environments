@@ -182,7 +182,7 @@ resource "aws_lb_listener" "tipstaff_lb" {
   }
 }
 
-resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
-  resource_arn = aws_lb.tipstaff_lb.arn
-  web_acl_arn  = aws_wafv2_web_acl.tipstaff_web_acl.arn
-}
+# resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
+#   resource_arn = aws_lb.tipstaff_lb.arn
+#   web_acl_arn  = aws_wafv2_web_acl.tipstaff_web_acl.arn
+# }
