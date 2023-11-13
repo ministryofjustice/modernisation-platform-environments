@@ -29,7 +29,7 @@ resource "aws_s3_object" "provision_files" {
 #This delays the creation of resource 
 resource "time_sleep" "wait_for_provision_files" {
   create_duration = "300s"
-  depends_on = [ aws_s3_object.provision_files ]
+ 
 }
 
 resource "aws_security_group" "lambdasg" {
