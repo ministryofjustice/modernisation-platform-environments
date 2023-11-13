@@ -223,6 +223,7 @@ locals {
         })
 
         tags = merge(local.bip_b.tags, {
+          oasys-environment = "t2"
           bip-db-name       = "T2BIPINF"
           bip-db-hostname   = "t2-oasys-db-a"
           oasys-db-name     = "T2OASYS"
