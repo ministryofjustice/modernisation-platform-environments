@@ -18,19 +18,19 @@ module "s3_bucket_lambda" {
 
 }
 
-# resource "aws_s3_object" "provision_files" {
-#   bucket = "laa-${local.application_name}-${local.environment}-mp"
-#   for_each = fileset("./zipfiles/", "**")
-#   key = each.value
-#   source = "./zipfiles/${each.value}"
-#   content_type = each.value
-# }
+resource "aws_s3_object" "provision_files" {
+  bucket = "laa-${local.application_name}-${local.environment}-mp"
+  for_each = fileset("./zipfiles/", "**")
+  key = each.value
+  source = "./zipfiles/${each.value}"
+  content_type = each.value
+}
 
-# #This delays the creation of resource 
-# resource "time_sleep" "wait_for_provision_files" {
-#   create_duration = "1m"
-#   depends_on = [ aws_s3_object.provision_files ]
-# }
+#This delays the creation of resource 
+resource "time_sleep" "wait_for_provision_files" {
+  create_duration = "1m"
+  depends_on = [ aws_s3_object.provision_files ]
+}
 
 resource "aws_security_group" "lambdasg" {
   name        = "${local.application_name}-${local.environment}-lambda-security-group"
