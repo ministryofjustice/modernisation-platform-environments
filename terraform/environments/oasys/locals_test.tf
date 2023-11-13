@@ -78,7 +78,7 @@ locals {
       }
       "/database/t2-oasys-db-a/T2BIPINF" = {
         secrets = {
-          systempassword = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
+          systempassword = {} # -> /oracle/database/T2BIPINF/bip-passwords { sys: ___ }
         }
       }
       "/weblogic/test-oasys-bip-b" = {
@@ -86,7 +86,7 @@ locals {
           admin_password     = {} # -> /oracle/bip/t2/passwords { weblogic: admin_pass }
           admin_username     = {} # just have in ansible defaults , username is always weblogic
           biplatformpassword = {} # ->  /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
-          db_username        = {} # put in ansible defaults, but can't find
+          db_username        = {} # put in ansible defaults
           mdspassword        = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
           syspassword        = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
         }
