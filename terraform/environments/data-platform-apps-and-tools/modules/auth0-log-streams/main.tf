@@ -88,16 +88,16 @@ resource "aws_cloudwatch_event_bus" "this" {
 #   policy_document = data.aws_iam_policy_document.this.json
 # }
 
-resource "aws_cloudwatch_event_rule" "this" {
-  name           = var.name
-  event_bus_name = aws_cloudwatch_event_bus.this.name
+# resource "aws_cloudwatch_event_rule" "this" {
+#   name           = var.name
+#   event_bus_name = aws_cloudwatch_event_bus.this.name
 
-  event_pattern = jsonencode({
-    source = [{
-      prefix = "aws.partner/auth0.com"
-    }]
-  })
-}
+#   event_pattern = jsonencode({
+#     source = [{
+#       prefix = "aws.partner/auth0.com"
+#     }]
+#   })
+# }
 
 # resource "aws_cloudwatch_event_target" "this" {
 #   target_id      = "auth0-to-cloudwatch-logs"
