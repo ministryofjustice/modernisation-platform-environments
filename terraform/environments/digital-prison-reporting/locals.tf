@@ -211,9 +211,9 @@ locals {
   enable_dms_freeablemem_check = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.enable
   thrld_dms_freeablemem_check = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.threshold
   period_dms_freeablemem_check = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.period
-  enable_dms_swapusage_check = local.application_data.accounts[local.environment].alarms.dms_swapusage_check.dms.enable
-  thrld_dms_swapusage_check = local.application_data.accounts[local.environment].alarms.dms_swapusage_check.dms.threshold
-  period_dms_swapusage_check = local.application_data.accounts[local.environment].alarms.dms_swapusage_check.dms.period
+  enable_dms_swapusage_check = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.enable
+  thrld_dms_swapusage_check = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.threshold
+  period_dms_swapusage_check = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.period
   enable_dms_network_trans_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_trans_tp_check.enable
   thrld_dms_network_trans_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_trans_tp_check.threshold
   period_dms_network_trans_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_trans_tp_check.period
