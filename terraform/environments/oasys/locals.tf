@@ -231,14 +231,7 @@ locals {
       max_size         = 2
     })
     lb_target_groups = {}
-    secretsmanager_secrets = {
-      "weblogic/admin_password"     = {}
-      "weblogic/admin_username"     = {}
-      "weblogic/biplatformpassword" = {}
-      "weblogic/db_username"        = {}
-      "weblogic/mdspassword"        = {}
-      "weblogic/syspassword"        = {}
-    }
+    secretsmanager_secrets = {}
     tags = {
       backup            = "false" # opt out of mod platform default backup plan
       component         = "bip"
