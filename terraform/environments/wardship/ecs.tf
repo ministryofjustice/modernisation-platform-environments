@@ -276,3 +276,81 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
   })
   policy_name = "TrustEventsToStoreLogEvents"
 }
+
+resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
+  count               = local.is-development ? 0 : 1
+  alarm_name          = "ecs-cpu-utilization-alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CpuUtilized"
+  namespace           = "ECS/ContainerInsights"
+  period              = "120"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "This metric checks if CPU utilization is high - threshold set to 80%"
+  alarm_actions       = [aws_sns_topic.wardship_utilisation_alarm[0].arn]
+  dimensions = {
+    ClusterName = aws_ecs_cluster.wardship_cluster.name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
+  count               = local.is-development ? 0 : 1
+  alarm_name          = "ecs-memory-utilization-alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "MemoryUtilized"
+  namespace           = "ECS/ContainerInsights"
+  period              = "120"
+  statistic           = "Average"
+  threshold           = "1600"
+  alarm_description   = "This metric checks if memory utilization is high - threshold set to 1600MB"
+  alarm_actions       = [aws_sns_topic.wardship_utilisation_alarm[0].arn]
+  dimensions = {
+    ClusterName = aws_ecs_cluster.wardship_cluster.name
+  }
+}
+
+resource "aws_sns_topic" "wardship_utilisation_alarm" {
+  count = local.is-development ? 0 : 1
+  name  = "wardship_utilisation_alarm"
+}
+
+# Pager duty integration
+
+# Get the map of pagerduty integration keys from the modernisation platform account
+data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+}
+
+# Add a local to get the keys
+locals {
+  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+}
+
+# link the sns topic to the service - preprod
+module "pagerduty_core_alerts_non_prod" {
+  count = local.is-preproduction ? 1 : 0
+  depends_on = [
+    aws_sns_topic.wardship_utilisation_alarm
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
+  pagerduty_integration_key = local.pagerduty_integration_keys["wardship_non_prod_alarms"]
+}
+
+# link the sns topic to the service - prod
+module "pagerduty_core_alerts_prod" {
+  count = local.is-production ? 1 : 0
+  depends_on = [
+    aws_sns_topic.wardship_utilisation_alarm
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
+  pagerduty_integration_key = local.pagerduty_integration_keys["wardship_prod_alarms"]
+}
