@@ -18,9 +18,9 @@ data "aws_iam_policy_document" "log_to_bucket" {
 
 data "aws_iam_policy_document" "read_openmetadata_secrets" {
   statement {
-    sid     = "openmetdataSecretsManager"
-    effect  = "Allow"
-    actions = ["secretsmanager:GetSecretValue"]
+    sid       = "openmetdataSecretsManager"
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
     resources = [aws_secretsmanager_secret.openmetadata.id]
   }
 }
@@ -617,11 +617,11 @@ data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
     sid    = "GluePermissions"
     effect = "Allow"
     actions = [
-     	  "glue:GetTable",
-				"glue:GetPartitions",
-				"glue:GetPartition",
-				"glue:GetDatabases",
-				"glue:GetDatabase"
+      "glue:GetTable",
+      "glue:GetPartitions",
+      "glue:GetPartition",
+      "glue:GetDatabases",
+      "glue:GetDatabase"
     ]
     resources = [
       "*"

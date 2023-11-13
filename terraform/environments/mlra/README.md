@@ -36,13 +36,13 @@ Also <https://mlra.legalservices.gov.uk/mlra/> redirects to the above URL. This 
 
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
-# laa-crime-apps is the slack channel for raising any issues with the product team.
+# laa-crime-apps is the slack channel for raising any issues with the product team
 
 ### **Service team contact:**
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 
-# laa-crime-apps.
+# laa-crime-apps
 
 ### **Hosting environment:**
 

@@ -17,7 +17,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 250 }
           "/dev/sdc"  = { type = "gp3", size = 50 }
-          "/dev/sdd"  = { type = "gp3", size = 250 }          
+          "/dev/sdd"  = { type = "gp3", size = 250 }
           "/dev/sde"  = { type = "gp3", size = 50 }
           "/dev/sdf"  = { type = "gp3", size = 250 }
           "/dev/sdg"  = { type = "gp3", size = 200 }
@@ -47,7 +47,7 @@ locals {
         tags = merge(local.web_ec2.tags, {
           description       = "copy of PPFWW0005 for planetfm ${local.environment}"
           ami               = "pp-cafm-w-5-a"
-          app-config-status = "pending"          
+          app-config-status = "pending"
         })
       })
     }
