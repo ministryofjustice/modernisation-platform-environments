@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "this" {
       type        = "Service"
       identifiers = ["events.amazonaws.com", "delivery.logs.amazonaws.com"]
     }
-    resources = ["${aws_cloudwatch_log_group.this.arn}:*}"]
+    resources = ["${aws_cloudwatch_log_group.this.arn}:*"]
   }
 }
 
