@@ -212,8 +212,7 @@ locals {
   bip_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "oasys_bip_release_2023-06-08T15-17-45.964Z"
-      ssm_parameters_prefix     = "ec2-web/"
-      iam_resource_names_prefix = "ec2-web"
+      iam_resource_names_prefix = "ec2"
       availability_zone         = "${local.region}a"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
@@ -232,6 +231,14 @@ locals {
       max_size         = 2
     })
     lb_target_groups = {}
+    secretsmanager_secrets = {
+      "weblogic/admin_password"     = {}
+      "weblogic/admin_username"     = {}
+      "weblogic/biplatformpassword" = {}
+      "weblogic/db_username"        = {}
+      "weblogic/mdspassword"        = {}
+      "weblogic/syspassword"        = {}
+    }
     tags = {
       backup            = "false" # opt out of mod platform default backup plan
       component         = "bip"

@@ -49,4 +49,18 @@ locals {
     }
   }
 
+  secretsmanager_secrets_oasys_db = {
+    secrets = {
+      passwords = {}
+      apex-passwords = {}
+    }
+  }
+
+  secretsmanager_secrets_bip_db = {
+    secrets = {
+      passwords = {}
+      bip-passwords = {}
+    }
+  }
+
 }
