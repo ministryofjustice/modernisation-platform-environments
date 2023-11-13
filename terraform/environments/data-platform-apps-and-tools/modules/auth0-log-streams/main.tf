@@ -64,8 +64,28 @@ resource "aws_cloudwatch_event_bus" "this" {
 resource "aws_cloudwatch_log_group" "this" {
   name = local.cloudwatch_log_group_name
 
-  # kms_key_id        = module.kms_key.key_arn
+  kms_key_id        = module.kms_key.key_arn
   retention_in_days = var.retention_in_days
+}
+
+data "aws_iam_policy_document" "this" {
+  statement {
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:PutLogEventsBatch"
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com", "delivery.logs.amazonaws.com"]
+    }
+    resources = ["${aws_cloudwatch_log_group.this.arn}:*}"]
+  }
+}
+
+resource "aws_cloudwatch_log_resource_policy" "this" {
+  policy_name     = "events-to-cloudwatch-logs"
+  policy_document = data.aws_iam_policy_document.this.json
 }
 
 resource "aws_cloudwatch_event_rule" "this" {
