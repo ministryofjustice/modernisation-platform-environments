@@ -43,6 +43,12 @@ data "aws_iam_policy_document" "write_metadata" {
     actions   = ["s3:PutObject"]
     resources = ["${module.metadata_s3_bucket.bucket.arn}/*"]
   }
+  statement {
+    sid       = "InvokePushToCatalogueLambda"
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = [module.data_product_push_to_catalogue_lambda.lambda_function_arn]    
+  }
 }
 
 data "aws_iam_policy_document" "create_write_lambda_logs" {
@@ -645,6 +651,14 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_pr
     data.aws_iam_policy_document.log_to_bucket.json,
     data.aws_iam_policy_document.read_metadata.json,
     data.aws_iam_policy_document.write_metadata.json,
+    data.aws_iam_policy_document.create_write_lambda_logs.json,
+  ]
+}
+
+data "aws_iam_policy_document" "iam_policy_document_for_push_to_catalogue_lambda" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.log_to_bucket.json,
+    data.aws_iam_policy_document.read_openmetadata_secrets.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
   ]
 }
