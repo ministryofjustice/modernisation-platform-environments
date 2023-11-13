@@ -91,7 +91,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   s3_key = local.snapshotDBFunctionfilename
   memory_size = 128
   timeout = 900
-  # depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
+   depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
   
 
 
@@ -124,7 +124,7 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
   s3_key = local.deletesnapshotFunctionfilename
   memory_size = 1024
   timeout = 900
-  # depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
+   depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
 
 
   environment {
@@ -157,7 +157,7 @@ resource "aws_lambda_function" "connectDBFunction" {
   s3_key = local.connectDBFunctionfilename
   memory_size = 128
   timeout = 900
-  # depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
+   depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
 
 
 
