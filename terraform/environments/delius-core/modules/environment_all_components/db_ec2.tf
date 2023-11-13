@@ -107,6 +107,7 @@ locals {
       for key, ebs_non_root_volumes in db_config_instance.ebs_volumes.ebs_non_root_volumes :
       {
         key                  = "${db_config_instance.name}-${key}"
+        block_name           = key
         index_name           = db_config_instance.name
         ebs_config           = db_config_instance.ebs_volumes
         ebs_non_root_volumes = ebs_non_root_volumes
@@ -115,7 +116,7 @@ locals {
   ])
 }
 
-module "ebs_volume_primary" {
+module "ebs_volumes" {
   source = "../ebs_volume"
   for_each = {
     for entry in local.flattened_ebs_volumes :
@@ -123,7 +124,7 @@ module "ebs_volume_primary" {
   }
   availability_zone = aws_instance.db_ec2_instance[each.value.index_name].availability_zone
   instance_id       = aws_instance.db_ec2_instance[each.value.index_name].id
-  device_name       = each.key
+  device_name       = each.value.block_name
   size              = each.value.ebs_non_root_volumes.volume_size
   iops              = each.value.ebs_config.iops
   throughput        = each.value.ebs_config.throughput
@@ -133,24 +134,6 @@ module "ebs_volume_primary" {
     aws_instance.db_ec2_instance
   ]
 }
-
-#module "ebs_volume_standby" {
-#  source = "../ebs_volume"
-#  for_each = {
-#    for k, v in var.db_config.standby.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false
-#  }
-#  availability_zone = aws_instance.db_ec2_instance["standby"].availability_zone
-#  instance_id       = aws_instance.db_ec2_instance["standby"].id
-#  device_name       = each.key
-#  size              = each.value.volume_size
-#  iops              = var.db_config.standby.ebs_volumes.iops
-#  throughput        = var.db_config.standby.ebs_volumes.throughput
-#  tags              = local.tags
-#  kms_key_id        = var.db_config.standby.ebs_volumes.kms_key_id
-#  depends_on = [
-#    aws_instance.db_ec2_instance
-#  ]
-#}
 
 resource "aws_route53_record" "db_ec2_instance" {
   for_each = {
