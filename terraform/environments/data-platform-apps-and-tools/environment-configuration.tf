@@ -13,7 +13,7 @@ locals {
       ses_domain_identity            = "apps-tools.development.data-platform.service.justice.gov.uk"
       auth0_log_streams = {
         "dev-analytics-moj" = {
-          event_source_name = "aws.partner/auth0.com/alpha-analytics-moj-e03aeb05-4c4e-4b55-9c7e-7929526f3181/auth0.logs"
+          event_source_name = "aws.partner/auth0.com/dev-analytics-moj-20c1595d-28e2-4822-9e1c-cb29ac38c7d2/auth0.logs"
         }
         "ministryofjustice-data-platform-development" = {
           event_source_name = "aws.partner/auth0.com/ministryofjustice-data-platform-development-a628362c-f79b-46e9-9604-7c9861565a1b/auth0.logs"
