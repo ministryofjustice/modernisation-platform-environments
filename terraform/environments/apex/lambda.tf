@@ -18,19 +18,19 @@ module "s3_bucket_lambda" {
 
 }
 
-resource "aws_s3_object" "provision_files" {
-  bucket = "laa-${local.application_name}-${local.environment}-mp"
-  for_each = fileset("./zipfiles/", "**")
-  key = each.value
-  source = "./zipfiles/${each.value}"
-  content_type = each.value
-}
+# resource "aws_s3_object" "provision_files" {
+#   bucket = "laa-${local.application_name}-${local.environment}-mp"
+#   for_each = fileset("./zipfiles/", "**")
+#   key = each.value
+#   source = "./zipfiles/${each.value}"
+#   content_type = each.value
+# }
 
-#This delays the creation of resource 
-resource "time_sleep" "wait_for_provision_files" {
-  create_duration = "300s"
- 
-}
+# #This delays the creation of resource 
+# resource "time_sleep" "wait_for_provision_files" {
+#   create_duration = "1m"
+#   depends_on = [ aws_s3_object.provision_files ]
+# }
 
 resource "aws_security_group" "lambdasg" {
   name        = "${local.application_name}-${local.environment}-lambda-security-group"
@@ -91,7 +91,7 @@ resource "aws_lambda_function" "snapshotDBFunction" {
   s3_key = local.snapshotDBFunctionfilename
   memory_size = 128
   timeout = 900
-  depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
+  # depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
   
 
 
@@ -124,7 +124,7 @@ resource "aws_lambda_function" "deletesnapshotFunction" {
   s3_key = local.deletesnapshotFunctionfilename
   memory_size = 1024
   timeout = 900
-  depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
+  # depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
 
 
   environment {
@@ -157,7 +157,7 @@ resource "aws_lambda_function" "connectDBFunction" {
   s3_key = local.connectDBFunctionfilename
   memory_size = 128
   timeout = 900
-  depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
+  # depends_on = [ time_sleep.wait_for_provision_files ] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
 
 
 
