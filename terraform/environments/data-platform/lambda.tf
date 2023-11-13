@@ -486,7 +486,7 @@ module "delete_data_product_lambda" {
     AllowExecutionFromAPIGateway = {
       action     = "lambda:InvokeFunction"
       principal  = "apigateway.amazonaws.com"
-      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.delete_table_for_data_product.http_method}${aws_api_gateway_resource.data_product_table_name.path}"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.delete_data_product.http_method}${aws_api_gateway_resource.data_product_name.path}"
     }
   }
 }

@@ -490,7 +490,6 @@ resource "aws_api_gateway_integration" "delete_data_product_lambda" {
   uri                     = module.delete_data_product_lambda.lambda_function_invoke_arn
 
   request_parameters = {
-    "integration.request.path.data-product-name" = "method.request.path.data-product-name",
-    "integration.request.path.table-name"        = "method.request.path.table-name",
+    "integration.request.path.data-product-name" = "method.request.path.data-product-name"
   }
 }
