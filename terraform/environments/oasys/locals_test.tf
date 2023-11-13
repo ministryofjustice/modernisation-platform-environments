@@ -120,6 +120,7 @@ locals {
         tags = merge(local.database_a.tags, {
           description                             = "t2 ${local.application_name} database"
           "${local.application_name}-environment" = "t2"
+          bip-db-name                             = "T2BIPINF"
           instance-scheduling                     = "skip-scheduling"
         })
       })
@@ -142,6 +143,7 @@ locals {
         tags = merge(local.database_a.tags, {
           description                             = "t1 ${local.application_name} database"
           "${local.application_name}-environment" = "t1"
+          bip-db-name                             = "T1BIPINF"
         })
       })
     }
