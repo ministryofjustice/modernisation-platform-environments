@@ -47,8 +47,8 @@ locals {
       "/oracle/database/T2ONRAUD"               = local.secretsmanager_secrets_db
       "/oracle/database/T2ONRBDS"               = local.secretsmanager_secrets_db
 
-      "/oracle/bip/t1/passwords"               = local.secretsmanager_secrets_db
-      "/oracle/bip/t2/passwords"               = local.secretsmanager_secrets_db
+      "/oracle/bip/t1"                          = local.secretsmanager_secrets_bip
+      "/oracle/bip/t2"                          = local.secretsmanager_secrets_bip
 
       "" = {
         postfix = ""
