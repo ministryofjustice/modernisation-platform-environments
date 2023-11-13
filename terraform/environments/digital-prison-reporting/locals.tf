@@ -196,9 +196,9 @@ locals {
   enable_redshift_health_check = local.application_data.accounts[local.environment].alarms.redshift.health_check.enable
   thrld_redshift_health_check = local.application_data.accounts[local.environment].alarms.redshift.health_check.threshold
   period_redshift_health_check = local.application_data.accounts[local.environment].alarms.redshift.health_check.period
-  enable_dms_stop_check = local.application_data.accounts[local.environment].alarms.dms.stop_check.stop_check.enable
-  thrld_dms_stop_check = local.application_data.accounts[local.environment].alarms.dms.stop_check.stop_check.threshold
-  period_dms_stop_check = local.application_data.accounts[local.environment].alarms.dms.stop_check.stop_check.period
+  enable_dms_stop_check = local.application_data.accounts[local.environment].alarms.dms.stop_check.enable
+  thrld_dms_stop_check = local.application_data.accounts[local.environment].alarms.dms.stop_check.threshold
+  period_dms_stop_check = local.application_data.accounts[local.environment].alarms.dms.stop_check.period
   enable_dms_start_check = local.application_data.accounts[local.environment].alarms.dms.start_check.enable
   thrld_dms_start_check = local.application_data.accounts[local.environment].alarms.dms.start_check.threshold
   period_dms_start_check = local.application_data.accounts[local.environment].alarms.dms.start_check.period
