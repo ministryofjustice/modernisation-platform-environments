@@ -93,6 +93,25 @@ locals {
       }
     }
 
+    baseline_iam_policies = {
+      Ec2T2BipPolicy = {
+        description = "Permissions required for T2 Bip EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/bip/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ec2_instances = {
       ##
       ## T2
@@ -197,6 +216,12 @@ locals {
           desired_capacity = 1
         })
         autoscaling_schedules = {}
+        config = merge(local.bip_b.config, {
+          instance_profile_policies = concat(local.bip_b.config.instance_profile_policies, [
+            "Ec2T2BipPolicy",
+          ])
+        })
+
         tags = merge(local.bip_b.tags, {
           bip-db-name       = "T2BIPINF"
           bip-db-hostname   = "t2-oasys-db-a"
