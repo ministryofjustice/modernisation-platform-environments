@@ -296,30 +296,30 @@ resource "aws_security_group" "lb" {
 # ## Cloudfront
 
 
-# resource "random_password" "cloudfront" {
-#   length  = 16
-#   special = false
-# }
+resource "random_password" "cloudfront" {
+  length  = 16
+  special = false
+}
 
-# resource "aws_secretsmanager_secret" "cloudfront" {
-#   name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
-#   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
-# }
+resource "aws_secretsmanager_secret" "cloudfront" {
+  name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
+  description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
+}
 
-# resource "aws_secretsmanager_secret_version" "cloudfront" {
-#   secret_id     = aws_secretsmanager_secret.cloudfront.id
-#   secret_string = random_password.cloudfront.result
-# }
+resource "aws_secretsmanager_secret_version" "cloudfront" {
+  secret_id     = aws_secretsmanager_secret.cloudfront.id
+  secret_string = random_password.cloudfront.result
+}
 
-# # Importing the AWS secrets created previously using arn.
-# data "aws_secretsmanager_secret" "cloudfront" {
-#   arn = aws_secretsmanager_secret.cloudfront.arn
-# }
+# Importing the AWS secrets created previously using arn.
+data "aws_secretsmanager_secret" "cloudfront" {
+  arn = aws_secretsmanager_secret.cloudfront.arn
+}
 
-# # Importing the AWS secret version created previously using arn.
-# data "aws_secretsmanager_secret_version" "cloudfront" {
-#   secret_id = data.aws_secretsmanager_secret.cloudfront.arn
-# }
+# Importing the AWS secret version created previously using arn.
+data "aws_secretsmanager_secret_version" "cloudfront" {
+  secret_id = data.aws_secretsmanager_secret.cloudfront.arn
+}
 
 # # TODO This was a centralised bucket in LAA Landing Zone - do we want one for each application/env account in MP? Yes for now
 
@@ -557,24 +557,23 @@ resource "aws_lb_listener" "alb_listener" {
 
 }
 
-#Uncomment the listener rule when CloudFront Secret is Setup
 
-# resource "aws_lb_listener_rule" "alb_listener_rule" {
-#   listener_arn = aws_lb_listener.alb_listener.arn
-#   priority     = 1
+resource "aws_lb_listener_rule" "alb_listener_rule" {
+  listener_arn = aws_lb_listener.alb_listener.arn
+  priority     = 1
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.alb_target_group.arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_target_group.arn
+  }
 
-#   condition {
-#     http_header {
-#       http_header_name = local.custom_header
-#       values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
-#     }
-#   }
-# }
+  condition {
+    http_header {
+      http_header_name = local.custom_header
+      values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
+    }
+  }
+}
 
 resource "aws_lb_target_group" "alb_target_group" {
   name                 = "${var.application_name}-alb-tg"
