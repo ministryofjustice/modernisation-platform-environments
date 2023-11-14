@@ -33,7 +33,7 @@ run_ansible() {
 
   echo "# Retrieving tags using aws cli"
   IFS=$'\n'
-  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=${instance_id}" "Name=key,Values=os-type,ami,server-type,environment-name,delius-environment-name,database" --output=text))
+  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$${instance_id}" "Name=key,Values=os-type,ami,server-type,environment-name,delius-environment-name,database" --output=text))
   unset IFS
 
   # clone ansible roles and playbook
