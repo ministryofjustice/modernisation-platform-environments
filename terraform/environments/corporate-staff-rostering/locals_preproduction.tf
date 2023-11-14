@@ -213,6 +213,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type           = "m5.2xlarge"
           disable_api_termination = true
+          disable_api_stop        = true
           monitoring              = true
           vpc_security_group_ids  = ["domain", "app", "jumpserver"]
           tags = {
