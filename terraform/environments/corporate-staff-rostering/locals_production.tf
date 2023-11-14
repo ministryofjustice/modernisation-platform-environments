@@ -235,6 +235,44 @@ locals {
         }
       }
 
+      pd-csr-a-9-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "pd-csr-a-9-a"
+          ami_owner                     = "self"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type           = "m5.4xlarge"
+          disable_api_termination = true
+          disable_api_stop        = true
+          monitoring              = true
+          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "skip-scheduling"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 112 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        tags = {
+          description       = "Migrated server PDCAW00009"
+          app-config-status = "pending"
+          csr-region        = "Region 3"
+          os-type           = "Windows"
+          ami               = "pd-csr-a-9-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
       pd-csr-w-1-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "pd-csr-w-1-a"
