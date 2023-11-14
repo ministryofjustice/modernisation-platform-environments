@@ -112,8 +112,8 @@ locals {
         }
       }
 
-      pd-csr-db-b = {
-        config = merge(local.database_ec2, {
+      pd-csr-db-b = merge(local.database_ec2, {
+        config = merge(local.database_ec2.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
@@ -157,7 +157,7 @@ locals {
           server-type = "csr-db"
           backup      = "false" # opt out of mod platform default backup plan
         }
-      }
+      })
 
       pd-csr-a-7-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
