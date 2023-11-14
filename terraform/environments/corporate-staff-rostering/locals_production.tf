@@ -112,6 +112,61 @@ locals {
         }
       }
 
+      pd-csr-db-b = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
+          ami_owner         = "self"
+          availability_zone = "${local.region}b"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        instance = merge(local.database_ec2.instance, {
+          instance_type                = "r6i.xlarge"
+          disable_api_stop             = true
+          metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+        })
+
+        ebs_volumes = {
+          "/dev/sdb" = { type = "gp3", label = "app", size = 100 } # /u01
+          "/dev/sdc" = { type = "gp3", label = "app", size = 100 } # /u02
+          "/dev/sde" = { type = "gp3", label = "data" }            # DATA01
+          "/dev/sdf" = { type = "gp3", label = "data" }            # DATA02
+          "/dev/sdg" = { type = "gp3", label = "data" }            # DATA03
+          "/dev/sdh" = { type = "gp3", label = "data" }            # DATA04
+          "/dev/sdi" = { type = "gp3", label = "data" }            # DATA05
+          "/dev/sdj" = { type = "gp3", label = "flash" }           # FLASH01
+          "/dev/sdk" = { type = "gp3", label = "flash" }           # FLASH02
+          "/dev/sds" = { type = "gp3", label = "swap" }
+        }
+
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data = {
+            iops       = 3000
+            throughput = 125
+            total_size = 1000
+          }
+          flash = {
+            iops       = 3000
+            throughput = 125
+            total_size = 100
+          }
+        })
+        
+        ssm_parameters = {
+          asm-passwords = {}
+        }
+
+        tags = {
+          description = "PD CSR DB server"
+          ami         = "base_ol_8_5"
+          os-type     = "Linux"
+          component   = "data"
+          server-type = "csr-db"
+          backup      = "false" # opt out of mod platform default backup plan
+        }
+      }
+
       pd-csr-a-7-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "pd-csr-a-7-a"
