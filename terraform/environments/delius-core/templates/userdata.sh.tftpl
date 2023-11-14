@@ -33,7 +33,7 @@ run_ansible() {
 
   echo "# Retrieving tags using aws cli"
   IFS=$'\n'
-  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=os-type,ami,server-type,environment-name" --output=text))
+  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=${instance_id}" "Name=key,Values=os-type,ami,server-type,environment-name,delius-environment-name,database" --output=text))
   unset IFS
 
   # clone ansible roles and playbook
@@ -49,14 +49,24 @@ run_ansible() {
   ansible_group_vars=
   for ((i=0; i<$${#tags[@]}; i++)); do
     tag=($${tags[i]})
-    group=$(echo "$${tag[1]}_$${tag[4]}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
-    if [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
+    echo "$${tag[*]}"
+    # aws ec2 describe-tags comes out in alphabetical order
+    if [[ $"$${tag[1]}" == "database" || "$${tag[1]}" == "delius-environment-name" || "$${tag[1]}" == "environment-name" ]]
+    then
+      [ "$${tag[1]}" == "database" ] && database=$${tag[4]}
+      [ "$${tag[1]}" == "delius-environment-name" ] && delius_environment_name=$${tag[4]}
+      [ "$${tag[1]}" == "environment-name" ] && environment_name="$${tag[1]}_$${tag[4]}"
+    fi
+    if [[ $i -eq 2 ]]
+    then
+      group=$(echo "$${environment_name}_$${delius_environment_name}_$${database}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
+      group_all=$(echo "$${environment_name}_$${delius_environment_name}_all" | tr [:upper:] [:lower:] | sed "s/-/_/g")
+      database_type=$(echo $database | cut -d'_' -f2 | sed "s/db//g")
+      ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml --extra-vars @group_vars/$group_all.yml --extra-vars database_type=$database_type"
+    elif [[ $i -gt 2 ]]
+    then
+      group=$(echo "$${tag[1]}_$${tag[4]}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
       ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
-    elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
-      ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
-    else
-      echo "Could not find group_vars $group yml"
-      exit 1
     fi
   done
 
