@@ -33,6 +33,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_method.update_data_product,
       aws_api_gateway_method.update_schema_for_data_product_table_name,
       aws_api_gateway_method.delete_table_for_data_product,
+      aws_api_gateway_method.delete_data_product,
       aws_api_gateway_integration.docs_to_lambda,
       aws_api_gateway_integration.upload_data_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.proxy_to_lambda,
@@ -44,6 +45,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_integration.update_schema_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.preview_data_from_data_product_lambda,
       aws_api_gateway_integration.delete_table_for_data_product_to_lambda,
+      aws_api_gateway_integration.delete_data_product_lambda,
     ]))
   }
 
@@ -464,3 +466,30 @@ resource "aws_api_gateway_integration" "preview_data_from_data_product_lambda" {
   }
 }
 
+# /data-product/{data-product-name} DELETE method
+resource "aws_api_gateway_method" "delete_data_product" {
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.authorizer.id
+  http_method   = "DELETE"
+  resource_id   = aws_api_gateway_resource.data_product_name.id
+  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+
+  request_parameters = {
+    "method.request.header.Authorization"   = true,
+    "method.request.path.data-product-name" = true,
+  }
+}
+
+# /data-product/{data-product-name} DELETE  lambda integration
+resource "aws_api_gateway_integration" "delete_data_product_lambda" {
+  http_method             = aws_api_gateway_method.delete_data_product.http_method
+  resource_id             = aws_api_gateway_resource.data_product_name.id
+  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.delete_data_product_lambda.lambda_function_invoke_arn
+
+  request_parameters = {
+    "integration.request.path.data-product-name" = "method.request.path.data-product-name"
+  }
+}

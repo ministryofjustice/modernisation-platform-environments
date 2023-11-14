@@ -41,6 +41,7 @@ locals {
   preview_data_version                  = lookup(var.preview_data_versions, local.environment)
   delete_table_for_data_product_version = lookup(var.delete_table_for_data_product_versions, local.environment)
   push_to_catalogue_version             = lookup(var.push_to_catalogue_versions, local.environment)
+  delete_data_product_version           = lookup(var.delete_data_product_versions, local.environment)
 
   # Environment vars that are used by many lambdas
   logger_environment_vars = {
