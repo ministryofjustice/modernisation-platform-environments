@@ -442,6 +442,32 @@ locals {
           ndh-ems-hostname     = "t2-ems.test.ndh.nomis.service.justice.gov.uk"
         })
       })
+      
+      t2-nomis-xtag-test = merge(local.xtag_ec2, {
+        autoscaling_group = merge(local.xtag_ec2.autoscaling_group, {
+          desired_capacity = 1
+        })
+        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        config = merge(local.xtag_ec2.config, {
+          ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+            "Ec2T2WeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
+          args = merge(local.xtag_ec2.user_data_cloud_init.args, {
+            branch = "nomis-xtag-secrets"
+          })
+        })
+        tags = merge(local.xtag_ec2.tags, {
+          nomis-environment    = "t2"
+          description          = "wills test server"
+          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T2CNOM"
+          ndh-ems-hostname     = "t2-ems.test.ndh.nomis.service.justice.gov.uk"
+        })
+      })
 
       # NOT-ACTIVE (blue deployment)
       t3-nomis-web-a = merge(local.weblogic_ec2, {
