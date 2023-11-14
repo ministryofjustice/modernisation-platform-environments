@@ -5,10 +5,10 @@ resource "aws_s3_bucket" "laa-lambda-backup" {
 
 
 resource "aws_s3_object" "provision_files" {
-  bucket = aws_s3_bucket.laa-lambda-backup.id
-  for_each = fileset("./zipfiles/", "**")
-  key = each.value
-  source = "./zipfiles/${each.value}"
+  bucket       = aws_s3_bucket.laa-lambda-backup.id
+  for_each     = fileset("./zipfiles/", "**")
+  key          = each.value
+  source       = "./zipfiles/${each.value}"
   content_type = each.value
 }
 

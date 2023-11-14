@@ -350,13 +350,13 @@ resource "aws_ecs_service" "ecs_service" {
     type  = "spread"
   }
 
-# Uncomment this section when the ALB for Apex is built
-# 
-#   load_balancer {
-#     target_group_arn = var.lb_tg_arn
-#     container_name   = var.app_name
-#     container_port   = var.server_port
-#   }
+  # Uncomment this section when the ALB for Apex is built
+  # 
+  #   load_balancer {
+  #     target_group_arn = var.lb_tg_arn
+  #     container_name   = var.app_name
+  #     container_port   = var.server_port
+  #   }
 
   depends_on = [
     aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group

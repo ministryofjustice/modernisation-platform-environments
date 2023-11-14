@@ -31,8 +31,8 @@
       "ecs_scaling_mem_threshold": 80,
       "region": "eu-west-2",
       "docker_image_tag": "development",
-      "app_db_url":"db.apex.aws.dev.legalservices.gov.uk:1521:APEX",
-      "app_debug_enabled":"false"
+      "app_db_url": "db.apex.aws.dev.legalservices.gov.uk:1521:APEX",
+      "app_debug_enabled": "false"
     },
     "test": {
       "example_var": "test-data"

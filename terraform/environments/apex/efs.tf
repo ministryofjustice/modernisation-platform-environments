@@ -9,7 +9,7 @@ resource "aws_efs_file_system" "efs" {
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 
-lifecycle_policy {
+  lifecycle_policy {
     transition_to_ia = "AFTER_90_DAYS"
   }
 }

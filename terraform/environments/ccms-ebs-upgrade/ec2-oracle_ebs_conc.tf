@@ -1,5 +1,5 @@
 resource "aws_instance" "ec2_oracle_conc" {
-  instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsconc
+  instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsconc
   ami                         = local.application_data.accounts[local.environment].ebsconc_ami_id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_ebsconc.id]
