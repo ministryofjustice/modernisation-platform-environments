@@ -10,6 +10,10 @@ resource "aws_wafv2_web_acl" "tipstaff_web_acl" {
     name     = "common-rule-set"
     priority = 1
 
+    override_action {
+      none {}
+    }
+
     statement {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
