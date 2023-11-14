@@ -38,6 +38,11 @@ locals {
     resources = ["*"]
   }
 
+  secretsmanager_secrets_bip = {
+    secrets = {
+      passwords = {}
+    }
+  }
 
   secretsmanager_secrets_db = {
     # policy = [
@@ -46,6 +51,20 @@ locals {
     # ]
     secrets = {
       passwords = {}
+    }
+  }
+
+  secretsmanager_secrets_oasys_db = {
+    secrets = {
+      passwords = {}
+      apex-passwords = {}
+    }
+  }
+
+  secretsmanager_secrets_bip_db = {
+    secrets = {
+      passwords = {}
+      bip-passwords = {}
     }
   }
 

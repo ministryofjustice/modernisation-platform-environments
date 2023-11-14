@@ -155,3 +155,8 @@ resource "aws_lb_listener" "wardship_lb" {
     target_group_arn = aws_lb_target_group.wardship_target_group.arn
   }
 }
+
+resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
+  resource_arn = aws_lb.wardship_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.wardship_web_acl.arn
+}

@@ -34,8 +34,13 @@ resource "aws_security_group" "load_balancer_security_group" {
     from_port   = 443
     to_port     = 443
     cidr_blocks = [
-      "81.134.202.29/32",  # MoJ Digital VPN
-      "35.176.93.186/32",  # Global Protect VPN
+      "81.134.202.29/32", # MoJ Digital VPN
+      "35.176.93.186/32", # Global Protect VPN
+      # 3 below were provided by infra eng. in mojo team - unsure if we need entire range in link below.
+      # https://github.com/ministryofjustice/modernisation-platform-environments/blob/2a14db540a5946fe6d870b848f50778c4e8248b6/terraform/modules/ip_addresses/moj.tf#L16
+      "51.149.250.206/32", # Global Protect AWS VPC Public 1
+      "51.149.250.164/32", # Global Protect AWS VPC Public 2
+      "51.149.250.30/32",  # Global Protect AWS VPC Public 3
       "10.184.0.0/16",     # Global Protect AWS VPC
       "217.33.148.210/32", # Digital studio
       "195.59.75.0/24",    # ARK internet (DOM1)

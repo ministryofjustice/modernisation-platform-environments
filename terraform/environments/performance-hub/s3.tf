@@ -61,24 +61,23 @@ resource "aws_s3_bucket_versioning" "upload_files" {
   }
 }
 
-resource "aws_s3_bucket_policy" "upload_files_policy" {
-  bucket = aws_s3_bucket.upload_files.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Id      = "upload_bucket_policy"
-    Statement = [
-      {
-        Effect    = "Allow"
-        Principal = { AWS = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"] }
-        Action    = "s3:*"
-        Resource = [
-          aws_s3_bucket.upload_files.arn,
-          "${aws_s3_bucket.upload_files.arn}/*",
-        ]
-      },
-    ]
-  })
-}
+# resource "aws_s3_bucket_policy" "upload_files_policy" {
+#   bucket = aws_s3_bucket.upload_files.id
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Id      = "upload_bucket_policy"
+#     Statement = [
+#       {
+#         Effect    = "Allow"
+#         actions = ["s3:GetObject","s3:PutObject","s3:ListBucket"]
+#         Resource = [
+#           aws_s3_bucket.upload_files.arn,
+#           "${aws_s3_bucket.upload_files.arn}/*",
+#         ]
+#       },
+#     ]
+#   })
+# }
 
 resource "aws_iam_role" "s3_uploads_role" {
   name               = "${local.application_name}-s3-uploads-role"
@@ -242,7 +241,7 @@ data "aws_iam_policy_document" "s3-kms" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
   }
 }

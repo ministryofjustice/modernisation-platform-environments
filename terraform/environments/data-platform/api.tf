@@ -15,7 +15,6 @@ resource "aws_api_gateway_deployment" "deployment" {
     #       resources will show a difference after the initial implementation.
     #       It will stabilize to only change when resources change afterwards.
     redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.get_glue_metadata,
       aws_api_gateway_resource.docs,
       aws_api_gateway_resource.data_product,
       aws_api_gateway_resource.register_data_product,
@@ -27,7 +26,6 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.schema_for_data_product_table_name,
       aws_api_gateway_method.preview_data_from_data_product,
       aws_api_gateway_method.docs,
-      aws_api_gateway_method.get_glue_metadata,
       aws_api_gateway_method.register_data_product,
       aws_api_gateway_method.upload_data_for_data_product_table_name,
       aws_api_gateway_method.create_schema_for_data_product_table_name,
@@ -39,7 +37,6 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_integration.upload_data_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.proxy_to_lambda,
       aws_api_gateway_integration.docs_lambda_root,
-      aws_api_gateway_integration.get_glue_metadata,
       aws_api_gateway_integration.register_data_product_to_lambda,
       aws_api_gateway_integration.create_schema_for_data_product_table_name_to_lambda,
       aws_api_gateway_integration.get_schema_for_data_product_table_name_to_lambda,
@@ -424,42 +421,6 @@ resource "aws_api_gateway_integration" "docs_lambda_root" {
 
   lifecycle {
     ignore_changes = all
-  }
-}
-
-# get_glue_metadata endpoint
-
-resource "aws_api_gateway_resource" "get_glue_metadata" {
-  parent_id   = aws_api_gateway_rest_api.data_platform.root_resource_id
-  path_part   = "get_glue_metadata"
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
-}
-
-resource "aws_api_gateway_method" "get_glue_metadata" {
-  authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.authorizer.id
-  http_method   = "GET"
-  resource_id   = aws_api_gateway_resource.get_glue_metadata.id
-  rest_api_id   = aws_api_gateway_rest_api.data_platform.id
-
-  request_parameters = {
-    "method.request.header.Authorization" = true,
-    "method.request.querystring.database" = true,
-    "method.request.querystring.table"    = true,
-  }
-}
-
-resource "aws_api_gateway_integration" "get_glue_metadata" {
-  http_method             = aws_api_gateway_method.get_glue_metadata.http_method
-  resource_id             = aws_api_gateway_resource.get_glue_metadata.id
-  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = module.data_product_get_glue_metadata_lambda.lambda_function_invoke_arn
-
-  request_parameters = {
-    "integration.request.querystring.database" = "method.request.querystring.database",
-    "integration.request.querystring.table"    = "method.request.querystring.table"
   }
 }
 

@@ -28,51 +28,28 @@ locals {
       "/oracle/database/T2ONRBDS" = local.database_ssm_parameters
     }
     baseline_secretsmanager_secrets = {
-      "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_db
-      "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
-      "/oracle/database/T1AZBIPI" = local.secretsmanager_secrets_db
-      "/oracle/database/T1MISTRN" = local.secretsmanager_secrets_db
-      "/oracle/database/T1ONRSYS" = local.secretsmanager_secrets_db
-      "/oracle/database/T1ONRAUD" = local.secretsmanager_secrets_db
-      "/oracle/database/T1ONRBDS" = local.secretsmanager_secrets_db
+      # NEW
+      "/oracle/database/T1OASYS"                = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/T1OASREP"               = local.secretsmanager_secrets_db
+      "/oracle/database/T1AZBIPI"               = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T1BIPINF"               = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T1MISTRN"               = local.secretsmanager_secrets_db
+      "/oracle/database/T1ONRSYS"               = local.secretsmanager_secrets_db
+      "/oracle/database/T1ONRAUD"               = local.secretsmanager_secrets_db
+      "/oracle/database/T1ONRBDS"               = local.secretsmanager_secrets_db
 
-      "/oracle/database/T2OASYS"  = local.secretsmanager_secrets_db
-      "/oracle/database/T2OASREP" = local.secretsmanager_secrets_db
-      "/oracle/database/T2AZBIPI" = local.secretsmanager_secrets_db
-      "/oracle/database/T2MISTRN" = local.secretsmanager_secrets_db
-      "/oracle/database/T2ONRSYS" = local.secretsmanager_secrets_db
-      "/oracle/database/T2ONRAUD" = local.secretsmanager_secrets_db
-      "/oracle/database/T2ONRBDS" = local.secretsmanager_secrets_db
+      "/oracle/database/T2OASYS"                = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/T2OASREP"               = local.secretsmanager_secrets_db
+      "/oracle/database/T2AZBIPI"               = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T2BIPINF"               = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T2MISTRN"               = local.secretsmanager_secrets_db
+      "/oracle/database/T2ONRSYS"               = local.secretsmanager_secrets_db
+      "/oracle/database/T2ONRAUD"               = local.secretsmanager_secrets_db
+      "/oracle/database/T2ONRBDS"               = local.secretsmanager_secrets_db
 
-      "/database/t1/T1OASYS" = {
-        secrets = {
-          apex_listenerpassword    = {}
-          apex_public_userpassword = {}
-          apex_rest_publicpassword = {}
-        }
-      }
-      "/database/t2/T2OASYS" = {
-        secrets = {
-          apex_listenerpassword    = {}
-          apex_public_userpassword = {}
-          apex_rest_publicpassword = {}
-        }
-      }
-      "/database/t2-oasys-db-a/T2BIPINF" = {
-        secrets = {
-          systempassword = {}
-        }
-      }
-      "/weblogic/test-oasys-bip-b" = {
-        secrets = {
-          admin_password     = {}
-          admin_username     = {}
-          biplatformpassword = {}
-          db_username        = {}
-          mdspassword        = {}
-          syspassword        = {}
-        }
-      }
+      "/oracle/bip/t1"                          = local.secretsmanager_secrets_bip
+      "/oracle/bip/t2"                          = local.secretsmanager_secrets_bip
+
       "" = {
         postfix = ""
         secrets = {
@@ -81,6 +58,57 @@ locals {
           environment_management_arn        = {}
           modernisation_platform_account_id = {}
         }
+      }
+
+      # OLD AND WILL BE REPLACED
+
+      "/database/t1/T1OASYS" = {
+        secrets = {
+          apex_listenerpassword    = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+          apex_public_userpassword = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+          apex_rest_publicpassword = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+        }
+      }
+      "/database/t2/T2OASYS" = {
+        secrets = {
+          apex_listenerpassword    = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+          apex_public_userpassword = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+          apex_rest_publicpassword = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
+        }
+      }
+      "/database/t2-oasys-db-a/T2BIPINF" = {
+        secrets = {
+          systempassword = {} # -> /oracle/database/T2BIPINF/bip-passwords { sys: ___ }
+        }
+      }
+      "/weblogic/test-oasys-bip-b" = {
+        secrets = {
+          admin_password     = {} # -> /oracle/bip/t2/passwords { weblogic: admin_pass }
+          admin_username     = {} # just have in ansible defaults , username is always weblogic
+          biplatformpassword = {} # ->  /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
+          db_username        = {} # put in ansible defaults
+          mdspassword        = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
+          syspassword        = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
+        }
+      }
+    }
+
+    baseline_iam_policies = {
+      Ec2T2BipPolicy = {
+        description = "Permissions required for T2 Bip EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/bip/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/bip-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/bip-*",
+            ]
+          }
+        ]
       }
     }
 
@@ -92,20 +120,21 @@ locals {
         tags = merge(local.database_a.tags, {
           description                             = "t2 ${local.application_name} database"
           "${local.application_name}-environment" = "t2"
+          bip-db-name                             = "T2BIPINF"
           instance-scheduling                     = "skip-scheduling"
         })
       })
-      "t2-${local.application_name}-db-b" = merge(local.database_b, {
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.database_b.tags, {
-          description                             = "t2 ${local.application_name} database"
-          "${local.application_name}-environment" = "t2"
-        })
-      })
+      # "t2-${local.application_name}-db-b" = merge(local.database_b, {
+      #   user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "main"
+      #     })
+      #   })
+      #   tags = merge(local.database_b.tags, {
+      #     description                             = "t2 ${local.application_name} database"
+      #     "${local.application_name}-environment" = "t2"
+      #   })
+      # })
 
       ##
       ## T1
@@ -114,6 +143,7 @@ locals {
         tags = merge(local.database_a.tags, {
           description                             = "t1 ${local.application_name} database"
           "${local.application_name}-environment" = "t1"
+          bip-db-name                             = "T1BIPINF"
         })
       })
     }
@@ -184,11 +214,22 @@ locals {
       # })
 
       "test-${local.application_name}-bip-b" = merge(local.bip_b, {
+        autoscaling_group = merge(local.bip_b.autoscaling_group, {
+          desired_capacity = 1
+        })
         autoscaling_schedules = {}
+        config = merge(local.bip_b.config, {
+          instance_profile_policies = concat(local.bip_b.config.instance_profile_policies, [
+            "Ec2T2BipPolicy",
+          ])
+        })
+
         tags = merge(local.bip_b.tags, {
-          oracle-db-hostname-a = "t2-oasys-db-a"
-          oracle-db-hostname-b = "t2-oasys-db-b"
-          oracle-db-name       = "T2BIPINF"
+          oasys-environment = "t2"
+          bip-db-name       = "T2BIPINF"
+          bip-db-hostname   = "t2-oasys-db-a"
+          oasys-db-name     = "T2OASYS"
+          oasys-db-hostname = "t2-oasys-db-a"
         })
       })
 
@@ -419,7 +460,6 @@ locals {
         }
       }
     }
-
 
     # The following zones can be found on azure:
     # az.justice.gov.uk

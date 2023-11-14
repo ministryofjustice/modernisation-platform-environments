@@ -154,3 +154,8 @@ resource "aws_lb_listener" "dacp_lb" {
     target_group_arn = aws_lb_target_group.dacp_target_group.arn
   }
 }
+
+resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
+  resource_arn = aws_lb.dacp_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.dacp_web_acl.arn
+}

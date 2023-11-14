@@ -28,7 +28,6 @@ locals {
 
   docs_version                          = lookup(var.docs_versions, local.environment)
   authorizer_version                    = lookup(var.authorizer_versions, local.environment)
-  get_glue_metadata_version             = lookup(var.get_glue_metadata_versions, local.environment)
   presigned_url_version                 = lookup(var.presigned_url_versions, local.environment)
   athena_load_version                   = lookup(var.athena_load_versions, local.environment)
   create_metadata_version               = lookup(var.create_metadata_versions, local.environment)

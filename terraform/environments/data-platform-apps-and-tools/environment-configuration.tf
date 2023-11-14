@@ -11,6 +11,14 @@ locals {
       eks_cluster_name               = "apps-tools-development"
       route53_zone                   = "apps-tools.development.data-platform.service.justice.gov.uk"
       ses_domain_identity            = "apps-tools.development.data-platform.service.justice.gov.uk"
+      auth0_log_streams = {
+        "dev-analytics-moj" = {
+          event_source_name = "aws.partner/auth0.com/dev-analytics-moj-20c1595d-28e2-4822-9e1c-cb29ac38c7d2/auth0.logs"
+        }
+        "ministryofjustice-data-platform-development" = {
+          event_source_name = "aws.partner/auth0.com/ministryofjustice-data-platform-development-a628362c-f79b-46e9-9604-7c9861565a1b/auth0.logs"
+        }
+      }
     }
     production = {
       eks_cluster_arn                = "arn:aws:eks:eu-west-1:312423030077:cluster/production-dBSvju9Y"
@@ -19,6 +27,14 @@ locals {
       eks_cluster_name               = "production-dBSvju9Y"
       route53_zone                   = "apps-tools.data-platform.service.justice.gov.uk"
       ses_domain_identity            = "apps-tools.data-platform.service.justice.gov.uk"
+      auth0_log_streams = {
+        "alpha-analytics-moj" = {
+          event_source_name = "aws.partner/auth0.com/alpha-analytics-moj-5246b1ce-4ea2-45ab-9c2d-1414d6ff608a/auth0.logs"
+        }
+        "ministryofjustice-data-platform" = {
+          event_source_name = "aws.partner/auth0.com/ministryofjustice-data-platform-e95e4fb0-f6f8-455f-9b62-61608adafd69/auth0.logs"
+        }
+      }
     }
   }
 }
