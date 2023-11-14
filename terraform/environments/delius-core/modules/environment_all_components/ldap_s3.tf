@@ -55,14 +55,12 @@ module "s3_bucket_migration" {
       effect = "Allow"
       actions = [
         "s3:GetObject",
-        "s3:ListBucket",
-        "s3:HeadBucket",
-        "s3:HeadObject"
+        "s3:ListBucket"
       ]
       principals = {
         type = "AWS"
         identifiers = [
-          module.ldap_ecs_policies.task_exec_role.arn
+          module.ldap_ecs_policies.task_role.arn
         ]
       }
     }
