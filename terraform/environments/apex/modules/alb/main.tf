@@ -7,6 +7,7 @@ locals {
       from_port       = var.security_group_ingress_from_port
       to_port         = var.security_group_ingress_to_port
       protocol        = var.security_group_ingress_protocol
+      # Uncomment below when CloudFront is setup
       # prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
     }
   }
@@ -556,22 +557,24 @@ resource "aws_lb_listener" "alb_listener" {
 
 }
 
-resource "aws_lb_listener_rule" "alb_listener_rule" {
-  listener_arn = aws_lb_listener.alb_listener.arn
-  priority     = 1
+#Uncomment the listener rule when CloudFront Secret is Setup
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.alb_target_group.arn
-  }
+# resource "aws_lb_listener_rule" "alb_listener_rule" {
+#   listener_arn = aws_lb_listener.alb_listener.arn
+#   priority     = 1
 
-  condition {
-    http_header {
-      http_header_name = local.custom_header
-      values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
-    }
-  }
-}
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.alb_target_group.arn
+#   }
+
+#   condition {
+#     http_header {
+#       http_header_name = local.custom_header
+#       values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
+#     }
+#   }
+# }
 
 resource "aws_lb_target_group" "alb_target_group" {
   name                 = "${var.application_name}-alb-tg"
