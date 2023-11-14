@@ -53,8 +53,8 @@ locals {
         throughput = 125
       }
     }
-    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
+    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ansible
   }
 }

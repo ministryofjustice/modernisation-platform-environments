@@ -113,9 +113,8 @@ locals {
       }
 
       pd-csr-db-b = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
+        config = merge(local.database_ec2, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
-          ami_owner         = "self"
           availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
@@ -151,7 +150,7 @@ locals {
         }
 
         tags = {
-          description = "PD CSR Oracle DR DB server"
+          description = "PD CSR Oracle secondary DB server"
           ami         = "base_ol_8_5"
           os-type     = "Linux"
           component   = "data"
