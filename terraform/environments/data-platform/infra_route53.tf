@@ -188,6 +188,17 @@ resource "aws_route53_record" "delegate_apps_tools_development_data_platform_ser
   ]
 }
 
+# Delegating to data-platform-apps-and-tools-development
+resource "aws_route53_record" "delegate_assets_development_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  zone_id = aws_route53_zone.development_data_platform_service_justice_gov_uk[0].zone_id
+  name    = "assets.development.data-platform.service.justice.gov.uk"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["ingress.apps-tools.development.data-platform.service.justice.gov.uk."]
+}
+
 ##################################################
 # PreProduction
 ##################################################
