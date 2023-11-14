@@ -188,8 +188,6 @@ locals {
         }
       }
 
-
-
       pd-csr-w-1-a = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "pd-csr-w-1-a"
