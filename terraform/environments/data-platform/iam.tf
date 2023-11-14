@@ -617,8 +617,8 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_pr
     sid    = "s3ListDeleteRawFailCurated"
     effect = "Allow"
     actions = [
-      "s3:DeleteObjects",
-      "s3:ListObjectsv2",
+      "s3:ListBucket",
+      "s3:DeleteObject"
     ]
     resources = [
       "${module.data_s3_bucket.bucket.arn}/raw/*",
@@ -634,9 +634,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_pr
     sid    = "s3ListDeleteSchema"
     effect = "Allow"
     actions = [
-      "s3:DeleteObject",
-      "s3:ListObjectsv2",
-      "s3:CopyObject"
+      "s3:DeleteObject"
     ]
     resources = [
       "${module.metadata_s3_bucket.bucket.arn}/*",
@@ -677,8 +675,8 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_data_product_lamb
     sid    = "s3ListDeleteRawFailCurated"
     effect = "Allow"
     actions = [
-      "s3:DeleteObjects",
-      "s3:ListObjectsv2",
+      "s3:ListBucket",
+      "s3:DeleteObject"
     ]
     resources = [
       "${module.data_s3_bucket.bucket.arn}/raw/*",
@@ -694,8 +692,8 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_data_product_lamb
     sid    = "s3ListDeleteMetadata"
     effect = "Allow"
     actions = [
-      "s3:DeleteObjects",
-      "s3:ListObjectsv2",
+      "s3:ListBucket",
+      "s3:DeleteObject"
     ]
     resources = [
       "${module.metadata_s3_bucket.bucket.arn}/*",
