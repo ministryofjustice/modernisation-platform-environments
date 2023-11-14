@@ -44,7 +44,7 @@ module "alb" {
   environment                      = local.environment
   region                           = "eu-west-2"
   enable_deletion_protection       = false
-  idle_timeout                     = 60
+  idle_timeout                     = 65
   force_destroy_bucket             = true
   security_group_ingress_from_port = 443
   security_group_ingress_to_port   = 443
@@ -70,7 +70,7 @@ module "alb" {
   vpc_id                            = data.aws_vpc.shared.id
 
   healthcheck_interval            = 15
-  healthcheck_path                = "/mlra/"
+  healthcheck_path                = "/i/alb.txt"
   healthcheck_protocol            = "HTTP"
   healthcheck_timeout             = 5
   healthcheck_healthy_threshold   = 2
