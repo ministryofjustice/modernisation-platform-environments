@@ -644,7 +644,7 @@ locals {
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "t2"
-          description         = "T2 NOMIS database"
+          description         = "Will's test server"
           oracle-sids         = "T2CNOM T2NDH T2TRDAT"
           instance-scheduling = "skip-scheduling"
         })
