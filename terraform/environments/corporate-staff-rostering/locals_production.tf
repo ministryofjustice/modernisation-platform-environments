@@ -103,7 +103,7 @@ locals {
         }
 
         tags = {
-          description = "PD CSR DB server"
+          description = "PD CSR Oracle primary DB server"
           ami         = "base_ol_8_5"
           os-type     = "Linux"
           component   = "data"
@@ -127,18 +127,11 @@ locals {
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
         })
 
-        ebs_volumes = {
-          "/dev/sdb" = { type = "gp3", label = "app", size = 100 } # /u01
-          "/dev/sdc" = { type = "gp3", label = "app", size = 100 } # /u02
-          "/dev/sde" = { type = "gp3", label = "data" }            # DATA01
-          "/dev/sdf" = { type = "gp3", label = "data" }            # DATA02
-          "/dev/sdg" = { type = "gp3", label = "data" }            # DATA03
-          "/dev/sdh" = { type = "gp3", label = "data" }            # DATA04
-          "/dev/sdi" = { type = "gp3", label = "data" }            # DATA05
-          "/dev/sdj" = { type = "gp3", label = "flash" }           # FLASH01
-          "/dev/sdk" = { type = "gp3", label = "flash" }           # FLASH02
-          "/dev/sds" = { type = "gp3", label = "swap" }
-        }
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sda1" = { label = "root", size = 30 }
+          "/dev/sdb"  = { label = "app", size = 100 } # /u01
+          "/dev/sdc"  = { label = "app", size = 100 } # /u02
+        })
 
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
           data = {
@@ -158,7 +151,7 @@ locals {
         }
 
         tags = {
-          description = "PD CSR DB server"
+          description = "PD CSR Oracle DR DB server"
           ami         = "base_ol_8_5"
           os-type     = "Linux"
           component   = "data"
