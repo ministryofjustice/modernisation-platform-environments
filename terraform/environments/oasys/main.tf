@@ -72,7 +72,7 @@ module "baseline" {
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
   ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})
   environment            = module.environment
-  iam_policies           = module.baseline_presets.iam_policies
+  iam_policies           = merge(module.baseline_presets.iam_policies, lookup(local.environment_config, "baseline_iam_policies", {}))
   iam_roles              = module.baseline_presets.iam_roles
   key_pairs              = module.baseline_presets.key_pairs
   kms_grants             = module.baseline_presets.kms_grants

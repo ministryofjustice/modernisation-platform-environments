@@ -38,6 +38,11 @@ locals {
     resources = ["*"]
   }
 
+  secretsmanager_secrets_bip = {
+    secrets = {
+      passwords = {}
+    }
+  }
 
   secretsmanager_secrets_db = {
     # policy = [
