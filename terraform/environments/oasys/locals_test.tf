@@ -213,7 +213,7 @@ locals {
       #   })
       # })
 
-      "test-${local.application_name}-bip-b" = merge(local.bip_b, {
+      "t2-${local.application_name}-bip-b" = merge(local.bip_b, {
         autoscaling_group = merge(local.bip_b.autoscaling_group, {
           desired_capacity = 1
         })
