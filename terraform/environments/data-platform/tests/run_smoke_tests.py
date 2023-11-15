@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import time
+from datetime import datetime, timedelta, timezone
 
 import requests
 
@@ -126,11 +127,35 @@ class APIClient:
         return requests.post(response_json["URL"]["url"], files=multipart_form_data)
 
 
+def parse_first_line_of_data(output):
+    lines = output.splitlines()
+    fields = [i.strip() for i in lines[1].split("|")]
+    row = fields[1:-1]
+    if len(row) != 5:
+        raise ValueError(row)
+
+    col1, col2, col3, col4, extraction_timestamp = fields[1:-1]
+
+    age = datetime.fromisoformat(extraction_timestamp) - datetime.now(timezone.utc)
+    return col1, col2, col3, col4, age
+
+
 def run_test(client):
     upload_response = client.upload_file()
     print(upload_response.status_code, upload_response.text)
     print(f"Waiting for {data_product_name}.{table_name} to create in athena")
+    
     time.sleep(10)
+
+    preview_repsonse = client.preview_data()
+    if preview_repsonse.status_code != 200:
+        print(f"Error previewing data: {preview_repsonse.status_code} {preview_repsonse.text}")
+
+    print(preview_repsonse.text)
+    col1, col2, col3, col4, age = parse_first_line_of_data(preview_repsonse.text)
+
+    assert (col1, col2, col3, col4) == ("0.1915194503788923", "0.3648859839013723", "0.0598092227798519", "0.2852509600245098")    
+    assert age < timedelta(seconds=15)
 
 
 client = APIClient(base_url, auth_token)
