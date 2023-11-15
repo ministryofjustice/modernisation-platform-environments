@@ -36,7 +36,8 @@ class APIClient:
     def __init__(self, base_url, auth_token):
         self.table_url = base_url + f"/data-product/{data_product_name}/table/{table_name}"
         self.data_product_url = base_url + f"/data-product/{data_product_name}"
-        self.register_url = base_url + f"/data-product/register"
+        self.register_url = base_url + "/data-product/register"
+        self.preview_data_url = self.table_url + "/preview"
         self.presigned_url = base_url + f"/data-product/{data_product_name}/table/{table_name}/upload"
         self.headers = {"authorizationToken": auth_token}
         
@@ -67,6 +68,13 @@ class APIClient:
         print("Deleting data product...")
         return requests.delete(
             url=self.data_product_url,
+            headers=self.headers,
+        )
+
+    def preview_data(self):
+        print("Fetching data")
+        return requests.get(
+            url=self.preview_data_url,
             headers=self.headers,
         )
 
