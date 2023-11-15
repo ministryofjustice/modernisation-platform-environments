@@ -121,18 +121,6 @@ class APIClient:
 
 
 def run_test(client):
-    # register_response = client.register()
-    # if register_response.status_code != 200:
-    #     print(f"Unable to create data product. Code: {register_response.status_code}")
-    #     print(f"Error creating data product. Response: {register_response.text}")
-    #     return
-
-    # schema_response = client.create_schema()
-    # if schema_response.status_code != 200:
-    #     print(f"Unable to create schema. Code: {schema_response.status_code}")
-    #     print(f"Error creating schema. Response: {schema_response.text}")
-    #     return
-
     upload_response = client.upload_file()
     print(upload_response.status_code, upload_response.text)
     print(f"Waiting for {data_product_name}.{table_name} to create in athena")
@@ -146,12 +134,5 @@ def run_test(client):
         raise e
 
 
-try:
-    client = APIClient(base_url, auth_token)
-    run_test(client)
-finally:
-    # response = client.delete_data_product()
-    # if response.status_code != 200:
-    #     print(f"Unable to delete data product code: {response.status_code}")
-    #     print(f"Error deleting data product. Response: {response.text}")
-    pass
+client = APIClient(base_url, auth_token)
+run_test(client)
