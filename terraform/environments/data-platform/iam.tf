@@ -626,6 +626,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_pr
       "s3:DeleteObject"
     ]
     resources = [
+      "${module.data_s3_bucket.bucket.arn}",
       "${module.data_s3_bucket.bucket.arn}/raw/*",
       "${module.data_s3_bucket.bucket.arn}/fail/*",
       "${module.data_s3_bucket.bucket.arn}/curated/*",
@@ -684,6 +685,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_data_product_lamb
       "s3:DeleteObject"
     ]
     resources = [
+      "${module.data_s3_bucket.bucket.arn}",
       "${module.data_s3_bucket.bucket.arn}/raw/*",
       "${module.data_s3_bucket.bucket.arn}/fail/*",
       "${module.data_s3_bucket.bucket.arn}/curated/*",
