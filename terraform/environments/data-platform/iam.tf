@@ -157,16 +157,21 @@ data "aws_iam_policy_document" "landing_to_raw_lambda_policy" {
       "${module.data_landing_s3_bucket.bucket.arn}",
     ]
   }
+
   statement {
-    sid    = "putRawData"
+    sid    = "copyToRawFail"
     effect = "Allow"
     actions = [
-      "s3:PutObject*",
+      "s3:PutObject",
+      "s3:PutObjectTagging",
       "s3:ListBucket",
+
     ]
     resources = [
       "${module.data_s3_bucket.bucket.arn}/raw/*",
       "${module.data_s3_bucket.bucket.arn}/raw",
+      "${module.data_s3_bucket.bucket.arn}/fail/*",
+      "${module.data_s3_bucket.bucket.arn}/fail",
     ]
   }
 }
