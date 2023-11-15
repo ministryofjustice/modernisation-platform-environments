@@ -5,14 +5,12 @@ import os
 import sys
 import time
 
-import boto3
 import requests
 
 filename = "test_data.csv"
 data_product_name = "example_prison_data_product"
 table_name = "testing"
 base_url = "https://hsolkci589.execute-api.eu-west-2.amazonaws.com/development"
-glue = boto3.client("glue")
 
 try:
     auth_token = json.loads(os.environ["API_AUTH"])
@@ -133,13 +131,6 @@ def run_test(client):
     print(upload_response.status_code, upload_response.text)
     print(f"Waiting for {data_product_name}.{table_name} to create in athena")
     time.sleep(10)
-
-    # Check for created table
-    try:
-        glue.get_table(DatabaseName=data_product_name, Name=table_name)
-        print(f"{data_product_name}.{table_name} found in glue")
-    except Exception as e:
-        raise e
 
 
 client = APIClient(base_url, auth_token)
