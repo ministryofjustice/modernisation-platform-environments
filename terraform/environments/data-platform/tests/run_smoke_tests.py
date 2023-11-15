@@ -136,7 +136,9 @@ def parse_first_line_of_data(output):
 
     col1, col2, col3, col4, extraction_timestamp = fields[1:-1]
 
-    age = datetime.fromisoformat(extraction_timestamp) - datetime.now(timezone.utc)
+    parsed_datetime = datetime.strptime(extraction_timestamp, r'%Y%m%dT%H%M%SZ')
+    age = parsed_datetime - datetime.now()
+
     return col1, col2, col3, col4, age
 
 
