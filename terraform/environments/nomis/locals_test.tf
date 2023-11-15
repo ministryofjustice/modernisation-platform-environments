@@ -238,7 +238,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -266,7 +266,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -317,7 +317,7 @@ locals {
         autoscaling_group = merge(local.xtag_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
           instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
@@ -343,7 +343,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -422,7 +422,7 @@ locals {
         autoscaling_group = merge(local.xtag_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
           instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
@@ -448,7 +448,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -537,7 +537,7 @@ locals {
 
     baseline_ec2_instances = {
       t1-nomis-db-1-a = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
           availability_zone = "${local.region}a"
@@ -562,7 +562,7 @@ locals {
       })
 
       t1-nomis-db-2-a = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
           availability_zone = "${local.region}a"
@@ -588,7 +588,7 @@ locals {
       })
 
       t2-nomis-db-1-a = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
           availability_zone = "${local.region}a"
@@ -612,46 +612,8 @@ locals {
         })
       })
 
-      t2-nomis-db-2-a = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
-        config = merge(local.database_ec2.config, {
-          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
-          availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
-          ])
-        })
-        user_data_cloud_init = {
-          args = {
-            lifecycle_hook_name  = "ready-hook"
-            branch               = "oracle-11g-secrets" #### changed
-            ansible_repo         = "modernisation-platform-configuration-management"
-            ansible_repo_basedir = "ansible"
-            ansible_args         = "--tags ec2provision"
-          }
-          scripts = [
-            "ansible-ec2provision.sh.tftpl",
-            "post-ec2provision.sh.tftpl"
-          ]
-        }
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 500 }
-          flash = { total_size = 50 }
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment   = "t2"
-          description         = "Wills test server"
-          oracle-sids         = "T2CNOM T2NDH T2TRDAT"
-          instance-scheduling = "skip-scheduling"
-        })
-      })
-
       t3-nomis-db-1 = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
