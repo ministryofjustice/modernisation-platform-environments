@@ -144,7 +144,7 @@ locals {
             total_size = 100
           }
         })
-        
+
         ssm_parameters = {
           asm-passwords = {}
         }
@@ -379,6 +379,34 @@ locals {
           csr-region        = "Region 3 and 4"
           os-type           = "Windows"
           ami               = "pd-csr-w-3-a"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pd-csr-w-4-b = {
+        config = merge(local._defaults_web_ec2.config, {
+          ami_name          = "pd-csr-w-4-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local._defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 112 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        tags = {
+          description       = "Migrated server PDCWW00004"
+          app-config-status = "pending"
+          csr-region        = "Region 3 and 4"
+          os-type           = "Windows"
+          ami               = "pd-csr-w-4-b"
           component         = "web"
         }
         route53_records = {
