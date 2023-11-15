@@ -154,7 +154,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -232,34 +232,6 @@ locals {
     }
 
     baseline_ec2_instances = {
-      preprod-nomis-db-2 = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
-        config = merge(local.database_ec2.config, {
-          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
-          availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          # reduce sdc to 1000 when we move into preprod subscription
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 5120 }
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 4000 }
-          flash = { total_size = 1000 }
-        })
-        instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment = "preprod"
-          description       = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
-          oracle-sids       = "PPCNMAUD"
-        })
-      })
-
       prod-nomis-db-1-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = {}
         config = merge(local.database_ec2.config, {
@@ -288,10 +260,10 @@ locals {
       })
 
       prod-nomis-db-2 = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          local.fixngo_connection_cloudwatch_metric_alarms
-        )
+        ## cloudwatch_metric_alarms = merge(
+        ##   local.database_ec2_cloudwatch_metric_alarms,
+        ##   local.fixngo_connection_cloudwatch_metric_alarms
+        ## )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
@@ -310,10 +282,10 @@ locals {
           instance_type = "r6i.2xlarge"
         })
         tags = merge(local.database_ec2.tags, {
-          nomis-environment         = "prod"
-          description               = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
-          oracle-sids               = "CNMAUD"
-          fixngo-connection-targets = "10.40.0.136 4903 10.40.129.79 22" # fixngo connection alarm
+          nomis-environment  = "prod"
+          description        = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
+          oracle-sids        = "CNMAUD"
+          connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
         })
       })
 
@@ -345,10 +317,10 @@ locals {
       })
 
       prod-nomis-db-3 = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          local.database_ec2_cloudwatch_metric_alarms_high_priority
-        )
+        ## cloudwatch_metric_alarms = merge(
+        ##   local.database_ec2_cloudwatch_metric_alarms,
+        ##   local.database_ec2_cloudwatch_metric_alarms_high_priority
+        ## )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
