@@ -49,8 +49,8 @@ variable "account_config" {
 
 variable "environment_config" {
   type = object({
-    migration_environment_private_cidr = optional(string)
-    migration_environment_db_cidr      = optional(string)
+    migration_environment_private_cidr = optional(list(string))
+    migration_environment_db_cidr      = optional(list(string))
     legacy_engineering_vpc_cidr        = string
     ec2_user_ssh_key                   = string
   })

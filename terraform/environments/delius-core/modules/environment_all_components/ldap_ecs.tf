@@ -91,7 +91,7 @@ resource "aws_security_group_rule" "allow_all_egress" {
 }
 
 resource "aws_security_group_rule" "ldap_nlb" {
-  for_each          = ["tcp", "udp"]
+  for_each          = toset(["tcp", "udp"])
   description       = "Allow inbound traffic from VPC"
   type              = "ingress"
   from_port         = local.ldap_port
@@ -102,7 +102,7 @@ resource "aws_security_group_rule" "ldap_nlb" {
 }
 
 resource "aws_security_group_rule" "allow_ldap_from_legacy_env" {
-  for_each          = ["tcp", "udp"]
+  for_each          = toset(["tcp", "udp"])
   description       = "Allow inbound LDAP traffic from corresponding legacy VPC"
   type              = "ingress"
   from_port         = local.ldap_port
