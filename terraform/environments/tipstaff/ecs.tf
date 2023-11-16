@@ -278,7 +278,7 @@ resource "aws_appautoscaling_policy" "ecs_scale_down_policy" {
 
     step_adjustment {
       metric_interval_lower_bound = 0
-      metric_interval_upper_bound = 2
+      metric_interval_upper_bound = 0
       scaling_adjustment          = -2
     }
   }
@@ -298,7 +298,7 @@ resource "aws_appautoscaling_policy" "ecs_scale_up_policy" {
 
     step_adjustment {
       metric_interval_lower_bound = 0
-      metric_interval_upper_bound = 2
+      metric_interval_upper_bound = 0
       scaling_adjustment          = 2
     }
   }
@@ -309,7 +309,7 @@ resource "aws_appautoscaling_scheduled_action" "scale_down_action" {
   scalable_dimension     = aws_appautoscaling_target.ecs_target.scalable_dimension
   service_namespace      = aws_appautoscaling_target.ecs_target.service_namespace
   resource_id            = aws_appautoscaling_target.ecs_target.resource_id
-  schedule               = "at(21:00)"
+  schedule               = "cron(0 21 ? * MON-FRI *)" # Runs every weekday at 9pm
   scalable_target_action {
     min_capacity = 0
   }
@@ -320,7 +320,7 @@ resource "aws_appautoscaling_scheduled_action" "scale_up_action" {
   scalable_dimension     = aws_appautoscaling_target.ecs_target.scalable_dimension
   service_namespace      = aws_appautoscaling_target.ecs_target.service_namespace
   resource_id            = aws_appautoscaling_target.ecs_target.resource_id
-  schedule               = "at(6:00)"
+  schedule               = "cron(0 6 ? * MON-FRI *)" # Runs every weekday at 6am
   scalable_target_action {
     min_capacity = 2
   }
