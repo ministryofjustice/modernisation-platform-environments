@@ -573,6 +573,7 @@ variable "lbs" {
         matcher             = optional(string)
         path                = optional(string)
         port                = optional(number)
+        protocol            = optional(string)
         timeout             = optional(number)
         unhealthy_threshold = optional(number)
       }))
