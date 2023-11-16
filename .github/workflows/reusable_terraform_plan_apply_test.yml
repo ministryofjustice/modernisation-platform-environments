@@ -225,9 +225,9 @@ jobs:
             const approved = reviews.some(review => review.state === 'APPROVED' && teamMemberLogins.includes(review.user.login));
 
             if (approved) {
-              core.notice('Pull request approved by a member of @woffenden/cloud-platform');
+              core.notice('Pull request approved by a member of @ministryofjustice/modernisation-platform');
             } else {
-              core.setFailed('Terraform plan evalaution detected changes to resources that require approval from a member of @woffenden/cloud-platform');
+              core.setFailed('Terraform plan evalaution detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform');
             }
 
       - name: Comment if PR Requires Approval
@@ -244,9 +244,8 @@ jobs:
               owner: owner,
               repo: repo,
               issue_number: context.payload.pull_request.number,
-              body: `@${context.actor} Terraform plan evalaution detected changes to resources that require approval from a member of @woffenden/cloud-platform`
+              body: `@${context.actor} Terraform plan evalaution detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform`
             });
-
 
   terratest:
     name: "terratest"
