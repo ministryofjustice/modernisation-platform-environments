@@ -152,7 +152,7 @@ jobs:
           (( exitcode == 1 )) && exit 1 || exit 0
 
       - name: Evaluate Terraform Plan
-        id: evaluate_terrafom_plan
+        id: evaluate_terraform_plan
         shell: bash
         run: |
           bash -x ${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh tfplan.json
@@ -199,6 +199,54 @@ jobs:
             -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
             -d '{"body":'"${escaped_message}"'}'
+
+      - name: Check for Approval
+        id: check_approval
+        if: ${{ steps.evaluate_terraform_plan.outputs.resources_found == 'true' }}
+        uses: actions/github-script@e69ef5462fd455e02edcaf4dd7708eda96b9eda0 # v7.0.0
+        with:
+          github-token: ${{ secrets.pipeline_github_token }}
+          script: |
+            const orgName = 'ministryofjustice';
+            const teamSlug = 'modernisation-platform';
+
+            const {data: reviews} = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            });
+
+            const {data: team_members} = await github.rest.teams.listMembersInOrg({
+              org: orgName,
+              team_slug: teamSlug
+            });
+
+            const teamMemberLogins = team_members.map(member => member.login);
+            const approved = reviews.some(review => review.state === 'APPROVED' && teamMemberLogins.includes(review.user.login));
+
+            if (approved) {
+              core.notice('Pull request approved by a member of @woffenden/cloud-platform');
+            } else {
+              core.setFailed('Terraform plan evalaution detected changes to resources that require approval from a member of @woffenden/cloud-platform');
+            }
+
+      - name: Comment if PR Requires Approval
+        id: comment_if_not_approved
+        if: failure() && steps.check_approval.outcome == 'failure'
+        uses: actions/github-script@e69ef5462fd455e02edcaf4dd7708eda96b9eda0 # v7.0.0
+        with:
+          github-token: ${{ secrets.pipeline_github_token }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            await github.rest.issues.createComment({
+              owner: owner,
+              repo: repo,
+              issue_number: context.payload.pull_request.number,
+              body: `@${context.actor} Terraform plan evalaution detected changes to resources that require approval from a member of @woffenden/cloud-platform`
+            });
+
 
   terratest:
     name: "terratest"
