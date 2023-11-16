@@ -256,24 +256,95 @@ resource "aws_cloudwatch_event_target" "logs" {
   arn        = aws_cloudwatch_log_group.deployment_logs.arn
 }
 
-# AWS EventBridge rule for ECS shutdown schedule
-resource "aws_cloudwatch_event_rule" "ecs_schedule" {
-  name                = "ecs-schedule"
-  description         = "ECS Schedule Rule"
-  schedule_expression = "cron(0 21 ? * MON-FRI *)" # Runs every weekday at 9pm
+resource "aws_appautoscaling_target" "ecs_target" {
+  max_capacity       = 2  # Maximum number of tasks
+  min_capacity       = 0  # Minimum number of tasks
+  resource_id        = "service/${aws_ecs_cluster.tipstaff_cluster.name}/${aws_ecs_service.tipstaff_ecs_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
 }
 
-# AWS EventBridge target for ECS shutdown schedule
-resource "aws_cloudwatch_event_target" "ecs_shutdown" {
-  target_id = "ecs_stop_function"
-  rule      = "${aws_cloudwatch_event_rule.ecs_schedule.name}"
-  arn       = "${aws_ecs_cluster.tipstaff_cluster.id}"
-  role_arn  = aws_iam_role.app_execution.arn
-  ecs_target {
-    task_count = 0
-    task_definition_arn = "${aws_ecs_task_definition.tipstaff_task_definition.arn}"
+resource "aws_appautoscaling_policy" "ecs_scale_down_policy" {
+  name               = "ecs-scale-down-policy"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Maximum"
+
+    step_adjustment {
+      metric_interval_lower_bound = 0
+      metric_interval_upper_bound = 2
+      scaling_adjustment          = -2
+    }
   }
 }
+
+resource "aws_appautoscaling_policy" "ecs_scale_up_policy" {
+  name               = "ecs-scale-up-policy"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Maximum"
+
+    step_adjustment {
+      metric_interval_lower_bound = 0
+      metric_interval_upper_bound = 2
+      scaling_adjustment          = 2
+    }
+  }
+}
+
+resource "aws_appautoscaling_scheduled_action" "scale_down_action" {
+  name                   = "scale-down-action"
+  scalable_dimension     = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace      = aws_appautoscaling_target.ecs_target.service_namespace
+  resource_id            = aws_appautoscaling_target.ecs_target.resource_id
+  schedule               = "at(21:00)"
+  scalable_target_action {
+    min_capacity = 0
+  }
+}
+
+resource "aws_appautoscaling_scheduled_action" "scale_up_action" {
+  name                   = "scale-up-action"
+  scalable_dimension     = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace      = aws_appautoscaling_target.ecs_target.service_namespace
+  resource_id            = aws_appautoscaling_target.ecs_target.resource_id
+  schedule               = "at(6:00)"
+  scalable_target_action {
+    min_capacity = 2
+  }
+}
+
+
+# # AWS EventBridge rule for ECS shutdown schedule
+# resource "aws_cloudwatch_event_rule" "ecs_schedule" {
+#   name                = "ecs-schedule"
+#   description         = "ECS Schedule Rule"
+#   schedule_expression = "cron(0 21 ? * MON-FRI *)" # Runs every weekday at 9pm
+# }
+
+# # AWS EventBridge target for ECS shutdown schedule
+# resource "aws_cloudwatch_event_target" "ecs_shutdown" {
+#   target_id = "ecs_stop_function"
+#   rule      = "${aws_cloudwatch_event_rule.ecs_schedule.name}"
+#   arn       = "${aws_ecs_cluster.tipstaff_cluster.id}"
+#   role_arn  = aws_iam_role.app_execution.arn
+#   ecs_target {
+#     task_count = 0
+#     task_definition_arn = "${aws_ecs_task_definition.tipstaff_task_definition.arn}"
+#   }
+# }
 
 # resource "aws_lambda_function" "ecs_stop_function" {
 #   filename      = "ecs_stop_lambda.zip"
