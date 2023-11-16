@@ -165,7 +165,7 @@ resource "aws_route53_record" "mail_cname_status_data_platform_service_justice_g
 resource "aws_route53_record" "delegate_assets_production_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
 
-  zone_id = aws_route53_zone.production_data_platform_service_justice_gov_uk[0].zone_id
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
   name    = "assets.data-platform.service.justice.gov.uk"
   type    = "CNAME"
   ttl     = "300"
