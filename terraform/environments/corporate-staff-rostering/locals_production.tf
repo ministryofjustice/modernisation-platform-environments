@@ -254,8 +254,8 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 128 }
-          "/dev/sdc"  = { type = "gp3", size = 112 }
-          "/dev/sdd"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
           description       = "Migrated server PDCAW00010"
