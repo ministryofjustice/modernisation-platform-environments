@@ -3,7 +3,8 @@
 TERRAFORM_PLAN="${1}"
 
 RESOURCES_TO_CHECK_FOR=(
-  "aws_s3_bucket"
+  "aws_vpc"
+  "aws_eks_cluster"
 )
 
 resourcesFound=false
