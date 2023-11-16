@@ -542,6 +542,8 @@ module "s3_dms_raw_bucket" {
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
 
+  force_destroy = true
+
   tags = merge(
     local.all_tags,
     {
@@ -597,6 +599,8 @@ module "s3_dms_structured_bucket" {
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
 
+  force_destroy = true
+
   tags = merge(
     local.all_tags,
     {
@@ -633,6 +637,8 @@ module "s3_dms_curated_bucket" {
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
+
+  force_destroy = true
 
   tags = merge(
     local.all_tags,
@@ -706,6 +712,8 @@ module "s3_dms_violation_bucket" {
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
+
+  force_destroy = true
 
   tags = merge(
     local.all_tags,

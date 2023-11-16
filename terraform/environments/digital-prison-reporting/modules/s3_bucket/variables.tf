@@ -99,3 +99,8 @@ variable "bucket_key" {
   description = "If Bucket Key is Enabled or Disabled"
   default     = true
 }
+
+variable "force_destroy" {
+  description = "Indicates all objects should be deleted from the bucket when the bucket is destroyed so that the bucket can be destroyed without error"
+  default     = false
+}
