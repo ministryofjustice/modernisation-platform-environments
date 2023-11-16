@@ -602,7 +602,6 @@ locals {
               enabled             = true
               interval            = 5
               healthy_threshold   = 3
-              matcher             = "200-399"
               path                = "/isps/index.html"
               port                = 7770
               protocol            = "HTTP"
@@ -625,7 +624,6 @@ locals {
               enabled             = true
               interval            = 5
               healthy_threshold   = 3
-              matcher             = "200-399"
               path                = "/isps/index.html"
               port                = 7771
               protocol            = "HTTP"
@@ -648,7 +646,6 @@ locals {
               enabled             = true
               interval            = 5
               healthy_threshold   = 3
-              matcher             = "200-399"
               path                = "/"
               port                = 7780
               protocol            = "HTTP"
@@ -671,7 +668,6 @@ locals {
               enabled             = true
               interval            = 5
               healthy_threshold   = 3
-              matcher             = "200-399"
               path                = "/"
               port                = 7781
               protocol            = "HTTP"
