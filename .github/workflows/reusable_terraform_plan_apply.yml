@@ -153,6 +153,7 @@ jobs:
 
       - name: Evaluate Terraform Plan
         id: evaluate_terraform_plan
+        working-directory: "terraform/environments/${{ inputs.application }}"
         shell: bash
         run: |
           bash -x ${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh tfplan.json
