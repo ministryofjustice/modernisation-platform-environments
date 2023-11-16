@@ -141,7 +141,7 @@ resource "aws_route53_record" "db_ec2_instance" {
   }
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone_info.zone_id
-  name     = each.key == "primary-db" ? "${var.app_name}-${var.env_name}-oracle_db.${var.account_config.route53_inner_zone_info.name}" : "${var.app_name}-${var.env_name}-${each.key}-oracle_db.${var.account_config.route53_inner_zone_info.name}"
+  name     = each.key == "primary-db" ? "delius-${var.env_name}-db-${index(var.db_config, each.value) + 1}.${var.account_config.route53_inner_zone_info.name}" : "delius-${var.env_name}-db-${index(var.db_config, each.value) + 1}.${var.account_config.route53_inner_zone_info.name}"
   type     = "CNAME"
   ttl      = 300
   records  = [aws_instance.db_ec2_instance[each.key].private_dns]
@@ -152,6 +152,9 @@ resource "aws_security_group" "delius_db_security_group" {
   description = "Rules for the delius testing db ecs service"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_private_subnets" {
@@ -162,6 +165,25 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.weblogic_service.id
 }
+
+resource "aws_vpc_security_group_ingress_rule" "db_inter_conn" {
+  security_group_id            = aws_security_group.delius_db_security_group.id
+  description                  = "Allow communication between delius db instances"
+  from_port                    = 1521
+  to_port                      = 1521
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.delius_db_security_group.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "db_inter_conn" {
+  security_group_id            = aws_security_group.delius_db_security_group.id
+  description                  = "Allow communication between delius db instances"
+  from_port                    = 1521
+  to_port                      = 1521
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.delius_db_security_group.id
+}
+
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_bastion" {
   security_group_id            = aws_security_group.delius_db_security_group.id
