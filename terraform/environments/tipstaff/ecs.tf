@@ -267,6 +267,7 @@ resource "aws_cloudwatch_event_rule" "ecs_schedule" {
 resource "aws_cloudwatch_event_target" "ecs_shutdown" {
   rule     = aws_cloudwatch_event_rule.ecs_schedule.name
   arn      = aws_lambda_function.ecs_stop_function.arn
+  target_id = "ecs_stop_function"
   role_arn = aws_iam_role.app_execution.arn
 }
 
@@ -283,6 +284,14 @@ resource "aws_lambda_function" "ecs_stop_function" {
       service_name = "${aws_ecs_service.tipstaff_ecs_service.name}"
     }
   }
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_foo" {
+    statement_id = "AllowExecutionFromCloudWatch"
+    action = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.ecs_stop_function.function_name
+    principal = "events.amazonaws.com"
+    source_arn = aws_cloudwatch_event_rule.ecs_schedule.arn
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
