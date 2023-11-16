@@ -605,6 +605,7 @@ locals {
               matcher             = "200-399"
               path                = "/isps/index.html"
               port                = 7770
+              protocol            = "HTTP"
               timeout             = 4
               unhealthy_threshold = 2
             }
@@ -627,6 +628,7 @@ locals {
               matcher             = "200-399"
               path                = "/isps/index.html"
               port                = 7771
+              protocol            = "HTTP"
               timeout             = 4
               unhealthy_threshold = 2
             }
@@ -649,6 +651,7 @@ locals {
               matcher             = "200-399"
               path                = "/"
               port                = 7780
+              protocol            = "HTTP"
               timeout             = 4
               unhealthy_threshold = 2
             }
@@ -663,7 +666,7 @@ locals {
           }
           pp-csr-w-56-7781 = {
             port     = 7781
-            protocol = "HTTP"
+            protocol = "TCP"
             health_check = {
               enabled             = true
               interval            = 5
@@ -671,6 +674,7 @@ locals {
               matcher             = "200-399"
               path                = "/"
               port                = 7781
+              protocol            = "HTTP"
               timeout             = 4
               unhealthy_threshold = 2
             }
