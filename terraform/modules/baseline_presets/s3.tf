@@ -214,7 +214,6 @@ locals {
         "s3:PutObjectAcl",
         "s3:PutObjectTagging",
         "s3:DeleteObject",
-        "s3:DeleteObjectVersion",
         "s3:RestoreObject",
       ]
       principals = {
