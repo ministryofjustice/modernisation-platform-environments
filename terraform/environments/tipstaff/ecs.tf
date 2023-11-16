@@ -263,9 +263,10 @@ resource "aws_cloudwatch_event_rule" "ecs_schedule" {
   schedule_expression = "cron(0 21 ? * MON-FRI *)" # Runs every weekday at 9pm
 }
 
+# AWS EventBridge target for ECS shutdown schedule
 resource "aws_cloudwatch_event_target" "ecs_shutdown" {
   rule     = aws_cloudwatch_event_rule.ecs_schedule.name
-  arn      = aws_ecs_task_definition.tipstaff_task_definition.arn
+  arn      = aws_lambda_function.ecs_stop_function.arn
   role_arn = aws_iam_role.app_execution.arn
 }
 
