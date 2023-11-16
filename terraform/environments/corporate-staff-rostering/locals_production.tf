@@ -160,22 +160,12 @@ locals {
       })
 
       pd-csr-a-7-a = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pd-csr-a-7-a"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}a"
-          ebs_volumes_copy_all_from_ami = false
+        config = merge(local._defaults_app_ec2.config, {
+          ami_name          = "pd-csr-a-7-a"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.4xlarge"
-          disable_api_termination = true
-          disable_api_stop        = true
-          monitoring              = true
-          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
-          tags = {
-            backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
-          }
+        instance = merge(local._defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -198,22 +188,12 @@ locals {
       }
 
       pd-csr-a-8-b = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pd-csr-a-8-b"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
-          ebs_volumes_copy_all_from_ami = false
+        config = merge(local._defaults_app_ec2.config, {
+          ami_name          = "pd-csr-a-8-b"
+          availability_zone = "${local.region}b"
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.4xlarge"
-          disable_api_termination = true
-          disable_api_stop        = true
-          monitoring              = true
-          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
-          tags = {
-            backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
-          }
+        instance = merge(local._defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -236,22 +216,12 @@ locals {
       }
 
       pd-csr-a-9-a = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pd-csr-a-9-a"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}a"
-          ebs_volumes_copy_all_from_ami = false
+        config = merge(local._defaults_app_ec2.config, {
+          ami_name          = "pd-csr-a-9-a"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.4xlarge"
-          disable_api_termination = true
-          disable_api_stop        = true
-          monitoring              = true
-          vpc_security_group_ids  = ["domain", "app", "jumpserver"]
-          tags = {
-            backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
-          }
+        instance = merge(local._defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -274,22 +244,12 @@ locals {
       }
 
       pd-csr-w-1-a = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pd-csr-w-1-a"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}a"
-          ebs_volumes_copy_all_from_ami = false
+        config = merge(local._defaults_web_ec2.config, {
+          ami_name          = "pd-csr-w-1-a"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.4xlarge"
-          disable_api_termination = true
-          disable_api_stop        = true
-          monitoring              = true
-          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
-          tags = {
-            backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
-          }
+        instance = merge(local._defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -312,22 +272,12 @@ locals {
       }
 
       pd-csr-w-2-b = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pd-csr-w-2-b"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}b"
-          ebs_volumes_copy_all_from_ami = false
+        config = merge(local._defaults_web_ec2.config, {
+          ami_name          = "pd-csr-w-2-b"
+          availability_zone = "${local.region}b"
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.4xlarge"
-          disable_api_termination = true
-          disable_api_stop        = true
-          monitoring              = true
-          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
-          tags = {
-            backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
-          }
+        instance = merge(local._defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -350,22 +300,12 @@ locals {
       }
 
       pd-csr-w-3-a = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "pd-csr-w-3-a"
-          ami_owner                     = "self"
-          availability_zone             = "${local.region}a"
-          ebs_volumes_copy_all_from_ami = false
+        config = merge(local._defaults_web_ec2.config, {
+          ami_name          = "pd-csr-w-3-a"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type           = "m5.4xlarge"
-          disable_api_termination = true
-          disable_api_stop        = true
-          monitoring              = true
-          vpc_security_group_ids  = ["domain", "web", "jumpserver"]
-          tags = {
-            backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
-          }
+        instance = merge(local._defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
