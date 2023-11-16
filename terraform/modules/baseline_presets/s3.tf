@@ -72,6 +72,7 @@ locals {
     AllEnvironmentsReadOnlyAccessBucketPolicy = {
       effect = "Allow"
       actions = [
+        "s3:GetBucketLocation",
         "s3:GetObject",
         "s3:GetObjectTagging",
         "s3:ListBucket"
@@ -88,6 +89,7 @@ locals {
     PreprodReadOnlyAccessBucketPolicy = {
       effect = "Allow"
       actions = [
+        "s3:GetBucketLocation",
         "s3:GetObject",
         "s3:GetObjectTagging",
         "s3:ListBucket"
@@ -103,6 +105,7 @@ locals {
     AllEnvironmentsWriteAccessBucketPolicy = {
       effect = "Allow"
       actions = [
+        "s3:GetBucketLocation",
         "s3:GetObject",
         "s3:GetObjectTagging",
         "s3:ListBucket",
@@ -122,6 +125,7 @@ locals {
     ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy = {
       effect = "Allow"
       actions = [
+        "s3:GetBucketLocation",
         "s3:GetObject",
         "s3:GetObjectTagging",
         "s3:ListBucket",
@@ -137,6 +141,7 @@ locals {
     ProdPreprodEnvironmentsWriteAccessBucketPolicy = {
       effect = "Allow"
       actions = [
+        "s3:GetBucketLocation",
         "s3:GetObject",
         "s3:GetObjectTagging",
         "s3:ListBucket",
@@ -156,6 +161,7 @@ locals {
     AllEnvironmentsWriteAndDeleteAccessBucketPolicy = {
       effect = "Allow"
       actions = [
+        "s3:GetBucketLocation",
         "s3:GetObject",
         "s3:GetObjectTagging",
         "s3:ListBucket",
@@ -176,6 +182,7 @@ locals {
     DevTestEnvironmentsReadOnlyAccessBucketPolicy = {
       effect = "Allow"
       actions = [
+        "s3:GetBucketLocation",
         "s3:GetObject",
         "s3:GetObjectTagging",
         "s3:ListBucket",
@@ -191,6 +198,7 @@ locals {
     DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy = {
       effect = "Allow"
       actions = [
+        "s3:GetBucketLocation",
         "s3:GetObject",
         "s3:GetObjectTagging",
         "s3:ListBucket",
@@ -215,6 +223,7 @@ locals {
       {
         effect = "Allow"
         actions = [
+          "s3:GetBucketLocation",
           "s3:GetObject",
           "s3:GetObjectTagging",
           "s3:ListBucket",
@@ -225,6 +234,7 @@ locals {
       {
         effect = "Allow"
         actions = [
+          "s3:GetBucketLocation",
           "s3:GetObject",
           "s3:GetObjectTagging",
           "s3:ListBucket",
@@ -239,6 +249,7 @@ locals {
       {
         effect = "Allow"
         actions = [
+          "s3:GetBucketLocation",
           "s3:GetObject",
           "s3:GetObjectTagging",
           "s3:ListBucket",
