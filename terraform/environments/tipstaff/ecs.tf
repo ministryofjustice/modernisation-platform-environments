@@ -265,59 +265,63 @@ resource "aws_cloudwatch_event_rule" "ecs_schedule" {
 
 # AWS EventBridge target for ECS shutdown schedule
 resource "aws_cloudwatch_event_target" "ecs_shutdown" {
-  rule     = aws_cloudwatch_event_rule.ecs_schedule.name
-  arn      = aws_lambda_function.ecs_stop_function.arn
   target_id = "ecs_stop_function"
-  role_arn = aws_iam_role.app_execution.arn
-}
-
-resource "aws_lambda_function" "ecs_stop_function" {
-  filename      = "ecs_stop_lambda.zip"
-  function_name = "ecsStopFunction"
-  role          = aws_iam_role.lambda_execution_role.arn
-  handler       = "index.handler"
-  runtime       = "python3.8"
-
-  environment {
-    variables = {
-      cluster_name = "${aws_ecs_cluster.tipstaff_cluster.name}"
-      service_name = "${aws_ecs_service.tipstaff_ecs_service.name}"
-    }
+  rule      = "${aws_cloudwatch_event_rule.ecs_schedule.name}"
+  arn       = "${aws_ecs_cluster.tipstaff_cluster.id}"
+  role_arn  = aws_iam_role.app_execution.arn
+  ecs_target {
+    task_count = 0
+    task_definition_arn = "${aws_ecs_task_definition.tipstaff_task_definition.arn}"
   }
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_foo" {
-    statement_id = "AllowExecutionFromCloudWatch"
-    action = "lambda:InvokeFunction"
-    function_name = aws_lambda_function.ecs_stop_function.function_name
-    principal = "events.amazonaws.com"
-    source_arn = aws_cloudwatch_event_rule.ecs_schedule.arn
-}
+# resource "aws_lambda_function" "ecs_stop_function" {
+#   filename      = "ecs_stop_lambda.zip"
+#   function_name = "ecsStopFunction"
+#   role          = aws_iam_role.lambda_execution_role.arn
+#   handler       = "index.handler"
+#   runtime       = "python3.8"
 
-resource "aws_iam_role" "lambda_execution_role" {
-  name = "lambda_execution_role"
+#   environment {
+#     variables = {
+#       cluster_name = "${aws_ecs_cluster.tipstaff_cluster.name}"
+#       service_name = "${aws_ecs_service.tipstaff_ecs_service.name}"
+#     }
+#   }
+# }
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
+# resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_foo" {
+#   statement_id  = "AllowExecutionFromCloudWatch"
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.ecs_stop_function.function_name
+#   principal     = "events.amazonaws.com"
+#   source_arn    = aws_cloudwatch_event_rule.ecs_schedule.arn
+# }
 
-resource "aws_iam_role_policy_attachment" "lambda_basic_execution_attachment" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.lambda_execution_role.name
-}
+# resource "aws_iam_role" "lambda_execution_role" {
+#   name = "lambda_execution_role"
+
+#   assume_role_policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Action": "sts:AssumeRole",
+#       "Principal": {
+#         "Service": "lambda.amazonaws.com"
+#       },
+#       "Effect": "Allow",
+#       "Sid": ""
+#     }
+#   ]
+# }
+# EOF
+# }
+
+# resource "aws_iam_role_policy_attachment" "lambda_basic_execution_attachment" {
+#   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+#   role       = aws_iam_role.lambda_execution_role.name
+# }
 
 resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
   policy_document = jsonencode({
