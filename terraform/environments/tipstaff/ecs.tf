@@ -235,7 +235,7 @@ resource "aws_ecr_repository" "tipstaff_ecr_repo" {
   force_delete = true
 }
 
-# AWS EventBridge rule
+# AWS EventBridge rule for ECS events
 resource "aws_cloudwatch_event_rule" "ecs_events" {
   name        = "ecs-events"
   description = "Capture all ECS events"
@@ -248,12 +248,65 @@ resource "aws_cloudwatch_event_rule" "ecs_events" {
   })
 }
 
-# AWS EventBridge target
+# AWS EventBridge target for ECS events
 resource "aws_cloudwatch_event_target" "logs" {
   depends_on = [aws_cloudwatch_log_group.deployment_logs]
   rule       = aws_cloudwatch_event_rule.ecs_events.name
   target_id  = "send-to-cloudwatch"
   arn        = aws_cloudwatch_log_group.deployment_logs.arn
+}
+
+# AWS EventBridge rule for ECS shutdown schedule
+resource "aws_cloudwatch_event_rule" "ecs_schedule" {
+  name                = "ecs-schedule"
+  description         = "ECS Schedule Rule"
+  schedule_expression = "cron(0 21 ? * MON-FRI *)" # Runs every weekday at 9pm
+}
+
+resource "aws_cloudwatch_event_target" "ecs_shutdown" {
+  rule     = aws_cloudwatch_event_rule.ecs_schedule.name
+  arn      = aws_ecs_task_definition.tipstaff_task_definition.arn
+  role_arn = aws_iam_role.app_execution.arn
+}
+
+resource "aws_lambda_function" "ecs_stop_function" {
+  filename      = "ecs_stop_lambda.zip"
+  function_name = "ecsStopFunction"
+  role          = aws_iam_role.lambda_execution_role.arn
+  handler       = "index.handler"
+  runtime       = "python3.8"
+
+  environment {
+    variables = {
+      cluster_name = "${aws_ecs_cluster.tipstaff_cluster.name}"
+      service_name = "${aws_ecs_service.tipstaff_ecs_service.name}"
+    }
+  }
+}
+
+resource "aws_iam_role" "lambda_execution_role" {
+  name = "lambda_execution_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role       = aws_iam_role.lambda_execution_role.name
 }
 
 resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
