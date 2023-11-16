@@ -583,7 +583,7 @@ locals {
               healthy_threshold   = 3
               port                = 80
               protocol            = "TCP"
-              timeout             = 5
+              timeout             = 4
               unhealthy_threshold = 2
             }
             stickiness = {
@@ -605,7 +605,7 @@ locals {
               matcher             = "200-399"
               path                = "/isps/index.html"
               port                = 7770
-              timeout             = 5
+              timeout             = 4
               unhealthy_threshold = 2
             }
             stickiness = {
@@ -627,7 +627,7 @@ locals {
               matcher             = "200-399"
               path                = "/isps/index.html"
               port                = 7771
-              timeout             = 5
+              timeout             = 4
               unhealthy_threshold = 2
             }
             stickiness = {
@@ -649,7 +649,7 @@ locals {
               matcher             = "200-399"
               path                = "/"
               port                = 7780
-              timeout             = 5
+              timeout             = 4
               unhealthy_threshold = 2
             }
             stickiness = {
@@ -671,7 +671,7 @@ locals {
               matcher             = "200-399"
               path                = "/"
               port                = 7781
-              timeout             = 5
+              timeout             = 4
               unhealthy_threshold = 2
             }
             stickiness = {
