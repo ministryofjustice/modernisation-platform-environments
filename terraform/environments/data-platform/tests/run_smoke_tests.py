@@ -4,15 +4,14 @@ import json
 import os
 import sys
 import time
+from datetime import datetime, timedelta, timezone
 
-import boto3
 import requests
 
 filename = "test_data.csv"
 data_product_name = "example_prison_data_product"
 table_name = "testing"
 base_url = "https://hsolkci589.execute-api.eu-west-2.amazonaws.com/development"
-glue = boto3.client("glue")
 
 try:
     auth_token = json.loads(os.environ["API_AUTH"])
@@ -36,7 +35,8 @@ class APIClient:
     def __init__(self, base_url, auth_token):
         self.table_url = base_url + f"/data-product/{data_product_name}/table/{table_name}"
         self.data_product_url = base_url + f"/data-product/{data_product_name}"
-        self.register_url = base_url + f"/data-product/register"
+        self.register_url = base_url + "/data-product/register"
+        self.preview_data_url = self.table_url + "/preview"
         self.presigned_url = base_url + f"/data-product/{data_product_name}/table/{table_name}/upload"
         self.headers = {"authorizationToken": auth_token}
         
@@ -67,6 +67,13 @@ class APIClient:
         print("Deleting data product...")
         return requests.delete(
             url=self.data_product_url,
+            headers=self.headers,
+        )
+
+    def preview_data(self):
+        print("Fetching data")
+        return requests.get(
+            url=self.preview_data_url,
             headers=self.headers,
         )
 
@@ -120,18 +127,37 @@ class APIClient:
         return requests.post(response_json["URL"]["url"], files=multipart_form_data)
 
 
+def parse_first_line_of_data(output):
+    lines = output.splitlines()
+    fields = [i.strip() for i in lines[1].split("|")]
+    row = fields[1:-1]
+    if len(row) != 5:
+        raise ValueError(row)
+
+    col1, col2, col3, col4, extraction_timestamp = fields[1:-1]
+
+    parsed_datetime = datetime.strptime(extraction_timestamp, r'%Y%m%dT%H%M%SZ')
+    age = parsed_datetime - datetime.now()
+
+    return col1, col2, col3, col4, age
+
+
 def run_test(client):
     upload_response = client.upload_file()
     print(upload_response.status_code, upload_response.text)
     print(f"Waiting for {data_product_name}.{table_name} to create in athena")
+    
     time.sleep(10)
 
-    # Check for created table
-    try:
-        glue.get_table(DatabaseName=data_product_name, Name=table_name)
-        print(f"{data_product_name}.{table_name} found in glue")
-    except Exception as e:
-        raise e
+    preview_repsonse = client.preview_data()
+    if preview_repsonse.status_code != 200:
+        print(f"Error previewing data: {preview_repsonse.status_code} {preview_repsonse.text}")
+
+    print(preview_repsonse.text)
+    col1, col2, col3, col4, age = parse_first_line_of_data(preview_repsonse.text)
+
+    assert (col1, col2, col3, col4) == ("0.1915194503788923", "0.3648859839013723", "0.0598092227798519", "0.2852509600245098")    
+    assert age < timedelta(seconds=15)
 
 
 client = APIClient(base_url, auth_token)
