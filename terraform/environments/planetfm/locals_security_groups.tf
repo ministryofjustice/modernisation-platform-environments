@@ -411,22 +411,20 @@ locals {
           protocol    = -1
           self        = true
         }
-        # delete these first so they can be renamed
-        # rdp_tcp_db = {
-        #   description = "3389: Allow RDP UDP ingress from jumpserver"
-        #   from_port   = 3389
-        #   to_port     = 3389
-        #   protocol    = "TCP"
-        #   cidr_blocks = local.security_group_cidrs.jumpservers
-        # }
-        # delete these first so they can be renamed
-        # rdp_udp_db = {
-        #   description = "3389: Allow RDP UDP ingress from jumpserver"
-        #   from_port   = 3389
-        #   to_port     = 3389
-        #   protocol    = "UDP"
-        #   cidr_blocks = local.security_group_cidrs.jumpservers
-        # }
+        rdp_tcp_db = {
+          description = "3389: Allow RDP TCP ingress from azure jumpservers"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+        rdp_udp_db = {
+          description = "3389: Allow RDP UDP ingress from azure jumpservers"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
         sql_tcp_1433_enduser = {
           description = "1433: Allow SQL Server TCP ingress from enduserclient for authentication"
           from_port   = 1433
