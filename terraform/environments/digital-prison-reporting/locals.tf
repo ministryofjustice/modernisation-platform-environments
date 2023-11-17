@@ -144,6 +144,12 @@ locals {
   kms_read_access_policy = "${local.project}_kms_read_policy"
   s3_read_access_policy  = "${local.project}_s3_read_policy"
   apigateway_get_policy  = "${local.project}_apigateway_get_policy"
+  invoke_lambda_policy   = "${local.project}_invoke_lambda_policy"
+
+  trigger_glue_job_policy = "${local.project}_start_glue_job_policy"
+  start_dms_task_policy   = "${local.project}_start_dms_task_policy"
+
+  s3_all_object_actions_policy   = "${local.project}_s3_all_object_actions_policy"
 
   # DPR Alerts
   enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
@@ -204,6 +210,26 @@ locals {
   lambda_transfercomp_policies       = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", ]
   create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
+
+  # s3 transfer lambda
+  enable_s3_file_transfer_lambda         = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda
+  s3_file_transfer_lambda_name           = "${local.project}-s3-file-transfer"
+  s3_file_transfer_lambda_handler        = "uk.gov.justice.digital.lambda.S3FileTransferLambda::handleRequest"
+  s3_file_transfer_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  s3_file_transfer_lambda_code_s3_key    = "build-artifacts/digital-prison-reporting-jobs/jars/lambdas-vLatest-all.jar"
+  s3_file_transfer_lambda_runtime        = "java8"
+  s3_file_transfer_lambda_tracing        = "Active"
+  s3_file_transfer_lambda_retention_days = local.application_data.accounts[local.environment].s3_file_transfer_lambda_retention_days
+
+  s3_file_transfer_lambda_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}"
+  ]
+
+  # Data Ingestion Pipeline Step Function
+  enable_data_ingestion_step_function = local.application_data.accounts[local.environment].enable_data_ingestion_step_function
+  data_ingestion_step_function_name   = "${local.project}-data-ingestion-step-function-${local.environment}"
 
   # Datamart
   create_scheduled_action_iam_role = local.application_data.accounts[local.environment].setup_scheduled_action_iam_role
