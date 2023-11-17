@@ -210,6 +210,9 @@ locals {
     password = "placeholder"
   }
 
+  # CW Insights
+  enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
+
   # Evaluate Redshift Secrets and Populate
   redshift_secrets = {
     dbClusterIdentifier = "dpr-redshift-${local.project}"
