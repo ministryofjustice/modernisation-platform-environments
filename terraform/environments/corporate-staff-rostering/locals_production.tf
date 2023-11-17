@@ -272,11 +272,11 @@ locals {
       }
 
       pd-csr-a-11-a = {
-        config = merge(local._defaults_app_ec2.config, {
+        config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-11-a"
           availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
+        instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
