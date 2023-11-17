@@ -855,7 +855,7 @@ module "data_ingestion_pipeline" {
     aws_iam_policy.invoke_lambda_policy,
     aws_iam_policy.start_dms_task_policy,
     aws_iam_policy.trigger_glue_job_policy,
-    module.dms_nomis_ingestor,
+    module.dms_nomis_ingestor.dms_replication_task_arn,
     module.glue_compact_curated_job,
     module.glue_reporting_hub_job,
     module.s3_file_transfer_lambda.lambda_function
@@ -879,7 +879,7 @@ module "data_ingestion_pipeline" {
         "Type": "Task",
         "Resource": "arn:aws:states:::glue:startJobRun.sync",
         "Parameters": {
-          "JobName": "${module.glue_compact_curated_job}"
+          "JobName": "${module.glue_compact_curated_job.name}"
         },
         "Next": "Invoke S3 File Transfer Lambda"
       },
@@ -919,7 +919,7 @@ module "data_ingestion_pipeline" {
         "Type": "Task",
         "Resource": "arn:aws:states:::glue:startJobRun",
         "Parameters": {
-          "JobName": "${module.glue_reporting_hub_job}"
+          "JobName": "${module.glue_reporting_hub_job.name}"
         },
         "End": true
       }
