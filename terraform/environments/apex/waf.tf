@@ -4,7 +4,7 @@ resource "aws_waf_ip_set" "wafmanualallowset" {
   scope              = "CLOUDFRONT"
   provider           = aws.us-east-1
   ip_address_version = "IPV4"
-  addresses          = [for ip in split("\n", chomp(file("${path.module}/aws_waf_ipset.txt"))) : ip]
+  addresses          = [for ip in split("\n", chomp(file("${path}/aws_waf_ipset.txt"))) : ip]
 }
 
 resource "aws_waf_ipset" "wafmanualblockset" {
@@ -12,7 +12,7 @@ resource "aws_waf_ipset" "wafmanualblockset" {
 }
 
 resource "aws_waf_rule" "wafmanualallowrule" {
-  depends_on  = [aws_waf_ipset.wafmanualblockset]
+  depends_on  = [aws_waf_ipset.wafmanualallowset]
   name     = "${upper(local.application_name)} Manual Allow Rule"
   metric_name = "${upper(local.application_name)}ManualAllowRule"
 
