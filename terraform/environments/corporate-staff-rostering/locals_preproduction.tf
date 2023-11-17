@@ -91,11 +91,11 @@ locals {
 
       pp-csr-a-13-a = {
         config = merge(local.defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-13-a"
-          availability_zone             = "${local.region}a"
+          ami_name          = "pp-csr-a-13-a"
+          availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -119,11 +119,11 @@ locals {
 
       pp-csr-a-14-b = {
         config = merge(local.defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-14-b"
-          availability_zone             = "${local.region}b"
+          ami_name          = "pp-csr-a-14-b"
+          availability_zone = "${local.region}b"
         })
         instance = merge(local.defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -147,11 +147,11 @@ locals {
 
       pp-csr-a-17-a = {
         config = merge(local.defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-17-a"
-          availability_zone             = "${local.region}a"
+          ami_name          = "pp-csr-a-17-a"
+          availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -175,11 +175,11 @@ locals {
 
       pp-csr-a-18-b = {
         config = merge(local.defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-18-b"
-          availability_zone             = "${local.region}b"
+          ami_name          = "pp-csr-a-18-b"
+          availability_zone = "${local.region}b"
         })
         instance = merge(local.defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -203,11 +203,11 @@ locals {
 
       pp-csr-a-2-b = {
         config = merge(local.defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-2-b"
-          availability_zone             = "${local.region}b"
+          ami_name          = "pp-csr-a-2-b"
+          availability_zone = "${local.region}b"
         })
         instance = merge(local.defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -229,11 +229,11 @@ locals {
 
       pp-csr-a-3-a = {
         config = merge(local.defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-3-a"
-          availability_zone             = "${local.region}a"
+          ami_name          = "pp-csr-a-3-a"
+          availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -255,11 +255,11 @@ locals {
 
       pp-csr-a-15-a = {
         config = merge(local.defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-15-a"
-          availability_zone             = "${local.region}a"
+          ami_name          = "pp-csr-a-15-a"
+          availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -283,11 +283,11 @@ locals {
 
       pp-csr-a-16-b = {
         config = merge(local.defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-16-b"
-          availability_zone             = "${local.region}b"
+          ami_name          = "pp-csr-a-16-b"
+          availability_zone = "${local.region}b"
         })
         instance = merge(local.defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -311,11 +311,11 @@ locals {
 
       pp-csr-w-1-a = {
         config = merge(local.defaults_web_ec2.config, {
-          ami_name                      = "PPCWW00001"
-          availability_zone             = "${local.region}a"
+          ami_name          = "PPCWW00001"
+          availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -339,11 +339,11 @@ locals {
 
       pp-csr-w-2-b = {
         config = merge(local.defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-2-b"
-          availability_zone             = "${local.region}b"
+          ami_name          = "pp-csr-w-2-b"
+          availability_zone = "${local.region}b"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -367,11 +367,11 @@ locals {
 
       pp-csr-w-5-a = {
         config = merge(local.defaults_web_ec2.config, {
-          ami_name                      = "PPCWW00005"
-          availability_zone             = "${local.region}a"
+          ami_name          = "PPCWW00005"
+          availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -394,11 +394,11 @@ locals {
 
       pp-csr-w-6-b = {
         config = merge(local.defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-6-b"
-          availability_zone             = "${local.region}b"
+          ami_name          = "pp-csr-w-6-b"
+          availability_zone = "${local.region}b"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -422,11 +422,11 @@ locals {
 
       pp-csr-w-7-a = {
         config = merge(local.defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-7-b"
-          availability_zone             = "${local.region}a"
+          ami_name          = "pp-csr-w-7-b"
+          availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -448,11 +448,11 @@ locals {
 
       pp-csr-w-8-b = {
         config = merge(local.defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-8-b"
-          availability_zone             = "${local.region}b"
+          ami_name          = "pp-csr-w-8-b"
+          availability_zone = "${local.region}b"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 200 }
@@ -474,11 +474,11 @@ locals {
 
       pp-csr-w-3-a = {
         config = merge(local.defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-3-a"
-          availability_zone             = "${local.region}a"
+          ami_name          = "pp-csr-w-3-a"
+          availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -502,11 +502,11 @@ locals {
 
       pp-csr-w-4-b = {
         config = merge(local.defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-4-b"
-          availability_zone             = "${local.region}b"
+          ami_name          = "pp-csr-w-4-b"
+          availability_zone = "${local.region}b"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -561,7 +561,7 @@ locals {
     }
 
     baseline_lbs = {
-      r56 = {
+      r34 = {
         internal_lb              = true
         enable_delete_protection = false
         load_balancer_type       = "network"
@@ -1388,8 +1388,8 @@ locals {
         lb_alias_records = [
           { name = "r1", type = "A", lbs_map_key = "private" },
           { name = "r2", type = "A", lbs_map_key = "private" },
-          { name = "r3", type = "A", lbs_map_key = "private" },
-          { name = "r4", type = "A", lbs_map_key = "private" },
+          { name = "r3", type = "A", lbs_map_key = "r34" },
+          { name = "r4", type = "A", lbs_map_key = "r34" },
           { name = "r5", type = "A", lbs_map_key = "private" },
           { name = "r6", type = "A", lbs_map_key = "private" },
           { name = "traina", type = "A", lbs_map_key = "private" },
