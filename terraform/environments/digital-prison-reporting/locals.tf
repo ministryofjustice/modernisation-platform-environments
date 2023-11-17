@@ -230,6 +230,9 @@ locals {
   thrld_dms_cdc_inc_events_check = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.threshold
   period_dms_cdc_inc_events_check = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.period
 
+  # CW Insights
+  enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
+
   # Sonatype Secrets
   setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
 

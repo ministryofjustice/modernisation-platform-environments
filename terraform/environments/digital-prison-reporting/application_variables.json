@@ -150,7 +150,8 @@
             "threshold": 100,
             "period": 60
           }
-        }
+        },
+        "setup_cw_insights": true
       }
     },
     "test": {
@@ -303,7 +304,8 @@
             "threshold": 100,
             "period": 60
           }
-        }
+        },
+        "setup_cw_insights": false
       }    
     },
     "preproduction": {
@@ -458,7 +460,8 @@
             "threshold": 100,
             "period": 60
           }
-        }
+        },
+        "setup_cw_insights": false        
       }
     },
     "production": {
@@ -611,7 +614,8 @@
             "threshold": 100,
             "period": 60
           }
-        }
+        },
+        "setup_cw_insights": false
       }          
     }
   }
