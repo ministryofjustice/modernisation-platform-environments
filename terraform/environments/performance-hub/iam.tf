@@ -39,7 +39,7 @@ EOF
 
 resource "aws_iam_role" "s3_ap_landing_role" {
   name               = "${local.application_name}-s3-ap-landing-role"
-  assume_role_policy = data.aws_iam_policy.s3_ap_landing_policy.json
+  assume_role_policy = data.aws_iam_policy.s3_ap_landing_policy
   tags = merge(
     local.tags,
     {
