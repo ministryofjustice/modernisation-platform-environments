@@ -574,7 +574,7 @@ locals {
         access_logs     = false
 
         instance_target_groups = {
-          pp-csr-w-34-80 = {
+          pp-csr-w-56-80 = {
             port     = 80
             protocol = "TCP"
             health_check = {
@@ -595,7 +595,7 @@ locals {
               { ec2_instance_name = "pp-csr-w-6-b" },
             ]
           }
-          pp-csr-w-34-7770 = {
+          pp-csr-w-56-7770 = {
             port     = 7770
             protocol = "TCP"
             health_check = {
@@ -617,7 +617,7 @@ locals {
               { ec2_instance_name = "pp-csr-w-6-b" },
             ]
           }
-          pp-csr-w-34-7771 = {
+          pp-csr-w-56-7771 = {
             port     = 7771
             protocol = "TCP"
             health_check = {
@@ -639,7 +639,7 @@ locals {
               { ec2_instance_name = "pp-csr-w-6-b" },
             ]
           }
-          pp-csr-w-34-7780 = {
+          pp-csr-w-56-7780 = {
             port     = 7780
             protocol = "TCP"
             health_check = {
@@ -661,7 +661,7 @@ locals {
               { ec2_instance_name = "pp-csr-w-6-b" },
             ]
           }
-          pp-csr-w-34-7781 = {
+          pp-csr-w-56-7781 = {
             port     = 7781
             protocol = "TCP"
             health_check = {
@@ -691,7 +691,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "pp-csr-w-34-80"
+              target_group_name = "pp-csr-w-56-80"
             }
           }
           http-7770 = {
@@ -699,7 +699,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "pp-csr-w-34-7770"
+              target_group_name = "pp-csr-w-56-7770"
             }
           }
           http-7771 = {
@@ -707,7 +707,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "pp-csr-w-34-7771"
+              target_group_name = "pp-csr-w-56-7771"
             }
           }
           http-7780 = {
@@ -715,7 +715,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "pp-csr-w-34-7780"
+              target_group_name = "pp-csr-w-56-7780"
             }
           }
           http-7781 = {
@@ -723,7 +723,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "pp-csr-w-34-7781"
+              target_group_name = "pp-csr-w-56-7781"
             }
           }
         }
