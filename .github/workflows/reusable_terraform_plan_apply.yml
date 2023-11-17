@@ -152,6 +152,7 @@ jobs:
           (( exitcode == 1 )) && exit 1 || exit 0
 
       - name: Evaluate Terraform Plan
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2'
         id: evaluate_terraform_plan
         working-directory: "terraform/environments/${{ inputs.application }}"
         shell: bash
@@ -203,7 +204,7 @@ jobs:
 
       - name: Check for Approval
         id: check_approval
-        if: ${{ steps.evaluate_terraform_plan.outputs.resources_found == 'true' }}
+        if: github.event_name == 'pull_request' && steps.evaluate_terraform_plan.outputs.resources_found == 'true'
         uses: actions/github-script@e69ef5462fd455e02edcaf4dd7708eda96b9eda0 # v7.0.0
         with:
           github-token: ${{ secrets.pipeline_github_token }}
@@ -233,7 +234,7 @@ jobs:
 
       - name: Comment if PR Requires Approval
         id: comment_if_not_approved
-        if: failure() && steps.check_approval.outcome == 'failure'
+        if: failure() && github.event_name == 'pull_request' && steps.check_approval.outcome == 'failure'
         uses: actions/github-script@e69ef5462fd455e02edcaf4dd7708eda96b9eda0 # v7.0.0
         with:
           github-token: ${{ secrets.pipeline_github_token }}
