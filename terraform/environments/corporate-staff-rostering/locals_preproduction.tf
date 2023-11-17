@@ -574,27 +574,27 @@ locals {
         access_logs     = false
 
         instance_target_groups = {
-#          pp-csr-w-56-80 = {
-#            port     = 80
-#            protocol = "TCP"
-#            health_check = {
-#              enabled             = true
-#              interval            = 5
-#              healthy_threshold   = 3
-#              port                = 80
-#              protocol            = "TCP"
-#              timeout             = 4
-#              unhealthy_threshold = 2
-#            }
-#            stickiness = {
-#              enabled = true
-#              type    = "source_ip"
-#            }
-#            attachments = [
-#              { ec2_instance_name = "pp-csr-w-5-a" },
-#              { ec2_instance_name = "pp-csr-w-6-b" },
-#            ]
-#          }
+          pp-csr-w-56-80 = {
+            port     = 80
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              port                = 80
+              protocol            = "TCP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
 #          pp-csr-w-56-7770 = {
 #            port     = 7770
 #            protocol = "TCP"
@@ -686,14 +686,14 @@ locals {
         }
 
         listeners = {
-#          http = {
-#            port     = 80
-#            protocol = "TCP"
-#            default_action = {
-#              type              = "forward"
-#              target_group_name = "pp-csr-w-56-80"
-#            }
-#          }
+          http = {
+            port     = 80
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-56-80"
+            }
+          }
 #          http-7770 = {
 #            port     = 7770
 #            protocol = "TCP"
