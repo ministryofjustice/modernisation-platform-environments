@@ -2,7 +2,7 @@
 # Filter for Lambda Errors with Exception/Error/Fails
 module "dpr_cw_insights_lambda_errors" {
   source              = "./modules/cw_insights"
-  create_metric_alarm = local.enable_cw_insights
+  create_cw_insight   = local.enable_cw_insights
 
   query_name          = "dpr-cw-insights-lambda-errors"
   log_groups          = ["/aws/lambda"]
