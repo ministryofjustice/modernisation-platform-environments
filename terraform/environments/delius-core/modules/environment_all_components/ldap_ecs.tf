@@ -101,6 +101,17 @@ resource "aws_security_group_rule" "ldap_nlb" {
   cidr_blocks       = [var.account_config.shared_vpc_cidr]
 }
 
+resource "aws_security_group_rule" "top_ldap_from_bastion" {
+  for_each                 = toset(["tcp", "udp"])
+  description              = "Allow inbound traffic from bastion"
+  type                     = "ingress"
+  from_port                = local.ldap_port
+  to_port                  = local.ldap_port
+  protocol                 = each.value
+  security_group_id        = aws_security_group.ldap.id
+  source_security_group_id = var.account_config.bastion.bastion_security_group
+}
+
 resource "aws_security_group_rule" "allow_ldap_from_legacy_env" {
   for_each          = toset(["tcp", "udp"])
   description       = "Allow inbound LDAP traffic from corresponding legacy VPC"
