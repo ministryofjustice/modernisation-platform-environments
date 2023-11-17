@@ -134,13 +134,20 @@ locals {
       "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
           # T1 BIP
-
+          { name = "t1ncr-bip-cmc", type = "CNAME", ttl = "300", records = ["t1-ncr-bip-cmc.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1ncr-bip", type = "CNAME", ttl = "300", records = ["t1-ncr-bip.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           # T1 Tomcat
-
+          { name = "t1ncr-tomcat", type = "CNAME", ttl = "300", records = ["t1-ncr-tomcat.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           # Oracle database
           { name = "t1ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.reporting.nomis.service.justice.gov.uk"] },
           { name = "t1ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+        ]
+        lb_alias_records = [
+          # T1
+          { name = "t1-ncr-bip-cmc", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-bip", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-tomcat", type = "A", lbs_map_key = "private" },
         ]
       }
     }
