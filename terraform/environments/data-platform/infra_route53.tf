@@ -169,7 +169,7 @@ resource "aws_route53_record" "delegate_assets_production_data_platform_service_
   name    = "assets.data-platform.service.justice.gov.uk"
   type    = "CNAME"
   ttl     = "300"
-  records = ["ingress.apps.live.cloud-platform.service.justice.gov.uk"]
+  records = ["ingress.apps-tools.data-platform.service.justice.gov.uk."]
 }
 
 ##################################################
