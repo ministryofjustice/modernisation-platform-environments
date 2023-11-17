@@ -151,7 +151,8 @@
             "period": 60
           }
         }
-      }
+      },
+      "setup_cw_insights": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -304,7 +305,8 @@
             "period": 60
           }
         }
-      }    
+      },
+      "setup_cw_insights": false        
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -459,7 +461,8 @@
             "period": 60
           }
         }
-      }
+      },
+      "setup_cw_insights": false      
     },
     "production": {
       "project_short_id": "dpr",
@@ -612,7 +615,8 @@
             "period": 60
           }
         }
-      }          
+      },
+      "setup_cw_insights": false               
     }
   }
 }
