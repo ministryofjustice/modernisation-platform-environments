@@ -69,7 +69,7 @@ locals {
 
         ebs_volumes = {
           "/dev/sdb" = { type = "gp3", label = "app", size = 100 } # /u01
-          "/dev/sdc" = { type = "gp3", label = "app", size = 100 } # /u02
+          "/dev/sdc" = { type = "gp3", label = "app", size = 500 } # /u02
           "/dev/sde" = { type = "gp3", label = "data" }            # DATA01
           "/dev/sdf" = { type = "gp3", label = "data" }            # DATA02
           "/dev/sdg" = { type = "gp3", label = "data" }            # DATA03
@@ -129,7 +129,7 @@ locals {
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
           "/dev/sdb"  = { label = "app", size = 100 } # /u01
-          "/dev/sdc"  = { label = "app", size = 100 } # /u02
+          "/dev/sdc"  = { label = "app", size = 500 } # /u02
         })
 
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
