@@ -595,94 +595,94 @@ locals {
               { ec2_instance_name = "pp-csr-w-6-b" },
             ]
           }
-#          pp-csr-w-56-7770 = {
-#            port     = 7770
-#            protocol = "TCP"
-#            health_check = {
-#              enabled             = true
-#              interval            = 5
-#              healthy_threshold   = 3
-#              path                = "/isps/index.html"
-#              port                = 7770
-#              protocol            = "HTTP"
-#              timeout             = 4
-#              unhealthy_threshold = 2
-#            }
-#            stickiness = {
-#              enabled = true
-#              type    = "source_ip"
-#            }
-#            attachments = [
-#              { ec2_instance_name = "pp-csr-w-5-a" },
-#              { ec2_instance_name = "pp-csr-w-6-b" },
-#            ]
-#          }
-#          pp-csr-w-56-7771 = {
-#            port     = 7771
-#            protocol = "TCP"
-#            health_check = {
-#              enabled             = true
-#              interval            = 5
-#              healthy_threshold   = 3
-#              path                = "/isps/index.html"
-#              port                = 7771
-#              protocol            = "HTTP"
-#              timeout             = 4
-#              unhealthy_threshold = 2
-#            }
-#            stickiness = {
-#              enabled = true
-#              type    = "source_ip"
-#            }
-#            attachments = [
-#              { ec2_instance_name = "pp-csr-w-5-a" },
-#              { ec2_instance_name = "pp-csr-w-6-b" },
-#            ]
-#          }
-#          pp-csr-w-56-7780 = {
-#            port     = 7780
-#            protocol = "TCP"
-#            health_check = {
-#              enabled             = true
-#              interval            = 5
-#              healthy_threshold   = 3
-#              path                = "/"
-#              port                = 7780
-#              protocol            = "HTTP"
-#              timeout             = 4
-#              unhealthy_threshold = 2
-#            }
-#            stickiness = {
-#              enabled = true
-#              type    = "source_ip"
-#            }
-#            attachments = [
-#              { ec2_instance_name = "pp-csr-w-5-a" },
-#              { ec2_instance_name = "pp-csr-w-6-b" },
-#            ]
-#          }
-#          pp-csr-w-56-7781 = {
-#            port     = 7781
-#            protocol = "TCP"
-#            health_check = {
-#              enabled             = true
-#              interval            = 5
-#              healthy_threshold   = 3
-#              path                = "/"
-#              port                = 7781
-#              protocol            = "HTTP"
-#              timeout             = 4
-#              unhealthy_threshold = 2
-#            }
-#            stickiness = {
-#              enabled = true
-#              type    = "source_ip"
-#            }
-#            attachments = [
-#              { ec2_instance_name = "pp-csr-w-5-a" },
-#              { ec2_instance_name = "pp-csr-w-6-b" },
-#            ]
-#          }
+          pp-csr-w-56-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          pp-csr-w-56-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          pp-csr-w-56-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7780
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          pp-csr-w-56-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7781
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
         }
 
         listeners = {
@@ -694,38 +694,38 @@ locals {
               target_group_name = "pp-csr-w-56-80"
             }
           }
-#          http-7770 = {
-#            port     = 7770
-#            protocol = "TCP"
-#            default_action = {
-#              type              = "forward"
-#              target_group_name = "pp-csr-w-56-7770"
-#            }
-#          }
-#          http-7771 = {
-#            port     = 7771
-#            protocol = "TCP"
-#            default_action = {
-#              type              = "forward"
-#              target_group_name = "pp-csr-w-56-7771"
-#            }
-#          }
-#          http-7780 = {
-#            port     = 7780
-#            protocol = "TCP"
-#            default_action = {
-#              type              = "forward"
-#              target_group_name = "pp-csr-w-56-7780"
-#            }
-#          }
-#          http-7781 = {
-#            port     = 7781
-#            protocol = "TCP"
-#            default_action = {
-#              type              = "forward"
-#              target_group_name = "pp-csr-w-56-7781"
-#            }
-#          }
+          http-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-56-7770"
+            }
+          }
+          http-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-56-7771"
+            }
+          }
+          http-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-56-7780"
+            }
+          }
+          http-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-56-7781"
+            }
+          }
         }
       }
       private = {
