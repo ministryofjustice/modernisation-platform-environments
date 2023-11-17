@@ -160,11 +160,11 @@ locals {
       })
 
       pd-csr-a-7-a = {
-        config = merge(local._defaults_app_ec2.config, {
+        config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-7-a"
           availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
+        instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -188,11 +188,11 @@ locals {
       }
 
       pd-csr-a-8-b = {
-        config = merge(local._defaults_app_ec2.config, {
+        config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-8-b"
           availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
+        instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -216,11 +216,11 @@ locals {
       }
 
       pd-csr-a-9-a = {
-        config = merge(local._defaults_app_ec2.config, {
+        config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-9-a"
           availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
+        instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -244,11 +244,11 @@ locals {
       }
 
       pd-csr-a-10-b = {
-        config = merge(local._defaults_app_ec2.config, {
+        config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-10-b"
           availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
+        instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -272,11 +272,11 @@ locals {
       }
 
       pd-csr-a-12-b = {
-        config = merge(local._defaults_app_ec2.config, {
+        config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-12-b"
           availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
+        instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -299,11 +299,11 @@ locals {
       }
 
       pd-csr-w-1-a = {
-        config = merge(local._defaults_web_ec2.config, {
+        config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-1-a"
           availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
+        instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -327,11 +327,11 @@ locals {
       }
 
       pd-csr-w-2-b = {
-        config = merge(local._defaults_web_ec2.config, {
+        config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-2-b"
           availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
+        instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -355,11 +355,11 @@ locals {
       }
 
       pd-csr-w-3-a = {
-        config = merge(local._defaults_web_ec2.config, {
+        config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-3-a"
           availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
+        instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -383,11 +383,11 @@ locals {
       }
 
       pd-csr-w-4-b = {
-        config = merge(local._defaults_web_ec2.config, {
+        config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-4-b"
           availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
+        instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
