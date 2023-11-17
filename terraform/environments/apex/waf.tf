@@ -60,7 +60,7 @@ resource "aws_waf_web_acl" "waf_acl" {
     aws_waf_rule.wafmanualblockrule,
   ]
   name     = "${upper(local.application_name)} Whitelisting Requesters"
-  metric_name = "${upper(local.application_name)}Whitelisting Requesters"
+  metric_name = "${upper(local.application_name)}WhitelistingRequesters"
 #   scope    = "CLOUDFRONT"
 #   provider = aws.us-east-1
 default_action {
