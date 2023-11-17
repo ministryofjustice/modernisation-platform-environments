@@ -37,21 +37,21 @@ resource "aws_iam_policy" "s3_ap_landing_policy" {
 EOF
 }
 
-# resource "aws_iam_role" "s3_ap_landing_role" {
-#   name               = "${local.application_name}-s3-ap-landing-role"
-#   assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name}-s3-ap-landing-role"
-#     }
-#   )
-# }
+resource "aws_iam_role" "s3_ap_landing_role" {
+  name               = "${local.application_name}-s3-ap-landing-role"
+  assume_role_policy = data.aws_iam_policy.s3_ap_landing_policy.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-s3-ap-landing-role"
+    }
+  )
+}
 
-# resource "aws_iam_role_policy_attachment" "s3_ap_landing_attachment" {
-#   role       = aws_iam_role.s3_ap_landing_role.name
-#   policy_arn = aws_iam_policy.s3_ap_landing_policy.arn
-# }
+resource "aws_iam_role_policy_attachment" "s3_ap_landing_attachment" {
+  role       = aws_iam_role.s3_ap_landing_role.name
+  policy_arn = aws_iam_policy.s3_ap_landing_policy.arn
+}
 
 # S3 bucket access policy for Performance Hub landing bucket (data pushed from 
 # AP to a bucket in this account)
@@ -88,8 +88,3 @@ resource "aws_iam_policy" "s3_hub_Landing_policy" {
 }
 EOF
 }
-
-# IAM user for uploads & content bucket
-# resource "aws_iam_user" "uploaduser" {
-#     name = "uploaduser"
-# }
