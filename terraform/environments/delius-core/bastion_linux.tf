@@ -34,6 +34,8 @@ module "bastion_linux" {
   environment   = local.environment
   region        = "eu-west-2"
 
+  extra_user_data_content = "sudo yum install -y openldap-clients"
+
   # Tags
   tags_common = local.tags
   tags_prefix = terraform.workspace
