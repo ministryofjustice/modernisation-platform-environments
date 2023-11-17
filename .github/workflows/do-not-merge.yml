@@ -1,4 +1,4 @@
-name: Enfore do not merge label
+name: Enforce do not merge label
 
 on:
   pull_request:
