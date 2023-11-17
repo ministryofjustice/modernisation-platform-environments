@@ -17,3 +17,9 @@ variable "query_name" {
   type = string
   default = ""
 }
+
+variable "create_cw_insight" {
+  description = "Whether to create the Cloudwatch Insights Definition"
+  type        = bool
+  default     = false
+}
