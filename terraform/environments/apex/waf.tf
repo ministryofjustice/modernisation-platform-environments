@@ -1,9 +1,9 @@
-resource "aws_waf_ip_set" "wafmanualallowset" {
+resource "aws_waf_ipset" "wafmanualallowset" {
   name     = "${upper(local.application_name)} Manual Allow Set"
-  description        = ""
-  scope              = "CLOUDFRONT"
+  # description        = ""
+  # scope              = "CLOUDFRONT"
   provider           = aws.us-east-1
-  ip_address_version = "IPV4"
+  # ip_address_version = "IPV4"
   addresses          = [for ip in split("\n", chomp(file("${path}/aws_waf_ipset.txt"))) : ip]
 }
 
