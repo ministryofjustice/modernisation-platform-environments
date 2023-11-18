@@ -219,7 +219,8 @@ locals {
   s3_file_transfer_lambda_code_s3_key    = "build-artifacts/dev-sandbox/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
   s3_file_transfer_lambda_runtime        = "java11"
   s3_file_transfer_lambda_tracing        = "Active"
-  s3_file_transfer_lambda_retention_days = local.application_data.accounts[local.environment].s3_file_transfer_lambda_retention_days
+
+  scheduled_s3_file_transfer_lambda_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_lambda_retention_days
 
   s3_file_transfer_lambda_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
