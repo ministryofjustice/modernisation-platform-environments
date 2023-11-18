@@ -217,7 +217,7 @@ locals {
   s3_file_transfer_lambda_handler        = "uk.gov.justice.digital.lambda.S3FileTransferLambda::handleRequest"
   s3_file_transfer_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
   s3_file_transfer_lambda_code_s3_key    = "build-artifacts/digital-prison-reporting-jobs/jars/lambdas-vLatest-all.jar"
-  s3_file_transfer_lambda_runtime        = "java8"
+  s3_file_transfer_lambda_runtime        = "java11"
   s3_file_transfer_lambda_tracing        = "Active"
   s3_file_transfer_lambda_retention_days = local.application_data.accounts[local.environment].s3_file_transfer_lambda_retention_days
 

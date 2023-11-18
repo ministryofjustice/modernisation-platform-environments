@@ -24,6 +24,7 @@ variable "definition" {
 }
 
 variable "additional_policies" {
-  default     = []
   description = "(Optional) The list of Policies used for this Step Function."
+  type        = list(any)
+  default     = []
 }

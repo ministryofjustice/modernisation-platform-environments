@@ -802,15 +802,8 @@ module "s3_file_transfer_lambda" {
   tracing       = local.s3_file_transfer_lambda_tracing
   timeout       = 900 # Max timeout of 15 minutes
 
-  env_vars = {
-    "SOURCE_BUCKET"      = "dpr-landing-development"
-    "SOURCE_PREFIX"      = ""
-    "DESTINATION_BUCKET" = "dpr-raw-development"
-    "RETENTION_DAYS"     = local.s3_file_transfer_lambda_retention_days
-  }
-
   vpc_settings = {
-    subnet_ids         = [
+    subnet_ids = [
       data.aws_subnet.data_subnets_a.id,
       data.aws_subnet.data_subnets_b.id,
       data.aws_subnet.data_subnets_c.id
@@ -826,7 +819,7 @@ module "s3_file_transfer_lambda" {
     {
       Resource_Group = "ingestion-pipeline"
       Jira           = "DPR2-209"
-      Resource_Type  = "lambda"
+      Resource_Type  = "Lambda"
       Name           = local.s3_file_transfer_lambda_name
     }
   )
@@ -846,9 +839,9 @@ module "data_ingestion_pipeline" {
   step_function_name   = local.data_ingestion_step_function_name
 
   additional_policies = [
-    aws_iam_policy.invoke_lambda_policy,
-    aws_iam_policy.start_dms_task_policy,
-    aws_iam_policy.trigger_glue_job_policy
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.invoke_lambda_policy.name}",
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.start_dms_task_policy.name}",
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.trigger_glue_job_policy.name}"
   ]
 
   depends_on = [
@@ -864,31 +857,18 @@ module "data_ingestion_pipeline" {
   definition = <<EOF
   {
     "Comment": "Data Ingestion Pipeline Step Function",
-    "StartAt": "Start DMS Replication Task",
+    "StartAt": "Invoke S3 File Transfer Lambda",
     "States": {
-      "Start DMS Replication Task": {
-        "Type": "Task",
-        "Next": "Start Glue Batch Job",
-        "Parameters": {
-          "ReplicationTaskArn": "${module.dms_nomis_ingestor.dms_replication_task_arn}",
-          "StartReplicationTaskType": "start-replication"
-        },
-        "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask.waitForTaskToken"
-      },
-      "Start Glue Batch Job": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::glue:startJobRun.sync",
-        "Parameters": {
-          "JobName": "${module.glue_compact_curated_job.name}"
-        },
-        "Next": "Invoke S3 File Transfer Lambda"
-      },
       "Invoke S3 File Transfer Lambda": {
         "Type": "Task",
         "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-        "OutputPath": "$.Payload",
+        "InputPath": "$.Payload",
         "Parameters": {
-          "Payload.$": "$",
+          "Payload.$": {
+            "sourceBucket": "dpr-working-development",
+            "destinationBucket": "dpr-violation-development",
+            "sourceFolder": "DPR2_209_SOURCE/TABLE"
+          },
           "FunctionName": "${module.s3_file_transfer_lambda.lambda_function}",
         },
         "Retry": [
@@ -904,23 +884,6 @@ module "data_ingestion_pipeline" {
             "BackoffRate": 2
           }
         ],
-        "Next": "Resume DMS Replication Task"
-      },
-      "Resume DMS Replication Task": {
-        "Type": "Task",
-        "Next": "Start Glue Streaming Job",
-        "Parameters": {
-          "ReplicationTaskArn": "${module.dms_nomis_ingestor.dms_replication_task_arn}",
-          "StartReplicationTaskType": "resume-processing"
-        },
-        "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask"
-      },
-      "Start Glue Streaming Job": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::glue:startJobRun",
-        "Parameters": {
-          "JobName": "${module.glue_reporting_hub_job.name}"
-        },
         "End": true
       }
     }
