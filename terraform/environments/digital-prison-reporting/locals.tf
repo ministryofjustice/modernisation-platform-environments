@@ -221,6 +221,7 @@ locals {
   s3_file_transfer_lambda_tracing        = "Active"
 
   scheduled_s3_file_transfer_lambda_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_lambda_retention_days
+  enable_s3_file_transfer_lambda_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda_trigger
 
   s3_file_transfer_lambda_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",

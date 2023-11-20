@@ -831,6 +831,31 @@ module "s3_file_transfer_lambda" {
   ]
 }
 
+module "s3_file_transfer_lambda_trigger" {
+  source = "./modules/lambda_trigger"
+
+  enable_lambda_trigger = local.enable_s3_file_transfer_lambda_trigger
+
+  event_name            = "${local.project}-s3-transfer-lambda-trigger-${local.env}"
+  lambda_function_arn   = module.s3_file_transfer_lambda.lambda_function
+  lambda_function_name  = module.s3_file_transfer_lambda.lambda_name
+
+  trigger_input_event = <<EOF
+  {
+    "sourceBucket": "dpr-working-development",
+    "destinationBucket": "dpr-violation-development",
+    "retentionDays": "${local.scheduled_s3_file_transfer_lambda_retention_days}",
+    "sourceFolder": "DPR2_209_SOURCE/TABLE"
+  }
+  EOF
+
+  trigger_schedule_expression = "cron(0/30 * ? * * *)"
+
+  depends_on = [
+    module.s3_file_transfer_lambda
+  ]
+}
+
 # Data Ingest Pipeline Step Function
 module "data_ingestion_pipeline" {
   source = "./modules/step_function"
