@@ -1,6 +1,16 @@
 locals {
   production_config = {
 
+    baseline_s3_buckets = {
+      ncr-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
+        ]
+        iam_policies   = module.baseline_presets.s3_iam_policies
+      }
+    }
+
     baseline_route53_zones = {
       "reporting.nomis.service.justice.gov.uk" = {
         ns_records = [

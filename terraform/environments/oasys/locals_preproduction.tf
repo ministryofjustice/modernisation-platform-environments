@@ -6,11 +6,47 @@ locals {
       patch_day                 = "TUE"
     }
 
+    baseline_iam_policies = {
+      Ec2PreprodDatabasePolicy = {
+        description = "Permissions required for Preprod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::prod$-{local.application_name}-db-backup-bucket*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
+            ]
+          }
+        ]
+      }
+    }
+
+
     baseline_ec2_instances = {
     }
 
     baseline_ec2_autoscaling_groups = {
       "pp-${local.application_name}-db-a" = merge(local.database_a, {
+        config = merge(local.database_a.config, {
+          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
             branch = "main"
@@ -45,7 +81,6 @@ locals {
         }
       }
     }
-
 
     baseline_lbs = {
       private = {
