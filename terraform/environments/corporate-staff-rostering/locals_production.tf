@@ -448,6 +448,34 @@ locals {
         }
       }
 
+      pd-csr-w-6-b = {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-csr-w-6-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 112 }
+        }
+        tags = {
+          description       = "Migrated server PDCWW00006"
+          app-config-status = "pending"
+          csr-region        = "Region 5 and 6"
+          os-type           = "Windows"
+          ami               = "pd-csr-w-6-b"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
 
     }
     baseline_route53_zones = {
