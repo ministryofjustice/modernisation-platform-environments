@@ -3,10 +3,10 @@ locals {
 
   loadbalancer_ingress_rules = {
     "lb_ingress" = {
-      description     = "Loadbalancer ingress rule from CloudFront"
-      from_port       = var.security_group_ingress_from_port
-      to_port         = var.security_group_ingress_to_port
-      protocol        = var.security_group_ingress_protocol
+      description = "Loadbalancer ingress rule from CloudFront"
+      from_port   = var.security_group_ingress_from_port
+      to_port     = var.security_group_ingress_to_port
+      protocol    = var.security_group_ingress_protocol
       # Uncomment below when CloudFront is setup
       # prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
     }
@@ -23,27 +23,27 @@ locals {
     }
   }
 
-#   ip_set_list   = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))) : ip]
+  #   ip_set_list   = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))) : ip]
   custom_header = "X-Custom-Header-LAA-${upper(var.application_name)}"
 
-#   cloudfront_validation_records = {
-#     for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
-#       name   = dvo.resource_record_name
-#       record = dvo.resource_record_value
-#       type   = dvo.resource_record_type
-#       zone = lookup(
-#         local.route53_zones,
-#         dvo.domain_name,
-#         lookup(
-#           local.route53_zones,
-#           replace(dvo.domain_name, "/^[^.]*./", ""),
-#           lookup(
-#             local.route53_zones,
-#             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
-#             { provider = "external" }
-#       )))
-#     }
-#   }
+  #   cloudfront_validation_records = {
+  #     for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
+  #       name   = dvo.resource_record_name
+  #       record = dvo.resource_record_value
+  #       type   = dvo.resource_record_type
+  #       zone = lookup(
+  #         local.route53_zones,
+  #         dvo.domain_name,
+  #         lookup(
+  #           local.route53_zones,
+  #           replace(dvo.domain_name, "/^[^.]*./", ""),
+  #           lookup(
+  #             local.route53_zones,
+  #             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
+  #             { provider = "external" }
+  #       )))
+  #     }
+  #   }
 
   external_lb_validation_records = {
     for dvo in aws_acm_certificate.external_lb.domain_validation_options : dvo.domain_name => {
@@ -72,13 +72,13 @@ locals {
     } if value.zone.provider == "external"
   }
 
-#   validation_records_cloudfront = {
-#     for key, value in local.cloudfront_validation_records : key => {
-#       name   = value.name
-#       record = value.record
-#       type   = value.type
-#     } if value.zone.provider == "external"
-#   }
+  #   validation_records_cloudfront = {
+  #     for key, value in local.cloudfront_validation_records : key => {
+  #       name   = value.name
+  #       record = value.record
+  #       type   = value.type
+  #     } if value.zone.provider == "external"
+  #   }
 
   core_network_services_domains = {
     for domain, value in var.validation : domain => value if value.account == "core-network-services"

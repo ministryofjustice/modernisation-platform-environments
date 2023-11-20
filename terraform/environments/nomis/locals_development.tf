@@ -290,9 +290,9 @@ locals {
           flash = { total_size = 50 }
         })
         tags = merge(local.database_ec2.tags, {
-          nomis-environment   = "dev"
-          description         = "temporary DB to test DB restore"
-          oracle-sids         = ""
+          nomis-environment = "dev"
+          description       = "temporary DB to test DB restore"
+          oracle-sids       = ""
         })
       })
     }

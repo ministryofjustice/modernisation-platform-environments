@@ -120,7 +120,7 @@
             "threshold": 1000000000,
             "period": 300
           },
-          "swapusage_check":{
+          "swapusage_check": {
             "enable": true,
             "threshold": 750000000,
             "period": 300
@@ -274,7 +274,7 @@
             "threshold": 1000000000,
             "period": 300
           },
-          "swapusage_check":{
+          "swapusage_check": {
             "enable": true,
             "threshold": 750000000,
             "period": 300
@@ -306,7 +306,7 @@
           }
         }
       },
-      "setup_cw_insights": false        
+      "setup_cw_insights": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -394,7 +394,7 @@
       "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
-      "enable_redshift_health_check": true,     
+      "enable_redshift_health_check": true,
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -430,7 +430,7 @@
             "threshold": 1000000000,
             "period": 300
           },
-          "swapusage_check":{
+          "swapusage_check": {
             "enable": true,
             "threshold": 750000000,
             "period": 300
@@ -462,7 +462,7 @@
           }
         }
       },
-      "setup_cw_insights": false      
+      "setup_cw_insights": false
     },
     "production": {
       "project_short_id": "dpr",
@@ -584,7 +584,7 @@
             "threshold": 1000000000,
             "period": 300
           },
-          "swapusage_check":{
+          "swapusage_check": {
             "enable": true,
             "threshold": 750000000,
             "period": 300
@@ -616,7 +616,7 @@
           }
         }
       },
-      "setup_cw_insights": false               
+      "setup_cw_insights": false
     }
   }
 }

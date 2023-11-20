@@ -106,7 +106,7 @@ module "dpr_dms_free_memory_check" {
   alarm_name          = "dpr-dms-nomis-free-memory"
   alarm_description   = "ATTENTION: DPR DMS Instance FreeMemory Monitor, Please investigate FreeMemory is Below 1Gb DMS Instance !"
   comparison_operator = "LessThanThreshold"
-  period              = local.period_dms_freemem_check 
+  period              = local.period_dms_freemem_check
   evaluation_periods  = 1
   threshold           = local.thrld_dms_freemem_check # 1Gb
 
@@ -153,7 +153,7 @@ module "dpr_dms_swap_usage_check" {
   alarm_name          = "dpr-dms-nomis-swap-usage"
   alarm_description   = "ATTENTION: DPR DMS Instance SWAP Usage Monitor, Please investigate SWAP Usage is Above 0.75 Gb for DMS Instance!"
   comparison_operator = "GreaterThanThreshold"
-  period              = local.period_dms_swapusage_check 
+  period              = local.period_dms_swapusage_check
   evaluation_periods  = 1
   threshold           = local.thrld_dms_swapusage_check # 0.75Gb
 
