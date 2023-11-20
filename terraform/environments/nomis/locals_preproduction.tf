@@ -224,7 +224,7 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
           description       = "PreProduction NOMIS MIS and Audit database"
-          oracle-sids       = ""
+          oracle-sids       = "PPCNMAUD"
         })
       })
     }
