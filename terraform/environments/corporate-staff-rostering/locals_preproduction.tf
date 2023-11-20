@@ -4,6 +4,13 @@ locals {
   # baseline config
   preproduction_config = {
 
+    baseline_s3_buckets = {
+      csr-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+      }
+    }
+
     baseline_ssm_parameters = {
       "/oracle/database/PPIWFM" = local.database_ssm_parameters
     }
@@ -15,6 +22,18 @@ locals {
       Ec2PreprodDatabasePolicy = {
         description = "Permissions required for Preprod Database EC2s"
         statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::csr-db-backup-bucket*",
+            ]
+          },
           {
             effect = "Allow"
             actions = [
