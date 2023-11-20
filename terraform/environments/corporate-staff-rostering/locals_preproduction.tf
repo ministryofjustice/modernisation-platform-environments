@@ -105,6 +105,7 @@ locals {
           os-type     = "Linux"
           component   = "test"
           server-type = "csr-db"
+          oracle-sids = "PPIWFM"
         }
       })
 

@@ -138,6 +138,7 @@ locals {
           "${local.application_name}-environment" = "t2"
           bip-db-name                             = "T2BIPINF"
           instance-scheduling                     = "skip-scheduling"
+          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
         })
       })
       # "t2-${local.application_name}-db-b" = merge(local.database_b, {
@@ -186,6 +187,7 @@ locals {
           "${local.application_name}-environment" = "t1"
           bip-db-name                             = "T1BIPINF"
           instance-scheduling                     = "skip-scheduling"
+          oracle-sids                             = "T1BIPINF T1MISTRN T1OASREP T1OASYS T1ONRAUD T1ONRBDS T1ONRSYS"
         })
       })
 
