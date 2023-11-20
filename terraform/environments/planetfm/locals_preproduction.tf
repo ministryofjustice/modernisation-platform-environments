@@ -51,6 +51,26 @@ locals {
         })
       })
 
+      pp-cafm-a-11-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-cafm-a-11-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.large"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+        }
+        cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
+        tags = merge(local.defaults_app_ec2.tags, {
+          description       = "Migrated server PPFAW011 RDS session host app server"
+          ami               = "pp-cafm-a-11-a"
+          app-config-status = "pending"
+        })
+      })
+
 
       # web servers
       pp-cafm-w-4-b = merge(local.defaults_web_ec2, {
