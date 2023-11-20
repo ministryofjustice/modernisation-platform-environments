@@ -137,7 +137,7 @@ locals {
           description                             = "t2 ${local.application_name} database"
           "${local.application_name}-environment" = "t2"
           bip-db-name                             = "T2BIPINF"
-          # instance-scheduling                     = "skip-scheduling"
+          instance-scheduling                     = "skip-scheduling"
         })
       })
       # "t2-${local.application_name}-db-b" = merge(local.database_b, {
@@ -185,6 +185,7 @@ locals {
           description                             = "t1 ${local.application_name} database"
           "${local.application_name}-environment" = "t1"
           bip-db-name                             = "T1BIPINF"
+          instance-scheduling                     = "skip-scheduling"
         })
       })
 
