@@ -48,6 +48,7 @@ locals {
           {
             effect = "Allow"
             actions = [
+              "s3:GetBucketLocation",
               "s3:GetObject",
               "s3:GetObjectTagging",
               "s3:ListBucket",
