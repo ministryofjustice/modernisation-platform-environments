@@ -109,7 +109,7 @@ locals {
         }
       })
 
-      pp-csr-a-13-a = {
+      pp-csr-a-13-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-13-a"
           availability_zone = "${local.region}a"
@@ -135,9 +135,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-14-b = {
+      pp-csr-a-14-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-14-b"
           availability_zone = "${local.region}b"
@@ -163,9 +163,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-17-a = {
+      pp-csr-a-17-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-17-a"
           availability_zone = "${local.region}a"
@@ -191,9 +191,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-18-b = {
+      pp-csr-a-18-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-18-b"
           availability_zone = "${local.region}b"
@@ -219,9 +219,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-2-b = {
+      pp-csr-a-2-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-2-b"
           availability_zone = "${local.region}b"
@@ -245,9 +245,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-3-a = {
+      pp-csr-a-3-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-3-a"
           availability_zone = "${local.region}a"
@@ -271,9 +271,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-15-a = {
+      pp-csr-a-15-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-15-a"
           availability_zone = "${local.region}a"
@@ -299,9 +299,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-16-b = {
+      pp-csr-a-16-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-16-b"
           availability_zone = "${local.region}b"
@@ -327,9 +327,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-1-a = {
+      pp-csr-w-1-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "PPCWW00001"
           availability_zone = "${local.region}a"
@@ -355,9 +355,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-2-b = {
+      pp-csr-w-2-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-2-b"
           availability_zone = "${local.region}b"
@@ -383,9 +383,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-5-a = {
+      pp-csr-w-5-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "PPCWW00005"
           availability_zone = "${local.region}a"
@@ -410,9 +410,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-6-b = {
+      pp-csr-w-6-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-6-b"
           availability_zone = "${local.region}b"
@@ -438,9 +438,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-7-a = {
+      pp-csr-w-7-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-7-b"
           availability_zone = "${local.region}a"
@@ -464,9 +464,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-8-b = {
+      pp-csr-w-8-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-8-b"
           availability_zone = "${local.region}b"
@@ -490,9 +490,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-3-a = {
+      pp-csr-w-3-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-3-a"
           availability_zone = "${local.region}a"
@@ -518,9 +518,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-4-b = {
+      pp-csr-w-4-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-4-b"
           availability_zone = "${local.region}b"
@@ -546,7 +546,7 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
     }
 
