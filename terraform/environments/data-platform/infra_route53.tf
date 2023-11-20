@@ -172,6 +172,7 @@ resource "aws_route53_record" "delegate_assets_production_data_platform_service_
   records = ["ingress.apps-tools.data-platform.service.justice.gov.uk."]
 }
 
+# Delegating to data-platform-apps-and-tools-production
 resource "aws_route53_record" "delegate_control_panel_production_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-production" ? 1 : 0
 
@@ -180,6 +181,17 @@ resource "aws_route53_record" "delegate_control_panel_production_data_platform_s
   type    = "CNAME"
   ttl     = "300"
   records = ["ingress.apps-tools.data-platform.service.justice.gov.uk."]
+}
+
+# Auth0
+resource "aws_route53_record" "auth_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  name    = "auth0.data-platform.service.justice.gov.uk"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["ministryofjustice-data-platform-cd-dk5jlhurgfon6kxk.edge.tenants.uk.auth0.com."]
 }
 
 ##################################################
@@ -220,6 +232,7 @@ resource "aws_route53_record" "delegate_assets_development_data_platform_service
   records = ["ingress.apps-tools.development.data-platform.service.justice.gov.uk."]
 }
 
+# Delegating to data-platform-apps-and-tools-development
 resource "aws_route53_record" "delegate_control_panel_development_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
@@ -228,6 +241,17 @@ resource "aws_route53_record" "delegate_control_panel_development_data_platform_
   type    = "CNAME"
   ttl     = "300"
   records = ["ingress.apps-tools.development.data-platform.service.justice.gov.uk."]
+}
+
+# Auth0
+resource "aws_route53_record" "auth_development_data_platform_service_justice_gov_uk" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  zone_id = aws_route53_zone.development_data_platform_service_justice_gov_uk[0].zone_id
+  name    = "auth0.development.data-platform.service.justice.gov.uk"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["ministryofjustice-data-platform-development-cd-zvdb1vq1ynemnuqs.edge.tenants.uk.auth0.com."]
 }
 
 ##################################################
