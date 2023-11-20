@@ -69,7 +69,7 @@ locals {
 
         ebs_volumes = {
           "/dev/sdb" = { type = "gp3", label = "app", size = 100 } # /u01
-          "/dev/sdc" = { type = "gp3", label = "app", size = 100 } # /u02
+          "/dev/sdc" = { type = "gp3", label = "app", size = 500 } # /u02
           "/dev/sde" = { type = "gp3", label = "data" }            # DATA01
           "/dev/sdf" = { type = "gp3", label = "data" }            # DATA02
           "/dev/sdg" = { type = "gp3", label = "data" }            # DATA03
@@ -129,7 +129,7 @@ locals {
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
           "/dev/sdb"  = { label = "app", size = 100 } # /u01
-          "/dev/sdc"  = { label = "app", size = 100 } # /u02
+          "/dev/sdc"  = { label = "app", size = 500 } # /u02
         })
 
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
@@ -160,11 +160,11 @@ locals {
       })
 
       pd-csr-a-7-a = {
-        config = merge(local._defaults_app_ec2.config, {
+        config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-7-a"
           availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
+        instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -188,11 +188,11 @@ locals {
       }
 
       pd-csr-a-8-b = {
-        config = merge(local._defaults_app_ec2.config, {
+        config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-8-b"
           availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
+        instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -216,11 +216,11 @@ locals {
       }
 
       pd-csr-a-9-a = {
-        config = merge(local._defaults_app_ec2.config, {
+        config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-9-a"
           availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
+        instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -243,12 +243,95 @@ locals {
         }
       }
 
+      pd-csr-a-10-b = {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-csr-a-10-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 112 }
+        }
+        tags = {
+          description       = "Migrated server PDCAW00010"
+          app-config-status = "pending"
+          csr-region        = "Region 4"
+          os-type           = "Windows"
+          ami               = "pd-csr-a-10-b"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pd-csr-a-11-a = {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-csr-a-11-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 112 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        tags = {
+          description       = "Migrated server PDCAW00011"
+          app-config-status = "pending"
+          csr-region        = "Region 5"
+          os-type           = "Windows"
+          ami               = "pd-csr-a-11-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
+      pd-csr-a-12-b = {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-csr-a-12-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 112 }
+        }
+        tags = {
+          description       = "Migrated server PDCAW00012"
+          app-config-status = "pending"
+          csr-region        = "Region 6"
+          os-type           = "Windows"
+          ami               = "pd-csr-a-12-b"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      }
+
       pd-csr-w-1-a = {
-        config = merge(local._defaults_web_ec2.config, {
+        config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-1-a"
           availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
+        instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -272,11 +355,11 @@ locals {
       }
 
       pd-csr-w-2-b = {
-        config = merge(local._defaults_web_ec2.config, {
+        config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-2-b"
           availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
+        instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -300,11 +383,11 @@ locals {
       }
 
       pd-csr-w-3-a = {
-        config = merge(local._defaults_web_ec2.config, {
+        config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-3-a"
           availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
+        instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {
@@ -328,11 +411,11 @@ locals {
       }
 
       pd-csr-w-4-b = {
-        config = merge(local._defaults_web_ec2.config, {
+        config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-4-b"
           availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
+        instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
         })
         ebs_volumes = {

@@ -1,6 +1,6 @@
 locals {
 
-  _defaults_ec2 = {
+  defaults_ec2 = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_owner                     = "self"
       ebs_volumes_copy_all_from_ami = false
@@ -16,14 +16,14 @@ locals {
     })
   }
 
-  _defaults_app_ec2 = merge(local._defaults_ec2, {
-    instance = merge(local._defaults_ec2.instance, {
+  defaults_app_ec2 = merge(local.defaults_ec2, {
+    instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["domain", "app", "jumpserver"]
     })
   })
 
-  _defaults_web_ec2 = merge(local._defaults_ec2, {
-    instance = merge(local._defaults_ec2.instance, {
+  defaults_web_ec2 = merge(local.defaults_ec2, {
+    instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["domain", "web", "jumpserver"]
     })
   })

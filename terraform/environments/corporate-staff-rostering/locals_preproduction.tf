@@ -90,12 +90,12 @@ locals {
       })
 
       pp-csr-a-13-a = {
-        config = merge(local._defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-13-a"
-          availability_zone             = "${local.region}a"
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-13-a"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -118,12 +118,12 @@ locals {
       }
 
       pp-csr-a-14-b = {
-        config = merge(local._defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-14-b"
-          availability_zone             = "${local.region}b"
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-14-b"
+          availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -146,12 +146,12 @@ locals {
       }
 
       pp-csr-a-17-a = {
-        config = merge(local._defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-17-a"
-          availability_zone             = "${local.region}a"
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-17-a"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -174,12 +174,12 @@ locals {
       }
 
       pp-csr-a-18-b = {
-        config = merge(local._defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-18-b"
-          availability_zone             = "${local.region}b"
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-18-b"
+          availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -202,12 +202,12 @@ locals {
       }
 
       pp-csr-a-2-b = {
-        config = merge(local._defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-2-b"
-          availability_zone             = "${local.region}b"
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-2-b"
+          availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -228,12 +228,12 @@ locals {
       }
 
       pp-csr-a-3-a = {
-        config = merge(local._defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-3-a"
-          availability_zone             = "${local.region}a"
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-3-a"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -254,12 +254,12 @@ locals {
       }
 
       pp-csr-a-15-a = {
-        config = merge(local._defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-15-a"
-          availability_zone             = "${local.region}a"
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-15-a"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -282,12 +282,12 @@ locals {
       }
 
       pp-csr-a-16-b = {
-        config = merge(local._defaults_app_ec2.config, {
-          ami_name                      = "pp-csr-a-16-b"
-          availability_zone             = "${local.region}b"
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-16-b"
+          availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_app_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -310,12 +310,12 @@ locals {
       }
 
       pp-csr-w-1-a = {
-        config = merge(local._defaults_web_ec2.config, {
-          ami_name                      = "PPCWW00001"
-          availability_zone             = "${local.region}a"
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "PPCWW00001"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -338,12 +338,12 @@ locals {
       }
 
       pp-csr-w-2-b = {
-        config = merge(local._defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-2-b"
-          availability_zone             = "${local.region}b"
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-2-b"
+          availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -366,12 +366,12 @@ locals {
       }
 
       pp-csr-w-5-a = {
-        config = merge(local._defaults_web_ec2.config, {
-          ami_name                      = "PPCWW00005"
-          availability_zone             = "${local.region}a"
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "PPCWW00005"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -393,12 +393,12 @@ locals {
       }
 
       pp-csr-w-6-b = {
-        config = merge(local._defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-6-b"
-          availability_zone             = "${local.region}b"
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-6-b"
+          availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -421,12 +421,12 @@ locals {
       }
 
       pp-csr-w-7-a = {
-        config = merge(local._defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-7-b"
-          availability_zone             = "${local.region}a"
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-7-b"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -447,12 +447,12 @@ locals {
       }
 
       pp-csr-w-8-b = {
-        config = merge(local._defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-8-b"
-          availability_zone             = "${local.region}b"
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-8-b"
+          availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 200 }
@@ -473,12 +473,12 @@ locals {
       }
 
       pp-csr-w-3-a = {
-        config = merge(local._defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-3-a"
-          availability_zone             = "${local.region}a"
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-3-a"
+          availability_zone = "${local.region}a"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -501,12 +501,12 @@ locals {
       }
 
       pp-csr-w-4-b = {
-        config = merge(local._defaults_web_ec2.config, {
-          ami_name                      = "pp-csr-w-4-b"
-          availability_zone             = "${local.region}b"
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-4-b"
+          availability_zone = "${local.region}b"
         })
-        instance = merge(local._defaults_web_ec2.instance, {
-          instance_type           = "m5.2xlarge"
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -561,6 +561,173 @@ locals {
     }
 
     baseline_lbs = {
+      r34 = {
+        internal_lb              = true
+        enable_delete_protection = false
+        load_balancer_type       = "network"
+        force_destroy_bucket     = true
+        subnets = [
+          module.environment.subnet["private"]["eu-west-2a"].id,
+          module.environment.subnet["private"]["eu-west-2b"].id,
+        ]
+        security_groups = ["load-balancer"]
+        access_logs     = false
+
+        instance_target_groups = {
+          pp-csr-w-56-80 = {
+            port     = 80
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              port                = 80
+              protocol            = "TCP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          pp-csr-w-56-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          pp-csr-w-56-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          pp-csr-w-56-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7780
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+          pp-csr-w-56-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7781
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-5-a" },
+              { ec2_instance_name = "pp-csr-w-6-b" },
+            ]
+          }
+        }
+
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-56-80"
+            }
+          }
+          http-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-56-7770"
+            }
+          }
+          http-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-56-7771"
+            }
+          }
+          http-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-56-7780"
+            }
+          }
+          http-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-56-7781"
+            }
+          }
+        }
+      }
       private = {
         internal_lb              = true
         enable_delete_protection = false
@@ -1221,8 +1388,8 @@ locals {
         lb_alias_records = [
           { name = "r1", type = "A", lbs_map_key = "private" },
           { name = "r2", type = "A", lbs_map_key = "private" },
-          { name = "r3", type = "A", lbs_map_key = "private" },
-          { name = "r4", type = "A", lbs_map_key = "private" },
+          { name = "r3", type = "A", lbs_map_key = "r34" },
+          { name = "r4", type = "A", lbs_map_key = "r34" },
           { name = "r5", type = "A", lbs_map_key = "private" },
           { name = "r6", type = "A", lbs_map_key = "private" },
           { name = "traina", type = "A", lbs_map_key = "private" },

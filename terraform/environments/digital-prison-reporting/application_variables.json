@@ -27,15 +27,15 @@
       "compact_raw_job_worker_type": "G.1X",
       "compact_raw_job_num_workers": 2,
       "compact_raw_job_log_level": "INFO",
-      "compact_raw_job_schedule": "cron(0 22 * * ? *)",
+      "compact_raw_job_schedule": "cron(45 1 * * ? *)",
       "compact_structured_job_worker_type": "G.1X",
       "compact_structured_job_num_workers": 2,
       "compact_structured_job_log_level": "INFO",
-      "compact_structured_job_schedule": "cron(0 22 * * ? *)",
+      "compact_structured_job_schedule": "cron(45 1 * * ? *)",
       "compact_curated_job_worker_type": "G.1X",
       "compact_curated_job_num_workers": 2,
       "compact_curated_job_log_level": "INFO",
-      "compact_curated_job_schedule": "cron(0 22 * * ? *)",
+      "compact_curated_job_schedule": "cron(45 1 * * ? *)",
       "compact_domain_job_worker_type": "G.1X",
       "compact_domain_job_num_workers": 2,
       "compact_domain_job_log_level": "INFO",
@@ -83,9 +83,76 @@
       "setup_fake_data_dms_instance": true,
       "enable_fake_data_dms_replication_task": true,
       "setup_sonatype_secrets": true,
-      "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
-      "setup_redshift_schedule": true
+      "setup_redshift_schedule": true,
+      "alarms": {
+        "setup_cw_alarms": true,
+        "redshift": {
+          "health_check": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
+        },
+        "dms": {
+          "stop_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "start_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "cpu_check": {
+            "enable": true,
+            "threshold": 80,
+            "period": 300
+          },
+          "freemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "freeablemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "swapusage_check":{
+            "enable": true,
+            "threshold": 750000000,
+            "period": 300
+          },
+          "network_trans_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "network_rec_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "cdc_src_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_targ_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_inc_events_check": {
+            "enable": true,
+            "threshold": 100,
+            "period": 60
+          }
+        }
+      },
+      "setup_cw_insights": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -114,15 +181,15 @@
       "compact_raw_job_worker_type": "G.1X",
       "compact_raw_job_num_workers": 2,
       "compact_raw_job_log_level": "INFO",
-      "compact_raw_job_schedule": "cron(0 22 * * ? *)",
+      "compact_raw_job_schedule": "cron(45 1 * * ? *)",
       "compact_structured_job_worker_type": "G.1X",
       "compact_structured_job_num_workers": 2,
       "compact_structured_job_log_level": "INFO",
-      "compact_structured_job_schedule": "cron(0 22 * * ? *)",
+      "compact_structured_job_schedule": "cron(45 1 * * ? *)",
       "compact_curated_job_worker_type": "G.1X",
       "compact_curated_job_num_workers": 2,
       "compact_curated_job_log_level": "INFO",
-      "compact_curated_job_schedule": "cron(0 22 * * ? *)",
+      "compact_curated_job_schedule": "cron(45 1 * * ? *)",
       "compact_domain_job_worker_type": "G.1X",
       "compact_domain_job_num_workers": 2,
       "compact_domain_job_log_level": "INFO",
@@ -170,9 +237,76 @@
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
       "setup_sonatype_secrets": false,
-      "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
-      "setup_redshift_schedule": true
+      "setup_redshift_schedule": true,
+      "alarms": {
+        "setup_cw_alarms": true,
+        "redshift": {
+          "health_check": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
+        },
+        "dms": {
+          "stop_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "start_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "cpu_check": {
+            "enable": true,
+            "threshold": 80,
+            "period": 300
+          },
+          "freemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "freeablemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "swapusage_check":{
+            "enable": true,
+            "threshold": 750000000,
+            "period": 300
+          },
+          "network_trans_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "network_rec_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "cdc_src_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_targ_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_inc_events_check": {
+            "enable": true,
+            "threshold": 100,
+            "period": 60
+          }
+        }
+      },
+      "setup_cw_insights": false        
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -201,15 +335,15 @@
       "compact_raw_job_worker_type": "G.1X",
       "compact_raw_job_num_workers": 2,
       "compact_raw_job_log_level": "INFO",
-      "compact_raw_job_schedule": "cron(0 22 * * ? *)",
+      "compact_raw_job_schedule": "cron(45 1 * * ? *)",
       "compact_structured_job_worker_type": "G.1X",
       "compact_structured_job_num_workers": 2,
       "compact_structured_job_log_level": "INFO",
-      "compact_structured_job_schedule": "cron(0 22 * * ? *)",
+      "compact_structured_job_schedule": "cron(45 1 * * ? *)",
       "compact_curated_job_worker_type": "G.1X",
       "compact_curated_job_num_workers": 2,
       "compact_curated_job_log_level": "INFO",
-      "compact_curated_job_schedule": "cron(0 22 * * ? *)",
+      "compact_curated_job_schedule": "cron(45 1 * * ? *)",
       "compact_domain_job_worker_type": "G.1X",
       "compact_domain_job_num_workers": 2,
       "compact_domain_job_log_level": "INFO",
@@ -259,7 +393,76 @@
       "setup_sonatype_secrets": false,
       "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
-      "setup_redshift_schedule": true
+      "setup_redshift_schedule": true,
+      "enable_redshift_health_check": true,     
+      "alarms": {
+        "setup_cw_alarms": true,
+        "redshift": {
+          "health_check": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
+        },
+        "dms": {
+          "stop_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "start_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "cpu_check": {
+            "enable": true,
+            "threshold": 80,
+            "period": 300
+          },
+          "freemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "freeablemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "swapusage_check":{
+            "enable": true,
+            "threshold": 750000000,
+            "period": 300
+          },
+          "network_trans_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "network_rec_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "cdc_src_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_targ_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_inc_events_check": {
+            "enable": true,
+            "threshold": 100,
+            "period": 60
+          }
+        }
+      },
+      "setup_cw_insights": false      
     },
     "production": {
       "project_short_id": "dpr",
@@ -288,15 +491,15 @@
       "compact_raw_job_worker_type": "G.1X",
       "compact_raw_job_num_workers": 2,
       "compact_raw_job_log_level": "INFO",
-      "compact_raw_job_schedule": "cron(0 22 * * ? *)",
+      "compact_raw_job_schedule": "cron(45 1 * * ? *)",
       "compact_structured_job_worker_type": "G.1X",
       "compact_structured_job_num_workers": 2,
       "compact_structured_job_log_level": "INFO",
-      "compact_structured_job_schedule": "cron(0 22 * * ? *)",
+      "compact_structured_job_schedule": "cron(45 1 * * ? *)",
       "compact_curated_job_worker_type": "G.1X",
       "compact_curated_job_num_workers": 2,
       "compact_curated_job_log_level": "INFO",
-      "compact_curated_job_schedule": "cron(0 22 * * ? *)",
+      "compact_curated_job_schedule": "cron(45 1 * * ? *)",
       "compact_domain_job_worker_type": "G.1X",
       "compact_domain_job_num_workers": 2,
       "compact_domain_job_log_level": "INFO",
@@ -344,9 +547,76 @@
       "setup_fake_data_dms_instance": false,
       "enable_fake_data_dms_replication_task": false,
       "setup_sonatype_secrets": false,
-      "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": false,
-      "setup_redshift_schedule": false
+      "setup_redshift_schedule": false,
+      "alarms": {
+        "setup_cw_alarms": true,
+        "redshift": {
+          "health_check": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
+        },
+        "dms": {
+          "stop_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "start_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "cpu_check": {
+            "enable": true,
+            "threshold": 80,
+            "period": 300
+          },
+          "freemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "freeablemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "swapusage_check":{
+            "enable": true,
+            "threshold": 750000000,
+            "period": 300
+          },
+          "network_trans_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "network_rec_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "cdc_src_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_targ_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_inc_events_check": {
+            "enable": true,
+            "threshold": 100,
+            "period": 60
+          }
+        }
+      },
+      "setup_cw_insights": false               
     }
   }
 }

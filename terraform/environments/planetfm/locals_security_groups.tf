@@ -411,19 +411,47 @@ locals {
           protocol    = -1
           self        = true
         }
-        rdp_tcp_app = {
-          description = "3389: Allow RDP UDP ingress from jumpserver"
+        rdp_tcp_db = {
+          description = "3389: Allow RDP TCP ingress from azure jumpservers"
           from_port   = 3389
           to_port     = 3389
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.jumpservers
         }
-        rdp_udp_app = {
-          description = "3389: Allow RDP UDP ingress from jumpserver"
+        rdp_udp_db = {
+          description = "3389: Allow RDP UDP ingress from azure jumpservers"
           from_port   = 3389
           to_port     = 3389
           protocol    = "UDP"
           cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+        sql_tcp_1433_enduser = {
+          description = "1433: Allow SQL Server TCP ingress from enduserclient for authentication"
+          from_port   = 1433
+          to_port     = 1433
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        sql_udp_1434_enduser = {
+          description = "1434: Allow SQL Server UDP ingress from enduserclient for authentication"
+          from_port   = 1434
+          to_port     = 1434
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        cafm_licensing_7071_db = {
+          description = "7071: All CAFM licensing inbound"
+          from_port   = 7071
+          to_port     = 7071
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient # NOTE: this may need to change at some point
+        }
+        cafm_licensing_db = {
+          description = "7073: All CAFM licensing inbound"
+          from_port   = 7073
+          to_port     = 7073
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient # NOTE: this may need to change at some point
         }
       }
       egress = {
