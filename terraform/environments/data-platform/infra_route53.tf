@@ -223,7 +223,7 @@ resource "aws_route53_record" "delegate_assets_development_data_platform_service
 resource "aws_route53_record" "delegate_control_panel_development_data_platform_service_justice_gov_uk" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  zone_id = aws_route53_zone.data_platform_service_justice_gov_uk[0].zone_id
+  zone_id = aws_route53_zone.development_data_platform_service_justice_gov_uk[0].zone_id
   name    = "control-panel.development.data-platform.service.justice.gov.uk"
   type    = "CNAME"
   ttl     = "300"
