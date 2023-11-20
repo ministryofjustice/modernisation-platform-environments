@@ -119,7 +119,7 @@ resource "aws_volume_attachment" "home_att" {
   instance_id = aws_instance.ec2_ebsapps[count.index].id
 }
 
-resource "aws_ebs_volume" "export_home" {
+resource "aws_ebs_volume" "apps_export_home" {
   count = local.application_data.accounts[local.environment].ebsapps_no_instances
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -135,15 +135,15 @@ resource "aws_ebs_volume" "export_home" {
   )
 }
 
-resource "aws_volume_attachment" "export_home_att" {
+resource "aws_volume_attachment" "apps_export_home_att" {
   count       = local.application_data.accounts[local.environment].ebsapps_no_instances
-  depends_on  = [aws_ebs_volume.export_home]
+  depends_on  = [aws_ebs_volume.apps_export_home]
   device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.export_home[count.index].id
+  volume_id   = aws_ebs_volume.apps_export_home[count.index].id
   instance_id = aws_instance.ec2_ebsapps[count.index].id
 }
 
-resource "aws_ebs_volume" "u01" {
+resource "aws_ebs_volume" "apps_u01" {
   count = local.application_data.accounts[local.environment].ebsapps_no_instances
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -159,15 +159,15 @@ resource "aws_ebs_volume" "u01" {
   )
 }
 
-resource "aws_volume_attachment" "u01_att" {
+resource "aws_volume_attachment" "apps_u01_att" {
   count       = local.application_data.accounts[local.environment].ebsapps_no_instances
-  depends_on  = [aws_ebs_volume.u01]
+  depends_on  = [aws_ebs_volume.apps_u01]
   device_name = "/dev/sdi"
-  volume_id   = aws_ebs_volume.u01[count.index].id
+  volume_id   = aws_ebs_volume.apps_u01[count.index].id
   instance_id = aws_instance.ec2_ebsapps[count.index].id
 }
 
-resource "aws_ebs_volume" "u03" {
+resource "aws_ebs_volume" "apps_u03" {
   count = local.application_data.accounts[local.environment].ebsapps_no_instances
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -183,11 +183,11 @@ resource "aws_ebs_volume" "u03" {
   )
 }
 
-resource "aws_volume_attachment" "u03_att" {
+resource "aws_volume_attachment" "apps_u03_att" {
   count       = local.application_data.accounts[local.environment].ebsapps_no_instances
-  depends_on  = [aws_ebs_volume.u03]
+  depends_on  = [aws_ebs_volume.apps_u03]
   device_name = "/dev/sdj"
-  volume_id   = aws_ebs_volume.u03[count.index].id
+  volume_id   = aws_ebs_volume.apps_u03[count.index].id
   instance_id = aws_instance.ec2_ebsapps[count.index].id
 }
 
