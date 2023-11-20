@@ -653,7 +653,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_pr
     effect = "Allow"
     actions = [
       "glue:DeleteTable",
-      "glue:GetTables"
+      "glue:GetTable"
     ]
     resources = [
       "*"
