@@ -594,8 +594,8 @@ locals {
           module.environment.subnet["private"]["eu-west-2a"].id,
           module.environment.subnet["private"]["eu-west-2b"].id,
         ]
-        security_groups = ["load-balancer"]
-        access_logs     = false
+        security_groups      = ["load-balancer"]
+        existing_bucket_name = "csr-nlb-log-bucket20231121131301186300000001"
 
         instance_target_groups = {
           pp-csr-w-56-80 = {

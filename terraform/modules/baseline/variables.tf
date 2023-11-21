@@ -562,6 +562,7 @@ variable "lbs" {
     load_balancer_type       = optional(string, "application")
     security_groups          = list(string)
     subnets                  = list(string)
+    existing_bucket_name     = optional(string, "") # module default value is empty string
     instance_target_groups = optional(map(object({
       port                 = optional(number)
       protocol             = optional(string)
