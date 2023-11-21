@@ -34,14 +34,6 @@ resource "aws_iam_policy" "dms-s3-target-policy" {
                 "kms:*"
             ],
             "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*",
-                "kms:*"
-            ],
-            "Resource": "*"
         }
     ]
 }

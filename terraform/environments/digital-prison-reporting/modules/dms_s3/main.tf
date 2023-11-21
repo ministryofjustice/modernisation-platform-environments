@@ -46,10 +46,6 @@ resource "aws_dms_replication_task" "dms-replication" {
   table_mappings            = data.template_file.table-mappings.rendered
   replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings.json")
 
-  #  lifecycle {
-  #    ignore_changes = [replication_task_settings]
-  #  }
-
   depends_on = [
     aws_dms_replication_instance.dms-s3-target-instance,
     aws_dms_endpoint.dms-s3-target-source,
@@ -101,7 +97,6 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
 
   tags = {
     Resource_Type = "DMS Target"
-    Jira          = "DPR2-165"
   }
 }
 
