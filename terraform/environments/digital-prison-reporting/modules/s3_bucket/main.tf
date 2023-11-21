@@ -15,8 +15,6 @@ resource "aws_s3_bucket" "storage" { # TBC "application_tf_state" should be gene
   }
 
   tags = var.tags
-
-  force_destroy = var.force_destroy
 }
 
 resource "aws_s3_bucket_public_access_block" "storage" {
