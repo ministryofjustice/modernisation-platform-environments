@@ -4,10 +4,9 @@
 #   *.laa-preproduction.modernisation-platform.service.justice.gov.uk
 
 resource "aws_acm_certificate" "external" {
-  count = local.is-production ? 0 : 1
 
   validation_method = "DNS"
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = format("%s-%s.modernisation-platform.service.justice.gov.uk", "laa", local.environment)
   subject_alternative_names = [
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "agatedev1-upgrade", var.networking[0].business-unit, local.environment),
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "agatedev2-upgrade", var.networking[0].business-unit, local.environment),
@@ -37,7 +36,7 @@ resource "aws_route53_record" "external_validation" {
     aws_instance.ec2_ebsapps
   ]
 
-  provider = aws.core-network-services
+  provider = aws.core-vpc
 
   for_each = {
     for dvo in local.cert_opts : dvo.domain_name => {
