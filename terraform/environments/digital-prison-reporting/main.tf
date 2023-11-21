@@ -842,14 +842,14 @@ module "s3_file_transfer_lambda_trigger" {
 
   trigger_input_event = <<EOF
   {
-    "sourceBucket": "dpr-working-development",
-    "destinationBucket": "dpr-violation-development",
+    "sourceBucket": "${module.s3_landing_bucket.bucket_id}",
+    "destinationBucket": "${module.s3_raw_bucket.bucket_id}",
     "retentionDays": "${local.scheduled_s3_file_transfer_lambda_retention_days}",
     "sourceFolder": "DPR2_209_SOURCE/TABLE"
   }
   EOF
 
-  trigger_schedule_expression = "cron(0/30 * ? * * *)"
+  trigger_schedule_expression = "cron(0 0/3 ? * * *)"
 
   depends_on = [
     module.s3_file_transfer_lambda
@@ -887,14 +887,12 @@ module "data_ingestion_pipeline" {
       "Invoke S3 File Transfer Lambda": {
         "Type": "Task",
         "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-        "InputPath": "$.Payload",
         "Parameters": {
-          "Payload.$": {
-            "sourceBucket": "dpr-working-development",
-            "destinationBucket": "dpr-violation-development",
-            "sourceFolder": "DPR2_209_SOURCE/TABLE"
+          "Payload": {
+            "sourceBucket": "${module.s3_landing_bucket.bucket_id}",
+            "destinationBucket": "${module.s3_raw_bucket.bucket_id}"
           },
-          "FunctionName": "${module.s3_file_transfer_lambda.lambda_function}",
+          "FunctionName": "${module.s3_file_transfer_lambda.lambda_function}"
         },
         "Retry": [
           {
@@ -904,8 +902,8 @@ module "data_ingestion_pipeline" {
               "Lambda.SdkClientException",
               "Lambda.TooManyRequestsException"
             ],
-            "IntervalSeconds": 1,
-            "MaxAttempts": 3,
+            "IntervalSeconds": 10,
+            "MaxAttempts": 2,
             "BackoffRate": 2
           }
         ],
