@@ -125,7 +125,8 @@ module "lb" {
   load_balancer_type         = each.value.load_balancer_type
   lb_target_groups           = each.value.lb_target_groups
   access_logs                = each.value.access_logs
-  existing_bucket_name       = each.value.existing_bucket_name
+
+  existing_bucket_name       = try(module.s3_bucket[each.value.existing_bucket_name].bucket.id, each.value.existing_bucket_name)
 
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
