@@ -75,6 +75,117 @@ module "glue_reporting_hub_job" {
   }
 }
 
+# Glue Job, Reporting Hub Batch
+module "glue_reporting_hub_batch_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-reporting-hub-batch-${local.env}"
+  short_name                    = "${local.project}-reporting-hub-batch"
+  command_type                  = "glueetl"
+  description                   = "Applies initial batch load inserts from reporting hub to structured and curated zones"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-batch-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-batch-${local.env}/"
+  script_location               = local.glue_placeholder_script_location
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  additional_policies           = module.dms_nomis_to_s3_ingestor.dms_s3_iam_policy_admin_arn
+  execution_class               = "FLEX"
+  worker_type                   = local.reporting_hub_batch_job_worker_type
+  number_of_workers             = local.reporting_hub_batch_job_num_workers
+  max_concurrent                = 64
+  region                        = local.account_region
+  account                       = local.account_id
+  log_group_retention_in_days   = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-reporting-hub-batch-${local.env}"
+      Resource_Type = "Glue Job"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
+    "--datalake-formats"                    = "delta"
+    "--dpr.aws.region"                      = local.account_region
+    "--dpr.raw.s3.path"                     = "s3://${module.s3_raw_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
+    "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_batch_job_retry_max_attempts
+    "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_batch_job_retry_min_wait_millis
+    "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_batch_job_retry_max_wait_millis
+    "--dpr.log.level"                       = local.reporting_hub_batch_job_log_level
+  }
+}
+
+# Glue Job, Reporting Hub CDC
+module "glue_reporting_hub_cdc_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-reporting-hub-cdc-${local.env}"
+  short_name                    = "${local.project}-reporting-hub-cdc"
+  command_type                  = "gluestreaming"
+  description                   = "Monitors the reporting hub for table changes and applies them to structured and curated zones"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-cdc-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-cdc-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-cdc-${local.env}/"
+  script_location               = local.glue_placeholder_script_location
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  execution_class               = "STANDARD"
+  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  worker_type                   = local.reporting_hub_cdc_job_worker_type
+  number_of_workers             = local.reporting_hub_cdc_job_num_workers
+  max_concurrent                = 64
+  region                        = local.account_region
+  account                       = local.account_id
+  log_group_retention_in_days   = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-reporting-hub-cdc-${local.env}"
+      Resource_Type = "Glue Job"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--job-bookmark-option"                 = "job-bookmark-disable"
+    "--class"                               = "uk.gov.justice.digital.job.DataHubCdcJob"
+    "--datalake-formats"                    = "delta"
+    "--dpr.aws.region"                      = local.account_region
+    "--dpr.raw.s3.path"                     = "s3://${module.s3_raw_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
+    "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_cdc_job_retry_max_attempts
+    "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_cdc_job_retry_min_wait_millis
+    "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_cdc_job_retry_max_wait_millis
+    "--enable-metrics"                      = true
+    "--enable-spark-ui"                     = false
+    "--enable-auto-scaling"                 = true
+    "--enable-job-insights"                 = true
+    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
+    "--dpr.domain.target.path"              = "s3://${module.s3_domain_bucket.bucket_id}"
+    "--dpr.domain.catalog.db"               = module.glue_data_domain_database.db_name
+    "--dpr.redshift.secrets.name"           = "${local.project}-redshift-secret-${local.environment}"
+    "--dpr.datamart.db.name"                = "datamart"
+    "--dpr.log.level"                       = local.reporting_hub_cdc_job_log_level
+  }
+}
+
 # Glue Job, Domain Refresh
 module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
@@ -776,6 +887,57 @@ module "dms_fake_data_ingestor" {
       Name            = "${local.project}-dms-fake-data-ingestor-${local.env}"
       Resource_Type   = "DMS Replication"
       Postgres_Source = "DPS"
+    }
+  )
+}
+
+# DMS Nomis Data Collector
+module "dms_nomis_to_s3_ingestor" {
+  source                       = "./modules/dms_s3"
+  setup_dms_instance           = true
+  enable_replication_task      = true
+  name                         = "${local.project}-dms-nomis-ingestor-s3-target-${local.env}"
+  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
+  source_engine_name           = "oracle"
+  source_db_name               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
+  source_app_username          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["user"]
+  source_app_password          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["password"]
+  source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
+  source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
+  vpc                          = data.aws_vpc.shared.id
+  project_id                   = local.project
+  env                          = local.environment
+  dms_source_name              = "oracle"
+  dms_target_name              = "s3"
+  short_name                   = "nomis"
+  migration_type               = "full-load-and-cdc"
+  replication_instance_version = "3.4.7" # Upgrade
+  replication_instance_class   = "dms.t3.medium"
+  subnet_ids                   = [
+    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
+  ]
+
+  rename_rule_source_schema = "OMS_OWNER"
+  rename_rule_output_space  = "nomis"
+
+  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
+  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
+
+  extra_attributes = "supportResetlog=TRUE"
+
+  bucket_name = module.s3_raw_bucket.bucket_id
+
+  availability_zones = {
+    0 = "eu-west-2a"
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-dms-t3nomis-ingestor-s3-target-${local.env}"
+      Resource_Type = "DMS Replication"
+      Nomis_Source  = "T3"
+      Jira          = "DPR2-165"
     }
   )
 }
