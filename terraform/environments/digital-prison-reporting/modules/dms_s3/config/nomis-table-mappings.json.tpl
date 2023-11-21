@@ -70,6 +70,17 @@
             "rule-type": "transformation",
             "rule-id": "870343803",
             "rule-name": "870343803",
+            "rule-action": "convert-lowercase",
+            "rule-target": "table",
+            "object-locator": {
+                "schema-name": "%",
+                "table-name": "%"
+            }
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "870343804",
+            "rule-name": "870343804",
             "rule-action": "rename",
             "rule-target": "schema",
             "object-locator": {
