@@ -15,7 +15,7 @@ filter @message like /(?i)(Exception|error|fail)/
 EOH
 }
 
-module "dpr_cw_insights_cdc events" {
+module "dpr_cw_insights_cdc_events" {
   source              = "./modules/cw_insights"
   create_cw_insight   = local.enable_cw_insights
 
