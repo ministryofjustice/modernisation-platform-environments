@@ -85,7 +85,7 @@
       "enable_s3_file_transfer_lambda": true,
       "enable_s3_file_transfer_lambda_trigger": true,
       "scheduled_s3_file_transfer_lambda_retention_days": 2,
-      "enable_data_ingestion_step_function": false,
+      "enable_data_ingestion_step_function": true,
       "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": false,
