@@ -596,7 +596,6 @@ locals {
         ]
         security_groups      = ["load-balancer"]
         existing_bucket_name = "csr-nlb-log-bucket"
-        access_logs = true
 
         instance_target_groups = {
           pp-csr-w-56-80 = {
