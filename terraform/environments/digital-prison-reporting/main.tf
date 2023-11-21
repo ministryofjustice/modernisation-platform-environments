@@ -917,6 +917,9 @@ module "dms_nomis_to_s3_ingestor" {
     data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
   ]
 
+  rename_rule_source_schema = "OMS_OWNER"
+  rename_rule_output_space  = "nomis"
+
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
 

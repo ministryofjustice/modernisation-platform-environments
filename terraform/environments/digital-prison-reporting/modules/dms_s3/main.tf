@@ -33,6 +33,11 @@ resource "aws_dms_replication_instance" "dms-s3-target-instance" {
 
 data "template_file" "table-mappings" {
   template = file("${path.module}/config/${var.short_name}-table-mappings.json.tpl")
+
+  vars = {
+    input_schema = var.rename_rule_source_schema
+    output_space = var.rename_rule_output_space
+  }
 }
 
 resource "aws_dms_replication_task" "dms-replication" {

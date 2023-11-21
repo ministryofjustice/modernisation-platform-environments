@@ -64,6 +64,16 @@ variable "availability_zones" {
   ]
 }
 
+variable "rename_rule_source_schema" {
+  description = "The source schema we will rename to a target output 'space'"
+  type = string
+}
+
+variable "rename_rule_output_space" {
+  description = "The name of the target output 'space' that the source schema will be renamed to"
+  type = string
+}
+
 
 variable "subnet_ids" {
   description = "An List of VPC subnet IDs to use in the subnet group"
@@ -125,14 +135,9 @@ variable "target_backup_retention_period" {
 }
 
 variable "target_backup_window" {
-  # 12:00AM-03:00AM AEST
   default     = "14:00-17:00"
   description = "RDS backup window"
 }
-
-#variable "target_db_name" {
-#  description = "Name of the target database"
-#}
 
 variable "target_db_port" {
   description = "The port the Application Server will access the database on"
@@ -153,10 +158,6 @@ variable "target_maintenance_window" {
   default     = "Mon:00:00-Mon:03:00"
   description = "RDS maintenance window"
 }
-
-#variable "target_password" {
-#  description = "Password of the target database"
-#}
 
 variable "target_rds_is_multi_az" {
   description = "Create backup database in separate availability zone"

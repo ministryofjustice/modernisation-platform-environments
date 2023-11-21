@@ -65,6 +65,17 @@
             },
             "rule-action": "include",
             "filters": []
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "870343803",
+            "rule-name": "870343803",
+            "rule-action": "rename",
+            "rule-target": "schema",
+            "object-locator": {
+                "schema-name": "${input_schema}"
+            },
+            "value": "${output_space}"
         }
     ]
 }
