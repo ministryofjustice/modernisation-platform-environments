@@ -176,6 +176,7 @@ locals {
         })
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -204,6 +205,7 @@ locals {
         })
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -232,6 +234,7 @@ locals {
         })
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -260,6 +263,7 @@ locals {
         })
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -288,6 +292,7 @@ locals {
         })
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -316,6 +321,7 @@ locals {
         })
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -343,6 +349,7 @@ locals {
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -371,6 +378,7 @@ locals {
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -399,6 +407,7 @@ locals {
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -427,6 +436,7 @@ locals {
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -455,6 +465,7 @@ locals {
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -483,6 +494,7 @@ locals {
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.4xlarge"
+          monitoring    = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
