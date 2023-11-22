@@ -9,13 +9,6 @@ locals {
         custom_kms_key = module.environment.kms_keys["general"].arn
         iam_policies   = module.baseline_presets.s3_iam_policies
       }
-      csr-nlb-log-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAndDeleteAccessBucketPolicy,
-        ]
-        iam_policies   = module.baseline_presets.s3_iam_policies
-      }
     }
 
     baseline_ssm_parameters = {
@@ -598,7 +591,6 @@ locals {
           module.environment.subnet["private"]["eu-west-2b"].id,
         ]
         security_groups      = ["load-balancer"]
-        existing_bucket_name = "csr-nlb-log-bucket"
 
         instance_target_groups = {
           pp-csr-w-56-80 = {
