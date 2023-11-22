@@ -286,7 +286,7 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment  = "prod"
           description        = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
-          oracle-sids        = "PCNMAUD"
+          oracle-sids        = "CNMAUD"
           connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
         })
       })
