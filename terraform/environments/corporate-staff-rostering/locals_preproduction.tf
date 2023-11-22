@@ -1585,8 +1585,8 @@ locals {
           { name = "r2", type = "A", lbs_map_key = "private" },
           { name = "r3", type = "A", lbs_map_key = "r34" },
           { name = "r4", type = "A", lbs_map_key = "r34" },
-          { name = "r5", type = "A", lbs_map_key = "private" },
-          { name = "r6", type = "A", lbs_map_key = "private" },
+          { name = "r5", type = "A", lbs_map_key = "r56" },
+          { name = "r6", type = "A", lbs_map_key = "r56" },
           { name = "traina", type = "A", lbs_map_key = "private" },
           { name = "trainb", type = "A", lbs_map_key = "private" },
         ]
