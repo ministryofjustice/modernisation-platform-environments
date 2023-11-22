@@ -58,13 +58,8 @@ locals {
     local.database_cloudwatch_log_groups,
   )
 
-  baseline_cloudwatch_metric_alarms = merge(
-    ## local.database_cloudwatch_metric_alarms,
-  )
-
-  baseline_cloudwatch_log_metric_filters = merge(
-    local.database_cloudwatch_log_metric_filters,
-  )
+  baseline_cloudwatch_metric_alarms      = {}
+  baseline_cloudwatch_log_metric_filters = {}
 
   baseline_ec2_autoscaling_groups   = {}
   baseline_ec2_instances            = {}

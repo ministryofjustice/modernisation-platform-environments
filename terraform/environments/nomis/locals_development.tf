@@ -11,9 +11,6 @@ locals {
   # baseline config
   development_config = {
 
-    cloudwatch_metric_alarms_dbnames         = []
-    cloudwatch_metric_alarms_dbnames_misload = []
-
     baseline_s3_buckets = {
       nomis-audit-archives = {
         custom_kms_key = module.environment.kms_keys["general"].arn

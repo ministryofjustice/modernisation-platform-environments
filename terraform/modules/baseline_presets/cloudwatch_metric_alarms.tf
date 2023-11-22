@@ -141,41 +141,111 @@ locals {
       }
     }
 
-    ec2_instance_cwagent_collectd = {
-      chronyd-stopped = {
+    ec2_instance_cwagent_collectd_service_status = {
+      service_status_error_os_layer = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "collectd_chronyd_value"
+        metric_name         = "collectd_service_status_os_value"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if the chronyd service has stopped"
+        alarm_description   = "Triggers if an os-layer linux service such as chronyd or amazon-ssm-agent is stopped or in error. See collectd-service-metrics ansible role"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      cloudwatch-agent-stopped = {
+      service_status_error_app_layer = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "collectd_amazoncloudwatchagent_value"
+        metric_name         = "collectd_service_status_app_value"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if the cloudwatch agent service has stopped"
+        alarm_description   = "Triggers if an application-layer linux service such as weblogic is stopped or in error. See collectd-service-metrics ansible role"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      ssm-agent-stopped = {
+    }
+    ec2_instance_cwagent_collectd_connectivity_test = {
+      connectivity_test_failed = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "collectd_amazonssmagent_value"
+        metric_name         = "collectd_connectivity_test_value"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if the ssm agent service has stopped"
+        alarm_description   = "Triggers if a connectivity test failed. See connectivity-tests ec2 instance tag and collectd-connectivity-test ansible role"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+    ec2_instance_cwagent_collectd_textfile_monitoring = {
+      textfile_monitoring_metric_error = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_value"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if any metric collected via /opt/textfile_monitoring is in error, e.g. nomis batch or misload. See collectd-textfile-monitoring ansible role"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      textfile_monitoring_metric_not_updated = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_seconds"
+        period              = "129600"
+        statistic           = "Maximum"
+        threshold           = "1"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if any metric in /opt/textfile_monitoring hasn't been updated for over 36 hours"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+    ec2_instance_cwagent_collectd_oracle_db_connected = {
+      oracle_db_disconnected = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_oracle_db_connected_value"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if an oracle database is disconnected. See oracle-sids ec2 instance tag and collectd-oracle-db-connected ansible role"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+    ec2_instance_cwagent_collectd_oracle_db_backup = {
+      oracle_db_rman_backup_error = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_rman_backup_value"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if a scheduled oracle rman db backup has failed. See collectd-textfile-monitoring and oracle-db-backup role"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      oracle_db_rman_backup_did_not_run = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_rman_backup_seconds"
+        period              = "129600"
+        statistic           = "Maximum"
+        threshold           = "1"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if rman_backup metric not collected or not updated for over 36 hours"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
