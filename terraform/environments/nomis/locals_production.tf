@@ -232,7 +232,11 @@ locals {
       prod-nomis-db-1-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected, {
+            high-memory-usage = merge(local.database_ec2_cloudwatch_metric_alarms["high-memory-usage"], {
+              threshold = "99" # Sandhya confirmed this is OK while in DR mode
+            })
+          }
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
