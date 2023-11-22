@@ -21,7 +21,8 @@ resource "aws_cloudtrail" "data_s3_put_objects" {
       field = "eventName"
 
       equals = [
-        "PutObject"
+        "PutObject",
+        "CopyObject"
       ]
     }
 
