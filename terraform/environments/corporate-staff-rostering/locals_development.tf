@@ -39,7 +39,7 @@ locals {
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
           user_data_raw                 = base64encode(file("./templates/user-data.yaml"))
         })
-        cloudwatch_metric_alarms = local.app_ec2_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.windows
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["app", "domain", "jumpserver"]
           instance_type          = "t3.medium"

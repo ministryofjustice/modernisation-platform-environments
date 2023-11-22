@@ -50,7 +50,7 @@ locals {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           ami_owner         = "self"
           availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
@@ -122,27 +122,27 @@ locals {
         }
       }
 
-      pd-csr-db-b = merge(local.database_ec2, {
-        config = merge(local.database_ec2.config, {
+      pd-csr-db-b = merge(local.defaults_database_ec2, {
+        config = merge(local.defaults_database_ec2.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           availability_zone = "${local.region}b"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
-        instance = merge(local.database_ec2.instance, {
+        instance = merge(local.defaults_database_ec2.instance, {
           instance_type                = "r6i.xlarge"
           disable_api_stop             = true
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
         })
 
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+        ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
           "/dev/sdb"  = { label = "app", size = 100 } # /u01
           "/dev/sdc"  = { label = "app", size = 500 } # /u02
         })
 
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+        ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
           data = {
             iops       = 3000
             throughput = 125
