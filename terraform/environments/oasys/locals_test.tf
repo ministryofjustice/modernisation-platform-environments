@@ -201,11 +201,11 @@ locals {
             "Ec2T1BipPolicy",
           ])
         })
-        # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-        #     branch = "add-oasys-bip-role"
-        #   })
-        # })
+        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+            branch = "oasys/bip-db-hostname-code_correction"
+          })
+        })
         tags = merge(local.bip_b.tags, {
           # instance-scheduling = "skip-scheduling"
           oasys-environment   = "t1"
