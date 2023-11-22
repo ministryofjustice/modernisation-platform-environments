@@ -329,7 +329,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -434,7 +434,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
