@@ -591,6 +591,7 @@ locals {
           module.environment.subnet["private"]["eu-west-2b"].id,
         ]
         security_groups      = ["load-balancer"]
+        access_logs          = false
 
         instance_target_groups = {
           pp-csr-w-56-80 = {
