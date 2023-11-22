@@ -63,11 +63,11 @@ locals {
   database_ec2_misload_cloudwatch_metric_alarms = {
     misload_error = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "3"
-      datapoints_to_alarm = "3"
+      evaluation_periods  = "1"
+      datapoints_to_alarm = "1"
       namespace           = "CWAgent"
       metric_name         = "collectd_textfile_monitoring_value"
-      period              = "60"
+      period              = "300"
       statistic           = "Maximum"
       threshold           = "1"
       alarm_description   = "Triggers if misload process failed. See nomis-misload and collectd-textfile-monitoring ansible roles"
@@ -79,13 +79,13 @@ locals {
     }
     misload_metric_not_updated = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "3"
-      datapoints_to_alarm = "3"
+      evaluation_periods  = "1"
+      datapoints_to_alarm = "1"
       namespace           = "CWAgent"
       metric_name         = "collectd_textfile_monitoring_seconds"
-      period              = "129600"
+      period              = "300"
       statistic           = "Maximum"
-      threshold           = "1"
+      threshold           = "129600"
       treat_missing_data  = "breaching"
       alarm_description   = "Triggers if misload status metric missing or not updated or over 36 hours"
       alarm_actions       = ["dso_pagerduty"]
@@ -96,13 +96,13 @@ locals {
     }
     misload_long_running = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "3"
-      datapoints_to_alarm = "3"
+      evaluation_periods  = "1"
+      datapoints_to_alarm = "1"
       namespace           = "CWAgent"
       metric_name         = "collectd_textfile_monitoring_seconds"
-      period              = "14400"
+      period              = "300"
       statistic           = "Maximum"
-      threshold           = "1"
+      threshold           = "14400"
       treat_missing_data  = "notBreaching"
       alarm_description   = "Triggers if misload process is taking longer than 4 hours"
       alarm_actions       = ["dso_pagerduty"]

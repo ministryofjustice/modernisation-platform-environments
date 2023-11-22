@@ -168,16 +168,16 @@ locals {
       }
     }
     ec2_instance_cwagent_collectd_connectivity_test = {
-      connectivity_test_failed = {
+      connectivity_test_all_failed = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
         metric_name         = "collectd_connectivity_test_value"
         period              = "60"
-        statistic           = "Maximum"
+        statistic           = "Minimum"
         threshold           = "1"
-        alarm_description   = "Triggers if a connectivity test failed. See connectivity-tests ec2 instance tag and collectd-connectivity-test ansible role"
+        alarm_description   = "Triggers if all connectivity tests fail on a host. See connectivity-tests ec2 instance tag and collectd-connectivity-test ansible role"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
@@ -196,13 +196,13 @@ locals {
       }
       textfile_monitoring_metric_not_updated = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        datapoints_to_alarm = "3"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
         namespace           = "CWAgent"
         metric_name         = "collectd_textfile_monitoring_seconds"
-        period              = "129600"
+        period              = "300"
         statistic           = "Maximum"
-        threshold           = "1"
+        threshold           = "129600"
         treat_missing_data  = "breaching"
         alarm_description   = "Triggers if any metric in /opt/textfile_monitoring hasn't been updated for over 36 hours"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
@@ -225,11 +225,11 @@ locals {
     ec2_instance_cwagent_collectd_oracle_db_backup = {
       oracle_db_rman_backup_error = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        datapoints_to_alarm = "3"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
         namespace           = "CWAgent"
         metric_name         = "collectd_textfile_monitoring_rman_backup_value"
-        period              = "60"
+        period              = "300"
         statistic           = "Maximum"
         threshold           = "1"
         alarm_description   = "Triggers if a scheduled oracle rman db backup has failed. See collectd-textfile-monitoring and oracle-db-backup role"
@@ -237,13 +237,13 @@ locals {
       }
       oracle_db_rman_backup_did_not_run = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        datapoints_to_alarm = "3"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
         namespace           = "CWAgent"
         metric_name         = "collectd_textfile_monitoring_rman_backup_seconds"
-        period              = "129600"
+        period              = "300"
         statistic           = "Maximum"
-        threshold           = "1"
+        threshold           = "129600"
         treat_missing_data  = "breaching"
         alarm_description   = "Triggers if rman_backup metric not collected or not updated for over 36 hours"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
