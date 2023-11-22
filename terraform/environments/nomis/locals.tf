@@ -82,7 +82,17 @@ locals {
     }
   }
 
-  baseline_secretsmanager_secrets = {}
+  baseline_secretsmanager_secrets = {
+    "" = {
+        postfix = ""
+        secrets = {
+          account_ids                       = {}
+          ec2-user_pem                      = {}
+          environment_management_arn        = {}
+          modernisation_platform_account_id = {}
+        }
+      }
+  }
 
   baseline_security_groups = {
     private-lb         = local.security_groups.private_lb

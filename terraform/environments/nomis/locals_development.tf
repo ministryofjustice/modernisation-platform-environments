@@ -66,6 +66,15 @@ locals {
       "/oracle/weblogic/qa11r" = local.weblogic_ssm_parameters
       "/oracle/database/qa11r" = local.database_nomis_ssm_parameters
     }
+    baseline_secretsmanager_secrets = {
+      "/azure"                 = {
+        secrets = {
+          sas_token = {}
+        }
+      }
+      "/oracle/weblogic/qa11r" = local.weblogic_secretsmanager_secrets
+      "/oracle/database/qa11r" = local.database_nomis_secretsmanager_secrets
+    }
 
     baseline_ec2_autoscaling_groups = {
 
