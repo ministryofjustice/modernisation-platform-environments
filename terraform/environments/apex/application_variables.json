@@ -33,7 +33,8 @@
       "docker_image_tag": "development",
       "app_db_url": "db.apex.aws.dev.legalservices.gov.uk:1521:APEX",
       "app_debug_enabled": "false",
-      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk"
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
+      "server_port": 8080
     },
     "test": {
       "example_var": "test-data"

@@ -141,3 +141,13 @@ variable "ecs_target_capacity" {
   type        = string
   description = "The target value for the CloudWatch metric used in the Amazon ECS-managed target tracking scaling policy. For example, a value of 100 will result in the Amazon EC2 instances in your Auto Scaling group being completely utilized."
 }
+
+variable "lb_tg_arn" {
+  type        = string
+  description = "Load balancer target group ARN used by ECS service"
+}
+
+variable "server_port" {
+  type        = string
+  description = "The port the containers will be listening on"
+}
