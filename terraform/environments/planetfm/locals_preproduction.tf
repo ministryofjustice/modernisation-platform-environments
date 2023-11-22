@@ -133,25 +133,25 @@ locals {
         })
       })
 
-      pp-cafm-w-5-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-cafm-w-5-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "t3.large"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-        }
-        cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
-        tags = merge(local.defaults_web_ec2.tags, {
-          description       = "Migrated server PPFWW0005 Web Portal Server"
-          ami               = "pp-cafm-w-5-a"
-          app-config-status = "pending"
-        })
-      })
+      # pp-cafm-w-5-a = merge(local.defaults_web_ec2, {
+      #   config = merge(local.defaults_web_ec2.config, {
+      #     ami_name          = "pp-cafm-w-5-a"
+      #     availability_zone = "${local.region}a"
+      #   })
+      #   instance = merge(local.defaults_web_ec2.instance, {
+      #     instance_type = "t3.large"
+      #   })
+      #   ebs_volumes = {
+      #     "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+      #     "/dev/sdb"  = { type = "gp3", size = 100 }
+      #   }
+      #   cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
+      #   tags = merge(local.defaults_web_ec2.tags, {
+      #     description       = "Migrated server PPFWW0005 Web Portal Server"
+      #     ami               = "pp-cafm-w-5-a"
+      #     app-config-status = "pending"
+      #   })
+      # })
     }
   }
 }
