@@ -1,4 +1,4 @@
-esource "aws_opensearch_domain" "logs" {
+resource "aws_opensearch_domain" "logs" {
   domain_name    = "observability-platform-logs"
   engine_version = "OpenSearch_2.11"
 
