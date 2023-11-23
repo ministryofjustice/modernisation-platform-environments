@@ -35,4 +35,16 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+
+  logs_domain = "logs"
+
+  index_pattern_logs = [
+    "manager_eventrouter*",
+    "live_kubernetes_cluster*",
+    "live_kubernetes_ingress*",
+    "live_eventrouter*",
+    "manager_kubernetes_cluster-*",
+    "manager_kubernetes_ingress-*",
+    "manager_concourse-*"
+  ]
 }

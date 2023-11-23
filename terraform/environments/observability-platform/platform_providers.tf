@@ -47,3 +47,13 @@ provider "aws" {
     role_arn = !can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? null : can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccessUSEast"
   }
 }
+
+provider "elasticsearch" {
+  alias               = "logs"
+  url                 = "https://${aws_opensearch_domain.logs.endpoint}"
+  aws_assume_role_arn = aws_iam_role.os_access_role_logs.arn
+  sign_aws_requests   = true
+  healthcheck         = false
+  sniff               = false
+}
+
