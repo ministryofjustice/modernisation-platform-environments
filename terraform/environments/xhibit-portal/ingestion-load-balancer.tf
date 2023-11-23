@@ -224,7 +224,8 @@ resource "aws_load_balancer_policy" "ingestion-ssl" {
   policy_attribute {
     name  = "Server order preference"
     value = "true"
-
+  }
+  
   policy_attribute {
     name  = "ECDHE-ECDSA-AES128-GCM-SHA256"
     value = "true"
