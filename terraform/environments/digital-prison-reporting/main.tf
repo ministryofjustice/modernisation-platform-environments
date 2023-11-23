@@ -1084,11 +1084,15 @@ module "dms_nomis_to_s3_ingestor" {
 
   extra_attributes = "supportResetlog=TRUE"
 
-  bucket_name = module.s3_raw_bucket.bucket_id
+  bucket_name = module.s3_landing_bucket.bucket_id
 
   availability_zones = {
     0 = "eu-west-2a"
   }
+
+  depends_on = [
+    module.s3_landing_bucket.bucket_id
+  ]
 
   tags = merge(
     local.all_tags,
