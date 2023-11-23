@@ -222,6 +222,11 @@ resource "aws_load_balancer_policy" "ingestion-ssl" {
   }
 
   policy_attribute {
+    name  = "Server-Defined-Cipher-Order"
+    value = "true"
+  }
+
+  policy_attribute {
     name  = "ECDHE-ECDSA-AES128-GCM-SHA256"
     value = "true"
   }
