@@ -890,7 +890,7 @@ module "data_ingestion_pipeline" {
           "StartReplicationTaskType": "start-replication"
         },
         "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask.waitForTaskToken",
-        "Next": "Start Glue Batch Job",
+        "Next": "Start Glue Batch Job"
       },
       "Start Glue Batch Job": {
         "Type": "Task",
