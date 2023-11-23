@@ -63,21 +63,21 @@ locals {
         ami_name  = "amzn2-ami-hvm*"
         ami_owner = "amazon"
       }
-      another_server = {
-        tags = {
-          server-type = "private"
-          description = "EC2 to test hitting lodbalancer for DOM1 Networking Test"
-          monitored   = false
-          os-type     = "Linux"
-          component   = "test"
-          environment = "test"
-        }
-        ebs_volumes = {
-          "/dev/xvda" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
-        }
-        ami_name  = "amzn2-ami-hvm*"
-        ami_owner = "amazon"
-      }
+      # another_server = {
+      #   tags = {
+      #     server-type = "private"
+      #     description = "EC2 to test hitting lodbalancer for DOM1 Networking Test"
+      #     monitored   = false
+      #     os-type     = "Linux"
+      #     component   = "test"
+      #     environment = "test"
+      #   }
+      #   ebs_volumes = {
+      #     "/dev/xvda" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
+      #   }
+      #   ami_name  = "amzn2-ami-hvm*"
+      #   ami_owner = "amazon"
+      # }
     }
     ec2_test_autoscaling_groups = {
       dev-rh-rhel79 = {

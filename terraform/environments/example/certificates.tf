@@ -46,19 +46,19 @@ resource "aws_route53_record" "example_cert_validation" {
 }
 
 
-# This will build on the core-vpc development account under platforms-development.modernisation-platform.service.justice.gov.uk, and route traffic back to example LB
-resource "aws_route53_record" "example_core_vpc" {
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform-example-core-vpc.service.justice.gov.uk"
-  type     = "A"
+# # This will build on the core-vpc development account under platforms-development.modernisation-platform.service.justice.gov.uk, and route traffic back to example LB
+# resource "aws_route53_record" "example_core_vpc" {
+#   provider = aws.core-vpc
+#   zone_id  = data.aws_route53_zone.external.zone_id
+#   name     = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform-example-core-vpc.service.justice.gov.uk"
+#   type     = "A"
 
-  alias {
-    name                   = aws_lb.certificate_example_lb.dns_name
-    zone_id                = aws_lb.certificate_example_lb.zone_id
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = aws_lb.certificate_example_lb.dns_name
+#     zone_id                = aws_lb.certificate_example_lb.zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
 # Another record for my internal example-lb
 resource "aws_route53_record" "core_vpc_a_record" {
@@ -78,38 +78,38 @@ resource "aws_route53_record" "core_vpc_a_record" {
 
 # Build loadbalancer
 #tfsec:ignore:aws-elb-alb-not-public as the external lb needs to be public.
-resource "aws_lb" "certificate_example_lb" {
-  name               = "certificate-example-loadbalancer"
-  load_balancer_type = "application"
-  subnets            = data.aws_subnets.shared-public.ids
-  #checkov:skip=CKV_AWS_150:Short-lived example environment, hence no need for deletion protection
-  enable_deletion_protection = false
-  # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
-  idle_timeout               = 240
-  drop_invalid_header_fields = true
+# resource "aws_lb" "certificate_example_lb" {
+#   name               = "certificate-example-loadbalancer"
+#   load_balancer_type = "application"
+#   subnets            = data.aws_subnets.shared-public.ids
+#   #checkov:skip=CKV_AWS_150:Short-lived example environment, hence no need for deletion protection
+#   enable_deletion_protection = false
+#   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
+#   idle_timeout               = 240
+#   drop_invalid_header_fields = true
 
-  security_groups = [aws_security_group.certificate_example_load_balancer_sg.id]
+#   security_groups = [aws_security_group.certificate_example_load_balancer_sg.id]
 
-  access_logs {
-    bucket  = module.s3-bucket-lb.bucket.id
-    prefix  = "test-lb"
-    enabled = true
-  }
+#   access_logs {
+#     bucket  = module.s3-bucket-lb.bucket.id
+#     prefix  = "test-lb"
+#     enabled = true
+#   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-external-loadbalancer"
-    }
-  )
-  depends_on = [aws_security_group.certificate_example_load_balancer_sg]
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "${local.application_name}-external-loadbalancer"
+#     }
+#   )
+#   depends_on = [aws_security_group.certificate_example_load_balancer_sg]
+# }
 
-resource "aws_security_group" "certificate_example_load_balancer_sg" {
-  name        = "certificate-example-lb-sg"
-  description = "controls access to load balancer"
-  vpc_id      = data.aws_vpc.shared.id
-  tags = merge(local.tags,
-    { Name = lower(format("lb-sg-%s-%s-example", local.application_name, local.environment)) }
-  )
-}
+# resource "aws_security_group" "certificate_example_load_balancer_sg" {
+#   name        = "certificate-example-lb-sg"
+#   description = "controls access to load balancer"
+#   vpc_id      = data.aws_vpc.shared.id
+#   tags = merge(local.tags,
+#     { Name = lower(format("lb-sg-%s-%s-example", local.application_name, local.environment)) }
+#   )
+# }
