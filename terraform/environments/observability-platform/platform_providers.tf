@@ -48,6 +48,14 @@ provider "aws" {
   }
 }
 
+provider "aws" {
+  alias  = "cloud-platform"
+  region = "eu-west-2"
+  assume_role {
+    role_arn = "arn:aws:iam::${local.cloud_platform_account_id}:role/modernisation-account-limited-read-member-access"
+  }
+}
+
 provider "elasticsearch" {
   alias               = "logs"
   url                 = "https://${aws_opensearch_domain.logs.endpoint}"

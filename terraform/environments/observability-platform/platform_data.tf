@@ -172,3 +172,18 @@ data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
 
+data "aws_eks_node_groups" "current" {
+  provider = aws.cloud-platform
+
+  cluster_name = "live" # change to the cluster you need -- note there is no terraform.workspace at the account level
+}
+
+data "aws_eks_node_group" "current" {
+  provider = aws.cloud-platform
+
+  for_each = data.aws_eks_node_groups.current.names
+
+  cluster_name    = "live"
+  node_group_name = each.value
+}
+
