@@ -96,12 +96,6 @@ resource "aws_elb" "ingestion_lb" {
   )
 }
 
-
-
-
-
-
-
 data "aws_acm_certificate" "ingestion_lb_cert" {
   domain   = local.application_data.accounts[local.environment].public_dns_name_ingestion
   statuses = ["ISSUED"]
@@ -226,6 +220,10 @@ resource "aws_load_balancer_policy" "ingestion-ssl" {
     name  = "Protocol-TLSv1.2"
     value = "true"
   }
+
+  policy_attribute {
+    name  = "Server order preference"
+    value = "true"
 
   policy_attribute {
     name  = "ECDHE-ECDSA-AES128-GCM-SHA256"
@@ -603,7 +601,12 @@ resource "aws_load_balancer_policy" "ingestion-ssl" {
   }
 
   policy_attribute {
-  name  = "EXP-EDH-DSS-DES-CBC-SHA"
+  name  = "EXP-EDH-RSA-DES-CBC-SHA"
+  value = "true"
+  }
+
+  policy_attribute {
+  name  = "DHE-RSA-AES128-SHA"
   value = "true"
   }
 
