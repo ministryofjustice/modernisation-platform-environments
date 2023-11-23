@@ -856,96 +856,97 @@ module "s3_file_transfer_lambda_trigger" {
 }
 
 # Data Ingest Pipeline Step Function
-#module "data_ingestion_pipeline" {
-#  source = "./modules/step_function"
-#
-#  enable_step_function = local.enable_data_ingestion_step_function
-#  step_function_name   = local.data_ingestion_step_function_name
-#
-#  additional_policies = [
-#    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.invoke_lambda_policy.name}",
-#    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.start_dms_task_policy.name}",
-#    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.trigger_glue_job_policy.name}"
-#  ]
-#
-#  depends_on = [
-#    aws_iam_policy.invoke_lambda_policy,
-#    aws_iam_policy.start_dms_task_policy,
-#    aws_iam_policy.trigger_glue_job_policy,
-#    module.dms_nomis_to_s3_ingestor.dms_replication_task_arn,
-#    module.glue_reporting_hub_batch_job.name,
-#    module.glue_reporting_hub_cdc_job.name,
-#    module.s3_file_transfer_lambda.lambda_function
-#  ]
-#
-#  definition = <<EOF
-#  {
-#    "Comment": "Data Ingestion Pipeline Step Function",
-#    "StartAt": "Start DMS Replication Task",
-#    "States": {
-#      "Start DMS Replication Task": {
-#        "Type": "Task",
-#        "Parameters": {
-#          "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
-#          "StartReplicationTaskType": "start-replication"
-#        },
-#        "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask.waitForTaskToken",
-#        "Next": "Start Glue Batch Job"
-#      },
-#      "Start Glue Batch Job": {
-#        "Type": "Task",
-#        "Resource": "arn:aws:states:::glue:startJobRun.sync",
-#        "Parameters": {
-#          "JobName": "${module.glue_reporting_hub_batch_job.name}"
-#        },
-#        "Next": "Invoke S3 File Transfer Lambda"
-#      },
-#      "Invoke S3 File Transfer Lambda": {
-#        "Type": "Task",
-#        "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-#        "Parameters": {
-#          "Payload": {
-#            "sourceBucket": "${module.s3_landing_bucket.bucket_id}",
-#            "destinationBucket": "${module.s3_raw_bucket.bucket_id}"
-#          },
-#          "FunctionName": "${module.s3_file_transfer_lambda.lambda_function}"
-#        },
-#        "Retry": [
-#          {
-#            "ErrorEquals": [
-#              "Lambda.ServiceException",
-#              "Lambda.AWSLambdaException",
-#              "Lambda.SdkClientException",
-#              "Lambda.TooManyRequestsException"
-#            ],
-#            "IntervalSeconds": 600,
-#            "MaxAttempts": 2,
-#            "BackoffRate": 2
-#          }
-#        ],
-#        "Next": "Resume DMS Replication Task"
-#      },
-#      "Resume DMS Replication Task": {
-#        "Type": "Task",
-#        "Parameters": {
-#          "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
-#          "StartReplicationTaskType": "resume-processing"
-#        },
-#        "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
-#        "Next": "Start Glue Streaming Job"
-#      },
-#      "Start Glue Streaming Job": {
-#        "Type": "Task",
-#        "Resource": "arn:aws:states:::glue:startJobRun",
-#        "Parameters": {
-#          "JobName": "${module.glue_reporting_hub_cdc_job.name}"
-#        },
-#        "End": true
-#      }
-#    }
-#  }
-#  EOF
-#}
+module "data_ingestion_pipeline" {
+  source = "./modules/step_function"
+
+  enable_step_function = local.enable_data_ingestion_step_function
+  step_function_name   = local.data_ingestion_step_function_name
+
+  additional_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.invoke_lambda_policy.name}",
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.start_dms_task_policy.name}",
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.trigger_glue_job_policy.name}"
+  ]
+
+  depends_on = [
+    aws_iam_policy.invoke_lambda_policy,
+    aws_iam_policy.start_dms_task_policy,
+    aws_iam_policy.trigger_glue_job_policy,
+    module.dms_nomis_to_s3_ingestor.dms_replication_task_arn,
+    module.glue_reporting_hub_batch_job.name,
+    module.glue_reporting_hub_cdc_job.name,
+    module.s3_file_transfer_lambda.lambda_function
+  ]
+
+  definition = <<EOF
+  {
+    "Comment": "Data Ingestion Pipeline Step Function",
+    "StartAt": "Start DMS Replication Task",
+    "States": {
+      "Start DMS Replication Task": {
+        "Type": "Task",
+        "Parameters": {
+          "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
+          "StartReplicationTaskType": "start-replication"
+        },
+        "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask.waitForTaskToken",
+        "Next": "Start Glue Batch Job"
+      },
+      "Start Glue Batch Job": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::glue:startJobRun.sync",
+        "Parameters": {
+          "JobName": "${module.glue_reporting_hub_batch_job.name}"
+        },
+        "Next": "Invoke S3 File Transfer Lambda"
+      },
+      "Invoke S3 File Transfer Lambda": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+        "Parameters": {
+          "Payload": {
+            "sourceBucket": "${module.s3_landing_bucket.bucket_id}",
+            "destinationBucket": "${module.s3_raw_bucket.bucket_id}"
+          },
+          "FunctionName": "${module.s3_file_transfer_lambda.lambda_function}"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException",
+              "Lambda.TooManyRequestsException"
+            ],
+            "IntervalSeconds": 600,
+            "MaxAttempts": 2,
+            "BackoffRate": 2
+          }
+        ],
+        "Next": "Resume DMS Replication Task"
+      },
+      "Resume DMS Replication Task": {
+        "Type": "Task",
+        "Parameters": {
+          "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
+          "StartReplicationTaskType": "resume-processing"
+        },
+        "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
+        "Next": "Start Glue Streaming Job"
+      },
+      "Start Glue Streaming Job": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::glue:startJobRun",
+        "Parameters": {
+          "JobName": "${module.glue_reporting_hub_cdc_job.name}"
+        },
+        "End": true
+      }
+    }
+  }
+  EOF
+
+}
 
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
