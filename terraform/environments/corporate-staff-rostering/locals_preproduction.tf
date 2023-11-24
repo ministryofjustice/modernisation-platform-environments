@@ -1224,7 +1224,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "pp-csr-w-78-80"
+              target_group_name = "pp-csr-w-34-80"
             }
           }
           http-7770 = {
