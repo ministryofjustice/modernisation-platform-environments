@@ -499,8 +499,8 @@ data "aws_iam_policy_document" "iam_policy_document_for_write_metadata_and_schem
 
 data "aws_iam_policy_document" "iam_policy_document_for_update_schema" {
   source_policy_documents = [
-    aws_iam_policy_document.aws_iam_policy_document.write_metadata.json,
-    aws_iam_policy_document.athena_load_lambda_function_policy
+    data.aws_iam_policy_document.write_metadata.json,
+    data.aws_iam_policy_document.athena_load_lambda_function_policy.json
   ]
 }
 
