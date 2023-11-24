@@ -766,8 +766,8 @@ locals {
           module.environment.subnet["private"]["eu-west-2a"].id,
           module.environment.subnet["private"]["eu-west-2b"].id,
         ]
-        security_groups = ["load-balancer"]
-        access_logs     = false
+        security_groups                  = ["load-balancer"]
+        access_logs                      = false
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
@@ -1089,6 +1089,174 @@ locals {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-78-7781"
+            }
+          }
+        }
+      }
+      trainab = {
+        internal_lb              = true
+        enable_delete_protection = false
+        load_balancer_type       = "network"
+        force_destroy_bucket     = true
+        subnets = [
+          module.environment.subnet["private"]["eu-west-2a"].id,
+          module.environment.subnet["private"]["eu-west-2b"].id,
+        ]
+        security_groups                  = ["load-balancer"]
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
+
+        instance_target_groups = {
+          pp-csr-w-34-80 = {
+            port     = 80
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              port                = 80
+              protocol            = "TCP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
+          pp-csr-w-34-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
+          pp-csr-w-34-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
+          pp-csr-w-34-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
+          pp-csr-w-34-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
+        }
+
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-78-80"
+            }
+          }
+          http-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-34-7770"
+            }
+          }
+          http-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-34-7771"
+            }
+          }
+          http-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-34-7780"
+            }
+          }
+          http-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-34-7781"
             }
           }
         }
