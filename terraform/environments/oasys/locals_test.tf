@@ -50,16 +50,6 @@ locals {
       "/oracle/bip/t1" = local.secretsmanager_secrets_bip
       "/oracle/bip/t2" = local.secretsmanager_secrets_bip
 
-      "" = {
-        postfix = ""
-        secrets = {
-          account_ids                       = {}
-          ec2-user_pem                      = {}
-          environment_management_arn        = {}
-          modernisation_platform_account_id = {}
-        }
-      }
-
       # OLD AND WILL BE REPLACED
 
       "/database/t1/T1OASYS" = {
