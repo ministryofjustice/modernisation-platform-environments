@@ -234,7 +234,7 @@ locals {
   # step function notification lambda
   enable_step_function_notification_lambda         = local.application_data.accounts[local.environment].enable_step_function_notification_lambda
   step_function_notification_lambda_name           = "${local.project}-step-function-notification"
-  step_function_notification_lambda_handler        = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambdaTest::handleRequest"
+  step_function_notification_lambda_handler        = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
   step_function_notification_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
   step_function_notification_lambda_code_s3_key    = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
   step_function_notification_lambda_runtime        = "java11"
