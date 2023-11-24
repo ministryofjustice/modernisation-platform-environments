@@ -91,7 +91,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   data_format                      = "parquet"
   cdc_path                         = "cdc"
   timestamp_column_name            = "_timestamp"
-  parquet_timestamp_in_millisecond = true
+  parquet_timestamp_in_millisecond = false
   include_op_for_full_load         = true
 
   max_file_size           = 120000
