@@ -843,7 +843,7 @@ locals {
               interval            = 5
               healthy_threshold   = 3
               path                = "/"
-              port                = 7780
+              port                = 7770
               protocol            = "HTTP"
               timeout             = 4
               unhealthy_threshold = 2
@@ -865,7 +865,7 @@ locals {
               interval            = 5
               healthy_threshold   = 3
               path                = "/"
-              port                = 7781
+              port                = 7771
               protocol            = "HTTP"
               timeout             = 4
               unhealthy_threshold = 2
@@ -911,7 +911,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "pp-csr-w-78-7770"
+              target_group_name = "pp-csr-w-78-7780"
             }
           }
           http-7781 = {
@@ -919,7 +919,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "pp-csr-w-78-7771"
+              target_group_name = "pp-csr-w-78-7781"
             }
           }
         }
