@@ -911,7 +911,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "pp-csr-w-78-7770"
+              target_group_name = "pp-csr-w-78-7780"
             }
           }
           http-7781 = {
@@ -919,7 +919,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "pp-csr-w-78-7771"
+              target_group_name = "pp-csr-w-78-7781"
             }
           }
         }
