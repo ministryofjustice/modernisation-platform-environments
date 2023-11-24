@@ -1919,14 +1919,14 @@ locals {
           { name = "ppiwfm-b", type = "CNAME", ttl = "300", records = ["pp-csr-db-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "r1", type = "A", lbs_map_key = "private" },
-          { name = "r2", type = "A", lbs_map_key = "private" },
+          { name = "r1", type = "A", lbs_map_key = "r12" },
+          { name = "r2", type = "A", lbs_map_key = "r12" },
           { name = "r3", type = "A", lbs_map_key = "r34" },
           { name = "r4", type = "A", lbs_map_key = "r34" },
           { name = "r5", type = "A", lbs_map_key = "r56" },
           { name = "r6", type = "A", lbs_map_key = "r56" },
-          { name = "traina", type = "A", lbs_map_key = "private" },
-          { name = "trainb", type = "A", lbs_map_key = "private" },
+          { name = "traina", type = "A", lbs_map_key = "trainab" },
+          { name = "trainb", type = "A", lbs_map_key = "trainab" },
         ]
       }
     }
