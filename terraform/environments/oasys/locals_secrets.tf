@@ -56,14 +56,14 @@ locals {
 
   secretsmanager_secrets_oasys_db = {
     secrets = {
-      passwords = {}
+      passwords      = {}
       apex-passwords = {}
     }
   }
 
   secretsmanager_secrets_bip_db = {
     secrets = {
-      passwords = {}
+      passwords     = {}
       bip-passwords = {}
     }
   }

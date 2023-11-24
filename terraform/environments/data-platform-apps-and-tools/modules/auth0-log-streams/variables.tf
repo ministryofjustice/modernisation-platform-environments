@@ -11,6 +11,6 @@ variable "tags" {
 }
 
 variable "retention_in_days" {
-  type = number
+  type    = number
   default = 400
 }

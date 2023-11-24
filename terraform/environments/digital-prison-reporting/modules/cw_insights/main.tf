@@ -3,7 +3,7 @@
 # log_group_names - (Optional) Specific log groups to use with the query.
 
 resource "aws_cloudwatch_query_definition" "this" {
-  count           = var.create_cw_insight ? 1 : 0
+  count = var.create_cw_insight ? 1 : 0
 
   name            = var.query_name
   log_group_names = var.log_groups

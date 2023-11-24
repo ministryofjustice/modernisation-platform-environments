@@ -230,7 +230,7 @@ locals {
       desired_capacity = 2
       max_size         = 2
     })
-    lb_target_groups = {}
+    lb_target_groups       = {}
     secretsmanager_secrets = {}
     tags = {
       backup            = "false" # opt out of mod platform default backup plan
