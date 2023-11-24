@@ -149,7 +149,9 @@ locals {
   trigger_glue_job_policy = "${local.project}_start_glue_job_policy"
   start_dms_task_policy   = "${local.project}_start_dms_task_policy"
 
-  s3_all_object_actions_policy   = "${local.project}_s3_all_object_actions_policy"
+  s3_all_object_actions_policy = "${local.project}_s3_all_object_actions_policy"
+  all_state_machine_policy     = "${local.project}_all_state_machine_policy"
+  dynamo_db_access_policy     = "${local.project}_dynamo_db_access_policy"
 
   # DPR Alerts
   enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
@@ -227,6 +229,21 @@ locals {
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}"
+  ]
+
+  # step function notification lambda
+  enable_step_function_notification_lambda         = local.application_data.accounts[local.environment].enable_step_function_notification_lambda
+  step_function_notification_lambda_name           = "${local.project}-step-function-notification"
+  step_function_notification_lambda_handler        = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambdaTest::handleRequest"
+  step_function_notification_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  step_function_notification_lambda_code_s3_key    = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
+  step_function_notification_lambda_runtime        = "java11"
+  step_function_notification_lambda_tracing        = "Active"
+
+  step_function_notification_lambda_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.all_state_machine_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.dynamo_db_access_policy}"
   ]
 
   # Data Ingestion Pipeline Step Function

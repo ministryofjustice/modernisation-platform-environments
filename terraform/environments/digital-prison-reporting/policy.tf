@@ -151,6 +151,44 @@ resource "aws_iam_policy" "trigger_glue_job_policy" {
   })
 }
 
+# DynamoDB Access Policy
+resource "aws_iam_policy" "dynamodb_access_policy" {
+  name = local.dynamo_db_access_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "DynamoDBTableAccess",
+        "Action" : [
+          "dynamodb:PutItem",
+          "dynamodb:DescribeTable",
+          "dynamodb:GetItem"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:dynamodb:*:*:table/dpr-*"
+        ]
+      }
+    ]
+  })
+}
+
+# State Machine Access Policy
+resource "aws_iam_policy" "all_state_machine_policy" {
+  name = local.all_state_machine_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "StateMachineAllAccess",
+        "Action": "states:*",
+        "Effect" : "Allow",
+        "Resource": "*"
+      }
+    ]
+  })
+}
+
 # KMS Read/Decrypt Policy
 resource "aws_iam_policy" "kms_read_access_policy" {
   name = local.kms_read_access_policy

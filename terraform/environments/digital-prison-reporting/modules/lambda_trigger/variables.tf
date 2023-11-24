@@ -9,13 +9,22 @@ variable "event_name" {
 }
 
 variable "trigger_schedule_expression" {
-  description = "The trigger schedule expression e.g. cron(0 20 * * ? *) or rate(5 minutes)"
+  description = "(Optional) The trigger schedule expression e.g. cron(0 20 * * ? *) or rate(5 minutes)"
   type        = string
+  default     = null
+}
+
+variable "trigger_event_pattern" {
+  description = "(Optional) The trigger event pattern"
+  type        = string
+  default     = null
 }
 
 variable "trigger_input_event" {
-  description = "JSON event which will be sent to the lambda"
+  description = "(Optional) JSON event which will be sent to the lambda"
   type        = string
+
+  default = null
 }
 
 variable "lambda_function_name" {

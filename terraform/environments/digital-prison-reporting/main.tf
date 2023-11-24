@@ -826,8 +826,7 @@ module "s3_file_transfer_lambda" {
 
   depends_on = [
     aws_iam_policy.s3_all_object_actions_policy,
-    aws_iam_policy.kms_read_access_policy,
-    aws_iam_policy.s3_read_access_policy
+    aws_iam_policy.kms_read_access_policy
   ]
 }
 
@@ -855,6 +854,73 @@ module "s3_file_transfer_lambda_trigger" {
   ]
 }
 
+# Lambda which notifies step function when DMS task stops
+module "step_function_notification_lambda" {
+  source = "./modules/lambdas/generic"
+
+  enable_lambda = local.enable_step_function_notification_lambda
+  name          = local.step_function_notification_lambda_name
+  s3_bucket     = local.s3_file_transfer_lambda_code_s3_bucket
+  s3_key        = local.s3_file_transfer_lambda_code_s3_key
+  handler       = local.step_function_notification_lambda_handler
+  runtime       = local.step_function_notification_lambda_runtime
+  policies      = local.step_function_notification_lambda_policies
+  tracing       = local.step_function_notification_lambda_tracing
+  timeout       = 300 # 5 minutes
+
+  vpc_settings = {
+    subnet_ids = [
+      data.aws_subnet.data_subnets_a.id,
+      data.aws_subnet.data_subnets_b.id,
+      data.aws_subnet.data_subnets_c.id
+    ]
+
+    security_group_ids = [
+      aws_security_group.lambda_generic[0].id
+    ]
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "ingestion-pipeline"
+      Jira           = "DPR2-209"
+      Resource_Type  = "Lambda"
+      Name           = local.step_function_notification_lambda_name
+    }
+  )
+
+  depends_on = [
+    aws_iam_policy.kms_read_access_policy,
+    aws_iam_policy.dynamodb_access_policy,
+    aws_iam_policy.all_state_machine_policy
+  ]
+}
+
+module "step_function_notification_lambda_trigger" {
+  source = "./modules/lambda_trigger"
+
+  enable_lambda_trigger = local.enable_step_function_notification_lambda
+
+  event_name            = "${local.project}-step-function-notification-${local.env}"
+  lambda_function_arn   = module.step_function_notification_lambda.lambda_function
+  lambda_function_name  = module.step_function_notification_lambda.lambda_name
+
+  trigger_event_pattern = jsonencode(
+    {
+      "source": ["aws.dms"],
+      "detail-type": ["DMS Replication Task State Change"],
+      "detail": {
+        "eventId": ["DMS-EVENT-0079"]
+      }
+    }
+  )
+
+  depends_on = [
+    module.step_function_notification_lambda
+  ]
+}
+
 # Data Ingest Pipeline Step Function
 module "data_ingestion_pipeline" {
   source = "./modules/step_function"
@@ -875,7 +941,8 @@ module "data_ingestion_pipeline" {
     module.dms_nomis_to_s3_ingestor.dms_replication_task_arn,
     module.glue_reporting_hub_batch_job.name,
     module.glue_reporting_hub_cdc_job.name,
-    module.s3_file_transfer_lambda.lambda_function
+    module.s3_file_transfer_lambda.lambda_function,
+    module.step_function_notification_lambda.lambda_function
   ]
 
   definition = <<EOF
@@ -887,9 +954,34 @@ module "data_ingestion_pipeline" {
         "Type": "Task",
         "Parameters": {
           "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
-          "StartReplicationTaskType": "start-replication"
+          "StartReplicationTaskType": "reload-target"
         },
-        "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask.waitForTaskToken",
+        "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
+        "Next": "Invoke DMS State Control Lambda"
+      },
+      "Invoke DMS State Control Lambda": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+        "Parameters": {
+          "Payload": {
+            "token.$": "$$.Task.Token",
+            "replicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}"
+          },
+          "FunctionName": "${module.step_function_notification_lambda.lambda_function}"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException",
+              "Lambda.TooManyRequestsException"
+            ],
+            "IntervalSeconds": 60,
+            "MaxAttempts": 2,
+            "BackoffRate": 2
+          }
+        ],
         "Next": "Start Glue Batch Job"
       },
       "Start Glue Batch Job": {
@@ -902,7 +994,7 @@ module "data_ingestion_pipeline" {
       },
       "Invoke S3 File Transfer Lambda": {
         "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+        "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
           "Payload": {
             "sourceBucket": "${module.s3_landing_bucket.bucket_id}",
@@ -945,6 +1037,7 @@ module "data_ingestion_pipeline" {
     }
   }
   EOF
+
 
 }
 
@@ -1157,6 +1250,33 @@ module "dynamo_tab_domain_registry" {
     local.all_tags,
     {
       Name          = "${local.project}-domain-registry-${local.environment}"
+      Resource_Type = "Dynamo Table"
+    }
+  )
+}
+
+# Dynamo DB for StepFunctions DMS Tokens, DPR2-209
+module "dynamo_table_step_functions_token" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-step-functions-${local.environment}"
+
+  hash_key    = "replicationTaskArn"
+  table_class = "STANDARD"
+  ttl_enabled = false
+
+  attributes = [
+    {
+      name = "replicationTaskArn"
+      type = "S"
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-step-functions-${local.environment}"
       Resource_Type = "Dynamo Table"
     }
   )
