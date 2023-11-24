@@ -492,7 +492,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_write_metadata_and_schem
   source_policy_documents = [
     data.aws_iam_policy_document.log_to_bucket.json,
     data.aws_iam_policy_document.read_metadata.json,
-
+    data.aws_iam_policy_document.write_metadata.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
   ]
 }
