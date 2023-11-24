@@ -23,7 +23,7 @@ locals {
       postfix = "_"
       parameters = {
         ids = {
-          description = "Selected modernisation platform AWS account IDs created by baseline module"
+          description = "Selected modernisation platform AWS account IDs managed by baseline module"
           value = jsonencode({
             for key, value in var.environment.account_ids :
             key => value if contains(local.account_names_for_account_ids_ssm_parameter, key)
@@ -36,7 +36,7 @@ locals {
       postfix = "-"
       parameters = {
         windows = {
-          description = "cloud watch agent config for windows created by baseline module"
+          description = "cloud watch agent config for windows managed by baseline module"
           file        = local.cloud_watch_windows_filename
           type        = "String"
         }
@@ -47,7 +47,7 @@ locals {
       postfix = "_"
       parameters = {
         pem = {
-          description = "Private key for ec2-user key pair created by baseline module"
+          description = "Private key for ec2-user key pair managed by baseline module"
         }
       }
     }
