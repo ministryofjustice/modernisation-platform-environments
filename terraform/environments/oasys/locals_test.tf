@@ -266,7 +266,25 @@ locals {
         })
       })
 
-
+      "t1-${local.application_name}-bip-b" = merge(local.bip_b, {
+        autoscaling_group = merge(local.bip_b.autoscaling_group, {
+          desired_capacity = 1
+        })
+        autoscaling_schedules = {}
+        config = merge(local.bip_b.config, {
+          instance_profile_policies = concat(local.bip_b.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
+        tags = merge(local.bip_b.tags, {
+          # instance-scheduling = "skip-scheduling"
+          oasys-environment   = "t1"
+          bip-db-name         = "T1BIPINF"
+          bip-db-hostname     = "t1-oasys-db-a"
+          oasys-db-name       = "T1OASYS"
+          oasys-db-hostname   = "t1-oasys-db-a"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
