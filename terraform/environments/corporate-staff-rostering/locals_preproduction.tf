@@ -843,7 +843,7 @@ locals {
               interval            = 5
               healthy_threshold   = 3
               path                = "/"
-              port                = 7780
+              port                = 7770
               protocol            = "HTTP"
               timeout             = 4
               unhealthy_threshold = 2
@@ -865,7 +865,7 @@ locals {
               interval            = 5
               healthy_threshold   = 3
               path                = "/"
-              port                = 7781
+              port                = 7771
               protocol            = "HTTP"
               timeout             = 4
               unhealthy_threshold = 2
