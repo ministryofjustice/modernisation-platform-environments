@@ -42,7 +42,9 @@ module "baseline_presets" {
 
     sns_topics = {
       pagerduty_integrations = {
-        dso_pagerduty = contains(["development", "test"], local.environment) ? "oasys_nonprod_alarms" : "oasys_alarms"
+        dso_pagerduty               = contains(["development", "test"], local.environment) ? "${local.application_name}_nonprod_alarms" : "${local.application_name}_alarms"
+        dba_pagerduty               = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_high_priority"
       }
     }
   }
@@ -68,7 +70,21 @@ module "baseline" {
     lookup(local.environment_config, "baseline_acm_certificates", {})
   )
 
-  cloudwatch_log_groups  = module.baseline_presets.cloudwatch_log_groups
+  cloudwatch_metric_alarms = merge(
+    local.baseline_cloudwatch_metric_alarms,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_metric_alarms", {})
+  )
+
+  cloudwatch_log_metric_filters = merge(
+    local.baseline_cloudwatch_log_metric_filters,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_log_metric_filters", {})
+  )
+
+  cloudwatch_log_groups = merge(
+    module.baseline_presets.cloudwatch_log_groups,
+    local.baseline_cloudwatch_log_groups,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_log_groups", {})
+  )
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
   ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})
   environment            = module.environment
@@ -82,6 +98,11 @@ module "baseline" {
   route53_zones          = lookup(local.environment_config, "baseline_route53_zones", {})
   s3_buckets             = merge(local.baseline_s3_buckets, module.baseline_presets.s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
   security_groups        = local.baseline_security_groups
+  sns_topics = merge(
+    module.baseline_presets.sns_topics,
+    local.baseline_sns_topics,
+    lookup(local.baseline_environment_config, "baseline_sns_topics", {})
+  )
   ssm_parameters         = merge(module.baseline_presets.ssm_parameters, lookup(local.environment_config, "baseline_ssm_parameters", {}))
   secretsmanager_secrets = merge(local.baseline_secretsmanager_secrets, lookup(local.environment_config, "baseline_secretsmanager_secrets", {}))
 }

@@ -29,7 +29,7 @@ locals {
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     sns_topics = {
       pagerduty_integrations = {
-        dso_pagerduty               = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
+        dso_pagerduty               = contains(["development", "test"], local.environment) ? "${local.application_name}_nonprod_alarms" : "${local.application_name}_alarms"
         dba_pagerduty               = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_low_priority"
         dba_high_priority_pagerduty = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_high_priority"
       }
@@ -72,8 +72,8 @@ locals {
   baseline_route53_resolvers        = {}
 
   baseline_route53_zones = {
-    "${local.environment}.nomis.az.justice.gov.uk"      = {}
-    "${local.environment}.nomis.service.justice.gov.uk" = {}
+    "${local.environment}.${local.application_name}.az.justice.gov.uk"      = {}
+    "${local.environment}.${local.application_name}.service.justice.gov.uk" = {}
   }
 
   baseline_s3_buckets = {

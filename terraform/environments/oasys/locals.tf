@@ -255,4 +255,11 @@ locals {
   baseline_secretsmanager_secrets = {}
 
   public_key_data = jsondecode(file("./files/bastion_linux.json"))
+
+  baseline_sns_topics = {}
+  
+  # baseline_cloudwatch_log_groups = merge(
+  #   local.web_cloudwatch_log_groups,
+  #   local.database_cloudwatch_log_groups,
+  # )
 }
