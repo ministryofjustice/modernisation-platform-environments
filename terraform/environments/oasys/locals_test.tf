@@ -137,7 +137,8 @@ locals {
           description                             = "t2 ${local.application_name} database"
           "${local.application_name}-environment" = "t2"
           bip-db-name                             = "T2BIPINF"
-          # instance-scheduling                     = "skip-scheduling"
+          instance-scheduling                     = "skip-scheduling"
+          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
         })
       })
       # "t2-${local.application_name}-db-b" = merge(local.database_b, {
@@ -185,33 +186,35 @@ locals {
           description                             = "t1 ${local.application_name} database"
           "${local.application_name}-environment" = "t1"
           bip-db-name                             = "T1BIPINF"
+          instance-scheduling                     = "skip-scheduling"
+          oracle-sids                             = "T1BIPINF T1MISTRN T1OASREP T1OASYS T1ONRAUD T1ONRBDS T1ONRSYS"
         })
       })
 
-      # "t1-${local.application_name}-bip-a" = merge(local.bip_a, {
-      #   autoscaling_group = merge(local.bip_b.autoscaling_group, {
-      #     desired_capacity = 1
-      #   })
-      #   autoscaling_schedules = {}
-      #   config = merge(local.bip_a.config, {
-      #     instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
-      #       "Ec2T1BipPolicy",
-      #     ])
-      #   })
-      #   # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-      #   #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #   #     branch = "add-oasys-bip-role"
-      #   #   })
-      #   # })
-      #   tags = merge(local.bip_b.tags, {
-      #     # instance-scheduling = "skip-scheduling"
-      #     oasys-environment   = "t1"
-      #     bip-db-name         = "T1BIPINF"
-      #     bip-db-hostname     = "t1-oasys-db-a"
-      #     oasys-db-name       = "T1OASYS"
-      #     oasys-db-hostname   = "t1-oasys-db-a"
-      #   })
-      # })
+      "t1-${local.application_name}-bip-a" = merge(local.bip_a, {
+        autoscaling_group = merge(local.bip_b.autoscaling_group, {
+          desired_capacity = 1
+        })
+        autoscaling_schedules = {}
+        config = merge(local.bip_a.config, {
+          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
+        # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+        #     branch = "add-oasys-bip-role"
+        #   })
+        # })
+        tags = merge(local.bip_b.tags, {
+          # instance-scheduling = "skip-scheduling"
+          oasys-environment   = "t1"
+          bip-db-name         = "T1BIPINF"
+          bip-db-hostname     = "t1-oasys-db-a"
+          oasys-db-name       = "T1OASYS"
+          oasys-db-hostname   = "t1-oasys-db-a"
+        })
+      })
 
 
     }

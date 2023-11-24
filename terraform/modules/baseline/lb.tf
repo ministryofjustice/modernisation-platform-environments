@@ -110,21 +110,25 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=2e3dd3c3bc37e59fb89ab2bcb733aea8d627fa1d"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=10b4dc871150e9fa94532be6c60c35b97f55c657"
 
   providers = {
     aws.bucket-replication = aws
   }
 
-  account_number             = var.environment.account_id
-  application_name           = each.key
-  enable_deletion_protection = each.value.enable_delete_protection
-  force_destroy_bucket       = each.value.force_destroy_bucket
-  idle_timeout               = each.value.idle_timeout
-  internal_lb                = each.value.internal_lb
-  load_balancer_type         = each.value.load_balancer_type
-  lb_target_groups           = each.value.lb_target_groups
-  access_logs                = each.value.access_logs
+  account_number                   = var.environment.account_id
+  application_name                 = each.key
+  enable_deletion_protection       = each.value.enable_delete_protection
+  force_destroy_bucket             = each.value.force_destroy_bucket
+  idle_timeout                     = each.value.idle_timeout
+  internal_lb                      = each.value.internal_lb
+  load_balancer_type               = each.value.load_balancer_type
+  lb_target_groups                 = each.value.lb_target_groups
+  access_logs                      = each.value.access_logs
+  enable_cross_zone_load_balancing = each.value.enable_cross_zone_load_balancing
+  dns_record_client_routing_policy = each.value.dns_record_client_routing_policy
+
+  existing_bucket_name = try(module.s3_bucket[each.value.existing_bucket_name].bucket.id, each.value.existing_bucket_name)
 
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg

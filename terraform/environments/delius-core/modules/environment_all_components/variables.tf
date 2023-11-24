@@ -29,6 +29,7 @@ variable "account_config" {
     route53_inner_zone_info       = any
     route53_network_services_zone = any
     route53_external_zone         = any
+    bastion                       = any
 
     general_shared_kms_key_arn = optional(string)
   })
@@ -44,14 +45,16 @@ variable "account_config" {
     route53_external_zone          = {}
     migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
     general_shared_kms_key_arn     = "default_general_shared_kms_key_arn"
+    bastion                        = {}
   }
 }
 
 variable "environment_config" {
   type = object({
-    migration_environment_vpc_cidr = optional(string)
-    legacy_engineering_vpc_cidr    = string
-    ec2_user_ssh_key               = string
+    migration_environment_private_cidr = optional(list(string))
+    migration_environment_db_cidr      = optional(list(string))
+    legacy_engineering_vpc_cidr        = string
+    ec2_user_ssh_key                   = string
   })
 }
 

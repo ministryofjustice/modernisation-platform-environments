@@ -4,9 +4,6 @@ locals {
   # baseline config
   production_config = {
 
-    cloudwatch_metric_alarms_dbnames         = []
-    cloudwatch_metric_alarms_dbnames_misload = []
-
     baseline_s3_buckets = {
       nomis-audit-archives = {
         custom_kms_key = module.environment.kms_keys["general"].arn
@@ -184,7 +181,7 @@ locals {
           desired_capacity = 2
           max_size         = 2
         })
-        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
 
@@ -233,7 +230,14 @@ locals {
 
     baseline_ec2_instances = {
       prod-nomis-db-1-b = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = {}
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected, {
+            high-memory-usage = merge(local.database_ec2_cloudwatch_metric_alarms["high-memory-usage"], {
+              threshold = "99" # Sandhya confirmed this is OK while in DR mode
+            })
+          }
+        )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           availability_zone = "${local.region}b"
@@ -255,15 +259,17 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
           description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
-          oracle-sids       = ""
+          oracle-sids       = "DRCNOM DRNDH DRTRDAT"
         })
       })
 
       prod-nomis-db-2 = merge(local.database_ec2, {
-        ## cloudwatch_metric_alarms = merge(
-        ##   local.database_ec2_cloudwatch_metric_alarms,
-        ##   local.fixngo_connection_cloudwatch_metric_alarms
-        ## )
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_connectivity_test,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring,
+        )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
@@ -290,7 +296,10 @@ locals {
       })
 
       prod-nomis-db-2-b = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = {}
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+        )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           availability_zone = "${local.region}b"
@@ -312,15 +321,15 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
           description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
-          oracle-sids       = ""
+          oracle-sids       = "DRMIS"
         })
       })
 
       prod-nomis-db-3 = merge(local.database_ec2, {
-        ## cloudwatch_metric_alarms = merge(
-        ##   local.database_ec2_cloudwatch_metric_alarms,
-        ##   local.database_ec2_cloudwatch_metric_alarms_high_priority
-        ## )
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+        )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [

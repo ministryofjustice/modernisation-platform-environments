@@ -58,13 +58,8 @@ locals {
     local.database_cloudwatch_log_groups,
   )
 
-  baseline_cloudwatch_metric_alarms = merge(
-    ## local.database_cloudwatch_metric_alarms,
-  )
-
-  baseline_cloudwatch_log_metric_filters = merge(
-    local.database_cloudwatch_log_metric_filters,
-  )
+  baseline_cloudwatch_metric_alarms      = {}
+  baseline_cloudwatch_log_metric_filters = {}
 
   baseline_ec2_autoscaling_groups   = {}
   baseline_ec2_instances            = {}
@@ -87,7 +82,17 @@ locals {
     }
   }
 
-  baseline_secretsmanager_secrets = {}
+  baseline_secretsmanager_secrets = {
+    "" = {
+        postfix = ""
+        secrets = {
+          account_ids                       = {}
+          ec2-user_pem                      = {}
+          environment_management_arn        = {}
+          modernisation_platform_account_id = {}
+        }
+      }
+  }
 
   baseline_security_groups = {
     private-lb         = local.security_groups.private_lb

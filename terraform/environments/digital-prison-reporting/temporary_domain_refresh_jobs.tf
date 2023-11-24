@@ -235,49 +235,52 @@ module "glue_temp_refresh_job_prisoner_prisoner" {
 
 # see https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
 # Establishment Establishment Schedule
-resource "aws_glue_trigger" "temp_domain_refresh_establishment_establishment" {
-  name     = "${local.domain_refresh_establishment_establishment}-trigger"
-  schedule = "cron(0/15 06-19 ? * MON-FRI *)"
-  type     = "SCHEDULED"
 
-  actions {
-    job_name = module.glue_temp_refresh_job_establishment_establishment.name
-  }
-}
+# All schedules temporarily commented out to prevent spamming job failure alerts. See comment on DPR2-208.
 
-
-# Establishment Living Unit Schedule
-resource "aws_glue_trigger" "temp_domain_refresh_establishment_living_unit" {
-  name     = "${local.domain_refresh_establishment_living_unit}-trigger"
-  schedule = "cron(0/15 06-19 ? * MON-FRI *)"
-  type     = "SCHEDULED"
-
-  actions {
-    job_name = module.glue_temp_refresh_job_establishment_living_unit.name
-  }
-}
-
-
-# Movements Movements Schedule
-resource "aws_glue_trigger" "temp_domain_refresh_movements_movements" {
-  name     = "${local.domain_refresh_movements_movements}-trigger"
-  schedule = "cron(0/15 06-19 ? * MON-FRI *)"
-  type     = "SCHEDULED"
-
-  actions {
-    job_name = module.glue_temp_refresh_job_movements_movements.name
-  }
-}
-
-
-
-# Prisoner Prisoner Schedule
-resource "aws_glue_trigger" "temp_domain_refresh_prisoner_prisoner" {
-  name     = "${local.domain_refresh_prisoner_prisoner}-trigger"
-  schedule = "cron(0/15 06-19 ? * MON-FRI *)"
-  type     = "SCHEDULED"
-
-  actions {
-    job_name = module.glue_temp_refresh_job_prisoner_prisoner.name
-  }
-}
+#resource "aws_glue_trigger" "temp_domain_refresh_establishment_establishment" {
+#  name     = "${local.domain_refresh_establishment_establishment}-trigger"
+#  schedule = "cron(0/15 06-19 ? * MON-FRI *)"
+#  type     = "SCHEDULED"
+#
+#  actions {
+#    job_name = module.glue_temp_refresh_job_establishment_establishment.name
+#  }
+#}
+#
+#
+## Establishment Living Unit Schedule
+#resource "aws_glue_trigger" "temp_domain_refresh_establishment_living_unit" {
+#  name     = "${local.domain_refresh_establishment_living_unit}-trigger"
+#  schedule = "cron(0/15 06-19 ? * MON-FRI *)"
+#  type     = "SCHEDULED"
+#
+#  actions {
+#    job_name = module.glue_temp_refresh_job_establishment_living_unit.name
+#  }
+#}
+#
+#
+## Movements Movements Schedule
+#resource "aws_glue_trigger" "temp_domain_refresh_movements_movements" {
+#  name     = "${local.domain_refresh_movements_movements}-trigger"
+#  schedule = "cron(0/15 06-19 ? * MON-FRI *)"
+#  type     = "SCHEDULED"
+#
+#  actions {
+#    job_name = module.glue_temp_refresh_job_movements_movements.name
+#  }
+#}
+#
+#
+#
+## Prisoner Prisoner Schedule
+#resource "aws_glue_trigger" "temp_domain_refresh_prisoner_prisoner" {
+#  name     = "${local.domain_refresh_prisoner_prisoner}-trigger"
+#  schedule = "cron(0/15 06-19 ? * MON-FRI *)"
+#  type     = "SCHEDULED"
+#
+#  actions {
+#    job_name = module.glue_temp_refresh_job_prisoner_prisoner.name
+#  }
+#}

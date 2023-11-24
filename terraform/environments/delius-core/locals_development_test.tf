@@ -14,12 +14,14 @@ locals {
     route53_external_zone         = data.aws_route53_zone.external
     general_shared_kms_key_arn    = data.aws_kms_key.general_shared.arn
     shared_vpc_id                 = data.aws_vpc.shared.id
+    bastion                       = module.bastion_linux
   }
 
   environment_config_test = {
-    migration_environment_vpc_cidr = "10.161.20.0/22"
-    legacy_engineering_vpc_cidr    = "10.161.98.0/25"
-    ec2_user_ssh_key               = file("${path.module}/files/.ssh/${terraform.workspace}-dev/ec2-user.pub")
+    migration_environment_private_cidr = ["10.162.32.0/22", "10.162.36.0/22", "10.162.40.0/22"]
+    migration_environment_db_cidr      = ["10.162.44.0/24", "10.162.45.0/24", "10.162.46.0/25"]
+    legacy_engineering_vpc_cidr        = "10.161.98.0/25"
+    ec2_user_ssh_key                   = file("${path.module}/files/.ssh/${terraform.workspace}-dev/ec2-user.pub")
   }
 
   ldap_config_test = {

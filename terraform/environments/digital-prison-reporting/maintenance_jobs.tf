@@ -382,15 +382,17 @@ module "glue_retention_domain_job" {
 }
 
 # Maintenance Job Schedules (triggers)
-resource "aws_glue_trigger" "compact_raw_job" {
-  name     = "${local.compact_raw_job_name}-trigger"
-  schedule = local.compact_raw_job_schedule
-  type     = "SCHEDULED"
 
-  actions {
-    job_name = module.glue_compact_raw_job.name
-  }
-}
+# Schedules temporarily commented out to prevent spamming job failure alerts. See comment on DPR2-208.
+#resource "aws_glue_trigger" "compact_raw_job" {
+#  name     = "${local.compact_raw_job_name}-trigger"
+#  schedule = local.compact_raw_job_schedule
+#  type     = "SCHEDULED"
+#
+#  actions {
+#    job_name = module.glue_compact_raw_job.name
+#  }
+#}
 
 resource "aws_glue_trigger" "compact_structured_job" {
   name     = "${local.compact_structured_job_name}-trigger"
@@ -421,16 +423,16 @@ resource "aws_glue_trigger" "compact_domain_job" {
     job_name = module.glue_compact_domain_job.name
   }
 }
-
-resource "aws_glue_trigger" "retention_raw_job" {
-  name     = "${local.retention_raw_job_name}-trigger"
-  schedule = local.retention_raw_job_schedule
-  type     = "SCHEDULED"
-
-  actions {
-    job_name = module.glue_retention_raw_job.name
-  }
-}
+# Schedules temporarily commented out to prevent spamming job failure alerts. See comment on DPR2-208.
+#resource "aws_glue_trigger" "retention_raw_job" {
+#  name     = "${local.retention_raw_job_name}-trigger"
+#  schedule = local.retention_raw_job_schedule
+#  type     = "SCHEDULED"
+#
+#  actions {
+#    job_name = module.glue_retention_raw_job.name
+#  }
+#}
 
 resource "aws_glue_trigger" "retention_structured_job" {
   name     = "${local.retention_structured_job_name}-trigger"
