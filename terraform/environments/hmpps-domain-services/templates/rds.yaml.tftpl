@@ -87,7 +87,7 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
-        # Configure RDS
+        # Prepare instance for RDS deployment
         content: |-
           Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
           Disable-NetAdapterBinding -Name 'Ethernet' -ComponentID 'ms_tcpip6'
