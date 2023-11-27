@@ -70,18 +70,18 @@ module "baseline" {
 
   cloudwatch_metric_alarms = merge(
     local.baseline_cloudwatch_metric_alarms,
-    lookup(local.baseline_environment_config, "baseline_cloudwatch_metric_alarms", {})
+    lookup(local.environment_config, "baseline_cloudwatch_metric_alarms", {})
   )
 
   cloudwatch_log_metric_filters = merge(
     local.baseline_cloudwatch_log_metric_filters,
-    lookup(local.baseline_environment_config, "baseline_cloudwatch_log_metric_filters", {})
+    lookup(local.environment_config, "baseline_cloudwatch_log_metric_filters", {})
   )
 
   cloudwatch_log_groups = merge(
     module.baseline_presets.cloudwatch_log_groups,
     local.baseline_cloudwatch_log_groups,
-    lookup(local.baseline_environment_config, "baseline_cloudwatch_log_groups", {})
+    lookup(local.environment_config, "baseline_cloudwatch_log_groups", {})
   )
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
   ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})

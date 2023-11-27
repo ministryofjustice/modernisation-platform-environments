@@ -297,6 +297,8 @@ locals {
   baseline_secretsmanager_secrets = {}
 
   baseline_cloudwatch_log_groups = {}
+  baseline_cloudwatch_metric_alarms = {}
+  baseline_cloudwatch_log_metric_filters = {}
 
   public_key_data = jsondecode(file("./files/bastion_linux.json"))
 }
