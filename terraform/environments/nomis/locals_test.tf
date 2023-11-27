@@ -615,7 +615,13 @@ locals {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms,
           module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup, {
+            cpu-utilization-high = merge(local.database_ec2_cloudwatch_metric_alarms["cpu-utilization-high"], {
+              evaluation_periods  = "300" # CPU can spike for 5 hours during DB restore
+              datapoints_to_alarm = "300"
+              alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 5 hours on a test nomis-db instance"
+            })
+          }
         )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"

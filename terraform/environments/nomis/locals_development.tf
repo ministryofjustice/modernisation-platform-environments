@@ -67,7 +67,7 @@ locals {
       "/oracle/database/qa11r" = local.database_nomis_ssm_parameters
     }
     baseline_secretsmanager_secrets = {
-      "/azure"                 = {
+      "/azure" = {
         secrets = {
           sas_token = {}
         }
