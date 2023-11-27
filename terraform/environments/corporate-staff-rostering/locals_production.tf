@@ -108,6 +108,9 @@ locals {
           create_external_record = true
         }
 
+        secretsmanager_secrets = {
+          asm-passwords = {}
+        }
         ssm_parameters = {
           asm-passwords = {}
         }
@@ -155,6 +158,9 @@ locals {
           }
         })
 
+        secretsmanager_secrets = {
+          asm-passwords = {}
+        }
         ssm_parameters = {
           asm-passwords = {}
         }
