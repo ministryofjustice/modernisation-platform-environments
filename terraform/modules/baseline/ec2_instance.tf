@@ -3,7 +3,7 @@ module "ec2_instance" {
 
   for_each = var.ec2_instances
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.3.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=DSOS-2406-align-secretsmanager-options-with-ssm"
 
   providers = {
     aws.core-vpc = aws.core-vpc
