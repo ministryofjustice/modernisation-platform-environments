@@ -619,6 +619,7 @@ locals {
             cpu-utilization-high = merge(local.database_ec2_cloudwatch_metric_alarms["cpu-utilization-high"], {
               evaluation_periods  = "300" # CPU can spike for 5 hours during DB restore
               datapoints_to_alarm = "300"
+              alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 5 hours on a test nomis-db instance"
             })
           }
         )
