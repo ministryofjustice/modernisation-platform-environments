@@ -1270,7 +1270,7 @@ module "dynamo_table_step_functions_token" {
   source              = "./modules/dynamo_tables"
   create_table        = true
   autoscaling_enabled = false
-  name                = "${local.project}-step-functions-${local.environment}"
+  name                = "${local.project}-step-function-tokens"
 
   hash_key    = "replicationTaskArn"
   table_class = "STANDARD"
