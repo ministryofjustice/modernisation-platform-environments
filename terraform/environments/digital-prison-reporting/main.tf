@@ -1289,6 +1289,16 @@ module "dynamo_table_step_functions_token" {
     }
   ]
 
+  global_secondary_indexes = [
+    {
+      name            = "expireAt-index"
+      hash_key        = "expireAt"
+      write_capacity  = 2
+      read_capacity   = 2
+      projection_type = "ALL"
+    }
+  ]
+
   tags = merge(
     local.all_tags,
     {
