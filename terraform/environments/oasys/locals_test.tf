@@ -554,5 +554,26 @@ locals {
         ]
       }
     }
+
+    baseline_cloudwatch_log_groups = merge(
+      session-manager-logs = {
+        retention_in_days = 7
+      }
+      cwagent-var-log-messages = {
+        retention_in_days = 7
+      }
+      cwagent-var-log-secure = {
+        retention_in_days = 7
+      }
+      cwagent-windows-system = {
+        retention_in_days = 7
+      }
+      cwagent-oasys-autologoff = {
+        retention_in_days = 7
+      }
+      cwagent-web-logs = {
+        retention_in_days = 7
+      }
+    )
   }
 }

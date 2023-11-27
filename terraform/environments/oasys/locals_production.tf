@@ -74,5 +74,26 @@ locals {
       #   ]
       # }
     }
+
+    baseline_cloudwatch_log_groups = merge(
+      session-manager-logs = {
+        retention_in_days = 400
+      }
+      cwagent-var-log-messages = {
+        retention_in_days = 90
+      }
+      cwagent-var-log-secure = {
+        retention_in_days = 400
+      }
+      cwagent-windows-system = {
+        retention_in_days = 90
+      }
+      cwagent-oasys-autologoff = {
+        retention_in_days = 400
+      }
+      cwagent-web-logs = {
+        retention_in_days = 90
+      }
+    )
   }
 }
