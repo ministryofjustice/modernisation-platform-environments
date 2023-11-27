@@ -47,6 +47,10 @@ resource "aws_security_group" "load_balancer_security_group" {
       "194.33.249.0/29",   # ARK Corsham Internet Egress Vodafone mojo_arkc_internet_egress_vodafone
       "51.149.249.32/29",  # ARK Farnborough Internet Egress Exponential-E mojo_arkf_internet_egress_exponential_e
       "194.33.248.0/29",   # ARK Farnborough Internet Egress Vodafone mojo_arkf_internet_egress_vodafone
+      "20.49.214.199/32",  # Azure Landing Zone Egress
+      "20.49.214.228/32",  # Azure Landing Zone Egress
+      "20.26.11.71/32",    # Azure Landing Zone Egress
+      "20.26.11.108/32",   # Azure Landing Zone Egress
       # Route53 Healthcheck Access Cidrs
       # London Region not support yet, so metrics are not yet publised, can be enabled at later stage for Route53 endpoint monitor
       "15.177.0.0/18",     # GLOBAL Region
