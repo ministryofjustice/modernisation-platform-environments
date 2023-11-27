@@ -545,14 +545,14 @@ locals {
         })
         secretsmanager_secrets = {
           asm-passwords = {}
-          test-fixed = {
-            value = "test fixed"
-          }
-          test-random = {
-            random = {
-              length = 10
-            }
-          }
+          # test-fixed = {
+          #   value = "test fixed"
+          # }
+          # test-random = {
+          #   random = {
+          #     length = 10
+          #   }
+          # }
         }
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "t1"
