@@ -103,6 +103,9 @@ locals {
           }
         })
 
+        secretsmanager_secrets = {
+          asm-passwords = {}
+        }
         ssm_parameters = {
           asm-passwords = {}
         }

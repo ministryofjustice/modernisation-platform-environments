@@ -37,6 +37,9 @@ locals {
 
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
+    secretsmanager_secrets = {
+      asm-passwords = {}
+    }
     ssm_parameters = {
       asm-passwords = {}
     }
