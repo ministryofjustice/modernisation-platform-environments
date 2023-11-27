@@ -269,7 +269,7 @@ resource "aws_ebs_volume" "dbf01" {
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf01
   type              = "io2"
-  iops              = 12000
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf01
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
@@ -296,7 +296,7 @@ resource "aws_ebs_volume" "dbf02" {
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf02
   type              = "io2"
-  iops              = 12000
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf02
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
@@ -323,7 +323,7 @@ resource "aws_ebs_volume" "dbf03" {
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf03
   type              = "io2"
-  iops              = 12000
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf03
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
