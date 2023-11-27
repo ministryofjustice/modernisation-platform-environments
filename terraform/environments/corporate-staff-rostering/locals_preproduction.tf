@@ -938,7 +938,7 @@ locals {
           module.environment.subnet["private"]["eu-west-2b"].id,
         ]
         security_groups                  = ["load-balancer"]
-        access_logs                      = false
+        access_logs                      = true
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
