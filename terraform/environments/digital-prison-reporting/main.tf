@@ -1265,7 +1265,7 @@ module "dynamo_tab_domain_registry" {
   )
 }
 
-# Dynamo DB for StepFunctions DMS Tokens, DPR2-209
+# Dynamo table for StepFunctions DMS Tokens, DPR2-209
 module "dynamo_table_step_functions_token" {
   source              = "./modules/dynamo_tables"
   create_table        = true
@@ -1274,12 +1274,18 @@ module "dynamo_table_step_functions_token" {
 
   hash_key    = "replicationTaskArn"
   table_class = "STANDARD"
-  ttl_enabled = false
+
+  ttl_enabled = true
+  ttl_attribute_name = "expireAt"
 
   attributes = [
     {
       name = "replicationTaskArn"
       type = "S"
+    },
+    {
+      name = "expireAt"
+      type = "N"
     }
   ]
 
