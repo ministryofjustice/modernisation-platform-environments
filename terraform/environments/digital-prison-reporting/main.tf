@@ -186,30 +186,28 @@ module "glue_reporting_hub_cdc_job" {
   }
 }
 
-# Glue Job, Domain Refresh
-module "glue_domain_refresh_job" {
+# Glue Job, Create Hive Tables
+module "glue_hive_table_creation_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-domain-refresh-${local.env}"
-  short_name                    = "${local.project}-domain-refresh"
+  name                          = "${local.project}-hive_table_creation-${local.env}"
+  short_name                    = "${local.project}-hive_table_creation"
   command_type                  = "glueetl"
-  description                   = "Monitors the reporting hub for table changes and applies them to domains"
+  description                   = "Creates Hive tables for schemas in the registry"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-domain-refresh-${local.env}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-domain-refresh-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-domain-refresh-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-hive_table_creation-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-hive_table_creation-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
   enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
-  additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  # timeout                       = 1440
-  execution_class             = "FLEX"
-  worker_type                 = local.refresh_job_worker_type
-  number_of_workers           = local.refresh_job_num_workers
-  max_concurrent              = 64
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 1
   region                      = local.account_region
   account                     = local.account_id
   log_group_retention_in_days = 1
@@ -217,25 +215,27 @@ module "glue_domain_refresh_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-refresh-${local.env}"
+      Name          = "${local.project}-hive_table_creation-${local.env}"
       Resource_Type = "Glue Job"
-      Jira          = "DPR-265"
+      Jira          = "DPR2-209"
     }
   )
 
   arguments = {
-    "--extra-jars"                   = local.glue_jobs_latest_jar_location
-    "--class"                        = "uk.gov.justice.digital.job.DomainRefreshJob"
-    "--datalake-formats"             = "delta"
-    "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"
-    "--dpr.aws.kinesis.endpointUrl"  = "https://kinesis.${local.account_region}.amazonaws.com"
-    "--dpr.aws.region"               = local.account_region
-    "--dpr.curated.s3.path"          = "s3://${module.s3_curated_bucket.bucket_id}"
-    "--dpr.domain.registry"          = "${local.project}-domain-registry-${local.environment}"
-    "--dpr.domain.target.path"       = "s3://${module.s3_domain_bucket.bucket_id}"
-    "--dpr.domain.catalog.db"        = module.glue_data_domain_database.db_name
-    "--dpr.log.level"                = local.refresh_job_log_level
+    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--class"                     = "uk.gov.justice.digital.job.HiveTableCreationJob"
+    "--dpr.aws.region"            = local.account_region
+    "--dpr.structured.s3.path"    = "s3://${module.s3_structured_bucket.bucket_id}"
+    "--dpr.curated.s3.path"       = "s3://${module.s3_curated_bucket.bucket_id}"
+    "--dpr.contract.registryName" = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.log.level"             = local.refresh_job_log_level
   }
+
+  depends_on = [
+    module.s3_structured_bucket.bucket_id,
+    module.s3_curated_bucket.bucket_id,
+    module.glue_registry_avro.registry_name
+  ]
 }
 
 # kinesis Data Stream Ingestor
@@ -455,11 +455,11 @@ module "s3_glue_job_bucket" {
   )
 }
 
-# S3 Landing
-module "s3_landing_bucket" {
+# S3 Raw Archive
+module "s3_raw_archive_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
-  name                      = "${local.project}-landing-${local.env}"
+  name                      = "${local.project}-raw-archive-${local.env}"
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
@@ -467,7 +467,7 @@ module "s3_landing_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-landing-${local.env}-s3"
+      Name          = "${local.project}-raw-archive-${local.env}-s3"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -788,7 +788,7 @@ module "datamart" {
   )
 }
 
-# Lambda for moving files from landing zone to raw zone
+# Lambda for moving files from the raw bucket to the raw archive bucket
 module "s3_file_transfer_lambda" {
   source = "./modules/lambdas/generic"
 
@@ -839,13 +839,13 @@ module "s3_file_transfer_lambda_trigger" {
   lambda_function_arn   = module.s3_file_transfer_lambda.lambda_function
   lambda_function_name  = module.s3_file_transfer_lambda.lambda_name
 
-  trigger_input_event = <<EOF
-  {
-    "sourceBucket": "${module.s3_landing_bucket.bucket_id}",
-    "destinationBucket": "${module.s3_raw_bucket.bucket_id}",
-    "retentionDays": "${local.scheduled_s3_file_transfer_lambda_retention_days}"
-  }
-  EOF
+  trigger_input_event = jsonencode(
+    {
+      "sourceBucket": "${module.s3_raw_bucket.bucket_id}",
+      "destinationBucket": "${module.s3_raw_archive_bucket.bucket_id}",
+      "retentionDays": "${local.scheduled_s3_file_transfer_lambda_retention_days}"
+    }
+  )
 
   trigger_schedule_expression = "cron(0 0/3 ? * * *)"
 
@@ -941,102 +941,112 @@ module "data_ingestion_pipeline" {
     module.dms_nomis_to_s3_ingestor.dms_replication_task_arn,
     module.glue_reporting_hub_batch_job.name,
     module.glue_reporting_hub_cdc_job.name,
+    module.glue_hive_table_creation_job.name,
     module.s3_file_transfer_lambda.lambda_function,
     module.step_function_notification_lambda.lambda_function
   ]
 
-  definition = <<EOF
-  {
-    "Comment": "Data Ingestion Pipeline Step Function",
-    "StartAt": "Start DMS Replication Task",
-    "States": {
-      "Start DMS Replication Task": {
-        "Type": "Task",
-        "Parameters": {
-          "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
-          "StartReplicationTaskType": "reload-target"
-        },
-        "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
-        "Next": "Invoke DMS State Control Lambda"
-      },
-      "Invoke DMS State Control Lambda": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-        "Parameters": {
-          "Payload": {
-            "token.$": "$$.Task.Token",
-            "replicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}"
+  definition = jsonencode(
+    {
+      "Comment": "Data Ingestion Pipeline Step Function",
+      "StartAt": "Start DMS Replication Task",
+      "States": {
+        "Start DMS Replication Task": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
+          "Parameters": {
+            "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
+            "StartReplicationTaskType": "reload-target"
           },
-          "FunctionName": "${module.step_function_notification_lambda.lambda_function}"
+          "Next": "Invoke DMS State Control Lambda"
         },
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException"
-            ],
-            "IntervalSeconds": 60,
-            "MaxAttempts": 2,
-            "BackoffRate": 2
-          }
-        ],
-        "Next": "Start Glue Batch Job"
-      },
-      "Start Glue Batch Job": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::glue:startJobRun.sync",
-        "Parameters": {
-          "JobName": "${module.glue_reporting_hub_batch_job.name}"
-        },
-        "Next": "Invoke S3 File Transfer Lambda"
-      },
-      "Invoke S3 File Transfer Lambda": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke",
-        "Parameters": {
-          "Payload": {
-            "sourceBucket": "${module.s3_landing_bucket.bucket_id}",
-            "destinationBucket": "${module.s3_raw_bucket.bucket_id}"
+        "Invoke DMS State Control Lambda": {
+          "Type": "Task",
+          "TimeoutSeconds": 1200,
+          "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+          "Parameters": {
+            "Payload": {
+              "token.$": "$$.Task.Token",
+              "replicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}"
+            },
+            "FunctionName": "${module.step_function_notification_lambda.lambda_function}"
           },
-          "FunctionName": "${module.s3_file_transfer_lambda.lambda_function}"
+          "Retry": [
+            {
+              "ErrorEquals": [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException"
+              ],
+              "IntervalSeconds": 60,
+              "MaxAttempts": 2,
+              "BackoffRate": 2
+            }
+          ],
+          "Next": "Start Glue Batch Job"
         },
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException"
-            ],
-            "IntervalSeconds": 600,
-            "MaxAttempts": 2,
-            "BackoffRate": 2
-          }
-        ],
-        "Next": "Resume DMS Replication Task"
-      },
-      "Resume DMS Replication Task": {
-        "Type": "Task",
-        "Parameters": {
-          "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
-          "StartReplicationTaskType": "resume-processing"
+        "Start Glue Batch Job": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters": {
+            "JobName": "${module.glue_reporting_hub_batch_job.name}"
+          },
+          "Next": "Create Hive Tables"
         },
-        "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
-        "Next": "Start Glue Streaming Job"
-      },
-      "Start Glue Streaming Job": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::glue:startJobRun",
-        "Parameters": {
-          "JobName": "${module.glue_reporting_hub_cdc_job.name}"
+        "Create Hive Tables": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters": {
+            "JobName": "${module.glue_hive_table_creation_job.name}"
+          },
+          "Next": "Invoke S3 File Transfer Lambda"
         },
-        "End": true
+        "Invoke S3 File Transfer Lambda": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::lambda:invoke",
+          "Parameters": {
+            "Payload": {
+              "sourceBucket": "${module.s3_raw_bucket.bucket_id}",
+              "destinationBucket": "${module.s3_raw_archive_bucket.bucket_id}"
+            },
+            "FunctionName": "${module.s3_file_transfer_lambda.lambda_function}"
+          },
+          "Retry": [
+            {
+              "ErrorEquals": [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException"
+              ],
+              "IntervalSeconds": 600,
+              "MaxAttempts": 2,
+              "BackoffRate": 2
+            }
+          ],
+          "Next": "Resume DMS Replication Task"
+        },
+        "Resume DMS Replication Task": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
+          "Parameters": {
+            "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
+            "StartReplicationTaskType": "resume-processing"
+          },
+          "Next": "Start Glue Streaming Job"
+        },
+        "Start Glue Streaming Job": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::glue:startJobRun",
+          "Parameters": {
+            "JobName": "${module.glue_reporting_hub_cdc_job.name}"
+          },
+          "End": true
+        }
       }
     }
-  }
-  EOF
+  )
 
 
 }
@@ -1178,14 +1188,14 @@ module "dms_nomis_to_s3_ingestor" {
 
   extra_attributes = "supportResetlog=TRUE"
 
-  bucket_name = module.s3_landing_bucket.bucket_id
+  bucket_name = module.s3_raw_bucket.bucket_id
 
   availability_zones = {
     0 = "eu-west-2a"
   }
 
   depends_on = [
-    module.s3_landing_bucket.bucket_id
+    module.s3_raw_bucket.bucket_id
   ]
 
   tags = merge(
