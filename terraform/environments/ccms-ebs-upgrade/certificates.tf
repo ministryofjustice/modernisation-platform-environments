@@ -36,7 +36,7 @@ resource "aws_route53_record" "external_validation" {
     aws_instance.ec2_ebsapps
   ]
 
-  provider = aws.core-vpc
+  provider = aws.core-network-services
 
   for_each = {
     for dvo in local.cert_opts : dvo.domain_name => {
