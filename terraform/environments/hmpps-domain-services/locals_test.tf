@@ -12,7 +12,7 @@ locals {
       }
     }
     baseline_secretsmanager_secrets = {
-      "/join_domain_linux_service_account"       = {
+      "/join_domain_linux_service_account" = {
         secrets = {
           passwords = {}
         }

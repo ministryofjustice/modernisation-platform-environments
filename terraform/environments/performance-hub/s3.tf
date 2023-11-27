@@ -212,7 +212,7 @@ resource "aws_s3_object" "prison_performance" {
 data "aws_iam_policy_document" "allow_ap_write_to_landing" {
   statement {
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::593291632749:role/service-role/export_prison_incidents-move",
         "arn:aws:iam::593291632749:role/service-role/export_prison_performance-move"
@@ -220,8 +220,8 @@ data "aws_iam_policy_document" "allow_ap_write_to_landing" {
     }
 
     actions = [
-        "s3:PutObject",
-        "s3:PutObjectAcl"
+      "s3:PutObject",
+      "s3:PutObjectAcl"
     ]
 
     resources = [

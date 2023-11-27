@@ -348,7 +348,7 @@ resource "aws_ecs_service" "ecs_service" {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
   }
-  
+
   load_balancer {
     target_group_arn = var.lb_tg_arn
     container_name   = var.app_name

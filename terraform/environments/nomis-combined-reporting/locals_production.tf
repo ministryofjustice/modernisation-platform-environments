@@ -7,7 +7,7 @@ locals {
         bucket_policy_v2 = [
           module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
         ]
-        iam_policies   = module.baseline_presets.s3_iam_policies
+        iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
 
