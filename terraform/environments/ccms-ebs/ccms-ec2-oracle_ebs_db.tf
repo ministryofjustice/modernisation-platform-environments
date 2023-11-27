@@ -262,14 +262,14 @@ resource "aws_volume_attachment" "diag_att" {
 }
 
 resource "aws_ebs_volume" "dbf01" {
-  count = local.is-development ? 1 : 0
+  count = local.is-production ? 0 : 1
   lifecycle {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf01
   type              = "io2"
-  iops              = 12000
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf01
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
@@ -278,7 +278,7 @@ resource "aws_ebs_volume" "dbf01" {
 }
 
 resource "aws_volume_attachment" "dbf01_att" {
-  count = local.is-development ? 1 : 0
+  count = local.is-production ? 0 : 1
   depends_on = [
     aws_ebs_volume.dbf01
   ]
@@ -289,14 +289,14 @@ resource "aws_volume_attachment" "dbf01_att" {
 
 
 resource "aws_ebs_volume" "dbf02" {
-  count = local.is-development ? 1 : 0
+  count = local.is-production ? 0 : 1
   lifecycle {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf02
   type              = "io2"
-  iops              = 12000
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf02
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
@@ -305,7 +305,7 @@ resource "aws_ebs_volume" "dbf02" {
 }
 
 resource "aws_volume_attachment" "dbf02_att" {
-  count = local.is-development ? 1 : 0
+  count = local.is-production ? 0 : 1
   depends_on = [
     aws_ebs_volume.dbf02
   ]
@@ -316,14 +316,14 @@ resource "aws_volume_attachment" "dbf02_att" {
 
 
 resource "aws_ebs_volume" "dbf03" {
-  count = local.is-development ? 1 : 0
+  count = local.is-production ? 0 : 1
   lifecycle {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf03
   type              = "io2"
-  iops              = 12000
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf03
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
@@ -332,7 +332,7 @@ resource "aws_ebs_volume" "dbf03" {
 }
 
 resource "aws_volume_attachment" "dbf03_att" {
-  count = local.is-development ? 1 : 0
+  count = local.is-production ? 0 : 1
   depends_on = [
     aws_ebs_volume.dbf03
   ]
