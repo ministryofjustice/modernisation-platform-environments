@@ -164,7 +164,7 @@ locals {
       # }
     }
 
-    baseline_cloudwatch_log_groups = merge(
+    baseline_cloudwatch_log_groups = {
       session-manager-logs = {
         retention_in_days = 1
       }
@@ -183,6 +183,6 @@ locals {
       cwagent-web-logs = {
         retention_in_days = 1
       }
-    )
+    }
   }
 }
