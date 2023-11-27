@@ -42,8 +42,7 @@ locals {
       to_port     = 61000
       protocol    = "tcp"
       cidr_blocks = []
-      # Update the below SG to mention ALB SG
-      security_groups = []
+      security_groups = [module.alb.security_group.id]
     }
   }
   ec2_egress_rules = {

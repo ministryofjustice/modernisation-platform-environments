@@ -29,36 +29,26 @@ locals {
     }
     baseline_secretsmanager_secrets = {
       # NEW
-      "/oracle/database/T1OASYS"                = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/T1OASREP"               = local.secretsmanager_secrets_db
-      "/oracle/database/T1AZBIPI"               = local.secretsmanager_secrets_bip_db
-      "/oracle/database/T1BIPINF"               = local.secretsmanager_secrets_bip_db
-      "/oracle/database/T1MISTRN"               = local.secretsmanager_secrets_db
-      "/oracle/database/T1ONRSYS"               = local.secretsmanager_secrets_db
-      "/oracle/database/T1ONRAUD"               = local.secretsmanager_secrets_db
-      "/oracle/database/T1ONRBDS"               = local.secretsmanager_secrets_db
+      "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
+      "/oracle/database/T1AZBIPI" = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T1BIPINF" = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T1MISTRN" = local.secretsmanager_secrets_db
+      "/oracle/database/T1ONRSYS" = local.secretsmanager_secrets_db
+      "/oracle/database/T1ONRAUD" = local.secretsmanager_secrets_db
+      "/oracle/database/T1ONRBDS" = local.secretsmanager_secrets_db
 
-      "/oracle/database/T2OASYS"                = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/T2OASREP"               = local.secretsmanager_secrets_db
-      "/oracle/database/T2AZBIPI"               = local.secretsmanager_secrets_bip_db
-      "/oracle/database/T2BIPINF"               = local.secretsmanager_secrets_bip_db
-      "/oracle/database/T2MISTRN"               = local.secretsmanager_secrets_db
-      "/oracle/database/T2ONRSYS"               = local.secretsmanager_secrets_db
-      "/oracle/database/T2ONRAUD"               = local.secretsmanager_secrets_db
-      "/oracle/database/T2ONRBDS"               = local.secretsmanager_secrets_db
+      "/oracle/database/T2OASYS"  = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/T2OASREP" = local.secretsmanager_secrets_db
+      "/oracle/database/T2AZBIPI" = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T2BIPINF" = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T2MISTRN" = local.secretsmanager_secrets_db
+      "/oracle/database/T2ONRSYS" = local.secretsmanager_secrets_db
+      "/oracle/database/T2ONRAUD" = local.secretsmanager_secrets_db
+      "/oracle/database/T2ONRBDS" = local.secretsmanager_secrets_db
 
-      "/oracle/bip/t1"                          = local.secretsmanager_secrets_bip
-      "/oracle/bip/t2"                          = local.secretsmanager_secrets_bip
-
-      "" = {
-        postfix = ""
-        secrets = {
-          account_ids                       = {}
-          ec2-user_pem                      = {}
-          environment_management_arn        = {}
-          modernisation_platform_account_id = {}
-        }
-      }
+      "/oracle/bip/t1" = local.secretsmanager_secrets_bip
+      "/oracle/bip/t2" = local.secretsmanager_secrets_bip
 
       # OLD AND WILL BE REPLACED
 
@@ -138,6 +128,7 @@ locals {
           "${local.application_name}-environment" = "t2"
           bip-db-name                             = "T2BIPINF"
           instance-scheduling                     = "skip-scheduling"
+          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
         })
       })
       # "t2-${local.application_name}-db-b" = merge(local.database_b, {
@@ -169,11 +160,11 @@ locals {
         # })
         tags = merge(local.bip_b.tags, {
           # instance-scheduling = "skip-scheduling"
-          oasys-environment   = "t2"
-          bip-db-name         = "T2BIPINF"
-          bip-db-hostname     = "t2-oasys-db-a"
-          oasys-db-name       = "T2OASYS"
-          oasys-db-hostname   = "t2-oasys-db-a"
+          oasys-environment = "t2"
+          bip-db-name       = "T2BIPINF"
+          bip-db-hostname   = "t2-oasys-db-a"
+          oasys-db-name     = "T2OASYS"
+          oasys-db-hostname = "t2-oasys-db-a"
         })
       })
 
@@ -186,35 +177,36 @@ locals {
           "${local.application_name}-environment" = "t1"
           bip-db-name                             = "T1BIPINF"
           instance-scheduling                     = "skip-scheduling"
+          oracle-sids                             = "T1BIPINF T1MISTRN T1OASREP T1OASYS T1ONRAUD T1ONRBDS T1ONRSYS"
         })
       })
 
-      # "t1-${local.application_name}-bip-a" = merge(local.bip_a, {
-      #   autoscaling_group = merge(local.bip_b.autoscaling_group, {
-      #     desired_capacity = 1
-      #   })
-      #   autoscaling_schedules = {}
-      #   config = merge(local.bip_a.config, {
-      #     instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
-      #       "Ec2T1BipPolicy",
-      #     ])
-      #   })
-      #   # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-      #   #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #   #     branch = "add-oasys-bip-role"
-      #   #   })
-      #   # })
-      #   tags = merge(local.bip_b.tags, {
-      #     # instance-scheduling = "skip-scheduling"
-      #     oasys-environment   = "t1"
-      #     bip-db-name         = "T1BIPINF"
-      #     bip-db-hostname     = "t1-oasys-db-a"
-      #     oasys-db-name       = "T1OASYS"
-      #     oasys-db-hostname   = "t1-oasys-db-a"
-      #   })
-      # })
+      "t1-${local.application_name}-bip-a" = merge(local.bip_a, {
+        autoscaling_group = merge(local.bip_b.autoscaling_group, {
+          desired_capacity = 1
+        })
+        autoscaling_schedules = {}
+        config = merge(local.bip_a.config, {
+          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
+        # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+        #     branch = "add-oasys-bip-role"
+        #   })
+        # })
+        tags = merge(local.bip_b.tags, {
+          # instance-scheduling = "skip-scheduling"
+          oasys-environment   = "t1"
+          bip-db-name         = "T1BIPINF"
+          bip-db-hostname     = "t1-oasys-db-a"
+          oasys-db-name       = "T1OASYS"
+          oasys-db-hostname   = "t1-oasys-db-a"
+        })
+      })
 
-      
+
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -282,7 +274,7 @@ locals {
       #   })
       # })
 
-      
+
 
     }
 

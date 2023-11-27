@@ -50,7 +50,7 @@ locals {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           ami_owner         = "self"
           availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
@@ -108,6 +108,9 @@ locals {
           create_external_record = true
         }
 
+        secretsmanager_secrets = {
+          asm-passwords = {}
+        }
         ssm_parameters = {
           asm-passwords = {}
         }
@@ -122,27 +125,27 @@ locals {
         }
       }
 
-      pd-csr-db-b = merge(local.database_ec2, {
-        config = merge(local.database_ec2.config, {
+      pd-csr-db-b = merge(local.defaults_database_ec2, {
+        config = merge(local.defaults_database_ec2.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           availability_zone = "${local.region}b"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
-        instance = merge(local.database_ec2.instance, {
+        instance = merge(local.defaults_database_ec2.instance, {
           instance_type                = "r6i.xlarge"
           disable_api_stop             = true
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
         })
 
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+        ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
           "/dev/sdb"  = { label = "app", size = 100 } # /u01
           "/dev/sdc"  = { label = "app", size = 500 } # /u02
         })
 
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+        ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
           data = {
             iops       = 3000
             throughput = 125
@@ -155,6 +158,9 @@ locals {
           }
         })
 
+        secretsmanager_secrets = {
+          asm-passwords = {}
+        }
         ssm_parameters = {
           asm-passwords = {}
         }
@@ -169,7 +175,7 @@ locals {
         }
       })
 
-      pd-csr-a-7-a = {
+      pd-csr-a-7-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-7-a"
           availability_zone = "${local.region}a"
@@ -195,9 +201,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pd-csr-a-8-b = {
+      pd-csr-a-8-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-8-b"
           availability_zone = "${local.region}b"
@@ -223,9 +229,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pd-csr-a-9-a = {
+      pd-csr-a-9-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-9-a"
           availability_zone = "${local.region}a"
@@ -251,9 +257,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pd-csr-a-10-b = {
+      pd-csr-a-10-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-10-b"
           availability_zone = "${local.region}b"
@@ -279,9 +285,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pd-csr-a-11-a = {
+      pd-csr-a-11-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-11-a"
           availability_zone = "${local.region}a"
@@ -307,9 +313,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pd-csr-a-12-b = {
+      pd-csr-a-12-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-12-b"
           availability_zone = "${local.region}b"
@@ -334,9 +340,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pd-csr-w-1-a = {
+      pd-csr-w-1-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-1-a"
           availability_zone = "${local.region}a"
@@ -362,9 +368,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pd-csr-w-2-b = {
+      pd-csr-w-2-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-2-b"
           availability_zone = "${local.region}b"
@@ -390,9 +396,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pd-csr-w-3-a = {
+      pd-csr-w-3-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-3-a"
           availability_zone = "${local.region}a"
@@ -418,9 +424,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pd-csr-w-4-b = {
+      pd-csr-w-4-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-4-b"
           availability_zone = "${local.region}b"
@@ -446,9 +452,37 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pd-csr-w-6-b = {
+      pd-csr-w-5-a = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-csr-w-5-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 112 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        tags = {
+          description       = "Migrated server PDCWW00005"
+          app-config-status = "pending"
+          csr-region        = "Region 5 and 6"
+          os-type           = "Windows"
+          ami               = "pd-csr-w-5-a"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+
+      pd-csr-w-6-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-6-b"
           availability_zone = "${local.region}b"
@@ -474,7 +508,7 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
 
     }

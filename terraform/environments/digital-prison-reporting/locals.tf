@@ -64,6 +64,24 @@ locals {
 
   reporting_hub_domain_refresh_enabled = local.application_data.accounts[local.environment].reporting_hub_domain_refresh_enabled
 
+  # Reporting Hub Batch Job
+  reporting_hub_batch_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_batch_job_worker_type
+  reporting_hub_batch_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_batch_job_num_workers
+  reporting_hub_batch_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_batch_job_log_level
+
+  reporting_hub_batch_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_attempts
+  reporting_hub_batch_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_min_wait_millis
+  reporting_hub_batch_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_wait_millis
+
+  # Reporting Hub CDC Job
+  reporting_hub_cdc_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_cdc_job_worker_type
+  reporting_hub_cdc_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_cdc_job_num_workers
+  reporting_hub_cdc_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_cdc_job_log_level
+
+  reporting_hub_cdc_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_max_attempts
+  reporting_hub_cdc_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_min_wait_millis
+  reporting_hub_cdc_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_max_wait_millis
+
   # Refresh Job
   refresh_job_worker_type = local.application_data.accounts[local.environment].refresh_job_worker_type
   refresh_job_num_workers = local.application_data.accounts[local.environment].refresh_job_num_workers
@@ -192,43 +210,43 @@ locals {
   create_redshift_schedule         = local.application_data.accounts[local.environment].setup_redshift_schedule
 
   # Enable CW alarms
-  enable_cw_alarm = local.application_data.accounts[local.environment].alarms.setup_cw_alarms
-  enable_redshift_health_check = local.application_data.accounts[local.environment].alarms.redshift.health_check.enable
-  thrld_redshift_health_check = local.application_data.accounts[local.environment].alarms.redshift.health_check.threshold
-  period_redshift_health_check = local.application_data.accounts[local.environment].alarms.redshift.health_check.period
-  enable_dms_stop_check = local.application_data.accounts[local.environment].alarms.dms.stop_check.enable
-  thrld_dms_stop_check = local.application_data.accounts[local.environment].alarms.dms.stop_check.threshold
-  period_dms_stop_check = local.application_data.accounts[local.environment].alarms.dms.stop_check.period
-  enable_dms_start_check = local.application_data.accounts[local.environment].alarms.dms.start_check.enable
-  thrld_dms_start_check = local.application_data.accounts[local.environment].alarms.dms.start_check.threshold
-  period_dms_start_check = local.application_data.accounts[local.environment].alarms.dms.start_check.period
-  enable_dms_cpu_check = local.application_data.accounts[local.environment].alarms.dms.cpu_check.enable
-  thrld_dms_cpu_check = local.application_data.accounts[local.environment].alarms.dms.cpu_check.threshold
-  period_dms_cpu_check = local.application_data.accounts[local.environment].alarms.dms.cpu_check.period
-  enable_dms_freemem_check = local.application_data.accounts[local.environment].alarms.dms.freemem_check.enable
-  thrld_dms_freemem_check = local.application_data.accounts[local.environment].alarms.dms.freemem_check.threshold
-  period_dms_freemem_check = local.application_data.accounts[local.environment].alarms.dms.freemem_check.period
-  enable_dms_freeablemem_check = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.enable
-  thrld_dms_freeablemem_check = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.threshold
-  period_dms_freeablemem_check = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.period
-  enable_dms_swapusage_check = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.enable
-  thrld_dms_swapusage_check = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.threshold
-  period_dms_swapusage_check = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.period
+  enable_cw_alarm                   = local.application_data.accounts[local.environment].alarms.setup_cw_alarms
+  enable_redshift_health_check      = local.application_data.accounts[local.environment].alarms.redshift.health_check.enable
+  thrld_redshift_health_check       = local.application_data.accounts[local.environment].alarms.redshift.health_check.threshold
+  period_redshift_health_check      = local.application_data.accounts[local.environment].alarms.redshift.health_check.period
+  enable_dms_stop_check             = local.application_data.accounts[local.environment].alarms.dms.stop_check.enable
+  thrld_dms_stop_check              = local.application_data.accounts[local.environment].alarms.dms.stop_check.threshold
+  period_dms_stop_check             = local.application_data.accounts[local.environment].alarms.dms.stop_check.period
+  enable_dms_start_check            = local.application_data.accounts[local.environment].alarms.dms.start_check.enable
+  thrld_dms_start_check             = local.application_data.accounts[local.environment].alarms.dms.start_check.threshold
+  period_dms_start_check            = local.application_data.accounts[local.environment].alarms.dms.start_check.period
+  enable_dms_cpu_check              = local.application_data.accounts[local.environment].alarms.dms.cpu_check.enable
+  thrld_dms_cpu_check               = local.application_data.accounts[local.environment].alarms.dms.cpu_check.threshold
+  period_dms_cpu_check              = local.application_data.accounts[local.environment].alarms.dms.cpu_check.period
+  enable_dms_freemem_check          = local.application_data.accounts[local.environment].alarms.dms.freemem_check.enable
+  thrld_dms_freemem_check           = local.application_data.accounts[local.environment].alarms.dms.freemem_check.threshold
+  period_dms_freemem_check          = local.application_data.accounts[local.environment].alarms.dms.freemem_check.period
+  enable_dms_freeablemem_check      = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.enable
+  thrld_dms_freeablemem_check       = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.threshold
+  period_dms_freeablemem_check      = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.period
+  enable_dms_swapusage_check        = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.enable
+  thrld_dms_swapusage_check         = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.threshold
+  period_dms_swapusage_check        = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.period
   enable_dms_network_trans_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_trans_tp_check.enable
-  thrld_dms_network_trans_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_trans_tp_check.threshold
+  thrld_dms_network_trans_tp_check  = local.application_data.accounts[local.environment].alarms.dms.network_trans_tp_check.threshold
   period_dms_network_trans_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_trans_tp_check.period
-  enable_dms_network_rec_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_rec_tp_check.enable
-  thrld_dms_network_rec_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_rec_tp_check.threshold
-  period_dms_network_rec_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_rec_tp_check.period
-  enable_dms_cdc_src_lat_check = local.application_data.accounts[local.environment].alarms.dms.cdc_src_lat_check.enable
-  thrld_dms_cdc_src_lat_check = local.application_data.accounts[local.environment].alarms.dms.cdc_src_lat_check.threshold
-  period_dms_cdc_src_lat_check = local.application_data.accounts[local.environment].alarms.dms.cdc_src_lat_check.period
-  enable_dms_cdc_targ_lat_check = local.application_data.accounts[local.environment].alarms.dms.cdc_targ_lat_check.enable
-  thrld_dms_cdc_targ_lat_check = local.application_data.accounts[local.environment].alarms.dms.cdc_targ_lat_check.threshold
-  period_dms_cdc_targ_lat_check = local.application_data.accounts[local.environment].alarms.dms.cdc_targ_lat_check.period
-  enable_dms_cdc_inc_events_check = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.enable
-  thrld_dms_cdc_inc_events_check = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.threshold
-  period_dms_cdc_inc_events_check = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.period
+  enable_dms_network_rec_tp_check   = local.application_data.accounts[local.environment].alarms.dms.network_rec_tp_check.enable
+  thrld_dms_network_rec_tp_check    = local.application_data.accounts[local.environment].alarms.dms.network_rec_tp_check.threshold
+  period_dms_network_rec_tp_check   = local.application_data.accounts[local.environment].alarms.dms.network_rec_tp_check.period
+  enable_dms_cdc_src_lat_check      = local.application_data.accounts[local.environment].alarms.dms.cdc_src_lat_check.enable
+  thrld_dms_cdc_src_lat_check       = local.application_data.accounts[local.environment].alarms.dms.cdc_src_lat_check.threshold
+  period_dms_cdc_src_lat_check      = local.application_data.accounts[local.environment].alarms.dms.cdc_src_lat_check.period
+  enable_dms_cdc_targ_lat_check     = local.application_data.accounts[local.environment].alarms.dms.cdc_targ_lat_check.enable
+  thrld_dms_cdc_targ_lat_check      = local.application_data.accounts[local.environment].alarms.dms.cdc_targ_lat_check.threshold
+  period_dms_cdc_targ_lat_check     = local.application_data.accounts[local.environment].alarms.dms.cdc_targ_lat_check.period
+  enable_dms_cdc_inc_events_check   = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.enable
+  thrld_dms_cdc_inc_events_check    = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.threshold
+  period_dms_cdc_inc_events_check   = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.period
 
   # CW Insights
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights

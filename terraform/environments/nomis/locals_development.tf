@@ -11,9 +11,6 @@ locals {
   # baseline config
   development_config = {
 
-    cloudwatch_metric_alarms_dbnames         = []
-    cloudwatch_metric_alarms_dbnames_misload = []
-
     baseline_s3_buckets = {
       nomis-audit-archives = {
         custom_kms_key = module.environment.kms_keys["general"].arn
@@ -68,6 +65,15 @@ locals {
     baseline_ssm_parameters = {
       "/oracle/weblogic/qa11r" = local.weblogic_ssm_parameters
       "/oracle/database/qa11r" = local.database_nomis_ssm_parameters
+    }
+    baseline_secretsmanager_secrets = {
+      "/azure"                 = {
+        secrets = {
+          sas_token = {}
+        }
+      }
+      "/oracle/weblogic/qa11r" = local.weblogic_secretsmanager_secrets
+      "/oracle/database/qa11r" = local.database_nomis_secretsmanager_secrets
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -276,25 +282,25 @@ locals {
     }
 
     baseline_ec2_instances = {
-      dev-nomis-db-1-a = merge(local.database_ec2, {
-        config = merge(local.database_ec2.config, {
-          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
-          availability_zone = "${local.region}a"
-        })
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 500 }
-          flash = { total_size = 50 }
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment   = "dev"
-          description         = "temporary DB to test DB restore"
-          oracle-sids         = ""
-        })
-      })
+      #dev-nomis-db-1-a = merge(local.database_ec2, {
+      #  config = merge(local.database_ec2.config, {
+      #    ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+      #    availability_zone = "${local.region}a"
+      #  })
+      #  ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+      #    "/dev/sdb" = { label = "app", size = 100 }
+      #    "/dev/sdc" = { label = "app", size = 100 }
+      #  })
+      #  ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+      #    data  = { total_size = 500 }
+      #    flash = { total_size = 50 }
+      #  })
+      #  tags = merge(local.database_ec2.tags, {
+      #    nomis-environment   = "dev"
+      #    description         = "temporary DB to test DB restore"
+      #    oracle-sids         = ""
+      #  })
+      #})
     }
 
     baseline_lbs = {

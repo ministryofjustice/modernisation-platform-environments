@@ -342,21 +342,18 @@ resource "aws_ecs_service" "ecs_service" {
     weight            = 1
   }
 
-  # Uncomment this section when the ALB for Apex is built
-  # health_check_grace_period_seconds = 300
+  health_check_grace_period_seconds = 300
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
   }
-
-  # Uncomment this section when the ALB for Apex is built
-  # 
-  #   load_balancer {
-  #     target_group_arn = var.lb_tg_arn
-  #     container_name   = var.app_name
-  #     container_port   = var.server_port
-  #   }
+  
+  load_balancer {
+    target_group_arn = var.lb_tg_arn
+    container_name   = var.app_name
+    container_port   = var.server_port
+  }
 
   depends_on = [
     aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
@@ -419,7 +416,8 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam
         "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
         "elasticloadbalancing:RegisterTargets",
         "ec2:Describe*",
-        "ec2:AuthorizeSecurityGroupIngress"
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ssm:GetParameters"
       ],
       "Resource": ["*"]
     }

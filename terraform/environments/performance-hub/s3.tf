@@ -61,6 +61,7 @@ resource "aws_s3_bucket_versioning" "upload_files" {
   }
 }
 
+## was a "grant all" policy attached directy to cicduser
 # resource "aws_s3_bucket_policy" "upload_files_policy" {
 #   bucket = aws_s3_bucket.upload_files.id
 #   policy = jsonencode({
@@ -208,6 +209,31 @@ resource "aws_s3_object" "prison_performance" {
   key    = "prison_performance/"
 }
 
+data "aws_iam_policy_document" "allow_ap_write_to_landing" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [
+        "arn:aws:iam::593291632749:role/service-role/export_prison_incidents-move",
+        "arn:aws:iam::593291632749:role/service-role/export_prison_performance-move"
+      ]
+    }
+
+    actions = [
+        "s3:PutObject",
+        "s3:PutObjectAcl"
+    ]
+
+    resources = [
+      "arn:aws:s3:::${module.ap_landing_bucket.bucket.id}/*"
+    ]
+  }
+}
+
+resource "aws_s3_bucket_policy" "allow_ap_write_to_landing" {
+  bucket = module.ap_landing_bucket.bucket.id
+  policy = data.aws_iam_policy_document.allow_ap_write_to_landing.json
+}
 
 #------------------------------------------------------------------------------
 # KMS setup for S3

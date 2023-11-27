@@ -12,10 +12,18 @@ locals {
     }
 
     baseline_ssm_parameters = {
-      "/oracle/database/PPIWFM" = local.database_ssm_parameters
+      "/oracle/database/PPIWFM" = {
+        parameters = {
+          passwords = { description = "database passwords" }
+        }
+      }
     }
     baseline_secretsmanager_secrets = {
-      "/oracle/database/PPIWFM" = local.database_secretsmanager_secrets
+      "/oracle/database/PPIWFM" = {
+        secrets = {
+          passwords = { description = "database passwords" }
+        }
+      }
     }
 
     baseline_iam_policies = {
@@ -61,28 +69,28 @@ locals {
     }
 
     baseline_ec2_instances = {
-      pp-csr-db-a = merge(local.database_ec2, {
-        config = merge(local.database_ec2.config, {
+      pp-csr-db-a = merge(local.defaults_database_ec2, {
+        config = merge(local.defaults_database_ec2.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        instance = merge(local.database_ec2.instance, {
+        instance = merge(local.defaults_database_ec2.instance, {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
           disable_api_termination      = true
           disable_api_stop             = true
         })
 
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+        ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
           "/dev/sdb"  = { label = "app", size = 100 } # /u01
           "/dev/sdc"  = { label = "app", size = 100 } # /u02
         })
 
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+        ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
           data = {
             iops       = 3000
             throughput = 125
@@ -95,6 +103,9 @@ locals {
           }
         })
 
+        secretsmanager_secrets = {
+          asm-passwords = {}
+        }
         ssm_parameters = {
           asm-passwords = {}
         }
@@ -105,10 +116,11 @@ locals {
           os-type     = "Linux"
           component   = "test"
           server-type = "csr-db"
+          oracle-sids = "PPIWFM"
         }
       })
 
-      pp-csr-a-13-a = {
+      pp-csr-a-13-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-13-a"
           availability_zone = "${local.region}a"
@@ -134,9 +146,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-14-b = {
+      pp-csr-a-14-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-14-b"
           availability_zone = "${local.region}b"
@@ -162,9 +174,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-17-a = {
+      pp-csr-a-17-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-17-a"
           availability_zone = "${local.region}a"
@@ -190,9 +202,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-18-b = {
+      pp-csr-a-18-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-18-b"
           availability_zone = "${local.region}b"
@@ -218,9 +230,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-2-b = {
+      pp-csr-a-2-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-2-b"
           availability_zone = "${local.region}b"
@@ -244,9 +256,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-3-a = {
+      pp-csr-a-3-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-3-a"
           availability_zone = "${local.region}a"
@@ -270,9 +282,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-15-a = {
+      pp-csr-a-15-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-15-a"
           availability_zone = "${local.region}a"
@@ -298,9 +310,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-a-16-b = {
+      pp-csr-a-16-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pp-csr-a-16-b"
           availability_zone = "${local.region}b"
@@ -326,9 +338,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-1-a = {
+      pp-csr-w-1-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "PPCWW00001"
           availability_zone = "${local.region}a"
@@ -354,9 +366,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-2-b = {
+      pp-csr-w-2-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-2-b"
           availability_zone = "${local.region}b"
@@ -382,9 +394,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-5-a = {
+      pp-csr-w-5-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "PPCWW00005"
           availability_zone = "${local.region}a"
@@ -409,9 +421,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-6-b = {
+      pp-csr-w-6-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-6-b"
           availability_zone = "${local.region}b"
@@ -437,9 +449,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-7-a = {
+      pp-csr-w-7-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-7-b"
           availability_zone = "${local.region}a"
@@ -463,9 +475,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-8-b = {
+      pp-csr-w-8-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-8-b"
           availability_zone = "${local.region}b"
@@ -489,9 +501,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-3-a = {
+      pp-csr-w-3-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-3-a"
           availability_zone = "${local.region}a"
@@ -517,9 +529,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
-      pp-csr-w-4-b = {
+      pp-csr-w-4-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-csr-w-4-b"
           availability_zone = "${local.region}b"
@@ -545,7 +557,7 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-      }
+      })
 
     }
 
@@ -580,6 +592,174 @@ locals {
     }
 
     baseline_lbs = {
+      r12 = {
+        internal_lb              = true
+        enable_delete_protection = false
+        load_balancer_type       = "network"
+        force_destroy_bucket     = true
+        subnets = [
+          module.environment.subnet["private"]["eu-west-2a"].id,
+          module.environment.subnet["private"]["eu-west-2b"].id,
+        ]
+        security_groups                  = ["load-balancer"]
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
+
+        instance_target_groups = {
+          pp-csr-w-12-80 = {
+            port     = 80
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              port                = 80
+              protocol            = "TCP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-1-a" },
+              { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+          pp-csr-w-12-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-1-a" },
+              { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+          pp-csr-w-12-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-1-a" },
+              { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+          pp-csr-w-12-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-1-a" },
+              { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+          pp-csr-w-12-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-1-a" },
+              { ec2_instance_name = "pp-csr-w-2-b" },
+            ]
+          }
+        }
+
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-12-80"
+            }
+          }
+          http-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-12-7770"
+            }
+          }
+          http-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-12-7771"
+            }
+          }
+          http-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-12-7780"
+            }
+          }
+          http-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-12-7781"
+            }
+          }
+        }
+      }
       r34 = {
         internal_lb              = true
         enable_delete_protection = false
@@ -589,8 +769,9 @@ locals {
           module.environment.subnet["private"]["eu-west-2a"].id,
           module.environment.subnet["private"]["eu-west-2b"].id,
         ]
-        security_groups = ["load-balancer"]
-        access_logs     = false
+        security_groups                  = ["load-balancer"]
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
           pp-csr-w-56-80 = {
@@ -666,7 +847,7 @@ locals {
               interval            = 5
               healthy_threshold   = 3
               path                = "/"
-              port                = 7780
+              port                = 7770
               protocol            = "HTTP"
               timeout             = 4
               unhealthy_threshold = 2
@@ -688,7 +869,7 @@ locals {
               interval            = 5
               healthy_threshold   = 3
               path                = "/"
-              port                = 7781
+              port                = 7771
               protocol            = "HTTP"
               timeout             = 4
               unhealthy_threshold = 2
@@ -747,361 +928,123 @@ locals {
           }
         }
       }
-      private = {
+      r56 = {
         internal_lb              = true
         enable_delete_protection = false
+        load_balancer_type       = "network"
         force_destroy_bucket     = true
-        idle_timeout             = 3600
-        subnets                  = module.environment.subnets["private"].ids
-        security_groups          = ["load-balancer"]
+        subnets = [
+          module.environment.subnet["private"]["eu-west-2a"].id,
+          module.environment.subnet["private"]["eu-west-2b"].id,
+        ]
+        security_groups                  = ["load-balancer"]
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          web-12-7770 = {
-            port     = 7770
-            protocol = "HTTP"
+          pp-csr-w-78-80 = {
+            port     = 80
+            protocol = "TCP"
             health_check = {
               enabled             = true
-              interval            = 30
+              interval            = 5
               healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7770
-              timeout             = 5
-              unhealthy_threshold = 5
+              port                = 80
+              protocol            = "TCP"
+              timeout             = 4
+              unhealthy_threshold = 2
             }
             stickiness = {
               enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-1-a" },
-              { ec2_instance_name = "pp-csr-w-2-b" },
-            ]
-          }
-          web-34-7770 = {
-            port     = 7770
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7770
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-3-a" },
-              { ec2_instance_name = "pp-csr-w-4-b" },
-            ]
-          }
-          web-56-7770 = {
-            port     = 7770
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7770
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" },
-              { ec2_instance_name = "pp-csr-w-6-b" },
-            ]
-          }
-          web-78-7770 = {
-            port     = 7770
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7770
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
+              type    = "source_ip"
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
-          web-12-7771 = {
-            port     = 7771
-            protocol = "HTTP"
+          pp-csr-w-78-7770 = {
+            port     = 7770
+            protocol = "TCP"
             health_check = {
               enabled             = true
-              interval            = 30
+              interval            = 5
               healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7771
-              timeout             = 5
-              unhealthy_threshold = 5
+              path                = "/isps/index.html"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
             }
             stickiness = {
               enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-1-a" },
-              { ec2_instance_name = "pp-csr-w-2-b" },
-            ]
-          }
-          web-34-7771 = {
-            port     = 7771
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7771
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-3-a" },
-              { ec2_instance_name = "pp-csr-w-4-b" },
-            ]
-          }
-          web-56-7771 = {
-            port     = 7771
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7771
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" },
-              { ec2_instance_name = "pp-csr-w-6-b" },
-            ]
-          }
-          web-78-7771 = {
-            port     = 7771
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7771
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
+              type    = "source_ip"
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
-          web-12-7780 = {
-            port     = 7780
-            protocol = "HTTP"
+          pp-csr-w-78-7771 = {
+            port     = 7771
+            protocol = "TCP"
             health_check = {
               enabled             = true
-              interval            = 30
+              interval            = 5
               healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7780
-              timeout             = 5
-              unhealthy_threshold = 5
+              path                = "/isps/index.html"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
             }
             stickiness = {
               enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-1-a" },
-              { ec2_instance_name = "pp-csr-w-2-b" },
-            ]
-          }
-          web-34-7780 = {
-            port     = 7780
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7780
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-3-a" },
-              { ec2_instance_name = "pp-csr-w-4-b" },
-            ]
-          }
-          web-56-7780 = {
-            port     = 7780
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7780
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" },
-              { ec2_instance_name = "pp-csr-w-6-b" },
-            ]
-          }
-          web-78-7780 = {
-            port     = 7780
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7780
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
+              type    = "source_ip"
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
-          web-12-7781 = {
-            port     = 7781
-            protocol = "HTTP"
+          pp-csr-w-78-7780 = {
+            port     = 7780
+            protocol = "TCP"
             health_check = {
               enabled             = true
-              interval            = 30
+              interval            = 5
               healthy_threshold   = 3
-              matcher             = "200-399"
               path                = "/"
-              port                = 7781
-              timeout             = 5
-              unhealthy_threshold = 5
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
             }
             stickiness = {
               enabled = true
-              type    = "lb_cookie"
+              type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-1-a" },
-              { ec2_instance_name = "pp-csr-w-2-b" },
+              { ec2_instance_name = "pp-csr-w-7-a" },
+              { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
-          web-34-7781 = {
+          pp-csr-w-78-7781 = {
             port     = 7781
-            protocol = "HTTP"
+            protocol = "TCP"
             health_check = {
               enabled             = true
-              interval            = 30
+              interval            = 5
               healthy_threshold   = 3
-              matcher             = "200-399"
               path                = "/"
-              port                = 7781
-              timeout             = 5
-              unhealthy_threshold = 5
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
             }
             stickiness = {
               enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-3-a" },
-              { ec2_instance_name = "pp-csr-w-4-b" },
-            ]
-          }
-          web-56-7781 = {
-            port     = 7781
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7781
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-csr-w-5-a" },
-              { ec2_instance_name = "pp-csr-w-6-b" },
-            ]
-          }
-          web-78-7781 = {
-            port     = 7781
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7781
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
+              type    = "source_ip"
             }
             attachments = [
               { ec2_instance_name = "pp-csr-w-7-a" },
@@ -1111,285 +1054,212 @@ locals {
         }
 
         listeners = {
-          http-80 = {
-            alarm_target_group_names = []
-            port                     = 80
-            protocol                 = "HTTP"
-
+          http = {
+            port     = 80
+            protocol = "TCP"
             default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
+              type              = "forward"
+              target_group_name = "pp-csr-w-78-80"
             }
-
-            rules = {
-              web-12-7770 = {
-                priority = 1270
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-12-7770"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r1.pp.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-34-7770 = {
-                priority = 3470
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-34-7770"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "traina.pp.csr.service.justice.gov.uk",
-                      "traina.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-56-7770 = {
-                priority = 5670
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-56-7770"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r3.pp.csr.service.justice.gov.uk",
-                      "csrppr3.az.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-78-7770 = {
-                priority = 7870
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-78-7770"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r5.pp.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-12-7771 = {
-                priority = 1271
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-12-7771"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r2.pp.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-34-7771 = {
-                priority = 3471
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-34-7771"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "trainb.pp.csr.service.justice.gov.uk",
-                      "trainb.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-56-7771 = {
-                priority = 5671
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-56-7771"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r4.pp.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-78-7771 = {
-                priority = 7871
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-78-7771"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r6.pp.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+          }
+          http-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-78-7770"
+            }
+          }
+          http-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-78-7771"
             }
           }
           http-7780 = {
-            alarm_target_group_names = []
-            port                     = 7780
-            protocol                 = "HTTP"
-
+            port     = 7780
+            protocol = "TCP"
             default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
-
-            rules = {
-              web-12-7780 = {
-                priority = 1280
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-12-7780"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r1.pp.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-34-7780 = {
-                priority = 3480
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-34-7780"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "traina.pp.csr.service.justice.gov.uk",
-                      "traina.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-56-7780 = {
-                priority = 5680
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-56-7780"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r3.pp.csr.service.justice.gov.uk",
-                      "csrppr3.az.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-78-7780 = {
-                priority = 7880
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-78-7780"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r5.pp.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+              type              = "forward"
+              target_group_name = "pp-csr-w-78-7780"
             }
           }
           http-7781 = {
-            alarm_target_group_names = []
-            port                     = 7781
-            protocol                 = "HTTP"
-
+            port     = 7781
+            protocol = "TCP"
             default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
+              type              = "forward"
+              target_group_name = "pp-csr-w-78-7781"
             }
+          }
+        }
+      }
+      trainab = {
+        internal_lb              = true
+        enable_delete_protection = false
+        load_balancer_type       = "network"
+        force_destroy_bucket     = true
+        subnets = [
+          module.environment.subnet["private"]["eu-west-2a"].id,
+          module.environment.subnet["private"]["eu-west-2b"].id,
+        ]
+        security_groups                  = ["load-balancer"]
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
 
-            rules = {
-              web-12-7781 = {
-                priority = 1281
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-12-7781"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r2.pp.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-34-7781 = {
-                priority = 3481
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-34-7781"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "trainb.pp.csr.service.justice.gov.uk",
-                      "trainb.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-56-7781 = {
-                priority = 5681
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-56-7781"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r4.pp.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-78-7781 = {
-                priority = 7881
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-78-7781"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "r6.pp.csr.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+        instance_target_groups = {
+          pp-csr-w-34-80 = {
+            port     = 80
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              port                = 80
+              protocol            = "TCP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
+          pp-csr-w-34-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
+          pp-csr-w-34-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
+          pp-csr-w-34-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
+          pp-csr-w-34-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-csr-w-3-a" },
+              { ec2_instance_name = "pp-csr-w-4-b" },
+            ]
+          }
+        }
+
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-34-80"
+            }
+          }
+          http-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-34-7770"
+            }
+          }
+          http-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-34-7771"
+            }
+          }
+          http-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-34-7780"
+            }
+          }
+          http-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-csr-w-34-7781"
             }
           }
         }
@@ -1405,14 +1275,14 @@ locals {
           { name = "ppiwfm-b", type = "CNAME", ttl = "300", records = ["pp-csr-db-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "r1", type = "A", lbs_map_key = "private" },
-          { name = "r2", type = "A", lbs_map_key = "private" },
+          { name = "r1", type = "A", lbs_map_key = "r12" },
+          { name = "r2", type = "A", lbs_map_key = "r12" },
           { name = "r3", type = "A", lbs_map_key = "r34" },
           { name = "r4", type = "A", lbs_map_key = "r34" },
-          { name = "r5", type = "A", lbs_map_key = "private" },
-          { name = "r6", type = "A", lbs_map_key = "private" },
-          { name = "traina", type = "A", lbs_map_key = "private" },
-          { name = "trainb", type = "A", lbs_map_key = "private" },
+          { name = "r5", type = "A", lbs_map_key = "r56" },
+          { name = "r6", type = "A", lbs_map_key = "r56" },
+          { name = "traina", type = "A", lbs_map_key = "trainab" },
+          { name = "trainb", type = "A", lbs_map_key = "trainab" },
         ]
       }
     }

@@ -14,6 +14,7 @@ locals {
     route53_external_zone         = data.aws_route53_zone.external
     general_shared_kms_key_arn    = data.aws_kms_key.general_shared.arn
     shared_vpc_id                 = data.aws_vpc.shared.id
+    bastion                       = module.bastion_linux
   }
 
   environment_config_dev = {

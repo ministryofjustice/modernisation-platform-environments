@@ -18,6 +18,18 @@
       "reporting_hub_retry_min_wait_millis": 100,
       "reporting_hub_retry_max_wait_millis": 10000,
       "reporting_hub_domain_refresh_enabled": false,
+      "reporting_hub_batch_job_worker_type": "G.1X",
+      "reporting_hub_batch_job_num_workers": 2,
+      "reporting_hub_batch_job_log_level": "INFO",
+      "reporting_hub_batch_job_retry_max_attempts": 10,
+      "reporting_hub_batch_job_retry_min_wait_millis": 100,
+      "reporting_hub_batch_job_retry_max_wait_millis": 10000,
+      "reporting_hub_cdc_job_worker_type": "G.1X",
+      "reporting_hub_cdc_job_num_workers": 2,
+      "reporting_hub_cdc_job_log_level": "INFO",
+      "reporting_hub_cdc_job_retry_max_attempts": 10,
+      "reporting_hub_cdc_job_retry_min_wait_millis": 100,
+      "reporting_hub_cdc_job_retry_max_wait_millis": 10000,
       "refresh_job_worker_type": "G.1X",
       "refresh_job_num_workers": 2,
       "refresh_job_log_level": "INFO",
@@ -120,7 +132,7 @@
             "threshold": 1000000000,
             "period": 300
           },
-          "swapusage_check":{
+          "swapusage_check": {
             "enable": true,
             "threshold": 750000000,
             "period": 300
@@ -172,6 +184,18 @@
       "reporting_hub_retry_min_wait_millis": 100,
       "reporting_hub_retry_max_wait_millis": 10000,
       "reporting_hub_domain_refresh_enabled": false,
+      "reporting_hub_batch_job_worker_type": "G.1X",
+      "reporting_hub_batch_job_num_workers": 2,
+      "reporting_hub_batch_job_log_level": "INFO",
+      "reporting_hub_batch_job_retry_max_attempts": 10,
+      "reporting_hub_batch_job_retry_min_wait_millis": 100,
+      "reporting_hub_batch_job_retry_max_wait_millis": 10000,
+      "reporting_hub_cdc_job_worker_type": "G.1X",
+      "reporting_hub_cdc_job_num_workers": 2,
+      "reporting_hub_cdc_job_log_level": "INFO",
+      "reporting_hub_cdc_job_retry_max_attempts": 10,
+      "reporting_hub_cdc_job_retry_min_wait_millis": 100,
+      "reporting_hub_cdc_job_retry_max_wait_millis": 10000,
       "refresh_job_worker_type": "G.1X",
       "refresh_job_num_workers": 2,
       "refresh_job_log_level": "INFO",
@@ -274,7 +298,7 @@
             "threshold": 1000000000,
             "period": 300
           },
-          "swapusage_check":{
+          "swapusage_check": {
             "enable": true,
             "threshold": 750000000,
             "period": 300
@@ -306,7 +330,7 @@
           }
         }
       },
-      "setup_cw_insights": false        
+      "setup_cw_insights": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -326,6 +350,18 @@
       "reporting_hub_retry_min_wait_millis": 100,
       "reporting_hub_retry_max_wait_millis": 10000,
       "reporting_hub_domain_refresh_enabled": false,
+      "reporting_hub_batch_job_worker_type": "G.1X",
+      "reporting_hub_batch_job_num_workers": 2,
+      "reporting_hub_batch_job_log_level": "INFO",
+      "reporting_hub_batch_job_retry_max_attempts": 10,
+      "reporting_hub_batch_job_retry_min_wait_millis": 100,
+      "reporting_hub_batch_job_retry_max_wait_millis": 10000,
+      "reporting_hub_cdc_job_worker_type": "G.1X",
+      "reporting_hub_cdc_job_num_workers": 2,
+      "reporting_hub_cdc_job_log_level": "INFO",
+      "reporting_hub_cdc_job_retry_max_attempts": 10,
+      "reporting_hub_cdc_job_retry_min_wait_millis": 100,
+      "reporting_hub_cdc_job_retry_max_wait_millis": 10000,
       "refresh_job_worker_type": "G.1X",
       "refresh_job_num_workers": 2,
       "refresh_job_log_level": "INFO",
@@ -394,7 +430,7 @@
       "setup_cw_alarms": true,
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
-      "enable_redshift_health_check": true,     
+      "enable_redshift_health_check": true,
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -430,7 +466,7 @@
             "threshold": 1000000000,
             "period": 300
           },
-          "swapusage_check":{
+          "swapusage_check": {
             "enable": true,
             "threshold": 750000000,
             "period": 300
@@ -462,7 +498,7 @@
           }
         }
       },
-      "setup_cw_insights": false      
+      "setup_cw_insights": false
     },
     "production": {
       "project_short_id": "dpr",
@@ -482,6 +518,18 @@
       "reporting_hub_retry_min_wait_millis": 100,
       "reporting_hub_retry_max_wait_millis": 10000,
       "reporting_hub_domain_refresh_enabled": false,
+      "reporting_hub_batch_job_worker_type": "G.1X",
+      "reporting_hub_batch_job_num_workers": 2,
+      "reporting_hub_batch_job_log_level": "INFO",
+      "reporting_hub_batch_job_retry_max_attempts": 10,
+      "reporting_hub_batch_job_retry_min_wait_millis": 100,
+      "reporting_hub_batch_job_retry_max_wait_millis": 10000,
+      "reporting_hub_cdc_job_worker_type": "G.1X",
+      "reporting_hub_cdc_job_num_workers": 2,
+      "reporting_hub_cdc_job_log_level": "INFO",
+      "reporting_hub_cdc_job_retry_max_attempts": 10,
+      "reporting_hub_cdc_job_retry_min_wait_millis": 100,
+      "reporting_hub_cdc_job_retry_max_wait_millis": 10000,
       "refresh_job_worker_type": "G.1X",
       "refresh_job_num_workers": 2,
       "refresh_job_log_level": "INFO",
@@ -584,7 +632,7 @@
             "threshold": 1000000000,
             "period": 300
           },
-          "swapusage_check":{
+          "swapusage_check": {
             "enable": true,
             "threshold": 750000000,
             "period": 300
@@ -616,7 +664,7 @@
           }
         }
       },
-      "setup_cw_insights": false               
+      "setup_cw_insights": false
     }
   }
 }
