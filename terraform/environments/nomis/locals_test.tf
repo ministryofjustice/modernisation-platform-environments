@@ -238,6 +238,19 @@ locals {
             branch = "main"
           })
         })
+
+        secretsmanager_secrets = {
+          test1 = {
+            value = "fixed"
+          }
+          test2 = {
+            random = {
+              length = 5
+            }
+          }
+          test3 = {}
+        }
+
         tags = merge(local.weblogic_ec2.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
