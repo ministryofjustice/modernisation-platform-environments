@@ -239,11 +239,6 @@ locals {
           })
         })
 
-        secretsmanager_secrets = {
-          test4 = {}
-          test5 = {}
-        }
-
         tags = merge(local.weblogic_ec2.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
