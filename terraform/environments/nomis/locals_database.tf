@@ -55,7 +55,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "95"
-        alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on a nomis-db instance"
+        alarm_description   = "Triggers if the average cpu remains at 95% utilization or above"
         alarm_actions       = ["dso_pagerduty"]
       }
   })
