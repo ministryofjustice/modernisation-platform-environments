@@ -562,8 +562,8 @@ variable "lbs" {
     load_balancer_type               = optional(string, "application")
     security_groups                  = list(string)
     subnets                          = list(string)
-    existing_bucket_name             = optional(string, "") # NOTE: module default value is empty string ""
-    enable_cross_zone_load_balancing = optional(bool, false) # network and gateway lb types only, application lb's this is always true
+    existing_bucket_name             = optional(string, "")                      # NOTE: module default value is empty string ""
+    enable_cross_zone_load_balancing = optional(bool, false)                     # network and gateway lb types only, application lb's this is always true
     dns_record_client_routing_policy = optional(string, "any_availability_zone") # network load-balancer types only
     instance_target_groups = optional(map(object({
       port                 = optional(number)

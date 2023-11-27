@@ -66,12 +66,12 @@ variable "availability_zones" {
 
 variable "rename_rule_source_schema" {
   description = "The source schema we will rename to a target output 'space'"
-  type = string
+  type        = string
 }
 
 variable "rename_rule_output_space" {
   description = "The name of the target output 'space' that the source schema will be renamed to"
-  type = string
+  type        = string
 }
 
 
