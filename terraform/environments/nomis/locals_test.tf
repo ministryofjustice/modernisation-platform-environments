@@ -240,15 +240,8 @@ locals {
         })
 
         secretsmanager_secrets = {
-          test1 = {
-            value = "fixed"
-          }
-          test2 = {
-            random = {
-              length = 5
-            }
-          }
-          test3 = {}
+          test4 = {}
+          test5 = {}
         }
 
         tags = merge(local.weblogic_ec2.tags, {
