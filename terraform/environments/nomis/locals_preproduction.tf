@@ -199,10 +199,10 @@ locals {
 
     baseline_ec2_instances = {
       preprod-nomis-db-1-b = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-        )
+        # cloudwatch_metric_alarms = merge(
+        #   local.database_ec2_cloudwatch_metric_alarms,
+        #   module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+        # )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           availability_zone = "${local.region}b"
