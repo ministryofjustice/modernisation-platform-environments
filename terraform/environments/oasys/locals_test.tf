@@ -200,20 +200,20 @@ locals {
           oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
         })
       })
-      "t2-${local.application_name}-db-b" = merge(local.database_b, {
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.database_b.tags, {
-          description                             = "t2 ${local.application_name} database"
-          "${local.application_name}-environment" = "t2"
-          bip-db-name                             = "T2BIPINF"
-          instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
-        })
-      })
+      # "t2-${local.application_name}-db-b" = merge(local.database_b, {
+      #   user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "main"
+      #     })
+      #   })
+      #   tags = merge(local.database_b.tags, {
+      #     description                             = "t2 ${local.application_name} database"
+      #     "${local.application_name}-environment" = "t2"
+      #     bip-db-name                             = "T2BIPINF"
+      #     instance-scheduling                     = "skip-scheduling"
+      #     oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
+      #   })
+      # })
 
       "t2-${local.application_name}-bip-b" = merge(local.bip_b, {
         autoscaling_group = merge(local.bip_b.autoscaling_group, {
