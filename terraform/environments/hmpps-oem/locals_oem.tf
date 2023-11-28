@@ -38,12 +38,18 @@ locals {
     resources = ["*"]
   }
   oem_secretsmanager_secrets = {
-    policy = [
-      local.oem_secret_policy_read,
-      local.oem_secret_policy_write,
-    ]
     secrets = {
-      passwords = {}
+      passwords = {
+        description = "passwords only accessible by OEM EC2"
+        # policy = []  # TODO" comment in once secrets have been updated
+      }
+      shared-passwords = {
+        description = "passwords shared with other accounts"
+        policy = [
+          local.oem_secret_policy_read,
+          local.oem_secret_policy_write,
+        ]
+      }
     }
   }
 

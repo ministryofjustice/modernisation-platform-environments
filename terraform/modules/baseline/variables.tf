@@ -883,6 +883,20 @@ variable "secretsmanager_secrets" {
       description = optional(string)
       file        = optional(string)
       kms_key_id  = optional(string)
+      policy = optional(list(object({
+        effect    = string
+        actions   = list(string)
+        resources = list(string)
+        principals = optional(object({
+          type        = string
+          identifiers = list(string)
+        }))
+        conditions = optional(list(object({
+          test     = string
+          variable = string
+          values   = list(string)
+        })), [])
+      })))
       random = optional(object({
         length  = number
         special = optional(bool)
