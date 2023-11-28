@@ -27,5 +27,5 @@ locals {
 
   cert_opts    = aws_acm_certificate.external.domain_validation_options
   cert_arn     = aws_acm_certificate.external.arn
-  cert_zone_id = data.aws_route53_zone.network-services.zone_id
+  cert_zone_id = data.aws_route53_zone.external.zone_id
 }
