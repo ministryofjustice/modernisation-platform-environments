@@ -213,16 +213,18 @@ locals {
   create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
+  reporting_lambda_code_s3_key    = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
+
   # s3 transfer lambda
   enable_s3_file_transfer_lambda         = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda
   s3_file_transfer_lambda_name           = "${local.project}-s3-file-transfer"
   s3_file_transfer_lambda_handler        = "uk.gov.justice.digital.lambda.S3FileTransferLambda::handleRequest"
   s3_file_transfer_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  s3_file_transfer_lambda_code_s3_key    = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
   s3_file_transfer_lambda_runtime        = "java11"
   s3_file_transfer_lambda_tracing        = "Active"
 
   scheduled_s3_file_transfer_lambda_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_lambda_retention_days
+  scheduled_s3_file_transfer_lambda_schedule       = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_lambda_schedule
   enable_s3_file_transfer_lambda_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda_trigger
 
   s3_file_transfer_lambda_policies = [
@@ -237,7 +239,6 @@ locals {
   step_function_notification_lambda_name           = "${local.project}-step-function-notification"
   step_function_notification_lambda_handler        = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
   step_function_notification_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  step_function_notification_lambda_code_s3_key    = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
   step_function_notification_lambda_runtime        = "java11"
   step_function_notification_lambda_tracing        = "Active"
 

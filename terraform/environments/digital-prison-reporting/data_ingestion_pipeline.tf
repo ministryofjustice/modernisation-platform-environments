@@ -5,7 +5,7 @@ module "step_function_notification_lambda" {
   enable_lambda = local.enable_step_function_notification_lambda
   name          = local.step_function_notification_lambda_name
   s3_bucket     = local.s3_file_transfer_lambda_code_s3_bucket
-  s3_key        = local.s3_file_transfer_lambda_code_s3_key
+  s3_key        = local.reporting_lambda_code_s3_key
   handler       = local.step_function_notification_lambda_handler
   runtime       = local.step_function_notification_lambda_runtime
   policies      = local.step_function_notification_lambda_policies

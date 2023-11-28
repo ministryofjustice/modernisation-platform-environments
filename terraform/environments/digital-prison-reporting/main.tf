@@ -762,7 +762,7 @@ module "s3_file_transfer_lambda" {
   enable_lambda = local.enable_s3_file_transfer_lambda
   name          = local.s3_file_transfer_lambda_name
   s3_bucket     = local.s3_file_transfer_lambda_code_s3_bucket
-  s3_key        = local.s3_file_transfer_lambda_code_s3_key
+  s3_key        = local.reporting_lambda_code_s3_key
   handler       = local.s3_file_transfer_lambda_handler
   runtime       = local.s3_file_transfer_lambda_runtime
   policies      = local.s3_file_transfer_lambda_policies
@@ -814,7 +814,7 @@ module "s3_file_transfer_lambda_trigger" {
     }
   )
 
-  trigger_schedule_expression = "cron(0 0/3 ? * * *)"
+  trigger_schedule_expression = "${local.scheduled_s3_file_transfer_lambda_schedule}"
 
   depends_on = [
     module.s3_file_transfer_lambda
