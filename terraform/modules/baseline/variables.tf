@@ -878,7 +878,7 @@ variable "secretsmanager_secrets" {
         values   = list(string)
       })), [])
     })))
-    recovery_window_in_days = optional(number, 0)
+    recovery_window_in_days = optional(number)
     secrets = map(object({
       description = optional(string)
       file        = optional(string)
