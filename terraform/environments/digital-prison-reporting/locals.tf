@@ -228,7 +228,8 @@ locals {
   s3_file_transfer_lambda_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
-    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}"
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.all_state_machine_policy}"
   ]
 
   # step function notification lambda

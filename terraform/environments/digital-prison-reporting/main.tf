@@ -225,15 +225,25 @@ module "glue_hive_table_creation_job" {
     "--extra-jars"                = local.glue_jobs_latest_jar_location
     "--class"                     = "uk.gov.justice.digital.job.HiveTableCreationJob"
     "--dpr.aws.region"            = local.account_region
+    "--dpr.raw.archive.s3.path"   = "s3://${module.s3_raw_archive_bucket.bucket_id}"
     "--dpr.structured.s3.path"    = "s3://${module.s3_structured_bucket.bucket_id}"
     "--dpr.curated.s3.path"       = "s3://${module.s3_curated_bucket.bucket_id}"
+    "--dpr.raw_archive.database"  = "s3://${module.glue_raw_archive_database.db_name}"
+    "--dpr.structured.database"   = "s3://${module.glue_structured_zone_database.db_name}"
+    "--dpr.curated.database"      = "s3://${module.glue_curated_zone_database.db_name}"
+    "--dpr.prisons.database"      = "s3://${module.glue_prisons_database.db_name}"
     "--dpr.contract.registryName" = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
     "--dpr.log.level"             = local.refresh_job_log_level
   }
 
   depends_on = [
+    module.s3_raw_archive_bucket.bucket_id,
     module.s3_structured_bucket.bucket_id,
     module.s3_curated_bucket.bucket_id,
+    module.glue_raw_archive_database.db_name,
+    module.glue_structured_zone_database.db_name,
+    module.glue_curated_zone_database.db_name,
+    module.glue_prisons_database.db_name,
     module.glue_registry_avro.registry_name
   ]
 }
@@ -298,70 +308,6 @@ module "glue_registry_avro" {
 ###################################################
 # Glue Tables, Reusable Module: /modules/glue_table
 ###################################################
-
-## Glue Table, RAW
-module "glue_raw_table" {
-  source                    = "./modules/glue_table"
-  enable_glue_catalog_table = true
-  name                      = "raw"
-
-  # AWS Glue catalog DB
-  glue_catalog_database_name       = module.glue_raw_zone_database.db_name
-  glue_catalog_database_parameters = null
-
-  # AWS Glue catalog table
-  glue_catalog_table_description = "Glue Table for raw data, managed by Terraform."
-  glue_catalog_table_table_type  = "EXTERNAL_TABLE"
-  glue_catalog_table_parameters = {
-    EXTERNAL              = "TRUE"
-    "parquet.compression" = "SNAPPY"
-    "classification"      = "parquet"
-  }
-  glue_catalog_table_storage_descriptor = {
-    location      = "s3://${module.s3_raw_bucket.bucket_id}/"
-    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
-    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
-
-    columns = [
-      {
-        columns_name    = "partitionkey"
-        columns_type    = "string"
-        columns_comment = "Partition Key"
-      },
-      {
-        columns_name    = "sequencenumber"
-        columns_type    = "string"
-        columns_comment = "Sequence Number"
-      },
-      {
-        columns_name    = "approximatearrivaltimestamp"
-        columns_type    = "timestamp"
-        columns_comment = "Arrival Timestamp"
-      },
-      {
-        columns_name    = "data"
-        columns_type    = "string"
-        columns_comment = "Data Column"
-      },
-    ]
-
-    ser_de_info = [
-      {
-        serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
-
-        parameters = {
-          "serialization.format" = 1
-        }
-      }
-    ]
-
-    skewed_info = []
-
-    sort_columns = []
-  }
-  glue_table_depends_on = [module.glue_raw_zone_database.db_name]
-}
-
 module "glue_reconciliation_table" {
   source                    = "./modules/glue_table"
   enable_glue_catalog_table = true
@@ -648,6 +594,16 @@ module "glue_raw_zone_database" {
   aws_region     = local.account_region
 }
 
+# Glue Database Catalog for Raw Archive
+module "glue_raw_archive_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "raw_archive"
+  description    = "Glue Data Catalog - Raw Archive"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
 # Glue Database Catalog for Data Domain
 module "glue_structured_zone_database" {
   source         = "./modules/glue_database"
@@ -664,6 +620,16 @@ module "glue_curated_zone_database" {
   create_db      = local.create_db
   name           = "curated"
   description    = "Glue Data Catalog - Curated Zone"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for Prisons Fabric
+module "glue_prisons_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "prisons"
+  description    = "Glue Data Catalog - Prisons Fabric"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }
@@ -852,203 +818,6 @@ module "s3_file_transfer_lambda_trigger" {
   depends_on = [
     module.s3_file_transfer_lambda
   ]
-}
-
-# Lambda which notifies step function when DMS task stops
-module "step_function_notification_lambda" {
-  source = "./modules/lambdas/generic"
-
-  enable_lambda = local.enable_step_function_notification_lambda
-  name          = local.step_function_notification_lambda_name
-  s3_bucket     = local.s3_file_transfer_lambda_code_s3_bucket
-  s3_key        = local.s3_file_transfer_lambda_code_s3_key
-  handler       = local.step_function_notification_lambda_handler
-  runtime       = local.step_function_notification_lambda_runtime
-  policies      = local.step_function_notification_lambda_policies
-  tracing       = local.step_function_notification_lambda_tracing
-  timeout       = 300 # 5 minutes
-
-  vpc_settings = {
-    subnet_ids = [
-      data.aws_subnet.data_subnets_a.id,
-      data.aws_subnet.data_subnets_b.id,
-      data.aws_subnet.data_subnets_c.id
-    ]
-
-    security_group_ids = [
-      aws_security_group.lambda_generic[0].id
-    ]
-  }
-
-  tags = merge(
-    local.all_tags,
-    {
-      Resource_Group = "ingestion-pipeline"
-      Jira           = "DPR2-209"
-      Resource_Type  = "Lambda"
-      Name           = local.step_function_notification_lambda_name
-    }
-  )
-
-  depends_on = [
-    aws_iam_policy.kms_read_access_policy,
-    aws_iam_policy.dynamodb_access_policy,
-    aws_iam_policy.all_state_machine_policy
-  ]
-}
-
-module "step_function_notification_lambda_trigger" {
-  source = "./modules/lambda_trigger"
-
-  enable_lambda_trigger = local.enable_step_function_notification_lambda
-
-  event_name            = "${local.project}-step-function-notification-${local.env}"
-  lambda_function_arn   = module.step_function_notification_lambda.lambda_function
-  lambda_function_name  = module.step_function_notification_lambda.lambda_name
-
-  trigger_event_pattern = jsonencode(
-    {
-      "source": ["aws.dms"],
-      "detail-type": ["DMS Replication Task State Change"],
-      "detail": {
-        "eventId": ["DMS-EVENT-0079"]
-      }
-    }
-  )
-
-  depends_on = [
-    module.step_function_notification_lambda
-  ]
-}
-
-# Data Ingest Pipeline Step Function
-module "data_ingestion_pipeline" {
-  source = "./modules/step_function"
-
-  enable_step_function = local.enable_data_ingestion_step_function
-  step_function_name   = local.data_ingestion_step_function_name
-
-  additional_policies = [
-    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.invoke_lambda_policy.name}",
-    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.start_dms_task_policy.name}",
-    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.trigger_glue_job_policy.name}"
-  ]
-
-  depends_on = [
-    aws_iam_policy.invoke_lambda_policy,
-    aws_iam_policy.start_dms_task_policy,
-    aws_iam_policy.trigger_glue_job_policy,
-    module.dms_nomis_to_s3_ingestor.dms_replication_task_arn,
-    module.glue_reporting_hub_batch_job.name,
-    module.glue_reporting_hub_cdc_job.name,
-    module.glue_hive_table_creation_job.name,
-    module.s3_file_transfer_lambda.lambda_function,
-    module.step_function_notification_lambda.lambda_function
-  ]
-
-  definition = jsonencode(
-    {
-      "Comment": "Data Ingestion Pipeline Step Function",
-      "StartAt": "Start DMS Replication Task",
-      "States": {
-        "Start DMS Replication Task": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
-          "Parameters": {
-            "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
-            "StartReplicationTaskType": "reload-target"
-          },
-          "Next": "Invoke DMS State Control Lambda"
-        },
-        "Invoke DMS State Control Lambda": {
-          "Type": "Task",
-          "TimeoutSeconds": 1200,
-          "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-          "Parameters": {
-            "Payload": {
-              "token.$": "$$.Task.Token",
-              "replicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}"
-            },
-            "FunctionName": "${module.step_function_notification_lambda.lambda_function}"
-          },
-          "Retry": [
-            {
-              "ErrorEquals": [
-                "Lambda.ServiceException",
-                "Lambda.AWSLambdaException",
-                "Lambda.SdkClientException",
-                "Lambda.TooManyRequestsException"
-              ],
-              "IntervalSeconds": 60,
-              "MaxAttempts": 2,
-              "BackoffRate": 2
-            }
-          ],
-          "Next": "Start Glue Batch Job"
-        },
-        "Start Glue Batch Job": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::glue:startJobRun.sync",
-          "Parameters": {
-            "JobName": "${module.glue_reporting_hub_batch_job.name}"
-          },
-          "Next": "Create Hive Tables"
-        },
-        "Create Hive Tables": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::glue:startJobRun.sync",
-          "Parameters": {
-            "JobName": "${module.glue_hive_table_creation_job.name}"
-          },
-          "Next": "Invoke S3 File Transfer Lambda"
-        },
-        "Invoke S3 File Transfer Lambda": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::lambda:invoke",
-          "Parameters": {
-            "Payload": {
-              "sourceBucket": "${module.s3_raw_bucket.bucket_id}",
-              "destinationBucket": "${module.s3_raw_archive_bucket.bucket_id}"
-            },
-            "FunctionName": "${module.s3_file_transfer_lambda.lambda_function}"
-          },
-          "Retry": [
-            {
-              "ErrorEquals": [
-                "Lambda.ServiceException",
-                "Lambda.AWSLambdaException",
-                "Lambda.SdkClientException",
-                "Lambda.TooManyRequestsException"
-              ],
-              "IntervalSeconds": 600,
-              "MaxAttempts": 2,
-              "BackoffRate": 2
-            }
-          ],
-          "Next": "Resume DMS Replication Task"
-        },
-        "Resume DMS Replication Task": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
-          "Parameters": {
-            "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
-            "StartReplicationTaskType": "resume-processing"
-          },
-          "Next": "Start Glue Streaming Job"
-        },
-        "Start Glue Streaming Job": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::glue:startJobRun",
-          "Parameters": {
-            "JobName": "${module.glue_reporting_hub_cdc_job.name}"
-          },
-          "End": true
-        }
-      }
-    }
-  )
-
-
 }
 
 # DMS Nomis Data Collector
