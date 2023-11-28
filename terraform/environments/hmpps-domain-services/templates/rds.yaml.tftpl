@@ -94,6 +94,6 @@ tasks:
           Get-WindowsUpdate -Download -Install -AcceptAll
           Import-Module RemoteDesktop
           Enable-PSRemoting -force
-          Rename-Computer -NewName $rds_hostname
+          Rename-Computer -NewName ${rds_hostname}
           Sleep 5
           Restart-Computer -Force
