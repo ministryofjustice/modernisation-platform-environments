@@ -54,9 +54,9 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data                = templatefile("./templates/rds.yaml.tftpl",{
             rds_hostname = "RDSConnectionBroker"
-          }))
+          })
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-dc"]
