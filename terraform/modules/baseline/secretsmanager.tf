@@ -2,6 +2,9 @@
 # between SSM parameters and SecretManager Secrets
 # Use Secrets if you need to share a parameter across accounts.
 
+# For placeholder values, we just create a Secret resource without
+# any secret value
+
 locals {
   secretsmanager_secrets_list = flatten([
     for sm_key, sm_value in var.secretsmanager_secrets : [
@@ -120,15 +123,4 @@ resource "aws_secretsmanager_secret_version" "fixed" {
 
   secret_id     = aws_secretsmanager_secret.this[each.key]
   secret_string = each.value.value
-}
-
-resource "aws_secretsmanager_secret_version" "placeholder" {
-  for_each = local.secretsmanager_secrets_default
-
-  secret_id     = aws_secretsmanager_secret.this[each.key].id
-  secret_string = each.value.value
-
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
 }
