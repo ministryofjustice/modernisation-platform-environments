@@ -18,5 +18,8 @@ locals {
       }
     }
 
+    baseline_route53_zones = {
+      "test.planetfm.service.justice.gov.uk" = {}
+    }
   }
 }
