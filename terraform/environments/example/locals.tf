@@ -50,12 +50,13 @@ locals {
       # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
       example-test-1 = {
         tags = {
-          server-type = "private"
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
-          monitored   = false
-          os-type     = "Linux"
-          component   = "ndh"
-          environment = "test"
+          server-type       = "private"
+          description       = "Standalone EC2 for testing RHEL7.9 NDH App"
+          monitored         = false
+          os-type           = "Linux"
+          component         = "ndh"
+          environment       = "test"
+          disable_api_stop  = false
         }
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
@@ -65,12 +66,13 @@ locals {
       }
       example-test-2 = {
         tags = {
-          server-type = "private"
-          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
-          monitored   = false
-          os-type     = "Linux"
-          component   = "ndh"
-          environment = "test"
+          server-type       = "private"
+          description       = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+          monitored         = false
+          os-type           = "Linux"
+          component         = "ndh"
+          environment       = "test"
+          disable_api_stop  = false
         }
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
