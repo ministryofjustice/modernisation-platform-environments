@@ -91,7 +91,6 @@ tasks:
         content: |-
           Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
           Disable-NetAdapterBinding -Name 'Ethernet' -ComponentID 'ms_tcpip6'
-          Get-WindowsUpdate -Download -Install -AcceptAll
           Import-Module RemoteDesktop
           Enable-PSRemoting -force
           Rename-Computer -NewName ${rds_hostname}
