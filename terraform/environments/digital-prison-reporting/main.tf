@@ -165,6 +165,7 @@ module "glue_reporting_hub_cdc_job" {
     "--class"                               = "uk.gov.justice.digital.job.DataHubCdcJob"
     "--datalake-formats"                    = "delta"
     "--dpr.aws.region"                      = local.account_region
+    "--dpr.raw.archive.s3.path"             = "s3://${module.s3_raw_archive_bucket.bucket_id}/"
     "--dpr.raw.s3.path"                     = "s3://${module.s3_raw_bucket.bucket_id}/"
     "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
