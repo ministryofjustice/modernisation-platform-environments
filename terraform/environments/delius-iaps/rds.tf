@@ -8,7 +8,7 @@ resource "aws_db_instance" "iaps" {
 
   username                      = local.application_data.accounts[local.environment].db_user
   manage_master_user_password   = true
-  master_user_secret_kms_key_id = local.is-preproduction ? null : data.aws_kms_key.general_shared.arn
+  master_user_secret_kms_key_id = data.aws_kms_key.rds_shared.arn
   snapshot_identifier           = length(local.iaps_snapshot_data_refresh_id) > 0 && local.iaps_snapshot_data_refresh_id != "null" ? local.iaps_snapshot_data_refresh_id : null
   db_subnet_group_name          = aws_db_subnet_group.iaps.id
   vpc_security_group_ids        = [aws_security_group.iaps_db.id]
