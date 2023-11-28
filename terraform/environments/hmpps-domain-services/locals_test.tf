@@ -188,17 +188,17 @@ locals {
         }
       }
     }
-  }
-  baseline_iam_policies = {
-    CSRWebServerPolicy = {
-      description = "Policy to allow ssm actions"
-      statements = [{
-        effect = "Allow"
-        actions = [
-          "ssm:SendCommand"
-        ]
-        resources = ["*"]
-      }]
+    baseline_iam_policies = {
+      CSRWebServerPolicy = {
+        description = "Policy to allow ssm actions"
+        statements = [{
+          effect = "Allow"
+          actions = [
+            "ssm:SendCommand"
+          ]
+          resources = ["*"]
+        }]
+      }
     }
   }
 }
