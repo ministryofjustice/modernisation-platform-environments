@@ -293,7 +293,7 @@ locals {
     #       oasys-db-hostname   = "t1-oasys-db-a"
     #     })
     #   })
-    # }
+    }
 
     baseline_ec2_autoscaling_groups = {
       ##
