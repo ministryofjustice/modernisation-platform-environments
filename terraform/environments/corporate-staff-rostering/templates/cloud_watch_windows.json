@@ -67,6 +67,13 @@
           "System Calls/sec",
           "Processor Queue Length"
         ]
+      },
+      "ASP.NET": {
+        "measurement":[
+          "Applications Requests in Application Queue",
+          "Requests Queued",
+          "Application Restarts"
+        ]
       }
     },
     "append_dimensions": {
