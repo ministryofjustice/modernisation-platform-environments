@@ -32,6 +32,7 @@ data "aws_iam_policy_document" "db_refresher_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "db_refresher_ssm_access" {
-  role = aws_iam_role.db_refresher[0].name
+  count      = local.is-development || local.is-test ? 1 : 0
+  role       = aws_iam_role.db_refresher[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
 }
