@@ -16,6 +16,49 @@ data "aws_iam_policy_document" "log_to_bucket" {
   }
 }
 
+data "aws_iam_policy_document" "manage_glue_databases" {
+  statement {
+    sid    = "gluePermissions"
+    effect = "Allow"
+    actions = [
+      "glue:BatchCreatePartition",
+      "glue:BatchDeletePartition",
+      "glue:BatchDeleteTable",
+      "glue:BatchDeleteTableVersion",
+      "glue:BatchGetPartition",
+      "glue:CreateDatabase",
+      "glue:CreatePartition",
+      "glue:CreatePartitionIndex",
+      "glue:CreateTable",
+      "glue:DeletePartition",
+      "glue:DeletePartitionIndex",
+      "glue:DeleteSchema",
+      "glue:DeleteTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:GetPartition",
+      "glue:GetPartitionIndexes",
+      "glue:GetPartitions",
+      "glue:GetSchema",
+      "glue:GetSchemaByDefinition",
+      "glue:GetSchemaVersion",
+      "glue:GetSchemaVersionsDiff",
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetTableVersion",
+      "glue:GetTableVersions",
+      "glue:ListSchemas",
+      "glue:UpdatePartition",
+      "glue:UpdateRegistry",
+      "glue:UpdateSchema",
+      "glue:UpdateTable"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "read_openmetadata_secrets" {
   statement {
     sid       = "openmetdataSecretsManager"
@@ -65,6 +108,7 @@ data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
     data.aws_iam_policy_document.log_to_bucket.json,
     data.aws_iam_policy_document.read_metadata.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
+    data.aws_iam_policy_document.manage_glue_databases.json
   ]
 
   statement {
@@ -85,46 +129,7 @@ data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
       "${module.s3_athena_query_results_bucket.bucket.arn}/*"
     ]
   }
-  statement {
-    sid    = "GluePermissions"
-    effect = "Allow"
-    actions = [
-      "glue:BatchCreatePartition",
-      "glue:BatchDeletePartition",
-      "glue:BatchDeleteTable",
-      "glue:BatchDeleteTableVersion",
-      "glue:BatchGetPartition",
-      "glue:CreateDatabase",
-      "glue:CreatePartition",
-      "glue:CreatePartitionIndex",
-      "glue:CreateTable",
-      "glue:DeletePartition",
-      "glue:DeletePartitionIndex",
-      "glue:DeleteSchema",
-      "glue:DeleteTable",
-      "glue:GetDatabase",
-      "glue:GetDatabases",
-      "glue:GetPartition",
-      "glue:GetPartitionIndexes",
-      "glue:GetPartitions",
-      "glue:GetSchema",
-      "glue:GetSchemaByDefinition",
-      "glue:GetSchemaVersion",
-      "glue:GetSchemaVersionsDiff",
-      "glue:GetTable",
-      "glue:GetTables",
-      "glue:GetTableVersion",
-      "glue:GetTableVersions",
-      "glue:ListSchemas",
-      "glue:UpdatePartition",
-      "glue:UpdateRegistry",
-      "glue:UpdateSchema",
-      "glue:UpdateTable"
-    ]
-    resources = [
-      "*"
-    ]
-  }
+
   statement {
     sid = "AthenaQueryAccess"
     actions = [
@@ -623,6 +628,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_pr
     data.aws_iam_policy_document.read_metadata.json,
     data.aws_iam_policy_document.write_metadata.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
+    data.aws_iam_policy_document.manage_glue_databases.json
   ]
 
   statement {
