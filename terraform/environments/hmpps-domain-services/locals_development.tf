@@ -29,8 +29,8 @@ locals {
           server-type = "hmpps-windows_2022"
         }
       }
-
     }
-
+    baseline_route53_zones = {
+    }
   }
 }

@@ -54,7 +54,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
             rds_hostname = "RDSConnectionBroker"
           }))
         })
@@ -82,7 +82,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
             rds_hostname = "RDSLicensing"
           }))
         })
@@ -110,7 +110,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
             rds_hostname = "RDSWebAccess"
           }))
         })
@@ -138,7 +138,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
             rds_hostname = "RDSGateway"
           }))
         })
@@ -166,7 +166,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
             rds_hostname = "RDSSessionHost"
           }))
         })
@@ -190,7 +190,7 @@ locals {
     }
 
     baseline_lbs = {
-      r12 = {
+      lbtest = {
         internal_lb              = true
         enable_delete_protection = false
         load_balancer_type       = "network"
@@ -358,13 +358,13 @@ locals {
           }
         }
       }
+    }
 
-      baseline_route53_zones = {
-        "pp.csr.service.justice.gov.uk" = {
-          lb_alias_records = [
-            { name = "r1", type = "A", lbs_map_key = "r12" },
-          ]
-        }
+    baseline_route53_zones = {
+      "test.hmpps-domain-services.service.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "lbtest", type = "A", lbs_map_key = "lbtest" },
+        ]
       }
     }
   }
