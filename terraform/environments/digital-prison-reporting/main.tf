@@ -229,10 +229,10 @@ module "glue_hive_table_creation_job" {
     "--dpr.raw.archive.s3.path"   = "s3://${module.s3_raw_archive_bucket.bucket_id}"
     "--dpr.structured.s3.path"    = "s3://${module.s3_structured_bucket.bucket_id}"
     "--dpr.curated.s3.path"       = "s3://${module.s3_curated_bucket.bucket_id}"
-    "--dpr.raw_archive.database"  = "s3://${module.glue_raw_archive_database.db_name}"
-    "--dpr.structured.database"   = "s3://${module.glue_structured_zone_database.db_name}"
-    "--dpr.curated.database"      = "s3://${module.glue_curated_zone_database.db_name}"
-    "--dpr.prisons.database"      = "s3://${module.glue_prisons_database.db_name}"
+    "--dpr.raw_archive.database"  = module.glue_raw_archive_database.db_name
+    "--dpr.structured.database"   = module.glue_structured_zone_database.db_name
+    "--dpr.curated.database"      = module.glue_curated_zone_database.db_name
+    "--dpr.prisons.database"      = module.glue_prisons_database.db_name
     "--dpr.contract.registryName" = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
     "--dpr.log.level"             = local.refresh_job_log_level
   }
