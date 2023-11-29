@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "db_refresher" {
       "ec2:DescribeInstances",
     ]
     resources = [
-      "arn:aws:ec2:*:*:instance/*",
+      "*",
     ]
   }
 }
@@ -56,6 +56,7 @@ resource "aws_iam_role_policy_attachment" "db_refresher_ec2_describe" {
   role       = aws_iam_role.db_refresher[0].name
   policy_arn = aws_iam_policy.db_refresher[0].arn
 }
+
 resource "aws_iam_role_policy_attachment" "db_refresher_ssm_access" {
   count      = local.is-development || local.is-test ? 1 : 0
   role       = aws_iam_role.db_refresher[0].name
