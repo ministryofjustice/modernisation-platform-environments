@@ -56,13 +56,13 @@ locals {
           os-type           = "Linux"
           component         = "ndh"
           environment       = "test"
-          disable_api_stop  = false
         }
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
-        ami_name  = "RHEL-7.9_HVM-*"
-        ami_owner = "309956199498"
+        ami_name          = "RHEL-7.9_HVM-*"
+        ami_owner         = "309956199498"
+        disable_api_stop  = false
       }
       example-test-2 = {
         tags = {
@@ -72,13 +72,13 @@ locals {
           os-type           = "Linux"
           component         = "ndh"
           environment       = "test"
-          disable_api_stop  = false
         }
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
-        ami_name  = "RHEL-7.9_HVM-*"
-        ami_owner = "309956199498"
+        ami_name          = "RHEL-7.9_HVM-*"
+        ami_owner         = "309956199498"
+        disable_api_stop  = false
       }
     }
     ec2_test_autoscaling_groups = {
