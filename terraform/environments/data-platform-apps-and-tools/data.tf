@@ -1,8 +1,3 @@
-resource "random_password" "datahub_rds" {
-  length  = 32
-  special = false
-}
-
 data "aws_eks_cluster" "apps_and_tools" {
   name = "apps-tools-${local.environment}"
 }
