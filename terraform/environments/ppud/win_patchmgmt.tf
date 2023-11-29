@@ -25,7 +25,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     patch_filter {
       key    = "CLASSIFICATION"
 #     values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups"] - November 2023
-      values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups","Update Rollups"]
+      values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups","DefinitionUpdates"]
     }
 
     patch_filter {
