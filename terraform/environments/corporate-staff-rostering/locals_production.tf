@@ -14,6 +14,19 @@ locals {
       }
     }
 
+    baseline_secretsmanager_secrets = {
+      "/oracle/database/PIWFM" = {
+        secrets = {
+          passwords = { description = "database passwords" }
+        }
+      }
+      "/oracle/database/DRIWFM" = {
+        secrets = {
+          passwords = { description = "database passwords" }
+        }
+      }
+    }
+
     baseline_iam_policies = {
       Ec2ProdDatabasePolicy = {
         description = "Permissions required for prod Database EC2s"

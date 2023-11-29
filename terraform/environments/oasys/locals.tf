@@ -27,9 +27,14 @@ locals {
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
 
-  ###
+  ######
   ### env independent webserver vars
+  ######
+
   ###
+  #  web
+  ###
+
   webserver_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "oasys_webserver_release_2023-07-02*"
@@ -41,7 +46,11 @@ locals {
       monitoring             = true
       vpc_security_group_ids = ["private_web"]
     })
-    cloudwatch_metric_alarms = {}
+    cloudwatch_metric_alarms = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
+    )
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules = {
       "scale_up" = {
@@ -98,6 +107,10 @@ locals {
     }
   }
 
+  ###
+  #  db
+  ###
+
   database_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name          = "oasys_oracle_db_release_2023-06-26T10-16-03.670Z"
@@ -112,6 +125,24 @@ locals {
       tags = {
         backup-plan = "daily-and-weekly"
       }
+    })
+    cloudwatch_metric_alarms = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
+      {
+        cpu-utilization-high = {
+          comparison_operator = "GreaterThanOrEqualToThreshold"
+          evaluation_periods  = "120"
+          datapoints_to_alarm = "120"
+          metric_name         = "CPUUtilization"
+          namespace           = "AWS/EC2"
+          period              = "60"
+          statistic           = "Maximum"
+          threshold           = "95"
+          alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on an oasys-db instance"
+          alarm_actions       = ["dso_pagerduty"]
+        }
     })
     autoscaling_schedules = {}
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
@@ -208,6 +239,9 @@ locals {
     })
   })
 
+  ###
+  #  bip
+  ###
 
   bip_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -223,7 +257,11 @@ locals {
         backup-plan = "daily-and-weekly"
       }
     })
-    cloudwatch_metric_alarms = {}
+    cloudwatch_metric_alarms = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
+    )
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
@@ -252,7 +290,15 @@ locals {
     })
   })
 
+  ###
+  #  other
+  ###
+
   baseline_secretsmanager_secrets = {}
+
+  baseline_cloudwatch_log_groups = {}
+  baseline_cloudwatch_metric_alarms = {}
+  baseline_cloudwatch_log_metric_filters = {}
 
   public_key_data = jsondecode(file("./files/bastion_linux.json"))
 }

@@ -2,15 +2,43 @@
 # between SSM parameters and SecretManager Secrets
 # Use Secrets if you need to share a parameter across accounts.
 
+# For placeholder values, we just create a Secret resource without
+# any secret value
+
 locals {
+
+  # Policies can be defined at top-level, e.g. same for all secrets,
+  # or specific to an individual secret. This code pulls out all these
+  # policies into a single map.
+  secretsmanager_secret_policies_top_level_list = [
+    for sm_key, sm_value in var.secretsmanager_secrets : {
+      key   = sm_key
+      value = sm_value.policy
+    } if sm_value.policy != null
+  ]
+  secretsmanager_secret_policies_secret_level_list = flatten([
+    for sm_key, sm_value in var.secretsmanager_secrets : [
+      for secret_name, secret_value in sm_value.secrets : {
+        key   = "${sm_key}/${secret_name}"
+        value = secret_value.policy
+      } if secret_value.policy != null
+    ]
+  ])
+  secretsmanager_secret_policies = {
+    for item in concat(
+      local.secretsmanager_secret_policies_top_level_list,
+      local.secretsmanager_secret_policies_secret_level_list
+    ) : item.key => item.value
+  }
+
   secretsmanager_secrets_list = flatten([
     for sm_key, sm_value in var.secretsmanager_secrets : [
       for secret_name, secret_value in sm_value.secrets : {
         key = "${sm_value.prefix}${sm_key}${sm_value.postfix}${secret_name}"
         value = merge(
           {
-            policy_key              = sm_key,
-            policy                  = sm_value.policy,
+            policy_key              = secret_value.policy != null ? "${sm_key}/${secret_name}" : sm_key
+            policy                  = secret_value.policy != null ? secret_value.policy : sm_value.policy
             recovery_window_in_days = sm_value.recovery_window_in_days
           },
           secret_value,
@@ -61,12 +89,10 @@ resource "random_password" "secrets" {
 }
 
 data "aws_iam_policy_document" "secretsmanager_secret_policy" {
-  for_each = {
-    for key, value in var.secretsmanager_secrets : key => value if value.policy != null
-  }
+  for_each = local.secretsmanager_secret_policies
 
   dynamic "statement" {
-    for_each = each.value.policy
+    for_each = each.value
     content {
       effect    = statement.value.effect
       actions   = statement.value.actions
@@ -120,15 +146,4 @@ resource "aws_secretsmanager_secret_version" "fixed" {
 
   secret_id     = aws_secretsmanager_secret.this[each.key]
   secret_string = each.value.value
-}
-
-resource "aws_secretsmanager_secret_version" "placeholder" {
-  for_each = local.secretsmanager_secrets_default
-
-  secret_id     = aws_secretsmanager_secret.this[each.key].id
-  secret_string = each.value.value
-
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
 }
