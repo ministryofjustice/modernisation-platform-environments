@@ -186,7 +186,7 @@ locals {
           oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
         })
       })
-      "t2-${local.application_name}-db-a-2" = merge(local.database_a, {
+      "t2-${local.application_name}-db-a-3" = merge(local.database_a, {
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
             branch = "oracle_psu_patching"
