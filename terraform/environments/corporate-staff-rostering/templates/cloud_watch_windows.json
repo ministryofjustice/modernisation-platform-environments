@@ -88,6 +88,13 @@
       "windows_events": {
         "collect_list": [
           {
+            "event_name": "Application",
+            "event_levels": ["INFORMATION", "ERROR"],
+            "log_group_name": "cwagent-windows-application",
+            "log_stream_name": "{instance_id}",
+            "event_format": "xml"
+          },
+          {
             "event_name": "System",
             "event_levels": ["INFORMATION", "ERROR"],
             "log_group_name": "cwagent-windows-system",
