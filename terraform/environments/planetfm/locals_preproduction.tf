@@ -154,7 +154,14 @@ locals {
       })
     }
     baseline_route53_zones = {
-      "pp.planetfm.service.justice.gov.uk" = {}
+      "pp.planetfm.service.justice.gov.uk" = {
+        records = [
+          # set to PPFDW0030 PP SQL server for planetfm
+          { name = "ppplanet", type = "A", ttl = "300", records = ["10.40.50.132"] },
+          { name = "ppplanet-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
+          { name = "ppplanet-b", type = "CNAME", ttl = "300", records = ["pp-cafm-db-a.planetfm.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+        ]
+      }
     }
   }
 }
