@@ -59,18 +59,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T1/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T1*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
@@ -86,18 +84,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T2/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T2*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
@@ -113,18 +109,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T3/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T3*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/*",
@@ -139,13 +133,13 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t1/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T1/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T1*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-*",
             ]
           }
         ]
@@ -156,13 +150,13 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t2/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T2/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T2*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-*",
             ]
           }
         ]
@@ -173,13 +167,13 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t3/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T3/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T3*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t3/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/weblogic-*",
             ]
           }
         ]

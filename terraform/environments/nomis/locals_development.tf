@@ -50,12 +50,12 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/qa11r/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/qa11r/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11r/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/weblogic-*",
             ]
           }
         ]
