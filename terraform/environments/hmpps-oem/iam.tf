@@ -63,10 +63,15 @@ data "aws_iam_policy_document" "db_refresher" {
       "s3:DeleteObject",
     ]
     resources = [
-      "arn:aws:s3:::s3-bucket20230608132808605000000001/*",
+      "${module.baseline.s3_buckets["s3-bucket"].bucket.arn}/*",
     ]
   }
 }
+
+# data "aws_s3_bucket" "db_refresher_ansible" {
+#   count = local.is-development || local.is-test ? 1 : 0
+#   bucket = module.baseline.s3_buckets["s3-bucket"].bucket.bucket
+# }
 
 resource "aws_iam_policy" "db_refresher" {
   count       = local.is-development || local.is-test ? 1 : 0
