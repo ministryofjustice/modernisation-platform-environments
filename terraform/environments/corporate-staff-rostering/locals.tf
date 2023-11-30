@@ -39,6 +39,19 @@ locals {
       retention_in_days = 30
     }
   }
+  baseline_cloudwatch_log_metric_filters = {
+    iwfm-scheduler-service-started = {
+      pattern        = "%iWFM Scheduler.+service started%"
+      log_group_name = "cwagent-windows-application"
+
+      metric_transformation = {
+        name         = "iWFM Scheduler Service Started"
+        namespace    = "CSR"
+        value        = 1
+        defaultValue = 0
+      }
+    }
+  }
   baseline_ec2_autoscaling_groups = {}
   baseline_ec2_instances          = {}
   baseline_iam_policies = {
