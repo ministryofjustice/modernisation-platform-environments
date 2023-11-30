@@ -45,7 +45,7 @@ locals {
       log_group_name = "cwagent-windows-application"
 
       metric_transformation = {
-        name         = "iWFM Scheduler Service Started"
+        name         = "iWFMSchedulerServiceStarted"
         namespace    = "CSR"
         value        = 1
         defaultValue = 0
