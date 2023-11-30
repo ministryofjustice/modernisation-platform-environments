@@ -166,13 +166,14 @@ locals {
     baseline_acm_certificates = {
       planetfm_wildcard_cert = {
 
-        domain_name = "pp.planetfm.service.justice.gov.uk"
+        domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
+          "*.pp.planetfm.service.justice.gov.uk",
           "pp-cafmwebx.az.justice.gov.uk",
           "pp-cafmtx.az.justice.gov.uk",
         ]
-        # external_validation_records_created = true TODO: un-comment and re-run terraform apply after
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+        external_validation_records_created = false
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for planetfm ${local.environment} domains"
         }
