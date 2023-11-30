@@ -137,56 +137,57 @@ locals {
           backup      = "false" # opt out of mod platform default backup plan
         }
       }
+      
+      #  removing temporarily due to licensing considerations
+      # pd-csr-db-b = merge(local.defaults_database_ec2, {
+      #   config = merge(local.defaults_database_ec2.config, {
+      #     ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
+      #     availability_zone = "${local.region}b"
+      #     instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
+      #       "Ec2ProdDatabasePolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.defaults_database_ec2.instance, {
+      #     instance_type                = "r6i.xlarge"
+      #     disable_api_stop             = true
+      #     metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+      #   })
 
-      pd-csr-db-b = merge(local.defaults_database_ec2, {
-        config = merge(local.defaults_database_ec2.config, {
-          ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
-          availability_zone = "${local.region}b"
-          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        instance = merge(local.defaults_database_ec2.instance, {
-          instance_type                = "r6i.xlarge"
-          disable_api_stop             = true
-          metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-        })
+      #   ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
+      #     "/dev/sda1" = { label = "root", size = 30 }
+      #     "/dev/sdb"  = { label = "app", size = 100 } # /u01
+      #     "/dev/sdc"  = { label = "app", size = 500 } # /u02
+      #   })
 
-        ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
-          "/dev/sda1" = { label = "root", size = 30 }
-          "/dev/sdb"  = { label = "app", size = 100 } # /u01
-          "/dev/sdc"  = { label = "app", size = 500 } # /u02
-        })
+      #   ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
+      #     data = {
+      #       iops       = 3000
+      #       throughput = 125
+      #       total_size = 1000
+      #     }
+      #     flash = {
+      #       iops       = 3000
+      #       throughput = 125
+      #       total_size = 100
+      #     }
+      #   })
 
-        ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
-          data = {
-            iops       = 3000
-            throughput = 125
-            total_size = 1000
-          }
-          flash = {
-            iops       = 3000
-            throughput = 125
-            total_size = 100
-          }
-        })
+      #   secretsmanager_secrets = {
+      #     asm-passwords = {}
+      #   }
+      #   ssm_parameters = {
+      #     asm-passwords = {}
+      #   }
 
-        secretsmanager_secrets = {
-          asm-passwords = {}
-        }
-        ssm_parameters = {
-          asm-passwords = {}
-        }
-
-        tags = {
-          description = "PD CSR Oracle secondary DB server"
-          ami         = "base_ol_8_5"
-          os-type     = "Linux"
-          component   = "data"
-          server-type = "csr-db"
-          backup      = "false" # opt out of mod platform default backup plan
-        }
-      })
+      #   tags = {
+      #     description = "PD CSR Oracle secondary DB server"
+      #     ami         = "base_ol_8_5"
+      #     os-type     = "Linux"
+      #     component   = "data"
+      #     server-type = "csr-db"
+      #     backup      = "false" # opt out of mod platform default backup plan
+      #   }
+      # })
 
       pd-csr-a-7-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
