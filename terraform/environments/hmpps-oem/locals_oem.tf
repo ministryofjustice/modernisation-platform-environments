@@ -100,12 +100,7 @@ locals {
       create_external_record = true
     }
 
-    secretsmanager_secrets = {
-      asm-passwords = {}
-    }
-    ssm_parameters = {
-      asm-passwords = {}
-    }
+    secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
     tags = {
       ami                  = "hmpps_ol_8_5_oracledb_19c" # not including as hardening role seems to cause an issue

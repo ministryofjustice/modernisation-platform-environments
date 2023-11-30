@@ -165,12 +165,7 @@ locals {
 
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
-    secretsmanager_secrets = {
-      asm-passwords = {}
-    }
-    ssm_parameters = {
-      asm-passwords = {}
-    }
+    secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_11g
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ansible
 
