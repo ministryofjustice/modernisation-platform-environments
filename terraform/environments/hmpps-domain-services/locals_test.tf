@@ -190,10 +190,10 @@ locals {
     }
 
     baseline_lbs = {
-      lbtest = {
+      networklb = {
         internal_lb              = true
         enable_delete_protection = false
-        load_balancer_type       = "application"
+        load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [
           module.environment.subnet["private"]["eu-west-2a"].id,
@@ -204,7 +204,7 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          rds-connection-broker-80 = {
+          rds-gateway-80 = {
             port     = 80
             protocol = "TCP"
             health_check = {
@@ -221,11 +221,10 @@ locals {
               type    = "source_ip"
             }
             #attachments = [
-            #  { ec2_instance_name = "rds-connection-broker-a" },
-            #  { ec2_instance_name = "rds-connection-broker-c" },
+            #  { ec2_instance_name = "rds-gateway" },
             #]
           }
-          rds-connection-broker-7770 = {
+          rds-gateway-7770 = {
             port     = 7770
             protocol = "TCP"
             health_check = {
@@ -243,11 +242,10 @@ locals {
               type    = "source_ip"
             }
             #attachments = [
-            #  { ec2_instance_name = "rds-connection-broker-a" },
-            #  { ec2_instance_name = "rds-connection-broker-c" },
+            #  { ec2_instance_name = "rds-gateway" },
             #]
           }
-          rds-connection-broker-7771 = {
+          rds-gateway-7771 = {
             port     = 7771
             protocol = "TCP"
             health_check = {
@@ -265,11 +263,10 @@ locals {
               type    = "source_ip"
             }
             #attachments = [
-            #  { ec2_instance_name = "rds-connection-broker-a" },
-            #  { ec2_instance_name = "rds-connection-broker-c" },
+            #  { ec2_instance_name = "rds-gateway" },
             #]
           }
-          rds-connection-broker-7780 = {
+          rds-gateway-7780 = {
             port     = 7780
             protocol = "TCP"
             health_check = {
@@ -287,11 +284,10 @@ locals {
               type    = "source_ip"
             }
             #attachments = [
-            #  { ec2_instance_name = "rds-connection-broker-a" },
-            #  { ec2_instance_name = "rds-connection-broker-c" },
+            #  { ec2_instance_name = "rds-gateway" },
             #]
           }
-          rds-connection-broker-7781 = {
+          rds-gateway-7781 = {
             port     = 7781
             protocol = "TCP"
             health_check = {
@@ -309,8 +305,7 @@ locals {
               type    = "source_ip"
             }
             #attachments = [
-            #  { ec2_instance_name = "rds-connection-broker-a" },
-            #  { ec2_instance_name = "rds-connection-broker-c" },
+            #  { ec2_instance_name = "rds-gateway" },
             #]
           }
         }
@@ -321,7 +316,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "rds-connection-broker-80"
+              target_group_name = "rds-gateway-80"
             }
           }
           http-7770 = {
@@ -329,7 +324,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "rds-connection-broker-7770"
+              target_group_name = "rds-gateway-7770"
             }
           }
           http-7771 = {
@@ -337,7 +332,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "rds-connection-broker-7771"
+              target_group_name = "rds-gateway-7771"
             }
           }
           http-7780 = {
@@ -345,7 +340,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "rds-connection-broker-7780"
+              target_group_name = "rds-gateway-7780"
             }
           }
           http-7781 = {
@@ -353,7 +348,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "rds-connection-broker-7781"
+              target_group_name = "rds-gateway-7781"
             }
           }
         }
@@ -363,7 +358,7 @@ locals {
     baseline_route53_zones = {
       "test.hmpps-domain-services.service.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "lbtest", type = "A", lbs_map_key = "lbtest" },
+          { name = "networklb", type = "A", lbs_map_key = "networklb" },
         ]
       }
     }
