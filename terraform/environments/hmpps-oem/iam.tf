@@ -43,10 +43,12 @@ data "aws_iam_policy_document" "db_refresher" {
     ]
   }
   statement {
-    sid    = "GenerateDataKey"
+    sid    = "KMSAccess"
     effect = "Allow"
     actions = [
       "kms:GenerateDataKey",
+      "kms:Decrypt",
+      "kms:Encrypt",
     ]
     resources = [
       data.aws_kms_key.general_shared.arn,
