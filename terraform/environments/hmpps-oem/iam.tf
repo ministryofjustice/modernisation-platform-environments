@@ -42,6 +42,16 @@ data "aws_iam_policy_document" "db_refresher" {
       "*",
     ]
   }
+  statement {
+    sid    = "GenerateDataKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+    ]
+    resources = [
+      data.aws_kms_key.general_shared.arn,
+    ]
+  }
 }
 
 resource "aws_iam_policy" "db_refresher" {
