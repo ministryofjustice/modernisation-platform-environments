@@ -88,3 +88,7 @@ resource "aws_opensearch_domain_policy" "datahub" {
   domain_name     = aws_opensearch_domain.datahub.domain_name
   access_policies = data.aws_iam_policy_document.opensearch_domain.json
 }
+
+output "endpoit" {
+  value = aws_opensearch_domain.datahub.endpoint
+}

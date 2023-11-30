@@ -40,4 +40,10 @@ data "aws_iam_policy_document" "datahub" {
     actions   = ["sts:AssumeRole"]
     resources = formatlist("arn:aws:iam::%s:role/${local.environment_configuration.datahub_role}", local.environment_configuration.datahub_target_accounts)
   }
+  statement {
+    sid       = "AllowOpenSearch"
+    effect    = "Allow"
+    actions   = ["es:*"]
+    resources = ["*"]
+  }
 }
