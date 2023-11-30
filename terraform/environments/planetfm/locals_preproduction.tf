@@ -157,10 +157,28 @@ locals {
       "pp.planetfm.service.justice.gov.uk" = {
         records = [
           # set to PPFDW0030 PP SQL server for planetfm
-          { name = "ppplanet", type = "A", ttl = "300", records = ["10.40.50.132"] },
-          { name = "ppplanet-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
-          { name = "ppplanet-b", type = "CNAME", ttl = "300", records = ["pp-cafm-db-a.planetfm.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "ppplanet", type = "A", ttl = "300", records = ["10.40.50.132"] },
+          # { name = "ppplanet-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
+          # { name = "ppplanet-b", type = "CNAME", ttl = "300", records = ["pp-cafm-db-a.planetfm.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
+      }
+    }
+    baseline_acm_certificates = {
+      planetfm_wildcard_cert = {
+
+        domain_name = "pp.planetfm.service.justice.gov.uk"
+        subject_alternate_names = [
+          "*.pp.planetfm.service.justice.gov.uk",
+          "*.pp-cafmwebx.az.justice.gov.uk",
+          "*.pp-cafmtx.az.justice.gov.uk",
+          "pp-cafmwebx.az.justice.gov.uk",
+          "pp-cafmtx.az.justice.gov.uk",
+        ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        tags = {
+          description = "wildcard cert for planetfm ${local.environment} domains"
+        }
       }
     }
   }
