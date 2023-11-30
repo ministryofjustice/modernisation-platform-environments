@@ -193,7 +193,7 @@ locals {
       lbtest = {
         internal_lb              = true
         enable_delete_protection = false
-        load_balancer_type       = "network"
+        load_balancer_type       = "application"
         force_destroy_bucket     = true
         subnets = [
           module.environment.subnet["private"]["eu-west-2a"].id,

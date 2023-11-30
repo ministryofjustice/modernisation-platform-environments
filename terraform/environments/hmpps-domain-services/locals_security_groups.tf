@@ -14,19 +14,6 @@ locals {
     rdp = {
       inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.0.0/16"]
     }
-    oracle_db = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
-      module.ip_addresses.azure_nomisapi_cidrs.devtest,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-      module.ip_addresses.azure_fixngo_cidrs.devtest_core,
-    ])
     domain_controllers = module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers
     jumpservers        = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
   }
@@ -52,19 +39,6 @@ locals {
         module.ip_addresses.azure_fixngo_cidrs.prod,
       ])
     }
-    oracle_db = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.prod,
-      module.ip_addresses.azure_nomisapi_cidrs.prod,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-      module.ip_addresses.azure_fixngo_cidrs.prod_core,
-    ])
     domain_controllers = module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers
     jumpservers        = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
   }
