@@ -157,6 +157,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/weblogic-passwords",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2CNOM/weblogic-passwords,
             ]
           }
         ]
