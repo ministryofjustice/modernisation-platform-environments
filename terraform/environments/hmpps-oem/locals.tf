@@ -56,10 +56,20 @@ locals {
 
   baseline_secretsmanager_secrets = {}
 
+  baseline_ssm_parameters = {
+    "/ansible" = {
+      parameters = {
+        ssm_bucket = {
+          description = "Ansible S3 bucket"
+          value       = module.baseline.s3_buckets["s3-bucket"].bucket.bucket
+        }
+      }
+    }
+  }
+
   baseline_security_groups = {
     data-oem = local.security_groups.data_oem
   }
 
-  baseline_sns_topics     = {}
-  baseline_ssm_parameters = {}
+  baseline_sns_topics = {}
 }

@@ -63,7 +63,19 @@ data "aws_iam_policy_document" "db_refresher" {
       "s3:DeleteObject",
     ]
     resources = [
-      "arn:aws:s3:::s3-bucket20230608132808605000000001/*",
+      "${module.baseline.s3_buckets["s3-bucket"].bucket.arn}/*",
+    ]
+  }
+  statement {
+    sid    = "SSMParameterAccess"
+    effect = "Allow"
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+      "ssm:GetParametersByPath",
+    ]
+    resources = [
+      "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/ansible/*",
     ]
   }
 }
