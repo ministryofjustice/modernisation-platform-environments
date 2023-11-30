@@ -138,8 +138,8 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t1/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/weblogic-passwords",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-*",
             ]
           }
         ]
@@ -155,9 +155,8 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/weblogic-passwords",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-passwords",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2CNOM/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-*",
             ]
           }
         ]
@@ -173,8 +172,8 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t3/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/weblogic-passwords",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/weblogic-*",
             ]
           }
         ]

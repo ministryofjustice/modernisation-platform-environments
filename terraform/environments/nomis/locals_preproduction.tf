@@ -88,8 +88,8 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/preprod/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/weblogic-passwords",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/weblogic-*",
             ]
           }
         ]

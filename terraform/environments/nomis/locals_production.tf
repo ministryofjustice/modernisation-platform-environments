@@ -83,10 +83,10 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/prod/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/weblogic-passwords",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/weblogic-passwords",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/DR*/weblogic-passwords",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*DR/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/DR*/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*DR/weblogic-*",
             ]
           }
         ]
