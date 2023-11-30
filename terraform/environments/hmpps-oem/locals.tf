@@ -63,7 +63,6 @@ locals {
           description = "Ansible S3 bucket"
           value       = module.baseline.s3_buckets["s3-bucket"].bucket.bucket
         }
-        # data.aws_s3_bucket.db_refresher_ansible[0].arn
       }
     }
   }

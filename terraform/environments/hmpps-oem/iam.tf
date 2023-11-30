@@ -80,11 +80,6 @@ data "aws_iam_policy_document" "db_refresher" {
   }
 }
 
-# data "aws_s3_bucket" "db_refresher_ansible" {
-#   count = local.is-development || local.is-test ? 1 : 0
-#   bucket = module.baseline.s3_buckets["s3-bucket"].bucket.bucket
-# }
-
 resource "aws_iam_policy" "db_refresher" {
   count       = local.is-development || local.is-test ? 1 : 0
   name        = "db_refresher"
