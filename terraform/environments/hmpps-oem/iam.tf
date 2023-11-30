@@ -52,6 +52,17 @@ data "aws_iam_policy_document" "db_refresher" {
       data.aws_kms_key.general_shared.arn,
     ]
   }
+  statement {
+    sid    = "S3ObjectAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = [
+      "arn:aws:s3:::s3-bucket20230608132808605000000001/*",
+    ]
+  }
 }
 
 resource "aws_iam_policy" "db_refresher" {
