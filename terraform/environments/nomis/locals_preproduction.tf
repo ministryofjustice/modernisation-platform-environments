@@ -59,18 +59,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*PP/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/PP*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
@@ -85,13 +83,13 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/preprod/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*PP/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/PP*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/preprod/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/weblogic-passwords",
             ]
           }
         ]
