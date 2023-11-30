@@ -17,6 +17,18 @@ locals {
     }
   }
 
+  bip_cmc_cloudwatch_metric_alarms = merge(
+    module.baseline_presets.cloudwatch_metric_alarms.ec2,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
+  )
+
+  bip_cmc_cloudwatch_log_groups = {
+    cwagent-bip-cmc-logs = {
+      retention_in_days = 30
+    }
+  }
+
   bip_cmc_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {

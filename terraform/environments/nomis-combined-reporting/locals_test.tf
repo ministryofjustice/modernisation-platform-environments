@@ -33,7 +33,10 @@ locals {
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
           "*.${module.environment.domains.public.application_environment}",
+          "*.${local.environment}.reporting.nomis.service.justice.gov.uk",
         ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "Wildcard certificate for the ${local.environment} environment"
         }
@@ -58,12 +61,14 @@ locals {
 
     baseline_ec2_instances = {
       t1-ncr-bip-cmc = merge(local.bip_cmc_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cmc_cloudwatch_metric_alarms
         tags = merge(local.bip_cmc_ec2_default.tags, {
           description                          = "For testing SAP BI CMC installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })
       t1-ncr-db-1-a = merge(local.database_ec2_default, {
+        cloudwatch_metric_alarms = local.database_cloudwatch_metric_alarms
         tags = merge(local.database_ec2_default.tags, {
           description                          = "T1 NCR DATABASE"
           nomis-combined-reporting-environment = "t1"
