@@ -59,14 +59,68 @@ locals {
       "/oracle/database/T1BIPAUD" = local.database_secretsmanager_secrets
     }
 
+    baseline_iam_policies = {
+      Ec2T1DatabasePolicy = {
+        description = "Permissions required for T1 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T1BipPolicy = {
+        description = "Permissions required for T1 Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/t1-ncr-bip-cmc/*",
+              "arn:aws:secretsmanager:*:*:secret:/t1-ncr-bip/*",
+              "arn:aws:secretsmanager:*:*:secret:/t1-ncr-tomcat/*",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ec2_instances = {
       t1-ncr-bip-cmc = merge(local.bip_cmc_ec2_default, {
+        config = merge(local.bip_cmc_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_cmc_ec2_default.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
         tags = merge(local.bip_cmc_ec2_default.tags, {
           description                          = "For testing SAP BI CMC installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })
       t1-ncr-db-1-a = merge(local.database_ec2_default, {
+        config = merge(local.database_ec2_default.config, {
+          instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
+            "Ec2T1DatabasePolicy",
+          ])
+        })
         tags = merge(local.database_ec2_default.tags, {
           description                          = "T1 NCR DATABASE"
           nomis-combined-reporting-environment = "t1"
@@ -84,6 +138,11 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        config = merge(local.tomcat_ec2_default.config, {
+          instance_profile_policies = concat(local.tomcat_ec2_default.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
         tags = merge(local.tomcat_ec2_default.tags, {
           description                          = "For testing BIP tomcat installation and configurations"
           nomis-combined-reporting-environment = "t1"
@@ -96,6 +155,11 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        config = merge(local.bip_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "For testing BIP 4.3 installation and configurations"
           nomis-combined-reporting-environment = "t1"
