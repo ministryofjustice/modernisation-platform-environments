@@ -164,7 +164,7 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          pp-web-80 = {
+          web-45-80 = {
             port     = 80
             protocol = "HTTP"
             health_check = {
@@ -186,6 +186,28 @@ locals {
               { ec2_instance_name = "pp-cafm-w-5-a" },
             ]
           }
+          web-23-80 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              path                = "/"
+              healthy_threshold   = 3
+              unhealthy_threshold = 5
+              timeout             = 5
+              interval            = 30
+              matcher             = "200-399"
+              port                = 80
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-cafm-w-2-b" },
+              { ec2_instance_name = "pp-cafm-w-3-a" },
+            ]
+          }
         }
         listeners = {
           https = {
@@ -193,8 +215,36 @@ locals {
             protocol               = "HTTPS"
             certificate_arn_lookup = "planetfm_wildcard_cert"
             default_action = {
-              type              = "forward"
-              target_group_name = "pp-web-80"
+              type              = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+          }
+          rules = {
+            web-23-80 = {
+              priority = 2380
+              actions = [{
+                type              = "forward"
+                target_group_name = "web-23-80"
+              }]
+              conditions = [{
+                field  = "host-header"
+                values = ["pp-cafmtx.az.justice.gov.uk"]
+              }]
+            }
+            web-45-80 = {
+              priority = 4580
+              actions = [{
+                type              = "forward"
+                target_group_name = "web-45-80"
+              }]
+              conditions = [{
+                field  = "host-header"
+                values = ["pp-cafmwebx.az.justice.gov.uk"]
+              }]
             }
           }
         }
