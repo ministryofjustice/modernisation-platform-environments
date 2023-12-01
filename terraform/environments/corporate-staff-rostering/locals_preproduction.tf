@@ -11,13 +11,6 @@ locals {
       }
     }
 
-    baseline_ssm_parameters = {
-      "/oracle/database/PPIWFM" = {
-        parameters = {
-          passwords = { description = "database passwords" }
-        }
-      }
-    }
     baseline_secretsmanager_secrets = {
       "/oracle/database/PPIWFM" = {
         secrets = {
