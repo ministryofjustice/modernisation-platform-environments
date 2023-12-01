@@ -222,30 +222,30 @@ locals {
                 status_code  = "501"
               }
             }
-          }
-          rules = {
-            web-23-80 = {
-              priority = 2380
-              actions = [{
-                type              = "forward"
-                target_group_name = "web-23-80"
-              }]
-              conditions = [{
-                field  = "host-header"
-                values = ["pp-cafmtx.az.justice.gov.uk"]
-              }]
-            }
-            web-45-80 = {
-              priority = 4580
-              actions = [{
-                type              = "forward"
-                target_group_name = "web-45-80"
-              }]
-              conditions = [{
-                field  = "host-header"
-                values = ["pp-cafmwebx.az.justice.gov.uk"]
-              }]
-            }
+            rules = {
+              web-23-80 = {
+                priority = 2380
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-23-80"
+                }]
+                conditions = [{
+                  field  = "host-header"
+                  values = ["pp-cafmtx.az.justice.gov.uk"]
+                }]
+              }
+              web-45-80 = {
+                priority = 4580
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-45-80"
+                }]
+                conditions = [{
+                  field  = "host-header"
+                  values = ["pp-cafmwebx.az.justice.gov.uk"]
+                }]
+              }
+            }  
           }
         }
       }
