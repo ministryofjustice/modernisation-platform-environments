@@ -342,7 +342,7 @@ resource "aws_ecs_service" "ecs_service" {
     weight            = 1
   }
 
-  # health_check_grace_period_seconds = 300
+  health_check_grace_period_seconds = 300
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
@@ -555,3 +555,4 @@ resource "aws_ecs_cluster_capacity_providers" "mlra" {
 
   capacity_providers = [aws_ecs_capacity_provider.mlra.name]
 }
+
