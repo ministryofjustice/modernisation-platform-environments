@@ -108,6 +108,7 @@ locals {
 
     baseline_ec2_instances = {
       t1-ncr-bip-cmc = merge(local.bip_cmc_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cmc_cloudwatch_metric_alarms
         config = merge(local.bip_cmc_ec2_default.config, {
           instance_profile_policies = concat(local.bip_cmc_ec2_default.config.instance_profile_policies, [
             "Ec2T1BipPolicy",
@@ -119,6 +120,11 @@ locals {
         })
       })
       t1-ncr-db-1-a = merge(local.database_ec2_default, {
+        cloudwatch_metric_alarms = merge(
+          local.database_cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+        )
         config = merge(local.database_ec2_default.config, {
           instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
             "Ec2T1DatabasePolicy",
@@ -141,6 +147,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        cloudwatch_metric_alarms = local.tomcat_cloudwatch_metric_alarms
         config = merge(local.tomcat_ec2_default.config, {
           instance_profile_policies = concat(local.tomcat_ec2_default.config.instance_profile_policies, [
             "Ec2T1BipPolicy",
@@ -158,6 +165,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
         config = merge(local.bip_ec2_default.config, {
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2T1BipPolicy",
