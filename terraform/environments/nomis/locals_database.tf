@@ -6,24 +6,6 @@
 
 locals {
 
-  database_nomis_ssm_parameters = {
-    parameters = {
-      passwords          = { description = "database passwords" }
-      weblogic-passwords = { description = "passwords available to weblogic servers" }
-    }
-  }
-  database_mis_ssm_parameters = {
-    parameters = {
-      passwords      = { description = "database passwords" }
-      misload-config = { description = "misload username, password and hostname" }
-    }
-  }
-  database_ssm_parameters = {
-    parameters = {
-      passwords = { description = "database passwords" }
-    }
-  }
-
   database_nomis_secretsmanager_secrets = {
     secrets = {
       passwords          = { description = "database passwords" }

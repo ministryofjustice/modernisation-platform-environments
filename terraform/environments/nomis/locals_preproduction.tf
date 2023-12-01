@@ -96,14 +96,6 @@ locals {
       }
     }
 
-    baseline_ssm_parameters = {
-      "/oracle/weblogic/preprod"  = local.weblogic_ssm_parameters
-      "/oracle/database/PPCNOM"   = local.database_nomis_ssm_parameters
-      "/oracle/database/PPNDH"    = local.database_ssm_parameters
-      "/oracle/database/PPTRDAT"  = local.database_ssm_parameters
-      "/oracle/database/PPCNMAUD" = local.database_ssm_parameters
-      "/oracle/database/PPMIS"    = local.database_mis_ssm_parameters
-    }
     baseline_secretsmanager_secrets = {
       "/oracle/weblogic/preprod"  = local.weblogic_secretsmanager_secrets
       "/oracle/database/PPCNOM"   = local.database_nomis_secretsmanager_secrets

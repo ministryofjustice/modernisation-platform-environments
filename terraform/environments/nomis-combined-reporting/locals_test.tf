@@ -45,9 +45,6 @@ locals {
       "t1-ncr-tomcat"  = local.tomcat_ssm_parameters
       "t1-ncr-bip"     = local.bip_ssm_parameters
       "t1-ncr-bip-cmc" = local.bip_cmc_ssm_parameters
-
-      "/oracle/database/T1BIPSYS" = local.database_ssm_parameters
-      "/oracle/database/T1BIPAUD" = local.database_ssm_parameters
     }
 
     baseline_secretsmanager_secrets = {

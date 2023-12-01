@@ -53,12 +53,6 @@ locals {
     }
   }
 
-  oem_ssm_parameters_passwords = {
-    parameters = {
-      passwords = {}
-    }
-  }
-
   oem_ec2_default = {
 
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
