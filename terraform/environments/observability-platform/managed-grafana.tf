@@ -20,6 +20,9 @@ module "managed_grafana" {
     unifiedAlerting = {
       enabled = true
     }
+    plugins = {
+      pluginAdminEnabled = true
+    }
   })
 
   role_associations = {
