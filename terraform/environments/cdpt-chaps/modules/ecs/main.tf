@@ -233,6 +233,8 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 
 resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
+
+  capacity_providers = [aws_ecs_capacity_provider.capacity_provider.name]
 }
 
 resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
@@ -291,6 +293,11 @@ resource "aws_ecs_service" "ecs_service" {
   launch_type     = "EC2"
 
   # health_check_grace_period_seconds = 300
+
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
+    weight            = 1
+  }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
