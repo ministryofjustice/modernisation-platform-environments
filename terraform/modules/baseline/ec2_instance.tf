@@ -3,7 +3,7 @@ module "ec2_instance" {
 
   for_each = var.ec2_instances
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.4.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.4.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -49,7 +49,7 @@ module "ec2_instance" {
       }
     )
   }
-  secretsmanager_secrets = each.value.secretsmanager_secrets == null ? {} : {
+  secretsmanager_secrets = each.value.secretsmanager_secrets == null ? null : {
     for key, value in each.value.secretsmanager_secrets : key => merge(value,
       value.kms_key_id == null ? { kms_key_id = null } : { kms_key_id = try(var.environment.kms_keys[value.kms_key_id].arn, value.kms_key_id) }
     )

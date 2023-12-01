@@ -119,12 +119,7 @@ locals {
           create_external_record = true
         }
 
-        secretsmanager_secrets = {
-          asm-passwords = {}
-        }
-        ssm_parameters = {
-          asm-passwords = {}
-        }
+        secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
         tags = {
           description = "PD CSR Oracle primary DB server"
@@ -135,7 +130,7 @@ locals {
           backup      = "false" # opt out of mod platform default backup plan
         }
       }
-      
+
       #  removing temporarily due to licensing considerations
       # pd-csr-db-b = merge(local.defaults_database_ec2, {
       #   config = merge(local.defaults_database_ec2.config, {
@@ -170,12 +165,7 @@ locals {
       #     }
       #   })
 
-      #   secretsmanager_secrets = {
-      #     asm-passwords = {}
-      #   }
-      #   ssm_parameters = {
-      #     asm-passwords = {}
-      #   }
+      #   secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
       #   tags = {
       #     description = "PD CSR Oracle secondary DB server"
