@@ -26,6 +26,8 @@ data "template_file" "task_definition" {
     storage_bucket                   = "${aws_s3_bucket.upload_files.id}"
     friendly_name                    = local.app_data.accounts[local.environment].friendly_name
     hub_wwwroot                      = local.app_data.accounts[local.environment].hub_wwwroot
+    pecs_basm_prod_access_key_id     = aws_secretsmanager_secret_version.pecs_basm_prod_access_key_id.arn
+    pecs_basm_prod_secret_access_key = aws_secretsmanager_secret_version.pecs_basm_prod_secret_access_key.arn
     ap_import_access_key_id          = aws_secretsmanager_secret_version.ap_import_access_key_id.arn
     ap_import_secret_access_key      = aws_secretsmanager_secret_version.ap_import_secret_access_key.arn
     ap_export_access_key_id          = aws_secretsmanager_secret_version.ap_export_access_key_id.arn
