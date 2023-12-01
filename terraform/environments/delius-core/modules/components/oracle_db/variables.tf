@@ -21,11 +21,6 @@ variable "db_count_index" {
   default     = 1
 }
 
-variable "db_ami" {
-  description = "AMI to use for the database instance"
-  type        = string
-}
-
 variable "env_name" {
   description = "Environment name short ie dev"
   type        = string
@@ -67,6 +62,15 @@ variable "metadata_options" {
     http_endpoint = "enabled"
     http_tokens   = "optional"
   }
+}
+
+variable "db_ami" {
+  description = "AMI to use for the database instance"
+  type = object({
+    name_regex = string
+    owners     = list(string)
+  })
+
 }
 
 variable "tags" {
