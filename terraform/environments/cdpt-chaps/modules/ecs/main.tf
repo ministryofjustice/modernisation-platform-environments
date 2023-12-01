@@ -464,7 +464,7 @@ resource "aws_appautoscaling_policy" "scaling_policy_down" {
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
-  name              = "${var.app_name}-ecs"
+  name              = "${var.app_name}-ecs-log-group"
   retention_in_days = 30
   tags = merge(
     var.tags_common,
