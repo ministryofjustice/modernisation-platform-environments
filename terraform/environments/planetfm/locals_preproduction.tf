@@ -154,7 +154,7 @@ locals {
       })
     }
     baseline_lbs = {
-      pp-webx = {
+      webx = {
         internal_lb                      = true
         enable_delete_protection         = false
         loadbalancer_type                = "application"
@@ -191,10 +191,10 @@ locals {
           https = {
             port            = 443
             protocol        = "HTTPS"
-            certificate_arn = module.baseline_presets.acm_certificates.planetfm_wildcard_cert.arn
+            certificate_arn_lookup = "planetfm_wildcard_cert"
             default_action = {
-              type             = "forward"
-              target_group_arn = module.baseline_presets.lbs.pp-web.instance_target_groups.pp-web-80.arn
+              type              = "forward"
+              target_group_name = "pp-web-80"
             }
           }
         }
@@ -203,13 +203,13 @@ locals {
     baseline_route53_zones = {
       "pp.planetfm.service.justice.gov.uk" = {
         records = [
-          # set to PPFDW0030 PP SQL server for planetfm
+          # set to PPFDW0030 PP SQL server for planetfm, not applied as not used previously in testing
           # { name = "ppplanet", type = "A", ttl = "300", records = ["10.40.50.132"] },
           # { name = "ppplanet-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
           # { name = "ppplanet-b", type = "CNAME", ttl = "300", records = ["pp-cafm-db-a.planetfm.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "cafmtwebx", type = "A", lbs_map = "pp-webx" }
+          # { name = "cafmtwebx", type = "A", lbs_map_key = "webx" } Create in subsequent PR to LB webx
         ]
       }
     }
