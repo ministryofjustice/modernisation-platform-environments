@@ -20,6 +20,12 @@ data "aws_subnets" "shared-private" {
   }
 }
 
+data "aws_lb_target_group" "target_group" {
+  tags = {
+    "Name" = "${var.app_name}-tg-${var.environment}"
+  }
+}
+
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
   desired_capacity    = var.ec2_desired_capacity
@@ -291,16 +297,22 @@ resource "aws_ecs_service" "ecs_service" {
   task_definition = data.aws_ecs_task_definition.task_definition.id
   desired_count   = var.app_count
 
-  # health_check_grace_period_seconds = 300
-
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
     weight            = 1
   }
 
+  health_check_grace_period_seconds = 300
+
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
+  }
+
+  load_balancer {
+    target_group_arn = data.aws_lb_target_group.target_group.arn
+    container_name   = var.app_name
+    container_port   = var.server_port
   }
 
   depends_on = [

@@ -24,5 +24,5 @@ module "windows-ecs" {
   ec2_egress_rules        = {}#local.ec2_egress_rules
   tags_common             = local.tags
 
-  # depends_on = [aws_lb_listener.listener]
+  depends_on = [aws_lb_listener.listener]
 }
