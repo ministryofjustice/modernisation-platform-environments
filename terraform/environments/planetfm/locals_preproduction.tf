@@ -215,7 +215,7 @@ locals {
             protocol               = "HTTPS"
             certificate_arn_lookup = "planetfm_wildcard_cert"
             default_action = {
-              type              = "fixed-response"
+              type = "fixed-response"
               fixed_response = {
                 content_type = "text/plain"
                 message_body = "Not implemented"
