@@ -2,15 +2,14 @@
   {
     "name": "${app_name}",
     "image": "${ecr_url}:${docker_image_tag}",
-    "essential": true,
-    "cpu": 992,
+    "cpu": 256,
     "portMappings": [
       {
         "containerPort": 80,
         "hostPort": 8080
       }
     ],
-    "memory": 5000,
+    "memory": 1024,
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
@@ -28,6 +27,7 @@
         "name": "APP_LOG_LEVEL",
         "value": "debug"
       }
-    ]
+    ],
+    "essential": true,
   }
 ]
