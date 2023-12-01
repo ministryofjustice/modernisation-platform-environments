@@ -189,8 +189,8 @@ locals {
         }
         listeners = {
           https = {
-            port            = 443
-            protocol        = "HTTPS"
+            port                   = 443
+            protocol               = "HTTPS"
             certificate_arn_lookup = "planetfm_wildcard_cert"
             default_action = {
               type              = "forward"
