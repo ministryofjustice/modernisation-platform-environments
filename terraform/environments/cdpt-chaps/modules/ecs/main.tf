@@ -290,7 +290,7 @@ resource "aws_ecs_service" "ecs_service" {
   desired_count   = var.app_count
   launch_type     = "EC2"
 
-  # health_check_grace_period_seconds = 300
+  health_check_grace_period_seconds = 300
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
