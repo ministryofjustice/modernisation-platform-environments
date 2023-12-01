@@ -52,13 +52,13 @@ locals {
       }]
     }
   }
-  baseline_iam_roles                     = {}
-  baseline_iam_service_linked_roles      = {}
-  baseline_key_pairs                     = {}
-  baseline_kms_grants                    = {}
-  baseline_lbs                           = {}
-  baseline_route53_resolvers             = {}
-  baseline_route53_zones                 = {}
+  baseline_iam_roles                = {}
+  baseline_iam_service_linked_roles = {}
+  baseline_key_pairs                = {}
+  baseline_kms_grants               = {}
+  baseline_lbs                      = {}
+  baseline_route53_resolvers        = {}
+  baseline_route53_zones            = {}
 
   baseline_s3_buckets = {
     s3-bucket = {

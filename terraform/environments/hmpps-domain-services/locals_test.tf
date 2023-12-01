@@ -54,7 +54,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
             rds_hostname = "RDSConnectionBroker"
           }))
         })
@@ -82,7 +82,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
             rds_hostname = "RDSLicensing"
           }))
         })
@@ -110,7 +110,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
             rds_hostname = "RDSWebAccess"
           }))
         })
@@ -138,7 +138,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
             rds_hostname = "RDSGateway"
           }))
         })
@@ -166,7 +166,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/rds.yaml.tftpl",{
+          user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
             rds_hostname = "RDSSessionHost"
           }))
         })
@@ -186,6 +186,64 @@ locals {
           component   = "RDS Session Host"
           server-type = "hmpps-windows_2022"
         }
+      }
+    }
+
+    baseline_lbs = {
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        load_balancer_type       = "application"
+        force_destroy_bucket     = true
+        subnets = [
+          module.environment.subnet["private"]["eu-west-2a"].id,
+          module.environment.subnet["private"]["eu-west-2b"].id,
+        ]
+        security_groups                  = ["load-balancer"]
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
+
+        instance_target_groups = {
+          rds-gateway-80 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              port                = 80
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            #attachments = [
+            #  { ec2_instance_name = "rds-gateway" },
+            #]
+          }
+        }
+
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "HTTP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "rds-gateway-80"
+            }
+          }
+        }
+      }
+    }
+
+    baseline_route53_zones = {
+      "test.hmpps-domain-services.service.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "private", type = "A", lbs_map_key = "private" },
+        ]
       }
     }
   }
