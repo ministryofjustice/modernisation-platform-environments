@@ -5,6 +5,11 @@ locals {
       passwords = { description = "database passwords" }
     }
   }
+  database_secretsmanager_secrets = {
+    secrets = {
+      passwords = { description = "database passwords" }
+    }
+  }
 
   database_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
@@ -108,6 +113,9 @@ locals {
 
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
+    secretsmanager_secrets = {
+      asm-passwords = {}
+    }
     ssm_parameters = {
       asm-passwords = {}
     }

@@ -14,7 +14,7 @@ parameters:
     description: "Username with domain join permissions"
   domainJoinPassword:
     type: "String"
-    description: "Password for domain join user"
+    description: "Password for domain join user (NOTE: Do not use a password containing quotes)"
   newHostname:
     type: "String"
     description: "If over-written, the hostname will be changed to this value. If un-changed the existing hostname will be kept. The new hostname must be 15 characters or less"

@@ -26,12 +26,22 @@ locals {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
-          }
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
         ]
       }
     }
@@ -123,6 +133,27 @@ locals {
       #   #   { name = "web", type = "A", lbs_map_key = "private" }, # "web.pp.oasys.service.justice.gov.uk"
       #   # ]
       # }
+    }
+
+    baseline_cloudwatch_log_groups = {
+      session-manager-logs = {
+        retention_in_days = 14
+      }
+      cwagent-var-log-messages = {
+        retention_in_days = 14
+      }
+      cwagent-var-log-secure = {
+        retention_in_days = 14
+      }
+      cwagent-windows-system = {
+        retention_in_days = 14
+      }
+      cwagent-oasys-autologoff = {
+        retention_in_days = 14
+      }
+      cwagent-web-logs = {
+        retention_in_days = 14
+      }
     }
 
   }

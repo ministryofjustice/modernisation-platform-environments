@@ -26,6 +26,29 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   max_size              = var.ec2_max_size
   min_size              = var.ec2_min_size
   protect_from_scale_in = true
+  metrics_granularity   = "1Minute"
+  enabled_metrics   = [
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupDesiredCapacity",
+    "GroupInServiceInstances",
+    "GroupPendingInstances",
+    "GroupStandbyInstances",
+    "GroupTerminatingInstances",
+    "GroupTotalInstances",
+    "GroupInServiceCapacity",
+    "GroupPendingCapacity",
+    "GroupStandbyCapacity",
+    "GroupTerminatingCapacity",
+    "GroupTotalCapacity",
+    "WarmPoolDesiredCapacity",
+    "WarmPoolWarmedCapacity",
+    "WarmPoolPendingCapacity",
+    "WarmPoolTerminatingCapacity",
+    "WarmPoolTotalCapacity",
+    "GroupAndWarmPoolDesiredCapacity",
+    "GroupAndWarmPoolTotalCapacity"
+  ]
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id

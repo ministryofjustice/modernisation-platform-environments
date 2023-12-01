@@ -19,6 +19,11 @@ locals {
           event_source_name = "aws.partner/auth0.com/ministryofjustice-data-platform-development-a628362c-f79b-46e9-9604-7c9861565a1b/auth0.logs"
         }
       }
+      datahub_role = "openmetadata"
+      datahub_target_accounts = [
+        local.environment_management.account_ids["data-platform-development"],
+        local.environment_management.account_ids["analytical-platform-data-production"]
+      ]
     }
     production = {
       eks_cluster_arn                = "arn:aws:eks:eu-west-1:312423030077:cluster/production-dBSvju9Y"
@@ -35,6 +40,11 @@ locals {
           event_source_name = "aws.partner/auth0.com/ministryofjustice-data-platform-e95e4fb0-f6f8-455f-9b62-61608adafd69/auth0.logs"
         }
       }
+      datahub_role = "openmetadata"
+      datahub_target_accounts = [
+        local.environment_management.account_ids["data-platform-production"],
+        local.environment_management.account_ids["analytical-platform-data-production"]
+      ]
     }
   }
 }

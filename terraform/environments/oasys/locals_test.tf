@@ -116,6 +116,56 @@ locals {
           }
         ]
       }
+      Ec2T1DatabasePolicy = {
+        description = "Permissions required for T1 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T2DatabasePolicy = {
+        description = "Permissions required for T2 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
+            ]
+          }
+        ]
+      }
     }
 
     baseline_ec2_instances = {
@@ -123,6 +173,11 @@ locals {
       ## T2
       ##
       "t2-${local.application_name}-db-a" = merge(local.database_a, {
+        config = merge(local.database_a.config, {
+          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+            "Ec2T2DatabasePolicy",
+          ])
+        })
         tags = merge(local.database_a.tags, {
           description                             = "t2 ${local.application_name} database"
           "${local.application_name}-environment" = "t2"
@@ -172,6 +227,11 @@ locals {
       ## T1
       ##
       "t1-${local.application_name}-db-a" = merge(local.database_a, {
+        config = merge(local.database_a.config, {
+          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+            "Ec2T1DatabasePolicy",
+          ])
+        })
         tags = merge(local.database_a.tags, {
           description                             = "t1 ${local.application_name} database"
           "${local.application_name}-environment" = "t1"
@@ -198,11 +258,11 @@ locals {
         # })
         tags = merge(local.bip_b.tags, {
           # instance-scheduling = "skip-scheduling"
-          oasys-environment   = "t1"
-          bip-db-name         = "T1BIPINF"
-          bip-db-hostname     = "t1-oasys-db-a"
-          oasys-db-name       = "T1OASYS"
-          oasys-db-hostname   = "t1-oasys-db-a"
+          oasys-environment = "t1"
+          bip-db-name       = "T1BIPINF"
+          bip-db-hostname   = "t1-oasys-db-a"
+          oasys-db-name     = "T1OASYS"
+          oasys-db-hostname = "t1-oasys-db-a"
         })
       })
 
@@ -552,6 +612,27 @@ locals {
           # { name = "t1.${local.application_name}", type = "A", lbs_map_key = "public" },
           # { name = "web.t1.${local.application_name}", type = "A", lbs_map_key = "public" },
         ]
+      }
+    }
+
+    baseline_cloudwatch_log_groups = {
+      session-manager-logs = {
+        retention_in_days = 7
+      }
+      cwagent-var-log-messages = {
+        retention_in_days = 7
+      }
+      cwagent-var-log-secure = {
+        retention_in_days = 7
+      }
+      cwagent-windows-system = {
+        retention_in_days = 7
+      }
+      cwagent-oasys-autologoff = {
+        retention_in_days = 7
+      }
+      cwagent-web-logs = {
+        retention_in_days = 7
       }
     }
   }

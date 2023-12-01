@@ -236,8 +236,14 @@ variable "ec2_autoscaling_groups" {
       value = optional(string)
     })))
     secretsmanager_secrets = optional(map(object({
-      description = optional(string)
-      kms_key_id  = optional(string, "general")
+      description             = optional(string)
+      kms_key_id              = optional(string, "general")
+      recovery_window_in_days = optional(number)
+      random = optional(object({
+        length  = number
+        special = optional(bool)
+      }))
+      value = optional(string)
     })))
     lb_target_groups = optional(map(object({
       port                 = optional(number)
@@ -351,8 +357,14 @@ variable "ec2_instances" {
       value = optional(string)
     })))
     secretsmanager_secrets = optional(map(object({
-      description = optional(string)
-      kms_key_id  = optional(string, "general")
+      description             = optional(string)
+      kms_key_id              = optional(string, "general")
+      recovery_window_in_days = optional(number)
+      random = optional(object({
+        length  = number
+        special = optional(bool)
+      }))
+      value = optional(string)
     })))
     route53_records = optional(object({
       create_internal_record = bool
@@ -562,8 +574,8 @@ variable "lbs" {
     load_balancer_type               = optional(string, "application")
     security_groups                  = list(string)
     subnets                          = list(string)
-    existing_bucket_name             = optional(string, "") # NOTE: module default value is empty string ""
-    enable_cross_zone_load_balancing = optional(bool, false) # network and gateway lb types only, application lb's this is always true
+    existing_bucket_name             = optional(string, "")                      # NOTE: module default value is empty string ""
+    enable_cross_zone_load_balancing = optional(bool, false)                     # network and gateway lb types only, application lb's this is always true
     dns_record_client_routing_policy = optional(string, "any_availability_zone") # network load-balancer types only
     instance_target_groups = optional(map(object({
       port                 = optional(number)
@@ -859,7 +871,7 @@ variable "secretsmanager_secrets" {
   # /database/my_db2_2/asm_password
   # /database/my_db2_2/sys_password
   #
-  description = "Create a placeholder SecretManager secret, or a secret with a given value (randomly generated, from file, or value set directly).  Use this instead of SSM Parameters secure strings if you need to share the secret across accounts.  The top-level key is used as a prefix for the secret name, e.g. /database/db1.  Then define a map of secrets to create underneath that prefix.  Secret name is {prefix}{top-level-map-key}{postfix}{secrets-map-key}"
+  description = "Create a placeholder SecretManager secret, or a secret with a given value (randomly generated, from file, or value set directly).  The top-level key is used as a prefix for the secret name, e.g. /database/db1.  Then define a map of secrets to create underneath that prefix.  Secret name is {prefix}{top-level-map-key}{postfix}{secrets-map-key}.  Set recovery_window_in_days to zero if you want to delete secret immediately"
   type = map(object({
     prefix     = optional(string, "")
     postfix    = optional(string, "/")
@@ -878,11 +890,25 @@ variable "secretsmanager_secrets" {
         values   = list(string)
       })), [])
     })))
-    recovery_window_in_days = optional(number, 0)
+    recovery_window_in_days = optional(number)
     secrets = map(object({
       description = optional(string)
       file        = optional(string)
       kms_key_id  = optional(string)
+      policy = optional(list(object({
+        effect    = string
+        actions   = list(string)
+        resources = list(string)
+        principals = optional(object({
+          type        = string
+          identifiers = list(string)
+        }))
+        conditions = optional(list(object({
+          test     = string
+          variable = string
+          values   = list(string)
+        })), [])
+      })))
       random = optional(object({
         length  = number
         special = optional(bool)

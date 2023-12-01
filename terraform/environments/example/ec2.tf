@@ -4,7 +4,7 @@
 
 # EC2 Created via module
 module "ec2_test_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.3.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -13,7 +13,7 @@ module "ec2_test_instance" {
   name                          = each.key
   ami_name                      = each.value.ami_name
   ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
-  instance                      = merge(local.instance, lookup(each.value, "instance", {}))
+  instance                      = merge(local.instance, lookup(each.value, "instance", { disable_api_stop = false }))
   ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
   ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})

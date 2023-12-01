@@ -46,18 +46,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*PP/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/PP*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
@@ -103,6 +101,9 @@ locals {
           }
         })
 
+        secretsmanager_secrets = {
+          asm-passwords = {}
+        }
         ssm_parameters = {
           asm-passwords = {}
         }

@@ -59,18 +59,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T1/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T1*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
@@ -86,18 +84,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T2/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T2*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
@@ -113,18 +109,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T3/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T3*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/*",
@@ -139,13 +133,13 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t1/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T1/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T1*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-*",
             ]
           }
         ]
@@ -156,13 +150,13 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t2/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T2/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T2*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-*",
             ]
           }
         ]
@@ -173,13 +167,13 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/t3/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*T3/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/T3*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t3/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/weblogic-*",
             ]
           }
         ]
@@ -615,7 +609,13 @@ locals {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms,
           module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup, {
+            cpu-utilization-high = merge(local.database_ec2_cloudwatch_metric_alarms["cpu-utilization-high"], {
+              evaluation_periods  = "300" # CPU can spike for 5 hours during DB restore
+              datapoints_to_alarm = "300"
+              alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 5 hours on a test nomis-db instance"
+            })
+          }
         )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"
