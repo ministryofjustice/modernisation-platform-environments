@@ -154,7 +154,7 @@ locals {
       })
     }
     baseline_lbs = {
-      webx = {
+      private = {
         internal_lb                      = true
         enable_delete_protection         = false
         loadbalancer_type                = "application"
@@ -259,7 +259,8 @@ locals {
           # { name = "ppplanet-b", type = "CNAME", ttl = "300", records = ["pp-cafm-db-a.planetfm.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          # { name = "cafmtwebx", type = "A", lbs_map_key = "webx" } Create in subsequent PR to LB webx
+          # { name = "cafmtx", type = "A", lbs_map_key = "private" } Create in subsequent PR to LB private deployment
+          # { name = "cafmtwebx", type = "A", lbs_map_key = "private" } Create in subsequent PR to LB private deployment
         ]
       }
     }
