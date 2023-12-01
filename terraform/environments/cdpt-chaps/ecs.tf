@@ -8,7 +8,7 @@ module "windows-ecs" {
   environment             = local.environment
   ami_image_id            = local.app_data.accounts[local.environment].ami_image_id
   instance_type           = local.app_data.accounts[local.environment].instance_type
-  user_data               = ""#base64encode(data.template_file.launch-template.rendered)
+  user_data               = local.user_data
   key_name                = local.app_data.accounts[local.environment].key_name
   task_definition         = local.task_definition
   ec2_desired_capacity    = local.app_data.accounts[local.environment].ec2_desired_capacity

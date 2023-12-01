@@ -7,4 +7,6 @@ locals {
     docker_image_tag    = local.application_data.accounts[local.environment].docker_image_tag
     region              = local.application_data.accounts[local.environment].region
   })
+
+  user_data = base64encode(file("./user-data.txt"))
 }
