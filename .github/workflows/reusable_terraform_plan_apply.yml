@@ -65,6 +65,8 @@ on:
     secrets:
       modernisation_platform_environments:
         required: true
+      modernisation_platform_account_id:
+        required: false
       pipeline_github_token:
         required: true
 
