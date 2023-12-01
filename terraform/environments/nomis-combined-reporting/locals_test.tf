@@ -86,6 +86,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        cloudwatch_metric_alarms = local.tomcat_cloudwatch_metric_alarms
         tags = merge(local.tomcat_ec2_default.tags, {
           description                          = "For testing BIP tomcat installation and configurations"
           nomis-combined-reporting-environment = "t1"
@@ -98,6 +99,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "For testing BIP 4.3 installation and configurations"
           nomis-combined-reporting-environment = "t1"

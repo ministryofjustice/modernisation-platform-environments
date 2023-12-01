@@ -6,7 +6,7 @@ locals {
     }
   }
 
-  database_ec2_cloudwatch_metric_alarms = merge(
+  database_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status, {
@@ -24,7 +24,7 @@ locals {
       }
   })
 
-  database_ec2_misload_cloudwatch_metric_alarms = {
+  database_misload_cloudwatch_metric_alarms = {
     misload_error = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "1"

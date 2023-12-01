@@ -101,6 +101,18 @@ locals {
     }
   }
 
+  tomcat_cloudwatch_metric_alarms = merge(
+    module.baseline_presets.cloudwatch_metric_alarms.ec2,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
+  )
+
+  tomcat_cloudwatch_log_groups = {
+    cwagent-tomcat-logs = {
+      retention_in_days = 30
+    }
+  }
+
   tomcat_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {

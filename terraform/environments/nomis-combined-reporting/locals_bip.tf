@@ -105,7 +105,7 @@ locals {
   )
 
   bip_cloudwatch_log_groups = {
-    cwagent-bip-cmc-logs = {
+    cwagent-bip-logs = {
       retention_in_days = 30
     }
   }
