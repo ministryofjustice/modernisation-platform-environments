@@ -153,6 +153,53 @@ locals {
         })
       })
     }
+    baseline_lbs = {
+      pp-webx = {
+        internal_lb                      = true
+        enable_delete_protection         = false
+        loadbalancer_type                = "application"
+        idle_timeout                     = 3600
+        security_groups                  = ["loadbalancer"]
+        subnets                          = module.environment.subnets["private"].ids
+        enable_cross_zone_load_balancing = true
+
+        instance_target_groups = {
+          pp-web-80 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              path                = "/"
+              healthy_threshold   = 3
+              unhealthy_threshold = 5
+              timeout             = 5
+              interval            = 30
+              matcher             = "200-399"
+              port                = 80
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-cafm-w-4-b" },
+              { ec2_instance_name = "pp-cafm-w-5-a" },
+            ]
+          }
+        }
+        listeners = {
+          https = {
+            port            = 443
+            protocol        = "HTTPS"
+            certificate_arn = module.baseline_presets.acm_certificates.planetfm_wildcard_cert.arn
+            default_action = {
+              type             = "forward"
+              target_group_arn = module.baseline_presets.lbs.pp-web.instance_target_groups.pp-web-80.arn
+            }
+          }
+        }
+      }
+    }
     baseline_route53_zones = {
       "pp.planetfm.service.justice.gov.uk" = {
         records = [
@@ -160,6 +207,9 @@ locals {
           # { name = "ppplanet", type = "A", ttl = "300", records = ["10.40.50.132"] },
           # { name = "ppplanet-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
           # { name = "ppplanet-b", type = "CNAME", ttl = "300", records = ["pp-cafm-db-a.planetfm.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+        ]
+        lb_alias_records = [
+          { name = "cafmtwebx", type = "A", lbs_map = "pp-webx" }
         ]
       }
     }
