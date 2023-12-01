@@ -1,0 +1,9 @@
+data-platform:
+  sso_uuid: "16a2d234-1031-70b5-2657-7f744c55e48f"
+  cloudwatch_sources:
+    - data-platform-apps-and-tools-development
+    - data-platform-development
+    - data-platform-test
+    - data-platform-preproduction
+  prometheus_sources:
+    - data-platform-apps-and-tools-development
