@@ -1,8 +1,44 @@
-resource "aws_security_group" "db_ec2_instance_sg" {
+resource "aws_security_group" "db_ec2" {
   name        = format("%s-sg-delius-db-ec2-instance", var.env_name)
   description = "Controls access to db ec2 instance"
   vpc_id      = var.vpc_id
   tags = merge(var.tags,
     { Name = lower(format("%s-sg-delius-db-ec2-instance", var.env_name)) }
+  )
+}
+
+resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_https_out" {
+  security_group_id = aws_security_group.db_ec2.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  description       = "Allow communication out on port 443, e.g. for SSM"
+  tags = merge(var.tags,
+    { Name = "https-out" }
+  )
+}
+
+resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_rman" {
+  security_group_id = aws_security_group.db_ec2.id
+  cidr_ipv4         = var.environment_config.legacy_engineering_vpc_cidr
+  from_port         = 1521
+  to_port           = 1521
+  ip_protocol       = "tcp"
+  description       = "Allow communication out on port 1521 to legacy rman"
+  tags = merge(var.tags,
+    { Name = "legacy-rman-out" }
+  )
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
+  security_group_id = aws_security_group.db_ec2.id
+  cidr_ipv4         = var.environment_config.legacy_engineering_vpc_cidr
+  from_port         = 1521
+  to_port           = 1521
+  ip_protocol       = "tcp"
+  description       = "Allow communication in on port 1521 from legacy rman"
+  tags = merge(var.tags,
+    { Name = "legacy-rman-in" }
   )
 }
