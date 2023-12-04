@@ -33,7 +33,6 @@ locals {
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
           "*.${module.environment.domains.public.application_environment}",
-          "*.${local.environment}.reporting.nomis.service.justice.gov.uk",
         ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
