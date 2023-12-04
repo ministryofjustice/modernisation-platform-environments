@@ -89,7 +89,7 @@ resource "aws_grafana_workspace_api_key" "automation_key" {
 
 
 module "cloudwatch_sources" {
-  source = "./modules/cloudwatch-source"
+  source = "./modules/cloudwatch_source"
 
   datasource_names       = local.all_cloudwatch_sources
   environment_management = local.environment_management

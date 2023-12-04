@@ -171,3 +171,7 @@ data "aws_iam_session_context" "whoami" {
 data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
+
+data "aws_cloudwatch_event_bus" "auth0" {
+  name = "aws.partner/auth0.com/alpha-analytics-moj-5991c2c1-c1a9-40e6-8460-b4bef6f519e7/auth0.logs" // This was created by Auth0, we accepted it in the UI
+}
