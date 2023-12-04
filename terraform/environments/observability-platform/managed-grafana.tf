@@ -90,6 +90,12 @@ resource "grafana_data_source" "observability_platform_prometheus" {
   name       = "observability-platform-prometheus"
   url        = module.managed_prometheus.workspace_prometheus_endpoint
   is_default = true
+  json_data_encoded = jsonencode({
+    httpMethod    = "POST"
+    sigV4Auth     = true
+    sigV4AuthType = "ec2_iam_role"
+    sigV4Region   = "eu-west-2"
+  })
 }
 
 /* CloudWatch Sources */
