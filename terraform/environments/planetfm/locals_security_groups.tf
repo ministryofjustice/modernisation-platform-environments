@@ -116,13 +116,20 @@ locals {
           protocol    = -1
           self        = true
         }
-        https_web = {
-          description = "443: Allow HTTPS ingress from Azure"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
+        http_web = {
+          description     = "80: Allow HTTP ingress from LB"
+          from_port       = 80
+          to_port         = 80
+          protocol        = "TCP"
+          security_groups = ["loadbalancer"]
         }
+        # https_web = {
+        #   description = "443: Allow HTTPS ingress from Azure"
+        #   from_port   = 443
+        #   to_port     = 443
+        #   protocol    = "TCP"
+        #   cidr_blocks = local.security_group_cidrs.enduserclient
+        # }
         rdp_tcp_web = {
           description = "3389: Allow RDP UDP ingress from jumpserver"
           from_port   = 3389
