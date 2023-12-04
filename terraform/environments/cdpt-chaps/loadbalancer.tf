@@ -68,19 +68,19 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
-resource "aws_lb_listener" "https_listener" {
-  # depends_on = [aws_acm_certificate_validation.external]
+# resource "aws_lb_listener" "https_listener" {
+#   # depends_on = [aws_acm_certificate_validation.external]
 
-  load_balancer_arn = aws_lb.external.id
-  port              = "443"
-  protocol          = "HTTPS"
-  # certificate_arn   = format("arn:aws:acm:eu-west-2:%s:certificate/%s", data.aws_caller_identity.current.account_id, local.app_data.accounts[local.environment].cert_arn)
+#   load_balancer_arn = aws_lb.external.id
+#   port              = "443"
+#   protocol          = "HTTPS"
+#   # certificate_arn   = format("arn:aws:acm:eu-west-2:%s:certificate/%s", data.aws_caller_identity.current.account_id, local.app_data.accounts[local.environment].cert_arn)
 
-  default_action {
-    target_group_arn = aws_lb_target_group.target_group.id
-    type             = "forward"
-  }
-}
+#   default_action {
+#     target_group_arn = aws_lb_target_group.target_group.id
+#     type             = "forward"
+#   }
+# }
 
 resource "aws_security_group" "load_balancer_security_group" {
   name_prefix = "${local.application_name}-loadbalancer-security-group"
