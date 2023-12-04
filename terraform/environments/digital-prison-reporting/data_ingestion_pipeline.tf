@@ -71,6 +71,7 @@ module "data_ingestion_pipeline" {
 
   enable_step_function = local.enable_data_ingestion_step_function
   step_function_name   = local.data_ingestion_step_function_name
+  dms_task_time_out    = local.dms_task_time_out
 
   additional_policies = [
     "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.invoke_lambda_policy.name}",
@@ -106,7 +107,7 @@ module "data_ingestion_pipeline" {
         },
         "Invoke DMS State Control Lambda" : {
           "Type" : "Task",
-          "TimeoutSeconds" : 1200,
+          "TimeoutSeconds" : local.dms_task_time_out,
           "Resource" : "arn:aws:states:::lambda:invoke.waitForTaskToken",
           "Parameters" : {
             "Payload" : {
