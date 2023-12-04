@@ -243,7 +243,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   }
 }
 
-resource "aws_ecs_cluster_capacity_providers" "ecs_cluster-2" {
+resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
 }
 
