@@ -30,8 +30,8 @@ locals {
     region              = local.application_data.accounts[local.environment].region
   })
 
-  # user_data = base64encode(file("./user-data.txt"))
-  user_data = base64encode(templatefile("user_data.sh", {
-    app_name = local.application_name
-  }))
+  user_data = base64encode(file("./user-data.txt"))
+  # user_data = base64encode(templatefile("user_data.sh", {
+  #   app_name = local.application_name
+  # }))
 }
