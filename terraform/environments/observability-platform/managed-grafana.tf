@@ -105,3 +105,16 @@ module "cloudwatch_sources" {
   name       = each.key
   account_id = local.environment_management.account_ids[each.key]
 }
+
+/* Tenant RBAC */
+module "tenant_rbac" {
+  for_each = local.environment_configuration.observability_platform_configuration
+
+  source = "./modules/grafana/tenant-rbac"
+
+  name                = each.key
+  sso_uuid            = each.value.sso_uuid
+  cloudwatch_accounts = each.value.cloudwatch_accounts
+
+  depends_on = [module.cloudwatch_sources]
+}
