@@ -4,6 +4,18 @@ locals {
       lookup(tenant_config, "sso_uuid", [])
     ]
   ]))
+
+  all_cloudwatch_accounts = distinct(flatten([
+    for tenant_name, tenant_config in local.environment_configuration.observability_platform_configuration : [
+      lookup(tenant_config, "cloudwatch_accounts", [])
+    ]
+  ]))
+
+  all_prometheus_accounts = distinct(flatten([
+    for tenant_name, tenant_config in local.environment_configuration.observability_platform_configuration : [
+      lookup(tenant_config, "prometheus_accounts", [])
+    ]
+  ]))
 }
 
 module "managed_grafana" {
@@ -69,4 +81,18 @@ resource "aws_grafana_workspace_api_key" "automation_key" {
   lifecycle {
     replace_triggered_by = [time_static.grafana_api_key_rotation]
   }
+}
+
+/* CloudWatch Sources */
+module "cloudwatch_sources" {
+  for_each = {
+    for account in local.all_cloudwatch_accounts : account => {
+      account_id = account
+    }
+  }
+
+  source = "./modules/grafana/cloudwatch-source"
+
+  name                   = each.key
+  environment_management = local.environment_management
 }

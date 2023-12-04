@@ -8,7 +8,6 @@ locals {
           cloudwatch_accounts = [
             "data-platform-development",
             "data-platform-test",
-            "data-platform-staging",
             "data-platform-preproduction",
             "data-platform-apps-and-tools-development"
           ]
