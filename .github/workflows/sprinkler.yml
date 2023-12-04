@@ -49,10 +49,11 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      init_plan_apply_tfargs: "-backend-config=assume_role={role_arn=\"arn:aws:iam::${{ secrets.modernisation_platform_account_id }}:role/modernisation-account-terraform-state-member-access\"}"
+      init_plan_apply_tfargs:  "-backend-config=assume_role={role_arn=\"arn:aws:iam::$modernisation_platform_account_id:role/modernisation-account-terraform-state-member-access\"}"
+    env:
+      modernisation_platform_account_id: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      modernisation_platform_account_id: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
 
   destroy-development:
