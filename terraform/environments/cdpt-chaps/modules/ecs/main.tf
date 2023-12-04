@@ -27,6 +27,7 @@ data "aws_lb_target_group" "target_group" {
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
+  name                = "${var.app_name}-cluster-scaling-group"
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
   desired_capacity    = var.ec2_desired_capacity
   max_size            = var.ec2_max_size
@@ -35,12 +36,6 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
     version = "$Latest"
-  }
-
-  tag {
-    key                 = "Name"
-    value               = "${var.app_name}-cluster-scaling-group"
-    propagate_at_launch = true
   }
 
   tag {
@@ -113,11 +108,6 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   monitoring {
     enabled = true
-  }
-
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
   }
 
   iam_instance_profile {
@@ -236,7 +226,7 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
 //ECS cluster
 
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name = var.app_name
+  name = "${var.app_name}-ecs-cluster"
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -303,15 +293,10 @@ resource "aws_ecs_service" "ecs_service" {
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
-    weight            = 1
   }
 
+  force_new_deployment = true
   health_check_grace_period_seconds = 300
-
-  ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
-    type  = "spread"
-  }
 
   load_balancer {
     target_group_arn = data.aws_lb_target_group.target_group.arn
@@ -335,7 +320,13 @@ resource "aws_ecs_capacity_provider" "capacity_provider" {
   name = "${var.app_name}-capacity-provider"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
+    managed_termination_protection = "ENABLED"
+
+    managed_scaling {
+      status          = "ENABLED"
+      target_capacity = 100
+    }
   }
 
   tags = merge(
