@@ -1,11 +1,3 @@
-locals {
-  all_prometheus_accounts = distinct(flatten([
-    for tenant_name, tenant_config in local.environment_configuration.observability_platform_configuration : [
-      lookup(tenant_config, "prometheus_accounts", [])
-    ]
-  ]))
-}
-
 module "managed_prometheus" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/managed-service-prometheus/aws"

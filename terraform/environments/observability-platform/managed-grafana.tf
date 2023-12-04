@@ -1,17 +1,3 @@
-locals {
-  all_sso_uuids = distinct(flatten([
-    for tenant_name, tenant_config in local.environment_configuration.observability_platform_configuration : [
-      lookup(tenant_config, "sso_uuid", [])
-    ]
-  ]))
-
-  all_cloudwatch_accounts = distinct(flatten([
-    for tenant_name, tenant_config in local.environment_configuration.observability_platform_configuration : [
-      lookup(tenant_config, "cloudwatch_accounts", [])
-    ]
-  ]))
-}
-
 module "managed_grafana" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
