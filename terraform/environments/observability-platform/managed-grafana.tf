@@ -43,10 +43,9 @@ module "managed_grafana" {
     "ADMIN" = {
       "group_ids" = ["16a2d234-1031-70b5-2657-7f744c55e48f"] # observability-platform
     }
-    # Seeing a cycle issue with the below, so commenting out for now
-    # "VIEWER" = {
-    #   "group_ids" = local.all_sso_uuids
-    # }
+    "VIEWER" = {
+      "group_ids" = local.all_sso_uuids
+    }
   }
 
   tags = local.tags

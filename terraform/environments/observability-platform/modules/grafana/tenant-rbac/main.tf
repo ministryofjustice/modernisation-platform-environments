@@ -17,6 +17,9 @@ resource "grafana_folder_permission" "this" {
   }
 }
 
+/* Commenting out as the following code isn't working as expected.
+   I've created a ticket with Grafana Labs
+
 data "grafana_data_source" "this" {
   for_each = toset(var.cloudwatch_accounts)
 
@@ -33,3 +36,4 @@ resource "grafana_data_source_permission" "this" {
     permission = "Query"
   }
 }
+*/
