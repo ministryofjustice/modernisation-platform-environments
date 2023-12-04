@@ -127,6 +127,7 @@ resource "aws_secretsmanager_secret_version" "ap_export_access_key_id" {
 resource "aws_secretsmanager_secret" "ap_export_secret_access_key" {
   #checkov:skip=CKV_AWS_149
   name = "ap_export_secret_access_key"
+  recovery_window_in_days = 0
   tags = merge(
     local.tags,
     {
