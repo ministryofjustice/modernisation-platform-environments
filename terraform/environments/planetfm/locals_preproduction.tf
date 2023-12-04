@@ -248,8 +248,8 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "cafmtwebx.pp.planetfm.service.justice.gov.uk",
-                      "pp-cafmtwebx.az.justice.gov.uk",
+                      "cafmwebx.pp.planetfm.service.justice.gov.uk",
+                      "pp-cafmwebx.az.justice.gov.uk",
                     ]
                   }
                 }]
@@ -269,7 +269,7 @@ locals {
         ]
         lb_alias_records = [
           { name = "cafmtx", type = "A", lbs_map_key = "private" },
-          { name = "cafmtwebx", type = "A", lbs_map_key = "private" },
+          # { name = "cafmwebx", type = "A", lbs_map_key = "private" },
         ]
       }
     }
