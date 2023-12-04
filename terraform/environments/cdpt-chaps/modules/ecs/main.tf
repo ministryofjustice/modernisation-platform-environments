@@ -27,11 +27,21 @@ data "aws_lb_target_group" "target_group" {
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
-  name                = "${var.app_name}-cluster-scaling-group"
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
   desired_capacity    = var.ec2_desired_capacity
   max_size            = var.ec2_max_size
   min_size            = var.ec2_min_size
+
+  launch_template {
+    id      = aws_launch_template.ec2-launch-template.id
+    version = "$Latest"
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "${var.app_name}-cluster-scaling-group"
+    propagate_at_launch = true
+  }
 
   tag {
     key                 = "AmazonECSManaged"
@@ -88,6 +98,67 @@ resource "aws_security_group" "cluster_ec2" {
       Name = "${var.app_name}-cluster-ec2-security-group"
     }
   )
+}
+
+# EC2 launch template - settings to use for new EC2s added to the group
+# Note - when updating this you will need to manually terminate the EC2s
+# so that the autoscaling group creates new ones using the new launch template
+
+resource "aws_launch_template" "ec2-launch-template" {
+  name_prefix   = "${var.app_name}-ec2-launch-template"
+  image_id      = var.ami_image_id
+  instance_type = var.instance_type
+  key_name      = var.key_name
+  ebs_optimized = true
+
+  monitoring {
+    enabled = true
+  }
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_instance_profile.name
+  }
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups             = [aws_security_group.cluster_ec2.id]
+  }
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_size           = 30
+      volume_type           = "gp2"
+      iops                  = 0
+    }
+  }
+
+  user_data = var.user_data
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(tomap({
+      "Name" = "${var.app_name}-ecs-cluster"
+    }), var.tags_common)
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags = merge(tomap({
+      "Name" = "${var.app_name}-ecs-cluster"
+    }), var.tags_common)
+  }
+
+  tags = merge(tomap({
+    "Name" = "${var.app_name}-ecs-cluster-template"
+  }), var.tags_common)
 }
 
 # IAM Role, policy and instance profile (to attach the role to the EC2)
@@ -165,7 +236,7 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
 //ECS cluster
 
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "${var.app_name}-ecs-cluster"
+  name = var.app_name
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -232,10 +303,15 @@ resource "aws_ecs_service" "ecs_service" {
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
+    weight            = 1
   }
 
-  force_new_deployment = true
   health_check_grace_period_seconds = 300
+
+  ordered_placement_strategy {
+    field = "attribute:ecs.availability-zone"
+    type  = "spread"
+  }
 
   load_balancer {
     target_group_arn = data.aws_lb_target_group.target_group.arn
@@ -259,13 +335,7 @@ resource "aws_ecs_capacity_provider" "capacity_provider" {
   name = "${var.app_name}-capacity-provider"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
-    managed_termination_protection = "ENABLED"
-
-    managed_scaling {
-      status          = "ENABLED"
-      target_capacity = 100
-    }
+    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
   }
 
   tags = merge(
