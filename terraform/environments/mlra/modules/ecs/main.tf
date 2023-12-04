@@ -27,7 +27,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   min_size              = var.ec2_min_size
   protect_from_scale_in = true
   metrics_granularity   = "1Minute"
-  enabled_metrics   = [
+  enabled_metrics = [
     "GroupMinSize",
     "GroupMaxSize",
     "GroupDesiredCapacity",
