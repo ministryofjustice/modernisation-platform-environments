@@ -1,3 +1,11 @@
+locals {
+  all_sso_uuids = distinct(flatten([
+    for tenant_name, tenant_config in local.environment_configuration.observability_platform_configuration : [
+      lookup(tenant_config, "sso_uuid", [])
+    ]
+  ]))
+}
+
 module "managed_grafana" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
@@ -29,11 +37,15 @@ module "managed_grafana" {
     "ADMIN" = {
       "group_ids" = ["16a2d234-1031-70b5-2657-7f744c55e48f"] # observability-platform
     }
+    "VIEWER" = {
+      "group_ids" = local.all_sso_uuids
+    }
   }
 
   tags = local.tags
 }
 
+/* Grafana API */
 locals {
   grafana_api_key_expiration_days    = 30
   grafana_api_key_expiration_seconds = 60 * 60 * 24 * local.grafana_api_key_expiration_days
