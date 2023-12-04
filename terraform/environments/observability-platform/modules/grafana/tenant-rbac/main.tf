@@ -16,3 +16,20 @@ resource "grafana_folder_permission" "this" {
     permission = "Admin"
   }
 }
+
+data "grafana_data_source" "this" {
+  for_each = toset(var.cloudwatch_accounts)
+
+  name = "${each.key}-cloudwatch"
+}
+
+resource "grafana_data_source_permission" "this" {
+  for_each = toset(var.cloudwatch_accounts)
+
+  datasource_id = data.grafana_data_source.this[each.key].id
+
+  permissions {
+    team_id    = grafana_team.this.id
+    permission = "Query"
+  }
+}
