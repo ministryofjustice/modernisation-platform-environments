@@ -82,14 +82,6 @@
         "valueFrom": "${os_vts_api_key}"
       },
       {
-        "name": "AP_IMPORT_ACCESS_KEY_ID",
-        "valueFrom": "${ap_import_access_key_id}"
-      },
-      {
-        "name": "AP_IMPORT_SECRET_ACCESS_KEY",
-        "valueFrom": "${ap_import_secret_access_key}"
-      },
-      {
         "name": "AP_EXPORT_ACCESS_KEY_ID",
         "valueFrom": "${ap_export_access_key_id}"
       },
