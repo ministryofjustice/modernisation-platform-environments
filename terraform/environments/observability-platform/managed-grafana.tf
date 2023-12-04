@@ -49,9 +49,10 @@ module "managed_grafana" {
     "ADMIN" = {
       "group_ids" = ["16a2d234-1031-70b5-2657-7f744c55e48f"] # observability-platform
     }
-    "VIEWER" = {
-      "group_ids" = local.all_sso_uuids
-    }
+    # Seeing a cycle issue with the below, so commenting out for now
+    # "VIEWER" = {
+    #   "group_ids" = local.all_sso_uuids
+    # }
   }
 
   tags = local.tags
@@ -81,6 +82,18 @@ resource "aws_grafana_workspace_api_key" "automation_key" {
   lifecycle {
     replace_triggered_by = [time_static.grafana_api_key_rotation]
   }
+}
+
+/* Prometheus Source */
+resource "grafana_data_source" "observability_platform_prometheus" {
+  type = "prometheus"
+  name = "observability-platform-prometheus"
+
+  is_default = true
+
+  json_data_encoded = jsonencode({
+    url = module.managed_prometheus.workspace_prometheus_endpoint
+  })
 }
 
 /* CloudWatch Sources */
