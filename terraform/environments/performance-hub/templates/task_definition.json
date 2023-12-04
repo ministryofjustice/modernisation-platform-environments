@@ -82,14 +82,6 @@
         "valueFrom": "${os_vts_api_key}"
       },
       {
-        "name": "PECS_BASM_PROD_ACCESS_KEY_ID",
-        "valueFrom": "${pecs_basm_prod_access_key_id}"
-      },
-      {
-        "name": "PECS_BASM_PROD_SECRET_ACCESS_KEY",
-        "valueFrom": "${pecs_basm_prod_secret_access_key}"
-      },
-      {
         "name": "AP_IMPORT_ACCESS_KEY_ID",
         "valueFrom": "${ap_import_access_key_id}"
       },
