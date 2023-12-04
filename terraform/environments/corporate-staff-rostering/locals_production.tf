@@ -950,7 +950,7 @@ locals {
               { ec2_instance_name = "pd-csr-w-6-b" },
             ]
           }
-          pd-csr-w-78-7781 = {
+          pd-csr-w-56-7781 = {
             port     = 7781
             protocol = "TCP"
             health_check = {
