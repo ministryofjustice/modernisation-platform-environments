@@ -1030,12 +1030,12 @@ locals {
           { name = "trainb", type = "CNAME", ttl = "300", records = ["trainb.pp.csr.service.justice.gov.uk"] },
         ]
         # lb_alias_records = [
-          # { name = "r1", type = "A", lbs_map_key = "r12" },
-          # { name = "r2", type = "A", lbs_map_key = "r12" },
-          # { name = "r3", type = "A", lbs_map_key = "r34" },
-          # { name = "r4", type = "A", lbs_map_key = "r34" },
-          # { name = "r5", type = "A", lbs_map_key = "r56" },
-          # { name = "r6", type = "A", lbs_map_key = "r56" },
+        # { name = "r1", type = "A", lbs_map_key = "r12" },
+        # { name = "r2", type = "A", lbs_map_key = "r12" },
+        # { name = "r3", type = "A", lbs_map_key = "r34" },
+        # { name = "r4", type = "A", lbs_map_key = "r34" },
+        # { name = "r5", type = "A", lbs_map_key = "r56" },
+        # { name = "r6", type = "A", lbs_map_key = "r56" },
         #]
       }
     }
