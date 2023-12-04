@@ -164,28 +164,6 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          web-45-80 = {
-            port     = 80
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              path                = "/"
-              healthy_threshold   = 3
-              unhealthy_threshold = 5
-              timeout             = 5
-              interval            = 30
-              matcher             = "200-399"
-              port                = 80
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-cafm-w-4-b" },
-              { ec2_instance_name = "pp-cafm-w-5-a" },
-            ]
-          }
           web-23-80 = {
             port     = 80
             protocol = "HTTP"
@@ -206,6 +184,28 @@ locals {
             attachments = [
               { ec2_instance_name = "pp-cafm-w-2-b" },
               { ec2_instance_name = "pp-cafm-w-3-a" },
+            ]
+          }
+          web-45-80 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              path                = "/"
+              healthy_threshold   = 3
+              unhealthy_threshold = 5
+              timeout             = 5
+              interval            = 30
+              matcher             = "200-399"
+              port                = 80
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-cafm-w-4-b" },
+              { ec2_instance_name = "pp-cafm-w-5-a" },
             ]
           }
         }
