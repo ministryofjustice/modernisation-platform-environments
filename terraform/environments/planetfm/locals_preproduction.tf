@@ -269,7 +269,7 @@ locals {
         ]
         lb_alias_records = [
           { name = "cafmtx", type = "A", lbs_map_key = "private" },
-          # { name = "cafmwebx", type = "A", lbs_map_key = "private" },
+          { name = "cafmwebx", type = "A", lbs_map_key = "private" },
         ]
       }
     }
