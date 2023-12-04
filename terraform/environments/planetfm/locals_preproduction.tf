@@ -231,7 +231,7 @@ locals {
                   target_group_name = "web-23-80"
                 }]
                 conditions = [{
-                  host-header = {
+                  host_header = {
                     values = [
                       "cafmtx.pp.planetfm.service.justice.gov.uk",
                       "pp-cafmtx.az.justice.gov.uk",
@@ -246,7 +246,7 @@ locals {
                   target_group_name = "web-45-80"
                 }]
                 conditions = [{
-                  host-header = {
+                  host_header = {
                     values = [
                       "cafmtwebx.pp.planetfm.service.justice.gov.uk",
                       "pp-cafmtwebx.az.justice.gov.uk",
