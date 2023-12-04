@@ -69,7 +69,7 @@
         ]
       },
       "ASP.NET": {
-        "measurement":[
+        "measurement": [
           "Applications Requests in Application Queue",
           "Requests Queued",
           "Application Restarts"

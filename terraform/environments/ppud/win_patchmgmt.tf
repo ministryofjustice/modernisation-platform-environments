@@ -15,7 +15,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   operating_system = "WINDOWS"
 
   approval_rule {
-#   approve_after_days = 6 - November 2023
+    #   approve_after_days = 6 - November 2023
     approve_after_days = 1
 
     patch_filter {
@@ -23,9 +23,9 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
       values = ["WindowsServer2012", "WindowsServer2016", "WindowsServer2019", "WindowsServer2022"]
     }
     patch_filter {
-      key    = "CLASSIFICATION"
-#     values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups"] - November 2023
-      values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups","DefinitionUpdates"]
+      key = "CLASSIFICATION"
+      #     values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups"] - November 2023
+      values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups", "DefinitionUpdates"]
     }
 
     patch_filter {
@@ -35,7 +35,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   }
 
   approval_rule {
-#   approve_after_days = 6 - November 2023 
+    #   approve_after_days = 6 - November 2023 
     approve_after_days = 1
 
     patch_filter {

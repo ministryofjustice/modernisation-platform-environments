@@ -183,5 +183,5 @@ output "domain_builder_rds_endpoint" {
 ## Data Ingestion Step Function
 output "s3_file_transfer_lambda_arn" {
   description = "data Ingestion File Transfer Lambda arn"
-  value = module.s3_file_transfer_lambda.lambda_function
+  value       = module.s3_file_transfer_lambda.lambda_function
 }

@@ -14,10 +14,10 @@ resource "aws_acm_certificate" "external" {
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-app2-upgrade", var.networking[0].business-unit, local.environment),
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-db-upgrade", var.networking[0].business-unit, local.environment),
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "ccms-ebs-upgrade", var.networking[0].business-unit, local.environment),
-#    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "clamav-upgrade", var.networking[0].business-unit, local.environment),
+    #    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "clamav-upgrade", var.networking[0].business-unit, local.environment),
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "portal-ag-upgrade", var.networking[0].business-unit, local.environment),
-#    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "wgatedev1-upgrade", var.networking[0].business-unit, local.environment),
-#    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "wgatedev2-upgrade", var.networking[0].business-unit, local.environment)
+    #    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "wgatedev1-upgrade", var.networking[0].business-unit, local.environment),
+    #    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "wgatedev2-upgrade", var.networking[0].business-unit, local.environment)
   ]
 
   tags = merge(local.tags,
