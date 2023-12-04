@@ -231,11 +231,12 @@ locals {
                   target_group_name = "web-23-80"
                 }]
                 conditions = [{
-                  field = "host-header"
-                  values = [
-                    "cafmtx.pp.planetfm.service.justice.gov.uk",
-                    "pp-cafmtx.az.justice.gov.uk",
-                  ]
+                  host-header = {
+                    values = [
+                      "cafmtx.pp.planetfm.service.justice.gov.uk",
+                      "pp-cafmtx.az.justice.gov.uk",
+                    ]
+                  }
                 }]
               }
               web-45-80 = {
@@ -245,11 +246,12 @@ locals {
                   target_group_name = "web-45-80"
                 }]
                 conditions = [{
-                  field = "host-header"
-                  values = [
-                    "cafmtwebx.pp.planetfm.service.justice.gov.uk",
-                    "pp-cafmtwebx.az.justice.gov.uk",
-                  ]
+                  host-header = {
+                    values = [
+                      "cafmtwebx.pp.planetfm.service.justice.gov.uk",
+                      "pp-cafmtwebx.az.justice.gov.uk",
+                    ]
+                  }
                 }]
               }
             }
