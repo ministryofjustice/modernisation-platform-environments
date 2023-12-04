@@ -38,6 +38,12 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   }
 
   tag {
+    key                 = "Name"
+    value               = "${var.app_name}-cluster-scaling-group"
+    propagate_at_launch = true
+  }
+
+  tag {
     key                 = "AmazonECSManaged"
     value               = true
     propagate_at_launch = true
@@ -239,8 +245,6 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 
 resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
-
-  capacity_providers = [aws_ecs_capacity_provider.capacity_provider.name]
 }
 
 resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
@@ -332,10 +336,6 @@ resource "aws_ecs_capacity_provider" "capacity_provider" {
 
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
-
-    managed_scaling {
-     status                    = "ENABLED"
-   }
   }
 
   tags = merge(
