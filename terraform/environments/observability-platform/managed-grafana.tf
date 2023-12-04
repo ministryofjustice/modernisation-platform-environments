@@ -86,14 +86,10 @@ resource "aws_grafana_workspace_api_key" "automation_key" {
 
 /* Prometheus Source */
 resource "grafana_data_source" "observability_platform_prometheus" {
-  type = "prometheus"
-  name = "observability-platform-prometheus"
-
+  type       = "prometheus"
+  name       = "observability-platform-prometheus"
+  url        = module.managed_prometheus.workspace_prometheus_endpoint
   is_default = true
-
-  json_data_encoded = jsonencode({
-    url = module.managed_prometheus.workspace_prometheus_endpoint
-  })
 }
 
 /* CloudWatch Sources */
