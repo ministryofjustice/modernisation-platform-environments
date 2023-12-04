@@ -1,6 +1,5 @@
 locals {
-  name       = "${var.name}-cloudwatch"
-  account_id = var.environment_management.account_ids[var.name]
+  name = "${var.name}-cloudwatch"
 }
 
 resource "grafana_data_source" "this" {
@@ -10,7 +9,7 @@ resource "grafana_data_source" "this" {
   json_data_encoded = jsonencode({
     defaultRegion = "eu-west-2"
     authType      = "ec2_iam_role"
-    assumeRoleArn = "arn:aws:iam::${local.account_id}:role/observability-platform"
+    assumeRoleArn = "arn:aws:iam::${var.account_id}:role/observability-platform"
     externalId    = var.name
   })
 }

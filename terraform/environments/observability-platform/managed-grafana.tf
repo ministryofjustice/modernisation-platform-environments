@@ -10,12 +10,6 @@ locals {
       lookup(tenant_config, "cloudwatch_accounts", [])
     ]
   ]))
-
-  all_prometheus_accounts = distinct(flatten([
-    for tenant_name, tenant_config in local.environment_configuration.observability_platform_configuration : [
-      lookup(tenant_config, "prometheus_accounts", [])
-    ]
-  ]))
 }
 
 module "managed_grafana" {
@@ -108,6 +102,6 @@ module "cloudwatch_sources" {
 
   source = "./modules/grafana/cloudwatch-source"
 
-  name                   = each.key
-  environment_management = local.environment_management
+  name       = each.key
+  account_id = local.environment_management.account_ids[each.key]
 }
