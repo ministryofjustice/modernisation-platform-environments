@@ -211,9 +211,10 @@ locals {
         }
         listeners = {
           https = {
-            port                   = 443
-            protocol               = "HTTPS"
-            certificate_arn_lookup = "planetfm_wildcard_cert"
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["planetfm_wildcard_cert"]
             default_action = {
               type = "fixed-response"
               fixed_response = {
