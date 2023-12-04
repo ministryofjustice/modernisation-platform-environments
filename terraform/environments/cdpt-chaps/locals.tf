@@ -5,7 +5,7 @@ locals {
   ec2_ingress_rules = {
     "cluster_ec2_lb_ingress" = {
       description     = "Cluster EC2 loadbalancer ingress rule"
-      from_port       = 8080
+      from_port       = 80
       to_port         = 80
       protocol        = "tcp"
       cidr_blocks     = []
