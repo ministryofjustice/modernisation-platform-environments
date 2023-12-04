@@ -42,3 +42,21 @@ resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
     { Name = "legacy-rman-in" }
   )
 }
+
+resource "aws_vpc_security_group_egress_rule" "db_inter_conn" {
+  security_group_id            = aws_security_group.db_ec2.id
+  description                  = "Allow communication between delius db instances"
+  from_port                    = 1521
+  to_port                      = 1521
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.db_ec2.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_bastion" {
+  security_group_id            = aws_security_group.db_ec2.id
+  description                  = "bastion to testing db"
+  from_port                    = 1521
+  to_port                      = 1521
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = var.account_config.bastion_security_group_id
+}
