@@ -268,8 +268,8 @@ locals {
           # { name = "ppplanet-b", type = "CNAME", ttl = "300", records = ["pp-cafm-db-a.planetfm.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          # { name = "cafmtx", type = "A", lbs_map_key = "private" } Create in subsequent PR to LB private deployment
-          # { name = "cafmtwebx", type = "A", lbs_map_key = "private" } Create in subsequent PR to LB private deployment
+          { name = "cafmtx", type = "A", lbs_map_key = "private" },
+          { name = "cafmtwebx", type = "A", lbs_map_key = "private" },
         ]
       }
     }
