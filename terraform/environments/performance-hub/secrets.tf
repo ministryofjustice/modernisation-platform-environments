@@ -76,6 +76,7 @@ resource "aws_secretsmanager_secret_version" "os_vts_api_key" {
 resource "aws_secretsmanager_secret" "ap_import_access_key_id" {
   #checkov:skip=CKV_AWS_149
   name = "ap_import_access_key_id"
+  recovery_window_in_days = 0
   tags = merge(
     local.tags,
     {
@@ -92,6 +93,7 @@ resource "aws_secretsmanager_secret_version" "ap_import_access_key_id" {
 resource "aws_secretsmanager_secret" "ap_import_secret_access_key" {
   #checkov:skip=CKV_AWS_149
   name = "ap_import_secret_access_key"
+  recovery_window_in_days = 0
   tags = merge(
     local.tags,
     {
@@ -108,6 +110,7 @@ resource "aws_secretsmanager_secret_version" "ap_import_secret_access_key" {
 resource "aws_secretsmanager_secret" "ap_export_access_key_id" {
   #checkov:skip=CKV_AWS_149
   name = "ap_export_access_key_id"
+  recovery_window_in_days = 0
   tags = merge(
     local.tags,
     {
@@ -124,6 +127,7 @@ resource "aws_secretsmanager_secret_version" "ap_export_access_key_id" {
 resource "aws_secretsmanager_secret" "ap_export_secret_access_key" {
   #checkov:skip=CKV_AWS_149
   name = "ap_export_secret_access_key"
+  recovery_window_in_days = 0
   tags = merge(
     local.tags,
     {
@@ -139,7 +143,8 @@ resource "aws_secretsmanager_secret_version" "ap_export_secret_access_key" {
 #tfsec:ignore:AWS095
 resource "aws_secretsmanager_secret" "pecs_basm_prod_access_key_id" {
   #checkov:skip=CKV_AWS_149
-  name = "pecs_basm_prod_access_key_id"
+  name                    = "pecs_basm_prod_access_key_id"
+  recovery_window_in_days = 0
   tags = merge(
     local.tags,
     {
@@ -155,7 +160,8 @@ resource "aws_secretsmanager_secret_version" "pecs_basm_prod_access_key_id" {
 #tfsec:ignore:AWS095
 resource "aws_secretsmanager_secret" "pecs_basm_prod_secret_access_key" {
   #checkov:skip=CKV_AWS_149
-  name = "pecs_basm_prod_secret_access_key"
+  name                    = "pecs_basm_prod_secret_access_key"
+  recovery_window_in_days = 0
   tags = merge(
     local.tags,
     {

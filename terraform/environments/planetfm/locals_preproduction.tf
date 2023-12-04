@@ -153,13 +153,123 @@ locals {
         })
       })
     }
+    baseline_lbs = {
+      private = {
+        internal_lb                      = true
+        enable_delete_protection         = false
+        loadbalancer_type                = "application"
+        idle_timeout                     = 3600
+        security_groups                  = ["loadbalancer"]
+        subnets                          = module.environment.subnets["private"].ids
+        enable_cross_zone_load_balancing = true
+
+        instance_target_groups = {
+          web-23-80 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              path                = "/"
+              healthy_threshold   = 3
+              unhealthy_threshold = 5
+              timeout             = 5
+              interval            = 30
+              matcher             = "200-399"
+              port                = 80
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-cafm-w-2-b" },
+              { ec2_instance_name = "pp-cafm-w-3-a" },
+            ]
+          }
+          web-45-80 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              path                = "/"
+              healthy_threshold   = 3
+              unhealthy_threshold = 5
+              timeout             = 5
+              interval            = 30
+              matcher             = "200-399"
+              port                = 80
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-cafm-w-4-b" },
+              { ec2_instance_name = "pp-cafm-w-5-a" },
+            ]
+          }
+        }
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["planetfm_wildcard_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+            rules = {
+              web-23-80 = {
+                priority = 2380
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-23-80"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "cafmtx.pp.planetfm.service.justice.gov.uk",
+                      "pp-cafmtx.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web-45-80 = {
+                priority = 4580
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-45-80"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "cafmtwebx.pp.planetfm.service.justice.gov.uk",
+                      "pp-cafmtwebx.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          }
+        }
+      }
+    }
     baseline_route53_zones = {
       "pp.planetfm.service.justice.gov.uk" = {
         records = [
-          # set to PPFDW0030 PP SQL server for planetfm
+          # set to PPFDW0030 PP SQL server for planetfm, not applied as not used previously in testing
           # { name = "ppplanet", type = "A", ttl = "300", records = ["10.40.50.132"] },
           # { name = "ppplanet-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
           # { name = "ppplanet-b", type = "CNAME", ttl = "300", records = ["pp-cafm-db-a.planetfm.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+        ]
+        lb_alias_records = [
+          { name = "cafmtx", type = "A", lbs_map_key = "private" },
+          { name = "cafmtwebx", type = "A", lbs_map_key = "private" },
         ]
       }
     }
@@ -172,7 +282,7 @@ locals {
           "pp-cafmwebx.az.justice.gov.uk",
           "pp-cafmtx.az.justice.gov.uk",
         ]
-        external_validation_records_created = false
+        external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for planetfm ${local.environment} domains"

@@ -4,13 +4,6 @@ locals {
   # baseline config
   test_config = {
 
-    baseline_ssm_parameters = {
-      "/join_domain_linux_service_account" = {
-        parameters = {
-          passwords = {}
-        }
-      }
-    }
     baseline_secretsmanager_secrets = {
       "/join_domain_linux_service_account" = {
         secrets = {

@@ -22,13 +22,13 @@ locals {
 
 module "managed_grafana" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
   source  = "terraform-aws-modules/managed-service-grafana/aws"
   version = "~> 2.0"
 
   name = local.application_name
 
-  license_type      = "ENTERPRISE"
-  associate_license = true
+  license_type = "ENTERPRISE"
 
   account_access_type       = "CURRENT_ACCOUNT"
   authentication_providers  = ["AWS_SSO"]
@@ -37,6 +37,15 @@ module "managed_grafana" {
   notification_destinations = ["SNS"]
 
   iam_role_policy_arns = [module.amazon_managed_grafana_remote_cloudwatch_iam_policy.arn]
+
+  configuration = jsonencode({
+    unifiedAlerting = {
+      enabled = true
+    }
+    plugins = {
+      pluginAdminEnabled = true
+    }
+  })
 
   role_associations = {
     "ADMIN" = {

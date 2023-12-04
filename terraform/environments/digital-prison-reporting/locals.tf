@@ -151,7 +151,7 @@ locals {
 
   s3_all_object_actions_policy = "${local.project}_s3_all_object_actions_policy"
   all_state_machine_policy     = "${local.project}_all_state_machine_policy"
-  dynamo_db_access_policy     = "${local.project}_dynamo_db_access_policy"
+  dynamo_db_access_policy      = "${local.project}_dynamo_db_access_policy"
 
   # DPR Alerts
   enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
@@ -213,7 +213,7 @@ locals {
   create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
-  reporting_lambda_code_s3_key    = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
+  reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
   # s3 transfer lambda
   enable_s3_file_transfer_lambda         = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda
@@ -251,6 +251,7 @@ locals {
   # Data Ingestion Pipeline Step Function
   enable_data_ingestion_step_function = local.application_data.accounts[local.environment].enable_data_ingestion_step_function
   data_ingestion_step_function_name   = "${local.project}-data-ingestion-step-function-${local.environment}"
+  dms_task_time_out                   = local.application_data.accounts[local.environment].dms_task_time_out
 
   # Datamart
   create_scheduled_action_iam_role = local.application_data.accounts[local.environment].setup_scheduled_action_iam_role

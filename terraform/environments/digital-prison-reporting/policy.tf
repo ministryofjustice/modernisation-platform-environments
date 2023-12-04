@@ -92,7 +92,7 @@ resource "aws_iam_policy" "s3_all_object_actions_policy" {
 
 # Invoke Lambda Policy
 resource "aws_iam_policy" "invoke_lambda_policy" {
-  name    = local.invoke_lambda_policy
+  name = local.invoke_lambda_policy
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -112,7 +112,7 @@ resource "aws_iam_policy" "invoke_lambda_policy" {
 
 # Start DMS Task Policy
 resource "aws_iam_policy" "start_dms_task_policy" {
-  name    = local.start_dms_task_policy
+  name = local.start_dms_task_policy
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -131,7 +131,7 @@ resource "aws_iam_policy" "start_dms_task_policy" {
 
 # Trigger Glue Job Policy
 resource "aws_iam_policy" "trigger_glue_job_policy" {
-  name    = local.trigger_glue_job_policy
+  name = local.trigger_glue_job_policy
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -181,9 +181,9 @@ resource "aws_iam_policy" "all_state_machine_policy" {
     "Statement" : [
       {
         "Sid" : "StateMachineAllAccess",
-        "Action": "states:*",
+        "Action" : "states:*",
         "Effect" : "Allow",
-        "Resource": "*"
+        "Resource" : "*"
       }
     ]
   })

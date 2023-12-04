@@ -46,16 +46,16 @@ module "step_function_notification_lambda_trigger" {
 
   enable_lambda_trigger = local.enable_step_function_notification_lambda
 
-  event_name            = "${local.project}-step-function-notification-${local.env}"
-  lambda_function_arn   = module.step_function_notification_lambda.lambda_function
-  lambda_function_name  = module.step_function_notification_lambda.lambda_name
+  event_name           = "${local.project}-step-function-notification-${local.env}"
+  lambda_function_arn  = module.step_function_notification_lambda.lambda_function
+  lambda_function_name = module.step_function_notification_lambda.lambda_name
 
   trigger_event_pattern = jsonencode(
     {
-      "source": ["aws.dms"],
-      "detail-type": ["DMS Replication Task State Change"],
-      "detail": {
-        "eventId": ["DMS-EVENT-0079"]
+      "source" : ["aws.dms"],
+      "detail-type" : ["DMS Replication Task State Change"],
+      "detail" : {
+        "eventId" : ["DMS-EVENT-0079"]
       }
     }
   )
@@ -71,6 +71,7 @@ module "data_ingestion_pipeline" {
 
   enable_step_function = local.enable_data_ingestion_step_function
   step_function_name   = local.data_ingestion_step_function_name
+  dms_task_time_out    = local.dms_task_time_out
 
   additional_policies = [
     "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.invoke_lambda_policy.name}",
@@ -92,102 +93,102 @@ module "data_ingestion_pipeline" {
 
   definition = jsonencode(
     {
-      "Comment": "Data Ingestion Pipeline Step Function",
-      "StartAt": "Start DMS Replication Task",
-      "States": {
-        "Start DMS Replication Task": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
-          "Parameters": {
-            "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
-            "StartReplicationTaskType": "reload-target"
+      "Comment" : "Data Ingestion Pipeline Step Function",
+      "StartAt" : "Start DMS Replication Task",
+      "States" : {
+        "Start DMS Replication Task" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
+          "Parameters" : {
+            "ReplicationTaskArn" : "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
+            "StartReplicationTaskType" : "reload-target"
           },
-          "Next": "Invoke DMS State Control Lambda"
+          "Next" : "Invoke DMS State Control Lambda"
         },
-        "Invoke DMS State Control Lambda": {
-          "Type": "Task",
-          "TimeoutSeconds": 1200,
-          "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-          "Parameters": {
-            "Payload": {
-              "token.$": "$$.Task.Token",
-              "replicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}"
+        "Invoke DMS State Control Lambda" : {
+          "Type" : "Task",
+          "TimeoutSeconds" : local.dms_task_time_out,
+          "Resource" : "arn:aws:states:::lambda:invoke.waitForTaskToken",
+          "Parameters" : {
+            "Payload" : {
+              "token.$" : "$$.Task.Token",
+              "replicationTaskArn" : "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}"
             },
-            "FunctionName": "${module.step_function_notification_lambda.lambda_function}"
+            "FunctionName" : "${module.step_function_notification_lambda.lambda_function}"
           },
-          "Retry": [
+          "Retry" : [
             {
-              "ErrorEquals": [
+              "ErrorEquals" : [
                 "Lambda.ServiceException",
                 "Lambda.AWSLambdaException",
                 "Lambda.SdkClientException",
                 "Lambda.TooManyRequestsException"
               ],
-              "IntervalSeconds": 60,
-              "MaxAttempts": 2,
-              "BackoffRate": 2
+              "IntervalSeconds" : 60,
+              "MaxAttempts" : 2,
+              "BackoffRate" : 2
             }
           ],
-          "Next": "Start Glue Batch Job"
+          "Next" : "Start Glue Batch Job"
         },
-        "Start Glue Batch Job": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::glue:startJobRun.sync",
-          "Parameters": {
-            "JobName": "${module.glue_reporting_hub_batch_job.name}"
+        "Start Glue Batch Job" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : "${module.glue_reporting_hub_batch_job.name}"
           },
-          "Next": "Invoke S3 File Transfer Lambda"
+          "Next" : "Invoke S3 File Transfer Lambda"
         },
-        "Invoke S3 File Transfer Lambda": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-          "Parameters": {
-            "Payload": {
-              "token.$": "$$.Task.Token",
-              "sourceBucket": "${module.s3_raw_bucket.bucket_id}",
-              "destinationBucket": "${module.s3_raw_archive_bucket.bucket_id}"
+        "Invoke S3 File Transfer Lambda" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::lambda:invoke.waitForTaskToken",
+          "Parameters" : {
+            "Payload" : {
+              "token.$" : "$$.Task.Token",
+              "sourceBucket" : "${module.s3_raw_bucket.bucket_id}",
+              "destinationBucket" : "${module.s3_raw_archive_bucket.bucket_id}"
             },
-            "FunctionName": "${module.s3_file_transfer_lambda.lambda_function}"
+            "FunctionName" : "${module.s3_file_transfer_lambda.lambda_function}"
           },
-          "Retry": [
+          "Retry" : [
             {
-              "ErrorEquals": [
+              "ErrorEquals" : [
                 "Lambda.ServiceException",
                 "Lambda.AWSLambdaException",
                 "Lambda.SdkClientException",
                 "Lambda.TooManyRequestsException"
               ],
-              "IntervalSeconds": 600,
-              "MaxAttempts": 2,
-              "BackoffRate": 2
+              "IntervalSeconds" : 600,
+              "MaxAttempts" : 2,
+              "BackoffRate" : 2
             }
           ],
-          "Next": "Create Hive Tables"
+          "Next" : "Create Hive Tables"
         },
-        "Create Hive Tables": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::glue:startJobRun.sync",
-          "Parameters": {
-            "JobName": "${module.glue_hive_table_creation_job.name}"
+        "Create Hive Tables" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : "${module.glue_hive_table_creation_job.name}"
           },
-          "Next": "Resume DMS Replication Task"
+          "Next" : "Resume DMS Replication Task"
         },
-        "Resume DMS Replication Task": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
-          "Parameters": {
-            "ReplicationTaskArn": "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
-            "StartReplicationTaskType": "resume-processing"
+        "Resume DMS Replication Task" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
+          "Parameters" : {
+            "ReplicationTaskArn" : "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
+            "StartReplicationTaskType" : "resume-processing"
           },
-          "Next": "Start Glue Streaming Job"
+          "Next" : "Start Glue Streaming Job"
         },
-        "Start Glue Streaming Job": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::glue:startJobRun",
-          "Parameters": {
-            "JobName": "${module.glue_reporting_hub_cdc_job.name}"
+        "Start Glue Streaming Job" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun",
+          "Parameters" : {
+            "JobName" : "${module.glue_reporting_hub_cdc_job.name}"
           },
-          "End": true
+          "End" : true
         }
       }
     }

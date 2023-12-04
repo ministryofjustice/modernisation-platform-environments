@@ -1,15 +1,5 @@
 locals {
 
-  xtag_weblogic_ssm_parameters = {
-    prefix = "/weblogic/"
-    parameters = {
-      admin_username = { description = "weblogic admin username" }
-      admin_password = { description = "weblogic admin password" }
-      db_username    = { description = "nomis database xtag username" }
-      db_password    = { description = "nomis database xtag password" }
-    }
-  }
-
   # TODO - change alarm actions to dba_pagerduty once alarms proven out
   xtag_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
