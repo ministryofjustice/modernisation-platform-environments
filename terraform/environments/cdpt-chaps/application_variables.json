@@ -9,7 +9,7 @@
       "env_name": "development",
       "friendly_name": "Chaps development",
       "container_instance_type": "windows",
-      "container_version": "preproduction",
+      "container_version": "preproduction"
     },
     "test": {
       "example_var": "test-data"
