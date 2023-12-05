@@ -79,6 +79,7 @@ env:
 jobs:
   plan:
     name: "plan"
+    secrets: inherit
     runs-on: ubuntu-latest
     outputs:
       plan_exitcode: "${{ steps.plan.outputs.exitcode }}"
