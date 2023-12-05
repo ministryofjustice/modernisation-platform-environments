@@ -29,7 +29,7 @@ module "managed_grafana" {
     "ADMIN" = {
       "group_ids" = ["16a2d234-1031-70b5-2657-7f744c55e48f"] # observability-platform
     }
-    "VIEWER" = {
+    "EDITOR" = {
       "group_ids" = local.all_sso_uuids
     }
   }
