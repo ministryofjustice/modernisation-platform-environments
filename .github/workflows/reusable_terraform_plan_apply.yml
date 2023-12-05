@@ -72,14 +72,14 @@ on:
 
 env:
   ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
-  WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
+  BACKEND_ACCOUNT_ID : "{{ secrets.modernisation_platform_account_id }}"
   ENVIRONMENT_MANAGEMENT: "${{ secrets.modernisation_platform_environments }}"
   GITHUB_TOKEN: "${{ secrets.pipeline_github_token }}"
+  WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
 
 jobs:
   plan:
     name: "plan"
-    secrets: inherit
     runs-on: ubuntu-latest
     outputs:
       plan_exitcode: "${{ steps.plan.outputs.exitcode }}"
@@ -120,6 +120,7 @@ jobs:
         run: |
           terraform --version
           echo "terraform init ${{ inputs.init_plan_apply_tfargs }}"
+          echo "confirming secret expansion -backend-config=assume_role={role_arn=\"arn:aws:iam::${{ env.BACKEND_ACCOUNT_ID }}:role/modernisation-account-terraform-state-member-access\"}"
           terraform init ${{ inputs.init_plan_apply_tfargs }}
 
       - name: Terraform Workspace Select
