@@ -121,8 +121,8 @@ locals {
           from_port   = 80
           to_port     = 80
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
-          # security_groups = ["loadbalancer"]
+          cidr_blocks = ["10.40.129.64/26"] # noms mgmt live jumpservers
+          security_groups = ["loadbalancer"]
         }
         https_web = {
           description = "443: Allow HTTPS ingress from Azure"
