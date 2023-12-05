@@ -3,7 +3,6 @@
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-	identifier                  = local.application_name
 	allocated_storage 					= local.app_data.accounts[local.environment].db_allocated_storage
 	storage_type 								= "gp2"
 	engine 											= "sqlserver-web"
