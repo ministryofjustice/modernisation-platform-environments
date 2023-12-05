@@ -199,7 +199,7 @@ locals {
         instance_target_groups = {
           rds-gateway-80 = {
             port     = 80
-            protocol = "HTTP"
+            protocol = "TCP"
             health_check = {
               enabled             = true
               interval            = 5
@@ -222,7 +222,7 @@ locals {
         listeners = {
           http = {
             port     = 80
-            protocol = "HTTP"
+            protocol = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "rds-gateway-80"
