@@ -199,7 +199,7 @@ locals {
         instance_target_groups = {
           rds-gateway-80 = {
             port     = 80
-            protocol = "TCP"
+            protocol = "HTTP"
             health_check = {
               enabled             = true
               interval            = 5
@@ -211,7 +211,7 @@ locals {
             }
             stickiness = {
               enabled = true
-              type    = "source_ip"
+              type    = "lb_cookie"
             }
             #attachments = [
             #  { ec2_instance_name = "rds-gateway" },
@@ -222,7 +222,7 @@ locals {
         listeners = {
           http = {
             port     = 80
-            protocol = "TCP"
+            protocol = "HTTP"
             default_action = {
               type              = "forward"
               target_group_name = "rds-gateway-80"
