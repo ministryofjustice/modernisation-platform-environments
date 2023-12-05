@@ -3,6 +3,15 @@
     "development": {
       "region": "eu-west-2",
       "docker_image_tag": "development"
+      "db_enabled": true,
+      "db_instance_class": "db.t3.small",
+      "db_user": "admin",
+      "db_allocated_storage": "75",
+      "db_name": "chaps-dev",
+      "env_name": "development",
+      "friendly_name": "Chaps development",
+      "container_instance_type": "windows",
+      "container_version": "preproduction",
     },
     "preproduction": {
       "region": "eu-west-2",
