@@ -27,6 +27,6 @@ data "aws_iam_policy_document" "opensearch_cloudwatch_logs" {
 }
 
 resource "aws_cloudwatch_log_resource_policy" "opensearch_cloudwatch_logs" {
-  policy_name     = "opensearch-cloudwatch-logs"
+  policy_name     = "opensearch-cloudwatch-logs-datahub"
   policy_document = data.aws_iam_policy_document.opensearch_cloudwatch_logs.json
 }
