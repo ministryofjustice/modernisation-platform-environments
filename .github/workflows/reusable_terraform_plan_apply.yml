@@ -115,8 +115,6 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Init
-        env:
-          modernisation_platform_account_id: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           terraform --version
