@@ -15,6 +15,11 @@ locals {
     general_shared_kms_key_arn    = data.aws_kms_key.general_shared.arn
     shared_vpc_id                 = data.aws_vpc.shared.id
     bastion                       = module.bastion_linux
+    kms_keys = {
+      ebs_shared     = data.aws_kms_key.ebs_shared.arn
+      general_shared = data.aws_kms_key.general_shared.arn
+      rds_shared     = data.aws_kms_key.rds_shared.arn
+    }
   }
 
   environment_config_test = {

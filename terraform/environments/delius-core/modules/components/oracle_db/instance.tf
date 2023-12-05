@@ -1,15 +1,16 @@
-resource "aws_instance" "db_ec2" {
 
+
+resource "aws_instance" "db_ec2" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   instance_type               = var.db_type
-  ami                         = var.db_ami
-  vpc_security_group_ids      = [aws_security_group.db_ec2_instance_sg.id, aws_security_group.delius_db_security_group.id]
+  ami                         = data.aws_ami.oracle_db.id
+  vpc_security_group_ids      = [aws_security_group.db_ec2.id, aws_security_group.db_ec2.id]
   subnet_id                   = var.subnet_id
   iam_instance_profile        = aws_iam_instance_profile.db_ec2_instanceprofile.name
   associate_public_ip_address = false
   monitoring                  = var.monitoring
   ebs_optimized               = true
-  key_name                    = aws_key_pair.environment_ec2_user_key_pair.key_name
+  key_name                    = var.ec2_key_pair_name
   user_data_base64            = base64encode(var.user_data)
 
   metadata_options {

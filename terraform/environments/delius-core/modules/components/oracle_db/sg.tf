@@ -1,7 +1,7 @@
 resource "aws_security_group" "db_ec2" {
   name        = format("%s-sg-delius-db-ec2-instance", var.env_name)
   description = "Controls access to db ec2 instance"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.account_config.shared_vpc_id
   tags = merge(var.tags,
     { Name = lower(format("%s-sg-delius-db-ec2-instance", var.env_name)) }
   )
@@ -58,5 +58,5 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
   from_port                    = 1521
   to_port                      = 1521
   ip_protocol                  = "tcp"
-  referenced_security_group_id = var.account_config.bastion_security_group_id
+  referenced_security_group_id = var.account_config.bastion.bastion_security_group
 }

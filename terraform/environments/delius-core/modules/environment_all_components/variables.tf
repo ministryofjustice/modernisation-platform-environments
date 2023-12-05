@@ -30,6 +30,11 @@ variable "account_config" {
     route53_network_services_zone = any
     route53_external_zone         = any
     bastion                       = any
+    kms_keys = object({
+      ebs_shared     = any
+      general_shared = any
+      rds_shared     = any
+    })
 
     general_shared_kms_key_arn = optional(string)
   })
@@ -46,6 +51,11 @@ variable "account_config" {
     migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
     general_shared_kms_key_arn     = "default_general_shared_kms_key_arn"
     bastion                        = {}
+    kms_keys = {
+      ebs_shared     = {}
+      general_shared = {}
+      rds_shared     = {}
+    }
   }
 }
 

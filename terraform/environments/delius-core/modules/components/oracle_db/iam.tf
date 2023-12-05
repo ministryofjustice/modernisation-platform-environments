@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "business_unit_kms_key_access" {
       "kms:RevokeGrant"
     ]
     resources = [
-      var.account_config.general_shared_kms_key_arn
+      var.account_config.kms_keys.general_shared,
     ]
   }
 }

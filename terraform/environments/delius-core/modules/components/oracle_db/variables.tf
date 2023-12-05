@@ -26,11 +26,6 @@ variable "env_name" {
   type        = string
 }
 
-variable "vpc_id" {
-  description = "VPC ID to launch the instance in"
-  type        = string
-}
-
 variable "subnet_id" {
   description = "Subnet ID to launch the instance in"
   type        = string
@@ -49,7 +44,7 @@ variable "user_data" {
 
 variable "account_config" {
   description = "Account config to pass to the instance"
-  type        = map(any)
+  type        = any
 }
 
 variable "metadata_options" {
@@ -80,7 +75,7 @@ variable "tags" {
 
 variable "ebs_volumes" {
   description = "EBS volumes to attach to the instance"
-  type = optional(object({
+  type = object({
     kms_key_id = string
     tags       = map(string)
     iops       = number
@@ -94,7 +89,7 @@ variable "ebs_volumes" {
       volume_size = optional(string)
       no_device   = optional(bool)
     }))
-  }))
+  })
 }
 
 variable "environment_config" {
@@ -104,4 +99,9 @@ variable "environment_config" {
     legacy_engineering_vpc_cidr        = string
     ec2_user_ssh_key                   = string
   })
+}
+
+variable "ec2_key_pair_name" {
+  description = "EC2 key pair name to associate with the instance"
+  type        = string
 }
