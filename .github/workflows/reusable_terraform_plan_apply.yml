@@ -64,7 +64,7 @@ on:
         default: false
     secrets:
       modernisation_platform_account_id:
-        required: false
+        required: true
       modernisation_platform_environments:
         required: true
       pipeline_github_token:
@@ -72,7 +72,7 @@ on:
 
 env:
   ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
-  BACKEND_ACCOUNT_ID : "{{ secrets.modernisation_platform_account_id }}"
+  BACKEND_ACCOUNT_ID : "${{ secrets.modernisation_platform_account_id }}"
   ENVIRONMENT_MANAGEMENT: "${{ secrets.modernisation_platform_environments }}"
   GITHUB_TOKEN: "${{ secrets.pipeline_github_token }}"
   WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
