@@ -283,31 +283,31 @@ locals {
         })
       })
 
-      "t1-${local.application_name}-bip-b" = merge(local.bip_b, {
-        autoscaling_group = merge(local.bip_b.autoscaling_group, {
-          desired_capacity = 1
-        })
-        autoscaling_schedules = {}
-        config = merge(local.bip_b.config, {
-          instance_profile_policies = concat(local.bip_b.config.instance_profile_policies, [
-            "Ec2T1BipPolicy",
-          ])
-          # ami_name                  = "base_rhel_7_9*"
-        })
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "oasys/bip-build-improvement2"
-          })
-        })
-        tags = merge(local.bip_b.tags, {
-          # instance-scheduling = "skip-scheduling"
-          oasys-environment   = "t1"
-          bip-db-name         = "T1BIPINF"
-          bip-db-hostname     = "t1-oasys-db-a"
-          oasys-db-name       = "T1OASYS"
-          oasys-db-hostname   = "t1-oasys-db-a"
-        })
-      })
+      # "t1-${local.application_name}-bip-b" = merge(local.bip_b, {
+      #   autoscaling_group = merge(local.bip_b.autoscaling_group, {
+      #     desired_capacity = 1
+      #   })
+      #   autoscaling_schedules = {}
+      #   config = merge(local.bip_b.config, {
+      #     instance_profile_policies = concat(local.bip_b.config.instance_profile_policies, [
+      #       "Ec2T1BipPolicy",
+      #     ])
+      #     # ami_name                  = "base_rhel_7_9*"
+      #   })
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "oasys/bip-build-improvement2"
+      #     })
+      #   })
+      #   tags = merge(local.bip_b.tags, {
+      #     # instance-scheduling = "skip-scheduling"
+      #     oasys-environment   = "t1"
+      #     bip-db-name         = "T1BIPINF"
+      #     bip-db-hostname     = "t1-oasys-db-a"
+      #     oasys-db-name       = "T1OASYS"
+      #     oasys-db-hostname   = "t1-oasys-db-a"
+      #   })
+      # })
     }
 
     baseline_ec2_autoscaling_groups = {
