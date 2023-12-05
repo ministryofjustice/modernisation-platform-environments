@@ -61,7 +61,8 @@ resource "aws_instance" "db_ec2_instance" {
 
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   instance_type               = each.value.instance.instance_type
-  ami                         = data.aws_ami.oracle_db_ami[each.key].id
+  # Temporarily hard coding AMI until we have a better solution to locking EC2 isntances to specific AZs
+  ami                         = "ami-084f5c88fe5bb9d44"
   vpc_security_group_ids      = [aws_security_group.db_ec2_instance_sg.id, aws_security_group.delius_db_security_group.id]
   subnet_id                   = var.account_config.data_subnet_a_id
   iam_instance_profile        = aws_iam_instance_profile.db_ec2_instanceprofile.name
