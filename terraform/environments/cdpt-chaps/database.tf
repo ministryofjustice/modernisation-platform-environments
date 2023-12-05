@@ -9,7 +9,6 @@ resource "aws_db_instance" "database" {
 	engine_version 							= "14.00.3381.3.v1"
 	instance_class 							= local.app_data.accounts[local.environment].db_instance_identifier
 	identifier									= local.app_data.accounts[local.environment].db_instance_class
-	name 												= local.app_data.accounts[local.environment].db_name
 	username										= local.app_data.accounts[local.environment].db_user
 }
 
