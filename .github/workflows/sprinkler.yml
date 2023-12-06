@@ -36,6 +36,13 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
+
+  show-backend-id:
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo-id
+        run: echo $BACKEND_ACCOUNT_ID
+
   strategy:
     uses: ./.github/workflows/reusable_terraform_strategy.yml
     if: inputs.action != 'destroy'
