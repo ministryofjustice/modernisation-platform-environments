@@ -49,7 +49,9 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      init_plan_apply_tfargs: "-no-color"
+      init_plan_apply_tfargs: "${{ env.modernisation_platform_account_id }}"
+    env:
+      modernisation_platform_account_id: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
