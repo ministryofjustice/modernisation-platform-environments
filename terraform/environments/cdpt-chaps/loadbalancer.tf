@@ -63,10 +63,10 @@ resource "aws_lb_target_group" "chaps_target_group" {
 }
 
 resource "aws_lb_listener" "chaps_lb" {
-  # depends_on = [
-  #   aws_acm_certificate.external
-  # ]
-  # certificate_arn   = local.is-production ? aws_acm_certificate.external_prod[0].arn : aws_acm_certificate.external.arn
+  depends_on = [
+    aws_acm_certificate.external
+  ]
+  certificate_arn   = aws_acm_certificate.external.arn
   load_balancer_arn = aws_lb.chaps_lb.arn
   port              = 443
   protocol          = "HTTPS"
