@@ -385,12 +385,6 @@ locals {
     baseline_route53_zones = {
       "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
-          # T1 BIP
-          { name = "t1-ncr-bip-cmc", type = "CNAME", ttl = "300", records = ["t1-ncr-bip-cmc.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1-ncr-bip", type = "CNAME", ttl = "300", records = ["t1-ncr-bip.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # T1 Tomcat
-          { name = "t1-ncr-tomcat", type = "CNAME", ttl = "300", records = ["t1-ncr-tomcat.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # Oracle database
           { name = "t1-ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.reporting.nomis.service.justice.gov.uk"] },
           { name = "t1-ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1-ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
