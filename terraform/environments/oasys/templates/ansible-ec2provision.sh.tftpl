@@ -108,11 +108,11 @@ run_ansible() {
    --extra-vars "target=localhost" \
    --become
 
-  # echo "# Cleanup"
-  # deactivate
-  # rm -rf $ansible_dir/python-venv
-  # rm -rf $ansible_dir/${ansible_repo}
-  # rmdir $ansible_dir
+  echo "# Cleanup"
+  deactivate
+  rm -rf $ansible_dir/python-venv
+  rm -rf $ansible_dir/${ansible_repo}
+  rmdir $ansible_dir
 }
 
 echo "ansible-ec2provision.sh start" | logger -p local3.info -t user-data
