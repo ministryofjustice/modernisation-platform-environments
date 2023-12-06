@@ -187,7 +187,7 @@ locals {
         listeners = {
           http = merge(local.bip_cmc_lb_listeners.http, local.bip_lb_listeners.http, local.tomcat_lb_listeners.http)
 
-          http7777 = merge(local.bip_cmc_lb_listeners.http7777, local.bip_lb_listeners.http7777, locals.tomcat_lb_listeners, {
+          http7777 = merge(local.bip_cmc_lb_listeners.http7777, local.bip_lb_listeners.http7777, locals.tomcat_lb_listeners.http7777, {
             rules = {
               t1-ncr-bip_cmc = {
                 priority = 300
@@ -207,12 +207,26 @@ locals {
                 priority = 300
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-bip-cmc-http-7777"
+                  target_group_name = "t1-ncr-bip-http-7777"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
                       "t1-ncr-bip.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
