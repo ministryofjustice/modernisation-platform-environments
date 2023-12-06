@@ -219,9 +219,9 @@ locals {
 
     lb_target_groups = {
       http-7777 = local.bip_cmc_target_group_http_7777
-      listening = local.bip_cmc_target_group_http_6455
-      sia       = local.bip_cmc_target_group_http_6410
-      cms       = local.bip_cmc_target_group_http_6400
+      http-6455 = local.bip_cmc_target_group_http_6455
+      http-6410       = local.bip_cmc_target_group_http_6410
+      http-6400       = local.bip_cmc_target_group_http_6400
     }
 
     ebs_volumes = {
