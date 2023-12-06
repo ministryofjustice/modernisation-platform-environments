@@ -141,40 +141,6 @@ resource "aws_secretsmanager_secret_version" "ap_export_secret_access_key" {
 }
 
 #tfsec:ignore:AWS095
-resource "aws_secretsmanager_secret" "pecs_basm_prod_access_key_id" {
-  #checkov:skip=CKV_AWS_149
-  name                    = "pecs_basm_prod_access_key_id"
-  recovery_window_in_days = 0
-  tags = merge(
-    local.tags,
-    {
-      Name = "pecs_basm_prod_access_key_id"
-    },
-  )
-}
-resource "aws_secretsmanager_secret_version" "pecs_basm_prod_access_key_id" {
-  secret_id     = aws_secretsmanager_secret.pecs_basm_prod_access_key_id.id
-  secret_string = random_password.random_password.result
-}
-
-#tfsec:ignore:AWS095
-resource "aws_secretsmanager_secret" "pecs_basm_prod_secret_access_key" {
-  #checkov:skip=CKV_AWS_149
-  name                    = "pecs_basm_prod_secret_access_key"
-  recovery_window_in_days = 0
-  tags = merge(
-    local.tags,
-    {
-      Name = "pecs_basm_prod_secret_access_key"
-    },
-  )
-}
-resource "aws_secretsmanager_secret_version" "pecs_basm_prod_secret_access_key" {
-  secret_id     = aws_secretsmanager_secret.pecs_basm_prod_secret_access_key.id
-  secret_string = random_password.random_password.result
-}
-
-#tfsec:ignore:AWS095
 resource "aws_secretsmanager_secret" "db_password" {
   #checkov:skip=CKV_AWS_149
 
