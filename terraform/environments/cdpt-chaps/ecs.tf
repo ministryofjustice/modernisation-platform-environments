@@ -50,7 +50,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
 
 resource "aws_ecs_service" "ecs_service" {
   depends_on = [
-    aws_lb_listener.chaps_lb
+    aws_lb_listener.listener
   ]
 
   name                              = var.networking[0].application
