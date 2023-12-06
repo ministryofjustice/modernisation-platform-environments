@@ -269,7 +269,7 @@ locals {
               }
             }
           })
-          http6455 = merge(local.bip_cmc_lb_listeners.http6410, local.bip_lb_listeners.http6410, {
+          http6410 = merge(local.bip_cmc_lb_listeners.http6410, local.bip_lb_listeners.http6410, {
             rules = {
               t1-ncr-bip-cmc = {
                 priority = 300
@@ -301,7 +301,7 @@ locals {
               }
             }
           })
-          http6455 = merge(local.bip_cmc_lb_listeners.http6400, local.bip_lb_listeners.http6400, {
+          http6400 = merge(local.bip_cmc_lb_listeners.http6400, local.bip_lb_listeners.http6400, {
             rules = {
               t1-ncr-bip-cmc = {
                 priority = 300
