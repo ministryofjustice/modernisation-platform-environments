@@ -231,12 +231,11 @@ locals {
         #   })
         # })
         tags = merge(local.bip_b.tags, {
-          # instance-scheduling = "skip-scheduling"
-          oasys-environment = "t2"
-          bip-db-name       = "T2BIPINF"
-          bip-db-hostname   = "t2-oasys-db-a"
-          oasys-db-name     = "T2OASYS"
-          oasys-db-hostname = "t2-oasys-db-a"
+          oasys-environment   = "t2"
+          bip-db-name         = "T2BIPINF"
+          bip-db-hostname     = "t2-oasys-db-a"
+          oasys-db-name       = "T2OASYS"
+          oasys-db-hostname   = "t2-oasys-db-a"
         })
       })
 
@@ -274,7 +273,6 @@ locals {
         #   })
         # })
         tags = merge(local.bip_b.tags, {
-          instance-scheduling = "skip-scheduling"
           oasys-environment   = "t1"
           bip-db-name         = "T1BIPINF"
           bip-db-hostname     = "t1-oasys-db-a"
@@ -300,7 +298,6 @@ locals {
           })
         })
         tags = merge(local.bip_b.tags, {
-          instance-scheduling = "skip-scheduling"
           oasys-environment   = "t1"
           bip-db-name         = "T1BIPINF"
           bip-db-hostname     = "t1-oasys-db-a"
