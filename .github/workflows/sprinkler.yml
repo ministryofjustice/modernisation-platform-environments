@@ -31,9 +31,6 @@ permissions:
   id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
-env:
- modernisation_platform_account_id: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
-
 jobs:
   strategy:
     uses: ./.github/workflows/reusable_terraform_strategy.yml
@@ -52,7 +49,7 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      init_plan_apply_tfargs: "${{ env.modernisation_platform_account_id }}"
+      init_plan_apply_tfargs: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
