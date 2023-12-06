@@ -28,12 +28,30 @@ resource "aws_security_group" "chaps_lb_sc" {
   }
 }
 
+# TODO: delete
 resource "aws_lb" "external" {
   name                       = "${local.application_name}-loadbalancer"
   load_balancer_type         = "application"
+  subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
   idle_timeout = 240
+
+  security_groups = [aws_security_group.load_balancer_security_group.id]
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-external-loadbalancer"
+    }
+  )
+}
+
+# TODO: delete
+resource "aws_security_group" "load_balancer_security_group" {
+  name_prefix = "${local.application_name}-loadbalancer-security-group"
+  description = "controls access to lb"
+  vpc_id      = data.aws_vpc.shared.id
 }
 
 resource "aws_lb" "chaps_lb" {
