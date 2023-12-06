@@ -28,6 +28,11 @@ resource "aws_security_group" "chaps_lb_sc" {
   }
 }
 
+resource "aws_lb" "old" {
+  name                       = "cdpt-chaps-loadbalancer"
+  enable_deletion_protection = false
+}
+
 resource "aws_lb" "chaps_lb" {
   name                       = "chaps-load-balancer"
   load_balancer_type         = "application"
