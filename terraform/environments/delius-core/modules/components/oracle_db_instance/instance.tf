@@ -38,6 +38,6 @@ resource "aws_instance" "db_ec2" {
   tags = merge(var.tags,
     { Name = lower(format("%s-delius-db-%s", var.env_name, var.db_count_index)) },
     { server-type = "delius_core_db" },
-    { database = "delius_${var.db_name}" }
+    { database = "delius_${var.db_type}" }
   )
 }
