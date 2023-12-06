@@ -189,7 +189,7 @@ locals {
 
           http7777 = merge(local.bip_cmc_lb_listeners.http7777, local.bip_lb_listeners.http7777, local.tomcat_lb_listeners.http7777, {
             rules = {
-              t1-ncr-bip_cmc = {
+              t1-ncr-bip-cmc = {
                 priority = 300
                 actions = [{
                   type              = "forward"
