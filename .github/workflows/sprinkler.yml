@@ -2,7 +2,7 @@
 name: sprinkler
 
 env:
-  BACKEND_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
 
 on:
   push:
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: echo-id
-        run: echo $BACKEND_ACCOUNT_ID
+        run: echo "BACKEND_ACCOUNT=$(jq -r -e '.aws_organizations_root_account_id' <<< $ENVIRONMENT_MANAGEMENT)"
 
   strategy:
     uses: ./.github/workflows/reusable_terraform_strategy.yml
