@@ -1,5 +1,9 @@
 ---
 name: sprinkler
+
+env:
+  BACKEND_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+
 on:
   push:
     branches:
@@ -49,7 +53,7 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      init_plan_apply_tfargs: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
+      init_plan_apply_tfargs: "$BACKEND_ACCOUNT_ID"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
