@@ -194,7 +194,7 @@ locals {
           http7777 = merge(local.bip_cmc_lb_listeners.http7777, local.bip_lb_listeners.http7777, local.tomcat_lb_listeners.http7777, {
             rules = {
               t1-ncr-bip-cmc = {
-                priority = 300
+                priority = 100
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-ncr-bip-cmc-http-7777"
@@ -208,7 +208,7 @@ locals {
                 }]
               }
               t1-ncr-bip = {
-                priority = 300
+                priority = 200
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-ncr-bip-http-7777"
@@ -240,7 +240,7 @@ locals {
           http6455 = merge(local.bip_cmc_lb_listeners.http6455, local.bip_lb_listeners.http6455, {
             rules = {
               t1-ncr-bip-cmc = {
-                priority = 300
+                priority = 100
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-ncr-bip-cmc-http-6455"
@@ -272,7 +272,7 @@ locals {
           http6410 = merge(local.bip_cmc_lb_listeners.http6410, local.bip_lb_listeners.http6410, {
             rules = {
               t1-ncr-bip-cmc = {
-                priority = 300
+                priority = 100
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-ncr-bip-cmc-http-6410"
@@ -304,7 +304,7 @@ locals {
           http6400 = merge(local.bip_cmc_lb_listeners.http6400, local.bip_lb_listeners.http6400, {
             rules = {
               t1-ncr-bip-cmc = {
-                priority = 300
+                priority = 100
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-ncr-bip-cmc-http-6400"
@@ -336,7 +336,7 @@ locals {
           https = merge(local.bip_cmc_lb_listeners.https, local.bip_lb_listeners.https, local.tomcat_lb_listeners.https, {
             rules = {
               t1-ncr-bip-cmc-http-7777 = {
-                priority = 300
+                priority = 100
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-ncr-bip-cmc-http-7777"
@@ -350,7 +350,7 @@ locals {
                 }]
               }
               t1-ncr-bip-http-7777 = {
-                priority = 300
+                priority = 200
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-ncr-bip-http-7777"
