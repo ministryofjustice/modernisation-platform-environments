@@ -300,7 +300,7 @@ locals {
           })
         })
         tags = merge(local.bip_b.tags, {
-          # instance-scheduling = "skip-scheduling"
+          instance-scheduling = "skip-scheduling"
           oasys-environment   = "t1"
           bip-db-name         = "T1BIPINF"
           bip-db-hostname     = "t1-oasys-db-a"
