@@ -174,7 +174,7 @@ locals {
       port                      = 443
       protocol                  = "HTTPS"
       ssl_policy                = "ELBSecurityPolicy-2016-08"
-      certificate_names_or_arns = ["nomis_wildcard_cert"]
+      certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
       cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms.lb
 
       default_action = {
