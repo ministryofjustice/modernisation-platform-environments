@@ -185,24 +185,34 @@ locals {
         subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private"]
         listeners = {
-          http = local.bip_cmc_lb_listeners.http
+          http = merge(local.bip_cmc_lb_listeners.http, local.bip_lb_listeners.http, local.tomcat_lb_listeners.http)
 
-          http7777 = merge(local.bip_cmc_lb_listeners.http7777, local.bip_lb_listeners.http7777, {
+          http7777 = merge(local.bip_cmc_lb_listeners.http7777, local.bip_lb_listeners.http7777, locals.tomcat_lb_listeners, {
             rules = {
-              # T1 users in Azure accessed server directly on http 7777
-              # so support this in Mod Platform as well to minimise
-              # disruption.  This isn't needed for other environments.
-              t1-nomis-web-a = {
+              t1-ncr-bip_cmc = {
                 priority = 300
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-nomis-web-a-http-7777"
+                  target_group_name = "t1-ncr-bip-cmc-http-7777"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
-                      "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+                      "t1-ncr-bip-cmc.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-bip = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-cmc-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
