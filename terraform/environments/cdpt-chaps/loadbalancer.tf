@@ -62,18 +62,29 @@ resource "aws_lb_target_group" "chaps_target_group" {
 
 }
 
-resource "aws_lb_listener" "chaps_lb" {
-  depends_on = [
-    aws_acm_certificate.external
-  ]
-  certificate_arn   = aws_acm_certificate.external.arn
+resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.chaps_lb.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  port              = 80
+  protocol          = "HTTP"
 
   default_action {
+    target_group_arn = aws_lb_target_group.chaps_target_group.id
     type             = "forward"
-    target_group_arn = aws_lb_target_group.chaps_target_group.arn
   }
 }
+
+# resource "aws_lb_listener" "chaps_lb" {
+#   depends_on = [
+#     aws_acm_certificate.external
+#   ]
+#   certificate_arn   = aws_acm_certificate.external.arn
+#   load_balancer_arn = aws_lb.chaps_lb.arn
+#   port              = 443
+#   protocol          = "HTTPS"
+#   ssl_policy        = "ELBSecurityPolicy-2016-08"
+
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.chaps_target_group.arn
+#   }
+# }
