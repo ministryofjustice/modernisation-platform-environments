@@ -31,9 +31,10 @@ permissions:
   id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
+env:
+ modernisation_platform_account_id: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
+
 jobs:
-  env:
-    modernisation_platform_account_id: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
   strategy:
     uses: ./.github/workflows/reusable_terraform_strategy.yml
     if: inputs.action != 'destroy'
