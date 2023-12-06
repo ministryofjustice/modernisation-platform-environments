@@ -16,7 +16,6 @@ locals {
           ]
         }
       }
-      data_platform_apps_tools_account_id = local.environment_management.account_ids["data-platform-apps-and-tools-development"]
     }
     production = {
       observability_platform_configuration = {
@@ -31,7 +30,6 @@ locals {
           ]
         }
       }
-      data_platform_apps_tools_account_id = local.environment_management.account_ids["data-platform-apps-and-tools-production"]
     }
   }
 }
