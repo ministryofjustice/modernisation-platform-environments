@@ -37,11 +37,11 @@ permissions:
 
 jobs:
 
-  show-backend-id:
+  set-backend-id:
     runs-on: ubuntu-latest
     steps:
-      - name: echo-id
-        run: echo "BACKEND_ACCOUNT=$(jq -r -e '.aws_organizations_root_account_id' <<< $ENVIRONMENT_MANAGEMENT)"
+      - name: set-id
+        run: echo "BACKEND_ACCOUNT=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
 
   strategy:
     uses: ./.github/workflows/reusable_terraform_strategy.yml
@@ -60,7 +60,7 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      init_plan_apply_tfargs: "$BACKEND_ACCOUNT_ID"
+      init_plan_apply_tfargs: "-backend-config=assume_role={role_arn=\"arn:aws:iam::$BACKEND_ACCOUNT:role/modernisation-account-terraform-state-member-access\"}"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
