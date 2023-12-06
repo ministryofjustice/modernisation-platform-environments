@@ -144,6 +144,14 @@ locals {
   kms_read_access_policy = "${local.project}_kms_read_policy"
   s3_read_access_policy  = "${local.project}_s3_read_policy"
   apigateway_get_policy  = "${local.project}_apigateway_get_policy"
+  invoke_lambda_policy   = "${local.project}_invoke_lambda_policy"
+
+  trigger_glue_job_policy = "${local.project}_start_glue_job_policy"
+  start_dms_task_policy   = "${local.project}_start_dms_task_policy"
+
+  s3_all_object_actions_policy = "${local.project}_s3_all_object_actions_policy"
+  all_state_machine_policy     = "${local.project}_all_state_machine_policy"
+  dynamo_db_access_policy      = "${local.project}_dynamo_db_access_policy"
 
   # DPR Alerts
   enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
@@ -204,6 +212,46 @@ locals {
   lambda_transfercomp_policies       = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", ]
   create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
+
+  reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
+
+  # s3 transfer lambda
+  enable_s3_file_transfer_lambda         = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda
+  s3_file_transfer_lambda_name           = "${local.project}-s3-file-transfer"
+  s3_file_transfer_lambda_handler        = "uk.gov.justice.digital.lambda.S3FileTransferLambda::handleRequest"
+  s3_file_transfer_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  s3_file_transfer_lambda_runtime        = "java11"
+  s3_file_transfer_lambda_tracing        = "Active"
+
+  scheduled_s3_file_transfer_lambda_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_lambda_retention_days
+  scheduled_s3_file_transfer_lambda_schedule       = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_lambda_schedule
+  enable_s3_file_transfer_lambda_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda_trigger
+
+  s3_file_transfer_lambda_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.all_state_machine_policy}"
+  ]
+
+  # step function notification lambda
+  enable_step_function_notification_lambda         = local.application_data.accounts[local.environment].enable_step_function_notification_lambda
+  step_function_notification_lambda_name           = "${local.project}-step-function-notification"
+  step_function_notification_lambda_handler        = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
+  step_function_notification_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  step_function_notification_lambda_runtime        = "java11"
+  step_function_notification_lambda_tracing        = "Active"
+
+  step_function_notification_lambda_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.all_state_machine_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.dynamo_db_access_policy}"
+  ]
+
+  # Data Ingestion Pipeline Step Function
+  enable_data_ingestion_step_function = local.application_data.accounts[local.environment].enable_data_ingestion_step_function
+  data_ingestion_step_function_name   = "${local.project}-data-ingestion-step-function-${local.environment}"
+  dms_task_time_out                   = local.application_data.accounts[local.environment].dms_task_time_out
 
   # Datamart
   create_scheduled_action_iam_role = local.application_data.accounts[local.environment].setup_scheduled_action_iam_role

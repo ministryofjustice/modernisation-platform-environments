@@ -34,7 +34,7 @@ for secret in $secrets; do
       exit 1
     fi
     echo aws secretsmanager get-secret-value --secret-id $arn --query SecretString --output text --profile $PROFILE >&2
-    value=$(aws secretsmanager get-secret-value --secret-id $arn --query SecretString --output text --profile $PROFILE)
+    value=$(aws secretsmanager get-secret-value --secret-id $arn --query SecretString --output text --profile $PROFILE || true)
     dir=$(dirname secretsmanager-secrets/$PROFILE/$secret)
     mkdir -p $dir
     echo "$value" > secretsmanager-secrets/$PROFILE/$secret

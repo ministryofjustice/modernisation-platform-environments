@@ -71,6 +71,124 @@ resource "aws_iam_policy" "s3_read_access_policy" {
   })
 }
 
+# S3 All Object Actions Policy
+resource "aws_iam_policy" "s3_all_object_actions_policy" {
+  name = local.s3_all_object_actions_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "AllObjectActions",
+        "Action" : ["s3:*Object"],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::${local.project}-*/*",
+          "arn:aws:s3:::${local.project}-*"
+        ]
+      }
+    ]
+  })
+}
+
+# Invoke Lambda Policy
+resource "aws_iam_policy" "invoke_lambda_policy" {
+  name = local.invoke_lambda_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeFunction"
+        ],
+        "Resource" : [
+          "arn:aws:lambda:*:${local.account_id}:function:*",
+          "arn:aws:lambda:*:${local.account_id}:function:*:*"
+        ]
+      }
+    ]
+  })
+}
+
+# Start DMS Task Policy
+resource "aws_iam_policy" "start_dms_task_policy" {
+  name = local.start_dms_task_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "dms:*"
+        ],
+        "Resource" : [
+          "arn:aws:dms:${local.account_region}:${local.account_id}:task:*"
+        ]
+      }
+    ]
+  })
+}
+
+# Trigger Glue Job Policy
+resource "aws_iam_policy" "trigger_glue_job_policy" {
+  name = local.trigger_glue_job_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "glue:StartJobRun",
+          "glue:GetJobRun",
+          "glue:GetJobRuns",
+          "glue:BatchStopJobRun"
+        ],
+        "Resource" : [
+          "arn:aws:glue:${local.account_region}:${local.account_id}:*"
+        ]
+      }
+    ]
+  })
+}
+
+# DynamoDB Access Policy
+resource "aws_iam_policy" "dynamodb_access_policy" {
+  name = local.dynamo_db_access_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "DynamoDBTableAccess",
+        "Action" : [
+          "dynamodb:PutItem",
+          "dynamodb:DescribeTable",
+          "dynamodb:GetItem"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:dynamodb:*:*:table/dpr-*"
+        ]
+      }
+    ]
+  })
+}
+
+# State Machine Access Policy
+resource "aws_iam_policy" "all_state_machine_policy" {
+  name = local.all_state_machine_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "StateMachineAllAccess",
+        "Action" : "states:*",
+        "Effect" : "Allow",
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+
 # KMS Read/Decrypt Policy
 resource "aws_iam_policy" "kms_read_access_policy" {
   name = local.kms_read_access_policy

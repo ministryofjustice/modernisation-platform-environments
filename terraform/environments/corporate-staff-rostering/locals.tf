@@ -33,10 +33,23 @@ locals {
     }
   }
 
-  baseline_acm_certificates       = {}
-  baseline_cloudwatch_log_groups  = {
+  baseline_acm_certificates = {}
+  baseline_cloudwatch_log_groups = {
     cwagent-windows-application = {
       retention_in_days = 30
+    }
+  }
+  baseline_cloudwatch_log_metric_filters = {
+    iwfm-scheduler-service-started = {
+      pattern        = "%iWFM Scheduler.+service started%"
+      log_group_name = "cwagent-windows-application"
+
+      metric_transformation = {
+        name         = "iWFMSchedulerServiceStarted"
+        namespace    = "CSR"
+        value        = 1
+        defaultValue = 0
+      }
     }
   }
   baseline_ec2_autoscaling_groups = {}

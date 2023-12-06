@@ -210,7 +210,6 @@ module "oracle_db_standby" {
       }
     )
   )
-
   providers = {
     aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc

@@ -15,7 +15,7 @@ module "ec2_autoscaling_group" {
 
   for_each = var.ec2_autoscaling_groups
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.3.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.5.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -60,7 +60,7 @@ module "ec2_autoscaling_group" {
     )
   }
 
-  secretsmanager_secrets = each.value.secretsmanager_secrets == null ? {} : {
+  secretsmanager_secrets = each.value.secretsmanager_secrets == null ? null : {
     for key, value in each.value.secretsmanager_secrets : key => merge(value,
       value.kms_key_id == null ? { kms_key_id = null } : { kms_key_id = try(var.environment.kms_keys[value.kms_key_id].arn, value.kms_key_id) }
     )

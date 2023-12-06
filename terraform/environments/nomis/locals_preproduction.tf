@@ -59,18 +59,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*PP/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/PP*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
@@ -85,27 +83,19 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/preprod/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*PP/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/PP*/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/preprod/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/weblogic-*",
             ]
           }
         ]
       }
     }
 
-    baseline_ssm_parameters = {
-      "/oracle/weblogic/preprod"  = local.weblogic_ssm_parameters
-      "/oracle/database/PPCNOM"   = local.database_nomis_ssm_parameters
-      "/oracle/database/PPNDH"    = local.database_ssm_parameters
-      "/oracle/database/PPTRDAT"  = local.database_ssm_parameters
-      "/oracle/database/PPCNMAUD" = local.database_ssm_parameters
-      "/oracle/database/PPMIS"    = local.database_mis_ssm_parameters
-    }
     baseline_secretsmanager_secrets = {
       "/oracle/weblogic/preprod"  = local.weblogic_secretsmanager_secrets
       "/oracle/database/PPCNOM"   = local.database_nomis_secretsmanager_secrets

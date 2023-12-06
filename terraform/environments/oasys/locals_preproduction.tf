@@ -26,12 +26,22 @@ locals {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
-          }
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
         ]
       }
     }

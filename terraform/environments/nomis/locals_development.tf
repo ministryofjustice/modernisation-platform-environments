@@ -50,28 +50,19 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/qa11r/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/qa11r/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11r/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/weblogic-*",
             ]
           }
         ]
       }
     }
 
-    baseline_ssm_parameters = {
-      "/oracle/weblogic/qa11r" = local.weblogic_ssm_parameters
-      "/oracle/database/qa11r" = local.database_nomis_ssm_parameters
-    }
     baseline_secretsmanager_secrets = {
-      "/azure" = {
-        secrets = {
-          sas_token = {}
-        }
-      }
       "/oracle/weblogic/qa11r" = local.weblogic_secretsmanager_secrets
       "/oracle/database/qa11r" = local.database_nomis_secretsmanager_secrets
     }

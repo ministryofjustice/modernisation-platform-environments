@@ -5,6 +5,11 @@ locals {
       passwords = { description = "database passwords" }
     }
   }
+  database_secretsmanager_secrets = {
+    secrets = {
+      passwords = { description = "database passwords" }
+    }
+  }
 
   database_ec2_default = {
 
@@ -37,12 +42,7 @@ locals {
 
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
-    secretsmanager_secrets = {
-      asm-passwords = {}
-    }
-    ssm_parameters = {
-      asm-passwords = {}
-    }
+    secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
     tags = {
       ami                  = "hmpps_ol_8_5_oracledb_19c"

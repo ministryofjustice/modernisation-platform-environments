@@ -52,20 +52,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*P/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/P*/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*DR/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/DR*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
@@ -82,34 +78,21 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-              "ssm:PutParameter",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:ssm:*:*:parameter/oracle/weblogic/prod/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/P*/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*P/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/DR*/weblogic-passwords",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*DR/weblogic-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/prod/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/DR*/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*DR/weblogic-*",
             ]
           }
         ]
       }
     }
 
-    baseline_ssm_parameters = {
-      "/oracle/weblogic/prod"     = local.weblogic_ssm_parameters
-      "/oracle/database/PCNOM"    = local.database_nomis_ssm_parameters
-      "/oracle/database/PNDH"     = local.database_ssm_parameters
-      "/oracle/database/PTRDAT"   = local.database_ssm_parameters
-      "/oracle/database/PCNMAUD"  = local.database_ssm_parameters
-      "/oracle/database/PMIS"     = local.database_mis_ssm_parameters
-      "/oracle/database/DRCNOM"   = local.database_nomis_ssm_parameters
-      "/oracle/database/DRNDH"    = local.database_ssm_parameters
-      "/oracle/database/DRTRDAT"  = local.database_ssm_parameters
-      "/oracle/database/DRCNMAUD" = local.database_ssm_parameters
-      "/oracle/database/DRMIS"    = local.database_mis_ssm_parameters
-    }
     baseline_secretsmanager_secrets = {
       "/oracle/weblogic/prod"     = local.weblogic_secretsmanager_secrets
       "/oracle/database/PCNOM"    = local.database_nomis_secretsmanager_secrets

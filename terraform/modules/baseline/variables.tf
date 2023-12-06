@@ -236,8 +236,14 @@ variable "ec2_autoscaling_groups" {
       value = optional(string)
     })))
     secretsmanager_secrets = optional(map(object({
-      description = optional(string)
-      kms_key_id  = optional(string, "general")
+      description             = optional(string)
+      kms_key_id              = optional(string, "general")
+      recovery_window_in_days = optional(number)
+      random = optional(object({
+        length  = number
+        special = optional(bool)
+      }))
+      value = optional(string)
     })))
     lb_target_groups = optional(map(object({
       port                 = optional(number)
@@ -351,8 +357,14 @@ variable "ec2_instances" {
       value = optional(string)
     })))
     secretsmanager_secrets = optional(map(object({
-      description = optional(string)
-      kms_key_id  = optional(string, "general")
+      description             = optional(string)
+      kms_key_id              = optional(string, "general")
+      recovery_window_in_days = optional(number)
+      random = optional(object({
+        length  = number
+        special = optional(bool)
+      }))
+      value = optional(string)
     })))
     route53_records = optional(object({
       create_internal_record = bool

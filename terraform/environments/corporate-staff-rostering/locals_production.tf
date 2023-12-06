@@ -35,18 +35,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*P/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/P*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
@@ -121,12 +119,7 @@ locals {
           create_external_record = true
         }
 
-        secretsmanager_secrets = {
-          asm-passwords = {}
-        }
-        ssm_parameters = {
-          asm-passwords = {}
-        }
+        secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
         tags = {
           description = "PD CSR Oracle primary DB server"
@@ -138,55 +131,51 @@ locals {
         }
       }
 
-      pd-csr-db-b = merge(local.defaults_database_ec2, {
-        config = merge(local.defaults_database_ec2.config, {
-          ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
-          availability_zone = "${local.region}b"
-          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        instance = merge(local.defaults_database_ec2.instance, {
-          instance_type                = "r6i.xlarge"
-          disable_api_stop             = true
-          metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-        })
+      #  removing temporarily due to licensing considerations
+      # pd-csr-db-b = merge(local.defaults_database_ec2, {
+      #   config = merge(local.defaults_database_ec2.config, {
+      #     ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
+      #     availability_zone = "${local.region}b"
+      #     instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
+      #       "Ec2ProdDatabasePolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.defaults_database_ec2.instance, {
+      #     instance_type                = "r6i.xlarge"
+      #     disable_api_stop             = true
+      #     metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+      #   })
 
-        ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
-          "/dev/sda1" = { label = "root", size = 30 }
-          "/dev/sdb"  = { label = "app", size = 100 } # /u01
-          "/dev/sdc"  = { label = "app", size = 500 } # /u02
-        })
+      #   ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
+      #     "/dev/sda1" = { label = "root", size = 30 }
+      #     "/dev/sdb"  = { label = "app", size = 100 } # /u01
+      #     "/dev/sdc"  = { label = "app", size = 500 } # /u02
+      #   })
 
-        ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
-          data = {
-            iops       = 3000
-            throughput = 125
-            total_size = 1000
-          }
-          flash = {
-            iops       = 3000
-            throughput = 125
-            total_size = 100
-          }
-        })
+      #   ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
+      #     data = {
+      #       iops       = 3000
+      #       throughput = 125
+      #       total_size = 1000
+      #     }
+      #     flash = {
+      #       iops       = 3000
+      #       throughput = 125
+      #       total_size = 100
+      #     }
+      #   })
 
-        secretsmanager_secrets = {
-          asm-passwords = {}
-        }
-        ssm_parameters = {
-          asm-passwords = {}
-        }
+      #   secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
-        tags = {
-          description = "PD CSR Oracle secondary DB server"
-          ami         = "base_ol_8_5"
-          os-type     = "Linux"
-          component   = "data"
-          server-type = "csr-db"
-          backup      = "false" # opt out of mod platform default backup plan
-        }
-      })
+      #   tags = {
+      #     description = "PD CSR Oracle secondary DB server"
+      #     ami         = "base_ol_8_5"
+      #     os-type     = "Linux"
+      #     component   = "data"
+      #     server-type = "csr-db"
+      #     backup      = "false" # opt out of mod platform default backup plan
+      #   }
+      # })
 
       pd-csr-a-7-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
@@ -522,9 +511,514 @@ locals {
           create_external_record = true
         }
       })
-
-
     }
+    baseline_lbs = {
+      r12 = {
+        internal_lb              = true
+        enable_delete_protection = false
+        load_balancer_type       = "network"
+        force_destroy_bucket     = true
+        subnets = [
+          module.environment.subnet["private"]["eu-west-2a"].id,
+          module.environment.subnet["private"]["eu-west-2b"].id,
+        ]
+        security_groups                  = ["load-balancer"]
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
+
+        instance_target_groups = {
+          pd-csr-w-12-80 = {
+            port     = 80
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              port                = 80
+              protocol            = "TCP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-1-a" },
+              { ec2_instance_name = "pd-csr-w-2-b" },
+            ]
+          }
+          pd-csr-w-12-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-1-a" },
+              { ec2_instance_name = "pd-csr-w-2-b" },
+            ]
+          }
+          pd-csr-w-12-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-1-a" },
+              { ec2_instance_name = "pd-csr-w-2-b" },
+            ]
+          }
+          pd-csr-w-12-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-1-a" },
+              { ec2_instance_name = "pd-csr-w-2-b" },
+            ]
+          }
+          pd-csr-w-12-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-1-a" },
+              { ec2_instance_name = "pd-csr-w-2-b" },
+            ]
+          }
+        }
+
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-12-80"
+            }
+          }
+          http-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-12-7770"
+            }
+          }
+          http-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-12-7771"
+            }
+          }
+          http-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-12-7780"
+            }
+          }
+          http-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-12-7781"
+            }
+          }
+        }
+      }
+      r34 = {
+        internal_lb              = true
+        enable_delete_protection = false
+        load_balancer_type       = "network"
+        force_destroy_bucket     = true
+        subnets = [
+          module.environment.subnet["private"]["eu-west-2a"].id,
+          module.environment.subnet["private"]["eu-west-2b"].id,
+        ]
+        security_groups                  = ["load-balancer"]
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
+
+        instance_target_groups = {
+          pd-csr-w-34-80 = {
+            port     = 80
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              port                = 80
+              protocol            = "TCP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-3-a" },
+              { ec2_instance_name = "pd-csr-w-4-b" },
+            ]
+          }
+          pd-csr-w-34-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-3-a" },
+              { ec2_instance_name = "pd-csr-w-4-b" },
+            ]
+          }
+          pd-csr-w-34-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-3-a" },
+              { ec2_instance_name = "pd-csr-w-4-b" },
+            ]
+          }
+          pd-csr-w-34-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-3-a" },
+              { ec2_instance_name = "pd-csr-w-4-b" },
+            ]
+          }
+          pd-csr-w-34-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-3-a" },
+              { ec2_instance_name = "pd-csr-w-4-b" },
+            ]
+          }
+        }
+
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-34-80"
+            }
+          }
+          http-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-34-7770"
+            }
+          }
+          http-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-34-7771"
+            }
+          }
+          http-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-34-7780"
+            }
+          }
+          http-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-34-7781"
+            }
+          }
+        }
+      }
+      r56 = {
+        internal_lb              = true
+        enable_delete_protection = false
+        load_balancer_type       = "network"
+        force_destroy_bucket     = true
+        subnets = [
+          module.environment.subnet["private"]["eu-west-2a"].id,
+          module.environment.subnet["private"]["eu-west-2b"].id,
+        ]
+        security_groups                  = ["load-balancer"]
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
+
+        instance_target_groups = {
+          pd-csr-w-56-80 = {
+            port     = 80
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              port                = 80
+              protocol            = "TCP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-5-a" },
+              { ec2_instance_name = "pd-csr-w-6-b" },
+            ]
+          }
+          pd-csr-w-56-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-5-a" },
+              { ec2_instance_name = "pd-csr-w-6-b" },
+            ]
+          }
+          pd-csr-w-56-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/isps/index.html"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-5-a" },
+              { ec2_instance_name = "pd-csr-w-6-b" },
+            ]
+          }
+          pd-csr-w-56-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7770
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-5-a" },
+              { ec2_instance_name = "pd-csr-w-6-b" },
+            ]
+          }
+          pd-csr-w-56-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              path                = "/"
+              port                = 7771
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "source_ip"
+            }
+            attachments = [
+              { ec2_instance_name = "pd-csr-w-5-a" },
+              { ec2_instance_name = "pd-csr-w-6-b" },
+            ]
+          }
+        }
+
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-56-80"
+            }
+          }
+          http-7770 = {
+            port     = 7770
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-56-7770"
+            }
+          }
+          http-7771 = {
+            port     = 7771
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-56-7771"
+            }
+          }
+          http-7780 = {
+            port     = 7780
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-56-7780"
+            }
+          }
+          http-7781 = {
+            port     = 7781
+            protocol = "TCP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "pd-csr-w-56-7781"
+            }
+          }
+        }
+      }
+    }
+
     baseline_route53_zones = {
       "csr.service.justice.gov.uk" = {
 
@@ -534,6 +1028,14 @@ locals {
           { name = "piwfm", type = "A", ttl = "300", records = ["10.40.8.132"] },
           { name = "traina", type = "CNAME", ttl = "300", records = ["traina.pp.csr.service.justice.gov.uk"] },
           { name = "trainb", type = "CNAME", ttl = "300", records = ["trainb.pp.csr.service.justice.gov.uk"] },
+        ]
+        lb_alias_records = [
+          { name = "r1", type = "A", lbs_map_key = "r12" },
+          { name = "r2", type = "A", lbs_map_key = "r12" },
+          { name = "r3", type = "A", lbs_map_key = "r34" },
+          { name = "r4", type = "A", lbs_map_key = "r34" },
+          { name = "r5", type = "A", lbs_map_key = "r56" },
+          { name = "r6", type = "A", lbs_map_key = "r56" },
         ]
       }
     }

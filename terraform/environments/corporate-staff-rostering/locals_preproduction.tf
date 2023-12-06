@@ -11,13 +11,6 @@ locals {
       }
     }
 
-    baseline_ssm_parameters = {
-      "/oracle/database/PPIWFM" = {
-        parameters = {
-          passwords = { description = "database passwords" }
-        }
-      }
-    }
     baseline_secretsmanager_secrets = {
       "/oracle/database/PPIWFM" = {
         secrets = {
@@ -46,18 +39,16 @@ locals {
             effect = "Allow"
             actions = [
               "ssm:GetParameter",
-              "ssm:PutParameter",
             ]
             resources = [
               "arn:aws:ssm:*:*:parameter/azure/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/*PP/*",
-              "arn:aws:ssm:*:*:parameter/oracle/database/PP*/*",
             ]
           },
           {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
@@ -103,12 +94,7 @@ locals {
           }
         })
 
-        secretsmanager_secrets = {
-          asm-passwords = {}
-        }
-        ssm_parameters = {
-          asm-passwords = {}
-        }
+        secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
         tags = {
           description = "PP CSR DB server"
