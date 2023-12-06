@@ -32,6 +32,8 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
+  env:
+    modernisation_platform_account_id: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
   strategy:
     uses: ./.github/workflows/reusable_terraform_strategy.yml
     if: inputs.action != 'destroy'
@@ -50,8 +52,6 @@ jobs:
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
       init_plan_apply_tfargs: "${{ env.modernisation_platform_account_id }}"
-    env:
-      modernisation_platform_account_id: "${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
