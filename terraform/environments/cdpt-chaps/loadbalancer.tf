@@ -28,9 +28,12 @@ resource "aws_security_group" "chaps_lb_sc" {
   }
 }
 
-resource "aws_lb" "old" {
-  name                       = "cdpt-chaps-loadbalancer"
+resource "aws_lb" "external" {
+  name                       = "${local.application_name}-loadbalancer"
+  load_balancer_type         = "application"
   enable_deletion_protection = false
+  # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
+  idle_timeout = 240
 }
 
 resource "aws_lb" "chaps_lb" {
