@@ -41,12 +41,7 @@ on:
         type: string
         required: false
         description: "The terraform version to use"
-        default: "~1.5"
-      init_plan_apply_tfargs:
-        type: string
-        required: false
-        description: "Any terraform arguments to be passed into terrafrom init, plan and apply, e.g. --lock-timeout=300s"
-        default: "-input=false -lock-timeout=300s"
+        default: "~1.6"
       plan_apply_tfargs:
         type: string
         required: false
@@ -99,6 +94,11 @@ jobs:
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
+      - name: Get Backend AWS Account Number
+        run: |
+          BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a  # v4.0.1
         with:
@@ -116,8 +116,8 @@ jobs:
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           terraform --version
-          echo "terraform init ${{ inputs.init_plan_apply_tfargs }}"
-          terraform init ${{ inputs.init_plan_apply_tfargs }}
+          echo "terraform init -backend-config=assume_role={role_arn=\"arn:aws:iam::${{env.BACKEND_NUMBER}}:role/modernisation-account-terraform-state-member-access\"}"
+          terraform init -backend-config=assume_role={role_arn=\"arn:aws:iam::${{env.BACKEND_NUMBER}}:role/modernisation-account-terraform-state-member-access\"}
 
       - name: Terraform Workspace Select
         working-directory: "terraform/environments/${{ inputs.application }}"
