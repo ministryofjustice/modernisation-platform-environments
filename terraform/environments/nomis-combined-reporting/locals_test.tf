@@ -185,32 +185,30 @@ locals {
         subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private"]
         listeners = {
-          http = {
-            port     = 80
-            protocol = "HTTP"
-            default_action = {
-              type = "redirect"
-              redirect = {
-                port        = "443"
-                protocol    = "HTTPS"
-                status_code = "HTTP_301"
+          http = local.bip_cmc_lb_listeners.http
+
+          http7777 = merge(local.bip_cmc_lb_listeners.http7777, local.bip_lb_listeners.http7777, {
+            rules = {
+              # T1 users in Azure accessed server directly on http 7777
+              # so support this in Mod Platform as well to minimise
+              # disruption.  This isn't needed for other environments.
+              t1-nomis-web-a = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
+                      "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
               }
             }
-          }
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "HTTPS"
-                status_code  = "200"
-              }
-            }
-          }
+          })
         }
       }
     }

@@ -101,6 +101,97 @@ locals {
     }
   }
 
+  tomcat_lb_listeners = {
+
+    http = {
+      port     = 80
+      protocol = "HTTP"
+
+      default_action = {
+        type = "redirect"
+        redirect = {
+          port        = 443
+          protocol    = "HTTPS"
+          status_code = "HTTP_301"
+        }
+      }
+    }
+
+    http7777 = {
+      port     = 7777
+      protocol = "HTTP"
+
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
+    http7010 = {
+      port     = 7010
+      protocol = "HTTP"
+
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
+    http8433 = {
+      port     = 8433
+      protocol = "HTTP"
+
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
+    http8005 = {
+      port     = 8005
+      protocol = "HTTP"
+
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
+    https = {
+      port                      = 443
+      protocol                  = "HTTPS"
+      ssl_policy                = "ELBSecurityPolicy-2016-08"
+      certificate_names_or_arns = ["nomis_wildcard_cert"]
+      cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms.lb
+
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
+  }
+
   tomcat_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
