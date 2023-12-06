@@ -2,54 +2,15 @@
   "accounts": {
     "development": {
       "region": "eu-west-2",
-      "container_instance_type": "windows",
-      "ami_image_id": "ami-0de7ce0d2a2e4fc16",
-      "instance_type": "t3.micro",
-      "key_name": "",
-      "ec2_desired_capacity": 2,
-      "ec2_max_size": 3,
-      "ec2_min_size": 2,
-      "container_cpu": 512,
-      "container_memory": 2048,
-      "network_mode": "none",
-      "server_port": "80",
-      "app_count": "1",
-      "docker_image_tag": "development",
-      "task_definition_volume": "upload_volume"
+      "docker_image_tag": "development"
     },
     "preproduction": {
       "region": "eu-west-2",
-      "container_instance_type": "windows",
-      "ami_image_id": "ami-0de7ce0d2a2e4fc16",
-      "instance_type": "t3.micro",
-      "key_name": "",
-      "ec2_desired_capacity": 2,
-      "ec2_max_size": 3,
-      "ec2_min_size": 2,
-      "container_cpu": 512,
-      "container_memory": 2048,
-      "network_mode": "none",
-      "server_port": "80",
-      "app_count": "1",
-      "docker_image_tag": "preproduction",
-      "task_definition_volume": "upload_volume"
+      "docker_image_tag": "preproduction"
     },
     "production": {
       "region": "eu-west-2",
-      "container_instance_type": "windows",
-      "ami_image_id": "ami-0de7ce0d2a2e4fc16",
-      "instance_type": "t3.medium",
-      "key_name": "",
-      "ec2_desired_capacity": 2,
-      "ec2_max_size": 3,
-      "ec2_min_size": 2,
-      "container_cpu": 512,
-      "container_memory": 2048,
-      "network_mode": "none",
-      "server_port": "80",
-      "app_count": "1",
-      "docker_image_tag": "production",
-      "task_definition_volume": "upload_volume"
+      "docker_image_tag": "production"
     }
   }
 }

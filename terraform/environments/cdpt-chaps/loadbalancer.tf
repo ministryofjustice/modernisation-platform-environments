@@ -1,35 +1,49 @@
-#------------------------------------------------------------------------------
-# Load Balancer
-#------------------------------------------------------------------------------
-#tfsec:ignore:AWS005 tfsec:ignore:AWS083
-resource "aws_lb" "external" {
-  #checkov:skip=CKV_AWS_91
-  #checkov:skip=CKV_AWS_131
-  #checkov:skip=CKV2_AWS_20
-  #checkov:skip=CKV2_AWS_28
-  name                       = "${local.application_name}-loadbalancer"
-  load_balancer_type         = "application"
-  subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = true
-  # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
-  idle_timeout = 240
+resource "aws_security_group" "chaps_lb_sc" {
+  name        = "load balancer security group"
+  description = "control access to the load balancer"
+  vpc_id      = data.aws_vpc.shared.id
 
-  security_groups = [aws_security_group.load_balancer_security_group.id]
+  ingress {
+    description = "allow access on HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-external-loadbalancer"
-    }
-  )
+  egress {
+    description = "allow all outbound traffic for port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "allow all outbound traffic for port 443"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
-resource "aws_lb_target_group" "target_group" {
-  name                 = "${local.application_name}-tg-${local.environment}"
-  port                 = local.app_data.accounts[local.environment].server_port
+resource "aws_lb" "chaps_lb" {
+  name                       = "chaps-load-balancer"
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.chaps_lb_sc.id]
+  subnets                    = data.aws_subnets.shared-public.ids
+  enable_deletion_protection = false
+  internal                   = false
+  depends_on                 = [aws_security_group.chaps_lb_sc]
+}
+
+resource "aws_lb_target_group" "chaps_target_group" {
+  name                 = "chaps-target-group"
+  port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
+  target_type          = "ip"
   deregistration_delay = 30
 
   stickiness {
@@ -37,89 +51,29 @@ resource "aws_lb_target_group" "target_group" {
   }
 
   health_check {
-    # path                = "/"
-    healthy_threshold   = "5"
-    interval            = "120"
+    healthy_threshold   = "3"
+    interval            = "30"
     protocol            = "HTTP"
-    unhealthy_threshold = "2"
-    matcher             = "200-499"
-    timeout             = "5"
+    port                = "80"
+    unhealthy_threshold = "5"
+    matcher             = "200-302"
+    timeout             = "10"
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-tg-${local.environment}"
-    }
-  )
 }
 
-#tfsec:ignore:AWS004
-resource "aws_lb_listener" "listener" {
-  #checkov:skip=CKV_AWS_2
-  #checkov:skip=CKV_AWS_103
-  load_balancer_arn = aws_lb.external.id
-  port              = local.app_data.accounts[local.environment].server_port
-  protocol          = "HTTP"
+resource "aws_lb_listener" "chaps_lb" {
+  # depends_on = [
+  #   aws_acm_certificate.external
+  # ]
+  # certificate_arn   = local.is-production ? aws_acm_certificate.external_prod[0].arn : aws_acm_certificate.external.arn
+  load_balancer_arn = aws_lb.chaps_lb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
 
   default_action {
-    target_group_arn = aws_lb_target_group.target_group.id
     type             = "forward"
+    target_group_arn = aws_lb_target_group.chaps_target_group.arn
   }
-}
-
-# resource "aws_lb_listener" "https_listener" {
-#   # depends_on = [aws_acm_certificate_validation.external]
-
-#   load_balancer_arn = aws_lb.external.id
-#   port              = "443"
-#   protocol          = "HTTPS"
-#   # certificate_arn   = format("arn:aws:acm:eu-west-2:%s:certificate/%s", data.aws_caller_identity.current.account_id, local.app_data.accounts[local.environment].cert_arn)
-
-#   default_action {
-#     target_group_arn = aws_lb_target_group.target_group.id
-#     type             = "forward"
-#   }
-# }
-
-resource "aws_security_group" "load_balancer_security_group" {
-  name_prefix = "${local.application_name}-loadbalancer-security-group"
-  description = "controls access to lb"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    protocol    = "tcp"
-    description = "Open the server port"
-    from_port   = local.app_data.accounts[local.environment].server_port
-    to_port     = local.app_data.accounts[local.environment].server_port
-    #tfsec:ignore:AWS008
-    cidr_blocks = ["0.0.0.0/0", ]
-  }
-
-  ingress {
-    protocol    = "tcp"
-    description = "Open the SSL port"
-    from_port   = 443
-    to_port     = 443
-    #tfsec:ignore:AWS008
-    cidr_blocks = ["0.0.0.0/0", ]
-  }
-
-  egress {
-    protocol    = "-1"
-    description = "Open all outbound ports"
-    from_port   = 0
-    to_port     = 0
-    #tfsec:ignore:AWS009
-    cidr_blocks = [
-      "0.0.0.0/0",
-    ]
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-loadbalancer-security-group"
-    }
-  )
 }
