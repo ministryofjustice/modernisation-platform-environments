@@ -276,7 +276,7 @@ locals {
       #     instance_profile_policies = concat(local.bip_b.config.instance_profile_policies, [
       #       "Ec2T1BipPolicy",
       #     ])
-      #     # ami_name                  = "base_rhel_7_9*"
+      #     ami_name                  = "base_rhel_7_9*"
       #   })
       #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
@@ -291,6 +291,7 @@ locals {
       #     oasys-db-hostname   = "t1-oasys-db-a"
       #   })
       # })
+      
     }
 
     baseline_ec2_autoscaling_groups = {
