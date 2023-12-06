@@ -2,6 +2,7 @@
   {
     "name": "${app_name}",
     "image": "${ecr_url}:${docker_image_tag}",
+    "requires_compatibilities": ["FARGATE"],
     "cpu": 256,
     "portMappings": [
       {
