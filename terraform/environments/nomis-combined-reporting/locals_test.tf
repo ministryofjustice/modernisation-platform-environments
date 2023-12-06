@@ -333,6 +333,52 @@ locals {
               }
             }
           })
+          https = merge(local.weblogic_lb_listeners.https, {
+            rules = {
+              t1-ncr-bip-cmc-http-7777 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-cmc-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip-cmc.reporting.test.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-bip-http-7777 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip.reporting.test.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat-http-7777 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat.reporting.test.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
         }
       }
     }
