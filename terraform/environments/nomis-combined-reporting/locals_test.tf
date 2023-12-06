@@ -106,18 +106,6 @@ locals {
     }
 
     baseline_ec2_instances = {
-      t1-ncr-bip-cmc = merge(local.bip_cmc_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cmc_cloudwatch_metric_alarms
-        config = merge(local.bip_cmc_ec2_default.config, {
-          instance_profile_policies = concat(local.bip_cmc_ec2_default.config.instance_profile_policies, [
-            "Ec2T1BipPolicy",
-          ])
-        })
-        tags = merge(local.bip_cmc_ec2_default.tags, {
-          description                          = "For testing SAP BI CMC installation and configurations"
-          nomis-combined-reporting-environment = "t1"
-        })
-      })
       t1-ncr-db-1-a = merge(local.database_ec2_default, {
         cloudwatch_metric_alarms = merge(
           local.database_cloudwatch_metric_alarms,
@@ -157,7 +145,23 @@ locals {
           nomis-combined-reporting-environment = "t1"
         })
       })
-
+      t1-ncr-bip-cmc = merge(local.bip_cmc_ec2_default, {
+        autoscaling_group = {
+          desired_capacity    = 0
+          max_size            = 1
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        cloudwatch_metric_alarms = local.bip_cmc_cloudwatch_metric_alarms
+        config = merge(local.bip_cmc_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_cmc_ec2_default.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
+        tags = merge(local.bip_cmc_ec2_default.tags, {
+          description                          = "For testing SAP BI CMC installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
       t1-ncr-bip = merge(local.bip_ec2_default, {
         autoscaling_group = {
           desired_capacity    = 1
