@@ -333,7 +333,7 @@ locals {
               }
             }
           })
-          https = merge(local.weblogic_lb_listeners.https, {
+          https = merge(local.bup_cmc_lb_listeners.https, local.bip_lb_listeners.https, local.tomcat_lb_listeners.https, {
             rules = {
               t1-ncr-bip-cmc-http-7777 = {
                 priority = 300
