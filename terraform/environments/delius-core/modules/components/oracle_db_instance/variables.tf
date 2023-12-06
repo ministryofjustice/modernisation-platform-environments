@@ -4,9 +4,10 @@ variable "db_type" {
   type        = string
 }
 
-variable "db_name" {
-  description = "Database name"
+variable "ec2_instance_type" {
+  description = "EC2 instance type"
   type        = string
+  default     = "r6i.xlarge"
 }
 
 variable "db_count_index" {

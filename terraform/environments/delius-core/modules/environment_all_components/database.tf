@@ -21,9 +21,10 @@ module "oracle_db_primary" {
     name_regex = "^delius_core_ol_8_5_oracle_db_19c_"
     owners     = [var.platform_vars.environment_management.account_ids["core-shared-services-production"]]
   }
-  db_name        = "primary"
-  count          = 1
-  db_count_index = count.index + 1
+  db_type           = "primary"
+  count             = 1
+  db_count_index    = count.index + 1
+  ec2_instance_type = "r6i.xlarge"
 
   instance_profile   = module.oracle_db_shared.instance_profile
   security_group_ids = [module.oracle_db_shared.security_group.id]
@@ -123,9 +124,11 @@ module "oracle_db_standby" {
     name_regex = "^delius_core_ol_8_5_oracle_db_19c_"
     owners     = [var.platform_vars.environment_management.account_ids["core-shared-services-production"]]
   }
-  db_name        = "standby"
+  db_type        = "standby"
   count          = 2
   db_count_index = count.index + 1
+
+  ec2_instance_type = "r6i.xlarge"
 
   instance_profile   = module.oracle_db_shared.instance_profile
   security_group_ids = [module.oracle_db_shared.security_group.id]
