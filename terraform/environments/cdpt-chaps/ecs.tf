@@ -1,5 +1,5 @@
 data "aws_ecs_task_definition" "task_definition" {
-  task_definition = "${local.application_name}-task-definition"
+  task_definition = aws_ecs_task_definition.chaps_task_definition.family
   depends_on      = [aws_ecs_task_definition.chaps_task_definition]
 }
 
