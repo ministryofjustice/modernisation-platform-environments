@@ -1,5 +1,5 @@
 module "ebs_volumes" {
-  source = "../../ebs_volume"
+  source = "../ebs_volume"
   for_each = {
     for k, v in var.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == false
   }

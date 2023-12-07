@@ -4,19 +4,14 @@ variable "db_type" {
   type        = string
 }
 
-variable "db_name" {
-  description = "Database name"
+variable "ec2_instance_type" {
+  description = "EC2 instance type"
   type        = string
-}
-
-variable "db_count_index0" {
-  description = "Database count index"
-  type        = number
-  default     = 0
+  default     = "r6i.xlarge"
 }
 
 variable "db_count_index" {
-  description = "Database count index + 1"
+  description = "Database count index"
   type        = number
   default     = 1
 }
@@ -104,4 +99,20 @@ variable "environment_config" {
 variable "ec2_key_pair_name" {
   description = "EC2 key pair name to associate with the instance"
   type        = string
+}
+
+variable "standby_dbs_required" {
+  description = "Number of standby databases required"
+  type        = number
+  default     = 0
+}
+
+variable "instance_profile" {
+  description = "The instance profile to attach"
+  type        = any
+}
+
+variable "security_group_ids" {
+  description = "A list of security group IDs to attach"
+  type        = list(string)
 }
