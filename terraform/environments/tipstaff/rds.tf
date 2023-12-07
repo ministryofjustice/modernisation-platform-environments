@@ -47,6 +47,14 @@ resource "aws_security_group" "postgresql_db_sc" {
       module.bastion_linux.bastion_security_group
     ]
   }
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    description = "MOJ Digital VPN access"
+    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
+  }
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
