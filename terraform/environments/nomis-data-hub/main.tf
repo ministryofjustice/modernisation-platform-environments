@@ -71,6 +71,11 @@ module "baseline" {
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
   lbs                    = lookup(local.environment_config, "baseline_lbs", {})
 
+  secretsmanager_secrets = merge(
+    local.baseline_secretsmanager_secrets,
+    lookup(local.baseline_environment_config, "baseline_secretsmanager_secrets", {})
+  )
+
   ssm_parameters = merge(
     module.baseline_presets.ssm_parameters,
     local.baseline_ssm_parameters,

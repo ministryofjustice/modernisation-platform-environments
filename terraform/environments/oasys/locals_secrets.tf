@@ -1,15 +1,8 @@
 locals {
 
-  database_ssm_parameters = {
-    parameters = {
-      passwords = { description = "database passwords" }
-    }
-  }
-
   share_secret_principal_ids_db = [
     "arn:aws:iam::${module.environment.account_id}:role/ec2-database-*"
   ]
-
 
   secret_policy_write_db = {
     effect = "Allow"

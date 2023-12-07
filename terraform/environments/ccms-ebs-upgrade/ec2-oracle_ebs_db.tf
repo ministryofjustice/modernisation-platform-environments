@@ -46,6 +46,30 @@ resource "aws_instance" "ec2_oracle_ebs" {
   depends_on = [aws_security_group.ec2_sg_ebsdb]
 }
 
+resource "aws_ebs_volume" "ebsdb_swap" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_swap
+  type              = "gp3"
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_swap
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "swap" }
+  )
+}
+
+resource "aws_volume_attachment" "ebsdb_swap_att" {
+  depends_on = [
+    aws_ebs_volume.ebsdb_swap
+  ]
+  device_name = "/dev/sdb"
+  volume_id   = aws_ebs_volume.ebsdb_swap.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
 resource "aws_ebs_volume" "export_home" {
   lifecycle {
     ignore_changes = [kms_key_id]

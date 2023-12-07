@@ -117,11 +117,11 @@ locals {
           self        = true
         }
         http_web = {
-          description = "80: Allow HTTP ingress from LB"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "TCP"
-          cidr_blocks = ["10.40.129.64/26"] # noms mgmt live jumpservers
+          description     = "80: Allow HTTP ingress from LB"
+          from_port       = 80
+          to_port         = 80
+          protocol        = "TCP"
+          cidr_blocks     = ["10.40.129.64/26"] # noms mgmt live jumpservers
           security_groups = ["loadbalancer"]
         }
         https_web = {

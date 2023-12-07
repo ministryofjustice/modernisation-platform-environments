@@ -26,7 +26,8 @@ locals {
     "ndh_harkemsadmin_ssl_pass",
   ]
 
-  baseline_ssm_parameters = {}
+  baseline_secretsmanager_secrets = {}
+  baseline_ssm_parameters         = {}
 
   baseline_s3_buckets = {
     s3-bucket = {
@@ -34,6 +35,12 @@ locals {
     }
   }
   baseline_route53_zones = {}
+
+  ndh_secretsmanager_secrets = {
+    secrets = {
+      shared = { description = "NDH secrets for both ems and app components" }
+    }
+  }
 
   ndh_app_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {

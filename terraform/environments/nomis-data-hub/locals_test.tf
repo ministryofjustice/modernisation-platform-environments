@@ -1,13 +1,31 @@
 locals {
   test_config = {
 
+    baseline_secretsmanager_secrets = {
+      "/ndh/t1"   = local.ndh_secretsmanager_secrets
+      "/ndh/t2"   = local.ndh_secretsmanager_secrets
+      "/ndh/test" = local.ndh_secretsmanager_secrets
+    }
+
     baseline_ec2_instances = {
 
-      test-management-server-2022 = local.management_server_2022
+      test-management-server-2022 = merge(local.management_server_2022, {
+        tags = merge(local.management_server_2022.tags, {
+          ndh-environment = "test"
+        })
+      })
 
-      test-ndh-app-a = local.ndh_app_a
+      test-ndh-app-a = merge(local.ndh_app_a, {
+        tags = merge(local.ndh_app_a.tags, {
+          ndh-environment = "test"
+        })
+      })
 
-      test-ndh-ems-a = local.ndh_ems_a
+      test-ndh-ems-a = merge(local.ndh_ems_a, {
+        tags = merge(local.ndh_ems_a.tags, {
+          ndh-environment = "test"
+        })
+      })
 
     }
     baseline_ec2_autoscaling_groups = {

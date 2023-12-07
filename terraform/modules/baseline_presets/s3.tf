@@ -1,38 +1,53 @@
 locals {
 
+  requested_s3_iam_policies = var.options.s3_iam_policies != null ? {
+    for key, value in local.s3_iam_policies : key => value if contains(var.options.s3_iam_policies, key)
+  } : local.s3_iam_policies
+
   s3_buckets = merge(
+
+    # if enable_shared_s3 set, create a bucket in test and production which can be used by dev and test / preprod and prod respectively
     var.options.enable_shared_s3 && var.environment.environment == "production" ? { "prodpreprod-${var.environment.application_name}-" = {
       bucket_policy_v2 = [
         local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
         local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy
       ]
-      iam_policies = local.s3_iam_policies
+      custom_kms_key = var.environment.kms_keys["general"].arn
+      iam_policies   = local.requested_s3_iam_policies
     } } : {},
     var.options.enable_shared_s3 && var.environment.environment == "test" ? { "devtest-${var.environment.application_name}-" = {
       bucket_policy_v2 = [
         local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
         local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
       ]
-      iam_policies = local.s3_iam_policies
+      custom_kms_key = var.environment.kms_keys["general"].arn
+      iam_policies   = local.requested_s3_iam_policies
     } } : {},
+
+    # If db_backup_s3 enabled, create db_backups in all environments.
+    # The test and production buckets allow read access from development and preproduction resepctively
     var.options.db_backup_s3 && var.environment.environment == "production" ? { "prod-${var.environment.application_name}-db-backup-bucket-" = {
       bucket_policy_v2 = [
         local.s3_bucket_policies.PreprodReadOnlyAccessBucketPolicy
       ]
-      iam_policies = local.s3_iam_policies
+      custom_kms_key = var.environment.kms_keys["general"].arn
+      iam_policies   = local.requested_s3_iam_policies
     } } : {},
     var.options.db_backup_s3 && var.environment.environment == "preproduction" ? { "preprod-${var.environment.application_name}-db-backup-bucket-" = {
-      bucket_policy_v2 = [
-        local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy
-      ]
-      iam_policies = local.s3_iam_policies
+      custom_kms_key = var.environment.kms_keys["general"].arn
+      iam_policies   = local.s3_iam_policies
     } } : {},
-    var.options.db_backup_s3 && var.options.enable_shared_s3 && var.environment.environment == "test" ? { "devtest-${var.environment.application_name}-db-backup-bucket-" = {
+    var.options.db_backup_s3 && var.environment.environment == "test" ? { "devtest-${var.environment.application_name}-db-backup-bucket-" = {
       bucket_policy_v2 = [
-        local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
+        local.s3_bucket_policies.DevelopmentReadOnlyAccessBucketPolicy
       ]
-      iam_policies = local.s3_iam_policies
-    } } : {}
+      custom_kms_key = var.environment.kms_keys["general"].arn
+      iam_policies   = local.requested_s3_iam_policies
+    } } : {},
+    var.options.db_backup_s3 && var.environment.environment == "development" ? { "dev-${var.environment.application_name}-db-backup-bucket-" = {
+      custom_kms_key = var.environment.kms_keys["general"].arn
+      iam_policies   = local.requested_s3_iam_policies
+    } } : {},
   )
 
   s3_bucket_policies = {
@@ -212,6 +227,22 @@ locals {
         type = "AWS"
         identifiers = [for account_name in var.environment.devtest_account_names :
           var.environment.account_root_arns[account_name]
+        ]
+      }
+    }
+
+    DevelopmentReadOnlyAccessBucketPolicy = {
+      effect = "Allow"
+      actions = [
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:GetObjectTagging",
+        "s3:ListBucket"
+      ]
+      principals = {
+        type = "AWS"
+        identifiers = [
+          var.environment.account_root_arns["${var.environment.application_name}-development"]
         ]
       }
     }
