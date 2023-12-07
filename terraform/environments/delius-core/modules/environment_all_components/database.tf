@@ -95,10 +95,8 @@ module "oracle_db_primary" {
   }
   env_name           = var.env_name
   environment_config = var.environment_config
-  # revisit this so that its dynamic
-  #  subnet_id          = var.account_config.ordered_private_subnet_ids[count.index % 3]
-  subnet_id = var.account_config.ordered_private_subnet_ids[count.index]
-  tags      = local.tags
+  subnet_id          = var.account_config.ordered_private_subnet_ids[count.index % 3]
+  tags               = local.tags
   user_data = base64encode(
     templatefile(
       "${path.module}/templates/userdata.sh.tftpl",
@@ -201,10 +199,8 @@ module "oracle_db_standby" {
   }
   env_name           = var.env_name
   environment_config = var.environment_config
-  # revisit this so that its dynamic
-  #  subnet_id          = var.account_config.ordered_private_subnet_ids[count.index % 3]
-  subnet_id = var.account_config.ordered_private_subnet_ids[count.index + 1]
-  tags      = local.tags
+  subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_primary)) % 3]
+  tags               = local.tags
   user_data = base64encode(
     templatefile(
       "${path.module}/templates/userdata.sh.tftpl",
