@@ -13,7 +13,6 @@ module "oracle_db_shared" {
 
 }
 
-
 module "oracle_db_primary" {
   source         = "../components/oracle_db_instance"
   account_config = var.account_config
@@ -97,7 +96,7 @@ module "oracle_db_primary" {
   env_name           = var.env_name
   environment_config = var.environment_config
   subnet_id          = var.account_config.private_subnet_ids[0]
-  tags               = var.tags
+  tags               = local.tags
   user_data = base64encode(
     templatefile(
       "${path.module}/templates/userdata.sh.tftpl",
