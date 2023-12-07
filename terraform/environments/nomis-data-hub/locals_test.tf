@@ -16,13 +16,13 @@ locals {
       })
 
       test-ndh-app-a = merge(local.ndh_app_a, {
-        tags = merge(local.management_server_2022.tags, {
+        tags = merge(local.ndh_app_a.tags, {
           ndh-environment = "test"
         })
       })
 
       test-ndh-ems-a = merge(local.ndh_ems_a, {
-        tags = merge(local.management_server_2022.tags, {
+        tags = merge(local.ndh_ems_a.tags, {
           ndh-environment = "test"
         })
       })
