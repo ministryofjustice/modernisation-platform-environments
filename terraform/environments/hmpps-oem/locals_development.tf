@@ -41,6 +41,7 @@ locals {
     baseline_ec2_instances = {
       dev-oem-a = merge(local.oem_ec2_default, {
         config = merge(local.oem_ec2_default.config, {
+          ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-12-07T12-10-49.620Z"
           availability_zone = "eu-west-2a"
         })
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
