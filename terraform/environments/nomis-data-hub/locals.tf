@@ -26,6 +26,7 @@ locals {
     "ndh_harkemsadmin_ssl_pass",
   ]
 
+  baseline_iam_policies           = {}
   baseline_secretsmanager_secrets = {}
   baseline_ssm_parameters         = {}
 
