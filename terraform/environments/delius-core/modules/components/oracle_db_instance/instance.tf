@@ -11,7 +11,7 @@ resource "aws_instance" "db_ec2" {
   monitoring                  = var.monitoring
   ebs_optimized               = true
   key_name                    = var.ec2_key_pair_name
-  user_data_base64            = base64encode(var.user_data)
+  user_data_base64            = var.user_data
 
   metadata_options {
     http_endpoint = var.metadata_options.http_endpoint
