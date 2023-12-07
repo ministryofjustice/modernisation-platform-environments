@@ -3,7 +3,7 @@ module "oracle_db_shared" {
   account_config     = var.account_config
   environment_config = var.environment_config
   env_name           = var.env_name
-  tags               = var.tags
+  tags               = local.tags
 
   providers = {
     aws.bucket-replication    = aws
@@ -201,7 +201,7 @@ module "oracle_db_standby" {
   env_name           = var.env_name
   environment_config = var.environment_config
   subnet_id          = var.account_config.private_subnet_ids[0]
-  tags               = var.tags
+  tags               = local.tags
   user_data = base64encode(
     templatefile(
       "${path.module}/templates/userdata.sh.tftpl",
