@@ -63,10 +63,10 @@ resource "aws_ebs_volume" "ebsdb_swap" {
 
 resource "aws_volume_attachment" "ebsdb_swap_att" {
   depends_on = [
-    aws_ebs_volume.swap
+    aws_ebs_volume.ebsdb_swap
   ]
   device_name = "/dev/sdb"
-  volume_id   = aws_ebs_volume.swap.id
+  volume_id   = aws_ebs_volume.ebsdb_swap.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
