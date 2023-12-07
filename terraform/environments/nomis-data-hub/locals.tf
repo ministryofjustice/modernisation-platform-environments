@@ -27,7 +27,7 @@ locals {
   ]
 
   baseline_secretsmanager_secrets = {}
-  baseline_ssm_parameters = {}
+  baseline_ssm_parameters         = {}
 
   baseline_s3_buckets = {
     s3-bucket = {

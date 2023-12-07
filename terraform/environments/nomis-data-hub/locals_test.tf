@@ -11,19 +11,19 @@ locals {
 
       test-management-server-2022 = merge(local.management_server_2022, {
         tags = merge(local.management_server_2022.tags, {
-          ndh-environment   = "test"
+          ndh-environment = "test"
         })
       })
 
       test-ndh-app-a = merge(local.ndh_app_a, {
         tags = merge(local.management_server_2022.tags, {
-          ndh-environment   = "test"
+          ndh-environment = "test"
         })
       })
 
       test-ndh-ems-a = merge(local.ndh_ems_a, {
         tags = merge(local.management_server_2022.tags, {
-          ndh-environment   = "test"
+          ndh-environment = "test"
         })
       })
 
