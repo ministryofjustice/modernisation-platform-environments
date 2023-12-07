@@ -2,7 +2,7 @@
 
 resource "aws_instance" "db_ec2" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
-  instance_type               = var.db_type
+  instance_type               = var.ec2_instance_type
   ami                         = data.aws_ami.oracle_db.id
   vpc_security_group_ids      = var.security_group_ids
   subnet_id                   = var.subnet_id
