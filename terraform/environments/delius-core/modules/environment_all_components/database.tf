@@ -199,7 +199,7 @@ module "oracle_db_standby" {
   }
   env_name           = var.env_name
   environment_config = var.environment_config
-  subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + 1 + length(module.oracle_db_primary)) % 3]
+  subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + 1) % 3]
   tags               = local.tags
   user_data = base64encode(
     templatefile(
