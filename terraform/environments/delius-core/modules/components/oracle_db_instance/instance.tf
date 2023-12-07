@@ -36,8 +36,13 @@ resource "aws_instance" "db_ec2" {
     }
   }
   tags = merge(var.tags,
-    { Name = lower(format("%s-delius-db-%s", var.env_name, var.db_count_index)) },
+    { Name = lower(format("%s-delius-db-%s", var.env_name, local.instance_name_index)) },
     { server-type = "delius_core_db" },
-    { database = "delius_${var.db_type}" }
+    { database = local.database_tag }
   )
+}
+
+locals {
+  instance_name_index = var.db_type == "primary" ? var.db_count_index : var.db_count_index + 1
+  database_tag        = var.db_type == "primary" ? "delius_${var.db_type}db" : "delius_${var.db_type}db${var.db_count_index}"
 }
