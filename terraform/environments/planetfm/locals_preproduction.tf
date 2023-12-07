@@ -211,13 +211,13 @@ locals {
         }
         listeners = {
           http = {
-            port = 80
+            port     = 80
             protocol = "HTTP"
             default_action = {
               type = "redirect"
               redirect = {
-                port = 443
-                protocol = "HTTPS"
+                port        = 443
+                protocol    = "HTTPS"
                 status_code = "HTTP_301"
               }
             }
