@@ -1,8 +1,3 @@
-data "aws_ecs_task_definition" "task_definition" {
-  task_definition = "${local.application_name}-task-definition"
-  depends_on      = [aws_ecs_task_definition.chaps_task_definition]
-}
-
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "${local.application_name}-ecs-cluster"
   setting {
@@ -46,6 +41,11 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
     operating_system_family = "WINDOWS_SERVER_2019_CORE"
     cpu_architecture        = "X86_64"
   }
+}
+
+data "aws_ecs_task_definition" "task_definition" {
+  task_definition = "${local.application_name}-task-definition"
+  depends_on      = [aws_ecs_task_definition.chaps_task_definition]
 }
 
 resource "aws_ecs_service" "ecs_service" {
