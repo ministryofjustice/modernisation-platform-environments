@@ -1,6 +1,7 @@
 resource "aws_secretsmanager_secret" "delius_core_dba_passwords" {
-  name = "delius-core-${var.env_name}-dba-passwords"
-  tags = var.tags
+  name        = "delius-core-${var.env_name}-dba-passwords"
+  description = "DBA Users Credentials"
+  tags        = var.tags
 }
 
 resource "aws_secretsmanager_secret_version" "delius_core_dba_passwords" {
@@ -14,8 +15,9 @@ resource "aws_secretsmanager_secret_version" "delius_core_dba_passwords" {
 }
 
 resource "aws_secretsmanager_secret" "delius_core_application_passwords" {
-  name = "delius-core-${var.env_name}-application-passwords"
-  tags = var.tags
+  name        = "delius-core-${var.env_name}-application-passwords"
+  description = "Application Users Credentials"
+  tags        = var.tags
 }
 
 resource "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
