@@ -169,7 +169,7 @@ locals {
             protocol = "HTTP"
             health_check = {
               enabled             = true
-              path                = "/"
+              path                = "/RDWeb"
               healthy_threshold   = 3
               unhealthy_threshold = 5
               timeout             = 5
