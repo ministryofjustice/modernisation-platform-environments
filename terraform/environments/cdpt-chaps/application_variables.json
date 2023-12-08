@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "region": "eu-west-2",
-      "docker_image_tag": "development"
+      "docker_image_tag": "development",
       "db_enabled": true,
       "db_instance_class": "db.t3.small",
       "db_user": "admin",
