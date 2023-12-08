@@ -1,7 +1,6 @@
-#### This file can be used to store locals specific to the member account ####
-
 locals {
   business_unit = var.networking[0].business-unit
+  region        = "eu-west-2"
 
   environment_configs = {
     development   = local.development_config
@@ -10,100 +9,44 @@ locals {
     production    = local.production_config
   }
   baseline_environment_config = local.environment_configs[local.environment]
-  environment_config          = local.environment_configs[local.environment]
-  ndh_secrets = [
-    "ndh_admin_user",
-    "ndh_admin_pass",
-    "ndh_domain_name",
-    "ndh_ems_host_a",
-    "ndh_ems_host_b",
-    "ndh_app_host_a",
-    "ndh_app_host_b",
-    "ndh_ems_port_1",
-    "ndh_ems_port_2",
-    "ndh_host_os",
-    "ndh_host_os_version",
-    "ndh_harkemsadmin_ssl_pass",
-  ]
 
-  baseline_iam_policies           = {}
-  baseline_secretsmanager_secrets = {}
-  baseline_ssm_parameters         = {}
+  baseline_presets_options = {
+    enable_application_environment_wildcard_cert = true
+    enable_backup_plan_daily_and_weekly          = true
+    enable_business_unit_kms_cmks                = true
+    enable_image_builder                         = true
+    enable_ec2_cloud_watch_agent                 = true
+    enable_ec2_self_provision                    = true
+    enable_ec2_user_keypair                      = true
+    iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+    iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+    s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+  }
+
+  baseline_acm_certificates              = {}
+  baseline_backup_plans                  = {}
+  baseline_cloudwatch_log_groups         = {}
+  baseline_cloudwatch_metric_alarms      = {}
+  baseline_cloudwatch_log_metric_filters = {}
+  baseline_ec2_autoscaling_groups        = {}
+  baseline_ec2_instances                 = {}
+  baseline_iam_policies                  = {}
+  baseline_iam_roles                     = {}
+  baseline_iam_service_linked_roles      = {}
+  baseline_key_pairs                     = {}
+  baseline_kms_grants                    = {}
+  baseline_lbs                           = {}
+  baseline_route53_resolvers             = {}
+  baseline_route53_zones                 = {}
 
   baseline_s3_buckets = {
     s3-bucket = {
       iam_policies = module.baseline_presets.s3_iam_policies
     }
   }
-  baseline_route53_zones = {}
 
-  ndh_secretsmanager_secrets = {
-    secrets = {
-      shared = { description = "NDH secrets for both ems and app components" }
-    }
-  }
-
-  ndh_app_a = {
-    config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
-    })
-    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      vpc_security_group_ids = ["ndh_app"]
-      tags = {
-        backup-plan = "daily-and-weekly"
-      }
-    })
-    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-    tags = {
-      description         = "RHEL7.9 NDH App"
-      component           = "ndh"
-      server-type         = "ndh-app"
-      monitored           = false
-      instance-scheduling = "skip-scheduling"
-    }
-  }
-
-  ndh_ems_a = {
-    config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
-    })
-    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      vpc_security_group_ids = ["ndh_ems"]
-      tags = {
-        backup-plan = "daily-and-weekly"
-      }
-    })
-    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-    tags = {
-      description         = "RHEL7.9 NDH ems"
-      component           = "ndh"
-      server-type         = "ndh-ems"
-      monitored           = false
-      instance-scheduling = "skip-scheduling"
-    }
-  }
-
-  management_server_2022 = {
-    # ami has unwanted ephemeral device, don't copy all the ebs_volumess
-    config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                      = "hmpps_windows_server_2022_release_2023-*"
-      ebs_volumes_copy_all_from_ami = false
-      user_data_raw                 = base64encode(file("./templates/ndh-user-data.yaml"))
-    })
-    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      vpc_security_group_ids = ["management_server"]
-      tags = {
-        backup-plan = "daily-and-weekly"
-      }
-    })
-    ebs_volumes = {
-      "/dev/sda1" = { type = "gp3", size = 100 }
-    }
-    tags = {
-      description = "Windows Server 2022 Management server for NDH"
-      os-type     = "Windows"
-      component   = "managementserver"
-      server-type = "ndh-management-server"
-    }
-  }
+  baseline_secretsmanager_secrets = {}
+  baseline_security_groups        = local.security_groups
+  baseline_sns_topics             = {}
+  baseline_ssm_parameters         = {}
 }
