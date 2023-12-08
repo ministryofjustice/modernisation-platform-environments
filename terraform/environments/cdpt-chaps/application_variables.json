@@ -15,10 +15,30 @@
       "container_version": "preproduction"
     },
     "preproduction": {
+      "db_enabled": true,
+      "db_instance_class": "db.t3.xlarge",
+      "db_user": "admin",
+      "db_allocated_storage": "75",
+      "db_name": "chaps-preproduction",
+      "env_name": "preproduction",
+      "db_instance_identifier": "chaps-preprod-instance",
+      "friendly_name": "Chaps preproduction",
+      "container_instance_type": "windows",
+      "container_version": "preproduction",
       "region": "eu-west-2",
       "docker_image_tag": "preproduction"
     },
     "production": {
+      "db_enabled": true,
+      "db_instance_class": "db.m5.xlarge",
+      "db_user": "admin",
+      "db_allocated_storage": "100",
+      "db_name": "chaps-prod",
+      "env_name": "production",
+      "db_instance_identifier": "chaps-prod-instance",
+      "friendly_name": "Chaps Production",
+      "container_instance_type": "windows",
+      "container_version": "production",
       "region": "eu-west-2",
       "docker_image_tag": "production"
     }
