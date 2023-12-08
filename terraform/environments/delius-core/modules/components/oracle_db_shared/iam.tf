@@ -163,7 +163,7 @@ resource "aws_iam_policy" "allow_access_to_secrets_manager" {
         "secretsmanager:ListSecret*",
         "secretsmanager:Put*",
         "secretsmanager:RestoreSecret",
-        "secretsmanager:Update*",
+        "secretsmanager:Update*"
       ]
       Effect   = "Allow"
       Resource = [
