@@ -7,6 +7,23 @@ locals {
       "/ndh/test" = local.ndh_secretsmanager_secrets
     }
 
+    baseline_iam_policies = {
+      Ec2TestPolicy = {
+        description = "Permissions required for Test EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/ndh/test/*",
+            ]
+          }
+        ]
+      }
+    }
+
     baseline_ec2_instances = {
 
       test-management-server-2022 = merge(local.management_server_2022, {
@@ -16,12 +33,22 @@ locals {
       })
 
       test-ndh-app-a = merge(local.ndh_app_a, {
+        config = merge(local.ndh_app_a.config, {
+          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
+            "Ec2TestPolicy",
+          ])
+        })
         tags = merge(local.ndh_app_a.tags, {
           ndh-environment = "test"
         })
       })
 
       test-ndh-ems-a = merge(local.ndh_ems_a, {
+        config = merge(local.ndh_ems_a.config, {
+          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
+            "Ec2TestPolicy",
+          ])
+        })
         tags = merge(local.ndh_ems_a.tags, {
           ndh-environment = "test"
         })
