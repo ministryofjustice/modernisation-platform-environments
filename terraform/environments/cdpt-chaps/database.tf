@@ -11,7 +11,12 @@ resource "aws_db_instance" "database" {
 	identifier													= local.app_data.accounts[local.environment].db_instance_identifier
 	username														= local.app_data.accounts[local.environment].db_user
 	iam_database_authentication_enabled = true
-  iam_roles 													= ["arn:aws:iam::613903586696:role/RDS-S3-CrossAccountAccess"]
+}
+
+resource "aws_db_instance_role_association" "rds_s3_role_association" {
+	db_instance_identifier 	= aws_db_instance.database.identifier
+	feature_name 						= "S3_INTEGRATION"
+	role_arn               = "arn:aws:iam::613903586696:role/RDS-S3-CrossAccountAccess"
 }
 
 resource "aws_security_group" "db" {
