@@ -13,7 +13,7 @@
       "container_version": "preproduction"
     },
     "test": {
-      "example_var": "test-data"
+      "example_var": "test-data",
       "region": "eu-west-2",
       "docker_image_tag": "development"
     },
