@@ -149,3 +149,36 @@ resource "aws_iam_role_policy_attachment" "db_ec2_instance_amazonssmmanagedinsta
   role       = aws_iam_role.db_ec2_instance_iam_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
+
+
+resource "aws_iam_policy" "allow_access_to_secrets_manager" {
+  name   = "${var.env_name}-delius-db-allow-access-secrets-manager"
+  policy = jsonencode({
+  Version = "2012-10-17"
+  Statement = [
+    {
+      Sid     = "AllowAccessToSecretsManager"
+      Actions = [
+        "secretsmanager:Get*",
+        "secretsmanager:ListSecret*",
+        "secretsmanager:Put*",
+        "secretsmanager:RestoreSecret",
+        "secretsmanager:Update*",
+      ]
+      Effect   = "Allow"
+      Resource = [
+        "${aws_secretsmanager_secret.delius_core_dba_passwords.arn}",
+        "${aws_secretsmanager_secret.delius_core_application_passwords.arn}"
+      ]
+    },
+  ]
+  })
+  tags = merge(var.tags,
+    { Name = "${var.env_name}-delius-db-ec2-access" }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "allow_access_to_secrets_manager" {
+  role       = aws_iam_role.db_ec2_instance_iam_role.name
+  policy_arn = aws_iam_policy.allow_access_to_secrets_manager.arn
+}
