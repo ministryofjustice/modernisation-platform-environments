@@ -11,7 +11,7 @@ locals {
   baseline_environment_config = local.environment_configs[local.environment]
 
   baseline_presets_options = {
-    enable_application_environment_wildcard_cert = false
+    enable_application_environment_wildcard_cert = true
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
     enable_image_builder                         = true
@@ -69,7 +69,8 @@ locals {
   baseline_secretsmanager_secrets = {}
 
   baseline_security_groups = {
-    private-dc = local.security_groups.private_dc
+    private-dc    = local.security_groups.private_dc
+    load-balancer = local.security_groups.load-balancer
   }
 
   baseline_sns_topics     = {}

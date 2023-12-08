@@ -251,6 +251,7 @@ locals {
   # Data Ingestion Pipeline Step Function
   enable_data_ingestion_step_function = local.application_data.accounts[local.environment].enable_data_ingestion_step_function
   data_ingestion_step_function_name   = "${local.project}-data-ingestion-step-function-${local.environment}"
+  dms_task_time_out                   = local.application_data.accounts[local.environment].dms_task_time_out
 
   # Datamart
   create_scheduled_action_iam_role = local.application_data.accounts[local.environment].setup_scheduled_action_iam_role

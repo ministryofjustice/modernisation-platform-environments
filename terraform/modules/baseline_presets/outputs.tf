@@ -102,9 +102,7 @@ output "s3_bucket_policies" {
 output "s3_iam_policies" {
   description = "Map of common iam_policies that can be used to give access to s3_buckets"
 
-  value = var.options.s3_iam_policies != null ? {
-    for key, value in local.s3_iam_policies : key => value if contains(var.options.s3_iam_policies, key)
-  } : local.s3_iam_policies
+  value = local.requested_s3_iam_policies
 }
 
 output "s3_buckets" {

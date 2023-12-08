@@ -211,7 +211,7 @@ locals {
             }
             stickiness = {
               enabled = true
-              type    = "source_ip"
+              type    = "lb_cookie"
             }
             #attachments = [
             #  { ec2_instance_name = "rds-gateway" },

@@ -266,17 +266,18 @@ locals {
     lb_target_groups       = {}
     secretsmanager_secrets = {}
     tags = {
-      backup            = "false" # opt out of mod platform default backup plan
-      component         = "bip"
-      description       = "${local.environment} ${local.application_name} bip"
-      os-type           = "Linux"
-      os-major-version  = 7
-      os-version        = "RHEL 7.9"
-      "Patch Group"     = "RHEL"
-      server-type       = "${local.application_name}-bip"
-      monitored         = true
-      oasys-environment = local.environment
-      environment-name  = terraform.workspace
+      backup              = "false" # opt out of mod platform default backup plan
+      component           = "bip"
+      description         = "${local.environment} ${local.application_name} bip"
+      os-type             = "Linux"
+      os-major-version    = 7
+      os-version          = "RHEL 7.9"
+      "Patch Group"       = "RHEL"
+      server-type         = "${local.application_name}-bip"
+      monitored           = true
+      oasys-environment   = local.environment
+      environment-name    = terraform.workspace
+      instance-scheduling = "skip-scheduling"
     }
   }
   bip_b = merge(local.bip_a, {

@@ -1,6 +1,7 @@
 {
   "accounts": {
     "development": {
+
       "db_enabled": true,
       "db_instance_class": "db.t3.small",
       "db_user": "admin",
@@ -14,12 +15,16 @@
     },
     "test": {
       "example_var": "test-data"
+      "region": "eu-west-2",
+      "docker_image_tag": "development"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "region": "eu-west-2",
+      "docker_image_tag": "preproduction"
     },
     "production": {
-      "example_var": "production-data"
+      "region": "eu-west-2",
+      "docker_image_tag": "production"
     }
   }
 }

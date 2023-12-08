@@ -210,10 +210,23 @@ locals {
           }
         }
         listeners = {
+          http = {
+            port     = 80
+            protocol = "HTTP"
+            default_action = {
+              type = "redirect"
+              redirect = {
+                port        = 443
+                protocol    = "HTTPS"
+                status_code = "HTTP_301"
+              }
+            }
+          }
           https = {
-            port                   = 443
-            protocol               = "HTTPS"
-            certificate_arn_lookup = "planetfm_wildcard_cert"
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["planetfm_wildcard_cert"]
             default_action = {
               type = "fixed-response"
               fixed_response = {
@@ -230,11 +243,12 @@ locals {
                   target_group_name = "web-23-80"
                 }]
                 conditions = [{
-                  field = "host-header"
-                  values = [
-                    "cafmtx.pp.planetfm.service.justice.gov.uk",
-                    "pp-cafmtx.az.justice.gov.uk",
-                  ]
+                  host_header = {
+                    values = [
+                      "cafmtx.pp.planetfm.service.justice.gov.uk",
+                      "pp-cafmtx.az.justice.gov.uk",
+                    ]
+                  }
                 }]
               }
               web-45-80 = {
@@ -244,11 +258,12 @@ locals {
                   target_group_name = "web-45-80"
                 }]
                 conditions = [{
-                  field = "host-header"
-                  values = [
-                    "cafmtwebx.pp.planetfm.service.justice.gov.uk",
-                    "pp-cafmtwebx.az.justice.gov.uk",
-                  ]
+                  host_header = {
+                    values = [
+                      "cafmwebx.pp.planetfm.service.justice.gov.uk",
+                      "pp-cafmwebx.az.justice.gov.uk",
+                    ]
+                  }
                 }]
               }
             }
@@ -265,8 +280,8 @@ locals {
           # { name = "ppplanet-b", type = "CNAME", ttl = "300", records = ["pp-cafm-db-a.planetfm.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          # { name = "cafmtx", type = "A", lbs_map_key = "private" } Create in subsequent PR to LB private deployment
-          # { name = "cafmtwebx", type = "A", lbs_map_key = "private" } Create in subsequent PR to LB private deployment
+          { name = "cafmtx", type = "A", lbs_map_key = "private" },
+          { name = "cafmwebx", type = "A", lbs_map_key = "private" },
         ]
       }
     }

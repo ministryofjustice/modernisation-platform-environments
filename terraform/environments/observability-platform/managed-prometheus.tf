@@ -7,3 +7,18 @@ module "managed_prometheus" {
 
   tags = local.tags
 }
+
+/* Prometheus Roles */
+module "prometheus_roles" {
+  for_each = {
+    for account in local.all_prometheus_accounts : account => {
+      account_id = account
+    }
+  }
+
+  source = "./modules/prometheus/iam-role"
+
+  name                     = each.key
+  account_id               = local.environment_management.account_ids[each.key]
+  prometheus_workspace_arn = module.managed_prometheus.workspace_arn
+}
