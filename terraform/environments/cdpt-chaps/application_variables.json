@@ -1,7 +1,6 @@
 {
   "accounts": {
     "development": {
-
       "db_enabled": true,
       "db_instance_class": "db.t3.small",
       "db_user": "admin",

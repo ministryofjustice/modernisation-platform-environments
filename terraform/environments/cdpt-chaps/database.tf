@@ -12,12 +12,6 @@ resource "aws_db_instance" "database" {
 	username														= local.app_data.accounts[local.environment].db_user
 	iam_database_authentication_enabled = true
   iam_roles 													= ["arn:aws:iam::613903586696:role/RDS-S3-CrossAccountAccess"]
-  s3_import {
-		bucket_name 		= tp-dbbackups
-		bucket-prefix 	= chap-dev
-		ingestion_role 	=	aws_iam_role.rds_s3_access.arn
-		source_engine 	= "sqlserver-web"
-}
 }
 
 resource "aws_security_group" "db" {
