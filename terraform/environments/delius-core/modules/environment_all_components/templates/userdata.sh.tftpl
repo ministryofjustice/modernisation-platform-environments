@@ -61,7 +61,7 @@ run_ansible() {
     then
       group=$(echo "$${environment_name}_$${delius_environment_name}_$${database}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
       group_all=$(echo "$${environment_name}_$${delius_environment_name}_all" | tr [:upper:] [:lower:] | sed "s/-/_/g")
-      database_type=$(echo $database | cut -d'_' -f2 | sed "s/db//g")
+      [[ $database =~ "primarydb" ]] && database_type="primary" || database_type="standby"
       ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml --extra-vars @group_vars/$group_all.yml --extra-vars database_type=$database_type"
     elif [[ $i -gt 2 ]]
     then
