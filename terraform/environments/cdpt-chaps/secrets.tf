@@ -6,7 +6,7 @@ resource "aws_secretsmanager_secret" "chaps_secret" {
 }
 
 resource "random_password" "password" {
-
+	length = 10
 }
 
 resource "aws_secretsmanager_secret_version" "chaps_secret" {
