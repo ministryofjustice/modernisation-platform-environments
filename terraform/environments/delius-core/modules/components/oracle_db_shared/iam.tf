@@ -179,5 +179,5 @@ resource "aws_iam_policy" "db_access_to_secrets_manager" {
 
 resource "aws_iam_role_policy_attachment" "db_access_to_secrets_manager" {
   role       = aws_iam_role.db_ec2_instance_iam_role.name
-  policy_arn = data.aws_iam_policy.db_access_to_secrets_manager.arn
+  policy_arn = aws_iam_policy.db_access_to_secrets_manager.arn
 }
