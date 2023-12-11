@@ -80,10 +80,6 @@ resource "aws_ecs_service" "ecs_service" {
     container_name   = "${local.application_name}-container"
     container_port   = 80
   }
-
-  lifecycle {
-    ignore_changes = [task_definition, desired_count]
-  }
 }
 
 resource "aws_iam_role" "app_execution" {
