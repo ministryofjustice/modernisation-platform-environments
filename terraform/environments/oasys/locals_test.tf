@@ -7,9 +7,9 @@ locals {
       patch_day                 = "TUE"
     }
 
-    baseline_s3_buckets = {}
+    baseline_s3_buckets     = {}
     baseline_ssm_parameters = {}
-    
+
     baseline_secretsmanager_secrets = {
       "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_oasys_db
       "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
@@ -153,11 +153,11 @@ locals {
         #   })
         # })
         tags = merge(local.bip_a.tags, {
-          oasys-environment   = "t2"
-          bip-db-name         = "T2BIPINF"
-          bip-db-hostname     = "t2-oasys-db-a"
-          oasys-db-name       = "T2OASYS"
-          oasys-db-hostname   = "t2-oasys-db-a"
+          oasys-environment = "t2"
+          bip-db-name       = "T2BIPINF"
+          bip-db-hostname   = "t2-oasys-db-a"
+          oasys-db-name     = "T2OASYS"
+          oasys-db-hostname = "t2-oasys-db-a"
         })
       })
 
@@ -195,11 +195,11 @@ locals {
         #   })
         # })
         tags = merge(local.bip_b.tags, {
-          oasys-environment   = "t1"
-          bip-db-name         = "T1BIPINF"
-          bip-db-hostname     = "t1-oasys-db-a"
-          oasys-db-name       = "T1OASYS"
-          oasys-db-hostname   = "t1-oasys-db-a"
+          oasys-environment = "t1"
+          bip-db-name       = "T1BIPINF"
+          bip-db-hostname   = "t1-oasys-db-a"
+          oasys-db-name     = "T1OASYS"
+          oasys-db-hostname = "t1-oasys-db-a"
         })
       })
 
