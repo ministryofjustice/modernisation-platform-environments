@@ -62,6 +62,7 @@ locals {
     database          = local.security_groups.database
     domain            = local.security_groups.domain
     jumpserver        = local.security_groups.jumpserver
+    cafm_app_fixngo   = local.security_groups.cafm_app_fixngo
   }
 
   baseline_sns_topics     = {}

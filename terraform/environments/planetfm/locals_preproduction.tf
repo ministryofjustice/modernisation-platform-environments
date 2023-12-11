@@ -78,6 +78,8 @@ locals {
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "t3.large"
+          # TODO: Apply in subsequent PR
+          # vpc_security_group_ids = concat(local.defaults_web_ec2.instance.vpc_security_group_ids, ["cafm_app_fixngo"])
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
