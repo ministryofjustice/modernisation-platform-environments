@@ -46,8 +46,8 @@ resource "aws_lb" "chaps_lb" {
   depends_on                 = [aws_security_group.chaps_lb_sc]
 }
 
-resource "aws_lb_target_group" "chaps_target_group" {
-  name                 = "chaps-target-group"
+resource "aws_lb_target_group" "chaps_tg" {
+  name                 = "chaps-tg"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -76,7 +76,7 @@ resource "aws_lb_listener" "listener" {
   protocol          = "HTTP"
 
   default_action {
-    target_group_arn = aws_lb_target_group.chaps_target_group.id
+    target_group_arn = aws_lb_target_group.chaps_tg.id
     type             = "forward"
   }
 }
@@ -93,6 +93,6 @@ resource "aws_lb_listener" "listener" {
 
 #   default_action {
 #     type             = "forward"
-#     target_group_arn = aws_lb_target_group.chaps_target_group.arn
+#     target_group_arn = aws_lb_target_group.chaps_tg.arn
 #   }
 # }
