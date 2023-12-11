@@ -81,8 +81,8 @@ resource "aws_ecs_service" "ecs_service" {
     container_port   = 80
   }
 
-  deployment_controller {
-    type = "ECS"
+  lifecycle {
+    ignore_changes = [task_definition, desired_count]
   }
 }
 
