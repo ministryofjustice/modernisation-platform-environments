@@ -6,7 +6,7 @@ locals {
       patch_day                 = "TUE"
     }
 
-    baseline_s3_buckets = {}
+    baseline_s3_buckets     = {}
     baseline_ssm_parameters = {}
 
     baseline_secretsmanager_secrets = {
@@ -94,7 +94,7 @@ locals {
           })
         })
         tags = merge(local.database_a.tags, {
-          instance-scheduling                     = "skip-scheduling"
+          instance-scheduling = "skip-scheduling"
         })
       })
 
