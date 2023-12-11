@@ -51,7 +51,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
+  target_type          = "ip"
   deregistration_delay = 30
 
   stickiness {
