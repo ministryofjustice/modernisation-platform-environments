@@ -2,6 +2,19 @@ locals {
   null
 }
 
+resource "null_resource" "lambda_build" {
+  triggers = {
+    # TODO add path to python file
+    lambda_py = filesha256(null)
+    # TODO add path to requirements file
+    requirements_py = filesha256(null)
+  }
+
+  provisioner "local-exec" {
+    command = "bash build.sh"
+  }
+}
+
 resource "aws_lambda_function" "cw_log_processor" {
   function_name = "CWXMLToJSON"
   role          = aws_iam_role.lambda_role.arn
