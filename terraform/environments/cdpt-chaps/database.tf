@@ -66,7 +66,7 @@ resource "aws_iam_role_policy_attachment" "rds_s3_access_attach" {
 	policy_arn = aws_iam_policy.rds_s3_access_policy.arn
 }
 
-resource "aws_iam_role" "rds_s3_access" {
+resource "aws_iam_role" "rds_s3_access_policy" {
 	assume_role_policy = jsonencode({
 		Version 	= "2012-10-17",
 		Statement = [
