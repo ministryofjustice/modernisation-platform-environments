@@ -51,7 +51,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "ip"
+  target_type          = "instance"
   deregistration_delay = 30
 
   stickiness {
@@ -64,7 +64,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
     protocol            = "HTTP"
     port                = "80"
     unhealthy_threshold = "5"
-    matcher             = "200-599"
+    matcher             = "200-499"
     timeout             = "10"
   }
 
