@@ -11,11 +11,6 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "deployment_logs" {
-  name              = "/aws/events/deploymentLogs"
-  retention_in_days = "7"
-}
-
 resource "aws_ecs_task_definition" "chaps_task_definition" {
   family                   = "chapsFamily"
   requires_compatibilities = ["FARGATE"]
@@ -249,4 +244,15 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
     ]
   })
   policy_name = "TrustEventsToStoreLogEvents"
+}
+
+# Set up CloudWatch group and log stream and retain logs for 30 days
+resource "aws_cloudwatch_log_group" "cloudwatch_group" {
+  name              = "${local.application_name}-ecs"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
+  name           = "${local.application_name}-log-stream"
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
 }
