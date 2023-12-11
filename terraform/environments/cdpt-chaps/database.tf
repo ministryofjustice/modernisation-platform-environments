@@ -40,7 +40,7 @@ resource "aws_security_group" "db" {
 
 resource "aws_iam_role" "rds_s3_access" {
 	assume_role_policy = jsonencode({
-		Version 	= "2017-10-17",
+		Version 	= "2012-10-17",
 		Statement = [
 			{
 				Action = "sts:AssumeRole",
