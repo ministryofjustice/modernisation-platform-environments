@@ -39,17 +39,51 @@ resource "aws_security_group" "db" {
   }
 }
 
+resource "aws_iam_policy" "rds-s3_access_policy" {
+	name = "RDS-S3-Access-Policy"
+	description = "Allows mod platform RDS access to tp-dbbackups bucket"
+
+	policy = jsonencode({
+		Version = "2012-10-17",
+		Statement = [
+			{
+				Effect = "Allow",
+				Action = [
+					"s3:GetObject",
+					"s3:ListBucket"
+				],
+				Resource = [
+					"arn:aws:s3:::tp-dbbackups/*",
+					"arn:aws:s3:::tp-dbbackups"
+				]
+			}
+		]
+	})
+}
+
+resource "aws_iam_role+policy_attachment" "rds_s3_access_attach" {
+	role = aws_iam_role.rds_s3_access.name
+	policy_arn = aws_iam_policy.rds_s3_access_policy.arn
+}
+
 resource "aws_iam_role" "rds_s3_access" {
 	assume_role_policy = jsonencode({
 		Version 	= "2012-10-17",
 		Statement = [
 			{
-				Action = "sts:AssumeRole",
 				Effect = "Allow",
 				Principal = {
-				Service = "rds.amazonaws.com"
+					Service = "rds.amazonaws.com"
 				},
+				Action = "sts:AssumeRole",
 			},
+			{
+				Effect = "Allow",
+				Principal = {
+					AWS = "arn:aws:iam::513884314856:root"
+				},
+				Action = "sts:AssumeRole"
+			}
 		]
 	})
 }
