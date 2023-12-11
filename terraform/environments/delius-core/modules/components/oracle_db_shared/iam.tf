@@ -152,22 +152,21 @@ resource "aws_iam_role_policy_attachment" "db_ec2_instance_amazonssmmanagedinsta
 
 
 data "aws_iam_policy_document" "db_access_to_secrets_manager" {
-  Statement
-    {
-      Sid     = "DbAccessToSecretsManager"
-      Actions = [
-        "secretsmanager:Get*",
-        "secretsmanager:ListSecret*",
-        "secretsmanager:Put*",
-        "secretsmanager:RestoreSecret",
-        "secretsmanager:Update*"
-      ]
-      Effect   = "Allow"
-      Resources = [
-        "${aws_secretsmanager_secret.delius_core_dba_passwords.arn}",
-        "${aws_secretsmanager_secret.delius_core_application_passwords.arn}"
-      ]
-    }
+  Statement {
+    Sid     = "DbAccessToSecretsManager"
+    Actions = [
+      "secretsmanager:Get*",
+      "secretsmanager:ListSecret*",
+      "secretsmanager:Put*",
+      "secretsmanager:RestoreSecret",
+      "secretsmanager:Update*"
+    ]
+    Effect   = "Allow"
+    Resources = [
+      "${aws_secretsmanager_secret.delius_core_dba_passwords.arn}",
+      "${aws_secretsmanager_secret.delius_core_application_passwords.arn}"
+    ]
+  }
 }
 
 resource "aws_iam_policy" "db_access_to_secrets_manager" {
