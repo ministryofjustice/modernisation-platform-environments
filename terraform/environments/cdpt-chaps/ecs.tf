@@ -38,6 +38,14 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
           hostPort      = 80
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-group = "${local.application_name}-ecs",
+          awslogs-region = "eu-west-2",
+          awslogs-stream-prefix = local.application_name
+        }
+      }
       environment = [
       ]
     }
