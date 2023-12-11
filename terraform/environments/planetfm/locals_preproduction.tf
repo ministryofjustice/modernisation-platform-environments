@@ -41,7 +41,7 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
+          
         }
         cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_app_ec2.tags, {
@@ -61,7 +61,7 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
+          
         }
         cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_app_ec2.tags, {
@@ -123,7 +123,7 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
+          
         }
         cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_web_ec2.tags, {
@@ -143,7 +143,7 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
+         
         }
         cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_web_ec2.tags, {
