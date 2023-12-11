@@ -64,7 +64,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
     protocol            = "HTTP"
     port                = "80"
     unhealthy_threshold = "5"
-    matcher             = "200-302"
+    matcher             = "200-499"
     timeout             = "10"
   }
 

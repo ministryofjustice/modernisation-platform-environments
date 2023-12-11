@@ -26,7 +26,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   memory                   = 2048
   container_definitions = jsonencode([
     {
-      name      = local.application_name
+      name      = "${local.application_name}-container"
       image     = "${local.ecr_url}:${local.application_data.accounts[local.environment].docker_image_tag}"
       cpu       = 1024
       memory    = 2048
@@ -38,6 +38,14 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
           hostPort      = 80
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-group = "${local.application_name}-ecs",
+          awslogs-region = "eu-west-2",
+          awslogs-stream-prefix = local.application_name
+        }
+      }
       environment = [
       ]
     }
@@ -69,12 +77,8 @@ resource "aws_ecs_service" "ecs_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.chaps_target_group.arn
-    container_name   = local.application_name
+    container_name   = "${local.application_name}-container"
     container_port   = 80
-  }
-
-  deployment_controller {
-    type = "ECS"
   }
 }
 
@@ -241,4 +245,15 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
     ]
   })
   policy_name = "TrustEventsToStoreLogEvents"
+}
+
+# Set up CloudWatch group and log stream and retain logs for 30 days
+resource "aws_cloudwatch_log_group" "cloudwatch_group" {
+  name              = "${local.application_name}-ecs"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
+  name           = "${local.application_name}-log-stream"
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
 }
