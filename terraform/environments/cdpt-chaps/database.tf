@@ -39,7 +39,7 @@ resource "aws_security_group" "db" {
   }
 }
 
-resource "aws_iam_policy" "rds-s3_access_policy" {
+resource "aws_iam_policy" "rds_s3_access_policy" {
 	name = "RDS-S3-Access-Policy"
 	description = "Allows mod platform RDS access to tp-dbbackups bucket"
 
@@ -62,7 +62,7 @@ resource "aws_iam_policy" "rds-s3_access_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_s3_access_attach" {
-	role = aws_iam_role.rds_s3_access_policy.name
+	role = aws_iam_role.rds_s3_access.name
 	policy_arn = aws_iam_policy.rds_s3_access_policy.arn
 }
 
