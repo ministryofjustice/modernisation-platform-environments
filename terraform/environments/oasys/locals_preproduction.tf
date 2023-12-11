@@ -19,6 +19,9 @@ locals {
       "/oracle/database/PPONRAUD" = local.secretsmanager_secrets_db
       "/oracle/database/PPONRBDS" = local.secretsmanager_secrets_db
       "/oracle/bip/preprod"       = local.secretsmanager_secrets_bip
+
+      # for azure, remove when migrated to aws db
+      "/oracle/database/OASPROD"  = local.secretsmanager_secrets_oasys_db
     }
 
     baseline_iam_policies = {
@@ -104,9 +107,14 @@ locals {
       #     ssm_parameters_prefix     = "ec2-web-pp/"
       #     iam_resource_names_prefix = "ec2-web-pp"
       #   })
+      #   user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "oasys-ords-secrets"
+      #     })
+      #   })
       #   tags = merge(local.webserver_a.tags, {
-      #     oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"###################################
-      #     oracle-db-sid                           = "T2OASYS" # for each env using azure DB will need to be OASPROD##############################################
+      #     oracle-db-hostname = "PPODL00009.azure.noms.root" # "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
+      #     oracle-db-sid      = "OASPROD" # "PPOASYS"
       #   })
       # })
     }
@@ -140,6 +148,7 @@ locals {
       public = {
         internal_lb              = false
         access_logs              = false
+        s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
         existing_target_groups = {
@@ -208,8 +217,8 @@ locals {
       }
       private = {
         internal_lb = true
-        access_logs = false
-        # s3_versioning            = false
+        access_logs = true
+        s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
         existing_target_groups   = {}
