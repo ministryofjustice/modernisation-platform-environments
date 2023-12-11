@@ -58,15 +58,15 @@ resource "aws_lb_target_group" "chaps_target_group" {
     type = "lb_cookie"
   }
 
-  # health_check {
-  #   healthy_threshold   = "3"
-  #   interval            = "30"
-  #   protocol            = "HTTP"
-  #   port                = "80"
-  #   unhealthy_threshold = "5"
-  #   matcher             = "200-302"
-  #   timeout             = "10"
-  # }
+  health_check {
+    healthy_threshold   = "3"
+    interval            = "30"
+    protocol            = "HTTP"
+    port                = "80"
+    unhealthy_threshold = "5"
+    matcher             = "200-302"
+    timeout             = "10"
+  }
 
 }
 
