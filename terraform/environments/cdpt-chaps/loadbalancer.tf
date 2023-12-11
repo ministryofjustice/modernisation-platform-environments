@@ -79,7 +79,7 @@ resource "aws_lb_listener" "https_listener" {
   load_balancer_arn = aws_lb.chaps_lb.arn
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn   = format("arn:aws:acm:eu-west-2:%s:certificate/%s", data.aws_caller_identity.current.account_id, local.app_data.accounts[local.environment].cert_arn)
+  certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
     target_group_arn = aws_lb_target_group.chaps_target_group.id
