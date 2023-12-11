@@ -21,10 +21,9 @@ data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
   }
 }
 resource "aws_iam_role" "db_ec2_instance_iam_role" {
-  name               = lower(format("%s-delius-db-ec2_instance", var.env_name))
+  name               = "EC2OracleEnterpriseManagementSecretsRole"
   assume_role_policy = data.aws_iam_policy_document.db_ec2_instance_iam_assume_policy.json
-  tags = merge(var.tags,
-    { Name = lower(format("%s-delius-db-ec2_instance", var.env_name)) }
+  tags = merge(var.tags, { Name = "EC2OracleEnterpriseManagementSecretsRole" }
   )
 }
 
@@ -148,30 +147,6 @@ resource "aws_iam_role_policy_attachment" "db_ec2_instance_amazonssmmanagedinsta
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-
-data "aws_iam_policy_document" "ec2_oem_assume_policy" {
-  statement {
-    effect  = "Allow"
-    actions = [
-      "sts:AssumeRole"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-  }
-}
-# new IAM role OEM setup to allow ec2s to access secrets manager and kms keys
-resource "aws_iam_role" "db_ec2_oem_role" {
-  name                  = "EC2OracleEnterpriseManagementSecretsRole"
-  assume_role_policy    = data.aws_iam_policy_document.ec2_oem_assume_policy.json
-}
-
-resource "aws_iam_instance_profile" "db_ec2_oem_role_profile" {
-  name = "ec2-oem-role-instance-profile"
-  role = aws_iam_role.db_ec2_oem_role.name
-}
-
 data "aws_iam_policy_document" "oem_policy_secret_manager_access" {
   statement {
     effect = "Allow"
@@ -189,13 +164,8 @@ resource "aws_iam_policy" "oem_policy_secret_manager_access_policy" {
   path   = "/"
   policy = data.aws_iam_policy_document.oem_policy_secret_manager_access.json
 }
-# Attach policies for accessing kms keys and oem secret manager to oem_secret_role
+# Attach policies for accessing oem secret manager to oem_secret_role
 resource "aws_iam_role_policy_attachment" "allow_oem_secret_manager_access" {
-  role       = aws_iam_role.db_ec2_oem_role.name
+  role       = aws_iam_role.db_ec2_instance_iam_role.name
   policy_arn = aws_iam_policy.oem_policy_secret_manager_access_policy.arn
-}
-
-resource "aws_iam_role_policy_attachment" "allow_kms_keys_access" {
-  role       = aws_iam_role.db_ec2_oem_role.name
-  policy_arn = aws_iam_policy.business_unit_kms_key_access.arn
 }
