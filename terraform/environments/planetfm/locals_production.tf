@@ -21,7 +21,7 @@ locals {
             "cafmtx.az.justice.gov.uk",
             "cafmtrainweb.az.justice.gov.uk",
           ]
-        external_validation_records_created = false
+        external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for planetfm ${local.environment} domains"
