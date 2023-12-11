@@ -121,7 +121,6 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          
         }
         cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_web_ec2.tags, {
