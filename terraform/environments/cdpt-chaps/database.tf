@@ -9,8 +9,10 @@ resource "aws_db_instance" "database" {
 	engine_version 											= "14.00.3381.3.v1"
 	instance_class 											= local.app_data.accounts[local.environment].db_instance_class
 	identifier													= local.app_data.accounts[local.environment].db_instance_identifier
-	username														= local.app_data.accounts[local.environment].db_user
 	iam_database_authentication_enabled = true
+	username														= local.app_data.accounts[local.environment].db_user
+	password 														= jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["password"]
+
 }
 
 resource "aws_db_instance_role_association" "rds_s3_role_association" {
@@ -51,6 +53,14 @@ resource "aws_iam_role" "rds_s3_access" {
 			},
 		]
 	})
+}
+
+data "aws_secretsmanager_secret" "db_password" {
+  name = aws_secretsmanager_secret.chaps_secret.name
+}
+
+data "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = data.aws_secretsmanager_secret.db_password.id
 }
 
 #------------------------------------------------------------------------------
