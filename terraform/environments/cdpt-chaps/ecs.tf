@@ -11,6 +11,11 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "deployment_logs" {
+  name              = "/aws/events/deploymentLogs"
+  retention_in_days = "7"
+}
+
 resource "aws_ecs_task_definition" "chaps_task_definition" {
   family                   = "chapsFamily"
   requires_compatibilities = ["FARGATE"]
