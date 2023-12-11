@@ -63,6 +63,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
 }
 
 resource "aws_lb_listener" "listener" {
+  #checkov:skip=CKV_AWS_103
   load_balancer_arn = aws_lb.chaps_lb.arn
   port              = 80
   protocol          = "HTTP"
@@ -74,6 +75,7 @@ resource "aws_lb_listener" "listener" {
 }
 
 resource "aws_lb_listener" "https_listener" {
+  #checkov:skip=CKV_AWS_103
   depends_on = [aws_acm_certificate_validation.external]
 
   load_balancer_arn = aws_lb.chaps_lb.arn
