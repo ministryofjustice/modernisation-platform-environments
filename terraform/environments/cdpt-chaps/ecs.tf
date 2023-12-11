@@ -26,7 +26,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   memory                   = 2048
   container_definitions = jsonencode([
     {
-      name      = local.application_name
+      name      = "${local.application_name}-container"
       image     = "${local.ecr_url}:${local.application_data.accounts[local.environment].docker_image_tag}"
       cpu       = 1024
       memory    = 2048
@@ -77,7 +77,7 @@ resource "aws_ecs_service" "ecs_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.chaps_target_group.arn
-    container_name   = local.application_name
+    container_name   = "${local.application_name}-container"
     container_port   = 80
   }
 
