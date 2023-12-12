@@ -17,8 +17,9 @@ resource "aws_db_instance" "database" {
 resource "aws_db_instance_role_association" "rds_s3_role_association" {
 	db_instance_identifier 	= aws_db_instance.database.identifier
 	feature_name 						= "S3_INTEGRATION"
-	role_arn               = "arn:aws:iam::613903586696:role/RDS-S3-XAccountAccess"
+	role_arn               = "arn:aws:iam::613903586696:role/RDS-S3-CrossAccountAccess"
 }
+
 
 resource "aws_security_group" "db" {
 	name 				= "db"
