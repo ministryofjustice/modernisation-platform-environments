@@ -14,13 +14,6 @@ resource "aws_db_instance" "database" {
 
 }
 
-resource "aws_db_instance_role_association" "rds_s3_role_association" {
-	db_instance_identifier 	= aws_db_instance.database.identifier
-	feature_name 						= "S3_INTEGRATION"
-	role_arn               = "arn:aws:iam::613903586696:role/RDS-S3-CrossAccountAccess"
-}
-
-
 resource "aws_security_group" "db" {
 	name 				= "db"
 	description = "Allow DB inbound traffic"
@@ -39,29 +32,6 @@ resource "aws_security_group" "db" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-resource "aws_iam_policy" "rds_s3_access_policy" {
-	name = "RDS-S3-Access-Policy"
-	description = "Allows mod platform RDS access to tp-dbbackups bucket"
-	policy = jsonencode({
-		Version = "2012-10-17",
-		Statement = [
-			{
-				Effect = "Allow",
-				Action = [
-					"s3:GetObject",
-					"s3:ListBucket"
-				],
-				Resource = [
-					"arn:aws:s3:::tp-dbbackups/*",
-					"arn:aws:s3:::tp-dbbackups"
-				]
-			}
-		]
-	})
-}
-
-
 
 data "aws_secretsmanager_secret" "db_password" {
   name = aws_secretsmanager_secret.chaps_secret.name
@@ -97,4 +67,3 @@ data "aws_iam_policy_document" "rds-kms" {
     }
   }
 }
-

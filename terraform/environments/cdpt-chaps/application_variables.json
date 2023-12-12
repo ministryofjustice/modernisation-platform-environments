@@ -12,7 +12,8 @@
       "db_instance_identifier": "chaps-dev-instance",
       "friendly_name": "Chaps development",
       "container_instance_type": "windows",
-      "container_version": "preproduction"
+      "container_version": "preproduction",
+      "s3_bucket_name": "chaps-dev-bucket"
     },
     "preproduction": {
       "db_enabled": true,
@@ -26,7 +27,8 @@
       "container_instance_type": "windows",
       "container_version": "preproduction",
       "region": "eu-west-2",
-      "docker_image_tag": "preproduction"
+      "docker_image_tag": "preproduction",
+      "s3_bucket_name": "chaps-staging-bucket"
     },
     "production": {
       "db_enabled": true,
@@ -40,7 +42,8 @@
       "container_instance_type": "windows",
       "container_version": "production",
       "region": "eu-west-2",
-      "docker_image_tag": "production"
+      "docker_image_tag": "production",
+      "s3_bucket_name": "chaps-production-bucket"
     }
   }
 }
