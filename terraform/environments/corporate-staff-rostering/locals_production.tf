@@ -69,7 +69,9 @@ locals {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
           disable_api_stop             = false
-          tags                         = merge(local.defaults_database_ec2.instance.tags, { instance-scheduling = null })
+          tags = merge(local.defaults_database_ec2.instance.tags, {
+            instance-scheduling = null
+          })
         })
 
         ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
