@@ -69,8 +69,7 @@ locals {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
           disable_api_termination      = true
-          disable_api_stop             = false
-          tags                         = merge(local.defaults_database_ec2.instance.tags, { instance-scheduling = null })
+          disable_api_stop             = true
         })
 
         ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
@@ -81,13 +80,9 @@ locals {
 
         ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
           data = {
-            iops       = 3000
-            throughput = 125
             total_size = 1000
           }
           flash = {
-            iops       = 3000
-            throughput = 125
             total_size = 100
           }
         })
