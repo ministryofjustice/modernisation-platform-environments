@@ -24,7 +24,7 @@ locals {
         instance_target_groups = {}
 
         listeners = {}
-       
+
       }
     }
   }
