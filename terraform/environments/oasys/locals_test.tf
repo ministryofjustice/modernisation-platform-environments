@@ -57,7 +57,7 @@ locals {
               "secretsmanager:GetSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1OASYS/apex-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1OASYS/apex-passwords*",
             ]
           }
         ]
