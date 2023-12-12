@@ -84,7 +84,7 @@ locals {
       protocol                  = "HTTPS"
       ssl_policy                = "ELBSecurityPolicy-2016-08"
       certificate_names_or_arns = ["nomis_wildcard_cert"]
-      cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms.lb
+      cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].lb
 
       default_action = {
         type = "fixed-response"
@@ -98,11 +98,11 @@ locals {
 
   }
 
-  # TODO - change alarm actions to dba_pagerduty once alarms proven out
   weblogic_cloudwatch_metric_alarms = merge(
-    module.baseline_presets.cloudwatch_metric_alarms.ec2,
-    module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
+    module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2,
+    module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2_cwagent_linux,
+    module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
+    module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
   )
 
   weblogic_cloudwatch_log_groups = {
