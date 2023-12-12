@@ -181,3 +181,58 @@ resource "aws_iam_role_policy_attachment" "db_access_to_secrets_manager" {
   role       = aws_iam_role.db_ec2_instance_iam_role.name
   policy_arn = aws_iam_policy.db_access_to_secrets_manager.arn
 }
+
+# new IAM role OEM setup to allow ec2s to access secrets manager and kms keys
+resource "aws_iam_role" "db_ec2_oem_role" {
+  name                  = "EC2OracleEnterpriseManagementSecretsRole"
+  assume_role_policy    = data.aws_iam_policy_document.ec2_oem_assume_policy.json
+}
+
+data "aws_iam_policy_document" "ec2_oem_assume_policy" {
+  statement {
+    effect  = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "allow_new_role_secrets_manager" {
+  role       = aws_iam_role.db_ec2_oem_role.name
+  policy_arn = aws_iam_policy.db_access_to_secrets_manager.arn
+}
+
+resource "aws_iam_role_policy_attachment" "allow_kms_keys_access" {
+  role       = aws_iam_role.db_ec2_oem_role.name
+  policy_arn = aws_iam_policy.business_unit_kms_key_access.arn
+}
+
+# Define a custom IAM policy document to grant assume role permissions
+data "aws_iam_policy_document" "ec2_oem_assume_role_policy_document" {
+    statement {
+      effect = "Allow"
+      actions = [
+        "sts:AssumeRole"
+      ]
+
+      resources = ["${aws_iam_role.db_ec2_oem_role.arn}"]
+    }
+}
+
+# Create the IAM policy using the custom policy document
+resource "aws_iam_policy" "ev2_oem_assume_role_policy" {
+  name        = "AssumeRolePolicy"
+  description = "Custom policy to grant assume role permissions to existing role to assume new OEM role"
+
+  policy = data.aws_iam_policy_document.ec2_oem_assume_role_policy_document.json
+}
+
+# Attach a policy to the existing role granting assume role permissions for the new OEM role
+resource "aws_iam_role_policy_attachment" "assume_role_policy_attachment" {
+  policy_arn = aws_iam_policy.ev2_oem_assume_role_policy.arn
+  role       = aws_iam_role.db_ec2_instance_iam_role.name
+}
