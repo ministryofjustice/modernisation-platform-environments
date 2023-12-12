@@ -279,6 +279,9 @@ locals {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
+          instance_profile_policies = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, [
+            "Ec2T2WebPolicy",
+          ])
         })
         user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
