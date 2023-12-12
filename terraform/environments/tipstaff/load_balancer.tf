@@ -79,7 +79,7 @@ resource "aws_security_group" "tipstaff_lb_sc" {
 }
 
 resource "aws_security_group" "tipstaff_lb_sc_pingdom_1" {
-  name        = "load balancer Pingdom security group"
+  name        = "load balancer Pingdom security group 1"
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -152,7 +152,7 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom_1" {
 }
 
 resource "aws_security_group" "tipstaff_lb_sc_pingdom_2" {
-  name        = "load balancer Pingdom security group"
+  name        = "load balancer Pingdom security group 2"
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
