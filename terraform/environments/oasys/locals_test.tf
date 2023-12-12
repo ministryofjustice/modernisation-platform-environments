@@ -41,9 +41,11 @@ locals {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2OASYS/apex-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
             ]
           }
         ]
