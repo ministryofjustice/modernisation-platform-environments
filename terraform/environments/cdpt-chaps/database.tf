@@ -17,7 +17,7 @@ resource "aws_db_instance" "database" {
 resource "aws_db_instance_role_association" "rds_s3_role_association" {
 	db_instance_identifier 	= aws_db_instance.database.identifier
 	feature_name 						= "S3_INTEGRATION"
-	role_arn               = "arn:aws:iam::613903586696:role/RDS-S3-CrossAccountAccess"
+	role_arn               = "arn:aws:iam::613903586696:role/RDS-S3-XAccountAccess"
 }
 
 resource "aws_security_group" "db" {
@@ -76,13 +76,11 @@ resource "aws_iam_role" "rds_s3_access" {
 					Service = "rds.amazonaws.com"
 				},
 				Action = "sts:AssumeRole",
-			},
-			{
-				Effect = "Allow",
-				Principal = {
-					AWS = "arn:aws:iam::513884314856:root"
-				},
-				Action = "sts:AssumeRole"
+				Condition = {
+					StringEquals = {
+					"sts:ExternalId": "613903586696"
+					}
+				}
 			}
 		]
 	})
