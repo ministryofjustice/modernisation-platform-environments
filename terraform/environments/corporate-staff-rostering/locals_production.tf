@@ -64,11 +64,13 @@ locals {
             "Ec2ProdDatabasePolicy",
           ])
         })
-        cloudwatch_metric_alarms = null
         instance = merge(local.defaults_database_ec2.instance, {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
           disable_api_stop             = true
+          tags = merge(local.defaults_database_ec2.instance.tags, {
+            instance-scheduling = null
+          })
         })
 
         ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
