@@ -7,10 +7,9 @@ locals {
       patch_day                 = "TUE"
     }
 
-    baseline_s3_buckets = {
-    }
-
+    baseline_s3_buckets     = {}
     baseline_ssm_parameters = {}
+
     baseline_secretsmanager_secrets = {
       "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_oasys_db
       "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
@@ -137,20 +136,6 @@ locals {
           oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
         })
       })
-      "t2-${local.application_name}-db-a-3" = merge(local.database_a, {
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "oracle_psu_patching"
-          })
-        })
-        tags = merge(local.database_a.tags, {
-          description                             = "t2 ${local.application_name} database"
-          "${local.application_name}-environment" = "t2"
-          bip-db-name                             = "T2BIPINF"
-          instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
-        })
-      })
 
       "t2-${local.application_name}-bip-a" = merge(local.bip_a, {
         autoscaling_group = merge(local.bip_a.autoscaling_group, {
@@ -168,11 +153,11 @@ locals {
         #   })
         # })
         tags = merge(local.bip_a.tags, {
-          oasys-environment   = "t2"
-          bip-db-name         = "T2BIPINF"
-          bip-db-hostname     = "t2-oasys-db-a"
-          oasys-db-name       = "T2OASYS"
-          oasys-db-hostname   = "t2-oasys-db-a"
+          oasys-environment = "t2"
+          bip-db-name       = "T2BIPINF"
+          bip-db-hostname   = "t2-oasys-db-a"
+          oasys-db-name     = "T2OASYS"
+          oasys-db-hostname = "t2-oasys-db-a"
         })
       })
 
@@ -210,11 +195,11 @@ locals {
         #   })
         # })
         tags = merge(local.bip_b.tags, {
-          oasys-environment   = "t1"
-          bip-db-name         = "T1BIPINF"
-          bip-db-hostname     = "t1-oasys-db-a"
-          oasys-db-name       = "T1OASYS"
-          oasys-db-hostname   = "t1-oasys-db-a"
+          oasys-environment = "t1"
+          bip-db-name       = "T1BIPINF"
+          bip-db-hostname   = "t1-oasys-db-a"
+          oasys-db-name     = "T1OASYS"
+          oasys-db-hostname = "t1-oasys-db-a"
         })
       })
 
@@ -548,8 +533,8 @@ locals {
       #
       # "${local.application_name}.service.justice.gov.uk" = {
       #   lb_alias_records = [
-      # { name = "t2", type = "A", lbs_map_key = "public" }, # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
-      # { name = "db.t2", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+      # { name = "t2",    type = "A", lbs_map_key = "public" }, #    t2.oasys.service.justice.gov.uk 
+      # { name = "db.t2", type = "A", lbs_map_key = "public" }, # db.t2.oasys.service.justice.gov.uk
       #   ]
       # }
       # "t1.${local.application_name}.service.justice.gov.uk" = {

@@ -1,3 +1,7 @@
+# Majority of resources created by baseline module.
+# See common settings in locals.tf and environment specific settings in
+# locals_development.tf, locals_test.tf etc.
+
 module "ip_addresses" {
   source = "../../modules/ip_addresses"
 }
@@ -23,24 +27,9 @@ module "baseline_presets" {
 
   environment  = module.environment
   ip_addresses = module.ip_addresses
-
-  options = {
-    enable_application_environment_wildcard_cert = true
-    enable_business_unit_kms_cmks                = true
-    enable_image_builder                         = true
-    enable_ec2_cloud_watch_agent                 = true
-    enable_ec2_self_provision                    = true
-    enable_ec2_user_keypair                      = true
-    iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-    iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-    s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-
-    # comment this in if you need to resolve FixNGo hostnames
-    # route53_resolver_rules = {
-    #   outbound-data-and-private-subnets = ["azure-fixngo-domain"]
-    # }
-  }
+  options      = local.baseline_presets_options
 }
+
 module "baseline" {
   source = "../../modules/baseline"
 
@@ -53,33 +42,97 @@ module "baseline" {
 
   environment = module.environment
 
-  security_groups          = local.baseline_security_groups
-  acm_certificates         = module.baseline_presets.acm_certificates
-  cloudwatch_log_groups    = module.baseline_presets.cloudwatch_log_groups
-  iam_policies             = module.baseline_presets.iam_policies
-  iam_roles                = module.baseline_presets.iam_roles
-  iam_service_linked_roles = module.baseline_presets.iam_service_linked_roles
-  key_pairs                = module.baseline_presets.key_pairs
-  kms_grants               = module.baseline_presets.kms_grants
-  route53_resolvers        = module.baseline_presets.route53_resolvers
+  acm_certificates = merge(
+    module.baseline_presets.acm_certificates,
+    local.baseline_acm_certificates,
+    lookup(local.baseline_environment_config, "baseline_acm_certificates", {})
+  )
+
+  backups = {
+    "everything" = {
+      plans = merge(
+        module.baseline_presets.backup_plans,
+        local.baseline_backup_plans,
+        lookup(local.baseline_environment_config, "baseline_backup_plans", {})
+      )
+    }
+  }
+
+  # bastion_linux = merge(
+  #   local.baseline_bastion_linux,
+  #   lookup(local.baseline_environment_config, "baseline_bastion_linux", {})
+  # )
+
+  cloudwatch_metric_alarms = merge(
+    local.baseline_cloudwatch_metric_alarms,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_metric_alarms", {})
+  )
+
+  cloudwatch_log_metric_filters = merge(
+    local.baseline_cloudwatch_log_metric_filters,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_log_metric_filters", {})
+  )
+
+  cloudwatch_log_groups = merge(
+    module.baseline_presets.cloudwatch_log_groups,
+    local.baseline_cloudwatch_log_groups,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_log_groups", {})
+  )
+
+  ec2_autoscaling_groups = merge(
+    local.baseline_ec2_autoscaling_groups,
+    lookup(local.baseline_environment_config, "baseline_ec2_autoscaling_groups", {})
+  )
+
+  ec2_instances = merge(
+    local.baseline_ec2_instances,
+    lookup(local.baseline_environment_config, "baseline_ec2_instances", {})
+  )
+
+  iam_policies = merge(
+    module.baseline_presets.iam_policies,
+    local.baseline_iam_policies,
+    lookup(local.baseline_environment_config, "baseline_iam_policies", {})
+  )
+
+  iam_roles = merge(
+    module.baseline_presets.iam_roles,
+    local.baseline_iam_roles,
+    lookup(local.baseline_environment_config, "baseline_iam_roles", {})
+  )
+
+  iam_service_linked_roles = merge(
+    module.baseline_presets.iam_service_linked_roles,
+    local.baseline_iam_service_linked_roles,
+    lookup(local.baseline_environment_config, "baseline_iam_service_linked_roles", {})
+  )
+
+  key_pairs = merge(
+    module.baseline_presets.key_pairs,
+    local.baseline_key_pairs,
+    lookup(local.baseline_environment_config, "baseline_key_pairs", {})
+  )
+
+  kms_grants = merge(
+    module.baseline_presets.kms_grants,
+    local.baseline_kms_grants,
+    lookup(local.baseline_environment_config, "baseline_kms_grants", {})
+  )
+
+  lbs = merge(
+    local.baseline_lbs,
+    lookup(local.baseline_environment_config, "baseline_lbs", {})
+  )
+
+  route53_resolvers = merge(
+    module.baseline_presets.route53_resolvers,
+    local.baseline_route53_resolvers,
+    lookup(local.baseline_environment_config, "baseline_route53_resolvers", {})
+  )
+
   route53_zones = merge(
     local.baseline_route53_zones,
     lookup(local.baseline_environment_config, "baseline_route53_zones", {})
-  )
-
-  ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})
-  ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
-  lbs                    = lookup(local.environment_config, "baseline_lbs", {})
-
-  secretsmanager_secrets = merge(
-    local.baseline_secretsmanager_secrets,
-    lookup(local.baseline_environment_config, "baseline_secretsmanager_secrets", {})
-  )
-
-  ssm_parameters = merge(
-    module.baseline_presets.ssm_parameters,
-    local.baseline_ssm_parameters,
-    lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
   )
 
   s3_buckets = merge(
@@ -87,22 +140,26 @@ module "baseline" {
     local.baseline_s3_buckets,
     lookup(local.baseline_environment_config, "baseline_s3_buckets", {})
   )
-}
 
-#create random value for defualt values
-resource "random_password" "random_value" {
-  length = 12
-}
+  secretsmanager_secrets = merge(
+    local.baseline_secretsmanager_secrets,
+    lookup(local.baseline_environment_config, "baseline_secretsmanager_secrets", {})
+  )
 
-#create secret store for ndh values
-resource "aws_ssm_parameter" "ndh_secrets" {
-  for_each = toset(local.ndh_secrets)
-  name     = each.value
-  type     = "SecureString"
-  value    = random_password.random_value.result
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
+  security_groups = merge(
+    local.baseline_security_groups,
+    lookup(local.baseline_environment_config, "baseline_security_groups", {})
+  )
+
+  sns_topics = merge(
+    module.baseline_presets.sns_topics,
+    local.baseline_sns_topics,
+    lookup(local.baseline_environment_config, "baseline_sns_topics", {})
+  )
+
+  ssm_parameters = merge(
+    module.baseline_presets.ssm_parameters,
+    local.baseline_ssm_parameters,
+    lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
+  )
 }
