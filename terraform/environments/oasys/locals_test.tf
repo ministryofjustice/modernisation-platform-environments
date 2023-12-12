@@ -34,6 +34,34 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2T2WebPolicy = {
+        description = "Permissions required for T2 Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2OASYS/apex-passwords",
+            ]
+          }
+        ]
+      }
+      Ec2T1WebPolicy = {
+        description = "Permissions required for T1 Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1OASYS/apex-passwords",
+            ]
+          }
+        ]
+      }
       Ec2T2BipPolicy = {
         description = "Permissions required for T2 Bip EC2s"
         statements = [
