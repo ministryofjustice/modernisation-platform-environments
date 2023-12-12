@@ -9,7 +9,7 @@ resource "aws_security_group" "db" {
     from_port   = var.rds_port
     to_port     = var.rds_port
     security_groups = [
-      var.account_config.bastion.bastion_security_group
+      var.account_config.bastion.bastion_security_group,
       var.rds_ingress_security_groups
     ]
   }
