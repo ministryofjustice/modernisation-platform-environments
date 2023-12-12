@@ -227,11 +227,11 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom_2" {
 resource "aws_lb" "tipstaff_lb" {
   name                       = "tipstaff-load-balancer"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tipstaff_lb_sc.id, aws_security_group.tipstaff_lb_sc_pingdom_1.id, aws_security_group.tipstaff_lb_sc_pingdom_2.id]
+  security_groups            = [aws_security_group.tipstaff_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
-  depends_on                 = [aws_security_group.tipstaff_lb_sc, aws_security_group.tipstaff_lb_sc_pingdom_1, aws_security_group.tipstaff_lb_sc_pingdom_2]
+  depends_on                 = [aws_security_group.tipstaff_lb_sc]
 }
 
 resource "aws_lb_target_group" "tipstaff_target_group" {

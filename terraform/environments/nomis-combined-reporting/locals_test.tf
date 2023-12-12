@@ -34,17 +34,12 @@ locals {
         subject_alternate_names = [
           "*.${module.environment.domains.public.application_environment}",
         ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "Wildcard certificate for the ${local.environment} environment"
         }
       }
-    }
-
-    baseline_ssm_parameters = {
-      # T1
-      "t1-ncr-tomcat"  = local.tomcat_ssm_parameters
-      "t1-ncr-bip"     = local.bip_ssm_parameters
-      "t1-ncr-bip-cmc" = local.bip_cmc_ssm_parameters
     }
 
     baseline_secretsmanager_secrets = {
@@ -101,18 +96,12 @@ locals {
     }
 
     baseline_ec2_instances = {
-      t1-ncr-bip-cmc = merge(local.bip_cmc_ec2_default, {
-        config = merge(local.bip_cmc_ec2_default.config, {
-          instance_profile_policies = concat(local.bip_cmc_ec2_default.config.instance_profile_policies, [
-            "Ec2T1BipPolicy",
-          ])
-        })
-        tags = merge(local.bip_cmc_ec2_default.tags, {
-          description                          = "For testing SAP BI CMC installation and configurations"
-          nomis-combined-reporting-environment = "t1"
-        })
-      })
       t1-ncr-db-1-a = merge(local.database_ec2_default, {
+        cloudwatch_metric_alarms = merge(
+          local.database_cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+        )
         config = merge(local.database_ec2_default.config, {
           instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
             "Ec2T1DatabasePolicy",
@@ -135,6 +124,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        cloudwatch_metric_alarms = local.tomcat_cloudwatch_metric_alarms
         config = merge(local.tomcat_ec2_default.config, {
           instance_profile_policies = concat(local.tomcat_ec2_default.config.instance_profile_policies, [
             "Ec2T1BipPolicy",
@@ -145,13 +135,30 @@ locals {
           nomis-combined-reporting-environment = "t1"
         })
       })
-
+      t1-ncr-bip-cmc = merge(local.bip_cmc_ec2_default, {
+        autoscaling_group = {
+          desired_capacity    = 0
+          max_size            = 1
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        cloudwatch_metric_alarms = local.bip_cmc_cloudwatch_metric_alarms
+        config = merge(local.bip_cmc_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_cmc_ec2_default.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
+        tags = merge(local.bip_cmc_ec2_default.tags, {
+          description                          = "For testing SAP BI CMC installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
       t1-ncr-bip = merge(local.bip_ec2_default, {
         autoscaling_group = {
           desired_capacity    = 1
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
         config = merge(local.bip_ec2_default.config, {
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2T1BipPolicy",
@@ -172,44 +179,202 @@ locals {
         subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private"]
         listeners = {
-          http = {
-            port     = 80
-            protocol = "HTTP"
-            default_action = {
-              type = "redirect"
-              redirect = {
-                port        = "443"
-                protocol    = "HTTPS"
-                status_code = "HTTP_301"
+          http = merge(local.bip_cmc_lb_listeners.http, local.bip_lb_listeners.http, local.tomcat_lb_listeners.http)
+
+          http7777 = merge(local.bip_cmc_lb_listeners.http7777, local.bip_lb_listeners.http7777, local.tomcat_lb_listeners.http7777, {
+            rules = {
+              t1-ncr-bip-cmc = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-cmc-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip-cmc.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-bip = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
               }
             }
-          }
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "HTTPS"
-                status_code  = "200"
+          })
+          http6455 = merge(local.bip_cmc_lb_listeners.http6455, local.bip_lb_listeners.http6455, {
+            rules = {
+              t1-ncr-bip-cmc = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-cmc-http-6455"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip-cmc.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-bip = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-http-6455"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
               }
             }
-          }
+          })
+          http6410 = merge(local.bip_cmc_lb_listeners.http6410, local.bip_lb_listeners.http6410, {
+            rules = {
+              t1-ncr-bip-cmc = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-cmc-http-6410"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip-cmc.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-bip = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-http-6410"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+          http6400 = merge(local.bip_cmc_lb_listeners.http6400, local.bip_lb_listeners.http6400, {
+            rules = {
+              t1-ncr-bip-cmc = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-cmc-http-6400"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip-cmc.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-bip = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-http-6400"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+          https = merge(local.bip_cmc_lb_listeners.https, local.bip_lb_listeners.https, local.tomcat_lb_listeners.https, {
+            rules = {
+              t1-ncr-bip-cmc-http-7777 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-cmc-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip-cmc.reporting.test.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-bip-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip.reporting.test.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat-http-7777 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat.reporting.test.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
         }
       }
     }
     baseline_route53_zones = {
       "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
-          # T1 BIP
-          { name = "t1-ncr-bip-cmc", type = "CNAME", ttl = "300", records = ["t1-ncr-bip-cmc.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1-ncr-bip", type = "CNAME", ttl = "300", records = ["t1-ncr-bip.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # T1 Tomcat
-          { name = "t1-ncr-tomcat", type = "CNAME", ttl = "300", records = ["t1-ncr-tomcat.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # Oracle database
           { name = "t1-ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.reporting.nomis.service.justice.gov.uk"] },
           { name = "t1-ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1-ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },

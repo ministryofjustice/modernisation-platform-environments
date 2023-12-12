@@ -27,6 +27,20 @@ output "cloudwatch_metric_alarms" {
   value       = local.cloudwatch_metric_alarms
 }
 
+output "cloudwatch_metric_alarms_by_sns_topic" {
+  description = "Map of sns topic key to cloudwatch metric alarms grouped by namespace, where the default action is the sns topic key"
+
+  value = {
+    for sns_key, sns_value in local.sns_topics : sns_key => {
+      for namespace_key, namespace_value in local.cloudwatch_metric_alarms : namespace_key => {
+        for alarm_key, alarm_value in namespace_value : alarm_key => merge(alarm_value, {
+          alarm_actions = [sns_key]
+        })
+      }
+    }
+  }
+}
+
 output "ec2_autoscaling_group" {
   description = "Common EC2 autoscaling group configuration for ec2_autoscaling_group module"
 
