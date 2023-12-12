@@ -113,7 +113,7 @@ resource "aws_s3_bucket_public_access_block" "oracledb_backups_inventory" {
 }
 
 data "template_file" "oracledb_backups_inventory_policy_file" {
-  template = file("./policies/oracledb_backups_inventory.json")
+  template = file("${path.module}/policies/oracledb_backups_inventory.json")
 
   vars = {
     backup_s3bucket_arn = module.s3_bucket_oracledb_backups.bucket.arn
