@@ -81,13 +81,9 @@ locals {
 
         ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
           data = {
-            iops       = 3000
-            throughput = 125
             total_size = 1000
           }
           flash = {
-            iops       = 3000
-            throughput = 125
             total_size = 100
           }
         })
