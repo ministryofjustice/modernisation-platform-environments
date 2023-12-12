@@ -61,7 +61,7 @@ locals {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
-            "Ec2PreprodDatabasePolicy",
+            "Ec2ProdDatabasePolicy",
           ])
         })
         instance = merge(local.defaults_database_ec2.instance, {
