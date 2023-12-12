@@ -25,6 +25,21 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2PreprodWebPolicy = {
+        description = "Permissions required for Preprod Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PPOASYS/apex-passwords*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/OASPROD/apex-passwords*",
+            ]
+          }
+        ]
+      }
       Ec2PreprodDatabasePolicy = {
         description = "Permissions required for Preprod Database EC2s"
         statements = [
@@ -101,22 +116,20 @@ locals {
         })
       })
 
-      # "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name                  = "oasys_webserver_release_*"
-      #     ssm_parameters_prefix     = "ec2-web-pp/"
-      #     iam_resource_names_prefix = "ec2-web-pp"
-      #   })
-      #   user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "oasys-ords-secrets"
-      #     })
-      #   })
-      #   tags = merge(local.webserver_a.tags, {
-      #     oracle-db-hostname = "PPODL00009.azure.noms.root" # "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
-      #     oracle-db-sid      = "OASPROD" # "PPOASYS"
-      #   })
-      # })
+      "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "oasys_webserver_release_*"
+          ssm_parameters_prefix     = "ec2-web-pp/"
+          iam_resource_names_prefix = "ec2-web-pp"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2PreprodWebPolicy",
+          ])
+        })
+        tags = merge(local.webserver_a.tags, {
+          oracle-db-hostname = "PPODL00009.azure.noms.root" # "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
+          oracle-db-sid      = "OASPROD" # "PPOASYS"
+        })
+      })
     }
 
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
