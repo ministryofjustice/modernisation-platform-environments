@@ -254,7 +254,7 @@ locals {
                 }]
               }
               t1-ncr-bip = {
-                priority = 300
+                priority = 200
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-ncr-bip-http-6455"
