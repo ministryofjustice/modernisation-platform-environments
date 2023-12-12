@@ -12,6 +12,7 @@ locals {
   }
 
   defaults_ec2 = {
+    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.windows
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_owner                     = "self"
       ebs_volumes_copy_all_from_ami = false
@@ -32,6 +33,7 @@ locals {
       disable_api_stop       = false
       vpc_security_group_ids = ["database"]
     })
+    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.linux
     ebs_volumes = {
       "/dev/sdb" = { label = "app" }   # /u01
       "/dev/sdc" = { label = "app" }   # /u02
