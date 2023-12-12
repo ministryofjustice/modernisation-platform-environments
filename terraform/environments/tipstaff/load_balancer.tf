@@ -231,7 +231,7 @@ resource "aws_lb" "tipstaff_lb" {
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
-  depends_on                 = [aws_security_group.tipstaff_lb_sc, aws_security_group.tipstaff_lb_sc_pingdom]
+  depends_on                 = [aws_security_group.tipstaff_lb_sc, aws_security_group.tipstaff_lb_sc_pingdom_1, aws_security_group.tipstaff_lb_sc_pingdom_2]
 }
 
 resource "aws_lb_target_group" "tipstaff_target_group" {
