@@ -93,19 +93,6 @@ locals {
       }
     }
 
-    baseline_ssm_parameters = {
-      "/oracle/weblogic/prod"     = local.weblogic_ssm_parameters
-      "/oracle/database/PCNOM"    = local.database_nomis_ssm_parameters
-      "/oracle/database/PNDH"     = local.database_ssm_parameters
-      "/oracle/database/PTRDAT"   = local.database_ssm_parameters
-      "/oracle/database/PCNMAUD"  = local.database_ssm_parameters
-      "/oracle/database/PMIS"     = local.database_mis_ssm_parameters
-      "/oracle/database/DRCNOM"   = local.database_nomis_ssm_parameters
-      "/oracle/database/DRNDH"    = local.database_ssm_parameters
-      "/oracle/database/DRTRDAT"  = local.database_ssm_parameters
-      "/oracle/database/DRCNMAUD" = local.database_ssm_parameters
-      "/oracle/database/DRMIS"    = local.database_mis_ssm_parameters
-    }
     baseline_secretsmanager_secrets = {
       "/oracle/weblogic/prod"     = local.weblogic_secretsmanager_secrets
       "/oracle/database/PCNOM"    = local.database_nomis_secretsmanager_secrets

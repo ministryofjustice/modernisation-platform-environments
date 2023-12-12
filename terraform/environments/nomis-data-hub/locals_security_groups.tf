@@ -63,7 +63,7 @@ locals {
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
-  baseline_security_groups = {
+  security_groups = {
     public = {
       description = "Security group for public subnet"
       ingress = {

@@ -46,6 +46,30 @@ resource "aws_instance" "ec2_oracle_ebs" {
   depends_on = [aws_security_group.ec2_sg_ebsdb]
 }
 
+resource "aws_ebs_volume" "ebsdb_swap" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_swap
+  type              = "gp3"
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_swap
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "swap" }
+  )
+}
+
+resource "aws_volume_attachment" "ebsdb_swap_att" {
+  depends_on = [
+    aws_ebs_volume.ebsdb_swap
+  ]
+  device_name = "/dev/sdb"
+  volume_id   = aws_ebs_volume.ebsdb_swap.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
 resource "aws_ebs_volume" "export_home" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -130,6 +154,78 @@ resource "aws_volume_attachment" "dbf_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
+resource "aws_ebs_volume" "dbf01" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf01
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf01
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "dbf01" }
+  )
+}
+
+resource "aws_volume_attachment" "dbf01_att" {
+  depends_on = [
+    aws_ebs_volume.dbf01
+  ]
+  device_name = "/dev/sde"
+  volume_id   = aws_ebs_volume.dbf01.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
+resource "aws_ebs_volume" "dbf02" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf02
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf02
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "dbf02" }
+  )
+}
+
+resource "aws_volume_attachment" "dbf02_att" {
+  depends_on = [
+    aws_ebs_volume.dbf02
+  ]
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.dbf02.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
+resource "aws_ebs_volume" "dbf03" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf03
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf03
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "dbf03" }
+  )
+}
+
+resource "aws_volume_attachment" "dbf03_att" {
+  depends_on = [
+    aws_ebs_volume.dbf03
+  ]
+  device_name = "/dev/sdg"
+  volume_id   = aws_ebs_volume.dbf03.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
 resource "aws_ebs_volume" "redoA" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -179,6 +275,7 @@ resource "aws_ebs_volume" "backup" {
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup
   type              = local.application_data.accounts[local.environment].ebs_type_ebsdb_backup
+  snapshot_id       = local.application_data.accounts[local.environment].ebs_backup_snapshot_id
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
@@ -240,7 +337,6 @@ resource "aws_volume_attachment" "diag_att" {
   volume_id   = aws_ebs_volume.diag.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
-
 
 resource "aws_ebs_volume" "appshare" {
   lifecycle {
@@ -308,6 +404,7 @@ resource "aws_volume_attachment" "db_temp_att" {
   volume_id   = aws_ebs_volume.db_temp.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
 /*
 ####  This mount was required for golive incident
 ####  Just commenting out, rather than remove - just in case

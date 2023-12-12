@@ -4,6 +4,12 @@ locals {
   # baseline config
   development_config = {
 
+    baseline_secretsmanager_secrets = {
+      "/oracle/oem"                = local.oem_secretsmanager_secrets
+      "/oracle/database/EMREP"     = local.oem_secretsmanager_secrets
+      "/oracle/database/DEVRCVCAT" = local.oem_secretsmanager_secrets
+    }
+
     baseline_ec2_autoscaling_groups = {
       dev-base-ol85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -32,5 +38,21 @@ locals {
       }
     }
 
+    baseline_ec2_instances = {
+      dev-oem-a = merge(local.oem_ec2_default, {
+        config = merge(local.oem_ec2_default.config, {
+          ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-12-07T12-10-49.620Z"
+          availability_zone = "eu-west-2a"
+        })
+        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
+          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
+            branch = "45027fb7482eb7fb601c9493513bb73658780dda" # 2023-08-11
+          })
+        })
+        tags = merge(local.oem_ec2_default.tags, {
+          oracle-sids = "EMREP DEVRCVCAT"
+        })
+      })
+    }
   }
 }

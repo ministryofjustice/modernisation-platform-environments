@@ -7,28 +7,10 @@ locals {
       patch_day                 = "TUE"
     }
 
-    baseline_s3_buckets = {
-    }
+    baseline_s3_buckets     = {}
+    baseline_ssm_parameters = {}
 
-    baseline_ssm_parameters = {
-      "/oracle/database/T1OASYS"  = local.database_ssm_parameters
-      "/oracle/database/T1OASREP" = local.database_ssm_parameters
-      "/oracle/database/T1AZBIPI" = local.database_ssm_parameters
-      "/oracle/database/T1MISTRN" = local.database_ssm_parameters
-      "/oracle/database/T1ONRSYS" = local.database_ssm_parameters
-      "/oracle/database/T1ONRAUD" = local.database_ssm_parameters
-      "/oracle/database/T1ONRBDS" = local.database_ssm_parameters
-
-      "/oracle/database/T2OASYS"  = local.database_ssm_parameters
-      "/oracle/database/T2OASREP" = local.database_ssm_parameters
-      "/oracle/database/T2AZBIPI" = local.database_ssm_parameters
-      "/oracle/database/T2MISTRN" = local.database_ssm_parameters
-      "/oracle/database/T2ONRSYS" = local.database_ssm_parameters
-      "/oracle/database/T2ONRAUD" = local.database_ssm_parameters
-      "/oracle/database/T2ONRBDS" = local.database_ssm_parameters
-    }
     baseline_secretsmanager_secrets = {
-      # NEW
       "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_oasys_db
       "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
       "/oracle/database/T1AZBIPI" = local.secretsmanager_secrets_bip_db
@@ -49,38 +31,6 @@ locals {
 
       "/oracle/bip/t1" = local.secretsmanager_secrets_bip
       "/oracle/bip/t2" = local.secretsmanager_secrets_bip
-
-      # OLD AND WILL BE REPLACED
-
-      "/database/t1/T1OASYS" = {
-        secrets = {
-          apex_listenerpassword    = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-          apex_public_userpassword = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-          apex_rest_publicpassword = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-        }
-      }
-      "/database/t2/T2OASYS" = {
-        secrets = {
-          apex_listenerpassword    = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-          apex_public_userpassword = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-          apex_rest_publicpassword = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-        }
-      }
-      "/database/t2-oasys-db-a/T2BIPINF" = {
-        secrets = {
-          systempassword = {} # -> /oracle/database/T2BIPINF/bip-passwords { sys: ___ }
-        }
-      }
-      "/weblogic/test-oasys-bip-b" = {
-        secrets = {
-          admin_password     = {} # -> /oracle/bip/t2/passwords { weblogic: admin_pass }
-          admin_username     = {} # just have in ansible defaults , username is always weblogic
-          biplatformpassword = {} # ->  /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
-          db_username        = {} # put in ansible defaults
-          mdspassword        = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
-          syspassword        = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
-        }
-      }
     }
 
     baseline_iam_policies = {
@@ -186,25 +136,14 @@ locals {
           oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
         })
       })
-      # "t2-${local.application_name}-db-b" = merge(local.database_b, {
-      #   user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "main"
-      #     })
-      #   })
-      #   tags = merge(local.database_b.tags, {
-      #     description                             = "t2 ${local.application_name} database"
-      #     "${local.application_name}-environment" = "t2"
-      #   })
-      # })
 
-      "t2-${local.application_name}-bip-b" = merge(local.bip_b, {
-        autoscaling_group = merge(local.bip_b.autoscaling_group, {
+      "t2-${local.application_name}-bip-a" = merge(local.bip_a, {
+        autoscaling_group = merge(local.bip_a.autoscaling_group, {
           desired_capacity = 1
         })
         autoscaling_schedules = {}
-        config = merge(local.bip_b.config, {
-          instance_profile_policies = concat(local.bip_b.config.instance_profile_policies, [
+        config = merge(local.bip_a.config, {
+          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
             "Ec2T2BipPolicy",
           ])
         })
@@ -213,8 +152,7 @@ locals {
         #     branch = "add-oasys-bip-role"
         #   })
         # })
-        tags = merge(local.bip_b.tags, {
-          # instance-scheduling = "skip-scheduling"
+        tags = merge(local.bip_a.tags, {
           oasys-environment = "t2"
           bip-db-name       = "T2BIPINF"
           bip-db-hostname   = "t2-oasys-db-a"
@@ -257,7 +195,6 @@ locals {
         #   })
         # })
         tags = merge(local.bip_b.tags, {
-          # instance-scheduling = "skip-scheduling"
           oasys-environment = "t1"
           bip-db-name       = "T1BIPINF"
           bip-db-hostname   = "t1-oasys-db-a"
@@ -266,7 +203,30 @@ locals {
         })
       })
 
-
+      # "t1-${local.application_name}-bip-b" = merge(local.bip_b, {
+      #   autoscaling_group = merge(local.bip_b.autoscaling_group, {
+      #     desired_capacity = 1
+      #   })
+      #   autoscaling_schedules = {}
+      #   config = merge(local.bip_b.config, {
+      #     instance_profile_policies = concat(local.bip_b.config.instance_profile_policies, [
+      #       "Ec2T1BipPolicy",
+      #     ])
+      #     # ami_name                  = "base_rhel_7_9*"
+      #   })
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "oasys/bip-build-improvement2"
+      #     })
+      #   })
+      #   tags = merge(local.bip_b.tags, {
+      #     oasys-environment   = "t1"
+      #     bip-db-name         = "T1BIPINF"
+      #     bip-db-hostname     = "t1-oasys-db-a"
+      #     oasys-db-name       = "T1OASYS"
+      #     oasys-db-hostname   = "t1-oasys-db-a"
+      #   })
+      # })
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -573,8 +533,8 @@ locals {
       #
       # "${local.application_name}.service.justice.gov.uk" = {
       #   lb_alias_records = [
-      # { name = "t2", type = "A", lbs_map_key = "public" }, # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
-      # { name = "db.t2", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+      # { name = "t2",    type = "A", lbs_map_key = "public" }, #    t2.oasys.service.justice.gov.uk 
+      # { name = "db.t2", type = "A", lbs_map_key = "public" }, # db.t2.oasys.service.justice.gov.uk
       #   ]
       # }
       # "t1.${local.application_name}.service.justice.gov.uk" = {

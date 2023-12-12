@@ -8,7 +8,7 @@ locals {
       nomis-audit-archives = {
         custom_kms_key = module.environment.kms_keys["general"].arn
         bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.DevelopmentReadOnlyAccessBucketPolicy
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
@@ -17,7 +17,7 @@ locals {
         custom_kms_key = module.environment.kms_keys["general"].arn
         iam_policies   = module.baseline_presets.s3_iam_policies
         bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.DevelopmentReadOnlyAccessBucketPolicy
         ]
       }
 
@@ -180,21 +180,6 @@ locals {
       }
     }
 
-    baseline_ssm_parameters = {
-      "/oracle/weblogic/t1"       = local.weblogic_ssm_parameters
-      "/oracle/weblogic/t2"       = local.weblogic_ssm_parameters
-      "/oracle/weblogic/t3"       = local.weblogic_ssm_parameters
-      "/oracle/database/T1CNOM"   = local.database_nomis_ssm_parameters
-      "/oracle/database/T1NDH"    = local.database_ssm_parameters
-      "/oracle/database/T1TRDAT"  = local.database_ssm_parameters
-      "/oracle/database/T1CNMAUD" = local.database_ssm_parameters
-      "/oracle/database/T1MIS"    = local.database_mis_ssm_parameters
-      "/oracle/database/T1ORSYS"  = local.database_ssm_parameters
-      "/oracle/database/T2CNOM"   = local.database_nomis_ssm_parameters
-      "/oracle/database/T2NDH"    = local.database_ssm_parameters
-      "/oracle/database/T2TRDAT"  = local.database_ssm_parameters
-      "/oracle/database/T3CNOM"   = local.database_nomis_ssm_parameters
-    }
     baseline_secretsmanager_secrets = {
       "/oracle/weblogic/t1"       = local.weblogic_secretsmanager_secrets
       "/oracle/weblogic/t2"       = local.weblogic_secretsmanager_secrets

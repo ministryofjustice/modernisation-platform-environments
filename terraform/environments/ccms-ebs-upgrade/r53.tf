@@ -25,9 +25,9 @@ resource "aws_route53_record" "ebsapps" {
   count    = local.application_data.accounts[local.environment].ebsapps_no_instances
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "ccms-ebs-app-${count.index + 1}-upgrade.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-  ttl     = 300
-  records = [aws_instance.ec2_ebsapps[count.index].private_ip]
+  type     = "A"
+  ttl      = 300
+  records  = [aws_instance.ec2_ebsapps[count.index].private_ip]
 }
 
 ## EBS ALB
@@ -57,4 +57,17 @@ resource "aws_route53_record" "accessgate_ec2" {
   type    = "A"
   ttl     = 300
   records = [aws_instance.ec2_accessgate[count.index].private_ip]
+}
+
+# WebGate Instances
+
+resource "aws_route53_record" "webgate_ec2" {
+  provider = aws.core-vpc
+  count    = local.application_data.accounts[local.environment].webgate_no_instances
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "${local.application_data.accounts[local.environment].webgate_dns_prefix}${count.index + 1}-upgrade.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+  ttl     = 300
+  records = [aws_instance.ec2_webgate[count.index].private_ip]
 }

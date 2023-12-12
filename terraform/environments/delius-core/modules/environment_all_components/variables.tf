@@ -23,6 +23,7 @@ variable "account_config" {
     shared_vpc_cidr               = string
     shared_vpc_id                 = string
     private_subnet_ids            = list(string)
+    ordered_private_subnet_ids    = list(string)
     public_subnet_ids             = list(string)
     data_subnet_ids               = list(string)
     data_subnet_a_id              = string
@@ -30,6 +31,11 @@ variable "account_config" {
     route53_network_services_zone = any
     route53_external_zone         = any
     bastion                       = any
+    kms_keys = object({
+      ebs_shared     = any
+      general_shared = any
+      rds_shared     = any
+    })
 
     general_shared_kms_key_arn = optional(string)
   })
@@ -37,6 +43,7 @@ variable "account_config" {
     shared_vpc_cidr                = "default_shared_vpc_cidr"
     shared_vpc_id                  = "default_shared_vpc_id"
     private_subnet_ids             = ["default_private_subnet_ids"]
+    ordered_private_subnet_ids     = []
     public_subnet_ids              = ["default_public_subnet_ids"]
     data_subnet_ids                = ["default_data_subnet_ids"]
     data_subnet_a_id               = "default_data_subnet_id"
@@ -46,6 +53,11 @@ variable "account_config" {
     migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
     general_shared_kms_key_arn     = "default_general_shared_kms_key_arn"
     bastion                        = {}
+    kms_keys = {
+      ebs_shared     = {}
+      general_shared = {}
+      rds_shared     = {}
+    }
   }
 }
 

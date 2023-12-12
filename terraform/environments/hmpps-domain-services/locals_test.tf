@@ -4,13 +4,6 @@ locals {
   # baseline config
   test_config = {
 
-    baseline_ssm_parameters = {
-      "/join_domain_linux_service_account" = {
-        parameters = {
-          passwords = {}
-        }
-      }
-    }
     baseline_secretsmanager_secrets = {
       "/join_domain_linux_service_account" = {
         secrets = {
@@ -55,7 +48,7 @@ locals {
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
           user_data_raw = base64encode(templatefile("./templates/rds.yaml.tftpl", {
-            rds_hostname = "RDSConnectionBroker"
+            rds_hostname = "RDSBroker"
           }))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
@@ -218,7 +211,7 @@ locals {
             }
             stickiness = {
               enabled = true
-              type    = "source_ip"
+              type    = "lb_cookie"
             }
             #attachments = [
             #  { ec2_instance_name = "rds-gateway" },

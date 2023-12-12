@@ -136,20 +136,6 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
-        http7770_7771_lb = {
-          description = "Allow http 7770-7771 ingress"
-          from_port   = 7770
-          to_port     = 7771
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
-        }
-        http7780_7781_lb = {
-          description = "Allow http 7780-7781 ingress"
-          from_port   = 7780
-          to_port     = 7781
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
-        }
       }
       egress = {
         all = {

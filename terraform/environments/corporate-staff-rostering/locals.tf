@@ -33,8 +33,8 @@ locals {
     }
   }
 
-  baseline_acm_certificates       = {}
-  baseline_cloudwatch_log_groups  = {
+  baseline_acm_certificates = {}
+  baseline_cloudwatch_log_groups = {
     cwagent-windows-application = {
       retention_in_days = 30
     }

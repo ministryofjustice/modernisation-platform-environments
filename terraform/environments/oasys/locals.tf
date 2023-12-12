@@ -51,7 +51,7 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
     )
-    user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
+    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules = {
       "scale_up" = {
         recurrence = "0 5 * * Mon-Fri"
@@ -208,13 +208,8 @@ locals {
         total_size = 50
       }
     }
-    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
-    ssm_parameters = {
-      asm-passwords = {}
-    }
-    secretsmanager_secrets = {
-      asm-passwords = {}
-    }
+    route53_records        = module.baseline_presets.ec2_instance.route53_records.internal_and_external
+    secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
     # Example target group setup below
     lb_target_groups = {}
     tags = {
@@ -262,8 +257,8 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
     )
-    user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
-    autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+    user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
+    autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
       desired_capacity = 2
       max_size         = 2
@@ -271,17 +266,18 @@ locals {
     lb_target_groups       = {}
     secretsmanager_secrets = {}
     tags = {
-      backup            = "false" # opt out of mod platform default backup plan
-      component         = "bip"
-      description       = "${local.environment} ${local.application_name} bip"
-      os-type           = "Linux"
-      os-major-version  = 7
-      os-version        = "RHEL 7.9"
-      "Patch Group"     = "RHEL"
-      server-type       = "${local.application_name}-bip"
-      monitored         = true
-      oasys-environment = local.environment
-      environment-name  = terraform.workspace
+      backup              = "false" # opt out of mod platform default backup plan
+      component           = "bip"
+      description         = "${local.environment} ${local.application_name} bip"
+      os-type             = "Linux"
+      os-major-version    = 7
+      os-version          = "RHEL 7.9"
+      "Patch Group"       = "RHEL"
+      server-type         = "${local.application_name}-bip"
+      monitored           = true
+      oasys-environment   = local.environment
+      environment-name    = terraform.workspace
+      instance-scheduling = "skip-scheduling"
     }
   }
   bip_b = merge(local.bip_a, {
@@ -296,8 +292,8 @@ locals {
 
   baseline_secretsmanager_secrets = {}
 
-  baseline_cloudwatch_log_groups = {}
-  baseline_cloudwatch_metric_alarms = {}
+  baseline_cloudwatch_log_groups         = {}
+  baseline_cloudwatch_metric_alarms      = {}
   baseline_cloudwatch_log_metric_filters = {}
 
   public_key_data = jsondecode(file("./files/bastion_linux.json"))

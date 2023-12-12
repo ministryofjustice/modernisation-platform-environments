@@ -7,14 +7,19 @@ locals {
     shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
     private_subnet_ids            = data.aws_subnets.shared-private.ids
     public_subnet_ids             = data.aws_subnets.shared-public.ids
+    ordered_private_subnet_ids    = local.ordered_subnet_ids
     data_subnet_ids               = data.aws_subnets.shared-data.ids
     data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
     route53_inner_zone_info       = data.aws_route53_zone.inner
     route53_network_services_zone = data.aws_route53_zone.network-services
     route53_external_zone         = data.aws_route53_zone.external
-    general_shared_kms_key_arn    = data.aws_kms_key.general_shared.arn
     shared_vpc_id                 = data.aws_vpc.shared.id
     bastion                       = module.bastion_linux
+    kms_keys = {
+      ebs_shared     = data.aws_kms_key.ebs_shared.arn
+      general_shared = data.aws_kms_key.general_shared.arn
+      rds_shared     = data.aws_kms_key.rds_shared.arn
+    }
   }
 
   environment_config_dev = {

@@ -491,6 +491,24 @@ module "s3_domain_bucket" {
   )
 }
 
+# Schema Registry Bucket
+module "s3_schema_registry_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-schema-registry-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-schema-registry-${local.env}"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
 # Data Domain Configuration Bucket
 module "s3_domain_config_bucket" {
   source                    = "./modules/s3_bucket"
@@ -802,19 +820,19 @@ module "s3_file_transfer_lambda_trigger" {
 
   enable_lambda_trigger = local.enable_s3_file_transfer_lambda_trigger
 
-  event_name            = "${local.project}-s3-transfer-lambda-trigger-${local.env}"
-  lambda_function_arn   = module.s3_file_transfer_lambda.lambda_function
-  lambda_function_name  = module.s3_file_transfer_lambda.lambda_name
+  event_name           = "${local.project}-s3-transfer-lambda-trigger-${local.env}"
+  lambda_function_arn  = module.s3_file_transfer_lambda.lambda_function
+  lambda_function_name = module.s3_file_transfer_lambda.lambda_name
 
   trigger_input_event = jsonencode(
     {
-      "sourceBucket": "${module.s3_raw_bucket.bucket_id}",
-      "destinationBucket": "${module.s3_raw_archive_bucket.bucket_id}",
-      "retentionDays": "${local.scheduled_s3_file_transfer_lambda_retention_days}"
+      "sourceBucket" : "${module.s3_raw_bucket.bucket_id}",
+      "destinationBucket" : "${module.s3_raw_archive_bucket.bucket_id}",
+      "retentionDays" : "${local.scheduled_s3_file_transfer_lambda_retention_days}"
     }
   )
 
-  trigger_schedule_expression = "${local.scheduled_s3_file_transfer_lambda_schedule}"
+  trigger_schedule_expression = local.scheduled_s3_file_transfer_lambda_schedule
 
   depends_on = [
     module.s3_file_transfer_lambda
@@ -1045,7 +1063,7 @@ module "dynamo_table_step_functions_token" {
   hash_key    = "replicationTaskArn"
   table_class = "STANDARD"
 
-  ttl_enabled = true
+  ttl_enabled        = true
   ttl_attribute_name = "expireAt"
 
   attributes = [

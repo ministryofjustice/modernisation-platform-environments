@@ -10,12 +10,6 @@ locals {
       "/oracle/database/PRCVCAT" = local.oem_secretsmanager_secrets
     }
 
-    baseline_ssm_parameters = {
-      "/oracle/oem"              = local.oem_ssm_parameters_passwords
-      "/oracle/database/EMREP"   = local.oem_ssm_parameters_passwords
-      "/oracle/database/PRCVCAT" = local.oem_ssm_parameters_passwords
-    }
-
     baseline_ec2_instances = {
       prod-oem-a = merge(local.oem_ec2_default, {
         config = merge(local.oem_ec2_default.config, {

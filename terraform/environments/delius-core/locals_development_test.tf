@@ -6,6 +6,7 @@ locals {
   account_config_test = {
     shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
     private_subnet_ids            = data.aws_subnets.shared-private.ids
+    ordered_private_subnet_ids    = local.ordered_subnet_ids
     public_subnet_ids             = data.aws_subnets.shared-public.ids
     data_subnet_ids               = data.aws_subnets.shared-data.ids
     data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
@@ -15,6 +16,11 @@ locals {
     general_shared_kms_key_arn    = data.aws_kms_key.general_shared.arn
     shared_vpc_id                 = data.aws_vpc.shared.id
     bastion                       = module.bastion_linux
+    kms_keys = {
+      ebs_shared     = data.aws_kms_key.ebs_shared.arn
+      general_shared = data.aws_kms_key.general_shared.arn
+      rds_shared     = data.aws_kms_key.rds_shared.arn
+    }
   }
 
   environment_config_test = {
