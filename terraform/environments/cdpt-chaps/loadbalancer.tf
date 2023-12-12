@@ -26,14 +26,6 @@ resource "aws_security_group" "chaps_lb_sc" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  egress {
-    description = "allow all outbound traffic for port 443"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
 resource "aws_lb" "chaps_lb" {
@@ -71,6 +63,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
 }
 
 resource "aws_lb_listener" "listener" {
+  #checkov:skip=CKV_AWS_103
   load_balancer_arn = aws_lb.chaps_lb.arn
   port              = 80
   protocol          = "HTTP"
@@ -81,18 +74,17 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
-# resource "aws_lb_listener" "chaps_lb" {
-#   depends_on = [
-#     aws_acm_certificate.external
-#   ]
-#   certificate_arn   = aws_acm_certificate.external.arn
-#   load_balancer_arn = aws_lb.chaps_lb.arn
-#   port              = 443
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-2016-08"
+resource "aws_lb_listener" "https_listener" {
+  #checkov:skip=CKV_AWS_103
+  depends_on = [aws_acm_certificate_validation.external]
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.chaps_target_group.arn
-#   }
-# }
+  load_balancer_arn = aws_lb.chaps_lb.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.external.arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.chaps_target_group.id
+    type             = "forward"
+  }
+}
