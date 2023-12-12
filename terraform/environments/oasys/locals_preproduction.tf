@@ -25,6 +25,21 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2PreprodWebPolicy = {
+        description = "Permissions required for Preprod Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PPOASYS/apex-passwords",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/OASPROD/apex-passwords",
+            ]
+          }
+        ]
+      }
       Ec2PreprodDatabasePolicy = {
         description = "Permissions required for Preprod Database EC2s"
         statements = [
@@ -106,6 +121,9 @@ locals {
       #     ami_name                  = "oasys_webserver_release_*"
       #     ssm_parameters_prefix     = "ec2-web-pp/"
       #     iam_resource_names_prefix = "ec2-web-pp"
+      #     instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+      #       "Ec2PreprodWebPolicy",
+      #     ])
       #   })
       #   user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {

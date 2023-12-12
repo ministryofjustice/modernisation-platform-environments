@@ -266,6 +266,9 @@ locals {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2T2WebPolicy",
+          ])
         })
         tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
@@ -280,7 +283,7 @@ locals {
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
           instance_profile_policies = concat(local.webserver_b.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
+            "Ec2T2WebPolicy",
           ])
         })
         user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
@@ -305,6 +308,9 @@ locals {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t1/"
           iam_resource_names_prefix = "ec2-web-t1"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2T1WebPolicy",
+          ])
         })
         tags = merge(local.webserver_a.tags, {
           description                             = "t1 ${local.application_name} web"
