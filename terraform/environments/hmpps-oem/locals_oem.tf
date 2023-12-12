@@ -42,7 +42,9 @@ locals {
     secrets = {
       passwords = {
         description = "passwords only accessible by OEM EC2"
-        policy      = []
+        policy = [
+          local.oem_secret_policy_write, # this isn't strictly needed but is added to clear a previous policy
+        ]
       }
       shared-passwords = {
         description = "passwords shared with other accounts"
