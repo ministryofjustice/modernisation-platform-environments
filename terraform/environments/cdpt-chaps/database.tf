@@ -43,7 +43,6 @@ resource "aws_security_group" "db" {
 resource "aws_iam_policy" "rds_s3_access_policy" {
 	name = "RDS-S3-Access-Policy"
 	description = "Allows mod platform RDS access to tp-dbbackups bucket"
-
 	policy = jsonencode({
 		Version = "2012-10-17",
 		Statement = [
@@ -67,25 +66,7 @@ resource "aws_iam_role_policy_attachment" "rds_s3_access_attach" {
 	policy_arn = aws_iam_policy.rds_s3_access_policy.arn
 }
 
-resource "aws_iam_role" "rds_s3_access" {
-	assume_role_policy = jsonencode({
-		Version 	= "2012-10-17",
-		Statement = [
-			{
-				Effect = "Allow",
-				Principal = {
-					Service = "rds.amazonaws.com"
-				},
-				Action = "sts:AssumeRole",
-				Condition = {
-					StringEquals = {
-					"sts:ExternalId": "613903586696"
-					}
-				}
-			}
-		]
-	})
-}
+
 
 data "aws_secretsmanager_secret" "db_password" {
   name = aws_secretsmanager_secret.chaps_secret.name
