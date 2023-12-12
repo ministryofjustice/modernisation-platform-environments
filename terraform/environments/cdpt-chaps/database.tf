@@ -3,13 +3,13 @@
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-	allocated_storage 									= local.app_data.accounts[local.environment].db_allocated_storage
+	allocated_storage 									= app_data.accounts[local.environment].db_allocated_storage
 	storage_type 												= "gp2"
 	engine 															= "sqlserver-web"
 	engine_version 											= "14.00.3381.3.v1"
-	instance_class 											= local.app_data.accounts[local.environment].db_instance_class
-	identifier													= local.app_data.accounts[local.environment].db_instance_identifier
-	username														= local.app_data.accounts[local.environment].db_user
+	instance_class 											= app_data.accounts[local.environment].db_instance_class
+	identifier													= app_data.accounts[local.environment].db_instance_identifier
+	username														= app_data.accounts[local.environment].db_user
 	password 														= data.aws_secretsmanager_secret_version.db_password.secret_string
 
 }
