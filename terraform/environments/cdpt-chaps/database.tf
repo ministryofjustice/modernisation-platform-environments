@@ -61,11 +61,6 @@ resource "aws_iam_policy" "rds_s3_access_policy" {
 	})
 }
 
-resource "aws_iam_role_policy_attachment" "rds_s3_access_attach" {
-	role = aws_iam_role.rds_s3_access.name
-	policy_arn = aws_iam_policy.rds_s3_access_policy.arn
-}
-
 
 
 data "aws_secretsmanager_secret" "db_password" {
