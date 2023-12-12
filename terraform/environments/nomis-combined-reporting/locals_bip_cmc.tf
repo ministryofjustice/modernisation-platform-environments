@@ -1,19 +1,8 @@
 locals {
-  bip_cmc_ssm_parameters = {
-    prefix = "/bip-cmc/"
-    parameters = {
-      product_key          = { description = "BIP product key" }
-      cms_cluster_key      = { description = "CMS Cluster Key" }
-      cms_admin_password   = { description = "CMS Admin Password" }
-      cms_db_password      = { description = "CMS DB password" }
-      auditing_db_password = { description = "Auditing DB password" }
-      lcm_password         = { description = "LCM Password" }
-    }
-  }
 
   bip_cmc_secretsmanager_secrets = {
     secrets = {
-      passwords = {}
+      passwords = { description = "BIP CMC Passwords" }
     }
   }
 

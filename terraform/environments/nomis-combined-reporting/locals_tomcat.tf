@@ -1,19 +1,8 @@
 locals {
 
-  tomcat_ssm_parameters = {
-    prefix = "/tomcat/"
-    parameters = {
-      bobj_password   = { description = "bobj account password" }
-      oracle_password = { description = "oracle account password" }
-      product_key     = { description = "BIP product key" }
-      cms_name        = { description = "Name of the BIP CMS machine" }
-      cms_password    = { description = "CMS password for host machine" }
-    }
-  }
-
   tomcat_secretsmanager_secrets = {
     secrets = {
-      passwords = {}
+      passwords = { description = "Tomcat Passwords" }
     }
   }
 
