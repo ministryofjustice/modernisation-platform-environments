@@ -27,15 +27,6 @@ locals {
 
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
-  cafm_app_fixngo_cidrs_by_environment = {
-    development   = []
-    test          = [] # ["10.101.69.64/26"]
-    preproduction = ["10.40.50.64/26"]
-    production    = ["10.40.15.64/26"]
-  }
-
-  cafm_app_fixngo = local.cafm_app_fixngo_cidrs_by_environment[local.environment]
-
   security_groups = {
     migration_cutover = {
       description = "Security group for migrated instances"
@@ -470,70 +461,6 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient # NOTE: this may need to change at some point
         }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
-    }
-    cafm_app_fixngo = {
-      description = "Allow fixngo cafm app connectivity"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        smb_udp_cafm_app_fixngo = {
-          description = "445: UDP SMB ingress from Cafm App Fixngo"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "UDP"
-          cidr_blocks = local.cafm_app_fixngo
-        }
-        rdp_tcp_cafm_app_fixngo = {
-          description = "3389: Allow RDP UDP ingress from Cafm App Fixngo"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = local.cafm_app_fixngo
-        }
-        rdp_udp_cafm_app_fixngo = {
-          description = "3389: Allow RDP UDP ingress from Cafm App Fixngo"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "UDP"
-          cidr_blocks = local.cafm_app_fixngo
-        }
-        winrm_tcp_cafm_app_fixngo = {
-          description = "5985: TCP WinRM ingress from Cafm App Fixngo"
-          from_port   = 5985
-          to_port     = 5986
-          protocol    = "TCP"
-          cidr_blocks = local.cafm_app_fixngo
-        }
-        rpc_dynamic_udp_cafm_app_fixngo = {
-          description = "49152-65535: UDP Dynamic Port rang from Cafm App Fixngo"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "UDP"
-          cidr_blocks = local.cafm_app_fixngo
-        }
-        rpc_dynamic_tcp_cafm_app_fixngo = {
-          description = "49152-65535: TCP Dynamic Port range from Cafm App Fixngo"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "TCP"
-          cidr_blocks = local.cafm_app_fixngo
-        }
-
       }
       egress = {
         all = {
