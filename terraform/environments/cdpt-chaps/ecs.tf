@@ -176,7 +176,12 @@ resource "aws_iam_role_policy" "app_task" {
           "logs:PutLogEvents",
           "ecr:*",
           "iam:*",
-          "ec2:*"
+          "ec2:*",
+          "ecs:ExecuteCommand",
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
         ],
        "Resource": "*"
      }
