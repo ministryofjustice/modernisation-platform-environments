@@ -42,7 +42,7 @@ locals {
     secrets = {
       passwords = {
         description = "passwords only accessible by OEM EC2"
-        # policy = []  # TODO" comment in once secrets have been updated
+        policy      = []
       }
       shared-passwords = {
         description = "passwords shared with other accounts"
