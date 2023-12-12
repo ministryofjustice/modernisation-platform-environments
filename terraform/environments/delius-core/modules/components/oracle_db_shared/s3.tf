@@ -81,3 +81,68 @@ resource "aws_iam_role_policy" "oracledb_backup_bucket_access_policy" {
   role   = aws_iam_role.db_ec2_instance_iam_role.name
   policy = data.aws_iam_policy_document.oracledb_backup_bucket_access.json
 }
+
+
+resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
+  bucket = "${var.env_name}-oracle-database-backups-inventory"
+  acl    = "private"
+
+  versioning {
+    enabled = false
+  }
+
+  tags = merge(
+    var.tags,
+    {
+      "Name" =  "${var.env_name}-oracle-database-backups-inventory"
+    },
+    {
+      "Purpose" = "Inventory of Oracle DB Backup Pieces"
+    },
+  )
+}
+data "aws_caller_identity" "current" {
+}
+
+resource "aws_s3_bucket_public_access_block" "oracledb_backups_inventory" {
+  bucket                  = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
+  block_public_acls       = true # Block public access to buckets and objects granted through *new* access control lists (ACLs)
+  ignore_public_acls      = true # Block public access to buckets and objects granted through any access control lists (ACLs)
+  block_public_policy     = true # Block public access to buckets and objects granted through new public bucket or access point policies
+  restrict_public_buckets = true # Block public and cross-account access to buckets and objects through any public bucket or access point policies
+}
+
+data "template_file" "oracledb_backups_inventory_policy_file" {
+  template = file("./policies/oracledb_backups_inventory.json")
+
+  vars = {
+    backup_s3bucket_arn = module.s3_bucket_oracledb_backups.bucket.arn
+    inventory_s3bucket_arn = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn
+    aws_account_id = data.aws_caller_identity.current.account_id
+  }
+}
+
+resource "aws_s3_bucket_policy" "oracledb_backups_inventory_policy" {
+  bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
+  policy = data.template_file.oracledb_backups_inventory_policy_file.rendered
+}
+
+resource "aws_s3_bucket_inventory" "oracledb_backuppieces" {
+  bucket = module.s3_bucket_oracledb_backups.bucket.id
+  name   = "${var.env_name}-oracle-database-backuppieces"
+
+  included_object_versions = "Current"
+
+  optional_fields = ["Size","LastModifiedDate"]
+
+  schedule {
+    frequency = "Daily"
+  }
+
+  destination {
+    bucket {
+      format     = "CSV"
+      bucket_arn = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn
+    }
+  }
+}
