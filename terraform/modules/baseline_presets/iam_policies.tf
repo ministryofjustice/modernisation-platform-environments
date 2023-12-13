@@ -141,7 +141,7 @@ locals {
           "s3:PutObject",
           "s3:PutObjectAcl",
         ]
-        resources = concat(var.environment == "production" || var.environment == "preproduction" ? [
+        resources = concat(var.environment.environment == "production" || var.environment.environment == "preproduction" ? [
           "arn:aws:s3:::prodpreprod-${var.environment.application_name}-*/*",
           "arn:aws:s3:::prodpreprod-${var.environment.application_name}-*"
           ] : [
