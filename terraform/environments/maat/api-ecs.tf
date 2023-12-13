@@ -11,7 +11,7 @@ resource "aws_ecs_cluster" "app_ecs_cluster" {
 }
 
 resource "aws_ecs_service" "maat_api_ecs_service" {
-  depends_on = [aws_lb_listener.alb_http_listener]
+  depends_on = [aws_lb_listener.maat_api_alb_http_listener]
 
   name            = "${local.application_name}-api-ecs-service"
   cluster         = aws_ecs_cluster.app_ecs_cluster.id
@@ -29,7 +29,8 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
     security_groups = [aws_security_group.maat_api_ecs_security_group.id]
     assign_public_ip = false
   }
-
+  
+  ######## ADD LB DETAILS HERE
   load_balancer {
     container_name   = "${local.application_name}-cd-api"
     container_port   = 8090
