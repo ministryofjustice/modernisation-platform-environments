@@ -7,7 +7,7 @@ module "lambda_cw_logs_xml_to_json" {
 
   application_name = "cw-logs-xml-to-json"
 
-  image_uri = null # TODO add image uri
+  image_uri = "${aws_ecr_repostitory.cw_logs_xml_to_json.repository_url}:latest"
 
   policy_json = jsonencode({
     Version = "2012-10-17",
