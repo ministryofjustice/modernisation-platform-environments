@@ -18,7 +18,7 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
 
 resource "aws_ecs_task_definition" "chaps_task_definition" {
   family                   = "chapsFamily"
-  requires_compatibilities = ["FARGATE"]
+  requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
@@ -64,10 +64,14 @@ resource "aws_ecs_service" "ecs_service" {
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
-  launch_type                       = "FARGATE"
-  enable_execute_command            = true
-  desired_count                     = 2
+  launch_type                       = "EC2"
+  desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 180
+
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.cdpt-chaps.name
+    weight            = 1
+  }
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
@@ -79,6 +83,46 @@ resource "aws_ecs_service" "ecs_service" {
     target_group_arn = aws_lb_target_group.chaps_target_group.arn
     container_name   = "${local.application_name}-container"
     container_port   = 80
+  }
+}
+
+resource "aws_ecs_capacity_provider" "cdpt-chaps" {
+  name = "${local.application_name}-capacity-provider"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
+    managed_termination_protection = "ENABLED"
+
+    managed_scaling {
+      status          = "ENABLED"
+      target_capacity = 100
+    }
+  }
+}
+
+resource "aws_ecs_cluster_capacity_providers" "cdpt-chaps" {
+  cluster_name = aws_ecs_cluster.ecs_cluster.name
+
+  capacity_providers = [aws_ecs_capacity_provider.apex.name]
+}
+
+resource "aws_autoscaling_group" "cluster-scaling-group" {
+  vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
+  name                  = "${local.application_name}-cluster-scaling-group"
+  desired_capacity      = local.application_data.accounts[local.environment].ec2_desired_capacity
+  max_size              = local.application_data.accounts[local.environment].ec2_max_size
+  min_size              = local.application_data.accounts[local.environment].ec2_min_size
+  protect_from_scale_in = true
+
+  launch_template {
+    id      = aws_launch_template.ec2-launch-template.id
+    version = "$Latest"
+  }
+
+  tag {
+    key                 = "AmazonECSManaged"
+    value               = true
+    propagate_at_launch = true
   }
 }
 

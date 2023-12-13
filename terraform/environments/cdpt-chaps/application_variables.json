@@ -2,15 +2,27 @@
   "accounts": {
     "development": {
       "region": "eu-west-2",
-      "docker_image_tag": "development"
+      "docker_image_tag": "development",
+      "app_count": 1,
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 3,
+      "ec2_min_size": 2
     },
     "preproduction": {
       "region": "eu-west-2",
-      "docker_image_tag": "preproduction"
+      "docker_image_tag": "preproduction",
+      "app_count": 1,
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 3,
+      "ec2_min_size": 2
     },
     "production": {
       "region": "eu-west-2",
-      "docker_image_tag": "production"
+      "docker_image_tag": "production",
+      "app_count": 1,
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 3,
+      "ec2_min_size": 2
     }
   }
 }
