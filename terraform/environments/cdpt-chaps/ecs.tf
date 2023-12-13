@@ -243,7 +243,7 @@ resource "aws_launch_template" "ec2-launch-template" {
     }
   }
 
-  # user_data = var.user_data
+  user_data = local.user_data
 }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
