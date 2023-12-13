@@ -64,7 +64,6 @@ resource "aws_ecs_service" "ecs_service" {
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
-  launch_type                       = "EC2"
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 180
 
