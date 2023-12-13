@@ -72,12 +72,6 @@ resource "aws_ecs_service" "ecs_service" {
     weight            = 1
   }
 
-  network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
-    security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = true
-  }
-
   load_balancer {
     target_group_arn = aws_lb_target_group.chaps_target_group.arn
     container_name   = "${local.application_name}-container"
