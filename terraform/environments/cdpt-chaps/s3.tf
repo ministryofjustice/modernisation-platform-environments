@@ -53,5 +53,5 @@ resource "aws_iam_policy" "s3_db_restore_policy" {
 
 resource "aws_iam_role_policy_attachment" "s3_db_restore_policy_attach" {
 	role       = aws_iam_role.S3_db_backup_restore_access.name
-  policy_arn = aws_iam_policy.s3_db_backup_restore_policy.arn 
+  policy_arn = aws_iam_policy.s3_db_backup_restore_access_policy.arn 
  }
