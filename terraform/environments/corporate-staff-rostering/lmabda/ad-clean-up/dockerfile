@@ -1,0 +1,16 @@
+# docs https://docs.aws.amazon.com/lambda/latest/dg/python-image.html#python-image-instructions
+# https://gallery.ecr.aws/lambda/python/
+FROM public.ecr.aws/lambda/python:3.11
+
+COPY requirements.txt ${LAMBDA_TASK_ROOT}
+
+# installs all specified python libraries
+RUN pip install -r requirements.txt
+
+# copies the function code
+COPY lambda_handler.py ${LAMBDA_TASK_ROOT}
+
+CMD [ "lambda_handler.handler" ]
+
+# build the docker image
+# docker build --platform linux/amd64 -t docker-image:ad-clean-up .

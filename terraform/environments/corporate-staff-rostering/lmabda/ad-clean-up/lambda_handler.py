@@ -1,15 +1,28 @@
+import json
 import boto3 
-# amazon SDK for python
 from ldap3 import Server, Connection, ALL
 
 # function to check for objects within active directory
 def check_ad_for_object(object):
+    
+    # create a secrets manager client
+    secrets_manager_client = boto3.client('secretsmanager')
+    # extract the secret value
+    secret_name = '/activedirectory/devtest/aws-lambda/passwords'
+    response = secrets_manager_client.get_secret_value(SecretId=secret_name)
+    secret_data = response['SecretString']
+
+    # parse the JSON format secret data
+    secret_json = json.loads(secret_data)
+    ad_password = secret_json['aws-lambda']
+    
+    # dev test domain controller connection details
     server = Server('MGMCW0002.azure.noms.root:389', get_info=ALL)
     username = r'azure\aws-lambda'
-    password = 'Aw5Servic3Acc0unt' # use secret ARN, pw declared whilst testing
+    password = ad_password
     
     with Connection(server, user=username, password=password, auto_bind=True) as conn:
-        search_base = 'ou=Managed-Windows-Servers, ou=Computers, dc=azure, dc=noms, dc=root'
+        search_base = 'ou=Managed-Windows-Servers,ou=Computers,dc=azure,dc=noms,dc=root'
         search_filter = f'(sAMAccountName={object})'
         
         conn.search(search_base, search_filter)
@@ -29,15 +42,13 @@ def get_tag_value(tags, key):
 # function to search active directory if an instance is stopped, final iteration will be state terminated                       
 def lambda_handler(event, context):
     if event['detail']['state'] == 'stopped':
-        instance_id = event['detail']['instance_id']
+        instance_id = event['detail']['instance-id']
         
         ec2 = boto3.client('ec2')
         response = ec2.describe_instances(InstanceIds=[instance_id])
         
         tags = response['Reservations'][0]['Instances'][0]['Tags']
-        
         resource_key = 'server-name'
-        
         resource_name = get_tag_value(tags, resource_key)
         
         if resource_name is not None:
