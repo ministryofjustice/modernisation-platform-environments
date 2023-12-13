@@ -3,6 +3,52 @@ data "aws_ecs_task_definition" "task_definition" {
   depends_on      = [aws_ecs_task_definition.chaps_task_definition]
 }
 
+resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name = "${local.application_name}-ec2-instance-policy"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeTags",
+                "ecs:CreateCluster",
+                "ecs:DeregisterContainerInstance",
+                "ecs:DiscoverPollEndpoint",
+                "ecs:Poll",
+                "ecs:RegisterContainerInstance",
+                "ecs:StartTelemetrySession",
+                "ecs:UpdateContainerInstancesState",
+                "ecs:Submit*",
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "s3:ListBucket",
+                "s3:*Object*",
+                "kms:Decrypt",
+                "kms:Encrypt",
+                "kms:GenerateDataKey",
+                "kms:ReEncrypt",
+                "kms:GenerateDataKey",
+                "kms:DescribeKey"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = aws_iam_policy.ec2_instance_policy.arn
+}
+
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "${local.application_name}-ecs-cluster"
   setting {
