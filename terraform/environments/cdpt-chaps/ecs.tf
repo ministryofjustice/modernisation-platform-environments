@@ -19,7 +19,7 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
 resource "aws_ecs_task_definition" "chaps_task_definition" {
   family                   = "chapsFamily"
   requires_compatibilities = ["EC2"]
-  network_mode             = "none"
+  network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
   cpu                      = 1024
@@ -70,6 +70,11 @@ resource "aws_ecs_service" "ecs_service" {
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.cdpt-chaps.name
     weight            = 1
+  }
+
+  network_configuration {
+    subnets          = data.aws_subnets.shared-public.ids
+    security_groups  = [aws_security_group.ecs_service.id]
   }
 
   load_balancer {
