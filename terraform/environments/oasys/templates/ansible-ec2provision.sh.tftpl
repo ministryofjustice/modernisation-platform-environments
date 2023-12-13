@@ -67,6 +67,20 @@ run_ansible() {
     fi
   done
 
+  echo "# Checking for $application-environment tag using aws cli"
+  application_environment=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=$application-environment" --output=text | head -1 | cut -f5)
+  if [[ -n $application_environment ]]; then
+    for ((i=0; i<$${#tags[@]}; i++)); do
+      tag=($${tags[i]})
+      group=$(echo "$${tag[1]}_$${tag[4]}_$${application_environment}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
+      if [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
+        ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
+      elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
+        ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
+      fi
+    done
+  fi
+
   # set python version
   if [[ $(which python3.9 2> /dev/null) ]]; then
     python=$(which python3.9)
@@ -83,11 +97,13 @@ run_ansible() {
   $python -m venv ansible
   source ansible/bin/activate
   $python -m pip install --upgrade pip
+  requirements_yml=requirements.yml
   if [[ "$python" =~ 3.6 ]]; then
     $python -m pip install wheel
     $python -m pip install cryptography==2.3
     export LC_ALL=en_US.UTF-8
     $python -m pip install ansible-core==2.11.12
+    requirements_yml=requirements.rhel6.yml
   else
     $python -m pip install ansible==6.0.0
   fi
@@ -96,11 +112,11 @@ run_ansible() {
   echo "# Installing ansible requirements"
   cd $ansible_dir/${ansible_repo}/${ansible_repo_basedir}
   $python -m pip install -r requirements.txt
-  ansible-galaxy role install -r requirements.yml
-  ansible-galaxy collection install -r requirements.yml
+  ansible-galaxy role install -r $requirements_yml
+  ansible-galaxy collection install -r $requirements_yml
 
   # run ansible (comma after localhost deliberate)
-  echo "# ansible-playbook site.yml ${ansible_args} $ansible_group_vars --connection=local --inventory localhost, --extra-vars \"ansible_python_interpreter=$python\" --extra-vars \"target=localhost\" --become site.yml ${ansible_args} $ansible_group_vars"
+  echo "# Execute ansible site.yml ${ansible_args} $ansible_group_vars ..."
   ansible-playbook site.yml ${ansible_args} $ansible_group_vars \
    --connection=local \
    --inventory localhost, \
