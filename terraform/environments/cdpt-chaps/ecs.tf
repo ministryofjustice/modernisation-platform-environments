@@ -126,6 +126,37 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   }
 }
 
+resource "aws_security_group" "cluster_ec2" {
+  name        = "${local.application_name}-cluster-ec2-security-group"
+  description = "controls access to the cluster ec2 instance"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    description = "allow access on HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "allow access on HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description     = "Cluster EC2 loadbalancer egress rule"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+    security_groups = []
+  }
+}
+
 # EC2 launch template - settings to use for new EC2s added to the group
 # Note - when updating this you will need to manually terminate the EC2s
 # so that the autoscaling group creates new ones using the new launch template
