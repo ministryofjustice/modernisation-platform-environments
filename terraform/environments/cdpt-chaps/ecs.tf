@@ -172,8 +172,28 @@ resource "aws_launch_template" "ec2-launch-template" {
 }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "${var.local.application_name}-ec2-instance-profile"
+  name = "${local.application_name}-ec2-instance-profile"
   role = aws_iam_role.ec2_instance_role.name
+}
+
+resource "aws_iam_role" "ec2_instance_role" {
+  name = "${local.application_name}-ec2-instance-role"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
 }
 
 resource "aws_iam_role" "app_execution" {
