@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "s3-access-policy" {
     sid    = ""
     effect = "Allow"
     actions = [
-      "sts:AssumeRole",
+      "sts:AssumeRole"
     ]
     principals {
       type = "Service"
@@ -39,7 +39,7 @@ resource "aws_iam_policy" "s3_db_restore_policy" {
 	        "kms:Encrypt",
 	        "kms:Decrypt",
 	        "s3:GetObject",
-	        "s3:ListBucket"
+	        "s3:ListBucket",
 	        "s3:PutObject"
 	      ],
       	Resource = [
@@ -51,6 +51,7 @@ resource "aws_iam_policy" "s3_db_restore_policy" {
 	})
 }
 
-resource "aws_iam_role_policy_attachment" "s3_db_restore_policy_attach"
+resource "aws_iam_role_policy_attachment" "s3_db_restore_policy_attach" {
 	role       = aws_iam_role.S3_db_backup_restore_access.name
   policy_arn = aws_iam_policy.s3_db_backup_restore_policy.arn 
+ }
