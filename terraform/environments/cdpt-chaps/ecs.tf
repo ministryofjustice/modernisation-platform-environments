@@ -103,7 +103,7 @@ resource "aws_ecs_capacity_provider" "cdpt-chaps" {
 resource "aws_ecs_cluster_capacity_providers" "cdpt-chaps" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
 
-  capacity_providers = [aws_ecs_capacity_provider.apex.name]
+  capacity_providers = [aws_ecs_capacity_provider.cdpt-chaps.name]
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
