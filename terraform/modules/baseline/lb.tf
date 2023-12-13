@@ -110,7 +110,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=e1355437c1ae24b5117063969c0b42ae0bf94779"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=97678d8418d6b97301d6c866e84d812e3c440b32"
 
   providers = {
     aws.bucket-replication = aws
