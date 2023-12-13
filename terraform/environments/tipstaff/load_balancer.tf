@@ -227,7 +227,7 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom_2" {
 resource "aws_lb" "tipstaff_lb" {
   name                       = "tipstaff-load-balancer"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tipstaff_lb_sc.id]
+  security_groups            = [aws_security_group.tipstaff_lb_sc.id, tipstaff_lb_sc_pingdom, tipstaff_lb_sc_pingdom_2]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
