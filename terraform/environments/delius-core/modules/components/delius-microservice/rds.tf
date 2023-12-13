@@ -28,7 +28,7 @@ resource "aws_db_subnet_group" "this" {
   tags       = var.tags
 }
 
-resource "aws_db_instance" "jitbit" {
+resource "aws_db_instance" "this" {
   engine         = var.rds_engine
   license_model  = length(var.rds_license_model) > 0 ? var.rds_license_model : null
   engine_version = var.rds_engine_version

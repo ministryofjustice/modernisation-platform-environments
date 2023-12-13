@@ -161,3 +161,10 @@ variable "tags" {
   description = "Tags to apply to the instance"
   type        = map(string)
 }
+
+
+variable "platform_vars" {
+  type = object({
+    environment_management = any
+  })
+}
