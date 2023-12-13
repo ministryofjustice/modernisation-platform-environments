@@ -11,8 +11,11 @@ resource "aws_db_instance" "database" {
 	identifier = local.application_data.accounts[local.environment].db_instance_identifier
 	username = local.application_data.accounts[local.environment].db_user
 	password = data.aws_secretsmanager_secret_version.db_password.secret_string
-	iam_role_arn = aws_iam_role.S3_db_backup_restore_access.arn
 
+}
+
+output "s3_db_backup_restore_access_role_arn" {
+	value = aws_iam_role.S3_db_backup_restore_access.arn
 }
 
 resource "aws_security_group" "db" {
