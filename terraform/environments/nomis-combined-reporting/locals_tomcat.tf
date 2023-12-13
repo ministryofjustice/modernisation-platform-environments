@@ -215,9 +215,9 @@ locals {
 
     lb_target_groups = {
       http-7777 = local.tomcat_target_group_http_7777
-      admin    = local.tomcat_target_group_http_7010
-      redirect = local.tomcat_target_group_http_8443
-      shutdown = local.tomcat_target_group_http_8005
+      admin     = local.tomcat_target_group_http_7010
+      redirect  = local.tomcat_target_group_http_8443
+      shutdown  = local.tomcat_target_group_http_8005
     }
 
     tags = {
