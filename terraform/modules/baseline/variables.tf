@@ -581,6 +581,7 @@ variable "lbs" {
     enable_cross_zone_load_balancing = optional(bool, false)                     # network and gateway lb types only, application lb's this is always true
     dns_record_client_routing_policy = optional(string, "any_availability_zone") # network load-balancer types only
     s3_versioning                    = optional(bool, true)
+    log_schedule                     = optional(string, "cron(15 1 ? * MON *)") # runs weekly on Monday at 1:15am
     instance_target_groups = optional(map(object({
       port                 = optional(number)
       protocol             = optional(string)

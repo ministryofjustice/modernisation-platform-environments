@@ -110,7 +110,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=81a12291fee6369c22bae5e653b0a195112e45c2"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=d6dedc712a8575006af17eb2b182af3c6c5bfc3c"
 
   providers = {
     aws.bucket-replication = aws
@@ -128,6 +128,7 @@ module "lb" {
   enable_cross_zone_load_balancing = each.value.enable_cross_zone_load_balancing
   dns_record_client_routing_policy = each.value.dns_record_client_routing_policy
   s3_versioning                    = each.value.s3_versioning
+  log_schedule                     = each.value.log_schedule
 
   existing_bucket_name = try(module.s3_bucket[each.value.existing_bucket_name].bucket.id, each.value.existing_bucket_name)
 
