@@ -33,7 +33,7 @@ mainSteps:
       runCommand:
         - |
           $ErrorActionPreference = "Stop" # all errors will terminate the script
-
+          $domain = "{{domain}}"
           $domainLeaveUsername = "{{domainLeaveUsername}}"
           $domainLeavePassword = "{{domainLeavePassword}}"
           $restart = "{{restart}}"
@@ -63,8 +63,7 @@ mainSteps:
 
           # splatting Remove-Computer parameters to make it easier to read
           $args = @{
-            DomainName = $environments[$domain]["domain"]
-            Credential = $credentials
+            UnjoinDomainCredential = $credentials
             Verbose = $true
             Force = $true
           }
