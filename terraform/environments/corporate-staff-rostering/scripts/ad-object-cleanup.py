@@ -5,7 +5,7 @@ from ldap3 import Server, Connection, ALL
 # function to check for objects within active directory
 def check_ad_for_object(object):
     server = Server('MGMCW0002.azure.noms.root:389', get_info=ALL)
-    username = 'azure\aws-lambda'
+    username = r'azure\aws-lambda'
     password = 'Aw5Servic3Acc0unt' # use secret ARN, pw declared whilst testing
     
     with Connection(server, user=username, password=password, auto_bind=True) as conn:
