@@ -1,8 +1,9 @@
 import base64
-import boto3
 import json
-import xmltodict
 import zlib
+
+import boto3
+import xmltodict
 
 
 def xml_to_dict(xml_string):
@@ -13,7 +14,7 @@ def xml_to_dict(xml_string):
         return f"Error: {e}"
 
 
-def lambda_handler(event, context):
+def handler(event, context):
     logs_client = boto3.client("logs")
 
     for record in event["awslogs"]["data"]:
