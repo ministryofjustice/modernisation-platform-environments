@@ -10,7 +10,6 @@ resource "aws_iam_role" "S3_db_backup_restore_access" {
 data "aws_iam_policy_document" "s3-access-policy" {
   version = "2012-10-17"
   statement {
-    sid    = ""
     effect = "Allow"
     actions = [
       "sts:AssumeRole"
@@ -52,6 +51,6 @@ resource "aws_iam_policy" "s3_db_backup_restore_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "s3_db_restore_policy_attach" {
-	role       = aws_iam_role.S3_db_backup_restore_access.name
+	role = aws_iam_role.S3_db_backup_restore_access.name
   policy_arn = aws_iam_policy.s3_db_backup_restore_policy.arn 
  }
