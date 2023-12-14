@@ -60,7 +60,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
 }
 
 resource "aws_lb_target_group" "chaps_target_group_https" {
-  name                 = "chaps-target-group"
+  name                 = "chaps-target-group_https"
   port                 = 443
   protocol             = "HTTPS"
   vpc_id               = data.aws_vpc.shared.id
