@@ -40,24 +40,24 @@ module "weblogic_service" {
   task_memory = "4096"
 
   # terraform will not let you use module.weblogic_ecs_policies.service_role.arn as it is not created yet and can't evaluate the count in this module
-  service_role_arn   = "arn:aws:iam::${var.account_info.id}:role/${module.weblogic_ecs_policies.service_role.name}"
-  task_role_arn      = "arn:aws:iam::${var.account_info.id}:role/${module.weblogic_ecs_policies.task_role.name}"
-  task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.weblogic_ecs_policies.task_exec_role.name}"
+  service_role_arn   = module.ecs_policies.service_role.arn
+  task_role_arn      = module.ecs_policies.task_role.arn
+  task_exec_role_arn = module.ecs_policies.task_exec_role.arn
 
   environment = var.env_name
-  namespace   = var.app_name
+  namespace   = "delius-core"
 
-  health_check_grace_period_seconds = 0
+  health_check_grace_period_seconds = var.health_check_grace_period_seconds
 
   ecs_load_balancers = [
     {
       target_group_arn = aws_lb_target_group.delius_core_frontend_target_group.id
       container_name   = "${var.env_name}-weblogic"
-      container_port   = var.weblogic_config.frontend_container_port
+      container_port   = var.task_def_container_port
     }
   ]
 
-  security_group_ids = [aws_security_group.weblogic_service.id]
+  security_group_ids = [aws_security_group.ecs_service.id]
 
   subnet_ids = var.account_config.private_subnet_ids
 
@@ -66,58 +66,4 @@ module "weblogic_service" {
   ignore_changes_task_definition = true
   redeploy_on_apply              = false
   force_new_deployment           = false
-}
-
-resource "aws_security_group" "ecs_service" {
-  name        = "ecs-service-${var.name}-${var.env_name}"
-  description = "Security group for the ${var.env_name} ${var.name} service"
-  vpc_id      = var.account_config.vpc_id
-  tags        = var.tags
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_vpc_security_group_egress_rule" "delius_core_weblogic_to_db" {
-  security_group_id            = aws_security_group.weblogic_service.id
-  description                  = "weblogic service to db"
-  from_port                    = var.delius_db_container_config.port
-  to_port                      = var.delius_db_container_config.port
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = module.oracle_db_shared.security_group.id
-}
-
-resource "aws_vpc_security_group_ingress_rule" "alb_to_weblogic" {
-  security_group_id            = aws_security_group.weblogic_service.id
-  description                  = "load balancer to weblogic frontend"
-  from_port                    = var.weblogic_config.frontend_container_port
-  to_port                      = var.weblogic_config.frontend_container_port
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
-}
-
-resource "aws_security_group_rule" "weblogic_allow_all_egress" {
-  description       = "Allow all outbound traffic to any IPv4 address on 443"
-  type              = "egress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.weblogic_service.id
-}
-
-resource "aws_security_group_rule" "alballow all ingress" {
-  description       = "Allow inbound traffic from VPC"
-  type              = "ingress"
-  from_port         = var.ecs_frontend_port
-  to_port           = var.ecs_frontend_port
-  protocol          = "TCP"
-  security_group_id = aws_security_group.ldap.id
-  cidr_blocks       = [var.account_config.shared_vpc_cidr]
-}
-
-resource "aws_cloudwatch_log_group" "ecs_log_group" {
-  name              = "${var.name}-${var.env_name}"s
-  retention_in_days = 7
-  tags              = var.tags
 }

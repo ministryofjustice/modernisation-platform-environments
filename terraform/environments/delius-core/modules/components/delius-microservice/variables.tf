@@ -168,3 +168,37 @@ variable "platform_vars" {
     environment_management = any
   })
 }
+
+variable "health_check_grace_period_seconds" {
+  description = "The amount of time, in seconds, that Amazon ECS waits before unhealthy instances are shut down."
+  type        = number
+  default     = 60
+}
+
+variable "ecs_service_port" {
+  description = "The port on which the ECS service is exposing the container"
+  type        = number
+  default     = 443
+}
+
+variable "task_def_container_port" {
+  description = "The port on which the container is exposing the application"
+  type        = number
+  default     = 8080
+}
+
+variable "target_group_protocol" {
+  description = "The protocol to use for the target group"
+  type        = string
+  default     = "HTTP"
+}
+
+variable "certificate_arn" {
+  description = "The ARN of the certificate to use for the target group"
+  type        = string
+}
+
+variable "microservice_lb_arn" {
+  description = "The ARN of the load balancer to use for the target group"
+  type        = string
+}
