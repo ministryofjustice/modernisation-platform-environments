@@ -188,6 +188,35 @@ locals {
     }
 
     baseline_ec2_instances = {
+      preprod-nomis-db-1-a = merge(local.database_ec2, {
+        # cloudwatch_metric_alarms = merge(
+        #   local.database_ec2_cloudwatch_metric_alarms.standard,
+        # )
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 1000 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "preprod"
+          description       = "pre-production database for CNOMPP"
+          oracle-sids       = "" # TODO
+        })
+      })
+
       preprod-nomis-db-1-b = merge(local.database_ec2, {
         # cloudwatch_metric_alarms = merge(
         #   local.database_ec2_cloudwatch_metric_alarms.standard,
