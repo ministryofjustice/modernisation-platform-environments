@@ -3,14 +3,14 @@
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-	allocated_storage	= local.application_data.accounts[local.environment].db_allocated_storage
-	storage_type = "gp2"
-	engine = "sqlserver-web"
-	engine_version = "14.00.3381.3.v1"
-	instance_class = local.application_data.accounts[local.environment].db_instance_class
-	identifier = local.application_data.accounts[local.environment].db_instance_identifier
-	username = local.application_data.accounts[local.environment].db_user
-	password = data.aws_secretsmanager_secret_version.db_password.secret_string
+  allocated_storage	= local.application_data.accounts[local.environment].db_allocated_storage
+  storage_type = "gp2"
+  engine = "sqlserver-web"
+  engine_version = "14.00.3381.3.v1"
+  instance_class = local.application_data.accounts[local.environment].db_instance_class
+  identifier = local.application_data.accounts[local.environment].db_instance_identifier
+  username = local.application_data.accounts[local.environment].db_user
+  password = data.aws_secretsmanager_secret_version.db_password.secret_string
 }
 
 resource "aws_db_instance_role_association" "database" {
@@ -20,7 +20,7 @@ resource "aws_db_instance_role_association" "database" {
 }
 
 output "s3_db_backup_restore_access_role_arn" {
-	value = aws_iam_role.S3_db_backup_restore_access.arn
+  value = aws_iam_role.S3_db_backup_restore_access.arn
 }
 
 resource "aws_security_group" "db" {
@@ -31,7 +31,7 @@ resource "aws_security_group" "db" {
     to_port = 1433
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-	}
+  }
   egress {
     from_port = 0
     to_port = 0
