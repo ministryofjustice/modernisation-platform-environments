@@ -1,4 +1,4 @@
-resource "aws_security_group" "chaps_lb_sc" {
+resource "aws_security_group" "lb" {
   name        = "load balancer security group"
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -20,9 +20,9 @@ resource "aws_security_group" "chaps_lb_sc" {
   }
 
   egress {
-    description = "allow all outbound traffic for port 80"
-    from_port   = 80
-    to_port     = 80
+    description = "Open all outbound ports"
+    from_port   = 0
+    to_port     = 0
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -33,9 +33,6 @@ resource "aws_lb" "chaps_lb" {
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.chaps_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = false
-  internal                   = false
-  depends_on                 = [aws_security_group.chaps_lb_sc]
 }
 
 resource "aws_lb_target_group" "chaps_target_group" {
