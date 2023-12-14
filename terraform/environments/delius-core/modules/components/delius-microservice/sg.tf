@@ -48,7 +48,7 @@ resource "aws_security_group_rule" "alballow all ingress" {
 }
 
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
-  name              = "${var.name}-${var.env_name}"s
+  name              = "${var.name}-${var.env_name}"
   retention_in_days = 7
   tags              = var.tags
 }
