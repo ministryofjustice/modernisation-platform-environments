@@ -48,8 +48,8 @@ resource "aws_dms_replication_task" "dms-replication" {
   replication_task_id       = "${var.project_id}-dms-s3-target-task-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
   source_endpoint_arn       = aws_dms_endpoint.dms-s3-target-source[0].endpoint_arn
   target_endpoint_arn       = aws_dms_s3_endpoint.dms-s3-target-endpoint[0].endpoint_arn
-  table_mappings            = try(each.value.table_mappings, null)
-  replication_task_settings = try(each.value.replication_task_settings, null) #JSON
+  table_mappings            = var.table_mappings
+  replication_task_settings = var.replication_task_settings #JSON
 
   depends_on = [
     aws_dms_replication_instance.dms-s3-target-instance,
