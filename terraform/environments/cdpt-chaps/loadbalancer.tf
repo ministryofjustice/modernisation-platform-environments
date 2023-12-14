@@ -109,7 +109,7 @@ resource "aws_lb_listener" "https_listener" {
   certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.chaps_target_group_https.id
+    target_group_arn = aws_lb_target_group.chaps_target_group.id
     type             = "forward"
   }
 }

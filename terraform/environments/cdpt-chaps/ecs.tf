@@ -77,7 +77,7 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.chaps_target_group_https.arn
+    target_group_arn = aws_lb_target_group.chaps_target_group.arn
     container_name   = "${local.application_name}-container"
     container_port   = 443
   }
