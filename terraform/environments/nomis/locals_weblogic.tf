@@ -20,7 +20,7 @@ locals {
       path                = "/"
       port                = 7001
       timeout             = 5
-      unhealthy_threshold = 5
+      unhealthy_threshold = 2
     }
     stickiness = {
       enabled = true
@@ -35,13 +35,13 @@ locals {
     deregistration_delay = 30
     health_check = {
       enabled             = true
-      interval            = 30
+      interval            = 10
       healthy_threshold   = 3
       matcher             = "200-399"
       path                = "/keepalive.htm"
       port                = 7777
       timeout             = 5
-      unhealthy_threshold = 5
+      unhealthy_threshold = 2
     }
     stickiness = {
       enabled = true
