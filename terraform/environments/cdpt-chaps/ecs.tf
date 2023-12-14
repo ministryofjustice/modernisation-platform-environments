@@ -66,14 +66,11 @@ resource "aws_ecs_service" "ecs_service" {
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
   launch_type                       = "FARGATE"
-  enable_execute_command            = true
-  desired_count                     = 2
-  health_check_grace_period_seconds = 180
+  desired_count                     = 1
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
     security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = true
   }
 
   load_balancer {
@@ -81,6 +78,8 @@ resource "aws_ecs_service" "ecs_service" {
     container_name   = "${local.application_name}-container"
     container_port   = 443
   }
+
+  depends_on = [aws_lb_listener.https_listener] # don't create until the lb exists
 }
 
 resource "aws_iam_role" "app_execution" {
@@ -195,6 +194,14 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
+    security_groups = [aws_security_group.chaps_lb_sc.id]
+  }
+
+  ingress {
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    description     = "Allow traffic on port 443 from load balancer"
     security_groups = [aws_security_group.chaps_lb_sc.id]
   }
 
