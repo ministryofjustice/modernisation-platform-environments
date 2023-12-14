@@ -14,6 +14,11 @@ resource "aws_cloudwatch_event_rule" "instance-state" {
     })
 }
 
+resource "aws_cloud_watch_event_target" "lambda" {
+    rule = aws_cloudwatch_event_rule.instance-state.InstanceState
+    arn = module.ad-clean-up-lambda.arn # TODO
+}
+
 module "ad-clean-up-lambda" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function" # ref for V2.1
   application_name = "AdCleanUp"
@@ -60,11 +65,4 @@ module "ad-clean-up-lambda" {
     },
   )
 
-}
-
-resource "aws_cloudwatch_log_subscription_filter" "ad-clean-up" {
-  name            = "ad-clean-up-application-logs"
-  log_group_name  = "" # TODO add log group name
-  filter_pattern  = ""   # TODO add filter pattern
-  destination_arn = module.ad-clean-up-lambda.lambda_function_arn
 }
