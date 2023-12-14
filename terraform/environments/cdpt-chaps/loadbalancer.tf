@@ -48,9 +48,10 @@ resource "aws_lb_target_group" "chaps_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "2"
+    healthy_threshold   = "3"
     interval            = "30"
     protocol            = "HTTP"
+    port                = "80"
     unhealthy_threshold = "5"
     matcher             = "200-499"
     timeout             = "10"
