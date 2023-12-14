@@ -1,35 +1,21 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# TODO delete in favour of Docker build and push script
+readonly SERVER_URL=111122223333.dkr.ecr.us-east-1.amazonaws.com
+readonly REPO_NAME=hello-world
 
-LAMBDA_ZIP="lambda_function.zip"
-BUILD_DIR="build"
-VENV_DIR="venv"
+tag=$1
 
-cd "$PATH_CWD" || exit 1
+docker build \
+	--platform linux/amd64 \
+	-t "docker-image:$tag" \
+	.
 
-echo "Creating virtual environment..."
-python3 -m venv $VENV_DIR
+aws ecr get-login-password \
+	--region us-east-1 |
+	docker login \
+		--username AWS \
+		--password-stdin $SERVER_URL
 
-echo "Activating virtual environment..."
-# shellcheck disable=SC1091
-source $VENV_DIR/bin/activate
+docker tag "$REPO_NAME:$tag" "$SERVER_URL/$REPO_NAME:$tag"
 
-echo "Installing requirements in virtual environment..."
-pip install -r "$SOURCE_DIR/requirements.txt"
-
-mkdir -p $BUILD_DIR
-cp -r $VENV_DIR/lib/python3.*/site-packages/* $BUILD_DIR/
-
-cp "$SOURCE_DIR/*.py" $BUILD_DIR/
-
-cd $BUILD_DIR || exit 1
-
-echo "Creating Lambda function package..."
-zip -r ../$LAMBDA_ZIP ./*
-
-deactivate
-cd ..
-rm -rf $VENV_DIR $BUILD_DIR
-
-echo "Lambda package created: $LAMBDA_ZIP"
+docker push "$SERVER_URL/$REPO_NAME:$tag"
