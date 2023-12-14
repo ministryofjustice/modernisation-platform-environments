@@ -50,31 +50,6 @@ resource "aws_lb_target_group" "chaps_target_group" {
   health_check {
     healthy_threshold   = "3"
     interval            = "30"
-    protocol            = "HTTP"
-    port                = "80"
-    unhealthy_threshold = "5"
-    matcher             = "200-499"
-    timeout             = "10"
-  }
-
-}
-
-resource "aws_lb_target_group" "chaps_target_group_https" {
-  name                 = "chaps-target-group-https"
-  port                 = 443
-  protocol             = "HTTPS"
-  vpc_id               = data.aws_vpc.shared.id
-  target_type          = "ip"
-  deregistration_delay = 30
-
-  stickiness {
-    type = "lb_cookie"
-  }
-
-  health_check {
-    healthy_threshold   = "2"
-    interval            = "30"
-    protocol            = "HTTPS"
     unhealthy_threshold = "5"
     matcher             = "200-499"
     timeout             = "10"
