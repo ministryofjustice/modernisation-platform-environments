@@ -33,6 +33,11 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       essential = true
       portMappings = [
         {
+          containerPort = 80
+          protocol      = "tcp"
+          hostPort      = 80
+        },
+        {
           containerPort = 443
           protocol      = "tcp"
           hostPort      = 443
