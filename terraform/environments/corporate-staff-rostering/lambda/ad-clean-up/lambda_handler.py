@@ -25,10 +25,15 @@ def check_ad_for_object(object):
         search_base = 'ou=Managed-Windows-Servers,ou=Computers,dc=azure,dc=noms,dc=root'
         search_filter = f'(sAMAccountName={object})'
         
-        conn.search(search_base, search_filter)
+        search_result = conn.search(search_base, search_filter) # not doing anything with this right now need to pass in result into print and delete
+        print(search_result)
         
         if conn.entries:
+            # Get the distinguished name (DN) of the found object
+            object_dn = conn.entries[0].entry_dn
+            print(object_dn)
             print(f"The object {object} is present in Active Directory and will be deleted.")
+            conn.delete(object_dn)
         else:
             print(f"The object {object} is not found in Active Directory - no further action taken.")
 
@@ -41,6 +46,7 @@ def get_tag_value(tags, key):
 
 # function to search active directory if an instance is stopped, final iteration will be state terminated                       
 def lambda_handler(event, context):
+    print (json.__version__)
     if event['detail']['state'] == 'stopped':
         instance_id = event['detail']['instance-id']
         

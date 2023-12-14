@@ -1,5 +1,14 @@
-resource "aws_ecr_respository" "ad-clean-up" {
-    name = "ad-clean-up"
+# resource "aws_ecr_respository" "ad-clean-up" {
+#     name = "ad-clean-up"
+# }
+
+resource "aws_secretsmanager_secret" "ad-service-account" {
+  name        = "ad-service-account-credentials"
+  description = "Credentials for lambda to interact with dev/test Active Directory."
+
+  tags = merge(local.tags,
+    { Name = "ad-service-account-credentials-${local.environment}" }
+  )
 }
 
 resource "aws_cloudwatch_event_rule" "instance-state" {
