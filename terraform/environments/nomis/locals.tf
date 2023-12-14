@@ -61,10 +61,62 @@ locals {
   baseline_cloudwatch_metric_alarms      = {}
   baseline_cloudwatch_log_metric_filters = {}
 
-  baseline_ec2_autoscaling_groups   = {}
-  baseline_ec2_instances            = {}
-  baseline_iam_policies             = {}
-  baseline_iam_roles                = {}
+  baseline_ec2_autoscaling_groups = {}
+  baseline_ec2_instances          = {}
+  baseline_iam_policies = {
+    SasTokenRotatorPolicy = {
+      description = "Allows updating of secrets in SSM"
+      statements = [
+        {
+          sid    = "RotateSecrets"
+          effect = "Allow"
+          actions = [
+            "ssm:PutParameter",
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/azure/*",
+          ]
+        },
+        {
+          sid    = "EncryptSecrets"
+          effect = "Allow"
+          actions = [
+            "kms:Encrypt",
+          ]
+          resources = [
+            data.aws_kms_key.general_shared.arn,
+          ]
+        },
+      ]
+    }
+  }
+  baseline_iam_roles = {
+    SasTokenRotatorRole = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRoleWithWebIdentity"]
+        principals = {
+          type        = "Federated"
+          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
+        }
+        conditions = [
+          {
+            test     = "StringEquals"
+            values   = ["sts.amazonaws.com"]
+            variable = "token.actions.githubusercontent.com:aud"
+          },
+          {
+            test     = "StringLike"
+            values   = ["repo:ministryofjustice/dso-modernisation-platform-automation:main"]
+            variable = "token.actions.githubusercontent.com:sub"
+          },
+        ]
+      }]
+      policy_attachments = [
+        "SasTokenRotatorPolicy",
+      ]
+    }
+  }
   baseline_iam_service_linked_roles = {}
   baseline_key_pairs                = {}
   baseline_kms_grants               = {}
