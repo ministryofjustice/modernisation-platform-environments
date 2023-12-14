@@ -36,11 +36,6 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
           containerPort = 80
           protocol      = "tcp"
           hostPort      = 80
-        },
-        {
-          containerPort = 443
-          protocol      = "tcp"
-          hostPort      = 443
         }
       ]
       logConfiguration = {
@@ -76,10 +71,10 @@ resource "aws_ecs_service" "ecs_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.chaps_target_group.arn
     container_name   = "${local.application_name}-container"
-    container_port   = 443
+    container_port   = 80
   }
 
-  depends_on = [aws_lb_listener.https_listener] # don't create until the lb exists
+  depends_on = [aws_lb_listener.listener] # don't create until the lb exists
 }
 
 resource "aws_iam_role" "app_execution" {
@@ -197,19 +192,12 @@ resource "aws_security_group" "ecs_service" {
     security_groups = [aws_security_group.chaps_lb_sc.id]
   }
 
-  ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    description     = "Allow traffic on port 443 from load balancer"
-    security_groups = [aws_security_group.chaps_lb_sc.id]
-  }
-
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.chaps_lb_sc.id]
   }
 }
 

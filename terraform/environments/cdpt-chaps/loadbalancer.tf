@@ -33,6 +33,7 @@ resource "aws_lb" "chaps_lb" {
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.chaps_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
+  depends_on                 = [aws_security_group.chaps_lb_sc]
 }
 
 resource "aws_lb_target_group" "chaps_target_group" {
@@ -48,9 +49,9 @@ resource "aws_lb_target_group" "chaps_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
+    healthy_threshold   = "2"
     interval            = "30"
-    unhealthy_threshold = "5"
+    unhealthy_threshold = "4"
     matcher             = "200-499"
     timeout             = "10"
   }
@@ -64,13 +65,8 @@ resource "aws_lb_listener" "listener" {
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+    target_group_arn = aws_lb_target_group.chaps_target_group.id
+    type             = "forward"
   }
 }
 
