@@ -24,17 +24,15 @@ output "s3_db_backup_restore_access_role_arn" {
 }
 
 resource "aws_security_group" "db" {
-	name = "db"
-	description = "Allow DB inbound traffic"
-	
-	ingress {
-		from_port = 1433
-		to_port = 1433
-		protocol = "tcp"
-		cidr_blocks = ["0.0.0.0/0"]
+  name = "db" 
+  description = "Allow DB inbound traffic"
+  ingress {
+    from_port = 1433
+    to_port = 1433
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
 	}
-
-	  egress {
+  egress {
     from_port = 0
     to_port = 0
     protocol = "-1"
