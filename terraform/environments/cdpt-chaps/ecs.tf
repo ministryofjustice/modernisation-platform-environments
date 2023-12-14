@@ -57,10 +57,6 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
 }
 
 resource "aws_ecs_service" "ecs_service" {
-  depends_on = [
-    aws_lb_listener.listener
-  ]
-
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
@@ -76,9 +72,9 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.chaps_target_group.arn
+    target_group_arn = aws_lb_target_group.chaps_target_group_https.arn
     container_name   = "${local.application_name}-container"
-    container_port   = 80
+    container_port   = 443
   }
 }
 
