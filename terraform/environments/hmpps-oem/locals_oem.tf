@@ -8,7 +8,7 @@ locals {
     "nomis-${local.environment}",
     "nomis-combined-reporting-${local.environment}",
     "oasys-${local.environment}",
-    contains(["development", "test"], local.environment) ? ["delius-core-${local.environment}"] : []
+    contains(["development"], local.environment) ? ["delius-core-${local.environment}"] : []
   ])
 
   oem_share_secret_principal_ids = [
