@@ -98,9 +98,9 @@ locals {
     baseline_ec2_instances = {
       t1-ncr-db-1-a = merge(local.database_ec2_default, {
         cloudwatch_metric_alarms = merge(
-          local.database_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+          local.database_cloudwatch_metric_alarms.standard,
+          local.database_cloudwatch_metric_alarms.db_connected,
+          local.database_cloudwatch_metric_alarms.db_backup,
         )
         config = merge(local.database_ec2_default.config, {
           instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
