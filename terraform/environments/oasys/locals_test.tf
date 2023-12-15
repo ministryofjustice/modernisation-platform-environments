@@ -34,6 +34,34 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2T2WebPolicy = {
+        description = "Permissions required for T2 Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2OASYS/apex-passwords*",
+            ]
+          }
+        ]
+      }
+      Ec2T1WebPolicy = {
+        description = "Permissions required for T1 Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1OASYS/apex-passwords*",
+            ]
+          }
+        ]
+      }
       Ec2T2BipPolicy = {
         description = "Permissions required for T2 Bip EC2s"
         statements = [
@@ -238,6 +266,9 @@ locals {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2T2WebPolicy",
+          ])
         })
         tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
@@ -251,17 +282,21 @@ locals {
       #     ami_name                  = "oasys_webserver_release_*"
       #     ssm_parameters_prefix     = "ec2-web-t2/"
       #     iam_resource_names_prefix = "ec2-web-t2"
+      #     instance_profile_policies = concat(local.webserver_b.config.instance_profile_policies, [
+      #       "Ec2T2WebPolicy",
+      #     ])
       #   })
       #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "oasys/web-index-html-updation"
+      #       branch = "oasys-ords-secrets"
       #     })
       #   })
-      #   autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
+      #   #autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
       #   tags = merge(local.webserver_a.tags, {
       #     description                             = "t2 ${local.application_name} web"
       #     "${local.application_name}-environment" = "t2"
       #     oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+      #     oracle-db-sid                           = "T2OASYS" # for each env using azure DB will need to be OASPROD
       #   })
       # })
 
@@ -273,6 +308,9 @@ locals {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t1/"
           iam_resource_names_prefix = "ec2-web-t1"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2T1WebPolicy",
+          ])
         })
         tags = merge(local.webserver_a.tags, {
           description                             = "t1 ${local.application_name} web"

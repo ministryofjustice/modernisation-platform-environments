@@ -181,7 +181,8 @@ locals {
   bip_cmc_cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms.ec2,
     module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+    # module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app, # add in once there are custom services monitored
   )
 
   bip_cmc_cloudwatch_log_groups = {
@@ -209,8 +210,8 @@ locals {
     lb_target_groups = {
       http-7777 = local.bip_cmc_target_group_http_7777
       http-6455 = local.bip_cmc_target_group_http_6455
-      http-6410       = local.bip_cmc_target_group_http_6410
-      http-6400       = local.bip_cmc_target_group_http_6400
+      http-6410 = local.bip_cmc_target_group_http_6410
+      http-6400 = local.bip_cmc_target_group_http_6400
     }
 
     ebs_volumes = {
