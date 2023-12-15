@@ -57,6 +57,8 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
 }
 
 resource "aws_ecs_service" "ecs_service" {
+  depends_on = [aws_lb_listener.listener] # don't create until the lb exists
+
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
@@ -66,6 +68,7 @@ resource "aws_ecs_service" "ecs_service" {
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
     security_groups  = [aws_security_group.ecs_service.id]
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -73,8 +76,6 @@ resource "aws_ecs_service" "ecs_service" {
     container_name   = "${local.application_name}-container"
     container_port   = 80
   }
-
-  depends_on = [aws_lb_listener.listener] # don't create until the lb exists
 }
 
 resource "aws_iam_role" "app_execution" {
