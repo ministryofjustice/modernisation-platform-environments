@@ -1,6 +1,6 @@
 #DMS S3 Endpoint role
 resource "aws_iam_role" "dms-s3-role" {
-  name = "dms-${var.short_name}-s3-endpoint-role"
+  name = "${var.project}-dms-${var.short_name}-s3-endpoint-role"
   path = "/"
 
   assume_role_policy = <<EOF
@@ -21,7 +21,7 @@ EOF
 
 # Attach s3 target operation policy to the role
 resource "aws_iam_policy" "dms-s3-target-policy" {
-  name = "dms-${var.short_name}-s3-target-policy"
+  name = "${var.project}-dms-${var.short_name}-s3-target-policy"
 
   policy = <<EOF
 {
@@ -48,7 +48,7 @@ resource "aws_iam_role_policy_attachment" "dms-s3-attachment" {
 
 #DMS Operation s3 target role
 resource "aws_iam_role" "dms-operator-s3-target-role" {
-  name = "dms-${var.short_name}-operator-s3-target-role"
+  name = "${var.project}-dms-${var.short_name}-operator-s3-target-role"
   path = "/"
 
   assume_role_policy = <<EOF
@@ -69,7 +69,7 @@ EOF
 
 # Attach an admin policy to the Operator role
 resource "aws_iam_policy" "dms-operator-s3-policy" {
-  name = "dms-${var.short_name}-operator-s3-target-policy"
+  name = "${var.project}-dms-${var.short_name}-operator-s3-target-policy"
 
   policy = <<EOF
 {
