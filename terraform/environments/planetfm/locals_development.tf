@@ -11,7 +11,7 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "s3.PutObject",
+              "s3:PutObject",
             ]
             principals = {
               identifiers = [data.aws_elb_service_account.default.arn]
