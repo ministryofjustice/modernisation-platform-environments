@@ -40,6 +40,7 @@ locals {
         access_logs                      = true #default value
         log_schedule                     = "cron(0 * * * ? *)"
         force_destroy_bucket             = true
+        existing_bucket_name             = "public-lb-logs-bucket20231215103827601100000001"
         # not required for testing in sandbox
         instance_target_groups = {}
         # not required for testing in sandbox
