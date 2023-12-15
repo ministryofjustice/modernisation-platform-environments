@@ -100,7 +100,7 @@ resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
 resource "aws_s3_bucket_versioning" "s3_bucket_oracledb_backups_inventory" {
   bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
   versioning_configuration {
-    status = "Enabled"
+    status = "Disabled"
   }
 }
 
