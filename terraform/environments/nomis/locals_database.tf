@@ -24,75 +24,59 @@ locals {
     }
   }
 
-  database_ec2_cloudwatch_metric_alarms = merge(
-    module.baseline_presets.cloudwatch_metric_alarms.ec2,
-    module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status, {
-      cpu-utilization-high = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "120"
-        datapoints_to_alarm = "120"
-        metric_name         = "CPUUtilization"
-        namespace           = "AWS/EC2"
-        period              = "60"
-        statistic           = "Maximum"
-        threshold           = "95"
-        alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on a nomis-db instance"
-        alarm_actions       = ["dso_pagerduty"]
-      }
-  })
-
-  database_ec2_misload_cloudwatch_metric_alarms = {
-    misload_error = {
-      comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "1"
-      datapoints_to_alarm = "1"
-      namespace           = "CWAgent"
-      metric_name         = "collectd_textfile_monitoring_value"
-      period              = "300"
-      statistic           = "Maximum"
-      threshold           = "1"
-      alarm_description   = "Triggers if misload process failed. See nomis-misload and collectd-textfile-monitoring ansible roles"
-      alarm_actions       = ["dso_pagerduty"]
-      dimensions = {
-        type          = "gauge"
-        type_instance = "misload_status"
-      }
-    }
-    misload_metric_not_updated = {
-      comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "1"
-      datapoints_to_alarm = "1"
-      namespace           = "CWAgent"
-      metric_name         = "collectd_textfile_monitoring_seconds"
-      period              = "300"
-      statistic           = "Maximum"
-      threshold           = "129600"
-      treat_missing_data  = "breaching"
-      alarm_description   = "Triggers if misload status metric missing or not updated or over 36 hours"
-      alarm_actions       = ["dso_pagerduty"]
-      dimensions = {
-        type          = "duration"
-        type_instance = "misload_status"
-      }
-    }
-    misload_long_running = {
-      comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "1"
-      datapoints_to_alarm = "1"
-      namespace           = "CWAgent"
-      metric_name         = "collectd_textfile_monitoring_seconds"
-      period              = "300"
-      statistic           = "Maximum"
-      threshold           = "14400"
-      treat_missing_data  = "notBreaching"
-      alarm_description   = "Triggers if misload process is taking longer than 4 hours"
-      alarm_actions       = ["dso_pagerduty"]
-      dimensions = {
-        type          = "duration"
-        type_instance = "misload_running"
-      }
-    }
+  database_ec2_cloudwatch_metric_alarms = {
+    standard = merge(
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
+      local.environment == "production" ? {} : {
+        cpu-utilization-high = {
+          comparison_operator = "GreaterThanOrEqualToThreshold"
+          evaluation_periods  = "480"
+          datapoints_to_alarm = "480"
+          metric_name         = "CPUUtilization"
+          namespace           = "AWS/EC2"
+          period              = "60"
+          statistic           = "Maximum"
+          threshold           = "95"
+          alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 8 hours to allow for DB refreshes"
+          alarm_actions       = ["dba_pagerduty"]
+        }
+      },
+    )
+    connectivity_test = merge(
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2_instance_cwagent_collectd_connectivity_test,
+    )
+    db_connected = merge(
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_high_priority_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_connected,
+    )
+    db_backup = merge(
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup,
+    )
+    nomis_batch = merge(
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_textfile_monitoring
+    )
+    misload = merge(
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_textfile_monitoring, {
+        misload-long-running = {
+          comparison_operator = "GreaterThanOrEqualToThreshold"
+          evaluation_periods  = "1"
+          datapoints_to_alarm = "1"
+          namespace           = "CWAgent"
+          metric_name         = "collectd_textfile_monitoring_seconds"
+          period              = "300"
+          statistic           = "Maximum"
+          threshold           = "14400"
+          treat_missing_data  = "notBreaching"
+          alarm_description   = "Triggers if misload process is taking longer than 4 hours, see https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615798942"
+          alarm_actions       = ["dba_pagerduty"]
+          dimensions = {
+            type          = "duration"
+            type_instance = "misload_running"
+          }
+        }
+    })
   }
 
   database_cloudwatch_log_groups = {

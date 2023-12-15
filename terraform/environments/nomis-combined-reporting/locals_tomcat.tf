@@ -1,19 +1,8 @@
 locals {
 
-  tomcat_ssm_parameters = {
-    prefix = "/tomcat/"
-    parameters = {
-      bobj_password   = { description = "bobj account password" }
-      oracle_password = { description = "oracle account password" }
-      product_key     = { description = "BIP product key" }
-      cms_name        = { description = "Name of the BIP CMS machine" }
-      cms_password    = { description = "CMS password for host machine" }
-    }
-  }
-
   tomcat_secretsmanager_secrets = {
     secrets = {
-      passwords = {}
+      passwords = { description = "Tomcat Passwords" }
     }
   }
 
@@ -101,6 +90,110 @@ locals {
     }
   }
 
+  tomcat_lb_listeners = {
+
+    http = {
+      port     = 80
+      protocol = "HTTP"
+
+      default_action = {
+        type = "redirect"
+        redirect = {
+          port        = 443
+          protocol    = "HTTPS"
+          status_code = "HTTP_301"
+        }
+      }
+    }
+
+    http7777 = {
+      port     = 7777
+      protocol = "HTTP"
+
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
+    http7010 = {
+      port     = 7010
+      protocol = "HTTP"
+
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
+    http8433 = {
+      port     = 8433
+      protocol = "HTTP"
+
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
+    http8005 = {
+      port     = 8005
+      protocol = "HTTP"
+
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
+    https = {
+      port                      = 443
+      protocol                  = "HTTPS"
+      ssl_policy                = "ELBSecurityPolicy-2016-08"
+      certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
+      cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms.lb
+
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
+  }
+
+  tomcat_cloudwatch_metric_alarms = merge(
+    module.baseline_presets.cloudwatch_metric_alarms.ec2,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+    # module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app, # add in once there are custom services monitored
+  )
+
+  tomcat_cloudwatch_log_groups = {
+    cwagent-tomcat-logs = {
+      retention_in_days = 30
+    }
+  }
+
   tomcat_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -122,10 +215,10 @@ locals {
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
 
     lb_target_groups = {
-      http7777 = local.tomcat_target_group_http_7777
-      admin    = local.tomcat_target_group_http_7010
-      redirect = local.tomcat_target_group_http_8443
-      shutdown = local.tomcat_target_group_http_8005
+      http-7777 = local.tomcat_target_group_http_7777
+      admin     = local.tomcat_target_group_http_7010
+      redirect  = local.tomcat_target_group_http_8443
+      shutdown  = local.tomcat_target_group_http_8005
     }
 
     tags = {

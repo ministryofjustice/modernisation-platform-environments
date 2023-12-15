@@ -93,6 +93,6 @@ tasks:
           Disable-NetAdapterBinding -Name 'Ethernet' -ComponentID 'ms_tcpip6'
           Import-Module RemoteDesktop
           Enable-PSRemoting -force
-          Rename-Computer -NewName ${rds_hostname}
+          Rename-Computer -NewName "${rds_hostname}1"
           Sleep 5
           Restart-Computer -Force

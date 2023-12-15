@@ -130,7 +130,7 @@ resource "aws_instance" "s609693lo6vw103" {
 
 resource "aws_instance" "s609693lo6vw110" {
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0d8e82a3d7fda95e0"
+  ami                    = "ami-0c261875f6ed81278"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -167,6 +167,26 @@ resource "aws_instance" "s609693lo6vw106" {
     Name        = "s609693lo6vw106"
     patch_group = "dev_win_patch"
     backup      = true
+  }
+}
+
+resource "aws_instance" "s609693lo6vw111" {
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-005cac270289ea0de"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Dev-Box-VW106[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw111"
+    patch_group = "dev_win_patch"
   }
 }
 

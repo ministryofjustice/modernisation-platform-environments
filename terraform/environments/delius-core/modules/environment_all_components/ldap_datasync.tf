@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "ldap_datasync_role_access" {
       "kms:ReEncryptFrom",
       "kms:GenerateDataKeyWithoutPlaintext"
     ]
-    resources = [var.account_config.general_shared_kms_key_arn]
+    resources = [var.account_config.kms_keys.general_shared]
   }
   statement {
     sid     = "allowAccessForDataSync"
@@ -119,7 +119,7 @@ module "s3_bucket_ldap_data_refresh" {
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
-  custom_kms_key      = var.account_config.general_shared_kms_key_arn
+  custom_kms_key      = var.account_config.kms_keys.general_shared
   bucket_policy_v2    = local.ldap_refresh_bucket_policies
 
   providers = {
