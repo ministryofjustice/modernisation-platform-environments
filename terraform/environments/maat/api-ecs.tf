@@ -40,9 +40,63 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-api ecs service"
+      Name = "${local.application_name}-api-ecs-service"
     }
   )
+}
+
+######################################
+# ECS TASK DEFINITION
+######################################
+resource "aws_ecs_task_definition" "TaskDefinition" {
+  family                   = "${local.application_name}-api-task-definition"
+  cpu                      = var.cNonProd ? 1024 : 1024
+  memory                   = var.cNonProd ? 2048 : 3072
+  network_mode             = "awsvpc"
+  requires_compatibilities = [var.pLaunchType]
+  execution_role_arn       = aws_iam_role.ECSTaskExecutionRole.arn
+  task_role_arn            = aws_iam_role.ECSTaskExecutionRole.arn
+
+  container_definitions = jsonencode([
+    {
+      name        = var.pAppName
+      cpu         = var.cNonProd ? 992 : 992
+      essential   = true
+      image       = "${var.pECSRepositoryURL}:${var.pDockerImageTag}"
+      memory      = var.cNonProd ? 1792 : 2816
+      log_configuration = {
+        log_driver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.CloudwatchLogsGroup.name
+          "awslogs-region"        = var.AWS_Region
+          "awslogs-stream-prefix" = "${var.pAppName}-app"
+        }
+      }
+      port_mappings = [
+        {
+          container_port = 8090
+        }
+      ]
+      secrets = [
+        {
+          name      = "DATASOURCE_USERNAME"
+          value_from = "arn:aws:ssm:${var.AWS_Region}:${var.AWS_AccountId}:parameter/maat-cd-api/DATASOURCE_USERNAME"
+        },
+        {
+          name      = "DATASOURCE_PASSWORD"
+          value_from = "arn:aws:ssm:${var.AWS_Region}:${var.AWS_AccountId}:parameter/APP_MAATDB_DBPASSWORD_MLA1"
+        },
+        # ... (repeat for other secrets)
+      ]
+      environment = [
+        {
+          name  = "DATASOURCE_URL"
+          value = var.pDatasourceUrl
+        },
+        # ... (repeat for other environment variables)
+      ]
+    }
+  ])
 }
 
 
@@ -53,10 +107,9 @@ resource "aws_appautoscaling_target" "ecs_service_scaling_target" {
   max_capacity = 5
   min_capacity = local.application_data.accounts[local.environment].ecs_service_count
   resource_id          = "service/${aws_ecs_cluster.example.id}/${aws_ecs_service.example.name}"
-  role_arn             = aws_iam_role.example.arn
+  role_arn             = aws_iam_role.maat_api_ecs_autoscaling_role.arn
   scalable_dimension   = "ecs:service:DesiredCount"
   service_namespace    = "ecs"
-#   role_arn             = aws_iam_role.example.arn       ########### come back to it
 }
 
 resource "aws_appautoscaling_policy" "maat_api_scaling_up_policy" {
