@@ -2,7 +2,7 @@ import json
 import boto3 
 from ldap3 import Server, Connection, ALL
 
-# function to check for objects within active directory
+# checks for objects within active directory
 def check_ad_for_object(object):
     
     # create a secrets manager client
@@ -46,7 +46,6 @@ def get_tag_value(tags, key):
 
 # function to search active directory if an instance is stopped, final iteration will be state terminated                       
 def lambda_handler(event, context):
-    print (json.__version__)
     if event['detail']['state'] == 'stopped':
         instance_id = event['detail']['instance-id']
         
