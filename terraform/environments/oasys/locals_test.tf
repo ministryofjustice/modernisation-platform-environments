@@ -75,7 +75,20 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/bip-*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/bip-*",
             ]
-          }
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetObject",
+              "s3:GetObjectVersion",
+              "s3:GetBucketPolicy",
+              "s3:ListBucket"
+            ],
+            resource = [
+              "arn:aws:s3:::modernisation-platform-software*",
+              "arn:aws:s3:::modernisation-platform-software*/*",
+            ]
+          },
         ]
       }
       Ec2T1BipPolicy = {
