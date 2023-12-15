@@ -87,8 +87,20 @@ locals {
             resources = [
               "arn:aws:s3:::modernisation-platform-software*",
               "arn:aws:s3:::modernisation-platform-software*/*",
+              "arn:aws:s3:::mod-platform-image-artefact-bucket*/*",
+              "arn:aws:s3:::mod-platform-image-artefact-bucket*"
             ]
           },
+          {
+            effect = "Allow"
+            actions = [
+              "kms:Encrypt",
+              "kms:Decrypt",
+            ]
+            resources = [
+              "*",
+            ]
+          }
         ]
       }
       Ec2T1BipPolicy = {
