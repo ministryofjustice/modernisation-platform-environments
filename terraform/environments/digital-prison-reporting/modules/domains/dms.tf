@@ -63,7 +63,7 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
   count = var.setup_dms_instance ? 1 : 0
 
   database_name = var.source_db_name
-  endpoint_id   = "${var.project_id}-dms-s3-target-${var.short_name}-${var.dms_source_name}-source"
+  endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-source-endpoint"
   endpoint_type = "source"
   engine_name   = var.source_engine_name
   password      = var.source_app_password
@@ -84,7 +84,7 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
 resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   count = var.setup_dms_instance ? 1 : 0
 
-  endpoint_id                      = "${var.project_id}-dms-${var.short_name}-s3-target"
+  endpoint_id                      = "${var.project_id}-dms-${var.short_name}-s3-target-endpoint"
   endpoint_type                    = "target"
   bucket_name                      = var.bucket_name
   service_access_role_arn          = aws_iam_role.dms-s3-role.arn
@@ -118,7 +118,7 @@ resource "aws_dms_replication_subnet_group" "dms-s3-target-subnet-group" {
 resource "aws_security_group" "dms_s3_target_sec_group" {
   count = var.setup_dms_instance ? 1 : 0
 
-  name   = "${var.project_id}-dms-s3-target-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"
+  name   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-sg"
   vpc_id = var.vpc
 
   ingress {
