@@ -11,7 +11,9 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "s3:PutObject"
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:PutObject",
             ]
             principals = {
               identifiers = ["arn:aws:iam::652711504416:root"]
