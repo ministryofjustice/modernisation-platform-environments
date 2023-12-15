@@ -110,7 +110,7 @@ resource "aws_dms_replication_subnet_group" "dms-s3-target-subnet-group" {
   count = var.setup_dms_instance ? 1 : 0
 
   replication_subnet_group_description = "DMS replication subnet group"
-  replication_subnet_group_id          = "${var.project_id}-dms-s3-target-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-subnet-group"
+  replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-sg"
   subnet_ids                           = var.subnet_ids
 }
 
