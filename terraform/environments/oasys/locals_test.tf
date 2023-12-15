@@ -84,7 +84,7 @@ locals {
               "s3:GetBucketPolicy",
               "s3:ListBucket"
             ],
-            resource = [
+            resources = [
               "arn:aws:s3:::modernisation-platform-software*",
               "arn:aws:s3:::modernisation-platform-software*/*",
             ]
