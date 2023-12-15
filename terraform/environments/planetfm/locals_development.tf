@@ -6,8 +6,50 @@ locals {
 
     baseline_s3_buckets = {
       public-lb-logs-bucket = {
-        # custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3.PutObject",
+            ]
+            principals = {
+              identifiers = [data.aws_elb_service_account.default.arn]
+              type        = "AWS"
+            }
+          },
+          {
+            sid    = "AWSLogDeliveryWrite"
+            effect = "Allow"
+            actions = [
+              "s3:PutObject"
+            ]
+            principals = {
+              identifiers = ["delivery.logs.amazonaws.com"]
+              type        = "Service"
+            }
+
+            conditions = [
+              {
+                test     = "StringEquals"
+                variable = "s3:x-amz-acl"
+                values   = ["bucket-owner-full-control"]
+              }
+            ]
+          },
+          {
+            sid    = "AWSLogDeliveryAclCheck"
+            effect = "Allow"
+            actions = [
+              "s3:GetBucketAcl"
+            ]
+            principals = {
+              identifiers = ["delivery.logs.amazonaws.com"]
+              type        = "Service"
+            }
+          }
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
 
