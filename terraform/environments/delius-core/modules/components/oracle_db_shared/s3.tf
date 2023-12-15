@@ -85,12 +85,6 @@ resource "aws_iam_role_policy" "oracledb_backup_bucket_access_policy" {
 
 resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
   bucket = "${var.env_name}-oracle-database-backups-inventory"
-  acl    = "private"
-
-  versioning {
-    enabled = false
-  }
-
   tags = merge(
     var.tags,
     {
@@ -101,6 +95,20 @@ resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
     },
   )
 }
+
+resource "aws_s3_bucket_acl" "s3_bucket_oracledb_backups_inventory" {
+  bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_versioning" "s3_bucket_oracledb_backups_inventory" {
+  bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
 data "aws_caller_identity" "current" {
 }
 
