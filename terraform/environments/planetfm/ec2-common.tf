@@ -53,5 +53,3 @@ resource "aws_ssm_document" "ami_build_automation" {
     },
   )
 }
-
-data "aws_elb_service_account" "default" {}
