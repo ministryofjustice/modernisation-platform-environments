@@ -85,12 +85,6 @@ resource "aws_iam_role_policy" "oracledb_backup_bucket_access_policy" {
 
 resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
   bucket = "${var.env_name}-oracle-database-backups-inventory"
-  acl    = "private"
-
-  versioning {
-    enabled = false
-  }
-
   tags = merge(
     var.tags,
     {
@@ -101,6 +95,16 @@ resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
     },
   )
 }
+
+
+resource "aws_s3_bucket_versioning" "s3_bucket_oracledb_backups_inventory" {
+  bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
+  versioning_configuration {
+    status = "Suspended"
+  }
+}
+
+
 data "aws_caller_identity" "current" {
 }
 
@@ -113,13 +117,13 @@ resource "aws_s3_bucket_public_access_block" "oracledb_backups_inventory" {
 }
 
 data "template_file" "oracledb_backups_inventory_policy_file" {
-  template = file("${path.module}/policies/oracledb_backups_inventory.json")
-
-  vars = {
-    backup_s3bucket_arn = module.s3_bucket_oracledb_backups.bucket.arn
-    inventory_s3bucket_arn = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn
-    aws_account_id = data.aws_caller_identity.current.account_id
-  }
+  template = templatefile("${path.module}/policies/oracledb_backups_inventory.json",
+                            {
+                              backup_s3bucket_arn = module.s3_bucket_oracledb_backups.bucket.arn,
+                              inventory_s3bucket_arn = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn,
+                              aws_account_id = data.aws_caller_identity.current.account_id
+                            }
+                          )
 }
 
 resource "aws_s3_bucket_policy" "oracledb_backups_inventory_policy" {
