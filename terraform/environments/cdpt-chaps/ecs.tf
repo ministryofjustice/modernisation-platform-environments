@@ -114,7 +114,7 @@ resource "aws_ecs_service" "ecs_service" {
   health_check_grace_period_seconds = 180
 
   capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.cdpt-chaps.name
+    capacity_provider = aws_ecs_capacity_provider.chaps.name
     weight            = 1
   }
 
@@ -130,8 +130,9 @@ resource "aws_ecs_service" "ecs_service" {
   }
 }
 
-resource "aws_ecs_capacity_provider" "cdpt-chaps" {
-  name = "${local.application_name}-capacity-provider"
+# duplicate
+resource "aws_ecs_capacity_provider" "chaps" {
+  name = "${local.application_name}-ecs-capacity-provider"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
@@ -145,9 +146,22 @@ resource "aws_ecs_capacity_provider" "cdpt-chaps" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-capacity-provider"
+      Name = "${local.application_name}-ecs-capacity-provider"
     }
   )
+}
+
+resource "aws_ecs_capacity_provider" "cdpt-chaps" {
+  name = "${local.application_name}-capacity-provider"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+
+    managed_scaling {
+      status          = "ENABLED"
+      target_capacity = 100
+    }
+  }
 }
 
 resource "aws_ecs_cluster_capacity_providers" "cdpt-chaps" {
