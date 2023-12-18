@@ -828,9 +828,9 @@ module "s3_file_transfer_lambda_trigger" {
 
   trigger_input_event = jsonencode(
     {
-      "sourceBucket" : "${module.s3_raw_bucket.bucket_id}",
-      "destinationBucket" : "${module.s3_raw_archive_bucket.bucket_id}",
-      "retentionDays" : "${local.scheduled_s3_file_transfer_lambda_retention_days}"
+      "sourceBucket" : module.s3_raw_bucket.bucket_id,
+      "destinationBucket" : module.s3_raw_archive_bucket.bucket_id,
+      "retentionDays" : tostring(local.scheduled_s3_file_transfer_lambda_retention_days)
     }
   )
 
