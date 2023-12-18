@@ -151,12 +151,10 @@ resource "aws_ecs_cluster_capacity_providers" "cdpt-chaps" {
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
-  vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
-  name                  = "${local.application_name}-cluster-scaling-group"
-  desired_capacity      = local.application_data.accounts[local.environment].ec2_desired_capacity
-  max_size              = local.application_data.accounts[local.environment].ec2_max_size
-  min_size              = local.application_data.accounts[local.environment].ec2_min_size
-  protect_from_scale_in = true
+  name                      = "${local.application_name}-cluster-scaling-group"
+  max_size                  = 1
+  min_size                  = 1
+  health_check_grace_period = 300
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
@@ -164,9 +162,19 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   }
 
   tag {
-    key                 = "AmazonECSManaged"
-    value               = true
+    key                 = "Name"
+    value               = "${local.application_name}-cluster-scaling-group"
     propagate_at_launch = true
+  }
+
+  dynamic "tag" {
+    for_each = local.tags
+
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
   }
 }
 
@@ -199,6 +207,13 @@ resource "aws_security_group" "cluster_ec2" {
     cidr_blocks     = ["0.0.0.0/0"]
     security_groups = []
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-cluster-ec2-security-group"
+    }
+  )
 }
 
 # EC2 launch template - settings to use for new EC2s added to the group
@@ -211,7 +226,6 @@ resource "aws_launch_template" "ec2-launch-template" {
   instance_type          = local.application_data.accounts[local.environment].instance_type
   key_name               = local.application_data.accounts[local.environment].key_name
   ebs_optimized          = true
-  update_default_version = true
 
   monitoring {
     enabled = true
@@ -220,7 +234,6 @@ resource "aws_launch_template" "ec2-launch-template" {
   metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "optional"
-    http_put_response_hop_limit = "2"
   }
 
   iam_instance_profile {
@@ -244,6 +257,24 @@ resource "aws_launch_template" "ec2-launch-template" {
   }
 
   user_data = local.user_data
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(tomap({
+      "Name" = "${local.application_name}-ecs-cluster"
+    }), local.tags)
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags = merge(tomap({
+      "Name" = "${local.application_name}-ecs-cluster"
+    }), local.tags)
+  }
+
+  tags = merge(tomap({
+    "Name" = "${local.application_name}-ecs-cluster-template"
+  }), local.tags)
 }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
