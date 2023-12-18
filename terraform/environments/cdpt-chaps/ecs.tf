@@ -143,7 +143,7 @@ resource "aws_ecs_capacity_provider" "cdpt-chaps" {
   }
 
   tags = merge(
-    var.local.tags,
+    local.tags,
     {
       Name = "${local.application_name}-capacity-provider"
     }
