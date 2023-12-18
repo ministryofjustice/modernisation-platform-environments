@@ -41,3 +41,10 @@ data "aws_iam_policy_document" "datahub" {
     resources = formatlist("arn:aws:iam::%s:role/${local.environment_configuration.datahub_role}", local.environment_configuration.datahub_target_accounts)
   }
 }
+
+data "aws_availability_zones" "available" {}
+
+data "aws_iam_roles" "eks_sso_access_role" {
+  name_regex  = "AWSReservedSSO_${local.environment_configuration.eks_sso_access_role}_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}

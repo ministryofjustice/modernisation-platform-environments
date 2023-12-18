@@ -5,6 +5,34 @@ locals {
   environment_configuration = local.environment_configurations[local.environment]
   environment_configurations = {
     development = {
+      /* VPC */
+      vpc_cidr                   = "10.26.128.0/21"
+      vpc_private_subnets        = ["10.26.130.0/23", "10.26.132.0/23", "10.26.134.0/23"]
+      vpc_public_subnets         = ["10.26.128.0/27", "10.26.128.32/27", "10.26.128.64/27"]
+      vpc_database_subnets       = ["10.26.128.96/27", "10.26.128.128/27", "10.26.128.160/27"]
+      vpc_enable_nat_gateway     = true
+      vpc_one_nat_gateway_per_az = false
+
+      /* EKS */
+      eks_cluster_name = "apps-tools-${local.environment}"
+      eks_versions = {
+        cluster                   = "1.28"
+        ami_release               = "1.16.0-d2d9cf87" // [major version].[minor version].[patch version]-[first 8 chars of commit SHA]. Get the SHA from here: https://github.com/bottlerocket-os/bottlerocket/releases
+        addon_coredns             = "v1.10.1-eksbuild.5"
+        addon_kube_proxy          = "v1.28.2-eksbuild.2"
+        addon_vpc_cni             = "v1.15.3-eksbuild.1"
+        addon_aws_guardduty_agent = "v1.3.1-eksbuild.1"
+        addon_ebs_csi_driver      = "v1.24.1-eksbuild.1"
+        addon_efs_csi_driver      = "v1.7.0-eksbuild.1"
+      }
+      eks_sso_access_role = "modernisation-platform-sandbox"
+
+      # FOR EKS
+      airflow_execution_role_name   = "${local.application_name}-${local.environment}-airflow-execution"
+
+
+      ### OLDER
+
       eks_cluster_arn                = "arn:aws:eks:eu-west-2:335889174965:cluster/apps-tools-development"
       eks_certificate_authority_data = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJV04xQi9kT3BSYTB3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TXpBNU1Ua3hPRFU1TVRsYUZ3MHpNekE1TVRZeE9EVTVNVGxhTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUNkLzBaK0JLdFVTWlUvS2dJeVI0aVllMWtFemhGaXBqK1oxbzV1eTVrMGlVU3ZmNm5GWElNWkRmdVcKZWVnVDVpNUhsZ1dRNVBaYm10MkJVbE1DR3lmUWsxa0c4MzNyYXVpUElsdXl5NDh2M0pKZUxOQ2RHQm1wb1Z6LwpoZk1BNUlpejlHRVdZMkVtTFJEMlFOMjlQS3R1VDhFUUVQL3p6WW9Yd0d5QUVUd1RQOTlnMG9lKzJqb3o5ZzZyCm1ZNmFHQTkzazg0QkMvTDBWYVRYZFFMT21vVHBncnRGdnU5VTlXQlBOTmhVTlduVDlMb0NpYktveFhDQzV4eU0KUHJHNXluSHM0OEszWjVVUURXTTY2S1VRcDBVaTdzVndlNkU2TG11eGcvNGFyZ1A1SkptSFJFTkNTQkFvdlBMQwpaZCtYNDF6WGtsOTczVDRXSjI3WUpJcTBNZ1N4QWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJScjk3NU1TS2Y2bzRiUk5IUjhNeXUxRUJmdmFqQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQjdwYjFOakI1cgpWaWcwb1pzOFByY2thTDh2aU1DYUdVQXBRTUlQeE00bnlHREF4VEU5aXNrOWlBc1BkbWlveDNuL1JOVW8wYmpiCm8rRnYvWUxXTlJCS0xxdWpKVWVWYUoyZzVIVDlQZVQvVEdsZzhuNkgyRzFHLzFmR3UybllFdVk2S2c3bzJadGcKRG1QazJFUzAwTVkzYkgrN2VoYURoaldpbzl1N2RQVGVsdnRVaU5Kbkd0TlAwMVZMUXJhK0t6SHZpd3N2VFkrYgo5d1VsQTIzYnFNK1cxQ0hTajdSbzFFckpBVEZXamdmVnZ2UUlYRnN3TmFsemM2VW1VN3ZPSEI3cDE3MEh3WGI2ClVOd2RVek4rc2JKRElodHhwV25KOXFtVlhkVnlycTJ5Q2V1M2FKdFFDMVltcWVaZFIwOW1mSjhaS2ZMMTlpTEoKTS9rU0NvZE5ueW53Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
       eks_server                     = "https://BEE86BED6494692D4ED31C2ED2319E13.gr7.eu-west-2.eks.amazonaws.com"
