@@ -135,13 +135,19 @@ resource "aws_ecs_capacity_provider" "cdpt-chaps" {
 
   auto_scaling_group_provider {
     auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
-    # managed_termination_protection = "ENABLED"
 
     managed_scaling {
       status          = "ENABLED"
       target_capacity = 100
     }
   }
+
+  tags = merge(
+    var.local.tags,
+    {
+      Name = "${local.application_name}-capacity-provider"
+    }
+  )
 }
 
 resource "aws_ecs_cluster_capacity_providers" "cdpt-chaps" {
