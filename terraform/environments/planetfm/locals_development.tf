@@ -75,9 +75,9 @@ locals {
         security_groups                  = ["loadbalancer"]
         subnets                          = module.environment.subnets["private"].ids
         enable_cross_zone_load_balancing = true
-        access_logs                      = false #default value is true
+        access_logs                      = true #default value is true
         force_destroy_bucket             = true
-        # existing_bucket_name             = "public-lb-logs-bucket20231215103827601100000001"
+        existing_bucket_name             = "public-lb-logs-bucket20231218121709816700000001"
         # not required for testing in sandbox
         instance_target_groups = {}
         # not required for testing in sandbox
