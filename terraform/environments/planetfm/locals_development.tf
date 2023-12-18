@@ -6,7 +6,7 @@ locals {
 
     baseline_s3_buckets = {
       public-lb-logs-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
+        # custom_kms_key = module.environment.kms_keys["general"].arn
         bucket_policy_v2 = [
           {
             effect = "Allow"
@@ -82,10 +82,10 @@ locals {
         security_groups                  = ["loadbalancer"]
         subnets                          = module.environment.subnets["private"].ids
         enable_cross_zone_load_balancing = true
-        access_logs                      = true #default value is true
+        access_logs                      = false #default value is true
         log_schedule                     = "cron(0 * * * ? *)"
         force_destroy_bucket             = true
-        existing_bucket_name             = "public-lb-logs-bucket20231215103827601100000001"
+        # existing_bucket_name             = "public-lb-logs-bucket20231215103827601100000001"
         # not required for testing in sandbox
         instance_target_groups = {}
         # not required for testing in sandbox
