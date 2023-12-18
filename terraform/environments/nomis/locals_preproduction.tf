@@ -188,10 +188,38 @@ locals {
     }
 
     baseline_ec2_instances = {
+      preprod-nomis-db-1-a = merge(local.database_ec2, {
+        # cloudwatch_metric_alarms = merge(
+        #   local.database_ec2_cloudwatch_metric_alarms.standard,
+        # )
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 1000 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "preprod"
+          description       = "pre-production database for CNOMPP"
+          oracle-sids       = "" # TODO
+        })
+      })
+
       preprod-nomis-db-1-b = merge(local.database_ec2, {
         # cloudwatch_metric_alarms = merge(
-        #   local.database_ec2_cloudwatch_metric_alarms,
-        #   module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+        #   local.database_ec2_cloudwatch_metric_alarms.standard,
         # )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -220,8 +248,8 @@ locals {
 
       preprod-nomis-db-2-a = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -317,15 +345,27 @@ locals {
       }
       "preproduction.nomis.service.justice.gov.uk" = {
         records = [
-          { name = "ppnomis", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis", type = "CNAME", ttl = "300", records = ["ppnomis-a.preproduction.nomis.service.justice.gov.uk"] },
           { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
-          { name = "ppnomis-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppnomis-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppndh", type = "CNAME", ttl = "300", records = ["ppndh-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "ppndh-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppndh-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppor", type = "CNAME", ttl = "300", records = ["ppor-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "ppor-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppor-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pptrdat", type = "CNAME", ttl = "300", records = ["pptrdat-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "pptrdat-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "pptrdat-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppaudit", type = "CNAME", ttl = "300", records = ["ppaudit-a.preproduction.nomis.service.justice.gov.uk"] },
           { name = "ppaudit-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppaudit-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "ppnomisapiro", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppmis", type = "CNAME", ttl = "300", records = ["ppmis-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "ppmis-a", type = "A", ttl = "300", records = ["10.40.37.133"] },
+          { name = "ppmis-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppnomisapiro", type = "CNAME", ttl = "300", records = ["preproduction.nomis.service.justice.gov.uk"] },
           { name = "ppnomisapiro-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
-          { name = "ppnomisapiro-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppnomisapiro-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },

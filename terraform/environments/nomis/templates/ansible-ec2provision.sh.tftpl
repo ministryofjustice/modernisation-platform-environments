@@ -67,6 +67,20 @@ run_ansible() {
     fi
   done
 
+  echo "# Checking for $application-environment tag using aws cli"
+  application_environment=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=$application-environment" --output=text | head -1 | cut -f5)
+  if [[ -n $application_environment ]]; then
+    for ((i=0; i<$${#tags[@]}; i++)); do
+      tag=($${tags[i]})
+      group=$(echo "$${tag[1]}_$${tag[4]}_$${application_environment}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
+      if [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
+        ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
+      elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
+        ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
+      fi
+    done
+  fi
+
   # set python version
   if [[ $(which python3.9 2> /dev/null) ]]; then
     python=$(which python3.9)

@@ -31,7 +31,7 @@ locals {
         period              = "86400"
         statistic           = "Minimum"
         threshold           = "14"
-        alarm_description   = "Triggers if an ACM certificate has not automatically renewed and is expiring soon. Automatic renewal should happen 60 days prior to expiration."
+        alarm_description   = "Triggers if an ACM certificate has notautomatically renewed and is expiring soon. Automatic renewal should happen 60 days prior to expiration. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340266"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
@@ -46,7 +46,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "95"
-        alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 15 minutes"
+        alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 15 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326064583"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       instance-status-check-failed = {
@@ -58,7 +58,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if there has been an instance status check failure within last hour. This monitors the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
+        alarm_description   = "Triggers if there has been an instance status check failure within last hour. This monitors the software and network configuration of your individual instance. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326491009"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       system-status-check-failed = {
@@ -70,7 +70,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if there has been a system status check failure within last hour.  This monitors the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
+        alarm_description   = "Triggers if there has been a system status check failure within last hour.  This monitors the AWS systems on which your instance runs. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326359363"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
@@ -85,7 +85,7 @@ locals {
         period              = "60"
         statistic           = "Minimum"
         threshold           = "15"
-        alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4305453159/Disk+Free+alarm+-+Windows"
+        alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       high-memory-usage = {
@@ -97,7 +97,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "95"
-        alarm_description   = "Triggers if memory usage is continually high for one hour"
+        alarm_description   = "Triggers if memory usage is continually high for one hour. See See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326523370"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
@@ -112,7 +112,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "85"
-        alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
+        alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       high-memory-usage = {
@@ -124,7 +124,7 @@ locals {
         period              = "60"
         statistic           = "Average"
         threshold           = "95"
-        alarm_description   = "Triggers if memory usage is continually high for one hour"
+        alarm_description   = "Triggers if memory usage is continually high for one hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326523370"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       cpu-iowait-high = {
@@ -136,13 +136,13 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "40"
-        alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 3 hours"
+        alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 3 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
 
-    ec2_instance_cwagent_collectd_service_status = {
-      service_status_error_os_layer = {
+    ec2_instance_cwagent_collectd_service_status_os = {
+      service-status-error-os-layer = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
@@ -151,10 +151,12 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if an os-layer linux service such as chronyd or amazon-ssm-agent is stopped or in error. See collectd-service-metrics ansible role"
+        alarm_description   = "Triggers if an os-layer linux service such as chronyd or amazon-ssm-agent is stopped or in error. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615406350"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      service_status_error_app_layer = {
+    }
+    ec2_instance_cwagent_collectd_service_status_app = {
+      service-status-error-app-layer = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
@@ -163,12 +165,12 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if an application-layer linux service such as weblogic is stopped or in error. See collectd-service-metrics ansible role"
+        alarm_description   = "Triggers if an application-layer linux service such as weblogic is stopped or in error. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615406362"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
     ec2_instance_cwagent_collectd_connectivity_test = {
-      connectivity_test_all_failed = {
+      connectivity-test-all-failed = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
@@ -177,12 +179,12 @@ locals {
         period              = "60"
         statistic           = "Minimum"
         threshold           = "1"
-        alarm_description   = "Triggers if all connectivity tests fail on a host. See connectivity-tests ec2 instance tag and collectd-connectivity-test ansible role"
+        alarm_description   = "Triggers if all netcat tests defined by connectivity-tests tag fail. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615274774"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
     ec2_instance_cwagent_collectd_textfile_monitoring = {
-      textfile_monitoring_metric_error = {
+      textfile-monitoring-metric-error = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
@@ -191,10 +193,10 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if any metric collected via /opt/textfile_monitoring is in error, e.g. nomis batch or misload. See collectd-textfile-monitoring ansible role"
+        alarm_description   = "Triggers if any metric collected via /opt/textfile_monitoring is in error, e.g. nomis batch or misload. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      textfile_monitoring_metric_not_updated = {
+      textfile-monitoring-metric-not-updated = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "1"
         datapoints_to_alarm = "1"
@@ -204,12 +206,12 @@ locals {
         statistic           = "Maximum"
         threshold           = "129600"
         treat_missing_data  = "breaching"
-        alarm_description   = "Triggers if any metric in /opt/textfile_monitoring hasn't been updated for over 36 hours"
+        alarm_description   = "Triggers if any metric in /opt/textfile_monitoring hasn't been updated for over 36 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325966186"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
     ec2_instance_cwagent_collectd_oracle_db_connected = {
-      oracle_db_disconnected = {
+      oracle-db-disconnected = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
@@ -218,12 +220,12 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if an oracle database is disconnected. See oracle-sids ec2 instance tag and collectd-oracle-db-connected ansible role"
+        alarm_description   = "Triggers if an oracle database defined in oracle-sids tag is disconnected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
     ec2_instance_cwagent_collectd_oracle_db_backup = {
-      oracle_db_rman_backup_error = {
+      oracle-db-rman-backup-error = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "1"
         datapoints_to_alarm = "1"
@@ -235,7 +237,7 @@ locals {
         alarm_description   = "Triggers if a scheduled oracle rman db backup has failed. See collectd-textfile-monitoring and oracle-db-backup role"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      oracle_db_rman_backup_did_not_run = {
+      oracle-db-rman-backup-did-not-run = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "1"
         datapoints_to_alarm = "1"
@@ -259,7 +261,7 @@ locals {
         period              = "60"
         statistic           = "Average"
         threshold           = "1"
-        alarm_description   = "Triggers if the number of unhealthy hosts in the target table group is at least one for 3 minutes"
+        alarm_description   = "Triggers if the number of unhealthy hosts in the target table group is at least one for 3 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340278"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }

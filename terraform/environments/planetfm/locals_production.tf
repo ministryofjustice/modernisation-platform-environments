@@ -14,18 +14,18 @@ locals {
     baseline_acm_certificates = {
       planetfm_wildcard_cert = {
         domain_name = module.environment.domains.public.modernisation_platform
-          subject_alternate_names = [
-            "*.planetfm.service.justice.gov.uk",
-            "cafmwebx.az.justice.gov.uk",
-            "cafmwebx2.az.justice.gov.uk",
-            "cafmtx.az.justice.gov.uk",
-            "cafmtrainweb.az.justice.gov.uk",
-          ]
+        subject_alternate_names = [
+          "*.planetfm.service.justice.gov.uk",
+          "cafmwebx.az.justice.gov.uk",
+          "cafmwebx2.az.justice.gov.uk",
+          "cafmtx.az.justice.gov.uk",
+          "cafmtrainweb.az.justice.gov.uk",
+        ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for planetfm ${local.environment} domains"
-        }        
+        }
       }
     }
   }
