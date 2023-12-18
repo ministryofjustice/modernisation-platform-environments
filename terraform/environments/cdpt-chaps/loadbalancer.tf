@@ -31,7 +31,7 @@ resource "aws_security_group" "lb" {
 resource "aws_lb" "chaps_lb" {
   name                       = "chaps-load-balancer"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.chaps_lb_sc.id]
+  security_groups            = [aws_security_group.lb.id]
   subnets                    = data.aws_subnets.shared-public.ids
 }
 

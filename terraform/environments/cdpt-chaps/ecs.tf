@@ -414,7 +414,7 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.chaps_lb_sc.id]
+    security_groups = [aws_security_group.lb.id]
   }
 
   egress {
