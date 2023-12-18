@@ -13,6 +13,7 @@ variable "env_name" {
   type        = string
 }
 
+
 variable "rds_license_model" {
   description = "RDS license model to use"
   type        = string
@@ -201,4 +202,16 @@ variable "certificate_arn" {
 variable "microservice_lb_arn" {
   description = "The ARN of the load balancer to use for the target group"
   type        = string
+}
+
+variable "create_rds" {
+  description = "Whether to create an RDS instance"
+  type        = bool
+  default     = false
+}
+
+variable "create_elasticache" {
+  description = "Whether to create an Elasticache instance"
+  type        = bool
+  default     = false
 }
