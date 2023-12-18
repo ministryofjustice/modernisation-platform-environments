@@ -1,6 +1,16 @@
 {
   "accounts": {
     "development": {
+      "db_enabled": true,
+      "db_instance_class": "db.t3.small",
+      "db_user": "admin",
+      "db_allocated_storage": "75",
+      "db_name": "chaps-dev",
+      "env_name": "development",
+      "db_instance_identifier": "chaps-dev-instance",
+      "friendly_name": "Chaps development",
+      "container_instance_type": "windows",
+      "container_version": "preproduction",
       "region": "eu-west-2",
       "docker_image_tag": "development",
       "app_count": 1,
@@ -9,9 +19,20 @@
       "ec2_min_size": 2,
       "ami_image_id": "ami-06cdd5b44c17085ed",
       "instance_type": "t3.medium",
-      "key_name": ""
+      "key_name": "",
+      "s3_bucket_name": "chaps-dev-bucket"
     },
     "preproduction": {
+      "db_enabled": true,
+      "db_instance_class": "db.t3.xlarge",
+      "db_user": "admin",
+      "db_allocated_storage": "75",
+      "db_name": "chaps-preproduction",
+      "env_name": "preproduction",
+      "db_instance_identifier": "chaps-preprod-instance",
+      "friendly_name": "Chaps preproduction",
+      "container_instance_type": "windows",
+      "container_version": "preproduction",
       "region": "eu-west-2",
       "docker_image_tag": "preproduction",
       "app_count": 1,
@@ -20,9 +41,20 @@
       "ec2_min_size": 2,
       "ami_image_id": "ami-06cdd5b44c17085ed",
       "instance_type": "t3.medium",
-      "key_name": ""
+      "key_name": "",
+      "s3_bucket_name": "chaps-staging-bucket"
     },
     "production": {
+      "db_enabled": true,
+      "db_instance_class": "db.m5.xlarge",
+      "db_user": "admin",
+      "db_allocated_storage": "100",
+      "db_name": "chaps-prod",
+      "env_name": "production",
+      "db_instance_identifier": "chaps-prod-instance",
+      "friendly_name": "Chaps Production",
+      "container_instance_type": "windows",
+      "container_version": "production",
       "region": "eu-west-2",
       "docker_image_tag": "production",
       "app_count": 1,
@@ -31,7 +63,8 @@
       "ec2_min_size": 2,
       "ami_image_id": "ami-06cdd5b44c17085ed",
       "instance_type": "t3.medium",
-      "key_name": ""
+      "key_name": "",
+      "s3_bucket_name": "chaps-production-bucket"
     }
   }
 }

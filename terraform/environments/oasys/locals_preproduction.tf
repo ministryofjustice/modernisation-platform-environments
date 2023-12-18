@@ -126,7 +126,7 @@ locals {
           ])
         })
         tags = merge(local.webserver_a.tags, {
-          oracle-db-hostname = "PPODL00009.azure.noms.root" # "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
+          oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
           oracle-db-sid      = "OASPROD" # "PPOASYS"
         })
       })
@@ -327,7 +327,8 @@ locals {
           id = module.environment.vpc.id
         }
         records = [
-          # { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # uncomment when db in aws is set up
+          { name = "db.pp.${local.application_name}", type = "A", ttl = "300", records = ["10.40.40.133"] }, # for azure 
+          # { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
         ]
         lb_alias_records = [
           # { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },
@@ -356,6 +357,7 @@ locals {
         retention_in_days = 14
       }
     }
+
 
   }
 }
