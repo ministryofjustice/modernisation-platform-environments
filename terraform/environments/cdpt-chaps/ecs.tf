@@ -151,6 +151,7 @@ resource "aws_ecs_cluster_capacity_providers" "cdpt-chaps" {
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
+  vpc_zone_identifier       = sort(data.aws_subnets.shared-private.ids)
   name                      = "${local.application_name}-cluster-scaling-group"
   max_size                  = 1
   min_size                  = 1
