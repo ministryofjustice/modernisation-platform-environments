@@ -11,14 +11,13 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "s3:GetBucketLocation",
-              "s3:GetObject",
               "s3:PutObject",
             ]
             principals = {
               identifiers = ["arn:aws:iam::652711504416:root"]
               type        = "AWS"
             }
+            ressources = "arn:aws:s3:::public-lb-logs-bucket20231215103827601100000001/public/AWSLogs/326533041175/*"
           },
           {
             sid    = "AWSLogDeliveryWrite"
@@ -38,6 +37,7 @@ locals {
                 values   = ["bucket-owner-full-control"]
               }
             ]
+            resources = "arn:aws:s3:::public-lb-logs-bucket20231215103827601100000001/public/AWSLogs/326533041175/*"
           },
           {
             sid    = "AWSLogDeliveryAclCheck"
@@ -49,6 +49,7 @@ locals {
               identifiers = ["delivery.logs.amazonaws.com"]
               type        = "Service"
             }
+            resources = "arn:aws:s3:::public-lb-logs-bucket20231215103827601100000001"
           }
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
