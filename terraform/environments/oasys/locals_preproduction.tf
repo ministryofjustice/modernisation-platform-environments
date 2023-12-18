@@ -21,7 +21,7 @@ locals {
       "/oracle/bip/preprod"       = local.secretsmanager_secrets_bip
 
       # for azure, remove when migrated to aws db
-      "/oracle/database/OASPROD"  = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
     }
 
     baseline_iam_policies = {
@@ -229,8 +229,8 @@ locals {
         }
       }
       private = {
-        internal_lb = true
-        access_logs = true
+        internal_lb              = true
+        access_logs              = true
         s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false

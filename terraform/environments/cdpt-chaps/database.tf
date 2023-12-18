@@ -3,20 +3,20 @@
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-  allocated_storage	= local.application_data.accounts[local.environment].db_allocated_storage
-  storage_type = "gp2"
-  engine = "sqlserver-web"
-  engine_version = "14.00.3381.3.v1"
-  instance_class = local.application_data.accounts[local.environment].db_instance_class
-  identifier = local.application_data.accounts[local.environment].db_instance_identifier
-  username = local.application_data.accounts[local.environment].db_user
-  password = data.aws_secretsmanager_secret_version.db_password.secret_string
+  allocated_storage = local.application_data.accounts[local.environment].db_allocated_storage
+  storage_type      = "gp2"
+  engine            = "sqlserver-web"
+  engine_version    = "14.00.3381.3.v1"
+  instance_class    = local.application_data.accounts[local.environment].db_instance_class
+  identifier        = local.application_data.accounts[local.environment].db_instance_identifier
+  username          = local.application_data.accounts[local.environment].db_user
+  password          = data.aws_secretsmanager_secret_version.db_password.secret_string
 }
 
 resource "aws_db_instance_role_association" "database" {
   db_instance_identifier = aws_db_instance.database.identifier
-  feature_name = "S3_INTEGRATION"
-  role_arn = aws_iam_role.S3_db_backup_restore_access.arn
+  feature_name           = "S3_INTEGRATION"
+  role_arn               = aws_iam_role.S3_db_backup_restore_access.arn
 }
 
 output "s3_db_backup_restore_access_role_arn" {
@@ -24,19 +24,19 @@ output "s3_db_backup_restore_access_role_arn" {
 }
 
 resource "aws_security_group" "db" {
-  name = "db" 
+  name        = "db"
   description = "Allow DB inbound traffic"
   ingress {
-    from_port = 1433
-    to_port = 1433
-    protocol = "tcp"
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks	= ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -53,23 +53,23 @@ data "aws_secretsmanager_secret_version" "db_password" {
 #------------------------------------------------------------------------------
 
 resource "aws_kms_key" "rds" {
-  description = "Encryption key for rds"
+  description         = "Encryption key for rds"
   enable_key_rotation = true
-  policy = data.aws_iam_policy_document.rds-kms.json
+  policy              = data.aws_iam_policy_document.rds-kms.json
 }
 
 resource "aws_kms_alias" "rds-kms-alias" {
-  name = "alias/rds"
+  name          = "alias/rds"
   target_key_id = aws_kms_key.rds.arn
 }
 
 data "aws_iam_policy_document" "rds-kms" {
   statement {
-    effect = "Allow"
-    actions = ["kms:*"]
+    effect    = "Allow"
+    actions   = ["kms:*"]
     resources = ["*"]
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
   }
