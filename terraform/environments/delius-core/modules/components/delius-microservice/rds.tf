@@ -11,7 +11,7 @@ resource "aws_security_group" "db" {
     to_port     = var.rds_port
     security_groups = [
       var.account_config.bastion.bastion_security_group,
-      var.rds_ingress_security_groups
+      var.ingress_security_groups
     ]
   }
 
@@ -52,8 +52,8 @@ resource "aws_db_instance" "this" {
   allocated_storage                   = var.rds_allocated_storage
   max_allocated_storage               = var.rds_max_allocated_storage
   storage_type                        = var.rds_storage_type
-  maintenance_window                  = var.rds_maintenance_window
-  auto_minor_version_upgrade          = var.rds_auto_minor_version_upgrade
+  maintenance_window                  = var.maintenance_window
+  auto_minor_version_upgrade          = true
   allow_major_version_upgrade         = var.rds_auto_major_version_upgrade
   backup_window                       = var.rds_backup_window
   backup_retention_period             = var.rds_backup_retention_period
