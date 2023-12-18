@@ -1,6 +1,6 @@
 resource "aws_security_group" "db" {
   count       = var.create_rds ? 1 : 0
-  name        = "${var.name}-database-security-group"
+  name        = "${var.name}-${var.env_name}-database-security-group"
   description = "controls access to db"
   vpc_id      = var.account_config.shared_vpc_id
 
@@ -18,7 +18,7 @@ resource "aws_security_group" "db" {
   tags = merge(
     var.tags,
     {
-      Name = "${var.name}-database_security_group"
+      Name = "${var.name}-${var.env_name}-db_security_group"
     }
   )
 }

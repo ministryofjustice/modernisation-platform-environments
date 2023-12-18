@@ -1,6 +1,6 @@
 resource "aws_elasticache_subnet_group" "this" {
   count      = var.create_elasticache ? 1 : 0
-  name       = "elasticache-subnet-group-${var.name}"
+  name       = "elasticache-subnet-group-${var.name}-${var.env_name}"
   subnet_ids = var.account_config.ordered_subnets.*.id
   tags       = var.tags
 }
@@ -24,7 +24,7 @@ resource "aws_elasticache_cluster" "this" {
 
 
 resource "aws_security_group" "elasticache" {
-  count       = var.create_rds ? 1 : 0
+  count       = var.create_elasticache ? 1 : 0
   name        = "${var.name}-elasticache-security-group"
   description = "controls access to elasticache"
   vpc_id      = var.account_config.shared_vpc_id
