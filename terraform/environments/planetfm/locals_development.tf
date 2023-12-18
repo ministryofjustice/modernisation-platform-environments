@@ -65,7 +65,20 @@ locals {
         # not required for testing in sandbox
         instance_target_groups = {}
         # not required for testing in sandbox
-        listeners = {}
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "HTTP"
+            default_action = {
+              type             = "fixed-response"
+              fixed_response   = {
+                content_type = "text/plain"
+                message_body = "Private LB Reply"
+                status_code  = "503"
+              }
+            }
+          }
+        }
       }
       public = {
         internal_lb                      = true
@@ -81,7 +94,20 @@ locals {
         # not required for testing in sandbox
         instance_target_groups = {}
         # not required for testing in sandbox
-        listeners = {}
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "HTTP"
+            default_action = {
+              type             = "fixed-response"
+              fixed_response   = {
+                content_type = "text/plain"
+                message_body = "Public LB Reply"
+                status_code  = "503"
+              }
+            }
+          }
+        }
       }
     }
   }
