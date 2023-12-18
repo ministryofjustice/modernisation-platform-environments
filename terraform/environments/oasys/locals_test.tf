@@ -189,20 +189,20 @@ locals {
         })
       })
 
-      "t2-${local.application_name}-db-b" = merge(local.database_b, {
-        config = merge(local.database_b.config, {
-          instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
-          ])
-        })
-        tags = merge(local.database_b.tags, {
-          description                             = "t2 ${local.application_name} database"
-          "${local.application_name}-environment" = "t2"
-          bip-db-name                             = "T2BIPINF"
-          instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
-        })
-      })
+      # "t2-${local.application_name}-db-b" = merge(local.database_b, {
+      #   config = merge(local.database_b.config, {
+      #     instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
+      #       "Ec2T2DatabasePolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.database_b.tags, {
+      #     description                             = "t2 ${local.application_name} database"
+      #     "${local.application_name}-environment" = "t2"
+      #     bip-db-name                             = "T2BIPINF"
+      #     instance-scheduling                     = "skip-scheduling"
+      #     oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
+      #   })
+      # })
 
       # "t2-${local.application_name}-bip-b" = merge(local.bip_b, {
       #   autoscaling_group = merge(local.bip_b.autoscaling_group, {
