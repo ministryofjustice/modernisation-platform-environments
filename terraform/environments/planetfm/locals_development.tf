@@ -67,7 +67,6 @@ locals {
         subnets                          = module.environment.subnets["private"].ids
         enable_cross_zone_load_balancing = true
         access_logs                      = true #default value
-        log_schedule                     = "cron(0 * * * ? *)"
         force_destroy_bucket             = true
         # not required for testing in sandbox
         instance_target_groups = {}
@@ -83,7 +82,6 @@ locals {
         subnets                          = module.environment.subnets["private"].ids
         enable_cross_zone_load_balancing = true
         access_logs                      = false #default value is true
-        log_schedule                     = "cron(0 * * * ? *)"
         force_destroy_bucket             = true
         # existing_bucket_name             = "public-lb-logs-bucket20231215103827601100000001"
         # not required for testing in sandbox
