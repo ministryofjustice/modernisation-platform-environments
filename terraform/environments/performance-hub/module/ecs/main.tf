@@ -239,6 +239,8 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 
 resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
+
+  capacity_providers = [aws_autoscaling_group.cluster-scaling-group.name]
 }
 
 resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
