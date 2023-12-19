@@ -164,6 +164,30 @@ locals {
           deployment           = "green"
         })
       })
+      preprod-nomis-xtag-a = merge(local.xtag_ec2, {
+        autoscaling_group = merge(local.xtag_ec2.autoscaling_group, {
+          desired_capacity = 1
+        })
+        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        config = merge(local.xtag_ec2.config, {
+          ami_name = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+            "Ec2PreprodWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
+          args = merge(local.xtag_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.xtag_ec2.tags, {
+          nomis-environment    = "preprod"
+          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PPCNOM"
+          ndh-ems-hostname     = "PPPML00009.azure.hmpp.root" # preprod NDH is currently down/broken
+        })
+      })
 
       preprod-jumpserver-a = merge(local.jumpserver_ec2, {
         config = merge(local.jumpserver_ec2.config, {
@@ -346,25 +370,25 @@ locals {
       "preproduction.nomis.service.justice.gov.uk" = {
         records = [
           { name = "ppnomis", type = "CNAME", ttl = "300", records = ["ppnomis-a.preproduction.nomis.service.justice.gov.uk"] },
-          { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppnomis-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppndh", type = "CNAME", ttl = "300", records = ["ppndh-a.preproduction.nomis.service.justice.gov.uk"] },
-          { name = "ppndh-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppndh-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppndh-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppor", type = "CNAME", ttl = "300", records = ["ppor-a.preproduction.nomis.service.justice.gov.uk"] },
-          { name = "ppor-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppor-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppor-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "pptrdat", type = "CNAME", ttl = "300", records = ["pptrdat-a.preproduction.nomis.service.justice.gov.uk"] },
-          { name = "pptrdat-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "pptrdat-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "pptrdat-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppaudit", type = "CNAME", ttl = "300", records = ["ppaudit-a.preproduction.nomis.service.justice.gov.uk"] },
           { name = "ppaudit-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppaudit-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppmis", type = "CNAME", ttl = "300", records = ["ppmis-a.preproduction.nomis.service.justice.gov.uk"] },
-          { name = "ppmis-a", type = "A", ttl = "300", records = ["10.40.37.133"] },
+          { name = "ppmis-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppmis-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppnomisapiro", type = "CNAME", ttl = "300", records = ["preproduction.nomis.service.justice.gov.uk"] },
-          { name = "ppnomisapiro-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomisapiro-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppnomisapiro-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
