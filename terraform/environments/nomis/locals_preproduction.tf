@@ -237,7 +237,7 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
           description       = "pre-production database for CNOMPP"
-          oracle-sids       = "" # TODO
+          oracle-sids       = "PPCNOM PPNDH PPTRDAT"
         })
       })
 
@@ -266,7 +266,7 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
           description       = "Disaster-Recovery/High-Availability pre-production database for CNOMPP"
-          oracle-sids       = ""
+          oracle-sids       = "" # TODO
         })
       })
 
@@ -296,7 +296,8 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
           description       = "PreProduction NOMIS MIS and Audit database"
-          oracle-sids       = "PPCNMAUD"
+          oracle-sids       = "PPMIS PPCNMAUD"
+          misload-dbname    = "PPMIS"
         })
       })
     }
