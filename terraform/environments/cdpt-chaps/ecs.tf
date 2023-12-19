@@ -66,7 +66,6 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
 resource "aws_ecs_task_definition" "chaps_task_definition" {
   family                   = "chapsFamily"
   requires_compatibilities = ["EC2"]
-  network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
   container_definitions = jsonencode([
@@ -117,9 +116,6 @@ resource "aws_ecs_service" "ecs_service" {
     weight            = 1
   }
 
-  network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
-    security_groups  = [aws_security_group.ecs_service.id]
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
