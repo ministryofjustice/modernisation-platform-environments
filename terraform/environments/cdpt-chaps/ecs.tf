@@ -120,6 +120,9 @@ resource "aws_ecs_service" "ecs_service" {
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
     security_groups  = [aws_security_group.ecs_service.id]
+  ordered_placement_strategy {
+    field = "attribute:ecs.availability-zone"
+    type  = "spread"
   }
 
   load_balancer {
