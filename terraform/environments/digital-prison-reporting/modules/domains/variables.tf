@@ -353,15 +353,9 @@ variable "description" {
 }
 
 variable "create_sec_conf" {
-  type = object({
-    cloudwatch_encryption_mode = string
-    kms_key_arn                = string
-  })
-  default = {
-    cloudwatch_encryption_mode = "DISABLED"
-    kms_key_arn                = null
-  }
-  description = "(Optional) A cloudwatch_encryption block which contains encryption configuration for CloudWatch."
+  type        = bool
+  default     = true
+  description = "(Optional) Create AWS Glue Security Configuration associated with the job."
 }
 
 variable "log_group_retention_in_days" {

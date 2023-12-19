@@ -1,6 +1,6 @@
 module "glue_reporting_hub_cdc_job" {
   source                        = "../glue_job"
-  create_job                    = local.setup_cdc_job
+  create_job                    = var.setup_cdc_job
   name                          = var.glue_job_name
   short_name                    = var.glue_job_short_name
   command_type                  = "gluestreaming"
