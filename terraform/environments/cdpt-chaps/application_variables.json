@@ -1,8 +1,6 @@
 {
   "accounts": {
     "development": {
-      "region": "eu-west-2",
-      "docker_image_tag": "development",
       "db_enabled": true,
       "db_instance_class": "db.t3.small",
       "db_user": "admin",
@@ -13,6 +11,15 @@
       "friendly_name": "Chaps development",
       "container_instance_type": "windows",
       "container_version": "preproduction",
+      "region": "eu-west-2",
+      "docker_image_tag": "development",
+      "app_count": 1,
+      "ec2_desired_capacity": 1,
+      "ec2_max_size": 2,
+      "ec2_min_size": 1,
+      "ami_image_id": "ami-06cdd5b44c17085ed",
+      "instance_type": "t3.micro",
+      "key_name": "",
       "s3_bucket_name": "chaps-dev-bucket"
     },
     "preproduction": {
@@ -28,6 +35,13 @@
       "container_version": "preproduction",
       "region": "eu-west-2",
       "docker_image_tag": "preproduction",
+      "app_count": 2,
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 3,
+      "ec2_min_size": 2,
+      "ami_image_id": "ami-06cdd5b44c17085ed",
+      "instance_type": "t3.medium",
+      "key_name": "",
       "s3_bucket_name": "chaps-staging-bucket"
     },
     "production": {
@@ -43,6 +57,13 @@
       "container_version": "production",
       "region": "eu-west-2",
       "docker_image_tag": "production",
+      "app_count": 2,
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 3,
+      "ec2_min_size": 2,
+      "ami_image_id": "ami-06cdd5b44c17085ed",
+      "instance_type": "t3.medium",
+      "key_name": "",
       "s3_bucket_name": "chaps-production-bucket"
     }
   }
