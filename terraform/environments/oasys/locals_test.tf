@@ -189,25 +189,25 @@ locals {
         })
       })
 
-      "t2-${local.application_name}-db-b" = merge(local.database_b, {
-        config = merge(local.database_b.config, {
-          instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
-          ])
-        })
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "oasys-monitoring"
-          })
-        })
-        tags = merge(local.database_b.tags, {
-          description                             = "t2 ${local.application_name} database"
-          "${local.application_name}-environment" = "t2"
-          bip-db-name                             = "T2BIPINF"
-          instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
-        })
-      })
+      # "t2-${local.application_name}-db-b" = merge(local.database_b, {
+      #   config = merge(local.database_b.config, {
+      #     instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
+      #       "Ec2T2DatabasePolicy",
+      #     ])
+      #   })
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "oasys-monitoring"
+      #     })
+      #   })
+      #   tags = merge(local.database_b.tags, {
+      #     description                             = "t2 ${local.application_name} database"
+      #     "${local.application_name}-environment" = "t2"
+      #     bip-db-name                             = "T2BIPINF"
+      #     instance-scheduling                     = "skip-scheduling"
+      #     oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
+      #   })
+      # })
       # before creating bip, read https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615602365/Oracle+Guide+for+WebOps+Engineers?atlOrigin=eyJpIjoiNDllNTFkOTE0NDRiNDUyOThlYWRiNGM1MTVlYjBhOTEiLCJwIjoiY29uZmx1ZW5jZS1jaGF0cy1pbnQifQ
       # "t2-${local.application_name}-bip-b" = merge(local.bip_b, {
       #   autoscaling_group = merge(local.bip_b.autoscaling_group, {
