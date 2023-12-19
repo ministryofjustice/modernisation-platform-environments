@@ -53,28 +53,27 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "s3:PutObject",
-            ]
-            principals = {
-              identifiers = ["arn:aws:iam::652711504416:root"]
-              type        = "AWS"
-            }
-          },
-          {
-            effect = "Allow"
-            actions = [
               "s3:PutObject"
             ]
             principals = {
               identifiers = ["delivery.logs.amazonaws.com"]
               type        = "Service"
             }
-
             conditions = [
               {
                 test     = "StringEquals"
                 variable = "s3:x-amz-acl"
                 values   = ["bucket-owner-full-control"]
+              },
+              {
+                test     = "StringEquals"
+                variable = "aws:SourceAccount"
+                values   = [module.environment.account_id]
+              },
+              {
+                test     = "ArnLike"
+                variable = "aws:SourceArn"
+                values   = ["arn:aws:logs:${module.environment.region}:${module.environment.account_id}:*"]
               }
             ]
           },
@@ -87,6 +86,18 @@ locals {
               identifiers = ["delivery.logs.amazonaws.com"]
               type        = "Service"
             }
+            conditions = [
+              {
+                test     = "StringEquals"
+                variable = "aws:SourceAccount"
+                values   = [module.environment.account_id]
+              },
+              {
+                test     = "ArnLike"
+                variable = "aws:SourceArn"
+                values   = ["arn:aws:logs:${module.environment.region}:${module.environment.account_id}:*"]
+              }
+            ]
           }
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
@@ -160,9 +171,9 @@ locals {
         security_groups                  = ["loadbalancer"]
         subnets                          = module.environment.subnets["private"].ids
         enable_cross_zone_load_balancing = true
-        access_logs                      = true #default value is true
+        access_logs                      = false #default value is true
         force_destroy_bucket             = true
-        existing_bucket_name             = "network-lb-logs-bucket20231219101122706700000001"
+        # existing_bucket_name             = "network-lb-logs-bucket20231219101122706700000001"
         # not required for testing in sandbox
         instance_target_groups = {}
         # not required for testing in sandbox
