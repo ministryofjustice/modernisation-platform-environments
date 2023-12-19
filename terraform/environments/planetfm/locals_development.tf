@@ -152,6 +152,35 @@ locals {
           }
         }
       }
+      network = {
+        internal_lb                      = true
+        enable_delete_protection         = false
+        loadbalancer_type                = "network"
+        idle_timeout                     = 3600
+        security_groups                  = ["loadbalancer"]
+        subnets                          = module.environment.subnets["private"].ids
+        enable_cross_zone_load_balancing = true
+        access_logs                      = false #default value is true
+        force_destroy_bucket             = true
+        # existing_bucket_name             = "network-lb-logs-bucket20231219101122706700000001"
+        # not required for testing in sandbox
+        instance_target_groups = {}
+        # not required for testing in sandbox
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "TCP"
+            default_action = {
+              type             = "fixed-response"
+              fixed_response   = {
+                content_type = "text/plain"
+                message_body = "Network LB Reply Success"
+                status_code  = "200"
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
