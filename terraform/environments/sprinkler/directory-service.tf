@@ -6,7 +6,7 @@ resource "aws_directory_service_directory" "mmad" {
 
   vpc_settings {
     vpc_id     = data.aws_vpc.shared.id
-    subnet_ids = data.aws_subnets.shared-private.ids
+    subnet_ids = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id]
   }
 
   tags = merge(
