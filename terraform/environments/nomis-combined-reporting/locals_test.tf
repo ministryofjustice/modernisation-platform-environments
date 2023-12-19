@@ -86,9 +86,9 @@ locals {
               "secretsmanager:GetSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/t1-ncr-bip-cmc/*",
-              "arn:aws:secretsmanager:*:*:secret:/t1-ncr-bip/*",
-              "arn:aws:secretsmanager:*:*:secret:/t1-ncr-tomcat/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip-cmc/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-tomcat/t1/*",
             ]
           }
         ]
