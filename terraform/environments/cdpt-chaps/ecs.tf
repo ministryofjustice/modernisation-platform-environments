@@ -127,6 +127,13 @@ resource "aws_ecs_service" "ecs_service" {
     container_name   = "${local.application_name}-container"
     container_port   = 80
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}"
+    }
+  )
 }
 
 resource "aws_ecs_capacity_provider" "chaps" {
