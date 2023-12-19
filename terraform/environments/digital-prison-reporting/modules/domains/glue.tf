@@ -22,6 +22,7 @@ module "glue_reporting_hub_cdc_job" {
   region                        = var.account_region
   account                       = var.account_id
   log_group_retention_in_days   = var.log_group_retention_in_days
+  create_role                   = var.create_role # Set to TRUE
 
   arguments = var.arguments
 

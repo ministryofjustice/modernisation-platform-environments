@@ -455,3 +455,9 @@ variable "account_id" {
   description = "AWS Account ID."
   default     = ""
 }
+
+variable "create_role" {
+  type        = bool
+  default     = false
+  description = "(Optional) Create AWS IAM role associated with the job."
+}
