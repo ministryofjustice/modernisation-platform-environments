@@ -169,7 +169,7 @@ locals {
         listeners = {
           http = {
             port     = 80
-            protocol = "TCP"
+            protocol = "HTTP"
             default_action = {
               type             = "fixed-response"
               fixed_response   = {
