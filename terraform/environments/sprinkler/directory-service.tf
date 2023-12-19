@@ -25,7 +25,7 @@ resource "aws_secretsmanager_secret_version" "mmad" {
 }
 
 resource "random_password" "mmad" {
-  length  = 16
-  numeric = false
-  special = false
+  length      = 16
+  min_numeric = 1
+  min_special = 1
 }
