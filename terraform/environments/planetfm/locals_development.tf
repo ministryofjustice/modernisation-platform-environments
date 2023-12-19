@@ -98,7 +98,7 @@ locals {
       private = {
         internal_lb                      = true
         enable_delete_protection         = false
-        loadbalancer_type                = "application"
+        load_balancer_type               = "application"
         idle_timeout                     = 3600
         security_groups                  = ["loadbalancer"]
         subnets                          = module.environment.subnets["private"].ids
@@ -126,7 +126,7 @@ locals {
       public = {
         internal_lb                      = true
         enable_delete_protection         = false
-        loadbalancer_type                = "application"
+        load_balancer_type               = "application"
         idle_timeout                     = 3600
         security_groups                  = ["loadbalancer"]
         subnets                          = module.environment.subnets["private"].ids
@@ -155,7 +155,7 @@ locals {
       network = {
         internal_lb                      = true
         enable_delete_protection         = false
-        loadbalancer_type                = "network"
+        load_balancer_type               = "network"
         idle_timeout                     = 3600
         security_groups                  = ["loadbalancer"]
         subnets                          = module.environment.subnets["private"].ids
