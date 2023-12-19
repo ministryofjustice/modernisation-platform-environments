@@ -158,7 +158,8 @@ resource "aws_ecs_cluster_capacity_providers" "cdpt-chaps" {
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier       = sort(data.aws_subnets.shared-private.ids)
   name                      = "${local.application_name}-cluster-scaling-group"
-  max_size                  = 1
+  desired_capacity          = 2
+  max_size                  = 3
   min_size                  = 1
   health_check_grace_period = 300
 
