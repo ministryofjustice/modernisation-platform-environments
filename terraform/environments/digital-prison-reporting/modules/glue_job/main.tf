@@ -179,10 +179,10 @@ resource "aws_iam_policy" "additional-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "glue_policies" {
-  for_each = toset([
+  for_each = var.create_role ? toset([
     "arn:aws:iam::${var.account}:policy/${aws_iam_policy.additional-policy.name}",
     "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
-  ])
+  ]) : []
 
   role       = var.create_role ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
   policy_arn = each.value
