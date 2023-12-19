@@ -51,6 +51,19 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
   }
 
   statement {
+    sid    = "allowAccessToOracleDbBackupInventoryBucket"
+    effect = "Allow"
+    actions = [
+      "s3:Get*",
+      "s3:List*"
+    ]
+    resources = [
+      "${aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn}",
+      "${aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn}/*"
+    ]
+  }
+
+  statement {
     sid    = "AllowAccessToS3OracleBackups"
     effect = "Allow"
     actions = [
