@@ -74,7 +74,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_agent" {
   ip_protocol       = "tcp"
   from_port         = 3872
   to_port           = 3872
-  cidr_blocks       = var.account_config.shared_vpc_cidr
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
   security_group_id = aws_security_group.db_ec2.id
 }
 
@@ -82,14 +82,15 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_oem_upload" {
   ip_protocol       = "tcp"
   from_port         = 4903
   to_port           = 4903
-  cidr_blocks       = var.account_config.shared_vpc_cidr
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
   security_group_id = aws_security_group.db_ec2.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_db_oem_console" {
-  ip_protocol       = "tcp"
-  from_port         = 7803
-  to_port           = 7803
-  cidr_blocks       = var.account_config.shared_vpc_cidr
+  ip_protocol = "tcp"
+  from_port   = 7803
+  to_port     = 7803
+  cidr_ipv4   = var.account_config.shared_vpc_cidr
+
   security_group_id = aws_security_group.db_ec2.id
 }
