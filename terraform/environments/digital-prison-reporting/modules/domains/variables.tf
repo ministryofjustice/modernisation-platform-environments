@@ -403,6 +403,7 @@ variable "spark_event_logs" {
 variable "script_location" {
   type        = string
   description = "(Optional) Specifies the S3 path to a script that executes a job."
+  default     = ""
 }
 
 variable "enable_cont_log_filter" {
