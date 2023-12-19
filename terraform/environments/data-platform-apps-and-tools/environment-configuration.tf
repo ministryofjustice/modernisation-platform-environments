@@ -29,7 +29,22 @@ locals {
 
       # FOR EKS
       airflow_execution_role_name   = "${local.application_name}-${local.environment}-airflow-execution"
-
+      airflow_s3_bucket             = "moj-data-platform-airflow-development20230627094128036000000001" // This is defined in modernisation-platform-environments
+      airflow_dag_s3_path           = "dags/"                                                           // This is defined in modernisation-platform-environments
+      airflow_requirements_s3_path  = "requirements.txt"                                                // This is defined in modernisation-platform-environments
+      airflow_execution_role_name   = "${local.application_name}-${local.environment}-airflow-execution"
+      airflow_name                  = "${local.application_name}-${local.environment}"
+      airflow_version               = "2.6.3"
+      airflow_environment_class     = "mw1.medium"
+      airflow_max_workers           = 2
+      airflow_min_workers           = 1
+      airflow_schedulers            = 2
+      airflow_webserver_access_mode = "PUBLIC_ONLY"
+      airflow_configuration_options = {
+        "webserver.warn_deployment_exposure" = 0
+      }
+      airflow_mail_from_address               = "airflow"
+      airflow_weekly_maintenance_window_start = "SAT:00:00"
 
       ### OLDER
 
@@ -47,11 +62,21 @@ locals {
           event_source_name = "aws.partner/auth0.com/ministryofjustice-data-platform-development-a628362c-f79b-46e9-9604-7c9861565a1b/auth0.logs"
         }
       }
+      openmetadata_role = "openmetadata"
+      openmetadata_target_accounts = [
+        local.environment_management.account_ids["data-platform-development"],
+        local.environment_management.account_ids["analytical-platform-data-production"]
+      ]
       datahub_role = "openmetadata"
       datahub_target_accounts = [
         local.environment_management.account_ids["data-platform-development"],
         local.environment_management.account_ids["analytical-platform-data-production"]
       ]
+
+      observability_platform_account_id     = local.environment_management.account_ids["observability-platform-development"]
+      observability_platform_role           = "data-platform-apps-and-tools-development-prometheus"
+      observability_platform_prometheus_url = "https://aps-workspaces.eu-west-2.amazonaws.com/workspaces/ws-464eea97-631a-4e5d-af22-4c5528d9e0e6/api/v1/remote_write"
+      static_assets_hostname = "assets.development.data-platform.service.justice.gov.uk"
     }
     production = {
       eks_cluster_arn                = "arn:aws:eks:eu-west-1:312423030077:cluster/production-dBSvju9Y"
