@@ -1,4 +1,4 @@
-resource "aws_directory_service_directory" "mmad-e" {
+resource "aws_directory_service_directory" "mmad" {
   name     = "sprinkler.modernisation-platform.internal"
   password = aws_secretsmanager_secret_version.mmad.secret_string
   edition  = "Standard"
