@@ -27,7 +27,6 @@ module "glue_reporting_hub_cdc_job" {
 
   tags = merge(
     var.tags,
-    local.all_tags,
     {
       Resource_Type = "Glue Job"
     }
