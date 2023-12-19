@@ -45,7 +45,7 @@ resource "aws_dms_replication_task" "dms-replication" {
 
   migration_type            = var.migration_type
   replication_instance_arn  = aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_arn
-  replication_task_id       = "${var.project_id}-dms-s3-target-task-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
+  replication_task_id       = "${var.project_id}-${var.name}"
   source_endpoint_arn       = aws_dms_endpoint.dms-s3-target-source[0].endpoint_arn
   target_endpoint_arn       = aws_dms_s3_endpoint.dms-s3-target-endpoint[0].endpoint_arn
   table_mappings            = data.template_file.table-mappings.rendered

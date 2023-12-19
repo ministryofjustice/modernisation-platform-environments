@@ -100,7 +100,7 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
           "Parameters" : {
-            "ReplicationTaskArn" : "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
+            "ReplicationTaskArn" : "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}", # DYNAMIC
             "StartReplicationTaskType" : "reload-target"
           },
           "Next" : "Invoke DMS State Control Lambda"
@@ -112,7 +112,7 @@ module "data_ingestion_pipeline" {
           "Parameters" : {
             "Payload" : {
               "token.$" : "$$.Task.Token",
-              "replicationTaskArn" : "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}"
+              "replicationTaskArn" : "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}" # DYNAMIC
             },
             "FunctionName" : "${module.step_function_notification_lambda.lambda_function}"
           },
@@ -146,7 +146,7 @@ module "data_ingestion_pipeline" {
             "Payload" : {
               "token.$" : "$$.Task.Token",
               "sourceBucket" : "${module.s3_raw_bucket.bucket_id}",
-              "destinationBucket" : "${module.s3_raw_archive_bucket.bucket_id}"
+              "destinationBucket" : "${module.s3_raw_archive_bucket.bucket_id}" # NEW PARAM, WIP
             },
             "FunctionName" : "${module.s3_file_transfer_lambda.lambda_function}"
           },
@@ -169,24 +169,24 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : "${module.glue_hive_table_creation_job.name}"
+            "JobName" : "${module.glue_hive_table_creation_job.name}"  # NEW PARAM, WIP
           },
           "Next" : "Resume DMS Replication Task"
         },
         "Resume DMS Replication Task" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
-          "Parameters" : {
-            "ReplicationTaskArn" : "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",
+          "Parameters" : { 
+            "ReplicationTaskArn" : "${module.dms_nomis_to_s3_ingestor.dms_replication_task_arn}",   # DYNAMIC
             "StartReplicationTaskType" : "resume-processing"
           },
           "Next" : "Start Glue Streaming Job"
         },
         "Start Glue Streaming Job" : {
           "Type" : "Task",
-          "Resource" : "arn:aws:states:::glue:startJobRun",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",   # SYNC - STEP, EVALUATE the Costs
           "Parameters" : {
-            "JobName" : "${module.glue_reporting_hub_cdc_job.name}"
+            "JobName" : "${module.glue_reporting_hub_cdc_job.name}"     # NEW PARAM, WIP
           },
           "End" : true
         }
