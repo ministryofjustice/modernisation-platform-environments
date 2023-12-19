@@ -123,6 +123,11 @@ resource "aws_ecs_service" "ecs_service" {
     container_port   = 80
   }
 
+  network_configuration {
+    subnets          = data.aws_subnets.shared-public.ids
+    security_groups  = [aws_security_group.ecs_service.id]
+  }
+
   tags = merge(
     local.tags,
     {
