@@ -354,7 +354,7 @@ variable "description" {
 
 variable "create_sec_conf" {
   type        = bool
-  default     = true
+  default     = false
   description = "(Optional) Create AWS Glue Security Configuration associated with the job."
 }
 
