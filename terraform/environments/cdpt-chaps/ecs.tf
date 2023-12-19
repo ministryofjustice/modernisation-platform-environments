@@ -51,6 +51,7 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
 
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "${local.application_name}-ecs-cluster"
+
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -130,7 +131,6 @@ resource "aws_ecs_service" "ecs_service" {
   }
 }
 
-# duplicate
 resource "aws_ecs_capacity_provider" "chaps" {
   name = "${local.application_name}-ecs-capacity-provider"
 
@@ -149,29 +149,6 @@ resource "aws_ecs_capacity_provider" "chaps" {
       Name = "${local.application_name}-ecs-capacity-provider"
     }
   )
-}
-
-# TODO: remove
-resource "aws_ecs_capacity_provider" "cdpt-chaps" {
-  name = "${local.application_name}-capacity-provider"
-
-  auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.temp.arn
-  }
-}
-
-# TODO: remove
-resource "aws_autoscaling_group" "temp" {
-  vpc_zone_identifier       = sort(data.aws_subnets.shared-private.ids)
-  name                      = "${local.application_name}-cluster-scaling-group-temp"
-  max_size                  = 1
-  min_size                  = 1
-  health_check_grace_period = 300
-
-  launch_template {
-    id      = aws_launch_template.ec2-launch-template.id
-    version = "$Latest"
-  }
 }
 
 resource "aws_ecs_cluster_capacity_providers" "cdpt-chaps" {
