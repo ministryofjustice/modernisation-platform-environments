@@ -189,7 +189,7 @@ locals {
               unhealthy_threshold = 2
             }
             attachments = [
-              { ec2_instance_name = "pp-cafm-test-1" },
+              # { ec2_instance_name = "pp-cafm-test-1" },
             ]
           }
         }
