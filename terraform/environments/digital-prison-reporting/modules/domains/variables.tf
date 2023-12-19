@@ -342,7 +342,7 @@ variable "glue_job_name" {
   default     = ""  
 }
 
-variable "short_name" {
+variable "glue_job_short_name" {
   description = "Name of the Glue CDC Job"
   default     = ""  
 }
@@ -377,7 +377,7 @@ variable "language" {
   description = "(Optional) The script programming language."
 
   validation {
-    condition     = contains(["scala", "python"], var.job_language)
+    condition     = contains(["scala", "python"], var.language)
     error_message = "Accepts a value of 'scala' or 'python'."
   }
 }
@@ -428,7 +428,7 @@ variable "reporting_hub_cdc_job_worker_type" {
   description = "(Optional) The type of predefined worker that is allocated when a job runs."
 
   validation {
-    condition     = contains(["Standard", "G.1X", "G.2X"], var.worker_type)
+    condition     = contains(["Standard", "G.1X", "G.2X"], var.reporting_hub_cdc_job_worker_type)
     error_message = "Accepts a value of Standard, G.1X, or G.2X."
   }
 }
