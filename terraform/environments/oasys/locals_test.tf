@@ -164,7 +164,7 @@ locals {
           oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
         })
       })
-
+      # before creating bip, read https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615602365/Oracle+Guide+for+WebOps+Engineers?atlOrigin=eyJpIjoiNDllNTFkOTE0NDRiNDUyOThlYWRiNGM1MTVlYjBhOTEiLCJwIjoiY29uZmx1ZW5jZS1jaGF0cy1pbnQifQ
       "t2-${local.application_name}-bip-a" = merge(local.bip_a, {
         autoscaling_group = merge(local.bip_a.autoscaling_group, {
           desired_capacity = 1
@@ -189,44 +189,44 @@ locals {
         })
       })
 
-      "t2-${local.application_name}-db-b" = merge(local.database_b, {
-        config = merge(local.database_b.config, {
-          instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
-          ])
-        })
-        tags = merge(local.database_b.tags, {
-          description                             = "t2 ${local.application_name} database"
-          "${local.application_name}-environment" = "t2"
-          bip-db-name                             = "T2BIPINF"
-          instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
-        })
-      })
-
-      "t2-${local.application_name}-bip-b" = merge(local.bip_b, {
-        autoscaling_group = merge(local.bip_b.autoscaling_group, {
-          desired_capacity = 1
-        })
-        autoscaling_schedules = {}
-        config = merge(local.bip_b.config, {
-          instance_profile_policies = concat(local.bip_b.config.instance_profile_policies, [
-            "Ec2T2BipPolicy",
-          ])
-        })
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "bip-better-restart"
-          })
-        })
-        tags = merge(local.bip_b.tags, {
-          oasys-environment = "t2"
-          bip-db-name       = "T2BIPINF"
-          bip-db-hostname   = "t2-oasys-db-b"
-          oasys-db-name     = "T2OASYS"
-          oasys-db-hostname = "t2-oasys-db-b"
-        })
-      })
+      # "t2-${local.application_name}-db-b" = merge(local.database_b, {
+      #   config = merge(local.database_b.config, {
+      #     instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
+      #       "Ec2T2DatabasePolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.database_b.tags, {
+      #     description                             = "t2 ${local.application_name} database"
+      #     "${local.application_name}-environment" = "t2"
+      #     bip-db-name                             = "T2BIPINF"
+      #     instance-scheduling                     = "skip-scheduling"
+      #     oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
+      #   })
+      # })
+      # before creating bip, read https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615602365/Oracle+Guide+for+WebOps+Engineers?atlOrigin=eyJpIjoiNDllNTFkOTE0NDRiNDUyOThlYWRiNGM1MTVlYjBhOTEiLCJwIjoiY29uZmx1ZW5jZS1jaGF0cy1pbnQifQ
+      # "t2-${local.application_name}-bip-b" = merge(local.bip_b, {
+      #   autoscaling_group = merge(local.bip_b.autoscaling_group, {
+      #     desired_capacity = 1
+      #   })
+      #   autoscaling_schedules = {}
+      #   config = merge(local.bip_b.config, {
+      #     instance_profile_policies = concat(local.bip_b.config.instance_profile_policies, [
+      #       "Ec2T2BipPolicy",
+      #     ])
+      #   })
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "bip-better-restart"
+      #     })
+      #   })
+      #   tags = merge(local.bip_b.tags, {
+      #     oasys-environment = "t2"
+      #     bip-db-name       = "T2BIPINF"
+      #     bip-db-hostname   = "t2-oasys-db-b"
+      #     oasys-db-name     = "T2OASYS"
+      #     oasys-db-hostname = "t2-oasys-db-b"
+      #   })
+      # })
 
       ##
       ## T1
