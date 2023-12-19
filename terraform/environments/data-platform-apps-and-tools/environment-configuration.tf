@@ -27,7 +27,7 @@ locals {
       }
       eks_sso_access_role = "modernisation-platform-sandbox"
 
-      # FOR EKS
+      /* Airflow */
       airflow_execution_role_name   = "${local.application_name}-${local.environment}-airflow-execution"
       airflow_s3_bucket             = "moj-data-platform-airflow-development20230627094128036000000001" // This is defined in modernisation-platform-environments
       airflow_dag_s3_path           = "dags/"                                                           // This is defined in modernisation-platform-environments
@@ -79,10 +79,66 @@ locals {
       static_assets_hostname = "assets.development.data-platform.service.justice.gov.uk"
     }
     production = {
+      /* VPC */
+      vpc_cidr                   = "10.27.128.0/21"
+      vpc_private_subnets        = ["10.27.130.0/23", "10.27.132.0/23", "10.27.134.0/23"]
+      vpc_public_subnets         = ["10.27.128.0/27", "10.27.128.32/27", "10.27.128.64/27"]
+      vpc_database_subnets       = ["10.27.128.96/27", "10.27.128.128/27", "10.27.128.160/27"]
+      vpc_enable_nat_gateway     = true
+      vpc_one_nat_gateway_per_az = false
+
+      /* EKS */
+      eks_cluster_name = "apps-tools-${local.environment}"
+      eks_versions = {
+        cluster                   = "1.28"
+        ami_release               = "1.16.0-d2d9cf87" // [major version].[minor version].[patch version]-[first 8 chars of commit SHA]. Get the SHA from here: https://github.com/bottlerocket-os/bottlerocket/releases
+        addon_coredns             = "v1.10.1-eksbuild.5"
+        addon_kube_proxy          = "v1.28.2-eksbuild.2"
+        addon_vpc_cni             = "v1.15.3-eksbuild.1"
+        addon_aws_guardduty_agent = "v1.3.1-eksbuild.1"
+        addon_ebs_csi_driver      = "v1.24.1-eksbuild.1"
+        addon_efs_csi_driver      = "v1.7.0-eksbuild.1"
+      }
+      eks_sso_access_role = "modernisation-platform-developer"
+
+      /* Airflow */
+      airflow_s3_bucket             = "moj-data-platform-airflow-production20230908140747954800000002" // This is defined in modernisation-platform-environments
+      airflow_dag_s3_path           = "dags/"                                                          // This is defined in modernisation-platform-environments
+      airflow_requirements_s3_path  = "requirements.txt"                                               // This is defined in modernisation-platform-environments
+      airflow_execution_role_name   = "${local.application_name}-${local.environment}-airflow-execution"
+      airflow_name                  = "${local.application_name}-${local.environment}"
+      airflow_version               = "2.6.3"
+      airflow_environment_class     = "mw1.medium"
+      airflow_max_workers           = 2
+      airflow_min_workers           = 1
+      airflow_schedulers            = 2
+      airflow_webserver_access_mode = "PUBLIC_ONLY"
+      airflow_configuration_options = {
+        "webserver.warn_deployment_exposure" = 0
+      }
+      airflow_mail_from_address               = "airflow"
+      airflow_weekly_maintenance_window_start = "SAT:00:00"
+
+      /* Open Metadata */
+      openmetadata_role = "openmetadata"
+      openmetadata_target_accounts = [
+        local.environment_management.account_ids["data-platform-production"],
+        local.environment_management.account_ids["analytical-platform-data-production"]
+      ]
+
+      /* Observability Platform */
+      observability_platform_account_id     = local.environment_management.account_ids["observability-platform-production"]
+      observability_platform_role           = "data-platform-apps-and-tools-production-prometheus"
+      observability_platform_prometheus_url = "https://aps-workspaces.eu-west-2.amazonaws.com/workspaces/ws-55a65e9b-aab9-47a0-88b4-8275c50f1ff9/api/v1/remote_write"
+
+      /* Static Assets */
+      static_assets_hostname = "assets.data-platform.service.justice.gov.uk"
+
+      ### OLD
       eks_cluster_arn                = "arn:aws:eks:eu-west-1:312423030077:cluster/production-dBSvju9Y"
       eks_certificate_authority_data = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM1ekNDQWMrZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeE1EZ3lOREV5TVRBd05Gb1hEVE14TURneU1qRXlNVEF3TkZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTGtyCllrNVhVT3VyU3M0T2o3aE5XRE0zSC9vUnhUMmY0c014eGJoMEEwM010OXQ5SUtBaWM2TFpiMlZJd3VobG14bUIKaVhuSEtXSHREbi85NUwwdEgvWURnN3VFSXVMa2xMS3F0NjRVWlFFWHNocElaakxpNFU1bW03WWttT1N4VjFYSQo4bXJ4VEhaRGZ1NHZwdURUSWdmR2szTE8rTXBBZVgrTFNFM1JVSWR4UFo1eDVzYloyU29NWkFYekRnaHEzOU9RCjY3WVNFdmRYS1Bkd1JDUnR0d2k4OGVuOGpxanRZMFB5dUVaMVQzRjVPeWhBMjNQWVBMam10aWt2akNwMmNKOTkKZnhUNG1NNWsyUUlxQmxZWTRzR0s3dzhTL1I2VGxtL1g4KzBjeWhyU2FmMjh2dUNVL0dXZVJ6MWhYa05rV2FKTQpkampuWElzeFRkc0tGc1RUMzVVQ0F3RUFBYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZQVkpZMGlHcW9RODlmMy9sbkNsdUQ4NnZvUDNNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFBb2tScklHRzRWbVBGMnBhV3dSdEdhU01NVnBaWDdRRGhEL0tSajY5NXZLOU1YaDJnSgpPeWR3enRJd2tMalNjZUhaZTJocE9DNkt3VUxMbFJYRzJRbXhzUnJtaEM5NU8xWEM1cURZV2JFRUoxUnpsUkJGCkdQT1FMQ0tWTnc4b21KTlRXcDdTTDgxeFBiZCtnNm1KSlB3UHQ2cVJHNTBaMnRVSzZVRnZSbVRUcXl3Z1U4UXkKemp5cFJMVkJtQWc3Tkw3MW9zS0x4T25qUHRHNDl4eVNTVExQaGpDSzlIUnM5bXJDaVJ0RWo1b2EwUHY3d2hIOQpWQS8yYVVmRTA5cjg4dXFYWHIvZlNoY1FXSlhmU1gvYVVIbFZwK0NJU2tHUkJscmFKc3ZHSlZ3UWJRR3ZvTGZmCnMyTFo3M1EzbHpDM2VOajJ6WTcrbTdlazVLOUJEc29oK2lWeAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
       eks_server                     = "https://EB06461747C1D40013EE978C4D8D1755.gr7.eu-west-1.eks.amazonaws.com"
-      eks_cluster_name               = "production-dBSvju9Y"
+      eks_cluster_name               = "apps-tools-production"
       route53_zone                   = "apps-tools.data-platform.service.justice.gov.uk"
       ses_domain_identity            = "apps-tools.data-platform.service.justice.gov.uk"
       auth0_log_streams = {
