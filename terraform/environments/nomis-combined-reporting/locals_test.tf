@@ -43,9 +43,9 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "/t1-ncr-bip-cmc" = local.bip_cmc_secretsmanager_secrets
-      "/t1-ncr-bip"     = local.bip_secretsmanager_secrets
-      "/t1-ncr-tomcat"  = local.tomcat_secretsmanager_secrets
+      "bipcmc/t1" = local.bip_cmc_secretsmanager_secrets
+      "bip/t1"     = local.bip_secretsmanager_secrets
+      "tomcat/t1"  = local.tomcat_secretsmanager_secrets
 
       "/oracle/database/T1BIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/T1BIPAUD" = local.database_secretsmanager_secrets
