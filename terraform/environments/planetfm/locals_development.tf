@@ -48,6 +48,49 @@ locals {
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
+      network-lb-logs-bucket = {
+        bucket_policy_v2 = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:PutObject",
+            ]
+            principals = {
+              identifiers = ["arn:aws:iam::652711504416:root"]
+              type        = "AWS"
+            }
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "s3:PutObject"
+            ]
+            principals = {
+              identifiers = ["delivery.logs.amazonaws.com"]
+              type        = "Service"
+            }
+
+            conditions = [
+              {
+                test     = "StringEquals"
+                variable = "s3:x-amz-acl"
+                values   = ["bucket-owner-full-control"]
+              }
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetBucketAcl"
+            ]
+            principals = {
+              identifiers = ["delivery.logs.amazonaws.com"]
+              type        = "Service"
+            }
+          }
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
     }
 
     baseline_lbs = {
