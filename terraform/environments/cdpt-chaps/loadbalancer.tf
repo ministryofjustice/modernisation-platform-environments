@@ -36,7 +36,7 @@ resource "aws_lb" "chaps_lb" {
 }
 
 resource "aws_lb_target_group" "chaps_target_group" {
-  name                 = "chaps-tg"
+  name                 = "chaps-target-group"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
