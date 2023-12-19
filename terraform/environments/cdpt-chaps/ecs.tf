@@ -94,10 +94,6 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       ]
     }
   ])
-  runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
-    cpu_architecture        = "X86_64"
-  }
 }
 
 resource "aws_ecs_service" "ecs_service" {
