@@ -66,6 +66,7 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
 resource "aws_ecs_task_definition" "chaps_task_definition" {
   family                   = "chapsFamily"
   requires_compatibilities = ["EC2"]
+  network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
   container_definitions = jsonencode([
@@ -79,7 +80,6 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
         {
           containerPort = 80
           protocol      = "tcp"
-          hostPort      = 8080
         }
       ]
       logConfiguration = {
