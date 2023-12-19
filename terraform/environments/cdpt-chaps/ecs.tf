@@ -79,7 +79,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
         {
           containerPort = 80
           protocol      = "tcp"
-          hostPort      = 80
+          hostPort      = 8080
         }
       ]
       logConfiguration = {
