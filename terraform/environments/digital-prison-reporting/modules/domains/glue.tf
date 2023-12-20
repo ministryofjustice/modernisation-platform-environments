@@ -64,7 +64,7 @@ module "glue_reporting_hub_batch_job" {
 
   arguments                     = var.glue_batch_arguments
 
-  tags =   tags = merge(
+  tags = merge(
     var.tags,
     {
       Resource_Type = "Glue Job"
