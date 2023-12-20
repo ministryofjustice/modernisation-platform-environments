@@ -115,19 +115,18 @@ locals {
       description = "Allows licensing metrics to be captured"
       statements = [
         {
-          "Action" : [
+          effect = "Allow"
+          actions = [
             "s3:PutObject",
             "s3:GetObject",
             "s3:PutObjectAcl",
             "s3:ListBucket",
             "s3:DeleteObject"
           ],
-          "Resource" : [
+          resources = [
             "arn:aws:s3:::license-manager-artifact-bucket/*",
             "arn:aws:s3:::license-manager-artifact-bucket"
           ],
-          "Effect" : "Allow",
-          "Sid" : "SSMS3BucketPolicy"
         }
       ]
     }
