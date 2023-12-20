@@ -105,7 +105,7 @@ resource "aws_ecs_service" "ecs_service" {
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
-  health_check_grace_period_seconds = 180
+  health_check_grace_period_seconds = 60
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.chaps.name
@@ -168,7 +168,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   desired_capacity          = local.application_data.accounts[local.environment].ec2_desired_capacity
   max_size                  = local.application_data.accounts[local.environment].ec2_max_size
   min_size                  = local.application_data.accounts[local.environment].ec2_min_size
-  health_check_grace_period = 300
+  health_check_grace_period = 60
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
