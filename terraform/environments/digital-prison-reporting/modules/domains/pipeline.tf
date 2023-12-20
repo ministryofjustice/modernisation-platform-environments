@@ -37,7 +37,7 @@ module "data_ingestion_pipeline" {
         },
         "Invoke DMS State Control Lambda" : {
           "Type" : "Task",
-          "TimeoutSeconds" : local.dms_task_time_out,
+          "TimeoutSeconds" : var.pipeline_dms_task_time_out,
           "Resource" : "arn:aws:states:::lambda:invoke.waitForTaskToken",
           "Parameters" : {
             "Payload" : {
