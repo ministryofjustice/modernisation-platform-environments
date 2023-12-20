@@ -9,6 +9,7 @@ locals {
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy","Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
+    var.options.enable_ec2_oracle_license_tracking ? ["Ec2OracleLicenseTrackingPolicy"] : [],
     var.options.iam_policies_filter,
     "EC2Default",
   ])
@@ -108,6 +109,27 @@ locals {
     Ec2OracleEnterpriseManagerPolicy = {
       description = "Permissions required for Oracle Enterprise Manager"
       statements = local.iam_policy_statements_ec2.OracleEnterpriseManager
+    }
+
+    Ec2OracleLicenseTrackingPolicy = {
+      description = "Allows licensing metrics to be captured"
+      statements = [
+        {
+          "Action" : [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:PutObjectAcl",
+            "s3:ListBucket",
+            "s3:DeleteObject"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::license-manager-artifact-bucket/*",
+            "arn:aws:s3:::license-manager-artifact-bucket"
+          ],
+          "Effect" : "Allow",
+          "Sid" : "SSMS3BucketPolicy"
+        }
+      ]
     }
 
     SSMManagedInstanceCoreReducedPolicy = {

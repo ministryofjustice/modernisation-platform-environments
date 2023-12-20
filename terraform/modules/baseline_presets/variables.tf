@@ -26,6 +26,7 @@ variable "options" {
     enable_ec2_reduced_ssm_policy                = optional(bool, false)
     enable_ec2_oracle_enterprise_managed_server  = optional(bool, false)
     enable_ec2_oracle_enterprise_manager         = optional(bool, false)
+    enable_ec2_oracle_license_tracking           = optional(bool, false)
     enable_ec2_user_keypair                      = optional(bool, false)
     enable_shared_s3                             = optional(bool, false)
     db_backup_s3                                 = optional(bool, false)
