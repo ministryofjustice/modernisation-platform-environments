@@ -58,30 +58,6 @@ resource "aws_lb_target_group" "chaps_target_group" {
   }
 }
 
-# TODO: delete
-resource "aws_lb_target_group" "chaps_tg" {
-  name                 = "chaps-tg"
-  port                 = 80
-  protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
-  deregistration_delay = 30
-
-  stickiness {
-    type = "lb_cookie"
-  }
-
-  health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
-    protocol            = "HTTP"
-    port                = "80"
-    unhealthy_threshold = "5"
-    matcher             = "200-499"
-    timeout             = "10"
-  }
-}
-
 resource "aws_lb_listener" "listener" {
   #checkov:skip=CKV_AWS_103
   load_balancer_arn = aws_lb.chaps_lb.arn
