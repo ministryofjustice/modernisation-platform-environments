@@ -36,15 +36,23 @@ variable "extra_attributes" {
 }
 
 variable "dms_source_name" {
-  type = string
+  type        = string
+  default     = ""  
 }
 
 variable "dms_target_name" {
-  type = string
+  type        = string
+  default     = ""  
 }
 
 variable "short_name" {
-  type = string
+  type        = string
+  default     = ""  
+}
+
+variable "source_address" {
+  default     = ""
+  description = "Default Source Address"    
 }
 
 variable "bucket_name" {
