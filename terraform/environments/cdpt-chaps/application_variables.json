@@ -7,7 +7,7 @@
       "db_allocated_storage": "75",
       "db_name": "chaps-dev",
       "env_name": "development",
-      "db_instance_identifier": "chaps-dev-instance",
+      "db_instance_identifier": "db-chaps-dev",
       "friendly_name": "Chaps development",
       "container_instance_type": "windows",
       "container_version": "preproduction",
