@@ -1,0 +1,1530 @@
+data.terraform_remote_state.core_network_services: Reading...
+random_password.openmetadata: Refreshing state... [id=none]
+random_uuid.openmetadata_jwt: Refreshing state... [id=40d1231d-3fd4-1af9-47b2-b5487c74bf67]
+data.http.environments_file: Reading...
+random_password.openmetadata_airflow: Refreshing state... [id=none]
+random_password.datahub_rds: Refreshing state... [id=none]
+random_password.opensearch: Refreshing state... [id=none]
+data.http.environments_file: Read complete after 0s [id=https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/data-platform-apps-and-tools.json]
+data.aws_ssm_parameter.modernisation_platform_account_id: Reading...
+data.aws_caller_identity.original_session: Reading...
+data.aws_caller_identity.original_session: Read complete after 0s [id=335889174965]
+data.aws_iam_session_context.whoami: Reading...
+data.aws_ssm_parameter.modernisation_platform_account_id: Read complete after 0s [id=modernisation_platform_account_id]
+data.terraform_remote_state.core_network_services: Read complete after 0s
+data.aws_iam_session_context.whoami: Read complete after 0s [id=arn:aws:sts::335889174965:assumed-role/AWSReservedSSO_AdministratorAccess_9856bdc1d4a830de/ep-93@digital.justice.gov.uk]
+data.aws_caller_identity.modernisation_platform: Reading...
+data.aws_secretsmanager_secret.environment_management: Reading...
+data.aws_caller_identity.modernisation_platform: Read complete after 0s [id=946070829339]
+data.aws_secretsmanager_secret.environment_management: Read complete after 1s [id=arn:aws:secretsmanager:eu-west-2:946070829339:secret:environment_management-BLRCDb]
+data.aws_secretsmanager_secret_version.environment_management: Reading...
+data.aws_secretsmanager_secret_version.environment_management: Read complete after 0s [id=arn:aws:secretsmanager:eu-west-2:946070829339:secret:environment_management-BLRCDb|AWSCURRENT]
+module.cluster_autoscaler_role.data.aws_caller_identity.current: Reading...
+module.auth0_log_streams["ministryofjustice-data-platform-development"].data.aws_caller_identity.current: Reading...
+module.auth0_log_streams["dev-analytics-moj"].data.aws_caller_identity.current: Reading...
+module.auth0_log_streams["dev-analytics-moj"].data.aws_region.current: Reading...
+data.aws_route53_zone.apps_tools: Reading...
+module.external_dns_role.data.aws_caller_identity.current: Reading...
+module.auth0_log_streams["ministryofjustice-data-platform-development"].data.aws_region.current: Reading...
+data.aws_eks_cluster.apps_and_tools: Reading...
+module.auth0_log_streams["dev-analytics-moj"].data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.datahub_rds.module.db_instance.data.aws_partition.current: Reading...
+module.datahub_rds.module.db_instance.data.aws_partition.current: Read complete after 0s [id=aws]
+module.efs_csi_driver_role.data.aws_region.current: Reading...
+module.openmetadata_rds.module.db_instance.data.aws_iam_policy_document.enhanced_monitoring: Reading...
+module.efs_csi_driver_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.openmetadata_rds.module.db_instance.data.aws_iam_policy_document.enhanced_monitoring: Read complete after 0s [id=76086537]
+module.iam_assumable_role_admin.data.aws_caller_identity.current: Reading...
+module.openmetadata_rds.module.db_instance.data.aws_partition.current: Reading...
+module.openmetadata_rds.module.db_instance.data.aws_partition.current: Read complete after 0s [id=aws]
+data.aws_db_subnet_group.db_subnet_group: Reading...
+module.auth0_log_streams["dev-analytics-moj"].data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.velero_role.data.aws_caller_identity.current: Reading...
+module.cluster_autoscaler_role.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.openmetadata_airflow_iam_role.data.aws_region.current: Reading...
+module.eks.data.aws_partition.current: Reading...
+module.openmetadata_airflow_iam_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.eks.data.aws_partition.current: Read complete after 0s [id=aws]
+module.datahub_iam_role.data.aws_caller_identity.current: Reading...
+module.datahub_rds.module.db_instance.data.aws_iam_policy_document.enhanced_monitoring: Reading...
+module.datahub_rds.module.db_instance.data.aws_iam_policy_document.enhanced_monitoring: Read complete after 0s [id=76086537]
+module.cluster_autoscaler_role.data.aws_partition.current: Reading...
+module.cluster_autoscaler_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.observability_platform_tenant.data.aws_iam_policy_document.assume: Reading...
+module.observability_platform_tenant.data.aws_iam_policy_document.assume: Read complete after 0s [id=2696902474]
+module.prometheus_iam_role.data.aws_region.current: Reading...
+module.prometheus_iam_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+data.aws_organizations_organization.root_account: Reading...
+data.aws_caller_identity.current: Reading...
+module.auth0_log_streams["ministryofjustice-data-platform-development"].data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.prometheus_iam_role.data.aws_caller_identity.current: Reading...
+module.external_dns_role.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+data.aws_availability_zones.available: Reading...
+module.velero_role.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.iam_assumable_role_admin.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+data.aws_secretsmanager_secret_version.openmetadata_entra_id_client_id: Reading...
+module.datahub_rds_kms.data.aws_partition.current[0]: Reading...
+module.datahub_rds_kms.data.aws_partition.current[0]: Read complete after 0s [id=aws]
+module.openmetadata_airflow_iam_role.data.aws_partition.current: Reading...
+module.openmetadata_airflow_iam_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.velero_s3_bucket.data.aws_caller_identity.current: Reading...
+module.datahub_iam_role.data.aws_caller_identity.current: Read complete after 1s [id=335889174965]
+module.efs_csi_driver_role.data.aws_iam_policy_document.efs_csi[0]: Reading...
+module.efs_csi_driver_role.data.aws_iam_policy_document.efs_csi[0]: Read complete after 0s [id=3064053908]
+module.airflow_execution_role.data.aws_partition.current: Reading...
+module.airflow_execution_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.prometheus_iam_role.data.aws_caller_identity.current: Read complete after 1s [id=335889174965]
+module.openmetadata_airflow_rds_kms.data.aws_caller_identity.current[0]: Reading...
+module.openmetadata_airflow_iam_role.data.aws_caller_identity.current: Reading...
+module.velero_s3_bucket.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.openmetadata_efs_kms.data.aws_partition.current[0]: Reading...
+data.aws_caller_identity.current: Read complete after 1s [id=335889174965]
+module.openmetadata_efs_kms.data.aws_partition.current[0]: Read complete after 0s [id=aws]
+module.ebs_csi_driver_role.data.aws_region.current: Reading...
+data.aws_vpc.shared: Reading...
+module.ebs_csi_driver_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.vpc.data.aws_iam_policy_document.flow_log_cloudwatch_assume_role[0]: Reading...
+module.vpc.data.aws_iam_policy_document.flow_log_cloudwatch_assume_role[0]: Read complete after 0s [id=1021377347]
+module.prometheus_iam_role.data.aws_partition.current: Reading...
+module.prometheus_iam_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.eks.module.kms.data.aws_caller_identity.current[0]: Reading...
+module.openmetadata_airflow_rds_kms.data.aws_caller_identity.current[0]: Read complete after 0s [id=335889174965]
+module.eks.aws_cloudwatch_log_group.this[0]: Refreshing state... [id=/aws/eks/apps-tools-development/cluster]
+module.openmetadata_airflow_iam_role.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.ebs_csi_driver_role.data.aws_partition.current: Reading...
+module.ebs_csi_driver_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.eks.module.kms.data.aws_partition.current[0]: Reading...
+module.eks.module.kms.data.aws_partition.current[0]: Read complete after 0s [id=aws]
+module.datahub_rds_kms.data.aws_caller_identity.current[0]: Reading...
+module.eks.module.kms.data.aws_caller_identity.current[0]: Read complete after 0s [id=335889174965]
+module.openmetadata_rds_kms.data.aws_caller_identity.current[0]: Reading...
+module.datahub_rds_kms.data.aws_caller_identity.current[0]: Read complete after 0s [id=335889174965]
+module.openmetadata_rds.module.db_parameter_group.aws_db_parameter_group.this[0]: Refreshing state... [id=openmetadata-20231006130300907500000001]
+module.openmetadata_rds_kms.data.aws_caller_identity.current[0]: Read complete after 0s [id=335889174965]
+module.openmetadata_rds_kms.data.aws_partition.current[0]: Reading...
+module.openmetadata_rds_kms.data.aws_partition.current[0]: Read complete after 0s [id=aws]
+aws_route53_zone.apps_tools: Refreshing state... [id=Z00349352A8S0N33WNL7B]
+data.aws_eks_cluster.apps_and_tools: Read complete after 1s [id=apps-tools-development]
+module.openmetadata_opensearch_kms.data.aws_partition.current[0]: Reading...
+data.aws_secretsmanager_secret_version.openmetadata_entra_id_client_id: Read complete after 1s [id=openmetadata/entra-id/client-id|AWSCURRENT]
+module.airflow_s3_bucket.data.aws_caller_identity.current: Reading...
+module.openmetadata_opensearch_kms.data.aws_partition.current[0]: Read complete after 0s [id=aws]
+module.external_secrets_role.data.aws_region.current: Reading...
+module.external_secrets_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.eks.module.eks_managed_node_group["general"].data.aws_caller_identity.current: Reading...
+module.eks.module.eks_managed_node_group["general"].data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].module.kms_key.data.aws_partition.current[0]: Reading...
+module.auth0_log_streams["ministryofjustice-data-platform-development"].module.kms_key.data.aws_partition.current[0]: Read complete after 0s [id=aws]
+module.auth0_log_streams["dev-analytics-moj"].module.kms_key.data.aws_partition.current[0]: Reading...
+module.auth0_log_streams["dev-analytics-moj"].module.kms_key.data.aws_partition.current[0]: Read complete after 0s [id=aws]
+module.velero_role.data.aws_partition.current: Reading...
+module.velero_role.data.aws_partition.current: Read complete after 0s [id=aws]
+data.aws_iam_policy_document.datahub: Reading...
+data.aws_iam_policy_document.datahub: Read complete after 0s [id=1776568014]
+data.aws_vpc.dedicated: Reading...
+module.airflow_s3_bucket.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.external_secrets_role.data.aws_iam_policy_document.external_secrets[0]: Reading...
+data.aws_availability_zones.available: Read complete after 1s [id=eu-west-2]
+data.aws_kms_key.ebs_shared: Reading...
+module.external_secrets_role.data.aws_iam_policy_document.external_secrets[0]: Read complete after 0s [id=2831063531]
+module.vpc.aws_vpc.this[0]: Refreshing state... [id=vpc-0604535a243e42c40]
+data.aws_db_subnet_group.db_subnet_group: Read complete after 1s [id=data-platform-apps-and-tools-development]
+module.cluster_autoscaler_role.data.aws_region.current: Reading...
+module.cluster_autoscaler_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.openmetadata_airflow_rds_kms.data.aws_partition.current[0]: Reading...
+module.openmetadata_airflow_rds_kms.data.aws_partition.current[0]: Read complete after 0s [id=aws]
+module.openmetadata_opensearch_kms.data.aws_caller_identity.current[0]: Reading...
+data.aws_iam_roles.eks_sso_access_role: Reading...
+module.openmetadata_opensearch_kms.data.aws_caller_identity.current[0]: Read complete after 0s [id=335889174965]
+module.openmetadata_airflow_rds.module.db_parameter_group.aws_db_parameter_group.this[0]: Refreshing state... [id=openmetadata-airflow-20231006115619994500000002]
+data.aws_kms_key.ebs_shared: Read complete after 0s [id=e40b98ff-dcc6-4a3b-90b2-2ca646f951f2]
+module.eks.module.eks_managed_node_group["general"].data.aws_partition.current: Reading...
+module.eks.module.eks_managed_node_group["general"].data.aws_partition.current: Read complete after 0s [id=aws]
+data.aws_iam_policy_document.prometheus: Reading...
+data.aws_iam_policy_document.prometheus: Read complete after 0s [id=3643214682]
+module.external_dns_role.data.aws_region.current: Reading...
+module.external_dns_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.ebs_csi_driver_role.data.aws_caller_identity.current: Reading...
+module.ebs_csi_driver_role.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.airflow_iam_user.aws_iam_user.this[0]: Refreshing state... [id=data-platform-apps-and-tools-development-airflow]
+module.openmetadata_airflow_rds.module.db_instance.data.aws_iam_policy_document.enhanced_monitoring: Reading...
+module.openmetadata_airflow_rds.module.db_instance.data.aws_iam_policy_document.enhanced_monitoring: Read complete after 0s [id=76086537]
+module.vpc.data.aws_iam_policy_document.vpc_flow_log_cloudwatch[0]: Reading...
+module.vpc.data.aws_iam_policy_document.vpc_flow_log_cloudwatch[0]: Read complete after 0s [id=2053943846]
+module.iam_assumable_role_admin.data.aws_partition.current: Reading...
+module.iam_assumable_role_admin.data.aws_partition.current: Read complete after 0s [id=aws]
+module.openmetadata_opensearch_cloudwatch_log_group.aws_cloudwatch_log_group.this[0]: Refreshing state... [id=/aws/opensearch/openmetadata]
+data.aws_vpc.shared: Read complete after 0s [id=vpc-0d531949a5db41ea5]
+data.aws_vpc.dedicated: Read complete after 0s [id=vpc-0604535a243e42c40]
+module.velero_s3_bucket.aws_s3_bucket.default: Refreshing state... [id=moj-data-platform-development-velero20230927164532332700000001]
+module.airflow_s3_bucket.aws_s3_bucket.default: Refreshing state... [id=moj-data-platform-airflow-development20230627094128036000000001]
+module.openmetadata_efs_kms.data.aws_caller_identity.current[0]: Reading...
+module.openmetadata_efs_kms.data.aws_caller_identity.current[0]: Read complete after 0s [id=335889174965]
+module.velero_role.data.aws_region.current: Reading...
+module.velero_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+data.aws_kms_key.general_shared: Reading...
+data.aws_region.current: Reading...
+data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.cert_manager_role.data.aws_caller_identity.current: Reading...
+data.aws_kms_key.general_shared: Read complete after 0s [id=4342fa0e-fefa-4994-a1f8-b46cdea3ffb1]
+module.cert_manager_role.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.cert_manager_role.data.aws_partition.current: Reading...
+module.cert_manager_role.data.aws_region.current: Reading...
+module.cert_manager_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.cert_manager_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+data.aws_iam_policy_document.openmetadata_airflow: Reading...
+aws_ses_domain_identity.apps_tools: Refreshing state... [id=apps-tools.development.data-platform.service.justice.gov.uk]
+data.aws_iam_policy_document.openmetadata_airflow: Read complete after 0s [id=1776568014]
+module.datahub_iam_role.data.aws_partition.current: Reading...
+module.datahub_iam_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.efs_csi_driver_role.data.aws_caller_identity.current: Reading...
+module.efs_csi_driver_role.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.external_secrets_role.data.aws_caller_identity.current: Reading...
+module.external_secrets_role.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.openmetadata_iam_role.data.aws_caller_identity.current: Reading...
+data.aws_organizations_organization.root_account: Read complete after 1s [id=o-b2fpbzyd95]
+module.efs_csi_driver_role.data.aws_partition.current: Reading...
+module.efs_csi_driver_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.airflow_execution_role.data.aws_caller_identity.current: Reading...
+data.aws_iam_roles.eks_sso_access_role: Read complete after 0s [id=eu-west-2]
+module.eks.data.aws_caller_identity.current: Reading...
+module.eks.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.openmetadata_iam_role.data.aws_partition.current: Reading...
+module.openmetadata_iam_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.external_dns_role.data.aws_partition.current: Reading...
+module.external_dns_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.openmetadata_iam_role.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.openmetadata_iam_role.data.aws_region.current: Reading...
+data.aws_s3_bucket.airflow: Reading...
+module.openmetadata_iam_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.openmetadata_airflow_rds.module.db_instance.data.aws_partition.current: Reading...
+module.openmetadata_airflow_rds.module.db_instance.data.aws_partition.current: Read complete after 0s [id=aws]
+data.aws_secretsmanager_secret_version.openmetadata_entra_id_tenant_id: Reading...
+module.airflow_execution_role.data.aws_caller_identity.current: Read complete after 0s [id=335889174965]
+module.datahub_iam_role.data.aws_region.current: Reading...
+module.datahub_iam_role.data.aws_region.current: Read complete after 0s [id=eu-west-2]
+module.datahub_rds.module.db_parameter_group.aws_db_parameter_group.this[0]: Refreshing state... [id=datahub-20231129135959315800000002]
+data.aws_kms_key.rds_shared: Reading...
+module.external_secrets_role.data.aws_partition.current: Reading...
+module.external_secrets_role.data.aws_partition.current: Read complete after 0s [id=aws]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].module.kms_key.data.aws_caller_identity.current[0]: Reading...
+data.aws_route53_zone.apps_tools: Read complete after 1s [id=Z00349352A8S0N33WNL7B]
+module.auth0_log_streams["dev-analytics-moj"].module.kms_key.data.aws_caller_identity.current[0]: Reading...
+module.openmetadata_rds.module.db_instance.aws_iam_role.enhanced_monitoring[0]: Refreshing state... [id=openmetadata-rds-monitoring-20231006124248644100000001]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].module.kms_key.data.aws_caller_identity.current[0]: Read complete after 0s [id=335889174965]
+data.aws_secretsmanager_secret_version.openmetadata_entra_id_tenant_id: Read complete after 0s [id=openmetadata/entra-id/tenant-id|AWSCURRENT]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].data.aws_cloudwatch_event_source.this: Reading...
+module.auth0_log_streams["dev-analytics-moj"].data.aws_cloudwatch_event_source.this: Reading...
+data.aws_kms_key.rds_shared: Read complete after 0s [id=9a9bea11-d21d-4871-80d6-c3f09d95218c]
+module.auth0_log_streams["dev-analytics-moj"].module.kms_key.data.aws_caller_identity.current[0]: Read complete after 0s [id=335889174965]
+data.aws_route53_zone.network-services: Reading...
+module.datahub_rds.module.db_instance.aws_iam_role.enhanced_monitoring[0]: Refreshing state... [id=datahub-rds-monitoring-20231129135959315500000001]
+module.observability_platform_tenant.aws_iam_role.this: Refreshing state... [id=observability-platform]
+data.aws_s3_bucket.airflow: Read complete after 0s [id=moj-data-platform-airflow-development20230627094128036000000001]
+data.aws_route53_zone.external: Reading...
+module.auth0_log_streams["dev-analytics-moj"].data.aws_cloudwatch_event_source.this: Read complete after 1s [id=aws.partner/auth0.com/dev-analytics-moj-20c1595d-28e2-4822-9e1c-cb29ac38c7d2/auth0.logs]
+data.aws_route53_zone.inner: Reading...
+module.auth0_log_streams["ministryofjustice-data-platform-development"].data.aws_cloudwatch_event_source.this: Read complete after 1s [id=aws.partner/auth0.com/ministryofjustice-data-platform-development-a628362c-f79b-46e9-9604-7c9861565a1b/auth0.logs]
+module.efs_csi_driver_role.aws_iam_policy.efs_csi[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/AmazonEKS_EFS_CSI_Policy-20230920170127406600000002]
+module.vpc.aws_iam_role.vpc_flow_log_cloudwatch[0]: Refreshing state... [id=vpc-flow-log-role-20230614151008640200000001]
+data.aws_iam_openid_connect_provider.apps_and_tools: Reading...
+aws_iam_policy.datahub: Refreshing state... [id=arn:aws:iam::335889174965:policy/datahub-policy]
+module.external_secrets_role.aws_iam_policy.external_secrets[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/AmazonEKS_External_Secrets_Policy-20230921155824470200000002]
+module.eks.module.eks_managed_node_group["general"].data.aws_iam_policy_document.assume_role_policy[0]: Reading...
+module.eks.module.eks_managed_node_group["general"].data.aws_iam_policy_document.assume_role_policy[0]: Read complete after 0s [id=2560088296]
+module.openmetadata_airflow_rds.module.db_instance.aws_iam_role.enhanced_monitoring[0]: Refreshing state... [id=openmetadata-airflow-rds-monitoring-20231006115619992300000001]
+module.vpc.aws_iam_policy.vpc_flow_log_cloudwatch[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/vpc-flow-log-to-cloudwatch-20230614151008640600000002]
+data.aws_subnets.shared-data: Reading...
+data.aws_subnets.shared-data: Read complete after 0s [id=eu-west-2]
+data.aws_subnets.shared-private: Reading...
+data.aws_subnets.shared-public: Reading...
+data.aws_subnets.dedicated["private"]: Reading...
+data.aws_subnets.dedicated["db"]: Reading...
+data.aws_iam_openid_connect_provider.apps_and_tools: Read complete after 0s [id=arn:aws:iam::335889174965:oidc-provider/oidc.eks.eu-west-2.amazonaws.com/id/BEE86BED6494692D4ED31C2ED2319E13]
+data.aws_subnets.dedicated["public"]: Reading...
+data.aws_subnets.shared-private: Read complete after 0s [id=eu-west-2]
+data.aws_subnet.public_subnets_b: Reading...
+data.aws_subnets.shared-public: Read complete after 0s [id=eu-west-2]
+data.aws_subnet.public_subnets_c: Reading...
+data.aws_subnets.dedicated["private"]: Read complete after 0s [id=eu-west-2]
+data.aws_subnet.private_subnets_a: Reading...
+data.aws_subnets.dedicated["db"]: Read complete after 0s [id=eu-west-2]
+data.aws_subnets.dedicated["public"]: Read complete after 0s [id=eu-west-2]
+data.aws_subnet.private_subnets_b: Reading...
+data.aws_subnet.public_subnets_a: Reading...
+data.aws_subnet.data_subnets_c: Reading...
+data.aws_subnet.public_subnets_c: Read complete after 0s [id=subnet-07d7c0c04d3587eaf]
+data.aws_subnet.data_subnets_b: Reading...
+data.aws_route53_zone.external: Read complete after 1s [id=Z02170133EEJ36ZQMFHHY]
+data.aws_subnet.private_subnets_c: Reading...
+data.aws_subnet.public_subnets_b: Read complete after 0s [id=subnet-05805e60db264a99e]
+data.aws_subnet.private_subnets_a: Read complete after 0s [id=subnet-0801c322d966aa525]
+data.aws_subnet.private_subnets_b: Read complete after 0s [id=subnet-0bc9984135d61ef53]
+data.aws_iam_policy_document.airflow_ses_policy: Reading...
+data.aws_subnet.data_subnets_a: Reading...
+data.aws_iam_policy_document.airflow_ses_policy: Read complete after 0s [id=1709304321]
+data.aws_subnet.public_subnets_a: Read complete after 0s [id=subnet-07c4fc6a1c8ffe2bf]
+module.eks.data.aws_iam_session_context.current: Reading...
+data.aws_route53_zone.network-services: Read complete after 1s [id=Z00379322STHYMCQ5Z45Y]
+module.vpc.aws_default_route_table.default[0]: Refreshing state... [id=rtb-08797f30f6c7ab5b2]
+module.vpc.aws_default_security_group.this[0]: Refreshing state... [id=sg-068db6d6b319ff45b]
+aws_route53_record.apps_tools_ses_verification: Refreshing state... [id=Z00349352A8S0N33WNL7B__amazonses.apps-tools.development.data-platform.service.justice.gov.uk_TXT]
+module.vpc.aws_default_network_acl.this[0]: Refreshing state... [id=acl-0fa31d04d492911c8]
+data.aws_subnet.data_subnets_c: Read complete after 0s [id=subnet-0c2c5a4f4a44e5b0c]
+module.eks.data.aws_iam_policy_document.assume_role_policy[0]: Reading...
+module.eks.data.aws_iam_policy_document.assume_role_policy[0]: Read complete after 0s [id=2764486067]
+module.airflow_iam_user.aws_iam_access_key.this_no_pgp[0]: Refreshing state... [id=AKIAU4NEOCG24CFXTH4C]
+data.aws_subnet.private_subnets_c: Read complete after 0s [id=subnet-014ca2f0c8ce76855]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].aws_cloudwatch_event_bus.this: Refreshing state... [id=aws.partner/auth0.com/ministryofjustice-data-platform-development-a628362c-f79b-46e9-9604-7c9861565a1b/auth0.logs]
+data.aws_subnet.data_subnets_b: Read complete after 0s [id=subnet-0e563a951945911bb]
+module.auth0_log_streams["dev-analytics-moj"].aws_cloudwatch_event_bus.this: Refreshing state... [id=aws.partner/auth0.com/dev-analytics-moj-20c1595d-28e2-4822-9e1c-cb29ac38c7d2/auth0.logs]
+data.aws_subnet.data_subnets_a: Read complete after 0s [id=subnet-0356c7aaf264b6a5b]
+module.velero_s3_bucket.aws_s3_bucket_server_side_encryption_configuration.default: Refreshing state... [id=moj-data-platform-development-velero20230927164532332700000001]
+module.velero_s3_bucket.aws_s3_bucket_ownership_controls.default: Refreshing state... [id=moj-data-platform-development-velero20230927164532332700000001]
+module.velero_s3_bucket.aws_s3_bucket_public_access_block.default: Refreshing state... [id=moj-data-platform-development-velero20230927164532332700000001]
+module.velero_s3_bucket.aws_s3_bucket_lifecycle_configuration.default: Refreshing state... [id=moj-data-platform-development-velero20230927164532332700000001]
+module.velero_s3_bucket.aws_s3_bucket_versioning.default: Refreshing state... [id=moj-data-platform-development-velero20230927164532332700000001]
+module.datahub_rds_kms.data.aws_iam_policy_document.this[0]: Reading...
+module.ebs_csi_driver_role.data.aws_iam_policy_document.ebs_csi[0]: Reading...
+module.datahub_rds_kms.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=1835058557]
+module.openmetadata_rds_kms.data.aws_iam_policy_document.this[0]: Reading...
+module.openmetadata_rds_kms.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=1835058557]
+module.ebs_csi_driver_role.data.aws_iam_policy_document.ebs_csi[0]: Read complete after 0s [id=932695789]
+module.airflow_s3_bucket.aws_s3_bucket_server_side_encryption_configuration.default: Refreshing state... [id=moj-data-platform-airflow-development20230627094128036000000001]
+module.airflow_s3_bucket.aws_s3_bucket_lifecycle_configuration.default: Refreshing state... [id=moj-data-platform-airflow-development20230627094128036000000001]
+module.eks.data.aws_iam_session_context.current: Read complete after 1s [id=arn:aws:sts::335889174965:assumed-role/MemberInfrastructureAccess/aws-go-sdk-1702988152059915000]
+module.airflow_s3_bucket.aws_s3_bucket_versioning.default: Refreshing state... [id=moj-data-platform-airflow-development20230627094128036000000001]
+module.airflow_s3_bucket.aws_s3_bucket_ownership_controls.default: Refreshing state... [id=moj-data-platform-airflow-development20230627094128036000000001]
+module.airflow_s3_bucket.aws_s3_bucket_public_access_block.default: Refreshing state... [id=moj-data-platform-airflow-development20230627094128036000000001]
+module.airflow_s3_bucket.data.aws_iam_policy_document.bucket_policy_v2: Reading...
+module.airflow_s3_bucket.data.aws_iam_policy_document.bucket_policy_v2: Read complete after 0s [id=1132004489]
+module.datahub_rds.module.db_instance.aws_iam_role_policy_attachment.enhanced_monitoring[0]: Refreshing state... [id=datahub-rds-monitoring-20231129135959315500000001-20231129135959601600000004]
+module.openmetadata_rds.module.db_instance.aws_iam_role_policy_attachment.enhanced_monitoring[0]: Refreshing state... [id=openmetadata-rds-monitoring-20231006124248644100000001-20231006124249156200000003]
+module.openmetadata_airflow_rds_kms.data.aws_iam_policy_document.this[0]: Reading...
+module.openmetadata_airflow_rds_kms.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=1835058557]
+module.openmetadata_opensearch_kms.data.aws_iam_policy_document.this[0]: Reading...
+module.openmetadata_opensearch_kms.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=1835058557]
+module.eks.module.eks_managed_node_group["general"].aws_iam_role.this[0]: Refreshing state... [id=general-eks-node-group-20230919185455988500000004]
+module.prometheus_iam_policy.aws_iam_policy.policy[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/prometheus20231009151314764600000001]
+data.aws_route53_zone.inner: Read complete after 1s [id=Z00755911OBY6D1NCB960]
+module.observability_platform_tenant.aws_iam_role_policy_attachment.cloudwatch_readonly_access: Refreshing state... [id=observability-platform-20231207164706960500000001]
+module.iam_assumable_role_admin.data.aws_iam_policy_document.assume_role[0]: Reading...
+module.iam_assumable_role_admin.data.aws_iam_policy_document.assume_role[0]: Read complete after 0s [id=242910696]
+module.datahub_rds_security_group.aws_security_group.this_name_prefix[0]: Refreshing state... [id=sg-05a90fbad342d2cbb]
+data.aws_iam_policy_document.opensearch_cloudwatch_logs: Reading...
+data.aws_iam_policy_document.opensearch_cloudwatch_logs: Read complete after 0s [id=1842805388]
+module.openmetadata_efs_kms.data.aws_iam_policy_document.this[0]: Reading...
+module.openmetadata_efs_kms.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=1835058557]
+data.aws_subnet.private["subnet-094f67e687a7116e1"]: Reading...
+data.aws_subnet.private["subnet-0c2226f3f02d24eb0"]: Reading...
+data.aws_subnet.private["subnet-09a262ce283aa5cc8"]: Reading...
+data.aws_subnet.private["subnet-094f67e687a7116e1"]: Read complete after 0s [id=subnet-094f67e687a7116e1]
+module.vpc.aws_iam_role_policy_attachment.vpc_flow_log_cloudwatch[0]: Refreshing state... [id=vpc-flow-log-role-20230614151008640200000001-20230614151010092100000004]
+module.openmetadata_airflow_iam_policy.aws_iam_policy.policy[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/openmetadata-airflow20231002155028099500000002]
+data.aws_subnet.private["subnet-09a262ce283aa5cc8"]: Read complete after 0s [id=subnet-09a262ce283aa5cc8]
+module.openmetadata_airflow_rds.module.db_instance.aws_iam_role_policy_attachment.enhanced_monitoring[0]: Refreshing state... [id=openmetadata-airflow-rds-monitoring-20231006115619992300000001-20231006115620447900000003]
+data.aws_subnet.private["subnet-0c2226f3f02d24eb0"]: Read complete after 0s [id=subnet-0c2226f3f02d24eb0]
+module.airflow_execution_role.data.aws_iam_policy_document.assume_role[0]: Reading...
+module.airflow_execution_role.data.aws_iam_policy_document.assume_role[0]: Read complete after 0s [id=659464784]
+module.vpc.aws_internet_gateway.this[0]: Refreshing state... [id=igw-0ef1e50718f8c68fb]
+module.vpc.aws_subnet.private[0]: Refreshing state... [id=subnet-0c2226f3f02d24eb0]
+module.vpc.aws_subnet.private[1]: Refreshing state... [id=subnet-09a262ce283aa5cc8]
+module.vpc.aws_subnet.private[2]: Refreshing state... [id=subnet-094f67e687a7116e1]
+module.vpc.aws_subnet.public[2]: Refreshing state... [id=subnet-05dafd5537c8ddab5]
+module.vpc.aws_subnet.public[0]: Refreshing state... [id=subnet-04fce2f131d1c792f]
+module.vpc.aws_subnet.public[1]: Refreshing state... [id=subnet-0a4e5ce9957ade3d5]
+module.vpc.aws_subnet.database[0]: Refreshing state... [id=subnet-034c9e97de3498bc8]
+module.vpc.aws_subnet.database[1]: Refreshing state... [id=subnet-07159fd4963c414cf]
+module.vpc.aws_subnet.database[2]: Refreshing state... [id=subnet-0284600fca97a763e]
+module.vpc.aws_route_table.public[0]: Refreshing state... [id=rtb-0a1c5e4c0dfc76551]
+module.cert_manager_role.data.aws_iam_policy_document.cert_manager[0]: Reading...
+module.cert_manager_role.data.aws_iam_policy_document.cert_manager[0]: Read complete after 0s [id=4025579098]
+module.external_dns_role.data.aws_iam_policy_document.external_dns[0]: Reading...
+module.external_dns_role.data.aws_iam_policy_document.external_dns[0]: Read complete after 0s [id=2298409107]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].module.kms_key.data.aws_iam_policy_document.this[0]: Reading...
+module.auth0_log_streams["ministryofjustice-data-platform-development"].module.kms_key.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=993691033]
+module.auth0_log_streams["dev-analytics-moj"].module.kms_key.data.aws_iam_policy_document.this[0]: Reading...
+module.auth0_log_streams["dev-analytics-moj"].module.kms_key.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=867672749]
+module.eks.aws_iam_role.this[0]: Refreshing state... [id=apps-tools-development-cluster-20230919185455985100000001]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].aws_cloudwatch_event_rule.this: Refreshing state... [id=aws.partner/auth0.com/ministryofjustice-data-platform-development-a628362c-f79b-46e9-9604-7c9861565a1b/auth0.logs/ministryofjustice-data-platform-development]
+module.auth0_log_streams["dev-analytics-moj"].aws_cloudwatch_event_rule.this: Refreshing state... [id=aws.partner/auth0.com/dev-analytics-moj-20c1595d-28e2-4822-9e1c-cb29ac38c7d2/auth0.logs/dev-analytics-moj]
+module.datahub_rds_kms.aws_kms_key.this[0]: Refreshing state... [id=5cdb1a14-5a14-47ae-94fe-1c6f2df264b8]
+module.openmetadata_rds_kms.aws_kms_key.this[0]: Refreshing state... [id=99549176-b94a-44fd-a85f-313b10c44831]
+aws_s3_object.airflow_kubernetes_config: Refreshing state... [id=dags/.kube/config]
+aws_s3_object.airflow_requirements: Refreshing state... [id=requirements.txt]
+module.ebs_csi_driver_role.aws_iam_policy.ebs_csi[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/AmazonEKS_EBS_CSI_Policy-20230920120755071100000002]
+module.velero_s3_bucket.aws_s3_bucket_acl.default[0]: Refreshing state... [id=moj-data-platform-development-velero20230927164532332700000001,private]
+module.airflow_s3_bucket.data.aws_iam_policy_document.default: Reading...
+module.airflow_s3_bucket.data.aws_iam_policy_document.default: Read complete after 0s [id=1669168437]
+module.vpc.aws_route_table.private[0]: Refreshing state... [id=rtb-03caea02ad98bee32]
+module.vpc.aws_route_table.private[2]: Refreshing state... [id=rtb-0c811eed94f1f83ce]
+module.vpc.aws_route_table.private[1]: Refreshing state... [id=rtb-064e1ebcd2a15fbdc]
+module.airflow_s3_bucket.aws_s3_bucket_acl.default[0]: Refreshing state... [id=moj-data-platform-airflow-development20230627094128036000000001,private]
+module.openmetadata_airflow_rds_kms.aws_kms_key.this[0]: Refreshing state... [id=6d9bc83d-3e92-4d46-8c03-4553383aace8]
+module.openmetadata_opensearch_kms.aws_kms_key.this[0]: Refreshing state... [id=72194602-2e25-4b81-8f8d-09c63dddb038]
+module.iam_assumable_role_admin.aws_iam_role.this[0]: Refreshing state... [id=data-platform-eks-access]
+module.datahub_iam_role.data.aws_iam_policy_document.this[0]: Reading...
+module.datahub_iam_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=510529344]
+aws_cloudwatch_log_resource_policy.opensearch_cloudwatch_logs: Refreshing state... [id=opensearch-cloudwatch-logs]
+module.openmetadata_efs_kms.aws_kms_key.this[0]: Refreshing state... [id=ee41d475-d018-45e4-a5dc-6b1c15477516]
+module.airflow_ses_policy.aws_iam_policy.policy[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/data-platform-apps-and-tools-development-airflow-ses]
+module.airflow_execution_role.aws_iam_role.this[0]: Refreshing state... [id=data-platform-apps-and-tools-development-airflow-execution]
+module.smtp_vpc_endpoint_security_group.aws_security_group.this_name_prefix[0]: Refreshing state... [id=sg-05967544c5cc871a7]
+module.opensearch_security_group.aws_security_group.this_name_prefix[0]: Refreshing state... [id=sg-0b5f588c031dd6115]
+module.eks.aws_security_group.cluster[0]: Refreshing state... [id=sg-091ba68f7ef2a112c]
+module.eks.aws_security_group.node[0]: Refreshing state... [id=sg-01d6cf0773ef4d840]
+module.rds_security_group.aws_security_group.this_name_prefix[0]: Refreshing state... [id=sg-0a6f5a8e1e6eb5301]
+module.mwaa_security_group.aws_security_group.this_name_prefix[0]: Refreshing state... [id=sg-059924cbe642f959a]
+module.guardduty_data_vpc_endpoint_security_group.aws_security_group.this_name_prefix[0]: Refreshing state... [id=sg-0eb7537da1a3f11a6]
+module.vpc.aws_cloudwatch_log_group.flow_log[0]: Refreshing state... [id=/aws/vpc-flow-log/data-platform-apps-and-tools-development]
+module.vpc.aws_eip.nat[0]: Refreshing state... [id=eipalloc-0e659ed1d8102ea33]
+module.vpc.aws_eip.nat[2]: Refreshing state... [id=eipalloc-016df583c44e81954]
+module.vpc.aws_eip.nat[1]: Refreshing state... [id=eipalloc-05f0851e8a7e14546]
+module.eks.module.eks_managed_node_group["general"].aws_iam_role_policy_attachment.additional["AmazonSSMManagedInstanceCore"]: Refreshing state... [id=general-eks-node-group-20230919185455988500000004-20230919185457073500000007]
+module.eks.module.eks_managed_node_group["general"].aws_iam_role_policy_attachment.additional["CloudWatchAgentServerPolicy"]: Refreshing state... [id=general-eks-node-group-20230919185455988500000004-20230925141117003800000001]
+module.eks.module.eks_managed_node_group["general"].aws_iam_role_policy_attachment.this["arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"]: Refreshing state... [id=general-eks-node-group-20230919185455988500000004-20230919185456897500000005]
+module.eks.module.eks_managed_node_group["general"].aws_iam_role_policy_attachment.this["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"]: Refreshing state... [id=general-eks-node-group-20230919185455988500000004-20230919185456986000000006]
+module.eks.module.eks_managed_node_group["general"].aws_iam_role_policy_attachment.this["arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"]: Refreshing state... [id=general-eks-node-group-20230919185455988500000004-20230919185457135200000008]
+module.cert_manager_role.aws_iam_policy.cert_manager[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/AmazonEKS_Cert_Manager_Policy-20230920144603467100000002]
+module.external_dns_role.aws_iam_policy.external_dns[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/AmazonEKS_External_DNS_Policy-20230920133507506700000002]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].module.kms_key.aws_kms_key.this[0]: Refreshing state... [id=c4330740-9f01-4af1-83ce-dd83e62fce80]
+module.auth0_log_streams["dev-analytics-moj"].module.kms_key.aws_kms_key.this[0]: Refreshing state... [id=23a849cb-d275-4b5f-b516-20a1fce99e9f]
+module.velero_role.data.aws_iam_policy_document.velero[0]: Reading...
+module.velero_role.data.aws_iam_policy_document.velero[0]: Read complete after 0s [id=351878310]
+module.velero_s3_bucket.aws_s3_bucket_policy.default: Refreshing state... [id=moj-data-platform-development-velero20230927164532332700000001]
+module.vpc.aws_route_table_association.public[2]: Refreshing state... [id=rtbassoc-03e697a3ef607beea]
+module.vpc.aws_route_table_association.public[0]: Refreshing state... [id=rtbassoc-05940158c366e78d5]
+module.vpc.aws_route_table_association.public[1]: Refreshing state... [id=rtbassoc-0393aded5a0c62e08]
+module.vpc.aws_route.public_internet_gateway[0]: Refreshing state... [id=r-rtb-0a1c5e4c0dfc765511080289494]
+module.vpc.aws_db_subnet_group.database[0]: Refreshing state... [id=data-platform-apps-and-tools-development]
+module.airflow_s3_bucket.aws_s3_bucket_policy.default: Refreshing state... [id=moj-data-platform-airflow-development20230627094128036000000001]
+module.datahub_rds_kms.aws_kms_alias.this["rds/datahub"]: Refreshing state... [id=alias/rds/datahub]
+module.openmetadata_rds_kms.aws_kms_alias.this["rds/openmetadata"]: Refreshing state... [id=alias/rds/openmetadata]
+module.vpc.aws_route_table_association.private[0]: Refreshing state... [id=rtbassoc-0bc02f51fe0a1206f]
+module.vpc.aws_route_table_association.private[1]: Refreshing state... [id=rtbassoc-07a16bc98a0dc02fe]
+module.vpc.aws_route_table_association.private[2]: Refreshing state... [id=rtbassoc-0b5a81140e4ba0ccf]
+module.vpc.aws_route_table_association.database[0]: Refreshing state... [id=rtbassoc-0f19b8cd050c09351]
+module.vpc.aws_route_table_association.database[1]: Refreshing state... [id=rtbassoc-04996440962c2df1b]
+module.vpc.aws_route_table_association.database[2]: Refreshing state... [id=rtbassoc-0803cd6572d70a840]
+module.datahub_iam_role.aws_iam_role.this[0]: Refreshing state... [id=datahub20231128131206460400000001]
+module.openmetadata_airflow_rds_kms.aws_kms_alias.this["rds/openmetadata-airflow"]: Refreshing state... [id=alias/rds/openmetadata-airflow]
+module.datahub_rds_security_group.aws_security_group_rule.ingress_with_cidr_blocks[0]: Refreshing state... [id=sgrule-1215231753]
+module.openmetadata_opensearch_kms.aws_kms_alias.this["opensearch/openmetadata"]: Refreshing state... [id=alias/opensearch/openmetadata]
+module.openmetadata_efs_kms.aws_kms_alias.this["efs/openmetadata"]: Refreshing state... [id=alias/efs/openmetadata]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSClusterPolicy"]: Refreshing state... [id=apps-tools-development-cluster-20230919185455985100000001-2023091918545725370000000a]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSVPCResourceController"]: Refreshing state... [id=apps-tools-development-cluster-20230919185455985100000001-20230919185457233400000009]
+module.velero_role.aws_iam_policy.velero[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/AmazonEKS_Velero_Policy-20230921140931861600000003]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].module.kms_key.aws_kms_alias.this["auth0/ministryofjustice-data-platform-development"]: Refreshing state... [id=alias/auth0/ministryofjustice-data-platform-development]
+module.auth0_log_streams["dev-analytics-moj"].module.kms_key.aws_kms_alias.this["auth0/dev-analytics-moj"]: Refreshing state... [id=alias/auth0/dev-analytics-moj]
+module.smtp_vpc_endpoint_security_group.aws_security_group_rule.ingress_rules[0]: Refreshing state... [id=sgrule-877401904]
+aws_opensearch_domain.openmetadata: Refreshing state... [id=arn:aws:es:eu-west-2:335889174965:domain/openmetadata]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"]: Refreshing state... [id=sgrule-3681321365]
+module.eks.aws_security_group_rule.node["ingress_cluster_443"]: Refreshing state... [id=sgrule-2148245575]
+module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"]: Refreshing state... [id=sgrule-3760944802]
+module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"]: Refreshing state... [id=sgrule-2438745883]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_udp"]: Refreshing state... [id=sgrule-2134057594]
+module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"]: Refreshing state... [id=sgrule-372609292]
+module.eks.aws_security_group_rule.node["ingress_cluster_8443_webhook"]: Refreshing state... [id=sgrule-1922343623]
+module.eks.aws_security_group_rule.node["egress_all"]: Refreshing state... [id=sgrule-1136119414]
+module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"]: Refreshing state... [id=sgrule-2827680112]
+module.eks.aws_security_group_rule.node["ingress_cluster_6443_webhook"]: Refreshing state... [id=sgrule-1640537830]
+module.mwaa_security_group.aws_security_group_rule.ingress_with_self[0]: Refreshing state... [id=sgrule-3557867961]
+module.mwaa_security_group.aws_security_group_rule.egress_rules[0]: Refreshing state... [id=sgrule-3299306720]
+module.eks.aws_security_group_rule.cluster["ingress_nodes_443"]: Refreshing state... [id=sgrule-3827748327]
+aws_iam_user_policy_attachment.airflow_ses: Refreshing state... [id=data-platform-apps-and-tools-development-airflow-20230914131809605400000002]
+module.opensearch_security_group.aws_security_group_rule.ingress_with_cidr_blocks[0]: Refreshing state... [id=sgrule-2516446984]
+module.rds_security_group.aws_security_group_rule.ingress_with_cidr_blocks[0]: Refreshing state... [id=sgrule-178552154]
+module.vpc.aws_flow_log.this[0]: Refreshing state... [id=fl-063ecd7a76c09d70f]
+module.guardduty_data_vpc_endpoint_security_group.aws_security_group_rule.ingress_rules[0]: Refreshing state... [id=sgrule-1523478875]
+module.vpc.aws_nat_gateway.this[1]: Refreshing state... [id=nat-0a1cbd4611e352999]
+module.vpc.aws_nat_gateway.this[0]: Refreshing state... [id=nat-0bfc282bdba00f585]
+module.vpc.aws_nat_gateway.this[2]: Refreshing state... [id=nat-04de47fe9600ab64c]
+module.auth0_log_streams["dev-analytics-moj"].aws_cloudwatch_log_group.this: Refreshing state... [id=/aws/events/auth0/dev-analytics-moj]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].aws_cloudwatch_log_group.this: Refreshing state... [id=/aws/events/auth0/ministryofjustice-data-platform-development]
+module.openmetadata_efs.aws_efs_file_system.this[0]: Refreshing state... [id=fs-093baac7afc5f0da2]
+module.eks.module.kms.data.aws_iam_policy_document.this[0]: Reading...
+module.eks.module.kms.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=3079086752]
+module.datahub_iam_role.aws_iam_role_policy_attachment.this["datahub-ingestion"]: Refreshing state... [id=datahub20231128131206460400000001-20231129135959632500000005]
+module.openmetadata_efs.aws_security_group.this[0]: Refreshing state... [id=sg-0a5671fcdb3c3c92f]
+data.aws_iam_policy_document.opensearch_domain: Reading...
+data.aws_iam_policy_document.opensearch_domain: Read complete after 0s [id=1478727029]
+module.datahub_rds.module.db_instance.aws_db_instance.this[0]: Refreshing state... [id=db-AOHOMZSI753O65QDK2V4TYPHE4]
+module.eks.module.kms.aws_kms_key.this[0]: Refreshing state... [id=5c48ea9e-cd3e-46e8-9d6d-ad740332bc63]
+aws_opensearch_domain_policy.openmetadata: Refreshing state... [id=esd-policy-openmetadata]
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["s3"]: Reading...
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["email-smtp"]: Reading...
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["guardduty-data"]: Reading...
+module.vpc.aws_route.private_nat_gateway[0]: Refreshing state... [id=r-rtb-03caea02ad98bee321080289494]
+module.vpc.aws_route.private_nat_gateway[1]: Refreshing state... [id=r-rtb-064e1ebcd2a15fbdc1080289494]
+module.vpc.aws_route.private_nat_gateway[2]: Refreshing state... [id=r-rtb-0c811eed94f1f83ce1080289494]
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["s3"]: Read complete after 0s [id=4224666350]
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["email-smtp"]: Read complete after 0s [id=983724835]
+module.openmetadata_efs.aws_security_group_rule.this["private-subnets"]: Refreshing state... [id=sgrule-2007354696]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].data.aws_iam_policy_document.this: Reading...
+module.auth0_log_streams["ministryofjustice-data-platform-development"].aws_cloudwatch_event_target.this: Refreshing state... [id=aws.partner/auth0.com/ministryofjustice-data-platform-development-a628362c-f79b-46e9-9604-7c9861565a1b/auth0.logs-ministryofjustice-data-platform-development-auth0-to-cloudwatch-logs]
+module.auth0_log_streams["dev-analytics-moj"].aws_cloudwatch_event_target.this: Refreshing state... [id=aws.partner/auth0.com/dev-analytics-moj-20c1595d-28e2-4822-9e1c-cb29ac38c7d2/auth0.logs-dev-analytics-moj-auth0-to-cloudwatch-logs]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].data.aws_iam_policy_document.this: Read complete after 0s [id=1281751034]
+module.auth0_log_streams["dev-analytics-moj"].data.aws_iam_policy_document.this: Reading...
+module.auth0_log_streams["dev-analytics-moj"].data.aws_iam_policy_document.this: Read complete after 0s [id=1791240299]
+module.eks.module.kms.aws_kms_alias.this["cluster"]: Refreshing state... [id=alias/eks/apps-tools-development]
+module.auth0_log_streams["ministryofjustice-data-platform-development"].aws_cloudwatch_log_resource_policy.this: Refreshing state... [id=ministryofjustice-data-platform-development]
+module.auth0_log_streams["dev-analytics-moj"].aws_cloudwatch_log_resource_policy.this: Refreshing state... [id=dev-analytics-moj]
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["guardduty-data"]: Read complete after 0s [id=3096571232]
+module.eks.aws_iam_policy.cluster_encryption[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/apps-tools-development-cluster-ClusterEncryption2023091918551601710000000b]
+module.eks.aws_eks_cluster.this[0]: Refreshing state... [id=apps-tools-development]
+module.vpc_endpoints.aws_vpc_endpoint.this["email-smtp"]: Refreshing state... [id=vpce-06eded8a18fc0052e]
+module.vpc_endpoints.aws_vpc_endpoint.this["guardduty-data"]: Refreshing state... [id=vpce-0853030fe278b6c4d]
+module.vpc_endpoints.aws_vpc_endpoint.this["s3"]: Refreshing state... [id=vpce-08d70955e822572d3]
+module.openmetadata_efs.aws_efs_access_point.this["airflow_logs"]: Refreshing state... [id=fsap-0dac3c2015590e77e]
+module.openmetadata_efs.aws_efs_access_point.this["airflow_dags"]: Refreshing state... [id=fsap-00c2c0cff68fd24a3]
+module.openmetadata_efs.aws_efs_backup_policy.this[0]: Refreshing state... [id=fs-093baac7afc5f0da2]
+module.openmetadata_efs.aws_efs_mount_target.this["private-subnets-1"]: Refreshing state... [id=fsmt-01a381e6c4383b6e8]
+module.openmetadata_efs.aws_efs_mount_target.this["private-subnets-0"]: Refreshing state... [id=fsmt-025435870de1c4d0b]
+module.openmetadata_efs.aws_efs_mount_target.this["private-subnets-2"]: Refreshing state... [id=fsmt-07d105f266de0c07e]
+module.openmetadata_airflow_rds.module.db_instance.aws_db_instance.this[0]: Refreshing state... [id=db-DXUW6DGFCQ5HPLAK7T45Y7XFII]
+module.openmetadata_rds.module.db_instance.aws_db_instance.this[0]: Refreshing state... [id=db-EBTICW4KXHFEAEJ6BSHDX6GQSI]
+module.eks.time_sleep.this[0]: Refreshing state... [id=2023-10-05T10:53:20Z]
+module.eks.data.aws_eks_addon_version.this["coredns"]: Reading...
+module.eks.data.aws_eks_addon_version.this["kube-proxy"]: Reading...
+module.eks.data.aws_eks_addon_version.this["vpc-cni"]: Reading...
+module.eks.data.aws_eks_addon_version.this["aws-guardduty-agent"]: Reading...
+module.eks.data.tls_certificate.this[0]: Reading...
+module.eks.aws_ec2_tag.cluster_primary_security_group["is-production"]: Refreshing state... [id=sg-070f33367e54edb56,is-production]
+module.eks.aws_ec2_tag.cluster_primary_security_group["source-code"]: Refreshing state... [id=sg-070f33367e54edb56,source-code]
+module.eks.data.tls_certificate.this[0]: Read complete after 0s [id=17bd96401642e610ba843d6cef08c95bfb79f46c]
+module.eks.aws_ec2_tag.cluster_primary_security_group["owner"]: Refreshing state... [id=sg-070f33367e54edb56,owner]
+module.eks.aws_ec2_tag.cluster_primary_security_group["environment-name"]: Refreshing state... [id=sg-070f33367e54edb56,environment-name]
+module.eks.data.aws_eks_addon_version.this["coredns"]: Read complete after 0s [id=coredns]
+module.eks.aws_ec2_tag.cluster_primary_security_group["application"]: Refreshing state... [id=sg-070f33367e54edb56,application]
+module.eks.data.aws_eks_addon_version.this["kube-proxy"]: Read complete after 0s [id=kube-proxy]
+module.eks.aws_ec2_tag.cluster_primary_security_group["business-unit"]: Refreshing state... [id=sg-070f33367e54edb56,business-unit]
+module.eks.aws_ec2_tag.cluster_primary_security_group["infrastructure-support"]: Refreshing state... [id=sg-070f33367e54edb56,infrastructure-support]
+module.eks.data.aws_eks_addon_version.this["vpc-cni"]: Read complete after 0s [id=vpc-cni]
+module.eks.data.aws_eks_addon_version.this["aws-guardduty-agent"]: Read complete after 0s [id=aws-guardduty-agent]
+data.aws_iam_policy_document.data_platform_eks_access: Reading...
+data.aws_iam_policy_document.data_platform_eks_access: Read complete after 0s [id=2914415724]
+data.aws_iam_policy_document.airflow_execution_policy: Reading...
+module.eks.aws_iam_role_policy_attachment.cluster_encryption[0]: Refreshing state... [id=apps-tools-development-cluster-20230919185455985100000001-2023091918551655760000000c]
+data.aws_iam_policy_document.airflow_execution_policy: Read complete after 0s [id=917529087]
+module.cluster_autoscaler_role.data.aws_iam_policy_document.cluster_autoscaler[0]: Reading...
+kubernetes_labels.kube_system: Refreshing state... [id=apiVersion=v1,kind=Namespace,name=kube-system]
+kubernetes_namespace.gatekeeper_system: Refreshing state... [id=gatekeeper-system]
+module.cluster_autoscaler_role.data.aws_iam_policy_document.cluster_autoscaler[0]: Read complete after 0s [id=4269967216]
+kubernetes_persistent_volume.openmetadata_airflow_logs: Refreshing state... [id=openmetadata-dependencies-logs-pv]
+module.eks.aws_iam_openid_connect_provider.oidc_provider[0]: Refreshing state... [id=arn:aws:iam::335889174965:oidc-provider/oidc.eks.eu-west-2.amazonaws.com/id/BEE86BED6494692D4ED31C2ED2319E13]
+module.data_platform_eks_access_iam_policy.aws_iam_policy.policy[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/data-platform-eks-access20231123153930932400000001]
+kubernetes_persistent_volume.openmetadata_airflow_dags: Refreshing state... [id=openmetadata-dependencies-dags-pv]
+module.airflow_execution_policy.aws_iam_policy.policy[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/data-platform-apps-and-tools-development-airflow-execution]
+module.cluster_autoscaler_role.aws_iam_policy.cluster_autoscaler[0]: Refreshing state... [id=arn:aws:iam::335889174965:policy/AmazonEKS_Cluster_Autoscaler_Policy-20230920125609976900000001]
+module.eks.module.eks_managed_node_group["general"].aws_launch_template.this[0]: Refreshing state... [id=lt-05766514d275753ee]
+module.ebs_csi_driver_role.data.aws_iam_policy_document.this[0]: Reading...
+module.ebs_csi_driver_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=824567765]
+module.cluster_autoscaler_role.data.aws_iam_policy_document.this[0]: Reading...
+module.cluster_autoscaler_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=4113660616]
+module.efs_csi_driver_role.data.aws_iam_policy_document.this[0]: Reading...
+module.efs_csi_driver_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=2939954459]
+module.ebs_csi_driver_role.aws_iam_role.this[0]: Refreshing state... [id=ebs-csi-driver20230920120755057700000001]
+module.cluster_autoscaler_role.aws_iam_role.this[0]: Refreshing state... [id=cluster-autoscaler20230920125609978300000002]
+module.efs_csi_driver_role.aws_iam_role.this[0]: Refreshing state... [id=efs-csi-driver20230920170127404800000001]
+module.eks.module.eks_managed_node_group["general"].aws_eks_node_group.this[0]: Refreshing state... [id=apps-tools-development:general-20231006173329769400000001]
+module.iam_assumable_role_admin.aws_iam_role_policy_attachment.custom[0]: Refreshing state... [id=data-platform-eks-access-20231123153931335200000002]
+module.eks.aws_eks_addon.this["vpc-cni"]: Refreshing state... [id=apps-tools-development:vpc-cni]
+module.eks.aws_eks_addon.this["aws-guardduty-agent"]: Refreshing state... [id=apps-tools-development:aws-guardduty-agent]
+module.eks.aws_eks_addon.this["coredns"]: Refreshing state... [id=apps-tools-development:coredns]
+module.eks.aws_eks_addon.this["kube-proxy"]: Refreshing state... [id=apps-tools-development:kube-proxy]
+module.airflow_execution_role.aws_iam_role_policy_attachment.custom[0]: Refreshing state... [id=data-platform-apps-and-tools-development-airflow-execution-20230914131809981400000003]
+module.ebs_csi_driver_role.aws_iam_role_policy_attachment.ebs_csi[0]: Refreshing state... [id=ebs-csi-driver20230920120755057700000001-20230920120755420700000003]
+module.cluster_autoscaler_role.aws_iam_role_policy_attachment.cluster_autoscaler[0]: Refreshing state... [id=cluster-autoscaler20230920125609978300000002-20230920125610255300000003]
+module.efs_csi_driver_role.aws_iam_role_policy_attachment.efs_csi[0]: Refreshing state... [id=efs-csi-driver20230920170127404800000001-20230920170127963700000003]
+aws_eks_addon.ebs_csi_driver: Refreshing state... [id=apps-tools-development:aws-ebs-csi-driver]
+module.eks.kubernetes_config_map_v1_data.aws_auth[0]: Refreshing state... [id=kube-system/aws-auth]
+aws_eks_addon.efs_csi_driver: Refreshing state... [id=apps-tools-development:aws-efs-csi-driver]
+helm_release.gatekeeper: Refreshing state... [id=gatekeeper]
+kubernetes_namespace.cosign_system: Refreshing state... [id=cosign-system]
+kubernetes_namespace.prometheus: Refreshing state... [id=prometheus]
+kubernetes_namespace.static_assets: Refreshing state... [id=static-assets]
+kubernetes_namespace.actions_runners: Refreshing state... [id=actions-runners]
+kubernetes_namespace.external_secrets: Refreshing state... [id=external-secrets]
+helm_release.gatekeeper_constraint_templates: Refreshing state... [id=gatekeeper-constraint-templates]
+helm_release.cluster_autoscaler: Refreshing state... [id=cluster-autoscaler]
+helm_release.aws_for_fluent_bit: Refreshing state... [id=aws-for-fluent-bit]
+kubernetes_namespace.external_dns: Refreshing state... [id=external-dns]
+kubernetes_namespace.ingress_nginx: Refreshing state... [id=ingress-nginx]
+kubernetes_namespace.velero_system: Refreshing state... [id=velero-system]
+kubernetes_namespace.cert_manager: Refreshing state... [id=cert-manager]
+kubernetes_namespace.openmetadata: Refreshing state... [id=openmetadata]
+kubernetes_namespace.airflow: Refreshing state... [id=airflow]
+helm_release.policy_controller: Refreshing state... [id=policy-controller]
+kubernetes_secret.openmetadata_rds_credentials: Refreshing state... [id=openmetadata/openmetadata-rds-credentials]
+kubernetes_secret.openmetadata_airflow_rds_credentials: Refreshing state... [id=openmetadata/openmetadata-airflow-rds-credentials]
+kubernetes_persistent_volume_claim.openmetadata_airflow_logs: Refreshing state... [id=openmetadata/openmetadata-dependencies-logs-pvc]
+kubernetes_secret.openmetadata_airflow: Refreshing state... [id=openmetadata/openmetadata-airflow]
+kubernetes_secret.openmetadata_opensearch_credentials: Refreshing state... [id=openmetadata/openmetadata-opensearch-credentials]
+kubernetes_persistent_volume_claim.openmetadata_airflow_dags: Refreshing state... [id=openmetadata/openmetadata-dependencies-dags-pvc]
+module.prometheus_iam_role.data.aws_iam_policy_document.this[0]: Reading...
+module.prometheus_iam_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=3548351912]
+module.external_secrets_role.data.aws_iam_policy_document.this[0]: Reading...
+module.external_secrets_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=2078101981]
+module.external_dns_role.data.aws_iam_policy_document.this[0]: Reading...
+module.external_dns_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=980656135]
+module.openmetadata_airflow_iam_role.data.aws_iam_policy_document.this[0]: Reading...
+module.openmetadata_airflow_iam_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=3744716134]
+module.cert_manager_role.data.aws_iam_policy_document.this[0]: Reading...
+module.velero_role.data.aws_iam_policy_document.this[0]: Reading...
+module.cert_manager_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=461230786]
+module.velero_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=2433574830]
+module.openmetadata_iam_role.data.aws_iam_policy_document.this[0]: Reading...
+module.openmetadata_iam_role.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=4216392609]
+kubernetes_role.airflow: Refreshing state... [id=airflow/airflow-role]
+module.prometheus_iam_role.aws_iam_role.this[0]: Refreshing state... [id=prometheus20231009151314766700000002]
+module.external_secrets_role.aws_iam_role.this[0]: Refreshing state... [id=external-secrets20230921155824468400000001]
+module.openmetadata_airflow_iam_role.aws_iam_role.this[0]: Refreshing state... [id=openmetadata-airflow20231002155028097300000001]
+module.external_dns_role.aws_iam_role.this[0]: Refreshing state... [id=external-dns20230920133507506000000001]
+module.cert_manager_role.aws_iam_role.this[0]: Refreshing state... [id=cert-manager20230920144603465800000001]
+module.velero_role.aws_iam_role.this[0]: Refreshing state... [id=velero20230921140926891200000001]
+module.openmetadata_iam_role.aws_iam_role.this[0]: Refreshing state... [id=openmetadata20231003151914729300000001]
+kubernetes_role_binding.airflow: Refreshing state... [id=airflow/airflow-role-binding]
+module.prometheus_iam_role.aws_iam_role_policy_attachment.this["amazon-managed-prometheus"]: Refreshing state... [id=prometheus20231009151314766700000002-20231009151315280600000003]
+module.openmetadata_airflow_iam_role.aws_iam_role_policy_attachment.this["openmetadata-airflow"]: Refreshing state... [id=openmetadata-airflow20231002155028097300000001-20231002155028717200000003]
+module.external_dns_role.aws_iam_role_policy_attachment.external_dns[0]: Refreshing state... [id=external-dns20230920133507506000000001-20230920133508141900000003]
+module.external_secrets_role.aws_iam_role_policy_attachment.external_secrets[0]: Refreshing state... [id=external-secrets20230921155824468400000001-20230921155824688400000003]
+helm_release.amazon_managed_prometheus_proxy: Refreshing state... [id=prometheus-proxy]
+helm_release.openmetadata_dependencies: Refreshing state... [id=openmetadata-dependencies]
+module.velero_role.aws_iam_role_policy_attachment.velero[0]: Refreshing state... [id=velero20230921140926891200000001-20230921140932312900000004]
+helm_release.external_dns: Refreshing state... [id=external-dns]
+helm_release.external_secrets: Refreshing state... [id=external-secrets]
+module.cert_manager_role.aws_iam_role_policy_attachment.cert_manager[0]: Refreshing state... [id=cert-manager20230920144603465800000001-20230920144604135500000003]
+helm_release.velero: Refreshing state... [id=velero]
+helm_release.cert_manager: Refreshing state... [id=cert-manager]
+helm_release.gatekeeper_constraints: Refreshing state... [id=gatekeeper-constraints]
+helm_release.openmetadata: Refreshing state... [id=openmetadata]
+helm_release.cert_manager_additional: Refreshing state... [id=cert-manager-additional]
+helm_release.static_assets: Refreshing state... [id=static-assets]
+helm_release.ingress_nginx_prerequisites: Refreshing state... [id=ingress-nginx-prerequisites]
+helm_release.ingress_nginx: Refreshing state... [id=ingress-nginx]
+
+Note: Objects have changed outside of Terraform
+
+Terraform detected the following changes made outside of Terraform since the
+last "terraform apply" which may have affected this plan:
+
+  # module.openmetadata_efs.aws_efs_file_system.this[0] has changed
+  ~ resource "aws_efs_file_system" "this" {
+        id                              = "fs-093baac7afc5f0da2"
+        name                            = "openmetadata"
+      ~ size_in_bytes                   = [
+          ~ {
+              ~ value             = 8351408128 -> 8372461568
+              ~ value_in_standard = 8351408128 -> 8372461568
+                # (1 unchanged attribute hidden)
+            },
+        ]
+        tags                            = {
+            "Name" = "openmetadata"
+        }
+        # (11 unchanged attributes hidden)
+    }
+
+  # module.datahub_rds.module.db_instance.aws_db_instance.this[0] has changed
+  ~ resource "aws_db_instance" "this" {
+      ~ availability_zone                     = "eu-west-2a" -> "eu-west-2b"
+        id                                    = "db-AOHOMZSI753O65QDK2V4TYPHE4"
+        tags                                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+            "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+        # (55 unchanged attributes hidden)
+
+        # (1 unchanged block hidden)
+    }
+
+  # module.openmetadata_airflow_rds.module.db_instance.aws_db_instance.this[0] has changed
+  ~ resource "aws_db_instance" "this" {
+      ~ availability_zone                     = "eu-west-2c" -> "eu-west-2b"
+        id                                    = "db-DXUW6DGFCQ5HPLAK7T45Y7XFII"
+        tags                                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+            "source-code"            = "https://github.com/ministryofjustice/modernisation-platform"
+        }
+        # (55 unchanged attributes hidden)
+
+        # (1 unchanged block hidden)
+    }
+
+  # module.openmetadata_rds.module.db_instance.aws_db_instance.this[0] has changed
+  ~ resource "aws_db_instance" "this" {
+      ~ availability_zone                     = "eu-west-2a" -> "eu-west-2c"
+        id                                    = "db-EBTICW4KXHFEAEJ6BSHDX6GQSI"
+        tags                                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+            "source-code"            = "https://github.com/ministryofjustice/modernisation-platform"
+        }
+        # (55 unchanged attributes hidden)
+
+        # (1 unchanged block hidden)
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the
+relevant attributes using ignore_changes, the following plan may include
+actions to undo or respond to these changes.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+ <= read (data resources)
+
+Terraform will perform the following actions:
+
+  # aws_cloudwatch_log_resource_policy.opensearch_cloudwatch_logs will be created
+  + resource "aws_cloudwatch_log_resource_policy" "opensearch_cloudwatch_logs" {
+      + id              = (known after apply)
+      + policy_document = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = [
+                          + "logs:PutLogEventsBatch",
+                          + "logs:PutLogEvents",
+                          + "logs:CreateLogStream",
+                        ]
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "es.amazonaws.com"
+                        }
+                      + Resource  = "arn:aws:logs:eu-west-2:335889174965:log-group:/aws/opensearch/openmetadata*"
+                      + Sid       = "AllowOpenSearchPublishCloudWatchLogs"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + policy_name     = "opensearch-cloudwatch-logs"
+    }
+
+  # aws_eks_addon.ebs_csi_driver will be updated in-place
+  ~ resource "aws_eks_addon" "ebs_csi_driver" {
+        id                       = "apps-tools-development:aws-ebs-csi-driver"
+      ~ tags                     = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all                 = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (7 unchanged attributes hidden)
+    }
+
+  # aws_eks_addon.efs_csi_driver will be updated in-place
+  ~ resource "aws_eks_addon" "efs_csi_driver" {
+        id                       = "apps-tools-development:aws-efs-csi-driver"
+      ~ tags                     = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all                 = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (7 unchanged attributes hidden)
+    }
+
+  # module.airflow_execution_policy.aws_iam_policy.policy[0] will be updated in-place
+  ~ resource "aws_iam_policy" "policy" {
+        id          = "arn:aws:iam::335889174965:policy/data-platform-apps-and-tools-development-airflow-execution"
+        name        = "data-platform-apps-and-tools-development-airflow-execution"
+      ~ tags        = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (5 unchanged attributes hidden)
+    }
+
+  # module.airflow_execution_role.aws_iam_role.this[0] will be updated in-place
+  ~ resource "aws_iam_role" "this" {
+        id                    = "data-platform-apps-and-tools-development-airflow-execution"
+        name                  = "data-platform-apps-and-tools-development-airflow-execution"
+      ~ tags                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (8 unchanged attributes hidden)
+    }
+
+  # module.airflow_iam_user.aws_iam_user.this[0] will be updated in-place
+  ~ resource "aws_iam_user" "this" {
+        id            = "data-platform-apps-and-tools-development-airflow"
+        name          = "data-platform-apps-and-tools-development-airflow"
+      ~ tags          = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all      = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (4 unchanged attributes hidden)
+    }
+
+  # module.airflow_ses_policy.aws_iam_policy.policy[0] will be updated in-place
+  ~ resource "aws_iam_policy" "policy" {
+        id          = "arn:aws:iam::335889174965:policy/data-platform-apps-and-tools-development-airflow-ses"
+        name        = "data-platform-apps-and-tools-development-airflow-ses"
+      ~ tags        = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (5 unchanged attributes hidden)
+    }
+
+  # module.cert_manager_role.aws_iam_policy.cert_manager[0] will be updated in-place
+  ~ resource "aws_iam_policy" "cert_manager" {
+        id          = "arn:aws:iam::335889174965:policy/AmazonEKS_Cert_Manager_Policy-20230920144603467100000002"
+        name        = "AmazonEKS_Cert_Manager_Policy-20230920144603467100000002"
+      ~ tags        = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.cert_manager_role.aws_iam_role.this[0] will be updated in-place
+  ~ resource "aws_iam_role" "this" {
+        id                    = "cert-manager20230920144603465800000001"
+        name                  = "cert-manager20230920144603465800000001"
+      ~ tags                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (9 unchanged attributes hidden)
+    }
+
+  # module.cluster_autoscaler_role.aws_iam_policy.cluster_autoscaler[0] will be updated in-place
+  ~ resource "aws_iam_policy" "cluster_autoscaler" {
+        id          = "arn:aws:iam::335889174965:policy/AmazonEKS_Cluster_Autoscaler_Policy-20230920125609976900000001"
+        name        = "AmazonEKS_Cluster_Autoscaler_Policy-20230920125609976900000001"
+      ~ tags        = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.cluster_autoscaler_role.aws_iam_role.this[0] will be updated in-place
+  ~ resource "aws_iam_role" "this" {
+        id                    = "cluster-autoscaler20230920125609978300000002"
+        name                  = "cluster-autoscaler20230920125609978300000002"
+      ~ tags                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (9 unchanged attributes hidden)
+    }
+
+  # module.ebs_csi_driver_role.aws_iam_policy.ebs_csi[0] will be updated in-place
+  ~ resource "aws_iam_policy" "ebs_csi" {
+        id          = "arn:aws:iam::335889174965:policy/AmazonEKS_EBS_CSI_Policy-20230920120755071100000002"
+        name        = "AmazonEKS_EBS_CSI_Policy-20230920120755071100000002"
+      ~ tags        = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.ebs_csi_driver_role.aws_iam_role.this[0] will be updated in-place
+  ~ resource "aws_iam_role" "this" {
+        id                    = "ebs-csi-driver20230920120755057700000001"
+        name                  = "ebs-csi-driver20230920120755057700000001"
+      ~ tags                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (9 unchanged attributes hidden)
+    }
+
+  # module.efs_csi_driver_role.aws_iam_policy.efs_csi[0] will be updated in-place
+  ~ resource "aws_iam_policy" "efs_csi" {
+        id          = "arn:aws:iam::335889174965:policy/AmazonEKS_EFS_CSI_Policy-20230920170127406600000002"
+        name        = "AmazonEKS_EFS_CSI_Policy-20230920170127406600000002"
+      ~ tags        = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.efs_csi_driver_role.aws_iam_role.this[0] will be updated in-place
+  ~ resource "aws_iam_role" "this" {
+        id                    = "efs-csi-driver20230920170127404800000001"
+        name                  = "efs-csi-driver20230920170127404800000001"
+      ~ tags                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (9 unchanged attributes hidden)
+    }
+
+  # module.external_dns_role.aws_iam_policy.external_dns[0] will be updated in-place
+  ~ resource "aws_iam_policy" "external_dns" {
+        id          = "arn:aws:iam::335889174965:policy/AmazonEKS_External_DNS_Policy-20230920133507506700000002"
+        name        = "AmazonEKS_External_DNS_Policy-20230920133507506700000002"
+      ~ tags        = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.external_dns_role.aws_iam_role.this[0] will be updated in-place
+  ~ resource "aws_iam_role" "this" {
+        id                    = "external-dns20230920133507506000000001"
+        name                  = "external-dns20230920133507506000000001"
+      ~ tags                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (9 unchanged attributes hidden)
+    }
+
+  # module.external_secrets_role.aws_iam_policy.external_secrets[0] will be updated in-place
+  ~ resource "aws_iam_policy" "external_secrets" {
+        id          = "arn:aws:iam::335889174965:policy/AmazonEKS_External_Secrets_Policy-20230921155824470200000002"
+        name        = "AmazonEKS_External_Secrets_Policy-20230921155824470200000002"
+      ~ tags        = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.external_secrets_role.aws_iam_role.this[0] will be updated in-place
+  ~ resource "aws_iam_role" "this" {
+        id                    = "external-secrets20230921155824468400000001"
+        name                  = "external-secrets20230921155824468400000001"
+      ~ tags                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (9 unchanged attributes hidden)
+    }
+
+  # module.iam_assumable_role_admin.aws_iam_role.this[0] will be updated in-place
+  ~ resource "aws_iam_role" "this" {
+        id                    = "data-platform-eks-access"
+        name                  = "data-platform-eks-access"
+      ~ tags                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (8 unchanged attributes hidden)
+    }
+
+  # module.openmetadata_airflow_rds_kms.aws_kms_key.this[0] will be updated in-place
+  ~ resource "aws_kms_key" "this" {
+        id                                 = "6d9bc83d-3e92-4d46-8c03-4553383aace8"
+      ~ tags                               = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all                           = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (11 unchanged attributes hidden)
+    }
+
+  # module.openmetadata_efs_kms.aws_kms_key.this[0] will be updated in-place
+  ~ resource "aws_kms_key" "this" {
+        id                                 = "ee41d475-d018-45e4-a5dc-6b1c15477516"
+      ~ tags                               = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all                           = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (11 unchanged attributes hidden)
+    }
+
+  # module.openmetadata_opensearch_cloudwatch_log_group.aws_cloudwatch_log_group.this[0] will be updated in-place
+  ~ resource "aws_cloudwatch_log_group" "this" {
+        id                = "/aws/opensearch/openmetadata"
+        name              = "/aws/opensearch/openmetadata"
+      ~ tags              = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all          = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (4 unchanged attributes hidden)
+    }
+
+  # module.openmetadata_opensearch_kms.aws_kms_key.this[0] will be updated in-place
+  ~ resource "aws_kms_key" "this" {
+        id                                 = "72194602-2e25-4b81-8f8d-09c63dddb038"
+      ~ tags                               = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all                           = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (11 unchanged attributes hidden)
+    }
+
+  # module.openmetadata_rds_kms.aws_kms_key.this[0] will be updated in-place
+  ~ resource "aws_kms_key" "this" {
+        id                                 = "99549176-b94a-44fd-a85f-313b10c44831"
+      ~ tags                               = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all                           = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (11 unchanged attributes hidden)
+    }
+
+  # module.velero_role.aws_iam_policy.velero[0] will be updated in-place
+  ~ resource "aws_iam_policy" "velero" {
+        id          = "arn:aws:iam::335889174965:policy/AmazonEKS_Velero_Policy-20230921140931861600000003"
+        name        = "AmazonEKS_Velero_Policy-20230921140931861600000003"
+      ~ tags        = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.velero_role.aws_iam_role.this[0] will be updated in-place
+  ~ resource "aws_iam_role" "this" {
+        id                    = "velero20230921140926891200000001"
+        name                  = "velero20230921140926891200000001"
+      ~ tags                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (9 unchanged attributes hidden)
+    }
+
+  # module.velero_s3_bucket.data.aws_iam_policy_document.bucket_policy_v2 will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "aws_iam_policy_document" "bucket_policy_v2" {
+      + id   = (known after apply)
+      + json = (known after apply)
+    }
+
+  # module.velero_s3_bucket.data.aws_iam_policy_document.default will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "default" {
+      + id                        = (known after apply)
+      + json                      = (known after apply)
+      + override_policy_documents = [
+          + jsonencode({}),
+          + (known after apply),
+        ]
+
+      + statement {
+          + actions   = [
+              + "s3:*",
+            ]
+          + effect    = "Deny"
+          + resources = [
+              + "arn:aws:s3:::moj-data-platform-development-velero20230927164532332700000001",
+              + "arn:aws:s3:::moj-data-platform-development-velero20230927164532332700000001/*",
+            ]
+
+          + condition {
+              + test     = "Bool"
+              + values   = [
+                  + "false",
+                ]
+              + variable = "aws:SecureTransport"
+            }
+
+          + principals {
+              + identifiers = [
+                  + "*",
+                ]
+              + type        = "AWS"
+            }
+        }
+    }
+
+  # module.velero_s3_bucket.aws_s3_bucket.default will be updated in-place
+  ~ resource "aws_s3_bucket" "default" {
+        id                          = "moj-data-platform-development-velero20230927164532332700000001"
+      ~ tags                        = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all                    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (11 unchanged attributes hidden)
+
+        # (4 unchanged blocks hidden)
+    }
+
+  # module.velero_s3_bucket.aws_s3_bucket_policy.default will be updated in-place
+  ~ resource "aws_s3_bucket_policy" "default" {
+        id     = "moj-data-platform-development-velero20230927164532332700000001"
+      ~ policy = jsonencode(
+            {
+              - Statement = [
+                  - {
+                      - Action    = "s3:*"
+                      - Condition = {
+                          - Bool = {
+                              - "aws:SecureTransport" = "false"
+                            }
+                        }
+                      - Effect    = "Deny"
+                      - Principal = {
+                          - AWS = "*"
+                        }
+                      - Resource  = [
+                          - "arn:aws:s3:::moj-data-platform-development-velero20230927164532332700000001/*",
+                          - "arn:aws:s3:::moj-data-platform-development-velero20230927164532332700000001",
+                        ]
+                    },
+                ]
+              - Version   = "2012-10-17"
+            }
+        ) -> (known after apply)
+        # (1 unchanged attribute hidden)
+    }
+
+  # module.datahub_rds.module.db_parameter_group.aws_db_parameter_group.this[0] will be updated in-place
+  ~ resource "aws_db_parameter_group" "this" {
+        id          = "datahub-20231129135959315800000002"
+        name        = "datahub-20231129135959315800000002"
+        tags        = {
+            "Name"                   = "datahub"
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+            "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+        # (5 unchanged attributes hidden)
+
+      - parameter {
+          - apply_method = "pending-reboot" -> null
+          - name         = "rds.force_ssl" -> null
+          - value        = "1" -> null
+        }
+      + parameter {
+          + apply_method = "immediate"
+          + name         = "rds.force_ssl"
+          + value        = "1"
+        }
+
+        # (3 unchanged blocks hidden)
+    }
+
+  # module.openmetadata_airflow_rds.module.db_instance.aws_db_instance.this[0] will be updated in-place
+  ~ resource "aws_db_instance" "this" {
+        id                                    = "db-DXUW6DGFCQ5HPLAK7T45Y7XFII"
+      ~ tags                                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all                              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (55 unchanged attributes hidden)
+
+        # (1 unchanged block hidden)
+    }
+
+  # module.openmetadata_airflow_rds.module.db_instance.aws_iam_role.enhanced_monitoring[0] will be updated in-place
+  ~ resource "aws_iam_role" "enhanced_monitoring" {
+        id                    = "openmetadata-airflow-rds-monitoring-20231006115619992300000001"
+        name                  = "openmetadata-airflow-rds-monitoring-20231006115619992300000001"
+      ~ tags                  = {
+            "Name"                   = "openmetadata-airflow-rds-monitoring"
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (7 unchanged elements hidden)
+        }
+        # (10 unchanged attributes hidden)
+    }
+
+  # module.openmetadata_airflow_rds.module.db_parameter_group.aws_db_parameter_group.this[0] will be updated in-place
+  ~ resource "aws_db_parameter_group" "this" {
+        id          = "openmetadata-airflow-20231006115619994500000002"
+        name        = "openmetadata-airflow-20231006115619994500000002"
+      ~ tags        = {
+            "Name"                   = "openmetadata-airflow"
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (7 unchanged elements hidden)
+        }
+        # (4 unchanged attributes hidden)
+
+      - parameter {
+          - apply_method = "pending-reboot" -> null
+          - name         = "rds.force_ssl" -> null
+          - value        = "1" -> null
+        }
+      + parameter {
+          + apply_method = "immediate"
+          + name         = "rds.force_ssl"
+          + value        = "1"
+        }
+
+        # (3 unchanged blocks hidden)
+    }
+
+  # module.openmetadata_rds.module.db_instance.aws_db_instance.this[0] will be updated in-place
+  ~ resource "aws_db_instance" "this" {
+        id                                    = "db-EBTICW4KXHFEAEJ6BSHDX6GQSI"
+      ~ tags                                  = {
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all                              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (6 unchanged elements hidden)
+        }
+        # (55 unchanged attributes hidden)
+
+        # (1 unchanged block hidden)
+    }
+
+  # module.openmetadata_rds.module.db_instance.aws_iam_role.enhanced_monitoring[0] will be updated in-place
+  ~ resource "aws_iam_role" "enhanced_monitoring" {
+        id                    = "openmetadata-rds-monitoring-20231006124248644100000001"
+        name                  = "openmetadata-rds-monitoring-20231006124248644100000001"
+      ~ tags                  = {
+            "Name"                   = "openmetadata-rds-monitoring"
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all              = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (7 unchanged elements hidden)
+        }
+        # (10 unchanged attributes hidden)
+    }
+
+  # module.openmetadata_rds.module.db_parameter_group.aws_db_parameter_group.this[0] will be updated in-place
+  ~ resource "aws_db_parameter_group" "this" {
+        id          = "openmetadata-20231006130300907500000001"
+        name        = "openmetadata-20231006130300907500000001"
+      ~ tags        = {
+            "Name"                   = "openmetadata"
+            "application"            = "data-platform-apps-and-tools"
+            "business-unit"          = "Platforms"
+            "environment-name"       = "data-platform-apps-and-tools-development"
+            "infrastructure-support" = "dataplatform@digital.justice.gov.uk"
+            "is-production"          = "false"
+            "owner"                  = "dataplatform@digital.justice.gov.uk"
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      ~ tags_all    = {
+          ~ "source-code"            = "https://github.com/ministryofjustice/modernisation-platform" -> "https://github.com/ministryofjustice/modernisation-platform-environments"
+            # (7 unchanged elements hidden)
+        }
+        # (4 unchanged attributes hidden)
+
+      - parameter {
+          - apply_method = "pending-reboot" -> null
+          - name         = "rds.force_ssl" -> null
+          - value        = "1" -> null
+        }
+      + parameter {
+          + apply_method = "immediate"
+          + name         = "rds.force_ssl"
+          + value        = "1"
+        }
+
+        # (4 unchanged blocks hidden)
+    }
+
+Plan: 1 to add, 35 to change, 0 to destroy.
+
+Warning: Argument is deprecated
+
+  with module.eks.aws_eks_addon.this["kube-proxy"],
+  on .terraform/modules/eks/main.tf line 400, in resource "aws_eks_addon" "this":
+ 400:   resolve_conflicts        = try(each.value.resolve_conflicts, "OVERWRITE")
+
+The "resolve_conflicts" attribute can't be set to "PRESERVE" on initial resource creation. Use
+"resolve_conflicts_on_create" and/or "resolve_conflicts_on_update" instead
+
+(and 3 more similar warnings elsewhere)
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

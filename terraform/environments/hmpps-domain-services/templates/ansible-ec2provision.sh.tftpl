@@ -33,7 +33,7 @@ run_ansible() {
 
   echo "# Retrieving tags using aws cli"
   IFS=$'\n'
-  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=Name,os-type,ami,server-type,environment-name" --output=text))
+  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=Name,os-type,ami,server-type,environment-name,application" --output=text))
   unset IFS
 
   # clone ansible roles and playbook
@@ -47,11 +47,15 @@ run_ansible() {
 
   # find the group_var yaml files
   ansible_group_vars=
+  aws_environment=
+  application=
   for ((i=0; i<$${#tags[@]}; i++)); do
     tag=($${tags[i]})
     group=$(echo "$${tag[1]}_$${tag[4]}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
     if [[ "$${tag[1]}" == "Name" ]]; then
       ansible_group_vars="$ansible_group_vars --extra-vars ec2_name=$${tag[4]}"
+    elif [[ "$${tag[1]}" == "application" ]]; then
+      application="$${tag[4]}"
     elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
       ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
     elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
@@ -62,23 +66,28 @@ run_ansible() {
     fi
     if [[ "$${tag[1]}" == "environment-name" ]]; then
       aws_environment=$(echo $${tag[4]} | rev | cut -d- -f1 | rev)
-      application=$(echo $${tag[4]} | rev | cut -d- -f2- | rev)
-      ansible_group_vars="$ansible_group_vars --extra-vars aws_environment=$aws_environment --extra-vars application=$application"
     fi
   done
 
-  echo "# Checking for $application-environment tag using aws cli"
-  application_environment=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=$application-environment" --output=text | head -1 | cut -f5)
-  if [[ -n $application_environment ]]; then
-    for ((i=0; i<$${#tags[@]}; i++)); do
-      tag=($${tags[i]})
-      group=$(echo "$${tag[1]}_$${tag[4]}_$${application_environment}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
-      if [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
-        ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
-      elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
-        ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
-      fi
-    done
+  if [[ -n $aws_environment ]]; then
+    ansible_group_vars="$ansible_group_vars --extra-vars aws_environment=$aws_environment"
+  fi
+  if [[ -n $application ]]; then
+    ansible_group_vars="$ansible_group_vars --extra-vars application=$application"
+
+    echo "# Checking for $application-environment tag using aws cli"
+    application_environment=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=$application-environment" --output=text | head -1 | cut -f5)
+    if [[ -n $application_environment ]]; then
+      for ((i=0; i<$${#tags[@]}; i++)); do
+        tag=($${tags[i]})
+        group=$(echo "$${tag[1]}_$${tag[4]}_$${application_environment}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
+        if [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
+          ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
+        elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
+          ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
+        fi
+      done
+    fi
   fi
 
   # set python version

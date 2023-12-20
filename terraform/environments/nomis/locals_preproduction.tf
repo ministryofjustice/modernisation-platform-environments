@@ -1,6 +1,17 @@
 # nomis-preproduction environment settings
 locals {
 
+  # baseline presets config
+  preproduction_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "nomis_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
+      }
+    }
+  }
+
   # baseline config
   preproduction_config = {
 
@@ -213,9 +224,10 @@ locals {
 
     baseline_ec2_instances = {
       preprod-nomis-db-1-a = merge(local.database_ec2, {
-        # cloudwatch_metric_alarms = merge(
-        #   local.database_ec2_cloudwatch_metric_alarms.standard,
-        # )
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+        )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           availability_zone = "${local.region}a"
@@ -274,6 +286,7 @@ locals {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
           local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.misload,
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
