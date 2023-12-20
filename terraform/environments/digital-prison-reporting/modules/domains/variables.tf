@@ -47,18 +47,17 @@ variable "extra_attributes" {
 
 variable "dms_source_name" {
   type = string
+  default = ""
 }
 
 variable "dms_target_name" {
   type = string
+  default = ""
 }
 
 variable "short_name" {
   type = string
-}
-
-variable "bucket_name" {
-  type = string
+  default = ""
 }
 
 variable "migration_type" {
@@ -90,8 +89,6 @@ variable "subnet_ids" {
   type        = list(string)
   default     = []
 }
-
-variable "source_address" {}
 
 variable "vpc" {}
 
@@ -191,15 +188,6 @@ variable "target_storage_encrypted" {
 #--------------------------------------------------------------
 # DMS source config
 #--------------------------------------------------------------
-
-variable "source_app_password" {
-  description = "Password for the endpoint to access the source database"
-}
-
-variable "source_app_username" {
-  description = "Username for the endpoint to access the source database"
-}
-
 variable "source_backup_retention_period" {
   # Days
   default     = "1"
