@@ -18,7 +18,7 @@ resource "aws_dms_replication_instance" "dms-s3-target-instance" {
   tags = merge(
     var.tags,
   {
-    name = "${var.name}-${var.resource}-${var.env}"
+    name = "${var.name}-instance-${var.env}"
   })
 
   timeouts {
@@ -62,7 +62,7 @@ resource "aws_dms_replication_task" "dms-replication" {
   tags = merge(
     var.tags,
   {
-    name = "${var.name}-${var.resource}-${var.env}"
+    name = "${var.name}-task-${var.env}"
   })
 
 }
