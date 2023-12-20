@@ -72,7 +72,7 @@ resource "aws_dms_replication_subnet_group" "dms-s3-target-subnet-group" {
   count = var.setup_dms_instance ? 1 : 0
 
   replication_subnet_group_description = "DMS replication subnet group"
-  replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-sg"
+  replication_subnet_group_id          = "${var.name}-sg"
   subnet_ids                           = var.subnet_ids
 }
 
@@ -80,7 +80,7 @@ resource "aws_dms_replication_subnet_group" "dms-s3-target-subnet-group" {
 resource "aws_security_group" "dms_s3_target_sec_group" {
   count = var.setup_dms_instance ? 1 : 0
 
-  name   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-sg"
+  name   = "${var.name}-sg"
   vpc_id = var.vpc
 
   ingress {
