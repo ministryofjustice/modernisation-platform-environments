@@ -469,7 +469,7 @@ variable "setup_step_function_notification_lambda" {
   default     = false
 }
 
-variable "step_function_notification_lambda_name" {
+variable "step_function_notification_lambda" {
   description = "Name for Notification Lambda Name"
   type        = string
   default     = ""
