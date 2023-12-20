@@ -545,7 +545,7 @@ variable "data_ingestion_pipeline"  {
 variable "pipeline_dms_task_time_out"  {
   description = "DMS Task Timeout"
   type        = number
-  number      = 300
+  default     = 300
 }
 
 variable "pipeline_additional_policies" {
