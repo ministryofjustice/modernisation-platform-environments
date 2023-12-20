@@ -1,13 +1,3 @@
-variable "dms_source_endpoint" {
-  type        = string
-  default     = ""
-}
-
-variable "dms_target_endpoint" {
-  type        = string
-  default     = ""
-}
-
 variable "name" {
   description = "DMS Replication name."
 }
@@ -18,10 +8,10 @@ variable "enable_replication_task" {
   default     = false
 }
 
-variable "setup_dms_instance" {
-  description = "Enable DMS Instance, True or False"
+variable "setup_dms_endpoints" {
+  description = "Enable DMS Endpoints, True or False"
   type        = bool
-  default     = false
+  default     = false    
 }
 
 variable "project_id" {
