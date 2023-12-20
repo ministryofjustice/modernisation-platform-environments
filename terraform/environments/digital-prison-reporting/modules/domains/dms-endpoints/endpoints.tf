@@ -14,7 +14,7 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
 
   extra_connection_attributes = var.extra_attributes
 
-  tags = (
+  tags = merge(
   var.tags,
   {
     Resource_Type = "DMS Source Endpoint"
@@ -38,7 +38,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   cdc_max_batch_interval  = 10
   cdc_inserts_and_updates = true
 
-  tags = (
+  tags = merge(
   var.tags,
   {
     Resource_Type = "DMS Target Endpoint"
