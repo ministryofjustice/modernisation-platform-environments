@@ -27,7 +27,11 @@ module "baseline_presets" {
 
   environment  = module.environment
   ip_addresses = module.ip_addresses
-  options      = local.baseline_presets_options
+
+  options = merge(
+    local.baseline_presets_options,
+    local.baseline_environment_presets_options,
+  )
 }
 
 module "baseline" {
