@@ -12,7 +12,7 @@ resource "aws_db_instance" "database" {
   username = local.application_data.accounts[local.environment].db_user
   password = data.aws_secretsmanager_secret_version.db_password.secret_string
   snapshot_identifier = "dev-modplatform-snapshot"
-  final_snapshot_identifier = "dev-modplatform-snapshot-final"
+  skip_final_snapshot = true
 }
 
 resource "aws_db_instance_role_association" "database" {
