@@ -38,7 +38,7 @@ module "glue_reporting_hub_cdc_job" {
 # Batch JOB
 # Glue Job, Reporting Hub Batch
 module "glue_reporting_hub_batch_job" {
-  source                        = "./modules/glue_job"
+  source                        = "../glue_job"
   create_job                    = var.setup_batch_job
   create_role                   = var.glue_batch_create_role # Needs to Set to TRUE
   name                          = var.glue_batch_job_name
