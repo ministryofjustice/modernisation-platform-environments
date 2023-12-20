@@ -198,7 +198,7 @@ resource "aws_security_group" "cluster_ec2" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description     = "allow access on HTTP"
+    description     = "allow access on HTTP from load balancer"
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
@@ -207,20 +207,11 @@ resource "aws_security_group" "cluster_ec2" {
   }
 
   ingress {
-    description     = "allow access on HTTP"
-    from_port       = 8080
-    to_port         = 8080
+    description     = "Allow RDP ingress"
+    from_port       = 3389
+    to_port         = 3389
     protocol        = "tcp"
-    cidr_blocks     = ["0.0.0.0/0"]
-    security_groups = [aws_security_group.chaps_lb_sc.id]
-  }
-
-  ingress {
-    description = "allow access on HTTPS"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks     = module.bastion_linux.bastion_security_group
   }
 
   egress {
