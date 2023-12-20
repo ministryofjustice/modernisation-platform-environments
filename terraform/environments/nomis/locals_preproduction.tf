@@ -275,6 +275,7 @@ locals {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
           local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.misload,
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
