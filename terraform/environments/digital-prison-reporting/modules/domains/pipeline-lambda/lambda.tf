@@ -1,6 +1,6 @@
 # Lambda which notifies step function when DMS task stops
 module "step_function_notification_lambda" {
-  source = "../lambdas/generic"
+  source = "../../lambdas/generic"
 
   enable_lambda = var.setup_step_function_notification_lambda
   name          = var.step_function_notification_lambda
