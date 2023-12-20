@@ -84,6 +84,7 @@ locals {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip-cmc/t1/*",
