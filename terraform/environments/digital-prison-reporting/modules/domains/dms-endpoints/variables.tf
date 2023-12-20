@@ -14,6 +14,16 @@ variable "setup_dms_endpoints" {
   default     = false    
 }
 
+variable "setup_dms_nomis_endpoint" {
+  type    = bool
+  default = false
+}
+
+variable "setup_dms_s3_endpoint" {
+  type    = bool
+  default = false
+}
+
 variable "project_id" {
   type        = string
   description = "(Required) Project Short ID that will be used for resources."

@@ -1,6 +1,6 @@
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "dms-s3-target-source" {
-  count = var.setup_dms_endpoints ? 1 : 0
+  count = var.setup_dms_endpoints && var.setup_dms_nomis_endpoint ? 1 : 0
 
   database_name = var.source_db_name
   endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-source-endpoint"
@@ -22,7 +22,7 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
 }
 
 resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
-  count = var.setup_dms_endpoints ? 1 : 0
+  count = var.setup_dms_endpoints && var.setup_dms_s3_endpoint ? 1 : 0
 
   endpoint_id                      = "${var.project_id}-dms-${var.short_name}-s3-target-endpoint"
   endpoint_type                    = "target"
