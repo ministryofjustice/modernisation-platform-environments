@@ -83,3 +83,21 @@ resource "null_resource" "setup_db" {
     always_run = "${timestamp()}"
   }
 }
+
+resource "aws_cloudwatch_metric_alarm" "rds_connections_alarm" {
+  count               = local.is-development ? 0 : 1
+  alarm_name          = "rds-connections-alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "DatabaseConnections"
+  namespace           = "AWS/RDS"
+  period              = "120"
+  statistic           = "Average"
+  threshold           = "8"  # Set desired threshold for high connections
+  alarm_description   = "This metric checks if RDS database connections are high - threshold set to 8"
+  alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm[0].arn]  # Use the existing SNS topic
+
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.dacp_db.identifier
+  }
+}
