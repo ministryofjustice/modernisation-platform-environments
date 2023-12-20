@@ -78,7 +78,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       essential = true
       portMappings = [
         {
-          containerPort = 80
+          containerPort = local.application_data.accounts[local.environment].container_port
           protocol      = "tcp"
         }
       ]
@@ -120,7 +120,7 @@ resource "aws_ecs_service" "ecs_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.chaps_target_group.arn
     container_name   = "${local.application_name}-container"
-    container_port   = 80
+    container_port   = local.application_data.accounts[local.environment].container_port
   }
 
   network_configuration {
