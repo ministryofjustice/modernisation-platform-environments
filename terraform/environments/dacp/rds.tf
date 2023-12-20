@@ -84,6 +84,33 @@ resource "null_resource" "setup_db" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "rds_logs" {
+  name              = "/aws/events/rdsLogs"
+  retention_in_days = "7"
+}
+
+# AWS EventBridge rule for RDS events
+resource "aws_cloudwatch_event_rule" "rds_events" {
+  name        = "rds-events"
+  description = "Capture all RDS events"
+
+  event_pattern = jsonencode({
+    "source" : ["aws.rds"],
+    "detail" : {
+      "eventSource" : ["db-instance"],
+      "resources" : [aws_db_instance.dacp_db.arn]
+    }
+  })
+}
+
+# AWS EventBridge target for RDS events
+resource "aws_cloudwatch_event_target" "rds_logs" {
+  depends_on = [aws_cloudwatch_log_group.rds_logs]
+  rule       = aws_cloudwatch_event_rule.rds_events.name
+  target_id  = "send-to-cloudwatch"
+  arn        = aws_cloudwatch_log_group.rds_logs.arn
+}
+
 resource "aws_cloudwatch_metric_alarm" "rds_connections_alarm" {
   count               = local.is-development ? 0 : 1
   alarm_name          = "rds-connections-alarm"
