@@ -11,11 +11,15 @@ resource "aws_dms_replication_instance" "dms-s3-target-instance" {
   preferred_maintenance_window = var.replication_instance_maintenance_window
   publicly_accessible          = false
   replication_instance_class   = var.replication_instance_class
-  replication_instance_id      = var.name
+  replication_instance_id      = "${var.name}-instance-${var.env}"
   replication_subnet_group_id  = aws_dms_replication_subnet_group.dms-s3-target-subnet-group[0].id
   vpc_security_group_ids       = aws_security_group.dms_s3_target_sec_group[*].id
 
-  tags = var.tags
+  tags = merge(
+    var.tags,
+  {
+    name = "${var.name}-${var.resource}-${var.env}"
+  })
 
   timeouts {
     create = "1h"
@@ -45,7 +49,7 @@ resource "aws_dms_replication_task" "dms-replication" {
 
   migration_type            = var.migration_type
   replication_instance_arn  = aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_arn
-  replication_task_id       = "${var.project_id}-${var.name}"
+  replication_task_id       = "${var.name}-task-${var.env}"
   source_endpoint_arn       = var.dms_source_endpoint # aws_dms_endpoint.dms-s3-target-source[0].endpoint_arn
   target_endpoint_arn       = var.dms_target_endpoint # aws_dms_s3_endpoint.dms-s3-target-endpoint[0].endpoint_arn
   table_mappings            = data.template_file.table-mappings.rendered
@@ -54,6 +58,13 @@ resource "aws_dms_replication_task" "dms-replication" {
   depends_on = [
     aws_dms_replication_instance.dms-s3-target-instance
   ]
+
+  tags = merge(
+    var.tags,
+  {
+    name = "${var.name}-${var.resource}-${var.env}"
+  })
+
 }
 
 # Create a subnet group using existing VPC subnets
