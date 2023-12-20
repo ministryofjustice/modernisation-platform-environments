@@ -18,11 +18,3 @@ output "dms_s3_iam_policy_admin_arn" {
 output "dms_replication_task_arn" {
   value = var.enable_replication_task ? join("", aws_dms_replication_task.dms-replication.*.replication_task_arn) : ""
 }
-
-output "dms_target_endpoint_arn" {
-  value = aws_dms_s3_endpoint.dms-s3-target-endpoint[0].endpoint_arn
-}
-
-output "dms_source_endpoint_arn" {
-  value = aws_dms_endpoint.dms-s3-target-source[0].endpoint_arn
-}
