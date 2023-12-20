@@ -683,12 +683,6 @@ variable "glue_batch_enable_cont_log_filter" {
   description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 
-variable "s3_kms_arn" {
-  type        = string
-  default     = ""
-  description = "(Optional) The ARN of the kMS Key associated to S3"
-}
-
 variable "glue_batch_execution_class" {
   default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
@@ -721,16 +715,6 @@ variable "glue_batch_max_concurrent" {
   type        = number
   default     = 1
   description = "(Optional) The maximum number of concurrent runs allowed for a job."
-}
-
-variable "account_region" {
-  description = "Current AWS Region."
-  default     = "eu-west-2"
-}
-
-variable "account_id" {
-  description = "AWS Account ID."
-  default     = ""
 }
 
 variable "glue_batch_create_role" {
