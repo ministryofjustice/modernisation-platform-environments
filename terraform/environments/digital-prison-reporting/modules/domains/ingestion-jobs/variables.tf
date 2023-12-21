@@ -338,4 +338,5 @@ variable "lambda_security_group_ids" {
   default     = []
 }
 
-variable "glue_cdc_script_version" {}
+variable "script_version" {}
+variable "jar_version" {}

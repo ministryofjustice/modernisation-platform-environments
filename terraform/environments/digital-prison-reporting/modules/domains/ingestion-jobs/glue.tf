@@ -12,7 +12,7 @@ module "glue_reporting_hub_cdc_job" {
   checkpoint_dir                = var.glue_cdc_checkpoint_dir
   temp_dir                      = var.glue_cdc_temp_dir
   spark_event_logs              = var.glue_cdc_spark_event_logs
-  script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.glue_cdc_script_version}"
+  script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
   enable_continuous_log_filter  = var.glue_cdc_enable_cont_log_filter
   project_id                    = var.project_id
   aws_kms_key                   = var.s3_kms_arn
