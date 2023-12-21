@@ -1,0 +1,178 @@
+{
+    "widgets": [
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 6,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "title": "Total IOPS (operations/sec)",
+                "view": "timeSeries",
+                "period": 60,
+                "stacked": false,
+                "stat": "Sum",
+                "metrics": [
+                    [ "AWS/FSx", "DataReadOperations", "FileSystemId", "${filesystemid}", { "id": "m1", "visible": false } ],
+                    [ ".", "DataWriteOperations", ".", ".", { "id": "m2", "visible": false } ],
+                    [ ".", "MetadataOperations", ".", ".", { "id": "m3", "visible": false } ],
+                    [ { "id": "e1", "expression": "SUM(METRICS())/PERIOD(m1)", "label": "Total IOPS" } ]
+                ],
+                "region": "${region}"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 6,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "AWS/FSx", "DataReadBytes", "FileSystemId", "${filesystemid}", { "id": "datareadbytes", "visible": false } ],
+                    [ ".", "DataWriteBytes", ".", ".", { "id": "datawritebytes", "visible": false } ],
+                    [ { "id": "totalthroughput", "expression": "totaldatabytes/PERIOD(datareadbytes)", "label": "Total Throughput (B/s)", "region": "${region}" } ],
+                    [ { "id": "datawritethroughput", "expression": "datawritebytes/PERIOD(datawritebytes)", "label": "Data Write Throughput (B/s)", "region": "${region}" } ],
+                    [ { "id": "datareadhroughput", "expression": "datareadbytes/PERIOD(datareadbytes)", "label": "Data Read Throughput (B/s)", "region": "${region}" } ],
+                    [ { "id": "totaldatabytes", "expression": "datareadbytes+datawritebytes", "label": "TotalDataBytes", "region": "${region}", "visible": false } ],
+                    [ { "id": "datawritepercent", "expression": "datawritebytes*100/totaldatabytes", "label": "Data Write Throughput (%)", "region": "${region}", "visible": false } ],
+                    [ { "id": "datareadpercent", "expression": "datareadbytes*100/totaldatabytes", "label": "Data Read Throughput (%)", "region": "${region}", "visible": false } ]
+                ],
+                "view": "timeSeries",
+                "title": "Throughput (bytes per second)",
+                "period": 60,
+                "stacked": false,
+                "stat": "Sum",
+                "region": "${region}"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 12,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "AWS/FSx", "DataReadBytes", "FileSystemId", "${filesystemid}", { "id": "datareadbytes" } ],
+                    [ ".", "DataWriteBytes", ".", ".", { "id": "datawritebytes" } ],
+                    [ { "id": "totalthroughput", "expression": "datawritebytes/PERIOD(datawritebytes)", "label": "Total Throughput (B/s)", "region": "${region}", "visible": false } ],
+                    [ { "id": "datawritethroughput", "expression": "SUM(METRICS())/PERIOD(datareadbytes)", "label": "Data Write Throughput (B/s)", "region": "${region}", "visible": false } ],
+                    [ { "id": "datareadhroughput", "expression": "datareadbytes/PERIOD(datareadbytes)", "label": "Data Read Throughput (B/s)", "region": "${region}", "visible": false } ],
+                    [ { "id": "totaldatabytes", "expression": "datareadbytes+datawritebytes", "label": "TotalDataBytes", "region": "${region}" } ],
+                    [ { "id": "datawritepercent", "expression": "datawritebytes*100/totaldatabytes", "label": "Data Write Throughput (%)", "region": "${region}", "visible": false } ],
+                    [ { "id": "datareadpercent", "expression": "datareadbytes*100/totaldatabytes", "label": "Data Read Throughput (%)", "region": "${region}", "visible": false } ]
+                ],
+                "view": "timeSeries",
+                "title": "Data Bytes",
+                "period": 60,
+                "stacked": false,
+                "stat": "Sum",
+                "region": "${region}"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 12,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "AWS/FSx", "DataReadBytes", "FileSystemId", "${filesystemid}", { "id": "datareadbytes", "visible": false } ],
+                    [ ".", "DataWriteBytes", ".", ".", { "id": "datawritebytes", "visible": false } ],
+                    [ { "id": "totalthroughput", "expression": "datawritebytes/PERIOD(datawritebytes)", "label": "Total Throughput (B/s)", "region": "${region}", "visible": false } ],
+                    [ { "id": "datawritethroughput", "expression": "SUM(METRICS())/PERIOD(datareadbytes)", "label": "Data Write Throughput (B/s)", "region": "${region}", "visible": false } ],
+                    [ { "id": "datareadhroughput", "expression": "datareadbytes/PERIOD(datareadbytes)", "label": "Data Read Throughput (B/s)", "region": "${region}", "visible": false } ],
+                    [ { "id": "totaldatabytes", "expression": "datareadbytes+datawritebytes", "label": "TotalDataBytes", "region": "${region}", "visible": false } ],
+                    [ { "id": "datawritepercent", "expression": "datawritebytes*100/totaldatabytes", "label": "Data Write Throughput (%)", "region": "${region}" } ],
+                    [ { "id": "datareadpercent", "expression": "datareadbytes*100/totaldatabytes", "label": "Data Read Throughput (%)", "region": "${region}" } ]
+                ],
+                "view": "timeSeries",
+                "title": "Throughput (Percent)",
+                "period": 60,
+                "stacked": false,
+                "stat": "Sum",
+                "region": "${region}"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "AWS/FSx", "FreeStorageCapacity", "FileSystemId", "${filesystemid}", { "id": "m1", "visible": false } ],
+                    [ { "id": "e1", "expression": "SUM(METRICS())/PERIOD(m1)*60", "label": "Free storage capacity", "region": "${region}" } ],
+                    [ { "expression": "30000000000-e1", "label": "Used Storage Capacity", "id": "e2", "region": "${region}" } ]
+                ],
+                "title": "Storage Capacity (GiB)",
+                "view": "timeSeries",
+                "period": 60,
+                "stacked": false,
+                "stat": "Sum",
+                "region": "${region}"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "AWS/FSx", "FreeStorageCapacity", "FileSystemId", "${filesystemid}", { "id": "m1", "visible": false } ],
+                    [ { "id": "e1", "expression": "SUM(METRICS())/PERIOD(m1)*60", "label": "Free storage capacity", "region": "${region}", "visible": false } ],
+                    [ { "expression": "100*(e2/32212254720)", "label": "Percent Storage Used", "id": "e3", "region": "${region}" } ],
+                    [ { "expression": "32212254720-e1", "label": "Used Storage capacity", "id": "e2", "visible": false, "region": "${region}" } ],
+                    [ { "expression": "100-e3", "label": "Percent Storage Free", "id": "e4", "region": "${region}" } ]
+                ],
+                "title": "Storage (Percent)",
+                "view": "timeSeries",
+                "period": 60,
+                "stacked": true,
+                "stat": "Sum",
+                "region": "${region}",
+                "setPeriodToTimeRange": true,
+                "annotations": {
+                    "horizontal": [
+                        {
+                            "label": "Warning Alarm %",
+                            "value": 80
+                        },
+                        {
+                            "label": "Critical Alarm %",
+                            "value": 90
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "AWS/FSx", "FreeStorageCapacity", "FileSystemId", "${filesystemid}", { "id": "m1", "visible": false } ],
+                    [ { "id": "e1", "expression": "SUM(METRICS())/PERIOD(m1)*60", "label": "Free storage capacity", "region": "${region}", "visible": false } ],
+                    [ { "expression": "100*(e2/32212254720)", "label": "Percent Storage Used", "id": "e3", "region": "${region}" } ],
+                    [ { "expression": "322122547200-e1", "label": "Used Storage capacity", "id": "e2", "visible": false, "region": "${region}" } ],
+                    [ { "expression": "100-e3", "label": "Percent Storage Free", "id": "e4", "region": "${region}" } ]
+                ],
+                "title": "Storage (Percent)",
+                "view": "pie",
+                "period": 60,
+                "stacked": true,
+                "stat": "Sum",
+                "region": "${region}",
+                "setPeriodToTimeRange": true
+            }
+        }
+    ]
+}

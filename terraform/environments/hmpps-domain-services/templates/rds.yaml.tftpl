@@ -96,3 +96,12 @@ tasks:
           Rename-Computer -NewName ${rds_hostname}
           Sleep 5
           Restart-Computer -Force
+      #- frequency: once
+      #  type: powershell
+      #  runAs: admin
+      #  # configure User Profile Disks
+      #  content: |-
+      #    $RdsCollectionName = "RDSCollection"
+      #    $FSxFileSharePath = "\\fsxexample\your_share_name"  # replace with FSx file share path
+      #    Add-RDSessionHost -CollectionName $RdsCollectionName -ConnectionBroker "RDSConnectionBroker"
+      #    Set-RDSessionCollectionConfiguration -CollectionName $RdsCollectionName -EnableUserProfileDisk -MaxUserProfileDiskSizeGB "20" -DiskPath $UserProfileDiskPath $FSxFileSharePath -UserProfileDiskDrive "P:" -ConnectionBroker $ConnectionBroker01
