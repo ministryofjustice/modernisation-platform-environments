@@ -163,48 +163,77 @@ locals {
           }
         }
       }
-      network = {
+      test = {
         internal_lb                      = true
         enable_delete_protection         = false
-        load_balancer_type               = "network"
+        load_balancer_type               = "application"
         idle_timeout                     = 3600
         security_groups                  = ["loadbalancer"]
         subnets                          = module.environment.subnets["private"].ids
-        enable_cross_zone_load_balancing = false
-        access_logs                      = true #default value is true
+        enable_cross_zone_load_balancing = true
+        access_logs                      = true #default value
         force_destroy_bucket             = true
-        # existing_bucket_name             = "network-lb-logs-bucket20231219101122706700000001"
         # not required for testing in sandbox
-        instance_target_groups = {
-          network-lb-target-group = {
-            port     = 80
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              port                = 80
-              protocol            = "TCP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            attachments = [
-              # { ec2_instance_name = "pp-cafm-test-1" },
-            ]
-          }
-        }
+        instance_target_groups = {}
         # not required for testing in sandbox
         listeners = {
           http = {
             port     = 80
-            protocol = "TCP"
+            protocol = "HTTP"
             default_action = {
-              type              = "forward"
-              target_group_name = "network-lb-target-group"
+              type             = "fixed-response"
+              fixed_response   = {
+                content_type = "text/plain"
+                message_body = "Test LB Reply"
+                status_code  = "503"
+              }
             }
           }
         }
       }
+
+      # network = {
+      #   internal_lb                      = true
+      #   enable_delete_protection         = false
+      #   load_balancer_type               = "network"
+      #   idle_timeout                     = 3600
+      #   security_groups                  = ["loadbalancer"]
+      #   subnets                          = module.environment.subnets["private"].ids
+      #   enable_cross_zone_load_balancing = false
+      #   access_logs                      = false #default value is true
+      #   force_destroy_bucket             = true
+      #   # existing_bucket_name             = "network-lb-logs-bucket20231219101122706700000001"
+      #   # not required for testing in sandbox
+      #   instance_target_groups = {
+      #     network-lb-target-group = {
+      #       port     = 80
+      #       protocol = "TCP"
+      #       health_check = {
+      #         enabled             = true
+      #         interval            = 5
+      #         healthy_threshold   = 3
+      #         port                = 80
+      #         protocol            = "TCP"
+      #         timeout             = 4
+      #         unhealthy_threshold = 2
+      #       }
+      #       attachments = [
+      #         # { ec2_instance_name = "pp-cafm-test-1" },
+      #       ]
+      #     }
+      #   }
+      #   # not required for testing in sandbox
+      #   listeners = {
+      #     http = {
+      #       port     = 80
+      #       protocol = "TCP"
+      #       default_action = {
+      #         type              = "forward"
+      #         target_group_name = "network-lb-target-group"
+      #       }
+      #     }
+      #   }
+      # }
     }
   }
 }
