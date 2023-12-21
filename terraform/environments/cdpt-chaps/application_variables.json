@@ -20,7 +20,7 @@
       "ami_image_id": "ami-06cdd5b44c17085ed",
       "instance_type": "t3.medium",
       "key_name": "",
-      "container_port": 8080,
+      "container_port": 80,
       "s3_bucket_name": "chaps-dev-bucket"
     },
     "preproduction": {
@@ -43,7 +43,7 @@
       "ami_image_id": "ami-06cdd5b44c17085ed",
       "instance_type": "t3.medium",
       "key_name": "",
-      "container_port": 8080,
+      "container_port": 80,
       "s3_bucket_name": "chaps-staging-bucket"
     },
     "production": {
@@ -66,7 +66,7 @@
       "ami_image_id": "ami-06cdd5b44c17085ed",
       "instance_type": "t3.medium",
       "key_name": "",
-      "container_port": 8080,
+      "container_port": 80,
       "s3_bucket_name": "chaps-production-bucket"
     }
   }
