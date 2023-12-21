@@ -15,8 +15,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   operating_system = "WINDOWS"
 
   approval_rule {
-    #   approve_after_days = 6 - November 2023
-    approve_after_days = 1
+    approve_after_days = 5
 
     patch_filter {
       key    = "PRODUCT"
@@ -35,9 +34,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   }
 
   approval_rule {
-    #   approve_after_days = 6 - November 2023 
-    approve_after_days = 1
-
+    approve_after_days = 5
     patch_filter {
       key    = "PATCH_SET"
       values = ["APPLICATION"]
