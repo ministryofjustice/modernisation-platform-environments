@@ -155,6 +155,7 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
   statement {
     sid = "DbAccessToSecretsManager"
     actions = [
+      "secretsmanager:Describe*",
       "secretsmanager:Get*",
       "secretsmanager:ListSecret*",
       "secretsmanager:Put*",

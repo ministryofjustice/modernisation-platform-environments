@@ -3,12 +3,13 @@ locals {
   # Once an account has baseline "enable_ec2_oracle_enterprise_managed_server"
   # enabled and run, or the equivalent terraform to create the 
   # EC2OracleEnterpriseManagementSecretsRole IAM role, add it to this list
-  oem_managed_applications = [
+  oem_managed_applications = flatten([
     "corporate-staff-rostering-${local.environment}",
     "nomis-${local.environment}",
     "nomis-combined-reporting-${local.environment}",
     "oasys-${local.environment}",
-  ]
+    contains(["development"], local.environment) ? ["delius-core-${local.environment}"] : []
+  ])
 
   oem_share_secret_principal_ids = [
     for key, value in module.environment.account_ids :
@@ -41,7 +42,9 @@ locals {
     secrets = {
       passwords = {
         description = "passwords only accessible by OEM EC2"
-        # policy = []  # TODO" comment in once secrets have been updated
+        policy = [
+          local.oem_secret_policy_write, # this isn't strictly needed but is added to clear a previous policy
+        ]
       }
       shared-passwords = {
         description = "passwords shared with other accounts"

@@ -1,6 +1,17 @@
 # nomis-test environment settings
 locals {
 
+  # baseline presets config
+  test_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "nomis_nonprod_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_non_prod"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
+      }
+    }
+  }
+
   # baseline config
   test_config = {
 
@@ -231,7 +242,13 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = merge(
+          local.weblogic_cloudwatch_metric_alarms, {
+            high-memory-usage = merge(local.weblogic_cloudwatch_metric_alarms["high-memory-usage"], {
+              threshold = "99" # Remove this if we decide to increase the EC2 size
+            })
+          }
+        )
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
