@@ -118,6 +118,7 @@ module "glue_reporting_hub_batch_job" {
     "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
     "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
     "--dpr.contract.registryName"           = module.s3_schema_registry_bucket.bucket_id
+    "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
     "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_batch_job_retry_max_attempts
     "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_batch_job_retry_min_wait_millis
     "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_batch_job_retry_max_wait_millis
@@ -179,11 +180,8 @@ module "glue_reporting_hub_cdc_job" {
     "--enable-auto-scaling"                 = true
     "--enable-job-insights"                 = true
     "--dpr.contract.registryName"           = module.s3_schema_registry_bucket.bucket_id
+    "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
     "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
-    "--dpr.domain.target.path"              = "s3://${module.s3_domain_bucket.bucket_id}"
-    "--dpr.domain.catalog.db"               = module.glue_data_domain_database.db_name
-    "--dpr.redshift.secrets.name"           = "${local.project}-redshift-secret-${local.environment}"
-    "--dpr.datamart.db.name"                = "datamart"
     "--dpr.schema.cache.max.size"           = local.reporting_hub_cdc_job_schema_cache_max_size
     "--dpr.log.level"                       = local.reporting_hub_cdc_job_log_level
   }
