@@ -101,7 +101,7 @@ resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
   tags = merge(
     var.tags,
     {
-      "Name" =  "${var.env_name}-oracle-database-backups-inventory"
+      "Name" = "${var.env_name}-oracle-database-backups-inventory"
     },
     {
       "Purpose" = "Inventory of Oracle DB Backup Pieces"
@@ -131,12 +131,12 @@ resource "aws_s3_bucket_public_access_block" "oracledb_backups_inventory" {
 
 data "template_file" "oracledb_backups_inventory_policy_file" {
   template = templatefile("${path.module}/policies/oracledb_backups_inventory.json",
-                            {
-                              backup_s3bucket_arn = module.s3_bucket_oracledb_backups.bucket.arn,
-                              inventory_s3bucket_arn = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn,
-                              aws_account_id = data.aws_caller_identity.current.account_id
-                            }
-                          )
+    {
+      backup_s3bucket_arn    = module.s3_bucket_oracledb_backups.bucket.arn,
+      inventory_s3bucket_arn = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn,
+      aws_account_id         = data.aws_caller_identity.current.account_id
+    }
+  )
 }
 
 resource "aws_s3_bucket_policy" "oracledb_backups_inventory_policy" {
@@ -150,7 +150,7 @@ resource "aws_s3_bucket_inventory" "oracledb_backuppieces" {
 
   included_object_versions = "Current"
 
-  optional_fields = ["Size","LastModifiedDate"]
+  optional_fields = ["Size", "LastModifiedDate"]
 
   schedule {
     frequency = "Daily"

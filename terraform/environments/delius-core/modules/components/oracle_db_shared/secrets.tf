@@ -15,7 +15,7 @@ resource "aws_secretsmanager_secret_version" "delius_core_dba_passwords" {
 }
 
 resource "aws_secretsmanager_secret" "delius_core_application_passwords" {
-  name        =join("-",[lookup(var.tags, "environment-name",null),lookup(var.tags,"delius-environment",null),replace(lookup(var.tags, "application",null),"-core",""),"application-passwords"])
+  name        = join("-",[lookup(var.tags, "environment-name",null),lookup(var.tags,"delius-environment",null),replace(lookup(var.tags, "application",null),"-core",""),"application-passwords"])
   description = "Application Users Credentials"
   tags        = var.tags
 }
