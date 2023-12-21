@@ -254,9 +254,9 @@ locals {
       })
 
       preprod-nomis-db-1-b = merge(local.database_ec2, {
-        # cloudwatch_metric_alarms = merge(
-        #   local.database_ec2_cloudwatch_metric_alarms.standard,
-        # )
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+        )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           availability_zone = "${local.region}b"
@@ -401,9 +401,9 @@ locals {
           { name = "ppmis", type = "CNAME", ttl = "300", records = ["ppmis-a.preproduction.nomis.service.justice.gov.uk"] },
           { name = "ppmis-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppmis-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-2-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "ppnomisapiro", type = "CNAME", ttl = "300", records = ["preproduction.nomis.service.justice.gov.uk"] },
-          { name = "ppnomisapiro-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "ppnomisapiro-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppnomisapiro", type = "CNAME", ttl = "300", records = ["ppnomisapiro-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "ppnomisapiro-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppnomisapiro-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
