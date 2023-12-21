@@ -80,97 +80,97 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
       secrets = [
         {
           name        = "DATASOURCE_USERNAME"
-          value_from  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/maat-cd-api/DATASOURCE_USERNAME"
+          value_from  = "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat-cd-api/DATASOURCE_USERNAME"
         },
         {
           name        = "DATASOURCE_PASSWORD"
-          value_from  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_MLA1"
+          value_from  = "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_MLA1"
         },
         {
           name        = "CDA_OAUTH_CLIENT_ID"
-          value_from  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/maat-cd-api/CDA_OAUTH_CLIENT_ID"
+          value_from  = "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat-cd-api/CDA_OAUTH_CLIENT_ID"
         },
         {
           name        = "CDA_OAUTH_CLIENT_SECRET"
-          value_from  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/maat-cd-api/CDA_OAUTH_CLIENT_SECRET"
+          value_from  = "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat-cd-api/CDA_OAUTH_CLIENT_SECRET"
         },
         {
           name        = "TOGDATA_DATASOURCE_PASSWORD"
-          value_from  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_TOGDATA"
+          value_from  = "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_TOGDATA"
         },
       ]
       environment = [
         {
           name  = "DATASOURCE_URL"
-          value = var.pDatasourceUrl
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_DatasourceUrl
         },
         {
           name  = "CLOUD_PLATFORM_QUEUE_REGION"
-          value = var.pCloudPlatformQueueRegion
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CloudPlatformQueueRegion
         },
         {
           name  = "CREATE_LINK_QUEUE"
-          value = var.pCreateLinkQueue
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CreateLinkQueue
         },
         {
           name  = "UNLINK_QUEUE"
-          value = var.pUnlinkQueue
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_UnlinkQueue
         },
         {
           name  = "HEARING_RESULTED_QUEUE"
-          value = var.pHearingsResultedQueue
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_HearingsResultedQueue
         },
         {
           name  = "CDA_OAUTH_URL"
-          value = var.pCdaOauthUrl
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CdaOauthUrl
         },
         {
           name  = "CDA_BASE_URL"
-          value = var.pCdaBaseUrl
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CdaBaseUrl
         },
         {
           name  = "SENTRY_ENV"
-          value = var.pEnvironment
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_Environment
         },
         {
           name  = "POST_MVP_ENABLED"
-          value = var.pPostMvpEnabled
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_PostMvpEnabled
         },
         {
           name  = "PROSECUTION_CONCLUDED_LISTENER_ENABLED"
-          value = var.pProsecutionConcludedListenerEnabled
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_ProsecutionConcludedListenerEnabled
         },
         {
           name  = "PROSECUTION_CONCLUDED_SCHEDULE_ENABLED"
-          value = var.pProsecutionConcludedScheduleEnabled
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_ProsecutionConcludedScheduleEnabled
         },
         {
           name  = "CREATE_LINK_CP_STATUS_JOB_QUEUE"
-          value = var.pCreateLinkCpStatusJobQueue
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CreateLinkCpStatusJobQueue
         },
         {
           name  = "LAA_PROSECUTION_CONCLUDED_QUEUE"
-          value = var.pLaaProsecutionConcludedQueue
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_LaaProsecutionConcludedQueue
         },
         {
           name  = "AWS_DEFAULT_REGION"
-          value = var.pAwsDefaultRegion
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_AwsDefaultRegion
         },
         {
           name  = "CLOUDWATCH_STEP"
-          value = var.pCloudwatchStep
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CloudwatchStep
         },
         {
           name  = "CLOUDWATCH_BATCH_SIZE"
-          value = var.pCloudwatchBatchSize
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CloudwatchBatchSize
         },
         {
           name  = "ENABLE_CLOUDWATCH_METRICS"
-          value = var.pEnableCloudwatchMetrics
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_EnableCloudwatchMetrics
         },
         {
           name  = "TOGDATA_DATASOURCE_USERNAME"
-          value = var.pTogDataUsername
+          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_TogDataUsername
         },
       ]
     }

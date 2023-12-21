@@ -34,7 +34,7 @@ resource "aws_iam_policy" "maat_api_ecs_taks_execution_policy" {
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage"
         ]
-        Resource = "arn:aws:ecr:${local.application_data.accounts[local.environment].region}:${local.environment_management.account_ids[terraform.workspace]}:repository/${local.application_name}-api"
+        Resource = "arn:aws:ecr:${local.env_account_region}:${local.env_account_id}:repository/${local.application_name}-api"
       },
       {
         Effect = "Allow"
@@ -51,9 +51,9 @@ resource "aws_iam_policy" "maat_api_ecs_taks_execution_policy" {
         Effect = "Allow"
         Action = "ssm:GetParameters"
         Resource = [
-          "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.environment_management.account_ids[terraform.workspace]}:parameter/maat-cd-api/*",
-          "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.environment_management.account_ids[terraform.workspace]}:parameter/APP_MAATDB_DBPASSWORD_MLA1",
-          "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.environment_management.account_ids[terraform.workspace]}:parameter/APP_MAATDB_DBPASSWORD_TOGDATA"
+          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat-cd-api/*",
+          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_MLA1",
+          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_TOGDATA"
         ]
       }
     ]
