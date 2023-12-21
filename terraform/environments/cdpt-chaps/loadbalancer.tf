@@ -3,14 +3,6 @@ resource "aws_security_group" "chaps_lb_sc" {
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   description = "allow access on HTTP"
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
-
   ingress {
     description = "allow access on HTTPS"
     from_port   = 443
