@@ -338,5 +338,10 @@ variable "lambda_security_group_ids" {
   default     = []
 }
 
+variable "env" {
+  type        = string
+  description = "Env Type"
+}
+
 variable "script_version" {}
 variable "jar_version" {}
