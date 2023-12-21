@@ -3,7 +3,7 @@
     "development": {
       "db_enabled": true,
       "db_instance_class": "db.t3.small",
-      "db_user": "admin",
+      "db_user": "dbadmin",
       "db_allocated_storage": "75",
       "db_name": "chaps-dev",
       "env_name": "development",
@@ -25,7 +25,7 @@
     "preproduction": {
       "db_enabled": true,
       "db_instance_class": "db.t3.xlarge",
-      "db_user": "admin",
+      "db_user": "dbadmin",
       "db_allocated_storage": "75",
       "db_name": "chaps-preproduction",
       "env_name": "preproduction",
@@ -47,7 +47,7 @@
     "production": {
       "db_enabled": true,
       "db_instance_class": "db.m5.xlarge",
-      "db_user": "admin",
+      "db_user": "dbadmin",
       "db_allocated_storage": "100",
       "db_name": "chaps-prod",
       "env_name": "production",
