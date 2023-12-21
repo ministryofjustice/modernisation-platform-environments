@@ -173,40 +173,50 @@ data "aws_iam_policy_document" "extra-policy-document" {
 }
 
 resource "aws_iam_policy" "additional-policy" {
+  count = var.create_role && var.create_job ? 1 : 0
+
   name        = "${var.name}-policy"
   description = "Extra Policy for AWS Glue Job"
   policy      = data.aws_iam_policy_document.extra-policy-document.json
 }
 
 resource "aws_iam_role_policy_attachment" "glue_policies" {
-  for_each = var.create_role ? toset([
-    "arn:aws:iam::${var.account}:policy/${aws_iam_policy.additional-policy.name}",
+  for_each = ar.create_role && var.create_job ?toset([
+    "arn:aws:iam::${var.account}:policy/${aws_iam_policy.additional-policy[0].name}",
     "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
   ]) : []
 
-  role       = var.create_role ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
+  role       = ar.create_role && var.create_job ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
   policy_arn = each.value
 }
 
 resource "aws_cloudwatch_log_group" "job" {
+  count             = var.create_job ? 1 : 0
+
   name              = "/aws-glue/jobs/${var.name}"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "sec_config" {
+  count             = var.create_job ? 1 : 0
+    
   name              = "/aws-glue/jobs/${var.short_name}-sec-config"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "sec_config_error" {
+  count             = var.create_job ? 1 : 0
+    
   name              = "/aws-glue/jobs/${var.short_name}-sec-config-role/${var.name}-glue-role/error"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "sec_config_output" {
+  count             = var.create_job ? 1 : 0
+  
   name              = "/aws-glue/jobs/${var.short_name}-sec-config-role/${var.name}-glue-role/output"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
@@ -214,12 +224,14 @@ resource "aws_cloudwatch_log_group" "sec_config_output" {
 
 
 resource "aws_cloudwatch_log_group" "continuous_log" {
+  count             = var.create_job ? 1 : 0
+    
   name              = "/aws-glue/jobs/${var.name}-${var.short_name}-sec-config"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
 }
 
-resource "aws_glue_security_configuration" "sec_cfg" {
+resource "aws_glue_security_configuration" "sec_cfg" {  
   count = var.create_security_configuration && var.create_job ? 1 : 0
   name  = "${var.short_name}-sec-config"
 
