@@ -181,12 +181,12 @@ resource "aws_iam_policy" "additional-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "glue_policies" {
-  for_each = ar.create_role && var.create_job ?toset([
+  for_each = var.create_role && var.create_job ?toset([
     "arn:aws:iam::${var.account}:policy/${aws_iam_policy.additional-policy[0].name}",
     "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
   ]) : []
 
-  role       = ar.create_role && var.create_job ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
+  role       = var.create_role && var.create_job ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
   policy_arn = each.value
 }
 
