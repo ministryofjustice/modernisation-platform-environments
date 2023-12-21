@@ -182,6 +182,7 @@ resource "aws_iam_policy" "additional-policy" {
 
 resource "aws_iam_role_policy_attachment" "glue_policies" {
   for_each = var.create_role ? toset([
+    try("arn:aws:iam::${var.account}:policy/${aws_iam_policy.additional-policy[0].name}", null),
     "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
   ]) : []
 
