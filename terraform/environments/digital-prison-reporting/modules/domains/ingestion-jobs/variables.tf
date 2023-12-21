@@ -127,3 +127,9 @@ variable "glue_batch_create_role" {
 
 variable "glue_cdc_script_version" {
 }
+
+variable "setup_cdc_job" {}
+variable "glue_cdc_create_role" {}
+variable "glue_cdc_create_sec_conf" {}
+variable "glue_cdc_job_worker_type" {}
+variable "glue_cdc_job_num_workers" {}
