@@ -1,3 +1,8 @@
+variable "project_id" {
+  type        = string
+  description = "(Required) Project Short ID that will be used for resources."
+}
+
 ## Glue job BATCH
 variable "tags" {
   type        = map(string)
