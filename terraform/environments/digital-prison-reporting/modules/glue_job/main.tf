@@ -5,7 +5,7 @@ locals {
     "--TempDir"                          = var.temp_dir
     "--checkpoint.location"              = var.checkpoint_dir
     "--spark-event-logs-path"            = var.spark_event_logs
-    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.job[0].name
+    "--continuous-log-logGroup"          = try(aws_cloudwatch_log_group.job[0].name, "null")
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
     "--enable-glue-datacatalog"          = "true"
@@ -181,7 +181,7 @@ resource "aws_iam_policy" "additional-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "glue_policies" {
-  for_each = var.create_role && var.create_job ?toset([
+  for_each = var.create_role && var.create_job ? toset([
     "arn:aws:iam::${var.account}:policy/${aws_iam_policy.additional-policy[0].name}",
     "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
   ]) : []
