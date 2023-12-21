@@ -1,6 +1,6 @@
 data "archive_file" "ad-cleanup-lambda" {
   type        = "zip"
-  source_file = "lambda/ad-clean-up"
+  source_dir = "lambda/ad-clean-up"
   output_path = "ad-cleanup-lambda-payload.zip"
   excludes    = "lambda/dockerfile"
 }
