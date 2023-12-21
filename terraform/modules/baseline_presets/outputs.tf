@@ -81,6 +81,12 @@ output "iam_policies" {
   }
 }
 
+output "iam_policy_statements" {
+  description = "Map of iam policy statements"
+
+  value = local.iam_policy_statements
+}
+
 output "key_pairs" {
   description = "Common key pairs to create"
 

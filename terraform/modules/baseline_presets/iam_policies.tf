@@ -13,27 +13,41 @@ locals {
     var.options.iam_policies_filter,
   ])
 
+  # for adding policies - be careful not to run into the limit
   iam_policies_ec2_default = flatten([
-    var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
-    var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
-    var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
-    var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
-    var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
-    var.options.enable_ec2_oracle_enterprise_managed_server ? ["Ec2OracleEnterpriseManagedServerPolicy"] : [],
-    var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
+    local.iam_policy_ec2_default,
+    var.options.enable_ec2_reduced_ssm_policy ? [] : ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
     var.options.iam_policies_ec2_default,
   ])
 
-  # iam_policies_ec2_db = flatten([
-  #   var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
-  #   var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
-  #   var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
-  #   var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
-  #   var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
-  #   var.options.enable_ec2_oracle_enterprise_managed_server ? ["Ec2OracleEnterpriseManagedServerPolicy"] : [],
-  #   var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
-  #   var.options.iam_policies_ec2_default,
-  # ])
+  # for adding policy statements which gets fed into the ec2 default policies
+  iam_policy_ec2_default = {
+    description = "Default EC2 Policy for this environment"
+    statements = flatten([
+      var.options.enable_business_unit_kms_cmks               ? local.iam_policy_statements.business_unit_kms_cmk : [],
+      var.options.enable_ec2_cloud_watch_agent                ? local.iam_policy_statements.CloudWatchAgentServerReduced : [],
+      var.options.enable_ec2_self_provision                   ? local.iam_policy_statements.Ec2SelfProvision : [],
+      var.options.enable_shared_s3                            ? local.iam_policy_statements.S3ReadSharedWrite : [],
+      var.options.enable_ec2_reduced_ssm_policy               ? local.iam_policy_statements.SSMManagedInstanceCoreReduced : [],
+      var.options.enable_ec2_oracle_enterprise_managed_server ? local.iam_policy_statements.OracleEnterpriseManagedServer : [],
+      var.options.enable_ec2_oracle_enterprise_manager        ? local.iam_policy_statements.OracleEnterpriseManager : [],
+      var.options.iam_policy_statements_ec2_default,
+    ])
+  }
+
+  iam_policy_ec2_db = {
+    description = "EC2 Policy for a DB"
+    statements = flatten([
+      local.iam_policy_statements.OracleLicenseTracking
+    ])
+  }
+
+  # iam_policy_ec2_web = {
+  #   description = "EC2 Policy for a webserver"
+  #   statements = flatten([
+  #     ...
+  #   ])
+  # }
 
   oem_account_id = try(var.environment.account_ids["hmpps-oem-${var.environment.environment}"], "OemAccountNotFound")
 
@@ -61,22 +75,22 @@ locals {
 
     Ec2AccessSharedS3Policy = {
       description = "Permissions to allow EC2 to access shared s3 bucket"
-      statements = local.iam_policy_statements.SharedS3ReadWrite
+      statements = local.iam_policy_statements.S3ReadSharedWrite
     }
 
     # see corresponding policy in core-shared-services-production
     # https://github.com/ministryofjustice/modernisation-platform-ami-builds/blob/main/modernisation-platform/iam.tf
     ImageBuilderS3BucketReadOnlyAccessPolicy = {
       description = "Permissions to access shared ImageBuilder bucket read-only"
-      statements = local.iam_policy_statements.SharedS3Read
+      statements = local.iam_policy_statements.S3ReadShared
     }
     ImageBuilderS3BucketWriteAccessPolicy = {
       description = "Permissions to access shared ImageBuilder bucket read-write"
-      statements = local.iam_policy_statements.SharedS3ReadWriteLimited
+      statements = local.iam_policy_statements.S3ReadSharedWriteLimited
     }
     ImageBuilderS3BucketWriteAndDeleteAccessPolicy = {
       description = "Permissions to access shared ImageBuilder bucket read-write-delete"
-      statements = local.iam_policy_statements.SharedS3ReadWriteDelete
+      statements = local.iam_policy_statements.S3ReadSharedWriteDelete
     }
 
     OracleEnterpriseManagementSecretsPolicy = {
