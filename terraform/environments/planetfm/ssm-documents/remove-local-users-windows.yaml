@@ -10,7 +10,7 @@ mainSteps:
       runCommand:
         - |
           # Fetch all local users except the default system accounts
-          $users = Get-WmiObject -Class Win32_UserAccount -Filter 'LocalAccount=''True'' AND Name<>'Administrator' AND Name<>'Guest' AND Name<>'DefaultAccount' AND Name<>'WDAGUtilityAccount'' -Namespace 'root\\cimv2'
+          $users = Get-WmiObject -Class Win32_UserAccount -Filter 'LocalAccount=''True'' AND Name<>'Developer' AND Name<>'Migration'' -Namespace 'root\\cimv2'
 
           # Remove each user
           foreach ($user in $users) {
