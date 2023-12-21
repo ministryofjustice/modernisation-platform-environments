@@ -3,22 +3,38 @@
     "development": {
       "example_var": "dev-data",
       "mlra_vpc_cidr": "10.26.56.0/21",
-      "ecs_service_count": 1
+      "ecs_service_count": 1,
+      "ecs_cpu": 1024,
+      "ecs_memory": 2048,
+      "ecs_container_cpu": 922,
+      "ecs_container_memory": 1792
     },
     "test": {
       "example_var": "test-data",
       "mlra_vpc_cidr": "10.26.96.0/21",
-      "ecs_service_count": 1
+      "ecs_service_count": 1,
+      "ecs_cpu": 1024,
+      "ecs_memory": 2048,
+      "ecs_container_cpu": 922,
+      "ecs_container_memory": 1792
     },
     "preproduction": {
       "example_var": "preproduction-data",
       "mlra_vpc_cidr": "10.27.72.0/21",
-      "ecs_service_count": 2
+      "ecs_service_count": 2,
+      "ecs_cpu": 1024,
+      "ecs_memory": 3072,
+      "ecs_container_cpu": 922,
+      "ecs_container_memory": 2816
     },
     "production": {
       "example_var": "production-data",
       "mlra_vpc_cidr": "10.27.64.0/21",
-      "ecs_service_count": 2
+      "ecs_service_count": 2,
+      "ecs_cpu": 1024,
+      "ecs_memory": 3072,
+      "ecs_container_cpu": 922,
+      "ecs_container_memory": 2816
     }
   }
 }

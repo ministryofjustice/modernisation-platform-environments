@@ -50,26 +50,26 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
 ######################################
 resource "aws_ecs_task_definition" "TaskDefinition" {
   family                   = "${local.application_name}-api-task-definition"
-  cpu                      = var.cNonProd ? 1024 : 1024
-  memory                   = var.cNonProd ? 2048 : 3072
+  cpu                      = local.application_data.accounts[local.environment].ecs_cpu
+  memory                   = local.application_data.accounts[local.environment].ecs_memory
   network_mode             = "awsvpc"
-  requires_compatibilities = [var.pLaunchType]
-  execution_role_arn       = aws_iam_role.ECSTaskExecutionRole.arn
-  task_role_arn            = aws_iam_role.ECSTaskExecutionRole.arn
+  requires_compatibilities = "FARGATE"
+  execution_role_arn       = aws_iam_role.maat_api_ecs_taks_execution_role.arn
+  task_role_arn            = aws_iam_role.maat_api_ecs_taks_execution_role.arn
 
   container_definitions = jsonencode([
     {
-      name        = var.pAppName
-      cpu         = var.cNonProd ? 992 : 992
+      name        = "${local.application_name}-api"
+      cpu         = local.application_data.accounts[local.environment].ecs_container_cpu
       essential   = true
-      image       = "${var.pECSRepositoryURL}:${var.pDockerImageTag}"
-      memory      = var.cNonProd ? 1792 : 2816
+      image       = "${ecr_url}:${docker_image_tag}" #"${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo" ---> look at it once Docker image is created and pushed to ECR
+      memory      = local.application_data.accounts[local.environment].ecs_container_memory
       log_configuration = {
         log_driver = "awslogs"
         options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.CloudwatchLogsGroup.name
-          "awslogs-region"        = var.AWS_Region
-          "awslogs-stream-prefix" = "${var.pAppName}-app"
+          "awslogs-group"         = aws_cloudwatch_log_group.maat_api_ecs_cw_group.name
+          "awslogs-region"        = "${data.aws_region.current.name}"
+          "awslogs-stream-prefix" = "${local.application_name}-api-app"
         }
       }
       port_mappings = [
@@ -79,21 +79,99 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
       ]
       secrets = [
         {
-          name      = "DATASOURCE_USERNAME"
-          value_from = "arn:aws:ssm:${var.AWS_Region}:${var.AWS_AccountId}:parameter/maat-cd-api/DATASOURCE_USERNAME"
+          name        = "DATASOURCE_USERNAME"
+          value_from  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/maat-cd-api/DATASOURCE_USERNAME"
         },
         {
-          name      = "DATASOURCE_PASSWORD"
-          value_from = "arn:aws:ssm:${var.AWS_Region}:${var.AWS_AccountId}:parameter/APP_MAATDB_DBPASSWORD_MLA1"
+          name        = "DATASOURCE_PASSWORD"
+          value_from  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_MLA1"
         },
-        # ... (repeat for other secrets)
+        {
+          name        = "CDA_OAUTH_CLIENT_ID"
+          value_from  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/maat-cd-api/CDA_OAUTH_CLIENT_ID"
+        },
+        {
+          name        = "CDA_OAUTH_CLIENT_SECRET"
+          value_from  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/maat-cd-api/CDA_OAUTH_CLIENT_SECRET"
+        },
+        {
+          name        = "TOGDATA_DATASOURCE_PASSWORD"
+          value_from  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_TOGDATA"
+        },
       ]
       environment = [
         {
           name  = "DATASOURCE_URL"
           value = var.pDatasourceUrl
         },
-        # ... (repeat for other environment variables)
+        {
+          name  = "CLOUD_PLATFORM_QUEUE_REGION"
+          value = var.pCloudPlatformQueueRegion
+        },
+        {
+          name  = "CREATE_LINK_QUEUE"
+          value = var.pCreateLinkQueue
+        },
+        {
+          name  = "UNLINK_QUEUE"
+          value = var.pUnlinkQueue
+        },
+        {
+          name  = "HEARING_RESULTED_QUEUE"
+          value = var.pHearingsResultedQueue
+        },
+        {
+          name  = "CDA_OAUTH_URL"
+          value = var.pCdaOauthUrl
+        },
+        {
+          name  = "CDA_BASE_URL"
+          value = var.pCdaBaseUrl
+        },
+        {
+          name  = "SENTRY_ENV"
+          value = var.pEnvironment
+        },
+        {
+          name  = "POST_MVP_ENABLED"
+          value = var.pPostMvpEnabled
+        },
+        {
+          name  = "PROSECUTION_CONCLUDED_LISTENER_ENABLED"
+          value = var.pProsecutionConcludedListenerEnabled
+        },
+        {
+          name  = "PROSECUTION_CONCLUDED_SCHEDULE_ENABLED"
+          value = var.pProsecutionConcludedScheduleEnabled
+        },
+        {
+          name  = "CREATE_LINK_CP_STATUS_JOB_QUEUE"
+          value = var.pCreateLinkCpStatusJobQueue
+        },
+        {
+          name  = "LAA_PROSECUTION_CONCLUDED_QUEUE"
+          value = var.pLaaProsecutionConcludedQueue
+        },
+        {
+          name  = "AWS_DEFAULT_REGION"
+          value = var.pAwsDefaultRegion
+        },
+        {
+          name  = "CLOUDWATCH_STEP"
+          value = var.pCloudwatchStep
+        },
+        {
+          name  = "CLOUDWATCH_BATCH_SIZE"
+          value = var.pCloudwatchBatchSize
+        },
+        {
+          name  = "ENABLE_CLOUDWATCH_METRICS"
+          value = var.pEnableCloudwatchMetrics
+        },
+        {
+          name  = "TOGDATA_DATASOURCE_USERNAME"
+          value = var.pTogDataUsername
+        },
       ]
     }
   ])
