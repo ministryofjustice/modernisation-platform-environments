@@ -567,7 +567,6 @@ locals {
 
     S3Read = [
       {
-        sid = "S3Read"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
@@ -579,7 +578,6 @@ locals {
     ]
     S3Write = [
       {
-        sid = "S3Write"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
@@ -595,7 +593,6 @@ locals {
     ]
     S3ReadWriteDelete = [
       {
-        sid = "S3ReadWriteDelete"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
