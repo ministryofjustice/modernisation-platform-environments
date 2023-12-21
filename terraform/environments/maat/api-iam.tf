@@ -64,7 +64,7 @@ resource "aws_iam_policy" "maat_api_ecs_taks_execution_policy" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "ECSTaskExecutionRolePolicyAttachment maat_api_task_execution_role_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "maat_api_task_execution_role_policy_attachment" {
   role       = aws_iam_role.maat_api_ecs_taks_execution_role.name
   policy_arn = aws_iam_policy.maat_api_ecs_taks_execution_policy.arn
 }
