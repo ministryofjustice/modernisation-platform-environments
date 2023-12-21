@@ -239,6 +239,17 @@ locals {
         ]
       }
     }
+
+    fsx = {
+      automatic_backup_retention_days    = 7
+      common_name                        = var.environment_name
+      copy_tags_to_backups               = false
+      daily_automatic_backup_start_time  = "03:00"
+      deployment_type                    = "MULTI_AZ_1"
+      filesystem_name                    = var.environment_name
+      storage_capacity                   = 32 # GiB // these values can be changed
+      throughput_capacity                = 8 # MB/s // these values can be changed
+    }
   }
 }
 

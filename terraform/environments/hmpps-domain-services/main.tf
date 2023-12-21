@@ -158,3 +158,16 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
   )
 }
+
+module "fsx" {
+  source = "./modules/fsx"
+
+  common = {
+    environment_name = var.environment_name
+    subnet_ids       = local.subnet_ids
+    tags             = local.tags
+    vpc_id           = local.vpc_id
+    region           = local.region
+  }
+  fsx    = local.fsx
+}
