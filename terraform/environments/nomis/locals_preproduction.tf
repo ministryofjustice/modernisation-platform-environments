@@ -254,9 +254,9 @@ locals {
       })
 
       preprod-nomis-db-1-b = merge(local.database_ec2, {
-        # cloudwatch_metric_alarms = merge(
-        #   local.database_ec2_cloudwatch_metric_alarms.standard,
-        # )
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+        )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           availability_zone = "${local.region}b"
