@@ -198,7 +198,7 @@ locals {
         idle_timeout                     = 3600
         security_groups                  = ["loadbalancer"]
         subnets                          = module.environment.subnets["private"].ids
-        access_logs                      = true #default value is true
+        access_logs                      = false #default value is true
         force_destroy_bucket             = true
         # existing_bucket_name             = "network-lb-logs-bucket20231219101122706700000001"
         # not required for testing in sandbox
