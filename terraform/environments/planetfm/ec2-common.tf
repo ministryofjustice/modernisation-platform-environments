@@ -53,3 +53,17 @@ resource "aws_ssm_document" "ami_build_automation" {
     },
   )
 }
+
+resource "aws_ssm_document" "remove_local_users_windows" {
+  name            = "remove-local-users-windows"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/remove-local-users-windows.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "remove-local-users-windows"
+    },
+  )
+}
