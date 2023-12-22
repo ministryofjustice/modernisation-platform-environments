@@ -526,7 +526,7 @@ variable "iam_roles" {
   description = "map of iam roles to create, where the key is the name of the role"
   type = map(object({
     assume_role_policy = list(object({
-      sid     = optional(string, null)
+      sid     = optional(string)
       effect  = string
       actions = list(string)
       principals = optional(object({

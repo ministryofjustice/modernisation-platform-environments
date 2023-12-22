@@ -51,22 +51,22 @@ locals {
   )
 
   s3_bucket_policies = {
-    ImageBuilderWriteAccessBucketPolicy                 = local.iam_policy_statements.S3ReadWriteCoreSharedServicesProduction[0]
-    AllEnvironmentsReadOnlyAccessBucketPolicy           = local.iam_policy_statements.S3ReadAllEnvironments[0]
-    PreprodReadOnlyAccessBucketPolicy                   = local.iam_policy_statements.S3ReadOnlyPreprod[0]
-    AllEnvironmentsWriteAccessBucketPolicy              = local.iam_policy_statements.S3ReadWriteAllEnvironments[0]
-    ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy   = local.iam_policy_statements.S3ReadProdPreprod[0]
-    ProdPreprodEnvironmentsWriteAccessBucketPolicy      = local.iam_policy_statements.S3ReadWriteProdPreprod[0]
-    AllEnvironmentsWriteAndDeleteAccessBucketPolicy     = local.iam_policy_statements.S3ReadWriteDeleteAllEnvironments[0]
-    DevTestEnvironmentsReadOnlyAccessBucketPolicy       = local.iam_policy_statements.S3ReadDevTest[0]
-    DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy = local.iam_policy_statements.S3ReadWriteDeleteDevTest[0]
-    DevelopmentReadOnlyAccessBucketPolicy               = local.iam_policy_statements.S3ReadDev[0]
+    ImageBuilderWriteAccessBucketPolicy                 = local.iam_policy_statements_s3.S3ReadWriteCoreSharedServicesProduction[0]
+    AllEnvironmentsReadOnlyAccessBucketPolicy           = local.iam_policy_statements_s3.S3ReadAllEnvironments[0]
+    PreprodReadOnlyAccessBucketPolicy                   = local.iam_policy_statements_s3.S3ReadOnlyPreprod[0]
+    AllEnvironmentsWriteAccessBucketPolicy              = local.iam_policy_statements_s3.S3ReadWriteAllEnvironments[0]
+    ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy   = local.iam_policy_statements_s3.S3ReadProdPreprod[0]
+    ProdPreprodEnvironmentsWriteAccessBucketPolicy      = local.iam_policy_statements_s3.S3ReadWriteProdPreprod[0]
+    AllEnvironmentsWriteAndDeleteAccessBucketPolicy     = local.iam_policy_statements_s3.S3ReadWriteDeleteAllEnvironments[0]
+    DevTestEnvironmentsReadOnlyAccessBucketPolicy       = local.iam_policy_statements_s3.S3ReadDevTest[0]
+    DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy = local.iam_policy_statements_s3.S3ReadWriteDeleteDevTest[0]
+    DevelopmentReadOnlyAccessBucketPolicy               = local.iam_policy_statements_s3.S3ReadDev[0]
   }
 
   s3_iam_policies = {
-    EC2S3BucketReadOnlyAccessPolicy = local.iam_policy_statements.S3Read
-    EC2S3BucketWriteAccessPolicy = local.iam_policy_statements.S3Write
-    EC2S3BucketWriteAndDeleteAccessPolicy = local.iam_policy_statements.S3ReadWriteDelete
+    EC2S3BucketReadOnlyAccessPolicy = local.iam_policy_statements_s3.S3Read
+    EC2S3BucketWriteAccessPolicy = local.iam_policy_statements_s3.S3Write
+    EC2S3BucketWriteAndDeleteAccessPolicy = local.iam_policy_statements_s3.S3ReadWriteDelete
   }
 
   s3_lifecycle_rules = {
