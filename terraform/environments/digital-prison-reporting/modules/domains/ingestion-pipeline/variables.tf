@@ -23,10 +23,7 @@ variable "pipeline_additional_policies" {
   default     = []
 }
 
-variable "dms_replication_task_arn" {
-  type        = string
-  default     = ""  
-}
+variable "dms_replication_task_arn" {}
 
 variable "pipeline_notification_lambda_function" {
   description = "Pipeline Notification Lambda Name"
