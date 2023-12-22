@@ -81,10 +81,16 @@ output "iam_policies" {
   }
 }
 
-output "iam_policy_statements" {
-  description = "Map of iam policy statements"
+output "iam_policy_statements_ec2" {
+  description = "Map of iam policy statements for ec2 instances"
 
-  value = local.iam_policy_statements
+  value = local.iam_policy_statements_ec2
+}
+
+output "iam_policy_statements_s3" {
+  description = "Map of iam policy statements for s3 buckets"
+
+  value = local.iam_policy_statements_s3
 }
 
 output "key_pairs" {
