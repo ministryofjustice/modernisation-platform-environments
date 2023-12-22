@@ -35,7 +35,7 @@ locals {
         var.options.enable_ec2_reduced_ssm_policy               ? local.iam_policy_statements.SSMManagedInstanceCoreReduced : [],
         var.options.enable_ec2_oracle_enterprise_managed_server ? local.iam_policy_statements.OracleEnterpriseManagedServer : [],
         var.options.enable_ec2_oracle_enterprise_manager        ? local.iam_policy_statements.OracleEnterpriseManager : [],
-        var.options.iam_policy_statements_ec2_default != null   ? var.options.iam_policy_statements_ec2_default : null
+        var.options.iam_policy_statements_ec2_default
       ])
     }
 

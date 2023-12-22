@@ -46,7 +46,7 @@ variable "options" {
         variable = string
         values   = list(string)
       })), [])
-    })), null)
+    })), [])
     s3_iam_policies                              = optional(list(string))
     sns_topics = optional(object({
       pagerduty_integrations = optional(map(string), {})
