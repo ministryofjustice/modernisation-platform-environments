@@ -119,6 +119,7 @@ module "glue_reporting_hub_batch_job" {
     "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
     "--dpr.contract.registryName"           = module.s3_schema_registry_bucket.bucket_id
     "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
+    "--dpr.config.key"                      = "current"
     "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_batch_job_retry_max_attempts
     "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_batch_job_retry_min_wait_millis
     "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_batch_job_retry_max_wait_millis
@@ -181,6 +182,7 @@ module "glue_reporting_hub_cdc_job" {
     "--enable-job-insights"                 = true
     "--dpr.contract.registryName"           = module.s3_schema_registry_bucket.bucket_id
     "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
+    "--dpr.config.key"                      = "current"
     "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
     "--dpr.schema.cache.max.size"           = local.reporting_hub_cdc_job_schema_cache_max_size
     "--dpr.log.level"                       = local.reporting_hub_cdc_job_log_level

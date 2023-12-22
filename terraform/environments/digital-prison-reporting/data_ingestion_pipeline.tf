@@ -135,7 +135,9 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : "${module.glue_reporting_hub_batch_job.name}"
+            "JobName" : "${module.glue_reporting_hub_batch_job.name}",
+            "--dpr.config.s3.bucket" : module.s3_glue_job_bucket.bucket_id,
+            "--dpr.config.key" : "current"
           },
           "Next" : "Invoke S3 File Transfer Lambda"
         },
@@ -146,7 +148,11 @@ module "data_ingestion_pipeline" {
             "Payload" : {
               "token.$" : "$$.Task.Token",
               "sourceBucket" : "${module.s3_raw_bucket.bucket_id}",
-              "destinationBucket" : "${module.s3_raw_archive_bucket.bucket_id}"
+              "destinationBucket" : "${module.s3_raw_archive_bucket.bucket_id}",
+              "config" : {
+                "bucket" : module.s3_glue_job_bucket.bucket_id,
+                "key" : "current"
+              }
             },
             "FunctionName" : "${module.s3_file_transfer_lambda.lambda_function}"
           },
@@ -169,7 +175,11 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : "${module.glue_hive_table_creation_job.name}"
+            "JobName" : "${module.glue_hive_table_creation_job.name}",
+            "Arguments" : {
+              "--dpr.config.s3.bucket" : module.s3_glue_job_bucket.bucket_id,
+              "--dpr.config.key" : "current"
+            }
           },
           "Next" : "Resume DMS Replication Task"
         },
@@ -186,7 +196,11 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun",
           "Parameters" : {
-            "JobName" : "${module.glue_reporting_hub_cdc_job.name}"
+            "JobName" : "${module.glue_reporting_hub_cdc_job.name}",
+            "Arguments" : {
+              "--dpr.config.s3.bucket" : module.s3_glue_job_bucket.bucket_id,
+              "--dpr.config.key" : "current"
+            }
           },
           "End" : true
         }
