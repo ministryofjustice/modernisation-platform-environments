@@ -1,6 +1,6 @@
 # Data Ingest Pipeline Step Function
 module "data_ingestion_pipeline" {
-  source = "../step_function"
+  source = "../../step_function"
 
   enable_step_function = var.setup_data_ingestion_pipeline
   step_function_name   = var.data_ingestion_pipeline
