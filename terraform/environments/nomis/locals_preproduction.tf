@@ -293,7 +293,7 @@ locals {
       preprod-nomis-xtag-a = merge(local.xtag_ec2, {
         # cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
-          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
+          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
             "Ec2PreprodWeblogicPolicy",
