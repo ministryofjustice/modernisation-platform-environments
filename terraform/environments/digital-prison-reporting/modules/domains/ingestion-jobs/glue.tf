@@ -73,3 +73,38 @@ module "glue_reporting_hub_batch_job" {
 }
 
 # Hive Tables Creation JOB
+module "glue_hive_table_setup_job" {
+  source                        = "../../glue_job"
+  create_job                    = var.setup_hive_job
+  create_role                   = var.glue_hive_create_role # Needs to Set to TRUE
+  name                          = var.glue_hive_job_name
+  short_name                    = var.glue_hive_job_short_name
+  command_type                  = "glueetl"
+  description                   = var.glue_hive_description
+  create_security_configuration = var.glue_hive_create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = var.glue_hive_temp_dir
+  spark_event_logs              = var.glue_hive_spark_event_logs
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-hive_table_creation-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-hive_table_creation-${local.env}/"
+  script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
+  enable_continuous_log_filter  = var.glue_hive_enable_cont_log_filter
+  project_id                    = var.project_id
+  aws_kms_key                   = var.s3_kms_arn
+  execution_class               = var.glue_hive_execution_class
+  worker_type                   = var.glue_hive_job_worker_type
+  number_of_workers             = var.glue_hive_job_num_workers
+  max_concurrent                = var.glue_hive_max_concurrent #64
+  region                        = var.account_region
+  account                       = var.account_id
+  log_group_retention_in_days   = var.glue_hive_log_group_retention_in_days
+
+  arguments                     = var.glue_hive_arguments
+
+  tags = merge(
+    var.tags,
+    {
+      Resource_Type = "Glue Job"
+    }
+  )
+}
