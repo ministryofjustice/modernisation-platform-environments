@@ -14,7 +14,7 @@ locals {
 
   # for adding policies - be careful not to run into the limit
   iam_policies_ec2_default = flatten([
-    "EC2Default",
+    # "EC2Default",
     var.options.enable_ec2_reduced_ssm_policy ? [] : ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
     var.options.iam_policies_ec2_default,
   ])
