@@ -10,6 +10,7 @@ locals {
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy","Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
     var.options.iam_policies_filter,
+    "EC2Default",
   ])
 
   # for adding policies - be careful not to run into the limit
