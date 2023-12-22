@@ -85,8 +85,6 @@ module "glue_hive_table_setup_job" {
   job_language                  = "scala"
   temp_dir                      = var.glue_hive_temp_dir
   spark_event_logs              = var.glue_hive_spark_event_logs
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-hive_table_creation-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-hive_table_creation-${local.env}/"
   script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
   enable_continuous_log_filter  = var.glue_hive_enable_cont_log_filter
   project_id                    = var.project_id
