@@ -349,12 +349,6 @@ variable "jar_version" {}
 # HIVE
 
 ## Glue job hive
-variable "tags" {
-  type        = map(string)
-  default     = {}
-  description = "(Optional) Key-value map of resource tags."
-}
-
 variable "glue_hive_arguments" {
   type    = map(any)
   default = {}
