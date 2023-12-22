@@ -136,8 +136,10 @@ module "data_ingestion_pipeline" {
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : "${module.glue_reporting_hub_batch_job.name}",
-            "--dpr.config.s3.bucket" : module.s3_glue_job_bucket.bucket_id,
-            "--dpr.config.key" : "current"
+            "Arguments" : {
+              "--dpr.config.s3.bucket" : module.s3_glue_job_bucket.bucket_id,
+              "--dpr.config.key" : "current"
+            }
           },
           "Next" : "Invoke S3 File Transfer Lambda"
         },
