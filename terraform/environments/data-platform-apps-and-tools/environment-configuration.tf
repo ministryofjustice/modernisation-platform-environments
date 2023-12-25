@@ -76,7 +76,7 @@ locals {
       observability_platform_account_id     = local.environment_management.account_ids["observability-platform-development"]
       observability_platform_role           = "data-platform-apps-and-tools-development-prometheus"
       observability_platform_prometheus_url = "https://aps-workspaces.eu-west-2.amazonaws.com/workspaces/ws-464eea97-631a-4e5d-af22-4c5528d9e0e6/api/v1/remote_write"
-      static_assets_hostname = "assets.development.data-platform.service.justice.gov.uk"
+      static_assets_hostname                = "assets.development.data-platform.service.justice.gov.uk"
     }
     production = {
       /* VPC */

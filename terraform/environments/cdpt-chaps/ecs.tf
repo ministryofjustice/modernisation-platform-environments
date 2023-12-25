@@ -124,8 +124,8 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
-    security_groups  = [aws_security_group.ecs_service.id]
+    subnets         = data.aws_subnets.shared-public.ids
+    security_groups = [aws_security_group.ecs_service.id]
   }
 
   tags = merge(
@@ -236,19 +236,19 @@ resource "aws_security_group" "cluster_ec2" {
 # so that the autoscaling group creates new ones using the new launch template
 
 resource "aws_launch_template" "ec2-launch-template" {
-  name_prefix            = "${local.application_name}-ec2-launch-template"
-  image_id               = local.application_data.accounts[local.environment].ami_image_id
-  instance_type          = local.application_data.accounts[local.environment].instance_type
-  key_name               = local.application_data.accounts[local.environment].key_name
-  ebs_optimized          = true
+  name_prefix   = "${local.application_name}-ec2-launch-template"
+  image_id      = local.application_data.accounts[local.environment].ami_image_id
+  instance_type = local.application_data.accounts[local.environment].instance_type
+  key_name      = local.application_data.accounts[local.environment].key_name
+  ebs_optimized = true
 
   monitoring {
     enabled = true
   }
 
   metadata_options {
-    http_endpoint               = "enabled"
-    http_tokens                 = "optional"
+    http_endpoint = "enabled"
+    http_tokens   = "optional"
   }
 
   iam_instance_profile {
