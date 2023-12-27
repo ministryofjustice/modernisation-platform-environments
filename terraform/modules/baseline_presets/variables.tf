@@ -32,6 +32,21 @@ variable "options" {
     route53_resolver_rules                       = optional(map(list(string)), {})
     iam_policies_filter                          = optional(list(string), [])
     iam_policies_ec2_default                     = optional(list(string), [])
+    iam_policy_statements_ec2_default            = optional(list(object({
+      sid       = optional(string, null)
+      effect    = string
+      actions   = list(string)
+      resources = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    })), [])
     s3_iam_policies                              = optional(list(string))
     sns_topics = optional(object({
       pagerduty_integrations = optional(map(string), {})
