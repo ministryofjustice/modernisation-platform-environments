@@ -97,37 +97,21 @@ locals {
     }
 
     baseline_ec2_instances = {
-      "pp-${local.application_name}-db-a" = merge(local.database_a, {
-        config = merge(local.database_a.config, {
-          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
-            "Ec2PreprodDatabasePolicy",
-          ])
-        })
-        tags = merge(local.database_a.tags, {
-          bip-db-name                             = "PPBIPINF"
-          instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "PPBIPINF PPMISTRN PPOASREP PPOASYS PPONRAUD PPONRBDS PPONRSYS"
-        })
-      })
+      # "pp-${local.application_name}-db-a" = merge(local.database_a, {
+      #   config = merge(local.database_a.config, {
+      #     instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+      #       "Ec2PreprodDatabasePolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.database_a.tags, {
+      #     bip-db-name                             = "PPBIPINF"
+      #     instance-scheduling                     = "skip-scheduling"
+      #     oracle-sids                             = "PPBIPINF PPMISTRN PPOASREP PPOASYS PPONRAUD PPONRBDS PPONRSYS"
+      #   })
+      # })
     }
 
     baseline_ec2_autoscaling_groups = {
-      "pp-${local.application_name}-db-a" = merge(local.database_a, {
-        config = merge(local.database_a.config, {
-          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
-            "Ec2PreprodDatabasePolicy",
-          ])
-        })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.database_a.tags, {
-          instance-scheduling = "skip-scheduling"
-        })
-      })
-
       "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "oasys_webserver_release_*"
