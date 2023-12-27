@@ -24,7 +24,7 @@ locals {
         ssm_parameters_prefix         = "ec2/"
         secretsmanager_secrets_prefix = "ec2/"
         iam_resource_names_prefix     = "ec2-database"
-        instance_profile_policies     = local.iam_policies_ec2_default
+        instance_profile_policies     = local.iam_policies_ec2_db
       }
     }
 

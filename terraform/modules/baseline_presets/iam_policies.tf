@@ -9,9 +9,9 @@ locals {
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy","Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
-    var.options.enable_ec2_oracle_license_tracking ? ["Ec2OracleLicenseTrackingPolicy"] : [],
     var.options.iam_policies_filter,
     "EC2Default",
+    "Ec2OracleLicenseTrackingPolicy",
   ])
 
   # for adding policies - be careful not to run into the limit
@@ -21,6 +21,24 @@ locals {
     var.options.iam_policies_ec2_default,
   ])
 
+  # for adding policies - be careful not to run into the limit
+  iam_policies_ec2_db = flatten([
+    "EC2Db",
+    var.options.enable_ec2_reduced_ssm_policy ? [] : ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
+    var.options.iam_policies_ec2_default,
+  ])
+
+  iam_policy_statements_in_ec2_default = flatten([
+    var.options.enable_business_unit_kms_cmks               ? local.iam_policy_statements_ec2.business_unit_kms_cmk : [],
+    var.options.enable_ec2_cloud_watch_agent                ? local.iam_policy_statements_ec2.CloudWatchAgentServerReduced : [],
+    var.options.enable_ec2_self_provision                   ? local.iam_policy_statements_ec2.Ec2SelfProvision : [],
+    var.options.enable_shared_s3                            ? local.iam_policy_statements_ec2.S3ReadSharedWrite : [],
+    var.options.enable_ec2_reduced_ssm_policy               ? local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced : [],
+    var.options.enable_ec2_oracle_enterprise_managed_server ? local.iam_policy_statements_ec2.OracleEnterpriseManagedServer : [],
+    var.options.enable_ec2_oracle_enterprise_manager        ? local.iam_policy_statements_ec2.OracleEnterpriseManager : [],
+    var.options.iam_policy_statements_ec2_default
+  ])
+
   oem_account_id = try(var.environment.account_ids["hmpps-oem-${var.environment.environment}"], "OemAccountNotFound")
 
   iam_policies = {
@@ -28,21 +46,13 @@ locals {
     # for adding policy statements which gets fed into the ec2 default policies
     EC2Default = {
       description = "Default EC2 Policy for this environment"
-      statements = flatten([
-        var.options.enable_business_unit_kms_cmks               ? local.iam_policy_statements_ec2.business_unit_kms_cmk : [],
-        var.options.enable_ec2_cloud_watch_agent                ? local.iam_policy_statements_ec2.CloudWatchAgentServerReduced : [],
-        var.options.enable_ec2_self_provision                   ? local.iam_policy_statements_ec2.Ec2SelfProvision : [],
-        var.options.enable_shared_s3                            ? local.iam_policy_statements_ec2.S3ReadSharedWrite : [],
-        var.options.enable_ec2_reduced_ssm_policy               ? local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced : [],
-        var.options.enable_ec2_oracle_enterprise_managed_server ? local.iam_policy_statements_ec2.OracleEnterpriseManagedServer : [],
-        var.options.enable_ec2_oracle_enterprise_manager        ? local.iam_policy_statements_ec2.OracleEnterpriseManager : [],
-        var.options.iam_policy_statements_ec2_default
-      ])
+      statements = local.iam_policy_statements_in_ec2_default
     }
 
     EC2Db = {
       description = "EC2 Policy for a DB"
       statements = flatten([
+        local.iam_policy_statements_in_ec2_default,
         local.iam_policy_statements_ec2.OracleLicenseTracking
       ])
     }
