@@ -97,6 +97,18 @@ locals {
     }
 
     baseline_ec2_instances = {
+      "pp-${local.application_name}-db-a" = merge(local.database_a, {
+        config = merge(local.database_a.config, {
+          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
+        tags = merge(local.database_a.tags, {
+          bip-db-name                             = "PPBIPINF"
+          instance-scheduling                     = "skip-scheduling"
+          oracle-sids                             = "PPBIPINF PPMISTRN PPOASREP PPOASYS PPONRAUD PPONRBDS PPONRSYS"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
