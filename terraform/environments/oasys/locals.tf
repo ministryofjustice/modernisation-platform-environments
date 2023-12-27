@@ -119,8 +119,7 @@ locals {
       availability_zone = "${local.region}a"
       instance_profile_policies = flatten([
         module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
-        "Ec2OracleEnterpriseManagerPolicy",
-        "Ec2OracleLicenseTrackingPolicy",
+        "Ec2OracleEnterpriseManagerPolicy", #### check if needed 
       ])
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
