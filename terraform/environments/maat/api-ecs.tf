@@ -62,7 +62,7 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
       name        = "${local.application_name}-api"
       cpu         = local.application_data.accounts[local.environment].ecs_container_cpu
       essential   = true
-      image       = "${ecr_url}:${docker_image_tag}" #"${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo" ---> look at it once Docker image is created and pushed to ECR
+      image       = "902837325998.dkr.ecr.eu-west-2.amazonaws.com/maat-cd-api:2b0a2803"
       memory      = local.application_data.accounts[local.environment].ecs_container_memory
       log_configuration = {
         log_driver = "awslogs"
@@ -184,7 +184,7 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
 resource "aws_appautoscaling_target" "ecs_service_scaling_target" {
   max_capacity = 5
   min_capacity = local.application_data.accounts[local.environment].ecs_service_count
-  resource_id          = "service/${aws_ecs_cluster.example.id}/${aws_ecs_service.example.name}"
+  resource_id          = "service/${aws_ecs_cluster.app_ecs_cluster.id}/${aws_ecs_service.maat_api_ecs_service.name}"
   role_arn             = aws_iam_role.maat_api_ecs_autoscaling_role.arn
   scalable_dimension   = "ecs:service:DesiredCount"
   service_namespace    = "ecs"

@@ -24,7 +24,8 @@ resource "aws_lb_target_group" "maat_api_ecs_target_group" {
   port       = 8090
   protocol   = "HTTP"
   vpc_id     = data.aws_vpc.shared.id
-
+  deregistration_delay = 30
+  target_type = "ip"
   depends_on = [aws_lb.maat_api_ecs_lb]
 
   health_check {
@@ -37,18 +38,9 @@ resource "aws_lb_target_group" "maat_api_ecs_target_group" {
     unhealthy_threshold = 3
   }
 
-  target_type = "ip"
-
-  dynamic "target_group_attribute" {
-    for_each = {
-      "stickiness.enabled"                     = "false"
-      "deregistration_delay.timeout_seconds"  = "30"
-    }
-
-    content {
-      key   = target_group_attribute.key
-      value = target_group_attribute.value
-    }
+  stickiness {
+    enabled         = false
+    type            = "lb_cookie"
   }
 }
 
