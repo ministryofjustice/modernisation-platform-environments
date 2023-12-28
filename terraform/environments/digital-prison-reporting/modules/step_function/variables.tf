@@ -34,3 +34,9 @@ variable "additional_policies" {
   type        = list(any)
   default     = []
 }
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Key-value map of resource tags."
+}
