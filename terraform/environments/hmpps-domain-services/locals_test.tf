@@ -260,6 +260,23 @@ locals {
         ]
 
         instance_target_groups = {
+          rds-gateway-80 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 5
+              healthy_threshold   = 3
+              port                = 80
+              protocol            = "HTTP"
+              timeout             = 4
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+          }
           test-rds-1 = {
             port     = 80
             protocol = "HTTP"
