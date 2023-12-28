@@ -247,48 +247,52 @@ locals {
 
     baseline_lbs = {
       private = {
-        internal_lb              = true
-        enable_delete_protection = false
-        load_balancer_type       = "application"
-        force_destroy_bucket     = true
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
+        enable_delete_protection         = false
+        force_destroy_bucket             = true
+        internal_lb                      = true
+        load_balancer_type               = "application"
+        security_groups                  = ["load-balancer"]
         subnets = [
           module.environment.subnet["private"]["eu-west-2a"].id,
           module.environment.subnet["private"]["eu-west-2b"].id,
         ]
-        security_groups                  = ["load-balancer"]
-        access_logs                      = false
-        enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          rds-gateway-80 = {
+          test-rds-1 = {
             port     = 80
             protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              port                = 80
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
             stickiness = {
               enabled = true
               type    = "lb_cookie"
             }
-            #attachments = [
-            #  { ec2_instance_name = "rds-gateway" },
-            #]
+            attachments = [
+              { ec2_instance_name = "test-rds-1-a" },
+            ]
           }
         }
-
         listeners = {
           http = {
             port     = 80
             protocol = "HTTP"
             default_action = {
+              type = "redirect"
+              redirect = {
+                port        = 443
+                protocol    = "HTTPS"
+                status_code = "HTTP_301"
+              }
+            }
+          }
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            default_action = {
               type              = "forward"
-              target_group_name = "rds-gateway-80"
+              target_group_name = "test-rds-1"
             }
           }
         }
