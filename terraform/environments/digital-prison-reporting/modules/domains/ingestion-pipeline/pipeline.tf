@@ -124,5 +124,6 @@ module "data_ingestion_pipeline" {
     }
   )
 
+  tags = var.tags
 
 }

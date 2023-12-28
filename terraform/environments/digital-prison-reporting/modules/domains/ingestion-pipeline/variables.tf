@@ -66,3 +66,9 @@ variable "glue_hive_table_creation_jobname" {
   type        = string
   default     = "" 
 }
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Key-value map of resource tags."
+}
