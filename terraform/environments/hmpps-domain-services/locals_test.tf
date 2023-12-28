@@ -192,7 +192,7 @@ locals {
           # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private-dc"]
+          vpc_security_group_ids = ["rds-ec2s"]
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
@@ -212,7 +212,7 @@ locals {
           # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private-dc"]
+          vpc_security_group_ids = ["rds-ec2s"]
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
@@ -232,7 +232,7 @@ locals {
           # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private-dc"]
+          vpc_security_group_ids = ["rds-ec2s"]
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
@@ -246,6 +246,67 @@ locals {
     }
 
     baseline_lbs = {
+      public = {
+        access_logs                      = false
+        enable_cross_zone_load_balancing = true
+        enable_delete_protection         = false
+        force_destroy_bucket             = true
+        internal_lb                      = false
+        load_balancer_type               = "application"
+        security_groups                  = ["public-lb"]
+        subnets = [
+          module.environment.subnet["public"]["eu-west-2a"].id,
+          module.environment.subnet["public"]["eu-west-2b"].id,
+        ]
+
+        instance_target_groups = {
+          public-test-rds-1 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-1-a" },
+            ]
+          }
+        }
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "HTTP"
+            default_action = {
+              type = "redirect"
+              redirect = {
+                port        = 443
+                protocol    = "HTTPS"
+                status_code = "HTTP_301"
+              }
+            }
+          }
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            default_action = {
+              type              = "forward"
+              target_group_name = "public-test-rds-1"
+            }
+          }
+        }
+      }
       private = {
         access_logs                      = false
         enable_cross_zone_load_balancing = true
@@ -253,7 +314,7 @@ locals {
         force_destroy_bucket             = true
         internal_lb                      = true
         load_balancer_type               = "application"
-        security_groups                  = ["load-balancer"]
+        security_groups                  = ["private-lb"]
         subnets = [
           module.environment.subnet["private"]["eu-west-2a"].id,
           module.environment.subnet["private"]["eu-west-2b"].id,
