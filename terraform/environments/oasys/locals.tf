@@ -119,7 +119,6 @@ locals {
       availability_zone = "${local.region}a"
       instance_profile_policies = flatten([
         module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
-        "Ec2OracleEnterpriseManagerPolicy"
       ])
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
@@ -228,6 +227,7 @@ locals {
       monitored                               = true
       "${local.application_name}-environment" = local.environment
       environment-name                        = terraform.workspace # used in provisioning script to select group vars
+      OracleDbLTS-ManagedInstance             = true # oracle license tracking
     }
   }
   database_b = merge(local.database_a, {
