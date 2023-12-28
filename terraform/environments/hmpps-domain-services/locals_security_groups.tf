@@ -42,6 +42,20 @@ locals {
             "public-lb",
           ]
         }
+        http-from-euc = {
+          description = "Allow direct http access for testing"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient_internal
+        }
+        https-from-euc = {
+          description = "Allow direct https access for testing"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient_internal
+        }
         all-from-azure-vnets-vnet = {
           description = "Allow all from azure vnets"
           from_port   = 0
