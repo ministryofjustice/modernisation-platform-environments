@@ -17,7 +17,7 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
   cluster         = aws_ecs_cluster.app_ecs_cluster.id
   launch_type     = "FARGATE"
   desired_count   = local.application_data.accounts[local.environment].ecs_service_count
-  task_definition = aws_ecs_task_definition.task_definition.arn
+  task_definition = aws_ecs_task_definition.TaskDefinition.arn
   health_check_grace_period_seconds = 120
 
   network_configuration {
@@ -34,7 +34,7 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
   load_balancer {
     container_name   = "${local.application_name}-cd-api"
     container_port   = 8090
-    target_group_arn = aws_lb_target_group.target_group.arn
+    target_group_arn = aws_lb_target_group.maat_api_ecs_target_grou.arn
   }
 
   tags = merge(
