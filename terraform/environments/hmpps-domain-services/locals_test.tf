@@ -310,10 +310,10 @@ locals {
     }
 
     baseline_route53_zones = {
-      "test.hmpps-domain-services.service.justice.gov.uk" = {
+      "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "rdgateway", type = "A", lbs_map_key = "private" },
-          { name = "rdweb", type = "A", lbs_map_key = "private" },
+          { name = "rdgateway.hmpps-domain-services", type = "A", lbs_map_key = "private" },
+          { name = "rdweb.hmpps-domain-services", type = "A", lbs_map_key = "private" },
         ]
       }
     }
