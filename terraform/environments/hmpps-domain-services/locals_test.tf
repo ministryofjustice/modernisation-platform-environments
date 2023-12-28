@@ -189,7 +189,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
           availability_zone             = "eu-west-2a"
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+          # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-dc"]
@@ -198,7 +198,47 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
         tags = {
-          description = "Windows Server 2022 for Remote Desktop Services"
+          description = "Remote Desktop Gateway and Web Access Server"
+          os-type     = "Windows"
+          component   = "remotedesktop"
+        }
+      }
+      test-rds-2-a = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
+          availability_zone             = "eu-west-2a"
+          ebs_volumes_copy_all_from_ami = false
+          # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-dc"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description = "Remote Desktop License Manager and Session Broker"
+          os-type     = "Windows"
+          component   = "remotedesktop"
+        }
+      }
+      test-rds-3-a = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
+          availability_zone             = "eu-west-2a"
+          ebs_volumes_copy_all_from_ami = false
+          # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-dc"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description = "Test Remote Desktop Session Host"
           os-type     = "Windows"
           component   = "test"
         }
