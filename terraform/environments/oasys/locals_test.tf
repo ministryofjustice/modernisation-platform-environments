@@ -165,7 +165,7 @@ locals {
         })
       })
 
-      "t2-${local.application_name}-db-a-2" = merge(local.database_a, {
+      "t2-${local.application_name}-db-a-5" = merge(local.database_a, {
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2T2DatabasePolicy",
