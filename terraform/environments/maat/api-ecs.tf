@@ -53,7 +53,7 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
   cpu                      = local.application_data.accounts[local.environment].ecs_cpu
   memory                   = local.application_data.accounts[local.environment].ecs_memory
   network_mode             = "awsvpc"
-  requires_compatibilities = "FARGATE"
+  requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.maat_api_ecs_taks_execution_role.arn
   task_role_arn            = aws_iam_role.maat_api_ecs_taks_execution_role.arn
 

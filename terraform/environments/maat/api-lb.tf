@@ -45,7 +45,7 @@ resource "aws_lb_target_group" "maat_api_ecs_target_group" {
 }
 
 resource "aws_lb_listener" "maat_api_alb_http_listener" {
-  load_balancer_arn = aws_lb.LoadBalancer.arn
+  load_balancer_arn = aws_lb.maat_api_ecs_lb.arn
   port              = 80
   protocol          = "HTTP"
 
