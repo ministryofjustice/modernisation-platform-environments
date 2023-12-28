@@ -165,21 +165,6 @@ locals {
         })
       })
 
-      "t2-${local.application_name}-db-a-5" = merge(local.database_a, {
-        config = merge(local.database_a.config, {
-          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
-          ])
-        })
-        tags = merge(local.database_a.tags, {
-          description                             = "t2 ${local.application_name} database"
-          "${local.application_name}-environment" = "t2"
-          bip-db-name                             = "T2BIPINF"
-          instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
-        })
-      })
-
       "t2-${local.application_name}-bip-a" = merge(local.bip_a, {
         autoscaling_group = merge(local.bip_a.autoscaling_group, {
           desired_capacity = 1
