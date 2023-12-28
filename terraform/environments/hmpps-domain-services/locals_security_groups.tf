@@ -38,7 +38,6 @@ locals {
           to_port     = 80
           protocol    = "TCP"
           security_groups = [
-            "load-balancer",
             "private-lb",
             "public-lb",
           ]
