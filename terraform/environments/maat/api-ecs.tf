@@ -34,7 +34,7 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
   load_balancer {
     container_name   = "${local.application_name}-cd-api"
     container_port   = 8090
-    target_group_arn = aws_lb_target_group.maat_api_ecs_target_grou.arn
+    target_group_arn = aws_lb_target_group.maat_api_ecs_target_group.arn
   }
 
   tags = merge(
