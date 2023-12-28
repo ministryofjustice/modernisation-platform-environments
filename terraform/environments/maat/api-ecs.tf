@@ -102,75 +102,75 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
       environment = [
         {
           name  = "DATASOURCE_URL"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_DatasourceUrl
+          value = local.application_data.accounts[local.environment].ecs_env_DatasourceUrl
         },
         {
           name  = "CLOUD_PLATFORM_QUEUE_REGION"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CloudPlatformQueueRegion
+          value = local.application_data.accounts[local.environment].ecs_env_CloudPlatformQueueRegion
         },
         {
           name  = "CREATE_LINK_QUEUE"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CreateLinkQueue
+          value = local.application_data.accounts[local.environment].ecs_env_CreateLinkQueue
         },
         {
           name  = "UNLINK_QUEUE"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_UnlinkQueue
+          value = local.application_data.accounts[local.environment].ecs_env_UnlinkQueue
         },
         {
           name  = "HEARING_RESULTED_QUEUE"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_HearingsResultedQueue
+          value = local.application_data.accounts[local.environment].ecs_env_HearingsResultedQueue
         },
         {
           name  = "CDA_OAUTH_URL"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CdaOauthUrl
+          value = local.application_data.accounts[local.environment].ecs_env_CdaOauthUrl
         },
         {
           name  = "CDA_BASE_URL"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CdaBaseUrl
+          value = local.application_data.accounts[local.environment].ecs_env_CdaBaseUrl
         },
         {
           name  = "SENTRY_ENV"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_Environment
+          value = local.application_data.accounts[local.environment].ecs_env_Environment
         },
         {
           name  = "POST_MVP_ENABLED"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_PostMvpEnabled
+          value = local.application_data.accounts[local.environment].ecs_env_PostMvpEnabled
         },
         {
           name  = "PROSECUTION_CONCLUDED_LISTENER_ENABLED"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_ProsecutionConcludedListenerEnabled
+          value = local.application_data.accounts[local.environment].ecs_env_ProsecutionConcludedListenerEnabled
         },
         {
           name  = "PROSECUTION_CONCLUDED_SCHEDULE_ENABLED"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_ProsecutionConcludedScheduleEnabled
+          value = local.application_data.accounts[local.environment].ecs_env_ProsecutionConcludedScheduleEnabled
         },
         {
           name  = "CREATE_LINK_CP_STATUS_JOB_QUEUE"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CreateLinkCpStatusJobQueue
+          value = local.application_data.accounts[local.environment].ecs_env_CreateLinkCpStatusJobQueue
         },
         {
           name  = "LAA_PROSECUTION_CONCLUDED_QUEUE"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_LaaProsecutionConcludedQueue
+          value = local.application_data.accounts[local.environment].ecs_env_LaaProsecutionConcludedQueue
         },
         {
           name  = "AWS_DEFAULT_REGION"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_AwsDefaultRegion
+          value = local.application_data.accounts[local.environment].ecs_env_AwsDefaultRegion
         },
         {
           name  = "CLOUDWATCH_STEP"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CloudwatchStep
+          value = local.application_data.accounts[local.environment].ecs_env_CloudwatchStep
         },
         {
           name  = "CLOUDWATCH_BATCH_SIZE"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_CloudwatchBatchSize
+          value = local.application_data.accounts[local.environment].ecs_env_CloudwatchBatchSize
         },
         {
           name  = "ENABLE_CLOUDWATCH_METRICS"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_EnableCloudwatchMetrics
+          value = local.application_data.accounts[local.environment].ecs_env_EnableCloudwatchMetrics
         },
         {
           name  = "TOGDATA_DATASOURCE_USERNAME"
-          value = local.application_data.accounts[local.environment].ecs_service_count.ecs_env_TogDataUsername
+          value = local.application_data.accounts[local.environment].ecs_env_TogDataUsername
         },
       ]
     }
