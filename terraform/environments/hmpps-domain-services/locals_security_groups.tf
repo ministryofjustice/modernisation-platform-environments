@@ -61,6 +61,15 @@ locals {
           protocol    = -1
           self        = true
         }
+        http_lb = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "TCP"
+          security_groups = [
+            "load-balancer",
+          ]
+        }
         all-from-noms-test-vnet = {
           description = "Allow all from noms test vnet"
           from_port   = 0
