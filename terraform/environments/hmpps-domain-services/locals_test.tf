@@ -260,26 +260,19 @@ locals {
         ]
 
         instance_target_groups = {
-          rds-gateway-80 = {
+          test-rds-1 = {
             port     = 80
             protocol = "HTTP"
             health_check = {
               enabled             = true
-              interval            = 5
+              interval            = 10
               healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
               port                = 80
-              protocol            = "HTTP"
-              timeout             = 4
+              timeout             = 5
               unhealthy_threshold = 2
             }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-          }
-          test-rds-1 = {
-            port     = 80
-            protocol = "HTTP"
             stickiness = {
               enabled = true
               type    = "lb_cookie"
@@ -319,7 +312,8 @@ locals {
     baseline_route53_zones = {
       "test.hmpps-domain-services.service.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "private", type = "A", lbs_map_key = "private" },
+          { name = "rdgateway", type = "A", lbs_map_key = "private" },
+          { name = "rdweb", type = "A", lbs_map_key = "private" },
         ]
       }
     }
