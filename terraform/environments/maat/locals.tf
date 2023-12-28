@@ -2,5 +2,5 @@
 
 locals {
   env_account_id       = local.environment_management.account_ids[terraform.workspace]
-  env_account_region   = local.application_data.accounts[local.environment]
+  env_account_region   = local.application_data.accounts[local.environment].region
 }
