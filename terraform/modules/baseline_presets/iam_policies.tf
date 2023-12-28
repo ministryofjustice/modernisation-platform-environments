@@ -11,7 +11,7 @@ locals {
     var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
     var.options.iam_policies_filter,
     "EC2Default",
-    "Ec2OracleLicenseTrackingPolicy",
+    "EC2Db",
   ])
 
   # for adding policies - be careful not to run into the limit
@@ -50,7 +50,7 @@ locals {
     }
 
     EC2Db = {
-      description = "EC2 Policy for a DB"
+      description = "Default EC2 Policy for a DB in this environment"
       statements = flatten([
         local.iam_policy_statements_in_ec2_default,
         local.iam_policy_statements_ec2.OracleLicenseTracking
@@ -119,26 +119,6 @@ locals {
     Ec2OracleEnterpriseManagerPolicy = {
       description = "Permissions required for Oracle Enterprise Manager"
       statements = local.iam_policy_statements_ec2.OracleEnterpriseManager
-    }
-
-    Ec2OracleLicenseTrackingPolicy = {
-      description = "Allows licensing metrics to be captured"
-      statements = [
-        {
-          effect = "Allow"
-          actions = [
-            "s3:PutObject",
-            "s3:GetObject",
-            "s3:PutObjectAcl",
-            "s3:ListBucket",
-            "s3:DeleteObject"
-          ],
-          resources = [
-            "arn:aws:s3:::license-manager-artifact-bucket/*",
-            "arn:aws:s3:::license-manager-artifact-bucket"
-          ],
-        }
-      ]
     }
 
     SSMManagedInstanceCoreReducedPolicy = {
