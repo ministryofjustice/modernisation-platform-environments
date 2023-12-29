@@ -277,7 +277,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              # { ec2_instance_name = "test-rds-1-a" },
+              { ec2_instance_name = "test-rds-1-b" },
             ]
           }
           test-rdweb-https = {
@@ -299,7 +299,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              # { ec2_instance_name = "test-rds-1-a" },
+              { ec2_instance_name = "test-rds-1-b" },
             ]
           }
         }
