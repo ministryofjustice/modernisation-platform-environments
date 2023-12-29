@@ -261,8 +261,8 @@ locals {
 
         instance_target_groups = {
           public-test-rds-1 = {
-            port     = 80
-            protocol = "HTTP"
+            port     = 443
+            protocol = "HTTPS"
             health_check = {
               enabled             = true
               interval            = 10
