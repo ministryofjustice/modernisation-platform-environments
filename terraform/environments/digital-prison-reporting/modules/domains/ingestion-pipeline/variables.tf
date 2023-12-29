@@ -43,6 +43,12 @@ variable "glue_reporting_hub_cdc_jobname" {
   default     = ""  
 }
 
+variable "s3_glue_bucket_id" {
+  description = "S3, Glue Bucket ID"
+  type        = string
+  default     = ""  
+}
+
 variable "s3_raw_bucket_id" {
   description = "S3, RAW Bucket ID"
   type        = string
@@ -71,4 +77,10 @@ variable "tags" {
   type        = map(string)
   default     = {}
   description = "(Optional) Key-value map of resource tags."
+}
+
+variable "domain" {
+  type        = string
+  default     = ""
+  description = "Domain Name"
 }

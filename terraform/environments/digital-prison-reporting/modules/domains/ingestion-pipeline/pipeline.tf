@@ -30,7 +30,7 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
           "Parameters" : {
-            "ReplicationTaskArn" : var.dms_replication_task_arn, # DYNAMIC
+            "ReplicationTaskArn" : var.dms_replication_task_arn,
             "StartReplicationTaskType" : "reload-target"
           },
           "Next" : "Invoke DMS State Control Lambda"
@@ -42,9 +42,9 @@ module "data_ingestion_pipeline" {
           "Parameters" : {
             "Payload" : {
               "token.$" : "$$.Task.Token",
-              "replicationTaskArn" : var.dms_replication_task_arn # DYNAMIC
+              "replicationTaskArn" : var.dms_replication_task_arn
             },
-            "FunctionName" : var.pipeline_notification_lambda_function # DYNAMIC
+            "FunctionName" : var.pipeline_notification_lambda_function
           },
           "Retry" : [
             {
@@ -65,7 +65,11 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : var.glue_reporting_hub_batch_jobname # DYNAMIC
+            "JobName" : var.glue_reporting_hub_batch_jobname,
+            "Arguments" : {
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            }
           },
           "Next" : "Invoke S3 File Transfer Lambda"
         },
@@ -75,8 +79,12 @@ module "data_ingestion_pipeline" {
           "Parameters" : {
             "Payload" : {
               "token.$" : "$$.Task.Token",
-              "sourceBucket" : var.s3_raw_bucket_id, # DYNAMIC
-              "destinationBucket" : var.s3_raw_archive_bucket_id # NEW PARAM, WIP
+              "sourceBucket" : var.s3_raw_bucket_id,
+              "destinationBucket" : var.s3_raw_archive_bucket_id,
+              "config" : {
+                "bucket" : var.s3_glue_bucket_id,
+                "key" : var.domain
+              }              
             },
             "FunctionName" : var.s3_file_transfer_lambda_function
           },
@@ -99,7 +107,11 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : var.glue_hive_table_creation_jobname  # DYNAMIC # NEW PARAM, WIP
+            "JobName" : var.glue_hive_table_creation_jobname,
+            "Arguments" : {
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            }            
           },
           "Next" : "Resume DMS Replication Task"
         },
@@ -107,7 +119,7 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
           "Parameters" : { 
-            "ReplicationTaskArn" : var.dms_replication_task_arn,   # DYNAMIC
+            "ReplicationTaskArn" : var.dms_replication_task_arn,
             "StartReplicationTaskType" : "resume-processing"
           },
           "Next" : "Start Glue Streaming Job"
@@ -116,7 +128,11 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun",
           "Parameters" : {
-            "JobName" : var.glue_reporting_hub_cdc_jobname    # DYNAMIC
+            "JobName" : var.glue_reporting_hub_cdc_jobname,
+            "Arguments" : {
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            }            
           },
           "End" : true
         }
