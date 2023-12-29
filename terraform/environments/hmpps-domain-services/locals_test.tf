@@ -261,6 +261,27 @@ locals {
 
         instance_target_groups = {
           public-test-rds-1 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-1-a" },
+            ]
+          }
+          test-rds-1-https = {
             port     = 443
             protocol = "HTTPS"
             health_check = {
@@ -269,7 +290,7 @@ locals {
               healthy_threshold   = 3
               matcher             = "200-399"
               path                = "/"
-              port                = 80
+              port                = 443
               timeout             = 5
               unhealthy_threshold = 2
             }
@@ -302,7 +323,7 @@ locals {
             certificate_names_or_arns = ["application_environment_wildcard_cert"]
             default_action = {
               type              = "forward"
-              target_group_name = "public-test-rds-1"
+              target_group_name = "test-rds-1-https"
             }
           }
         }
