@@ -1,4 +1,4 @@
-# nomis-test environment settings
+ nomis-test environment settings
 locals {
 
   # baseline config
@@ -183,46 +183,46 @@ locals {
     }
 
     baseline_ec2_instances = {
-#     test-rds-1-a = {
-#       # ami has unwanted ephemeral device, don't copy all the ebs_volumess
-#       config = merge(module.baseline_presets.ec2_instance.config.default, {
-#         ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
-#         availability_zone             = "eu-west-2a"
-#         ebs_volumes_copy_all_from_ami = false
-#         # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
-#       })
-#       instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-#         vpc_security_group_ids = ["rds-ec2s"]
-#       })
-#       ebs_volumes = {
-#         "/dev/sda1" = { type = "gp3", size = 100 }
-#       }
-#       tags = {
-#         description = "Remote Desktop Gateway and Web Access Server"
-#         os-type     = "Windows"
-#         component   = "remotedesktop"
-#       }
-#     }
-#     test-rds-2-a = {
-#       # ami has unwanted ephemeral device, don't copy all the ebs_volumess
-#       config = merge(module.baseline_presets.ec2_instance.config.default, {
-#         ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
-#         availability_zone             = "eu-west-2a"
-#         ebs_volumes_copy_all_from_ami = false
-#         # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
-#       })
-#       instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-#         vpc_security_group_ids = ["rds-ec2s"]
-#       })
-#       ebs_volumes = {
-#         "/dev/sda1" = { type = "gp3", size = 100 }
-#       }
-#       tags = {
-#         description = "Remote Desktop License Manager and Session Broker"
-#         os-type     = "Windows"
-#         component   = "remotedesktop"
-#       }
-#     }
+      #     test-rds-1-a = {
+      #       # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+      #       config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #         ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
+      #         availability_zone             = "eu-west-2a"
+      #         ebs_volumes_copy_all_from_ami = false
+      #         # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+      #       })
+      #       instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      #         vpc_security_group_ids = ["rds-ec2s"]
+      #       })
+      #       ebs_volumes = {
+      #         "/dev/sda1" = { type = "gp3", size = 100 }
+      #       }
+      #       tags = {
+      #         description = "Remote Desktop Gateway and Web Access Server"
+      #         os-type     = "Windows"
+      #         component   = "remotedesktop"
+      #       }
+      #     }
+      #     test-rds-2-a = {
+      #       # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+      #       config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #         ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
+      #         availability_zone             = "eu-west-2a"
+      #         ebs_volumes_copy_all_from_ami = false
+      #         # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+      #       })
+      #       instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      #         vpc_security_group_ids = ["rds-ec2s"]
+      #       })
+      #       ebs_volumes = {
+      #         "/dev/sda1" = { type = "gp3", size = 100 }
+      #       }
+      #       tags = {
+      #         description = "Remote Desktop License Manager and Session Broker"
+      #         os-type     = "Windows"
+      #         component   = "remotedesktop"
+      #       }
+      #     }
     }
 
     baseline_lbs = {
@@ -258,7 +258,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-            # { ec2_instance_name = "test-rds-1-a" },
+              # { ec2_instance_name = "test-rds-1-a" },
             ]
           }
           test-rds-1-https = {
@@ -280,7 +280,50 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-            # { ec2_instance_name = "test-rds-1-a" },
+              # { ec2_instance_name = "test-rds-1-a" },
+            ]
+          }
+          test-rdgateway-http = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              # { ec2_instance_name = "test-rds-1-a" },
+            ]
+          }
+          test-rdweb-https = {
+            port     = 443
+            protocol = "HTTPS"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 443
+              protocol            = "HTTPS"
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              # { ec2_instance_name = "test-rds-1-a" },
             ]
           }
         }
@@ -303,20 +346,38 @@ locals {
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["application_environment_wildcard_cert"]
             default_action = {
-              type              = "forward"
-              target_group_name = "test-rds-1-https"
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
             }
             rules = {
               test-rdgateway = {
                 priority = 300
                 actions = [{
                   type              = "forward"
-                  target_group_name = "test-rds-1-http"
+                  target_group_name = "test-rdgateway-http"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
                       "rdgateway.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdweb = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdweb-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
