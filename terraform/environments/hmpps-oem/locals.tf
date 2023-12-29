@@ -121,6 +121,9 @@ locals {
           ]
         }
       ]
+      policy_attachments = [
+        "DbRefresherPolicy",
+      ]
     }
   }
   baseline_iam_service_linked_roles = {}
