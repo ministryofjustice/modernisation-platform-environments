@@ -290,7 +290,7 @@ locals {
               healthy_threshold   = 3
               matcher             = "200-399"
               path                = "/"
-              port                = 443
+              port                = 80
               timeout             = 5
               unhealthy_threshold = 2
             }
