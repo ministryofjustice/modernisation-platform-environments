@@ -182,13 +182,13 @@ locals {
     }
 
     baseline_ec2_instances = {
-      test-rds-1-a = {
+      test-rds-1-b = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
-          availability_zone             = "eu-west-2a"
+          availability_zone             = "eu-west-2b"
           ebs_volumes_copy_all_from_ami = false
-          # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]
@@ -202,13 +202,13 @@ locals {
           component   = "remotedesktop"
         }
       }
-      test-rds-2-b = {
+      test-rds-2-c = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
-          availability_zone             = "eu-west-2b"
+          availability_zone             = "eu-west-2c"
           ebs_volumes_copy_all_from_ami = false
-          # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]
@@ -222,13 +222,13 @@ locals {
           component   = "remotedesktop"
         }
       }
-      test-rds-3-c = {
+      test-rds-3-b = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
-          availability_zone             = "eu-west-2c"
+          availability_zone             = "eu-west-2b"
           ebs_volumes_copy_all_from_ami = false
-          # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]
