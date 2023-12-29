@@ -260,7 +260,7 @@ locals {
         ]
 
         instance_target_groups = {
-          public-test-rds-1 = {
+          test-rds-1-http = {
             port     = 80
             protocol = "HTTP"
             health_check = {
@@ -324,6 +324,22 @@ locals {
             default_action = {
               type              = "forward"
               target_group_name = "test-rds-1-https"
+            }
+            rules = {
+              test-rdgateway = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rds-1-http"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           }
         }
