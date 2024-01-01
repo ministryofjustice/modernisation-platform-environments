@@ -7,7 +7,7 @@ locals {
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
-    var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy","Ec2OracleEnterpriseManagedServerPolicy"] : [],
+    var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
     var.options.iam_policies_filter,
     "EC2Default",
@@ -29,13 +29,13 @@ locals {
   ])
 
   iam_policy_statements_in_ec2_default = flatten([
-    var.options.enable_business_unit_kms_cmks               ? local.iam_policy_statements_ec2.business_unit_kms_cmk : [],
-    var.options.enable_ec2_cloud_watch_agent                ? local.iam_policy_statements_ec2.CloudWatchAgentServerReduced : [],
-    var.options.enable_ec2_self_provision                   ? local.iam_policy_statements_ec2.Ec2SelfProvision : [],
-    var.options.enable_shared_s3                            ? local.iam_policy_statements_ec2.S3ReadSharedWrite : [],
-    var.options.enable_ec2_reduced_ssm_policy               ? local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced : [],
+    var.options.enable_business_unit_kms_cmks ? local.iam_policy_statements_ec2.business_unit_kms_cmk : [],
+    var.options.enable_ec2_cloud_watch_agent ? local.iam_policy_statements_ec2.CloudWatchAgentServerReduced : [],
+    var.options.enable_ec2_self_provision ? local.iam_policy_statements_ec2.Ec2SelfProvision : [],
+    var.options.enable_shared_s3 ? local.iam_policy_statements_ec2.S3ReadSharedWrite : [],
+    var.options.enable_ec2_reduced_ssm_policy ? local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? local.iam_policy_statements_ec2.OracleEnterpriseManagedServer : [],
-    var.options.enable_ec2_oracle_enterprise_manager        ? local.iam_policy_statements_ec2.OracleEnterpriseManager : [],
+    var.options.enable_ec2_oracle_enterprise_manager ? local.iam_policy_statements_ec2.OracleEnterpriseManager : [],
     var.options.iam_policy_statements_ec2_default
   ])
 
@@ -46,7 +46,7 @@ locals {
     # for adding policy statements which gets fed into the ec2 default policies
     EC2Default = {
       description = "Default EC2 Policy for this environment"
-      statements = local.iam_policy_statements_in_ec2_default
+      statements  = local.iam_policy_statements_in_ec2_default
     }
 
     EC2Db = {
@@ -66,64 +66,64 @@ locals {
 
     ImageBuilderLaunchTemplatePolicy = {
       description = "Policy allowing access to image builder launch templates"
-      statements = local.iam_policy_statements_ec2.ImageBuilderLaunchTemplate
+      statements  = local.iam_policy_statements_ec2.ImageBuilderLaunchTemplate
     }
 
     BusinessUnitKmsCmkPolicy = {
       description = "Policy allowing access to business unit wide customer managed keys"
-      statements = local.iam_policy_statements_ec2.business_unit_kms_cmk
+      statements  = local.iam_policy_statements_ec2.business_unit_kms_cmk
     }
 
     CloudWatchAgentServerReducedPolicy = {
       description = "Same as CloudWatchAgentServerReducedPolicy but with CreateLogGroup permission removed to ensure groups are created in code"
-      statements = local.iam_policy_statements_ec2.CloudWatchAgentServerReduced
+      statements  = local.iam_policy_statements_ec2.CloudWatchAgentServerReduced
     }
 
     Ec2SelfProvisionPolicy = {
       description = "Permissions to allow EC2 to self provision by pulling ec2 instance, volume and tag info"
-      statements = local.iam_policy_statements_ec2.Ec2SelfProvision
+      statements  = local.iam_policy_statements_ec2.Ec2SelfProvision
     }
 
     Ec2AccessSharedS3Policy = {
       description = "Permissions to allow EC2 to access shared s3 bucket"
-      statements = local.iam_policy_statements_ec2.S3ReadSharedWrite
+      statements  = local.iam_policy_statements_ec2.S3ReadSharedWrite
     }
 
     # see corresponding policy in core-shared-services-production
     # https://github.com/ministryofjustice/modernisation-platform-ami-builds/blob/main/modernisation-platform/iam.tf
     ImageBuilderS3BucketReadOnlyAccessPolicy = {
       description = "Permissions to access shared ImageBuilder bucket read-only"
-      statements = local.iam_policy_statements_ec2.S3ReadShared
+      statements  = local.iam_policy_statements_ec2.S3ReadShared
     }
     ImageBuilderS3BucketWriteAccessPolicy = {
       description = "Permissions to access shared ImageBuilder bucket read-write"
-      statements = local.iam_policy_statements_ec2.S3ReadSharedWriteLimited
+      statements  = local.iam_policy_statements_ec2.S3ReadSharedWriteLimited
     }
     ImageBuilderS3BucketWriteAndDeleteAccessPolicy = {
       description = "Permissions to access shared ImageBuilder bucket read-write-delete"
-      statements = local.iam_policy_statements_ec2.S3ReadSharedWriteDelete
+      statements  = local.iam_policy_statements_ec2.S3ReadSharedWriteDelete
     }
 
     OracleEnterpriseManagementSecretsPolicy = {
       description = "For cross account secret access identity policy"
-      statements = local.iam_policy_statements_ec2.SecretsCrossAccount
+      statements  = local.iam_policy_statements_ec2.SecretsCrossAccount
     }
 
     # NOTE, this doesn't include GetSecretValue since the EC2 must assume
     # a separate role to get these (EC2OracleEnterpriseManagementSecretsRole)
     Ec2OracleEnterpriseManagedServerPolicy = {
       description = "Permissions required for Oracle Enterprise Managed Server"
-      statements = local.iam_policy_statements_ec2.OracleEnterpriseManagedServer
+      statements  = local.iam_policy_statements_ec2.OracleEnterpriseManagedServer
     }
 
     Ec2OracleEnterpriseManagerPolicy = {
       description = "Permissions required for Oracle Enterprise Manager"
-      statements = local.iam_policy_statements_ec2.OracleEnterpriseManager
+      statements  = local.iam_policy_statements_ec2.OracleEnterpriseManager
     }
 
     SSMManagedInstanceCoreReducedPolicy = {
       description = "AmazonSSMManagedInstanceCore minus GetParameters"
-      statements = local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced
+      statements  = local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced
     }
   }
 }

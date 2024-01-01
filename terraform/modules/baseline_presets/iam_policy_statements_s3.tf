@@ -1,12 +1,12 @@
 locals {
 
   iam_policy_statements_s3 = {
-  
- 
+
+
     # for image builder
     S3ReadWriteCoreSharedServicesProduction = [
       {
-        sid = "S3ReadWriteCoreSharedServicesProduction"
+        sid    = "S3ReadWriteCoreSharedServicesProduction"
         effect = "Allow"
         actions = [
           "s3:GetObject",
@@ -27,7 +27,7 @@ locals {
 
     S3ReadAllEnvironments = [
       {
-        sid = "S3ReadAllEnvironments"
+        sid    = "S3ReadAllEnvironments"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
@@ -47,7 +47,7 @@ locals {
 
     S3ReadOnlyPreprod = [
       {
-        sid = "S3ReadOnlyPreprod"
+        sid    = "S3ReadOnlyPreprod"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
@@ -66,7 +66,7 @@ locals {
 
     S3ReadWriteAllEnvironments = [
       {
-        sid = "S3ReadWriteAllEnvironments"
+        sid    = "S3ReadWriteAllEnvironments"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
@@ -89,7 +89,7 @@ locals {
 
     S3ReadProdPreprod = [
       {
-        sid = "S3ReadProdPreprod"
+        sid    = "S3ReadProdPreprod"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
@@ -108,7 +108,7 @@ locals {
 
     S3ReadWriteProdPreprod = [
       {
-        sid = "S3ReadWriteProdPreprod"
+        sid    = "S3ReadWriteProdPreprod"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
@@ -131,7 +131,7 @@ locals {
 
     S3ReadWriteDeleteAllEnvironments = [
       {
-        sid = "S3ReadWriteDeleteAllEnvironments"
+        sid    = "S3ReadWriteDeleteAllEnvironments"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
@@ -155,7 +155,7 @@ locals {
 
     S3ReadDevTest = [
       {
-        sid = "S3ReadDevTest"
+        sid    = "S3ReadDevTest"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
@@ -174,7 +174,7 @@ locals {
 
     S3ReadWriteDeleteDevTest = [
       {
-        sid = "S3ReadWriteDeleteDevTest"
+        sid    = "S3ReadWriteDeleteDevTest"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
@@ -198,7 +198,7 @@ locals {
 
     S3ReadDev = [
       {
-        sid = "S3ReadDev"
+        sid    = "S3ReadDev"
         effect = "Allow"
         actions = [
           "s3:GetBucketLocation",
