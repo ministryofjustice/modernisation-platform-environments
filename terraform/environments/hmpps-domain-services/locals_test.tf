@@ -256,6 +256,7 @@ locals {
         subnets = [
           module.environment.subnet["public"]["eu-west-2a"].id,
           module.environment.subnet["public"]["eu-west-2b"].id,
+          module.environment.subnet["public"]["eu-west-2c"].id,
         ]
 
         instance_target_groups = {
