@@ -64,8 +64,8 @@ locals {
   }
 
   s3_iam_policies = {
-    EC2S3BucketReadOnlyAccessPolicy = local.iam_policy_statements_s3.S3Read
-    EC2S3BucketWriteAccessPolicy = local.iam_policy_statements_s3.S3Write
+    EC2S3BucketReadOnlyAccessPolicy       = local.iam_policy_statements_s3.S3Read
+    EC2S3BucketWriteAccessPolicy          = local.iam_policy_statements_s3.S3Write
     EC2S3BucketWriteAndDeleteAccessPolicy = local.iam_policy_statements_s3.S3ReadWriteDelete
   }
 

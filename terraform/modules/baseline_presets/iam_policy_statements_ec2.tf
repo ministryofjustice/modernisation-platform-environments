@@ -3,7 +3,7 @@ locals {
   iam_policy_statements_ec2 = {
     ImageBuilderLaunchTemplate = [
       {
-        sid = "ImageBuilderLaunchTemplate1"
+        sid    = "ImageBuilderLaunchTemplate1"
         effect = "Allow"
         actions = [
           "ec2:CreateLaunchTemplateVersion",
@@ -17,7 +17,7 @@ locals {
         }]
       },
       {
-        sid = "ImageBuilderLaunchTemplate2"
+        sid    = "ImageBuilderLaunchTemplate2"
         effect = "Allow"
         actions = [
           "ec2:DescribeLaunchTemplates"
@@ -33,7 +33,7 @@ locals {
 
     business_unit_kms_cmk = [
       {
-        sid = "BusinessUnitKmsCmk"
+        sid    = "BusinessUnitKmsCmk"
         effect = "Allow"
         actions = [
           "kms:Encrypt",
@@ -54,7 +54,7 @@ locals {
 
     CloudWatchAgentServerReduced = [ # "Same as CloudWatchAgentServerReduced but with CreateLogGroup permission removed to ensure groups are created in code"
       {
-        sid = "CloudWatchAgentServerReduced"
+        sid    = "CloudWatchAgentServerReduced"
         effect = "Allow"
         actions = [
           "cloudwatch:PutMetricData",
@@ -69,7 +69,7 @@ locals {
         resources = ["*"]
       },
       {
-        sid = "DenyCreateLogGroup"
+        sid    = "DenyCreateLogGroup"
         effect = "Deny"
         actions = [
           "logs:CreateLogGroup"
@@ -77,7 +77,7 @@ locals {
         resources = ["*"]
       },
       {
-        sid = "AllowCloudwatchSSMParams"
+        sid    = "AllowCloudwatchSSMParams"
         effect = "Allow"
         actions = [
           "ssm:GetParameter",
@@ -92,7 +92,7 @@ locals {
 
     Ec2SelfProvision = [
       {
-        sid = "Ec2SelfProvision"
+        sid    = "Ec2SelfProvision"
         effect = "Allow"
         actions = [
           "ec2:DescribeVolumes",
@@ -105,7 +105,7 @@ locals {
 
     S3ReadSharedWrite = [
       {
-        sid = "S3ReadSharedWrite"
+        sid    = "S3ReadSharedWrite"
         effect = "Allow"
         actions = [
           "s3:GetObject",
@@ -136,7 +136,7 @@ locals {
     # https://github.com/ministryofjustice/modernisation-platform-ami-builds/blob/main/modernisation-platform/iam.tf
     S3ReadShared = [
       {
-        sid = "S3ReadShared"
+        sid    = "S3ReadShared"
         effect = "Allow"
         actions = [
           "s3:GetObject",
@@ -157,7 +157,7 @@ locals {
 
     S3ReadSharedWriteLimited = [
       {
-        sid = "S3ReadSharedWriteLimited"
+        sid    = "S3ReadSharedWriteLimited"
         effect = "Allow"
         actions = [
           "s3:GetObject",
@@ -180,7 +180,7 @@ locals {
 
     S3ReadSharedWriteDelete = [
       {
-        sid = "S3ReadSharedWriteDelete"
+        sid    = "S3ReadSharedWriteDelete"
         effect = "Allow"
         actions = [
           "s3:GetObject",
@@ -201,10 +201,10 @@ locals {
         ]
       }
     ]
-    
+
     SecretsCrossAccount = [
       {
-        sid = "SecretsCrossAccount"
+        sid    = "SecretsCrossAccount"
         effect = "Allow"
         actions = [
           "secretsmanager:GetSecretValue",
@@ -212,12 +212,12 @@ locals {
         resources = ["*"]
       }
     ]
-    
+
     # NOTE, this doesn't include GetSecretValue since the EC2 must assume
     # a separate role to get these (EC2OracleEnterpriseManagementSecretsRole)
     OracleEnterpriseManagedServer = [
       {
-        sid = "S3ListLocation"
+        sid    = "S3ListLocation"
         effect = "Allow"
         actions = [
           "s3:ListAllMyBuckets",
@@ -228,7 +228,7 @@ locals {
         ]
       },
       {
-        sid = "SSMGetAccountIds"
+        sid    = "SSMGetAccountIds"
         effect = "Allow"
         actions = [
           "ssm:GetParameter",
@@ -239,10 +239,10 @@ locals {
         ]
       }
     ]
-    
+
     OracleEnterpriseManager = [
       {
-        sid = "S3ListLocation"
+        sid    = "S3ListLocation"
         effect = "Allow"
         actions = [
           "s3:ListAllMyBuckets",
@@ -253,7 +253,7 @@ locals {
         ]
       },
       {
-        sid = "SecretsmanagerReadWriteOracle"
+        sid    = "SecretsmanagerReadWriteOracle"
         effect = "Allow"
         actions = [
           "secretsmanager:GetSecretValue",
@@ -264,7 +264,7 @@ locals {
         ]
       },
       {
-        sid = "SSMReadAccountIdsOracle"
+        sid    = "SSMReadAccountIdsOracle"
         effect = "Allow"
         actions = [
           "ssm:GetParameter",
@@ -276,7 +276,7 @@ locals {
         ]
       },
       {
-        sid = "SSMWriteOracle"
+        sid    = "SSMWriteOracle"
         effect = "Allow"
         actions = [
           "ssm:PutParameter",
@@ -287,10 +287,10 @@ locals {
         ]
       }
     ]
-    
+
     OracleLicenseTracking = [
       {
-        sid = "OracleLicenseTracking"
+        sid    = "OracleLicenseTracking"
         effect = "Allow"
         actions = [
           "s3:PutObject",
@@ -305,10 +305,10 @@ locals {
         ],
       }
     ]
-    
+
     SSMManagedInstanceCoreReduced = [ # AmazonSSMManagedInstanceCore minus GetParameters
       {
-        sid = "SSMManagedSSM"
+        sid    = "SSMManagedSSM"
         effect = "Allow"
         actions = [
           "ssm:DescribeAssociation",
@@ -328,7 +328,7 @@ locals {
         resources = ["*"]
       },
       {
-        sid = "SSMManagedSSMMessages"
+        sid    = "SSMManagedSSMMessages"
         effect = "Allow"
         actions = [
           "ssmmessages:CreateControlChannel",
@@ -339,7 +339,7 @@ locals {
         resources = ["*"]
       },
       {
-        sid = "SSMManagedEC2Messages"
+        sid    = "SSMManagedEC2Messages"
         effect = "Allow"
         actions = [
           "ec2messages:AcknowledgeMessage",

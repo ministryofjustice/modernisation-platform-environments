@@ -227,7 +227,7 @@ locals {
       monitored                               = true
       "${local.application_name}-environment" = local.environment
       environment-name                        = terraform.workspace # used in provisioning script to select group vars
-      OracleDbLTS-ManagedInstance             = true # oracle license tracking
+      OracleDbLTS-ManagedInstance             = true                # oracle license tracking
     }
   }
   database_b = merge(local.database_a, {
