@@ -302,6 +302,49 @@ locals {
               { ec2_instance_name = "test-rds-1-b" },
             ]
           }
+          test-rdgateway-http2 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-2-c" },
+            ]
+          }
+          test-rdweb-https2 = {
+            port     = 443
+            protocol = "HTTPS"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 443
+              protocol            = "HTTPS"
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-2-c" },
+            ]
+          }
         }
         listeners = {
           http = {
@@ -358,6 +401,34 @@ locals {
                   }
                 }]
               }
+              test-rdgateway2 = {
+                priority = 500
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdgateway-http2"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway2.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdweb2 = {
+                priority = 600
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdweb-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb2.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           }
         }
@@ -369,6 +440,8 @@ locals {
         lb_alias_records = [
           { name = "rdgateway.hmpps-domain-services", type = "A", lbs_map_key = "public" },
           { name = "rdweb.hmpps-domain-services", type = "A", lbs_map_key = "public" },
+          { name = "rdgateway2.hmpps-domain-services", type = "A", lbs_map_key = "public" },
+          { name = "rdweb2.hmpps-domain-services", type = "A", lbs_map_key = "public" },
         ]
       }
     }
