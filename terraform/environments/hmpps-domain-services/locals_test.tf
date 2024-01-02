@@ -420,7 +420,7 @@ locals {
                 priority = 600
                 actions = [{
                   type              = "forward"
-                  target_group_name = "test-rdweb-https"
+                  target_group_name = "test-rdweb-https2"
                 }]
                 conditions = [{
                   host_header = {
