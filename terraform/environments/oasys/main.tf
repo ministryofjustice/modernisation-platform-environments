@@ -38,7 +38,7 @@ module "baseline_presets" {
     db_backup_s3                                 = true # adds db backup buckets
     iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+    iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy", "Ec2OracleEnterpriseManagerPolicy"]
 
     sns_topics = {
       pagerduty_integrations = {
