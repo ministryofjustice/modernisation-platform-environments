@@ -7,7 +7,7 @@ locals {
     "corporate-staff-rostering-${local.environment}",
     "nomis-${local.environment}",
     "nomis-combined-reporting-${local.environment}",
-    "oasys-${local.environment}",
+    # "oasys-${local.environment}",
     contains(["development"], local.environment) ? ["delius-core-${local.environment}"] : []
   ])
 
