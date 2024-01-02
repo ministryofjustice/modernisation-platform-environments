@@ -216,7 +216,7 @@ locals {
         force_destroy_bucket             = true
         # not required for testing in sandbox
         instance_target_groups = {
-          network-lb-target-group = {
+          networktwo-lb-target-group = {
             port     = 80
             protocol = "TCP"
             health_check = {
@@ -240,7 +240,7 @@ locals {
             protocol = "TCP"
             default_action = {
               type              = "forward"
-              target_group_name = "network-lb-target-group"
+              target_group_name = "networktwo-lb-target-group"
             }
           }
         }
