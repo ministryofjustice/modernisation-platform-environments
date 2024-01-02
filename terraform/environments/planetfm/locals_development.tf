@@ -49,6 +49,7 @@ locals {
         iam_policies = module.baseline_presets.s3_iam_policies
       }
       network-lb-logs-bucket = {
+        sse_algorithm = "AES256"
         bucket_policy_v2 = [
           {
             effect = "Allow"
