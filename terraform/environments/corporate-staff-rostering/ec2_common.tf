@@ -54,6 +54,20 @@ resource "aws_ssm_document" "ami_build_automation" {
   )
 }
 
+resource "aws_ssm_document" "leave_windows_domain" {
+  name            = "windows-cloudwatch-agent-config"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/leave-windows-domain.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "windows-cloudwatch-agent-config"
+    },
+  )
+}
+
 # resource "aws_ssm_document" "network-testing-tools" {
 #   name            = "network-testing-tools"
 #   document_type   = "Command"
