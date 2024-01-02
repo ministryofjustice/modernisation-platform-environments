@@ -55,7 +55,7 @@ resource "aws_ssm_document" "ami_build_automation" {
 }
 
 resource "aws_ssm_document" "leave_windows_domain" {
-  name            = "windows-cloudwatch-agent-config"
+  name            = "leave-windows-domain"
   document_type   = "Command"
   document_format = "YAML"
   content         = file("./ssm-documents/leave-windows-domain.yaml")
@@ -63,7 +63,7 @@ resource "aws_ssm_document" "leave_windows_domain" {
   tags = merge(
     local.tags,
     {
-      Name = "windows-cloudwatch-agent-config"
+      Name = "leave-windows-domain"
     },
   )
 }
