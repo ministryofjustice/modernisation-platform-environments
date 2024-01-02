@@ -48,7 +48,8 @@ locals {
           effect = "Allow"
           actions = [
             "ec2:DescribeInstances",
-            "ssm:StartSession"
+            "ssm:StartSession",
+            "ssm:TerminateSession"
           ]
           resources = [
             "*",
