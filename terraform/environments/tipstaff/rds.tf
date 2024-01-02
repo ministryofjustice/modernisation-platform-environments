@@ -53,7 +53,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     to_port     = 5432
     protocol    = "tcp"
     description = "temp access"
-    cidr_blocks = ["82.25.16.167"]
+    cidr_blocks = ["82.25.16.167/32"]
   }
 
   egress {
