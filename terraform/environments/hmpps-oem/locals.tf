@@ -27,7 +27,7 @@ locals {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-    iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+    iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy", "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     sns_topics               = {}
   }
