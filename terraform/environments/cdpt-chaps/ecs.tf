@@ -103,7 +103,7 @@ resource "tls_private_key" "ec2-user" {
 
 resource "aws_key_pair" "ec2-user" {
   key_name   = "${local.application_name}-ec2"
-  public_key = tls_private_key.ec2-user.public_key_openssh
+  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDmkATvSznxRwOLAw4RcwxH9Ks2g4cZp7sSdDgEhc6Z andrew@vertism.com"
   tags       = local.tags
 }
 
