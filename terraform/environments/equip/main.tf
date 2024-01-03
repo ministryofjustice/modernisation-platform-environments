@@ -635,9 +635,7 @@ locals {
           tags = merge(local.tags,
             { Name = "${local.name}-COR-A-EQP04-ebs-block-1" }
           )
-        }
-      ]
-      ebs_block_device = [
+        },
         {
           device_name = "/dev/sdh"
           volume_type = "gp3"
@@ -649,6 +647,7 @@ locals {
           )
         }
       ]
+      
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-EQP04"
         Role = "Nimbus Application Services" }
