@@ -101,7 +101,10 @@ variable "subnet_ids" {
   default     = []
 }
 
-variable "vpc" {}
+variable "vpc" {
+  type        = string
+  default     = ""  
+}
 
 variable "availability_zone" {
   default = null
@@ -331,6 +334,12 @@ variable "table_mappings" {
 
 variable "replication_task_settings" {
   type = any
+}
+
+variable "dms_replication_instance" {
+  type        = string
+  default     = ""
+  description = "DMS Rep Instance ARN"
 }
 
 # Lambda
