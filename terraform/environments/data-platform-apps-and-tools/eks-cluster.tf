@@ -96,7 +96,7 @@ module "eks" {
     }
   ]
 
-  kms_key_owners = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ModernisationPlatformAccess"]
+  kms_key_owners         = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ModernisationPlatformAccess"]
   kms_key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"]
 
   tags = local.tags

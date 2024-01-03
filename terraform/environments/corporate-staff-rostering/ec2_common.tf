@@ -54,6 +54,20 @@ resource "aws_ssm_document" "ami_build_automation" {
   )
 }
 
+resource "aws_ssm_document" "leave_windows_domain" {
+  name            = "leave-windows-domain"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/leave-windows-domain.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "leave-windows-domain"
+    },
+  )
+}
+
 # resource "aws_ssm_document" "network-testing-tools" {
 #   name            = "network-testing-tools"
 #   document_type   = "Command"

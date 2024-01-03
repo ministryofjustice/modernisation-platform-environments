@@ -136,15 +136,16 @@ locals {
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ansible
 
     tags = {
-      ami                  = "nomis_rhel_7_9_oracledb_11_2"
-      backup               = "false" # disable mod platform backup since we use our own policies
-      component            = "data"
-      server-type          = "nomis-db"
-      os-type              = "Linux"
-      os-major-version     = 7
-      os-version           = "RHEL 7.9"
-      licence-requirements = "Oracle Database"
-      "Patch Group"        = "RHEL"
+      ami                         = "nomis_rhel_7_9_oracledb_11_2"
+      backup                      = "false" # disable mod platform backup since we use our own policies
+      component                   = "data"
+      server-type                 = "nomis-db"
+      os-type                     = "Linux"
+      os-major-version            = 7
+      os-version                  = "RHEL 7.9"
+      licence-requirements        = "Oracle Database"
+      "Patch Group"               = "RHEL"
+      OracleDbLTS-ManagedInstance = true # oracle license tracking
     }
   }
 }
