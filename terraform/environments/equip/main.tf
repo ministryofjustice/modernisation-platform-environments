@@ -636,7 +636,7 @@ locals {
             { Name = "${local.name}-COR-A-EQP04-ebs-block-1" }
           )
         }
-      ],  
+      ]
       ebs_block_device = [
         {
           device_name = "/dev/sdh"
@@ -766,7 +766,7 @@ module "win2022_STD_multiple" {
 
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
-  ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  ebs_block_device   = lookup(for_each.value, "ebs_block_device", [])
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
