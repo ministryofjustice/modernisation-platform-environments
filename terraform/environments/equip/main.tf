@@ -637,7 +637,7 @@ locals {
           )
         }
       ]  
-      ebs_block_device = [
+      ebs_block_device2 = [
         {
           device_name = "/dev/sdh"
           volume_type = "gp3"
