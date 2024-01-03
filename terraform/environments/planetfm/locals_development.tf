@@ -4,150 +4,106 @@ locals {
   # baseline config
   development_config = {
 
-    baseline_s3_buckets = {
-      public-lb-logs-bucket = {
-        bucket_policy_v2 = [
-          {
-            effect = "Allow"
-            actions = [
-              "s3:PutObject",
-            ]
-            principals = {
-              identifiers = ["arn:aws:iam::652711504416:root"]
-              type        = "AWS"
-            }
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "s3:PutObject"
-            ]
-            principals = {
-              identifiers = ["delivery.logs.amazonaws.com"]
-              type        = "Service"
-            }
+    # baseline_s3_buckets = {
+    #   public-lb-logs-bucket = {
+    #     bucket_policy_v2 = [
+    #       {
+    #         effect = "Allow"
+    #         actions = [
+    #           "s3:PutObject",
+    #         ]
+    #         principals = {
+    #           identifiers = ["arn:aws:iam::652711504416:root"]
+    #           type        = "AWS"
+    #         }
+    #       },
+    #       {
+    #         effect = "Allow"
+    #         actions = [
+    #           "s3:PutObject"
+    #         ]
+    #         principals = {
+    #           identifiers = ["delivery.logs.amazonaws.com"]
+    #           type        = "Service"
+    #         }
 
-            conditions = [
-              {
-                test     = "StringEquals"
-                variable = "s3:x-amz-acl"
-                values   = ["bucket-owner-full-control"]
-              }
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "s3:GetBucketAcl"
-            ]
-            principals = {
-              identifiers = ["delivery.logs.amazonaws.com"]
-              type        = "Service"
-            }
-          }
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-      network-lb-logs-bucket = {
-        sse_algorithm = "AES256"
-        bucket_policy_v2 = [
-          {
-            effect = "Allow"
-            actions = [
-              "s3:PutObject"
-            ]
-            principals = {
-              identifiers = ["delivery.logs.amazonaws.com"]
-              type        = "Service"
-            }
-            conditions = [
-              {
-                test     = "StringEquals"
-                variable = "s3:x-amz-acl"
-                values   = ["bucket-owner-full-control"]
-              },
-              {
-                test     = "StringEquals"
-                variable = "aws:SourceAccount"
-                values   = [module.environment.account_id]
-              },
-              {
-                test     = "ArnLike"
-                variable = "aws:SourceArn"
-                values   = ["arn:aws:logs:${module.environment.region}:${module.environment.account_id}:*"]
-              }
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "s3:GetBucketAcl"
-            ]
-            principals = {
-              identifiers = ["delivery.logs.amazonaws.com"]
-              type        = "Service"
-            }
-            conditions = [
-              {
-                test     = "StringEquals"
-                variable = "aws:SourceAccount"
-                values   = [module.environment.account_id]
-              },
-              {
-                test     = "ArnLike"
-                variable = "aws:SourceArn"
-                values   = ["arn:aws:logs:${module.environment.region}:${module.environment.account_id}:*"]
-              }
-            ]
-          }
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-    }
-
-    baseline_lbs = {
-      network = {
-        internal_lb                      = true
-        enable_delete_protection         = false
-        load_balancer_type               = "network"
-        idle_timeout                     = 3600
-        security_groups                  = ["loadbalancer"]
-        subnets                          = module.environment.subnets["private"].ids
-        access_logs                      = false
-        force_destroy_bucket             = true
-        # existing_bucket_name             = "network-lb-logs-bucket20231219101122706700000001"
-
-        instance_target_groups = {
-          network-lb-target-group = {
-            port     = 80
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              port                = 80
-              protocol            = "TCP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            attachments = [
-              # { ec2_instance_name = "pp-cafm-test-1" },
-            ]
-          }
-        }
-        # not required for testing in sandbox
-        listeners = {
-          http = {
-            port     = 80
-            protocol = "TCP"
-            default_action = {
-              type              = "forward"
-              target_group_name = "network-lb-target-group"
-            }
-          }
-        }
-      }
-    }
+    #         conditions = [
+    #           {
+    #             test     = "StringEquals"
+    #             variable = "s3:x-amz-acl"
+    #             values   = ["bucket-owner-full-control"]
+    #           }
+    #         ]
+    #       },
+    #       {
+    #         effect = "Allow"
+    #         actions = [
+    #           "s3:GetBucketAcl"
+    #         ]
+    #         principals = {
+    #           identifiers = ["delivery.logs.amazonaws.com"]
+    #           type        = "Service"
+    #         }
+    #       }
+    #     ]
+    #     iam_policies = module.baseline_presets.s3_iam_policies
+    #   }
+    #   network-lb-logs-bucket = {
+    #     sse_algorithm = "AES256"
+    #     bucket_policy_v2 = [
+    #       {
+    #         effect = "Allow"
+    #         actions = [
+    #           "s3:PutObject"
+    #         ]
+    #         principals = {
+    #           identifiers = ["delivery.logs.amazonaws.com"]
+    #           type        = "Service"
+    #         }
+    #         conditions = [
+    #           {
+    #             test     = "StringEquals"
+    #             variable = "s3:x-amz-acl"
+    #             values   = ["bucket-owner-full-control"]
+    #           },
+    #           {
+    #             test     = "StringEquals"
+    #             variable = "aws:SourceAccount"
+    #             values   = [module.environment.account_id]
+    #           },
+    #           {
+    #             test     = "ArnLike"
+    #             variable = "aws:SourceArn"
+    #             values   = ["arn:aws:logs:${module.environment.region}:${module.environment.account_id}:*"]
+    #           }
+    #         ]
+    #       },
+    #       {
+    #         effect = "Allow"
+    #         actions = [
+    #           "s3:GetBucketAcl"
+    #         ]
+    #         principals = {
+    #           identifiers = ["delivery.logs.amazonaws.com"]
+    #           type        = "Service"
+    #         }
+    #         conditions = [
+    #           {
+    #             test     = "StringEquals"
+    #             variable = "aws:SourceAccount"
+    #             values   = [module.environment.account_id]
+    #           },
+    #           {
+    #             test     = "ArnLike"
+    #             variable = "aws:SourceArn"
+    #             values   = ["arn:aws:logs:${module.environment.region}:${module.environment.account_id}:*"]
+    #           }
+    #         ]
+    #       }
+    #     ]
+    #     iam_policies = module.baseline_presets.s3_iam_policies
+    #   }
+    # }
   }
 }
 
