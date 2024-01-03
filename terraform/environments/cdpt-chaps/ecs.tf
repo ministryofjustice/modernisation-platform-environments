@@ -96,6 +96,17 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   ])
 }
 
+resource "tls_private_key" "ec2-user" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "ec2-user" {
+  key_name   = "${local.application_name}-ec2"
+  public_key = tls_private_key.ec2-user.public_key_openssh
+  tags       = local.tags
+}
+
 resource "aws_ecs_service" "ecs_service" {
   depends_on = [
     aws_lb_listener.https_listener
@@ -239,7 +250,7 @@ resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
   image_id      = local.application_data.accounts[local.environment].ami_image_id
   instance_type = local.application_data.accounts[local.environment].instance_type
-  key_name      = local.application_data.accounts[local.environment].key_name
+  key_name      = "${local.application_name}-ec2"
   ebs_optimized = true
 
   monitoring {
