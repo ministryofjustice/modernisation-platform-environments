@@ -45,10 +45,10 @@ data "template_file" "table-mappings" {
 }
 
 resource "aws_dms_replication_task" "dms-replication" {
-  count = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
+  count = var.enable_replication_task ? 1 : 0
 
   migration_type            = var.migration_type
-  replication_instance_arn  = aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_arn
+  replication_instance_arn  = var.replication_instance_arn
   replication_task_id       = "${var.name}-task-${var.env}"
   source_endpoint_arn       = var.dms_source_endpoint # aws_dms_endpoint.dms-s3-target-source[0].endpoint_arn
   target_endpoint_arn       = var.dms_target_endpoint # aws_dms_s3_endpoint.dms-s3-target-endpoint[0].endpoint_arn
