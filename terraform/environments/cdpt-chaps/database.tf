@@ -52,11 +52,6 @@ data "aws_secretsmanager_secret_version" "db_password" {
   secret_id = data.aws_secretsmanager_secret.db_password.id
 }
 
-data "aws_vpc" "shared" {
-  tags = {
-    "Name" = var.vpc_all
-  }
-}
 
 #------------------------------------------------------------------------------
 # KMS setup for RDS
