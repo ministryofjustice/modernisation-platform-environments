@@ -47,27 +47,27 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
 ##### PARAMETER STORE SECRETS
 resource "aws_ssm_parameter" "data_source_username" {
   name  = "/maat-cd-api/DATASOURCE_USERNAME"
-  type  = "String"
+  type  = "SecureString"
 }
 
 resource "aws_ssm_parameter" "data_source_password" {
   name  = "APP_MAATDB_DBPASSWORD_MLA1"
-  type  = "String"
+  type  = "SecureString"
 }
 
 resource "aws_ssm_parameter" "cda_client_id" {
   name  = "/maat-cd-api/CDA_OAUTH_CLIENT_ID"
-  type  = "String"
+  type  = "SecureString"
 }
 
 resource "aws_ssm_parameter" "cda_client_secret" {
   name  = "/maat-cd-api/CDA_OAUTH_CLIENT_SECRET"
-  type  = "String"
+  type  = "SecureString"
 }
 
 resource "aws_ssm_parameter" "togdata_datasource_password" {
   name  = "APP_MAATDB_DBPASSWORD_TOGDATA"
-  type  = "String"
+  type  = "SecureString"
 }
 ######################################
 # ECS TASK DEFINITION
