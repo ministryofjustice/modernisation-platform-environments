@@ -15,7 +15,7 @@ resource "aws_db_instance" "database" {
   depends_on             = [aws_security_group.db]
   snapshot_identifier    = "arn:aws:rds:eu-west-2:613903586696:snapshot:dev-modplatform-snapshot"
   skip_final_snapshot    = true
-  db_subnet_group_name   = aws_db_subnet_group.rds.id
+  db_subnet_group_name   = aws_db_subnet_group.db.id
 }
 
 resource "aws_db_instance_role_association" "database" {
@@ -28,20 +28,8 @@ output "s3_db_backup_restore_access_role_arn" {
   value = aws_iam_role.S3_db_backup_restore_access.arn
 }
 
-# TODO: delete
 resource "aws_db_subnet_group" "db" {
   name       = "${local.application_name}-db-subnet-group"
-  subnet_ids = sort(data.aws_subnets.shared-data.ids)
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-db-subnet-group"
-    }
-  )
-}
-
-resource "aws_db_subnet_group" "rds" {
-  name       = "${local.application_name}-db-sub-net-group"
   subnet_ids = sort(data.aws_subnets.shared-data.ids)
   tags = merge(
     local.tags,
