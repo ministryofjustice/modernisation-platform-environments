@@ -110,6 +110,10 @@ module "lb" {
 
   for_each = var.lbs
 
+  # references my working fork of the module
+  # source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=0d4f8e35ba3605fabbd233b592caaa656a8a03e8"
+
+  # experimental
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=0d4f8e35ba3605fabbd233b592caaa656a8a03e8"
 
   providers = {
