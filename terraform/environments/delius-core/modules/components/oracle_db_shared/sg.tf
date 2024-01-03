@@ -70,6 +70,14 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
   referenced_security_group_id = var.account_config.bastion.bastion_security_group
 }
 
+resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_db" {
+  ip_protocol       = "tcp"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
+  security_group_id = aws_security_group.db_ec2.id
+}
+
 resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_agent" {
   ip_protocol       = "tcp"
   from_port         = 3872

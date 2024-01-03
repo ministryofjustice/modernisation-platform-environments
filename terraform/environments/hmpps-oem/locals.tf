@@ -44,10 +44,12 @@ locals {
       description = "Permissions for the db refresh process"
       statements = [
         {
-          sid    = "DescribeInstances"
+          sid    = "InstanceAccess"
           effect = "Allow"
           actions = [
             "ec2:DescribeInstances",
+            "ssm:StartSession",
+            "ssm:TerminateSession"
           ]
           resources = [
             "*",
@@ -120,6 +122,9 @@ locals {
             }
           ]
         }
+      ]
+      policy_attachments = [
+        "DbRefresherPolicy",
       ]
     }
   }
