@@ -72,8 +72,8 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   container_definitions = jsonencode([
     {
       name      = "${local.application_name}-container"
-      image     = "${local.ecr_url}:development"
-      cpu       = 1024
+      image     = "${local.ecr_url}:${local.application_data.accounts[local.environment].docker_image_tag}"
+      cpu       = 1
       memory    = 1024
       essential = true
       portMappings = [
