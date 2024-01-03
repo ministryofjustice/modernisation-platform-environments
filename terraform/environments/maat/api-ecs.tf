@@ -44,7 +44,36 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
     }
   )
 }
+##### PARAMETER STORE SECRETS
+resource "aws_ssm_parameter" "data_source_username" {
+  name  = "/maat-cd-api/DATASOURCE_USERNAME"
+  type  = "SecureString"
+  value = "??"
+}
 
+resource "aws_ssm_parameter" "data_source_password" {
+  name  = "APP_MAATDB_DBPASSWORD_MLA1"
+  type  = "String"
+  value = "??"
+}
+
+resource "aws_ssm_parameter" "cda_client_id" {
+  name  = "/maat-cd-api/CDA_OAUTH_CLIENT_ID"
+  type  = "String"
+  value = "??"
+}
+
+resource "aws_ssm_parameter" "cda_client_secret" {
+  name  = "/maat-cd-api/CDA_OAUTH_CLIENT_SECRET"
+  type  = "String"
+  value = "??"
+}
+
+resource "aws_ssm_parameter" "togdata_datasource_password" {
+  name  = "APP_MAATDB_DBPASSWORD_TOGDATA"
+  type  = "String"
+  value = "??"
+}
 ######################################
 # ECS TASK DEFINITION
 ######################################
@@ -80,23 +109,23 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
       secrets = [
         {
           name        = "DATASOURCE_USERNAME"
-          value_from  = "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat-cd-api/DATASOURCE_USERNAME"
+          value_from  = aws_ssm_parameter.data_source_username.arn
         },
         {
           name        = "DATASOURCE_PASSWORD"
-          value_from  = "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_MLA1"
+          value_from  = aws_ssm_parameter.data_source_password.arn
         },
         {
           name        = "CDA_OAUTH_CLIENT_ID"
-          value_from  = "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat-cd-api/CDA_OAUTH_CLIENT_ID"
+          value_from  = aws_ssm_parameter.cda_client_id.arn
         },
         {
           name        = "CDA_OAUTH_CLIENT_SECRET"
-          value_from  = "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat-cd-api/CDA_OAUTH_CLIENT_SECRET"
+          value_from  = aws_ssm_parameter.cda_client_secret.arn
         },
         {
           name        = "TOGDATA_DATASOURCE_PASSWORD"
-          value_from  = "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/APP_MAATDB_DBPASSWORD_TOGDATA"
+          value_from  = aws_ssm_parameter.togdata_datasource_password.arn
         },
       ]
       environment = [

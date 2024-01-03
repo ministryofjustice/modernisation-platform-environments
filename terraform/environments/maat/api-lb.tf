@@ -3,7 +3,7 @@
 ######################################
 resource "aws_lb" "maat_api_ecs_lb" {
   name               = "${local.application_name}-api-ecs-lb"
-  load_balancer_type = "network"
+  load_balancer_type = "application"
   subnets            = [data.aws_subnets.shared-private.ids[0], data.aws_subnets.shared-private.ids[1], data.aws_subnets.shared-private.ids[2],]
   security_groups    = [aws_security_group.maat_api_alb_sg.id]
   idle_timeout       = 65
