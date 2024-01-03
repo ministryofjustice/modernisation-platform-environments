@@ -635,9 +635,7 @@ locals {
           tags = merge(local.tags,
             { Name = "${local.name}-COR-A-EQP04-ebs-block-1" }
           )
-        }
-      ]
-      ebs_block_device = [
+        },
         {
           device_name = "/dev/sdh"
           volume_type = "gp3"
@@ -680,9 +678,7 @@ locals {
           tags = merge(local.tags,
             { Name = "${local.name}-COR-A-EQP05-ebs-block-1" }
           )
-        }
-      ]
-      ebs_block_device = [
+        },
         {
           device_name = "/dev/sdg"
           volume_type = "gp3"
@@ -724,9 +720,7 @@ locals {
           tags = merge(local.tags,
             { Name = "${local.name}-COR-A-EQP06-ebs-block-1" }
           )
-        }
-      ]
-      ebs_block_device = [
+        },
         {
           device_name = "/dev/sdg"
           volume_type = "gp3"
@@ -766,7 +760,7 @@ module "win2022_STD_multiple" {
 
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
-  ebs_block_device   = lookup(for_each.value, "ebs_block_device", [])
+  ebs_block_device   = lookup(each.value, "ebs_block_device", [])
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
