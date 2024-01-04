@@ -74,6 +74,7 @@ variable "short_name" {
 variable "migration_type" {
   type        = string
   description = "DMS Migration Type"
+  default     = ""
 }
 
 variable "availability_zones" {
@@ -87,11 +88,13 @@ variable "availability_zones" {
 variable "rename_rule_source_schema" {
   description = "The source schema we will rename to a target output 'space'"
   type        = string
+  default     = ""
 }
 
 variable "rename_rule_output_space" {
   description = "The name of the target output 'space' that the source schema will be renamed to"
   type        = string
+  default     = ""
 }
 
 
@@ -329,11 +332,13 @@ variable "cloudwatch_role_dependency" {
 }
 
 variable "table_mappings" {
-  type = any
+  type        = any
+  default     = {}
 }
 
 variable "replication_task_settings" {
-  type = any
+  type        = any
+  default     = {}
 }
 
 variable "dms_replication_instance" {
