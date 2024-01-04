@@ -569,11 +569,11 @@ locals {
       description = "New security group for web-servers"
       ingress = {
         all-from-self = {
-          description     = "Allow all ingress to self"
-          from_port       = 0
-          to_port         = 0
-          protocol        = -1
-          self            = true
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
         }
         # IMPORTANT: check if an 'allow all from load-balancer' rule is required
         http_web = {
