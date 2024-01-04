@@ -14,7 +14,7 @@ resource "aws_route53_record" "maat_api_lb_a_record" {
     evaluate_target_health = true
   }
 
-  records = [aws_lb.maat_api_ecs_lb.dns_name]
+  # records = [aws_lb.maat_api_ecs_lb.dns_name]
 
   # Optional comment
   set_identifier = "Domain A record for Internal Application LoadBalancer"

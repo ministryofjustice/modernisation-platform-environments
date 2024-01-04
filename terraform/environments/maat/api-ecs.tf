@@ -88,7 +88,7 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
 
   container_definitions = jsonencode([
     {
-      name        = "${local.application_name}-api"
+      name        = "${local.application_name}-cd-api"
       cpu         = local.application_data.accounts[local.environment].ecs_container_cpu
       essential   = true
       image       = "902837325998.dkr.ecr.eu-west-2.amazonaws.com/maat-cd-api:2b0a2803"
