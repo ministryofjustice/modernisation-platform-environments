@@ -103,7 +103,7 @@ resource "tls_private_key" "ec2-user" {
 
 resource "aws_key_pair" "ec2-user" {
   key_name   = "${local.application_name}-ec2"
-  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDmkATvSznxRwOLAw4RcwxH9Ks2g4cZp7sSdDgEhc6Z andrew@vertism.com"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDUKqPVftVDfgJoj+j6Oi/xFKDvdy/DVnmLZBRJMG8qsp1xdw9W/J0OGnNNYuoCobUUzxDUapFhjhkYXvG9i5MNXSJv1/pznMD3CkS0jkWFHJmhSBo14KQb7O/L41ibIe9z0iluiZeiN4pYWcHD2gJEHjQSmF5ZHrTQoqPqSPCnwjO+hrxRCeioSAvOZQN8qSEkPFme21tXfV0+IAQ/62RBeSJOp09Omx0zlEESH0ctWFnVPtHqQOxQWeow/uu4BJejbvHtf5/vzrMXSFrOfzLy1JtwhECfTyM3JRaJnLrGm5VSREpfqQTqwDRCgS+H/jfqIhrp79KiZLNqcNt1V2Kg6EUGN8hLSBxJ2FIKCzFrh6j2GhWbW4SHGsaMRtZ27n/1XivNPyACOz3T5KhnzBxF6ls9U1suczaxM/GQpZNWdTX/NVABwj/f9IqKmhxkil5XEw2u8eU3FwRl68VCH01M8i5t7h8MIyMLBO3BeWAHz4a15Kb9UTHsBzLCMHe13yM= andrew.pepler@MJ003740"
   tags       = local.tags
 }
 
