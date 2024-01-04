@@ -19,10 +19,6 @@ resource "aws_dms_replication_task" "dms-replication" {
   table_mappings            = data.template_file.table-mappings.rendered
   replication_task_settings = var.replication_task_settings #JSON
 
-  depends_on = [
-    aws_dms_replication_instance.dms-s3-target-instance
-  ]
-
   tags = merge(
     var.tags,
   {
