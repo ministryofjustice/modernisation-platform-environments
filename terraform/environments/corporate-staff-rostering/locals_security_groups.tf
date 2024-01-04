@@ -574,7 +574,6 @@ locals {
           to_port         = 0
           protocol        = -1
           self            = true
-          security_groups = ["app", "database"]
         }
         # IMPORTANT: check if an 'allow all from load-balancer' rule is required
         http_web = {
