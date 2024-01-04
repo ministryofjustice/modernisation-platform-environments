@@ -569,11 +569,12 @@ locals {
       description = "New security group for web-servers"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
+          security_groups = ["app", "database"]
         }
         # IMPORTANT: check if an 'allow all from load-balancer' rule is required
         http_web = {
@@ -698,11 +699,12 @@ locals {
       description = "New security group for application servers"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
+          security_groups = ["web"]
         }
         # IMPORTANT: check if an 'allow all from load-balancer' rule is required
         # IMPORTANT: check whether http/https traffic is still needed? It's in the original but not used at an app level
@@ -711,7 +713,7 @@ locals {
           from_port       = 135
           to_port         = 135
           protocol        = "TCP"
-          security_groups = ["app", "database"]
+          security_groups = ["web", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rpc_tcp_app = {
@@ -719,7 +721,7 @@ locals {
           from_port       = 135
           to_port         = 135
           protocol        = "UDP"
-          security_groups = ["app", "database"]
+          security_groups = ["web", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         smb_tcp_app = {
@@ -727,7 +729,7 @@ locals {
           from_port       = 445
           to_port         = 445
           protocol        = "TCP"
-          security_groups = ["app", "database"]
+          security_groups = ["web", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         smb_udp_app = {
@@ -735,7 +737,7 @@ locals {
           from_port       = 445
           to_port         = 445
           protocol        = "UDP"
-          security_groups = ["app", "database"]
+          security_groups = ["web", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         http_2109_csr = {
@@ -780,7 +782,7 @@ locals {
           from_port       = 49152
           to_port         = 65535
           protocol        = "UDP"
-          security_groups = ["app", "database"]
+          security_groups = ["web", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rpc_dynamic_tcp_app = {
@@ -788,7 +790,7 @@ locals {
           from_port       = 49152
           to_port         = 65535
           protocol        = "TCP"
-          security_groups = ["app", "database"]
+          security_groups = ["web", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
       }
@@ -994,11 +996,12 @@ locals {
       description = "New security group for database servers"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
+          security_groups = ["web", "app"]
         }
         # IMPORTANT: check if an 'allow all from load-balancer' rule is required
         echo_core_tcp_db = {
