@@ -1,10 +1,14 @@
 # nomis-development environment settings
 locals {
-  nomis_development = {
-    # vars common across ec2 instances
-    ec2_common = {
-      patch_approval_delay_days = 3
-      patch_day                 = "TUE"
+
+  # baseline presets config
+  development_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "nomis_nonprod_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_non_prod"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
+      }
     }
   }
 

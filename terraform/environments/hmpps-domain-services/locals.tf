@@ -67,12 +67,7 @@ locals {
   }
 
   baseline_secretsmanager_secrets = {}
-
-  baseline_security_groups = {
-    private-dc    = local.security_groups.private_dc
-    load-balancer = local.security_groups.load-balancer
-  }
-
-  baseline_sns_topics     = {}
-  baseline_ssm_parameters = {}
+  baseline_security_groups        = local.security_groups
+  baseline_sns_topics             = {}
+  baseline_ssm_parameters         = {}
 }

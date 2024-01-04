@@ -1,6 +1,17 @@
 # nomis-test environment settings
 locals {
 
+  # baseline presets config
+  test_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "nomis_nonprod_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_non_prod"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
+      }
+    }
+  }
+
   # baseline config
   test_config = {
 
@@ -231,7 +242,13 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = merge(
+          local.weblogic_cloudwatch_metric_alarms, {
+            high-memory-usage = merge(local.weblogic_cloudwatch_metric_alarms["high-memory-usage"], {
+              threshold = "99" # Remove this if we decide to increase the EC2 size
+            })
+          }
+        )
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -308,7 +325,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -336,7 +353,13 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 1
         })
-        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = merge(
+          local.weblogic_cloudwatch_metric_alarms, {
+            high-memory-usage = merge(local.weblogic_cloudwatch_metric_alarms["high-memory-usage"], {
+              threshold = "99" # Remove this if we decide to increase the EC2 size
+            })
+          }
+        )
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -413,7 +436,7 @@ locals {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
-        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -503,9 +526,9 @@ locals {
     baseline_ec2_instances = {
       t1-nomis-db-1-a = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
@@ -532,10 +555,10 @@ locals {
 
       t1-nomis-db-2-a = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          local.database_ec2_misload_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
+          local.database_ec2_cloudwatch_metric_alarms.misload,
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
@@ -563,9 +586,9 @@ locals {
 
       t2-nomis-db-1-a = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
@@ -592,15 +615,9 @@ locals {
 
       t3-nomis-db-1 = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup, {
-            cpu-utilization-high = merge(local.database_ec2_cloudwatch_metric_alarms["cpu-utilization-high"], {
-              evaluation_periods  = "300" # CPU can spike for 5 hours during DB restore
-              datapoints_to_alarm = "300"
-              alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 5 hours on a test nomis-db instance"
-            })
-          }
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
         )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"

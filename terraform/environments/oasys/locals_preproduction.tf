@@ -21,10 +21,25 @@ locals {
       "/oracle/bip/preprod"       = local.secretsmanager_secrets_bip
 
       # for azure, remove when migrated to aws db
-      "/oracle/database/OASPROD"  = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
     }
 
     baseline_iam_policies = {
+      Ec2PreprodWebPolicy = {
+        description = "Permissions required for Preprod Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PPOASYS/apex-passwords*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/OASPROD/apex-passwords*",
+            ]
+          }
+        ]
+      }
       Ec2PreprodDatabasePolicy = {
         description = "Permissions required for Preprod Database EC2s"
         statements = [
@@ -37,7 +52,7 @@ locals {
               "s3:ListBucket",
             ]
             resources = [
-              "arn:aws:s3:::prod-{local.application_name}-db-backup-bucket*",
+              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
             ]
           },
           {
@@ -82,41 +97,67 @@ locals {
     }
 
     baseline_ec2_instances = {
-    }
-
-    baseline_ec2_autoscaling_groups = {
       "pp-${local.application_name}-db-a" = merge(local.database_a, {
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "main"
-          })
-        })
+        ebs_volumes = { # need this config until prod db moves to aws
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 1000
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 2000
+            type  = "gp3"
+          }
+          "/dev/sdf" = {  # DATA02
+            label = "data"
+            size  = 2000
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 500
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
         tags = merge(local.database_a.tags, {
-          instance-scheduling = "skip-scheduling"
+          bip-db-name                             = "PPBIPINF"
+          instance-scheduling                     = "skip-scheduling"
+          oracle-sids                             = "PPBIPINF PPOASYS"
         })
       })
+    }
 
-      # "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name                  = "oasys_webserver_release_*"
-      #     ssm_parameters_prefix     = "ec2-web-pp/"
-      #     iam_resource_names_prefix = "ec2-web-pp"
-      #   })
-      #   user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "oasys-ords-secrets"
-      #     })
-      #   })
-      #   tags = merge(local.webserver_a.tags, {
-      #     oracle-db-hostname = "PPODL00009.azure.noms.root" # "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
-      #     oracle-db-sid      = "OASPROD" # "PPOASYS"
-      #   })
-      # })
+    baseline_ec2_autoscaling_groups = {
+      "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "oasys_webserver_release_*"
+          ssm_parameters_prefix     = "ec2-web-pp/"
+          iam_resource_names_prefix = "ec2-web-pp"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2PreprodWebPolicy",
+          ])
+        })
+        tags = merge(local.webserver_a.tags, {
+          oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
+          oracle-db-sid      = "OASPROD" # "PPOASYS"
+        })
+      })
     }
 
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
@@ -216,8 +257,8 @@ locals {
         }
       }
       private = {
-        internal_lb = true
-        access_logs = true
+        internal_lb              = true
+        access_logs              = true
         s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
@@ -314,7 +355,8 @@ locals {
           id = module.environment.vpc.id
         }
         records = [
-          # { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # uncomment when db in aws is set up
+          { name = "db.pp.${local.application_name}", type = "A", ttl = "300", records = ["10.40.40.133"] }, # for azure 
+          # { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
         ]
         lb_alias_records = [
           # { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },
@@ -343,6 +385,7 @@ locals {
         retention_in_days = 14
       }
     }
+
 
   }
 }

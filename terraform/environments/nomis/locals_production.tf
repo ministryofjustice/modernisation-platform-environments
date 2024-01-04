@@ -1,6 +1,17 @@
 # nomis-production environment settings
 locals {
 
+  # baseline presets config
+  production_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "nomis_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
+      }
+    }
+  }
+
   # baseline config
   production_config = {
 
@@ -214,9 +225,9 @@ locals {
     baseline_ec2_instances = {
       prod-nomis-db-1-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected, {
-            high-memory-usage = merge(local.database_ec2_cloudwatch_metric_alarms["high-memory-usage"], {
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected, {
+            high-memory-usage = merge(local.database_ec2_cloudwatch_metric_alarms.standard["high-memory-usage"], {
               threshold = "99" # Sandhya confirmed this is OK while in DR mode
             })
           }
@@ -248,10 +259,10 @@ locals {
 
       prod-nomis-db-2 = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_connectivity_test,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring,
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.connectivity_test,
+          local.database_ec2_cloudwatch_metric_alarms.nomis_batch,
         )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"
@@ -280,8 +291,8 @@ locals {
 
       prod-nomis-db-2-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -310,8 +321,8 @@ locals {
 
       prod-nomis-db-3 = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
         )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"

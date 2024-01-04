@@ -1,0 +1,72 @@
+---
+schemaVersion: "2.2"
+description: "SSM Document for removing Windows EC2 instances from the Active Directory domain."
+parameters:
+  domain:
+    type: "String"
+    default: "dev"
+    description: "Domain to join, either Dev (default) or Prod"
+    allowedValues:
+      - dev
+      - prod
+  domainLeaveUsername:
+    type: "String"
+    description: "Username with domain leave permissions"
+  domainLeavePassword:
+    type: "String"
+    description: "Password for domain leave user (NOTE: Do not use a password containing quotes)"
+  restart:
+    type: "String"
+    description: "If set to true, the instance will be restarted after leaving the domain. If set to false, the instance will not be restarted. Default is true."
+    default: "true"
+    allowedValues:
+      - "true"
+      - "false"
+mainSteps:
+  - name: WindowsDomainLeave
+    action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
+    inputs:
+      runCommand:
+        - |
+          $ErrorActionPreference = "Stop" # all errors will terminate the script
+          $domain = "{{domain}}"
+          $domainLeaveUsername = "{{domainLeaveUsername}}"
+          $domainLeavePassword = "{{domainLeavePassword}}"
+          $restart = "{{restart}}"
+
+          # Define environment settings
+          $environments = @{
+            "dev" = @{
+                "domain" = "azure.noms.root";
+                "primarydns" = "10.102.0.196";
+                "serveraddresses" = @("10.102.0.196","10.102.0.200");
+                "suffixsearchlist" = @("azure.noms.root", "noms.root");
+                "domaincontroller" = "MGMCW0002.azure.noms.root";
+                "usernameprefix" = "azure";
+            };
+            "prod" = @{
+                "domain" = "azure.hmpp.root";
+                "primarydns" = "10.40.128.196";
+                "serveraddresses" = @("10.40.128.196","10.40.0.133");
+                "suffixsearchlist" = @("azure.hmpp.root", "hmpp.root");
+                "domaincontroller" = "PCMCW0011.azure.hmpp.root";
+                "usernameprefix" = "hmpp";
+            };
+          }
+
+          $secpasswd = ConvertTo-SecureString $domainLeavePassword -AsPlainText -Force
+          $credentials = New-Object System.Management.Automation.PSCredential (($environments[$domain]["usernameprefix"] + "\" + $domainLeaveUsername), $secpasswd)
+
+          # splatting Remove-Computer parameters to make it easier to read
+          $args = @{
+            UnjoinDomainCredential = $credentials
+            Verbose = $true
+            Force = $true
+          }
+
+          # Run the command to remove the computer from the domain
+          Remove-Computer @args

@@ -33,7 +33,7 @@ run_ansible() {
 
   echo "# Retrieving tags using aws cli"
   IFS=$'\n'
-  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$${instance_id}" "Name=key,Values=os-type,ami,server-type,environment-name,delius-environment-name,database" --output=text))
+  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$${instance_id}" "Name=key,Values=os-type,ami,server-type,environment-name,delius-environment,database" --output=text))
   unset IFS
 
   # clone ansible roles and playbook
@@ -51,10 +51,10 @@ run_ansible() {
     tag=($${tags[i]})
     echo "$${tag[*]}"
     # aws ec2 describe-tags comes out in alphabetical order
-    if [[ $"$${tag[1]}" == "database" || "$${tag[1]}" == "delius-environment-name" || "$${tag[1]}" == "environment-name" ]]
+    if [[ $"$${tag[1]}" == "database" || "$${tag[1]}" == "delius-environment" || "$${tag[1]}" == "environment-name" ]]
     then
       [ "$${tag[1]}" == "database" ] && database=$${tag[4]}
-      [ "$${tag[1]}" == "delius-environment-name" ] && delius_environment_name=$${tag[4]}
+      [ "$${tag[1]}" == "delius-environment" ] && delius_environment_name=$${tag[4]}
       [ "$${tag[1]}" == "environment-name" ] && environment_name="$${tag[1]}_$${tag[4]}"
     fi
     if [[ $i -eq 2 ]]

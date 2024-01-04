@@ -69,6 +69,8 @@ locals {
   reporting_hub_batch_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_batch_job_num_workers
   reporting_hub_batch_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_batch_job_log_level
 
+  reporting_hub_batch_job_schema_cache_max_size = local.application_data.accounts[local.environment].reporting_hub_batch_job_schema_cache_max_size
+
   reporting_hub_batch_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_attempts
   reporting_hub_batch_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_min_wait_millis
   reporting_hub_batch_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_wait_millis
@@ -77,6 +79,8 @@ locals {
   reporting_hub_cdc_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_cdc_job_worker_type
   reporting_hub_cdc_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_cdc_job_num_workers
   reporting_hub_cdc_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_cdc_job_log_level
+
+  reporting_hub_cdc_job_schema_cache_max_size = local.application_data.accounts[local.environment].reporting_hub_cdc_job_schema_cache_max_size
 
   reporting_hub_cdc_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_max_attempts
   reporting_hub_cdc_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_min_wait_millis
@@ -139,6 +143,9 @@ locals {
   retention_domain_job_num_workers = local.application_data.accounts[local.environment].retention_domain_job_num_workers
   retention_domain_job_log_level   = local.application_data.accounts[local.environment].retention_domain_job_log_level
   retention_domain_job_schedule    = local.application_data.accounts[local.environment].retention_domain_job_schedule
+
+  # Hive Table Creation Job
+  hive_table_creation_job_schema_cache_max_size = local.application_data.accounts[local.environment].hive_table_creation_job_schema_cache_max_size
 
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"

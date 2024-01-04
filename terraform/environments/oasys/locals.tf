@@ -49,7 +49,8 @@ locals {
     cloudwatch_metric_alarms = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
     )
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules = {
@@ -129,7 +130,8 @@ locals {
     cloudwatch_metric_alarms = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
       {
         cpu-utilization-high = {
           comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -226,6 +228,7 @@ locals {
       monitored                               = true
       "${local.application_name}-environment" = local.environment
       environment-name                        = terraform.workspace # used in provisioning script to select group vars
+      OracleDbLTS-ManagedInstance             = true                # oracle license tracking
     }
   }
   database_b = merge(local.database_a, {
@@ -255,7 +258,8 @@ locals {
     cloudwatch_metric_alarms = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
     )
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
