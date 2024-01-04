@@ -44,8 +44,8 @@ module "s3_bucket" {
   replication_region         = coalesce(each.value.replication_region, var.environment.region)
   bucket_policy              = each.value.bucket_policy
   bucket_policy_v2           = each.value.bucket_policy_v2
-  custom_kms_key             = coalesce(each.value.custom_kms_key, var.environment.kms_keys["general"].arn)
-  custom_replication_kms_key = coalesce(each.value.custom_replication_kms_key, var.environment.kms_keys["general"].arn)
+  custom_kms_key             = each.value.custom_kms_key
+  custom_replication_kms_key = each.value.custom_replication_kms_key
   lifecycle_rule             = each.value.lifecycle_rule
   log_bucket                 = each.value.log_bucket
   log_prefix                 = each.value.log_prefix
