@@ -7,7 +7,11 @@ module "lambda_cw_logs_xml_to_json" {
 
   application_name = "cw-logs-xml-to-json"
 
-  image_uri = "${aws_ecr_repostitory.cw_logs_xml_to_json.repository_url}:latest"
+  package_type     = "Zip"
+  filename         = "deployment_package.zip"
+  source_code_hash = filebase64sha256("deployment_package.zip")
+  runtime          = "python3.12"
+  handler          = "lambda_function.lambda_handler"
 
   policy_json = jsonencode({
     Version = "2012-10-17",

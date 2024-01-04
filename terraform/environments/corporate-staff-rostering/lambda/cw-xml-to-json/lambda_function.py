@@ -14,7 +14,7 @@ def xml_to_dict(xml_string):
         return f"Error: {e}"
 
 
-def handler(event, context):
+def lambda_handler(event, context):
     logs_client = boto3.client("logs")
 
     for record in event["awslogs"]["data"]:
