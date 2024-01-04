@@ -333,7 +333,7 @@ variable "cloudwatch_role_dependency" {
 
 variable "table_mappings" {
   type        = any
-  default     = {}
+  default     = ""
 }
 
 variable "replication_task_settings" {
