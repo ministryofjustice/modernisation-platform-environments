@@ -125,6 +125,7 @@ locals {
       ]
       policy_attachments = [
         "DbRefresherPolicy",
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
       ]
     }
   }
