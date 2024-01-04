@@ -13,10 +13,6 @@ resource "aws_lb" "maat_api_ecs_lb" {
   }
 
   enable_deletion_protection = false
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_lb_target_group" "maat_api_ecs_target_group" {

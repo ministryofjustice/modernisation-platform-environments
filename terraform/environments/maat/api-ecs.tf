@@ -109,23 +109,23 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
       secrets = [
         {
           name        = "DATASOURCE_USERNAME"
-          value_from  = aws_ssm_parameter.data_source_username.arn
+          valueFrom  = aws_ssm_parameter.data_source_username.arn
         },
         {
           name        = "DATASOURCE_PASSWORD"
-          value_from  = aws_ssm_parameter.data_source_password.arn
+          valueFrom  = aws_ssm_parameter.data_source_password.arn
         },
         {
           name        = "CDA_OAUTH_CLIENT_ID"
-          value_from  = aws_ssm_parameter.cda_client_id.arn
+          valueFrom  = aws_ssm_parameter.cda_client_id.arn
         },
         {
           name        = "CDA_OAUTH_CLIENT_SECRET"
-          value_from  = aws_ssm_parameter.cda_client_secret.arn
+          valueFrom  = aws_ssm_parameter.cda_client_secret.arn
         },
         {
           name        = "TOGDATA_DATASOURCE_PASSWORD"
-          value_from  = aws_ssm_parameter.togdata_datasource_password.arn
+          valueFrom  = aws_ssm_parameter.togdata_datasource_password.arn
         },
       ]
       environment = [
