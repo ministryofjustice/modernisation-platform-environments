@@ -13,7 +13,7 @@
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-apps-and-tools @ministryofjustice/data-platform-apps-and-tools-airflow-users @ministryofjustice/data-platform-apps-and-tools-development-sandbox @ministryofjustice/data-platform-apps-and-tools-production-developer @ministryofjustice/data-platform-audit-and-security @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform-compute @ministryofjustice/data-platform-core-infra @ministryofjustice/data-tech-archs @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform-compute @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-audit-and-security @ministryofjustice/data-platform-development-sandbox @ministryofjustice/data-platform-preproduction-developer @ministryofjustice/data-platform-production-developer @ministryofjustice/data-platform-test-developer @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/unilink @ministryofjustice/modernisation-platform
 /terraform/environments/delius-iaps @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
