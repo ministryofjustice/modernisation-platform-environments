@@ -40,7 +40,7 @@ resource "aws_db_subnet_group" "db" {
 }
 
 resource "aws_security_group" "db" {
-  name = "${local.application_name}-db-sg" 
+  name = "${local.application_name}-db-sg"
   description = "Allow DB inbound traffic"
   vpc_id = data.aws_vpc.shared.id
   ingress {
