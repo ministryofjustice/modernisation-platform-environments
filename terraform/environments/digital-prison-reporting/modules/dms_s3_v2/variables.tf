@@ -66,11 +66,6 @@ variable "dms_target_name" {
   default = ""
 }
 
-variable "short_name" {
-  type = string
-  default = ""
-}
-
 variable "migration_type" {
   type        = string
   description = "DMS Migration Type"
@@ -186,3 +181,139 @@ variable "vpc_cidr" {
   type        = list(string)
   default     = null
 }
+
+#--------------------------------------------------------------
+# DMS Task
+#--------------------------------------------------------------
+variable "table_mappings" {
+  type        = any
+  default     = ""
+}
+
+variable "replication_task_settings" {
+  type        = any
+  default     = {}
+}
+
+variable "rename_rule_source_schema" {
+  description = "The source schema we will rename to a target output 'space'"
+  type        = string
+  default     = ""
+}
+
+variable "rename_rule_output_space" {
+  description = "The name of the target output 'space' that the source schema will be renamed to"
+  type        = string
+  default     = ""
+}
+
+
+variable "enable_replication_task" {
+  description = "Enable DMS Replication Task, True or False"
+  type        = bool
+  default     = false
+}
+
+variable "migration_type" {
+  type        = string
+  description = "DMS Migration Type"
+  default     = ""
+}
+
+variable "dms_replication_instance" {
+  type        = string
+  default     = ""
+  description = "DMS Rep Instance ARN"
+}
+
+
+variable "dms_source_endpoint" {
+  type        = string
+  default     = ""
+}
+
+variable "dms_target_endpoint" {
+  type        = string
+  default     = ""
+}
+
+variable "replication_task_settings" {
+  type        = any
+  default     = {}
+}
+
+#--------------------------------------------------------------
+# DMS Endpoint
+#--------------------------------------------------------------
+
+variable "setup_dms_endpoints" {
+  description = "Enable DMS Endpoints, True or False"
+  type        = bool
+  default     = false    
+}
+
+variable "setup_dms_nomis_endpoint" {
+  type    = bool
+  default = false
+}
+
+variable "setup_dms_s3_endpoint" {
+  type    = bool
+  default = false
+}
+
+variable "extra_attributes" {
+  type    = string
+  default = null
+}
+
+variable "dms_source_name" {
+  type        = string
+  default     = ""  
+}
+
+variable "dms_target_name" {
+  type        = string
+  default     = ""  
+}
+
+
+variable "short_name" {
+  type        = string
+  default     = ""  
+}
+
+variable "source_address" {
+  default     = ""
+  description = "Default Source Address"    
+}
+
+variable "bucket_name" {
+  type = string
+}
+
+
+variable "source_db_port" {
+  description = "The port the Application Server will access the database on"
+  default     = null
+}
+
+variable "source_engine" {
+  default     = "oracle-se2"
+  description = "Engine type, example values mysql, postgres"
+}
+
+variable "source_engine_name" {
+  default     = ""
+  description = "Engine name for DMS"
+}
+
+
+variable "source_app_password" {
+  description = "Password for the endpoint to access the source database"
+}
+
+variable "source_app_username" {
+  description = "Username for the endpoint to access the source database"
+}
+
