@@ -290,28 +290,28 @@ locals {
         })
       })
 
-      preprod-nomis-xtag-a = merge(local.xtag_ec2, {
-        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
-        config = merge(local.xtag_ec2.config, {
-          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
-          availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
-            "Ec2PreprodWeblogicPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
-          args = merge(local.xtag_ec2.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.xtag_ec2.tags, {
-          nomis-environment    = "preprod"
-          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-name       = "PPCNOM"
-          ndh-ems-hostname     = "PPPML00009.azure.hmpp.root" # preprod NDH is currently down/broken
-        })
-      })
+      # preprod-nomis-xtag-a = merge(local.xtag_ec2, {
+      #   cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+      #   config = merge(local.xtag_ec2.config, {
+      #     ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
+      #     availability_zone = "${local.region}a"
+      #     instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+      #       "Ec2PreprodWeblogicPolicy",
+      #     ])
+      #   })
+      #   user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
+      #     args = merge(local.xtag_ec2.user_data_cloud_init.args, {
+      #       branch = "main"
+      #     })
+      #   })
+      #   tags = merge(local.xtag_ec2.tags, {
+      #     nomis-environment    = "preprod"
+      #     oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+      #     oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+      #     oracle-db-name       = "PPCNOM"
+      #     ndh-ems-hostname     = "PPPML00009.azure.hmpp.root" # preprod NDH is currently down/broken
+      #   })
+      # })
     }
 
     baseline_lbs = {
