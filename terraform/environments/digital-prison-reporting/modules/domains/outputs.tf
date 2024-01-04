@@ -15,5 +15,5 @@ output "dms_replication_task_arn" {
 }
 
 output "dms_replication_instance_arn" {
-  value = var.enable_replication_task ? join("", aws_dms_replication_instance.dms-s3-target-instance.*.replication_instance_arn) : ""
+  value = var.setup_dms_instance ? join("", aws_dms_replication_instance.dms-s3-target-instance.*.replication_instance_arn) : ""
 }
