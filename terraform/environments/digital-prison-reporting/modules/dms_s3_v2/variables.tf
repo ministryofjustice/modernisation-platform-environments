@@ -147,3 +147,27 @@ variable "identifier" {
   default     = "rds"
   description = "Name of the database in the RDS"
 }
+
+#--------------------------------------------------------------
+# DMS Replication Instance
+#--------------------------------------------------------------
+
+variable "replication_instance_maintenance_window" {
+  description = "Maintenance window for the replication instance"
+  default     = "sun:10:30-sun:14:30"
+}
+
+variable "replication_instance_storage" {
+  description = "Size of the replication instance in GB"
+  default     = "10"
+}
+
+variable "replication_instance_version" {
+  description = "Engine version of the replication instance"
+  default     = "3.4.6"
+}
+
+variable "replication_instance_class" {
+  description = "Instance class of replication instance"
+  default     = "dms.t2.micro"
+}
