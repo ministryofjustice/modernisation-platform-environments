@@ -171,3 +171,18 @@ variable "replication_instance_class" {
   description = "Instance class of replication instance"
   default     = "dms.t2.micro"
 }
+
+#--------------------------------------------------------------
+# Network
+#--------------------------------------------------------------
+
+variable "database_subnet_cidr" {
+  default     = ["10.26.25.208/28", "10.26.25.224/28", "10.26.25.240/28"]
+  description = "List of subnets to be used for databases"
+}
+
+variable "vpc_cidr" {
+  description = "CIDR for the  VPC"
+  type        = list(string)
+  default     = null
+}
