@@ -8,7 +8,7 @@ module "dms_endpoints" {
   source_engine_name       = var.source_engine_name
   dms_source_name          = var.dms_source_name
   dms_target_name          = var.dms_target_name
-  project_id               = local.project_id
+  project_id               = var.project_id
   env                      = var.env # common
   short_name               = var.short_name
   source_db_name           = var.source_db_name
@@ -18,5 +18,6 @@ module "dms_endpoints" {
   source_db_port           = var.source_db_port
   extra_attributes         = var.extra_attributes
   bucket_name              = var.bucket_name
+  
   tags                     = var.tags
 }
