@@ -1,5 +1,6 @@
 resource "aws_security_group" "db" {
-  name        = "${var.name}-database-security-group"
+  count       = var.create_rds ? 1 : 0
+  name        = "${var.name}-${var.env_name}-database-security-group"
   description = "controls access to db"
   vpc_id      = var.account_config.shared_vpc_id
 
@@ -10,25 +11,27 @@ resource "aws_security_group" "db" {
     to_port     = var.rds_port
     security_groups = [
       var.account_config.bastion.bastion_security_group,
-      var.rds_ingress_security_groups
+      var.ingress_security_groups
     ]
   }
 
   tags = merge(
     var.tags,
     {
-      Name = "${var.name}-database_security_group"
+      Name = "${var.name}-${var.env_name}-db_security_group"
     }
   )
 }
 
 resource "aws_db_subnet_group" "this" {
+  count      = var.create_rds ? 1 : 0
   name       = "data-tier"
   subnet_ids = var.account_config.ordered_subnets.*.id
   tags       = var.tags
 }
 
 resource "aws_db_instance" "this" {
+  count          = var.create_rds ? 1 : 0
   engine         = var.rds_engine
   license_model  = length(var.rds_license_model) > 0 ? var.rds_license_model : null
   engine_version = var.rds_engine_version
@@ -49,14 +52,14 @@ resource "aws_db_instance" "this" {
   allocated_storage                   = var.rds_allocated_storage
   max_allocated_storage               = var.rds_max_allocated_storage
   storage_type                        = var.rds_storage_type
-  maintenance_window                  = var.rds_maintenance_window
-  auto_minor_version_upgrade          = var.rds_auto_minor_version_upgrade
+  maintenance_window                  = var.maintenance_window
+  auto_minor_version_upgrade          = true
   allow_major_version_upgrade         = var.rds_auto_major_version_upgrade
   backup_window                       = var.rds_backup_window
   backup_retention_period             = var.rds_backup_retention_period
   iam_database_authentication_enabled = var.rds_iam_database_authentication_enabled
-  db_subnet_group_name                = aws_db_subnet_group.this.id
-  vpc_security_group_ids              = [aws_security_group.db.id]
+  db_subnet_group_name                = aws_db_subnet_group.this[0].id
+  vpc_security_group_ids              = [aws_security_group.db[0].id]
   multi_az                            = var.rds_multi_az
   monitoring_interval                 = var.rds_monitoring_interval
   monitoring_role_arn                 = var.rds_monitoring_interval != null || var.rds_monitoring_interval != 0 ? aws_iam_role.rds_enhanced_monitoring[0].arn : null
@@ -77,13 +80,13 @@ resource "aws_iam_role" "rds_enhanced_monitoring" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
-  count      = var.rds_monitoring_interval != null || var.rds_monitoring_interval != 0 ? 1 : 0
+  count      = var.create_rds ? 1 : (var.rds_monitoring_interval != null || var.rds_monitoring_interval != 0 ? 1 : 0)
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
   role       = aws_iam_role.rds_enhanced_monitoring[0].name
 }
 
 data "aws_iam_policy_document" "rds_enhanced_monitoring" {
-  count = var.rds_monitoring_interval != null || var.rds_monitoring_interval != 0 ? 1 : 0
+  count = var.create_rds ? 1 : (var.rds_monitoring_interval != null || var.rds_monitoring_interval != 0 ? 1 : 0)
 
   statement {
     actions = [
