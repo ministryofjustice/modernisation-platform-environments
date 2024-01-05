@@ -1,11 +1,22 @@
 # START: lambda_cw_logs_xml_to_json
 
+locals {
+  lambda_cw_logs_xml_to_json = {
+    monitored_log_group = "cwagent-windows-application"
+    function_name       = "cw-logs-xml-to-json"
+  }
+}
+
+data "aws_cloudwatch_log_group" "cwagent-windows-application" {
+  name = locals.lambda_cw_logs_xml_to_json.monitored_log_group
+}
+
 module "lambda_cw_logs_xml_to_json" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function"
 
-  application_name = "cw-logs-xml-to-json"
-  function_name    = "cw-logs-xml-to-json"
-  role_name        = "cw-logs-xml-to-json"
+  application_name = locals.lambda_cw_logs_xml_to_json.function_name
+  function_name    = locals.lambda_cw_logs_xml_to_json.function_name
+  role_name        = locals.lambda_cw_logs_xml_to_json.function_name
 
   package_type     = "Zip"
   filename         = "${path.module}/lambda/cw-xml-to-json/deployment_package.zip"
@@ -29,6 +40,13 @@ module "lambda_cw_logs_xml_to_json" {
     ]
   })
 
+  allowed_triggers = {
+    AllowExecutionFromCloudWatch = {
+      principal  = "logs.amazonaws.com"
+      source_arn = data.aws_cloudwatch_log_group.cwagent-windows-application.arn
+    }
+  }
+
   tags = {}
 }
 
@@ -40,7 +58,7 @@ resource "aws_cloudwatch_log_subscription_filter" "cw_logs_xml_to_json" {
   }
 
   name            = "cw-logs-xml-to-json-${each.key}"
-  log_group_name  = "cwagent-windows-application"
+  log_group_name  = locals.lambda_cw_logs_xml_to_json.monitored_log_group
   filter_pattern  = each.value.pattern
   destination_arn = module.lambda_cw_logs_xml_to_json.lambda_function_arn
 }
