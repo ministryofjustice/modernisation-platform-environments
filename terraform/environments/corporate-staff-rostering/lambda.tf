@@ -8,15 +8,15 @@ locals {
 }
 
 data "aws_cloudwatch_log_group" "cwagent-windows-application" {
-  name = locals.lambda_cw_logs_xml_to_json.monitored_log_group
+  name = local.lambda_cw_logs_xml_to_json.monitored_log_group
 }
 
 module "lambda_cw_logs_xml_to_json" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function"
 
-  application_name = locals.lambda_cw_logs_xml_to_json.function_name
-  function_name    = locals.lambda_cw_logs_xml_to_json.function_name
-  role_name        = locals.lambda_cw_logs_xml_to_json.function_name
+  application_name = local.lambda_cw_logs_xml_to_json.function_name
+  function_name    = local.lambda_cw_logs_xml_to_json.function_name
+  role_name        = local.lambda_cw_logs_xml_to_json.function_name
 
   package_type     = "Zip"
   filename         = "${path.module}/lambda/cw-xml-to-json/deployment_package.zip"
@@ -58,7 +58,7 @@ resource "aws_cloudwatch_log_subscription_filter" "cw_logs_xml_to_json" {
   }
 
   name            = "cw-logs-xml-to-json-${each.key}"
-  log_group_name  = locals.lambda_cw_logs_xml_to_json.monitored_log_group
+  log_group_name  = local.lambda_cw_logs_xml_to_json.monitored_log_group
   filter_pattern  = each.value.pattern
   destination_arn = module.lambda_cw_logs_xml_to_json.lambda_function_arn
 }
