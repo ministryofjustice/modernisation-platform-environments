@@ -26,7 +26,7 @@ module "ecs_policies" {
   tags         = var.tags
 }
 
-module "weblogic_service" {
+module "ecs_service" {
   source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
   container_definition_json = module.container_definition.json_map_encoded_list
   ecs_cluster_arn           = var.ecs_cluster_arn
