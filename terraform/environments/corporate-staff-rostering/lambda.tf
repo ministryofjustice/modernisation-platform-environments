@@ -26,6 +26,8 @@ module "lambda_cw_logs_xml_to_json" {
       },
     ]
   })
+
+  tags = {}
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cw_logs_xml_to_json" {
