@@ -68,3 +68,9 @@ variable "tags" {
   default     = {}
   description = "(Optional) Key-value map of resource tags."
 }
+
+
+variable "short_name" {
+  type        = string
+  default     = ""  
+}

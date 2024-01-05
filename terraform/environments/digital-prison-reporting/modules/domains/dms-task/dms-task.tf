@@ -14,6 +14,7 @@ module "dms_task" {
   rename_rule_output_space   = var.rename_rule_output_space
   dms_source_endpoint        = var.dms_source_endpoint
   dms_target_endpoint        = var.dms_target_endpoint
+  short_name                 = var.short_name
 
   tags                       = var.tags
 }

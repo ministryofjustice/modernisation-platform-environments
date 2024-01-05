@@ -12,6 +12,7 @@ module "dms_instance" {
   subnet_ids                   = var.subnet_ids
   vpc_cidr                     = var.vpc_cidr
   vpc                          = var.vpc
+  short_name                   = var.short_name
 
   tags = var.tags
 }
