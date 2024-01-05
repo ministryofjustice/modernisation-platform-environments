@@ -500,7 +500,9 @@ module "s3_schema_registry_bucket" {
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
-
+  enable_s3_versioning      = true
+  enable_versioning_config  = "Enabled"
+  
   tags = merge(
     local.all_tags,
     {
