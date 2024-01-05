@@ -258,6 +258,7 @@ variable "container_secrets" {
   description = "Secrets to pass to the container"
   type        = map(string)
 }
+
 variable "container_port_mappings" {
   description = "Port mappings to pass to the container"
   type = list(object({
@@ -265,4 +266,9 @@ variable "container_port_mappings" {
     host_port      = number
     protocol       = string
   }))
+}
+
+variable "alb_security_group_id" {
+  description = "The security group ID of the ALB"
+  type        = string
 }

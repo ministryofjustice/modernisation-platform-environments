@@ -12,9 +12,9 @@ module "container_definition" {
   log_configuration = {
     logDriver = "awslogs"
     options = {
-      "awslogs-group"         = aws_cloudwatch_log_group.delius_core_frontend_log_group.name
+      "awslogs-group"         = aws_cloudwatch_log_group.ecs.name
       "awslogs-region"        = "eu-west-2"
-      "awslogs-stream-prefix" = var.weblogic_config.frontend_fully_qualified_name
+      "awslogs-stream-prefix" = "${var.env_name}-${var.name}"
     }
   }
 }
