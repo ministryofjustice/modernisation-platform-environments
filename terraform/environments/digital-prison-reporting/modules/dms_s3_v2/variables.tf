@@ -9,24 +9,9 @@ variable "account_id" {
   default     = ""
 }
 
-variable "dms_source_endpoint" {
-  type        = string
-  default     = ""
-}
-
-variable "dms_target_endpoint" {
-  type        = string
-  default     = ""
-}
-
 variable "name" {
   description = "DMS Replication name."
-}
-
-variable "enable_replication_task" {
-  description = "Enable DMS Replication Task, True or False"
-  type        = bool
-  default     = false
+  default     = ""
 }
 
 variable "setup_dms_instance" {
@@ -51,26 +36,6 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
-variable "extra_attributes" {
-  type    = string
-  default = null
-}
-
-variable "dms_source_name" {
-  type = string
-  default = ""
-}
-
-variable "dms_target_name" {
-  type = string
-  default = ""
-}
-
-variable "migration_type" {
-  type        = string
-  description = "DMS Migration Type"
-  default     = ""
-}
 
 variable "availability_zones" {
   default = [
@@ -78,18 +43,6 @@ variable "availability_zones" {
       0 = "eu-west-2a"
     }
   ]
-}
-
-variable "rename_rule_source_schema" {
-  description = "The source schema we will rename to a target output 'space'"
-  type        = string
-  default     = ""
-}
-
-variable "rename_rule_output_space" {
-  description = "The name of the target output 'space' that the source schema will be renamed to"
-  type        = string
-  default     = ""
 }
 
 
@@ -226,7 +179,6 @@ variable "dms_replication_instance" {
   description = "DMS Rep Instance ARN"
 }
 
-
 variable "dms_source_endpoint" {
   type        = string
   default     = ""
@@ -235,11 +187,6 @@ variable "dms_source_endpoint" {
 variable "dms_target_endpoint" {
   type        = string
   default     = ""
-}
-
-variable "replication_task_settings" {
-  type        = any
-  default     = {}
 }
 
 #--------------------------------------------------------------
@@ -289,7 +236,8 @@ variable "source_address" {
 }
 
 variable "bucket_name" {
-  type = string
+  type        = string
+  default     = ""  
 }
 
 
@@ -311,9 +259,10 @@ variable "source_engine_name" {
 
 variable "source_app_password" {
   description = "Password for the endpoint to access the source database"
+  default     = ""  
 }
 
 variable "source_app_username" {
   description = "Username for the endpoint to access the source database"
+  default     = ""  
 }
-
