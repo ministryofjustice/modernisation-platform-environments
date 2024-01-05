@@ -103,7 +103,7 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
       }
       port_mappings = [
         {
-          container_port = 8090
+          containerPort = 8090
         }
       ]
       secrets = [
