@@ -175,6 +175,11 @@ variable "ecs_service_port" {
   default     = 443
 }
 
+variable "ecs_cluster_arn" {
+  description = "The ARN of the ECS cluster"
+  type        = string
+}
+
 variable "task_def_container_port" {
   description = "The port on which the container is exposing the application"
   type        = number
