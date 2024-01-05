@@ -66,7 +66,7 @@ locals {
   baseline_ec2_autoscaling_groups = {}
   baseline_ec2_instances          = {}
   baseline_iam_policies = {
-        DbRefresherPolicy = {
+    DBRefresherPolicy = {
       description = "Permissions for the db refresh process"
       statements = [
         {
@@ -146,7 +146,7 @@ locals {
     }
   }
   baseline_iam_roles = {
-    DbRefresherRole = {
+    DBRefresherRole = {
       description = "Allows the db refresh process to access the database instance"
       assume_role_policy = [{
         effect  = "Allow"
@@ -167,10 +167,10 @@ locals {
             variable = "token.actions.githubusercontent.com:sub"
           },
         ]
-      }
+        }
       ]
       policy_attachments = [
-        "DbRefresherPolicy",
+        "DBRefresherPolicy",
       ]
     },
     SasTokenRotatorRole = {
