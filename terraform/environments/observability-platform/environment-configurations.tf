@@ -15,6 +15,13 @@ locals {
             "data-platform-apps-and-tools-development"
           ]
         }
+        "digital-studio-operations" = {
+          sso_uuid = "<Retrieve this from AWS Identity Center>"
+            cloudwatch_accounts = [
+              "nomis-test",
+              "oasys-test"
+            ]
+        }
       }
     }
     production = {
