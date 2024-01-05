@@ -1,5 +1,8 @@
 # environment specific settings
 locals {
+
+  preproduction_baseline_presets_options = {}
+
   preproduction_config = {
     ec2_common = {
       patch_approval_delay_days = 3
