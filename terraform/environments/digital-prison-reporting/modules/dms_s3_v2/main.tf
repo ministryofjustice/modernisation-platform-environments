@@ -123,7 +123,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   endpoint_id                      = "${var.project_id}-dms-${var.short_name}-s3-target-endpoint"
   endpoint_type                    = "target"
   bucket_name                      = var.bucket_name
-  service_access_role_arn          = aws_iam_role.dms-s3-role.arn
+  service_access_role_arn          = aws_iam_role.dms-s3-role[0].arn
   data_format                      = "parquet"
   cdc_path                         = "cdc"
   timestamp_column_name            = "_timestamp"
