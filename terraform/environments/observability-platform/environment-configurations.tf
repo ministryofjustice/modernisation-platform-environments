@@ -16,7 +16,7 @@ locals {
           ]
         }
         "digital-studio-operations" = {
-          sso_uuid = "<Retrieve this from AWS Identity Center>"
+          sso_uuid = "a68242b4-b0a1-7085-25f4-dc60e4c122c0"
             cloudwatch_accounts = [
               "nomis-test",
               "oasys-test"
