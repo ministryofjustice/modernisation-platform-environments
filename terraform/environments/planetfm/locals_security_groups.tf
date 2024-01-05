@@ -165,6 +165,7 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+          security_groups = ["web"]
         }
         rdp_tcp_app = {
           description = "3389: Allow RDP UDP ingress from jumpserver"
@@ -418,6 +419,7 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+          security_groups = ["web", "app"]
         }
         netbios_udp_enduser = {
           description = "137-139: UDP NetBIOS ingress from enduserclient"
