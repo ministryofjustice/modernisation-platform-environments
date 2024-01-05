@@ -1,5 +1,12 @@
 # environment specific settings
 locals {
+
+  # baseline presets config
+  test_baseline_presets_options = {
+    enable_observability_platform_monitoring = true
+  }
+
+  # baseline config
   test_config = {
 
     ec2_common = {

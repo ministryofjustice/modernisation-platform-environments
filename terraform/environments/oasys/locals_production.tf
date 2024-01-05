@@ -1,5 +1,8 @@
 # environment specific settings
 locals {
+  
+  production_baseline_presets_options = {}
+  
   production_config = {
 
     ec2_common = {

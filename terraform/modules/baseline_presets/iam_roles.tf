@@ -3,6 +3,7 @@ locals {
   iam_roles_filter = flatten([
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
+    var.options.enable_observability_platform_monitoring ? ["observability-platform"] : [],
   ])
 
   iam_roles = {
@@ -44,6 +45,21 @@ locals {
       policy_attachments = [
         "OracleEnterpriseManagementSecretsPolicy",
         "BusinessUnitKmsCmkPolicy",
+      ]
+    }
+
+    # allow Observability Plaform read-only access to Cloudwatch metrics
+    observability-platform = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
+        principals = {
+          type        = "AWS"
+          identifiers = ["observability-platform-production"]
+        }
+      }]
+      policy_attachments = [
+        "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
       ]
     }
   }

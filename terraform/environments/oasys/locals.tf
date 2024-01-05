@@ -15,14 +15,24 @@ locals {
   business_unit  = "hmpps"
   networking_set = "general"
 
-  accounts = {
+  environment_baseline_presets_options = {
+    development   = local.development_baseline_presets_options
+    test          = local.test_baseline_presets_options
+    preproduction = local.preproduction_baseline_presets_options
+    production    = local.production_baseline_presets_options
+  }
+
+  environment_configs = {
     development   = local.development_config
     test          = local.test_config
     preproduction = local.preproduction_config
     production    = local.production_config
   }
 
-  environment_config = local.accounts[local.environment]
+  environment_config = local.environment_configs[local.environment]
+  
+  baseline_environment_presets_options = local.environment_baseline_presets_options[local.environment]
+  baseline_environment_config          = local.environment_configs[local.environment]
 
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
