@@ -1,7 +1,3 @@
-resource "aws_ecr_repository" "cw_logs_xml_to_json" {
-  name = "cw-logs-xml-to-json"
-}
-
 module "lambda_cw_logs_xml_to_json" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function"
 
@@ -42,4 +38,3 @@ resource "aws_cloudwatch_log_subscription_filter" "cw_logs_xml_to_json" {
   filter_pattern  = each.value.pattern
   destination_arn = module.lambda_cw_logs_xml_to_json.lambda_function_arn
 }
-
