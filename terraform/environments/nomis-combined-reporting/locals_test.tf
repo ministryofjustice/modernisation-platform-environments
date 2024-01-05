@@ -43,9 +43,9 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "/t1-ncr-bip-cmc" = local.bip_cmc_secretsmanager_secrets
-      "/t1-ncr-bip"     = local.bip_secretsmanager_secrets
-      "/t1-ncr-tomcat"  = local.tomcat_secretsmanager_secrets
+      "/ec2/ncr-bip-cmc/t1" = local.bip_cmc_secretsmanager_secrets
+      "/ec2/ncr-bip/t1"     = local.bip_secretsmanager_secrets
+      "/ec2/ncr-tomcat/t1"  = local.tomcat_secretsmanager_secrets
 
       "/oracle/database/T1BIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/T1BIPAUD" = local.database_secretsmanager_secrets
@@ -84,11 +84,12 @@ locals {
             effect = "Allow"
             actions = [
               "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/t1-ncr-bip-cmc/*",
-              "arn:aws:secretsmanager:*:*:secret:/t1-ncr-bip/*",
-              "arn:aws:secretsmanager:*:*:secret:/t1-ncr-tomcat/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip-cmc/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-tomcat/t1/*",
             ]
           }
         ]
@@ -137,7 +138,7 @@ locals {
       })
       t1-ncr-bip-cmc = merge(local.bip_cmc_ec2_default, {
         autoscaling_group = {
-          desired_capacity    = 0
+          desired_capacity    = 1
           max_size            = 1
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }

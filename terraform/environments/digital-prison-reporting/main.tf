@@ -117,10 +117,12 @@ module "glue_reporting_hub_batch_job" {
     "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
     "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.contract.registryName"           = module.s3_schema_registry_bucket.bucket_id
+    "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
     "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_batch_job_retry_max_attempts
     "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_batch_job_retry_min_wait_millis
     "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_batch_job_retry_max_wait_millis
+    "--dpr.schema.cache.max.size"           = local.reporting_hub_batch_job_schema_cache_max_size
     "--dpr.log.level"                       = local.reporting_hub_batch_job_log_level
   }
 }
@@ -177,12 +179,10 @@ module "glue_reporting_hub_cdc_job" {
     "--enable-spark-ui"                     = false
     "--enable-auto-scaling"                 = true
     "--enable-job-insights"                 = true
-    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.contract.registryName"           = module.s3_schema_registry_bucket.bucket_id
+    "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
     "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
-    "--dpr.domain.target.path"              = "s3://${module.s3_domain_bucket.bucket_id}"
-    "--dpr.domain.catalog.db"               = module.glue_data_domain_database.db_name
-    "--dpr.redshift.secrets.name"           = "${local.project}-redshift-secret-${local.environment}"
-    "--dpr.datamart.db.name"                = "datamart"
+    "--dpr.schema.cache.max.size"           = local.reporting_hub_cdc_job_schema_cache_max_size
     "--dpr.log.level"                       = local.reporting_hub_cdc_job_log_level
   }
 }
@@ -233,7 +233,8 @@ module "glue_hive_table_creation_job" {
     "--dpr.structured.database"   = module.glue_structured_zone_database.db_name
     "--dpr.curated.database"      = module.glue_curated_zone_database.db_name
     "--dpr.prisons.database"      = module.glue_prisons_database.db_name
-    "--dpr.contract.registryName" = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
+    "--dpr.contract.registryName" = module.s3_schema_registry_bucket.bucket_id
+    "--dpr.schema.cache.max.size" = local.hive_table_creation_job_schema_cache_max_size
     "--dpr.log.level"             = local.refresh_job_log_level
   }
 
@@ -826,9 +827,9 @@ module "s3_file_transfer_lambda_trigger" {
 
   trigger_input_event = jsonencode(
     {
-      "sourceBucket" : "${module.s3_raw_bucket.bucket_id}",
-      "destinationBucket" : "${module.s3_raw_archive_bucket.bucket_id}",
-      "retentionDays" : "${local.scheduled_s3_file_transfer_lambda_retention_days}"
+      "sourceBucket" : module.s3_raw_bucket.bucket_id,
+      "destinationBucket" : module.s3_raw_archive_bucket.bucket_id,
+      "retentionDays" : tostring(local.scheduled_s3_file_transfer_lambda_retention_days)
     }
   )
 

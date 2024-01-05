@@ -195,7 +195,6 @@ locals {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "base_rhel_8_5_*"
-      ssm_parameters_prefix     = "bip-cmc/"
       iam_resource_names_prefix = "ec2-bip-cmc"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {

@@ -2,13 +2,20 @@ locals {
   business_unit = var.networking[0].business-unit
   region        = "eu-west-2"
 
+  environment_baseline_presets_options = {
+    development   = local.development_baseline_presets_options
+    test          = local.test_baseline_presets_options
+    preproduction = local.preproduction_baseline_presets_options
+    production    = local.production_baseline_presets_options
+  }
   environment_configs = {
     development   = local.development_config
     test          = local.test_config
     preproduction = local.preproduction_config
     production    = local.production_config
   }
-  baseline_environment_config = local.environment_configs[local.environment]
+  baseline_environment_presets_options = local.environment_baseline_presets_options[local.environment]
+  baseline_environment_config          = local.environment_configs[local.environment]
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
@@ -27,13 +34,8 @@ locals {
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    sns_topics = {
-      pagerduty_integrations = {
-        dso_pagerduty               = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
-        dba_pagerduty               = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_low_priority"
-        dba_high_priority_pagerduty = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_high_priority"
-      }
-    }
+
+    # sns_topics are defined in locals_${environment}.tf
   }
 
   baseline_acm_certificates = {}
@@ -61,10 +63,62 @@ locals {
   baseline_cloudwatch_metric_alarms      = {}
   baseline_cloudwatch_log_metric_filters = {}
 
-  baseline_ec2_autoscaling_groups   = {}
-  baseline_ec2_instances            = {}
-  baseline_iam_policies             = {}
-  baseline_iam_roles                = {}
+  baseline_ec2_autoscaling_groups = {}
+  baseline_ec2_instances          = {}
+  baseline_iam_policies = {
+    SasTokenRotatorPolicy = {
+      description = "Allows updating of secrets in SSM"
+      statements = [
+        {
+          sid    = "RotateSecrets"
+          effect = "Allow"
+          actions = [
+            "ssm:PutParameter",
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/azure/*",
+          ]
+        },
+        {
+          sid    = "EncryptSecrets"
+          effect = "Allow"
+          actions = [
+            "kms:Encrypt",
+          ]
+          resources = [
+            data.aws_kms_key.general_shared.arn,
+          ]
+        },
+      ]
+    }
+  }
+  baseline_iam_roles = {
+    SasTokenRotatorRole = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRoleWithWebIdentity"]
+        principals = {
+          type        = "Federated"
+          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
+        }
+        conditions = [
+          {
+            test     = "StringEquals"
+            values   = ["sts.amazonaws.com"]
+            variable = "token.actions.githubusercontent.com:aud"
+          },
+          {
+            test     = "StringLike"
+            values   = ["repo:ministryofjustice/dso-modernisation-platform-automation:ref:refs/heads/main"]
+            variable = "token.actions.githubusercontent.com:sub"
+          },
+        ]
+      }]
+      policy_attachments = [
+        "SasTokenRotatorPolicy",
+      ]
+    }
+  }
   baseline_iam_service_linked_roles = {}
   baseline_key_pairs                = {}
   baseline_kms_grants               = {}

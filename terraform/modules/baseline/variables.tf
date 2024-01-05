@@ -257,6 +257,7 @@ variable "ec2_autoscaling_groups" {
         matcher             = optional(string)
         path                = optional(string)
         port                = optional(number)
+        protocol            = optional(string)
         timeout             = optional(number)
         unhealthy_threshold = optional(number)
       }))
@@ -504,6 +505,7 @@ variable "iam_policies" {
     path        = optional(string, "/")
     description = optional(string)
     statements = list(object({
+      sid       = optional(string, null)
       effect    = string
       actions   = list(string)
       resources = list(string)
@@ -525,6 +527,7 @@ variable "iam_roles" {
   description = "map of iam roles to create, where the key is the name of the role"
   type = map(object({
     assume_role_policy = list(object({
+      sid     = optional(string)
       effect  = string
       actions = list(string)
       principals = optional(object({
@@ -782,6 +785,7 @@ variable "s3_buckets" {
     replication_region  = optional(string)
     bucket_policy       = optional(list(string), ["{}"])
     bucket_policy_v2 = optional(list(object({
+      sid     = optional(string, null)
       effect  = string
       actions = list(string)
       principals = optional(object({
@@ -835,6 +839,7 @@ variable "s3_buckets" {
     force_destroy        = optional(bool, false)
     sse_algorithm        = optional(string, "aws:kms")
     iam_policies = optional(map(list(object({
+      sid     = optional(string, null)
       effect  = string
       actions = list(string)
       principals = optional(object({
@@ -878,6 +883,7 @@ variable "secretsmanager_secrets" {
     postfix    = optional(string, "/")
     kms_key_id = optional(string, "general")
     policy = optional(list(object({
+      sid       = optional(string, null)
       effect    = string
       actions   = list(string)
       resources = list(string)
@@ -897,6 +903,7 @@ variable "secretsmanager_secrets" {
       file        = optional(string)
       kms_key_id  = optional(string)
       policy = optional(list(object({
+        sid       = optional(string, null)
         effect    = string
         actions   = list(string)
         resources = list(string)

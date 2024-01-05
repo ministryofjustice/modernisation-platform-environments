@@ -77,7 +77,7 @@ locals {
           availability_zone = "${local.region}b"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "t3.large"
+          instance_type          = "t3.large"
           vpc_security_group_ids = concat(local.defaults_web_ec2.instance.vpc_security_group_ids, ["cafm_app_fixngo"])
         })
         ebs_volumes = {
@@ -154,7 +154,7 @@ locals {
       private = {
         internal_lb                      = true
         enable_delete_protection         = false
-        loadbalancer_type                = "application"
+        load_balancer_type               = "application"
         idle_timeout                     = 3600
         security_groups                  = ["loadbalancer"]
         subnets                          = module.environment.subnets["private"].ids

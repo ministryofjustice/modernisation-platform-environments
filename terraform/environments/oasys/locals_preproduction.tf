@@ -21,7 +21,7 @@ locals {
       "/oracle/bip/preprod"       = local.secretsmanager_secrets_bip
 
       # for azure, remove when migrated to aws db
-      "/oracle/database/OASPROD"  = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
     }
 
     baseline_iam_policies = {
@@ -52,7 +52,7 @@ locals {
               "s3:ListBucket",
             ]
             resources = [
-              "arn:aws:s3:::prod-{local.application_name}-db-backup-bucket*",
+              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
             ]
           },
           {
@@ -97,25 +97,53 @@ locals {
     }
 
     baseline_ec2_instances = {
-    }
-
-    baseline_ec2_autoscaling_groups = {
       "pp-${local.application_name}-db-a" = merge(local.database_a, {
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "main"
-          })
-        })
+        ebs_volumes = { # need this config until prod db moves to aws
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 1000
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 2000
+            type  = "gp3"
+          }
+          "/dev/sdf" = {  # DATA02
+            label = "data"
+            size  = 2000
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 500
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
         tags = merge(local.database_a.tags, {
-          instance-scheduling = "skip-scheduling"
+          bip-db-name                             = "PPBIPINF"
+          instance-scheduling                     = "skip-scheduling"
+          oracle-sids                             = "PPBIPINF PPOASYS"
         })
       })
+    }
 
+    baseline_ec2_autoscaling_groups = {
       "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "oasys_webserver_release_*"
@@ -229,8 +257,8 @@ locals {
         }
       }
       private = {
-        internal_lb = true
-        access_logs = true
+        internal_lb              = true
+        access_logs              = true
         s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
