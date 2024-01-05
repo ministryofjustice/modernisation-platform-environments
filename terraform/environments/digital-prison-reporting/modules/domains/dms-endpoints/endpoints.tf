@@ -3,6 +3,7 @@ module "dms_endpoints" {
   source                   = "../../dms_s3_v2"
 
   setup_dms_endpoints      = var.setup_dms_endpoints
+  setup_dms_iam            = var.setup_dms_iam
   setup_dms_nomis_endpoint = var.setup_dms_nomis_endpoint
   setup_dms_s3_endpoint    = var.setup_dms_s3_endpoint
   source_engine_name       = var.source_engine_name
@@ -18,6 +19,6 @@ module "dms_endpoints" {
   source_db_port           = var.source_db_port
   extra_attributes         = var.extra_attributes
   bucket_name              = var.bucket_name
-
+  
   tags                     = var.tags
 }

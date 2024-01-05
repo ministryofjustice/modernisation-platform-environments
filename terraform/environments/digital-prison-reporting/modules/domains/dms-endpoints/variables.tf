@@ -4,6 +4,12 @@ variable "setup_dms_endpoints" {
   default     = false    
 }
 
+variable "setup_dms_iam" {
+  description = "Enable DMS IAM, True or False"
+  type        = bool
+  default     = false
+}
+
 variable "setup_dms_nomis_endpoint" {
   type    = bool
   default = false
