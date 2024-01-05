@@ -96,6 +96,12 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   ])
 }
 
+resource "aws_key_pair" "ec2-user" {
+  key_name   = "${local.application_name}-ec2"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDmRtGHtGEQN/zg8Di50nphpu9IQAujIlDjX+Xp1pi7ojxxpQ2V2ag/EacncsvfIMOb2dDavnV8ysx2iw/RTH9+qPAwdnCPrJ4oKagE5PU6tR4TZhQTjZshomP692U6Hy6LbSknxVnC7mPiaOtPLdF4Dcguv6yrSlO7UNdV83sTSl2bDbkQ+OW5x0CwH1IdOcuo+Mxq5fHPUxW+JKD5reYoqo0cL2++zavX60KyQgRWLOdHPPP9Jqs5lEGrKMXo1ECTWpdK6Gn/vfZBA5d4VZ1hiBe7DRPoEzjE6R5evMRQEnmn3Y8RJhX7qRPbwGsNlWiAFwR951f8B+yiEygSbw3ckr16iGdj6fRYBVTHdE3+AQt6hvNAFDMituUXQqfzDFnR9IXF0TRNNTHPSL5Mt+u+P2D3ElDbJGZwr9HTZTiLr94XCZSdv7FESisBSWSkEXBCKMSkpAXhw4z0zW0nPQicrZ72d5SQ5vmTb82/cES3sQ6WtBI9RuzfEP9qtGtmACq0pUFLM319QZiWyZRbmWqRSub5WwsWba407KnIQM9m6cwfB41CfOt95ziAGGEc3b6dB9CzOs6hb/S14Ufu2CNJWR6zZS1PamXioagpDhlv8BziMGhZge8jF46RlsSz3DgMfs188VF/7qVNaPneBOtbURqUR5QZueoYfrW9OzGZAQ== andrew.pepler@MJ003740"
+  tags       = local.tags
+}
+
 resource "aws_ecs_service" "ecs_service" {
   depends_on = [
     aws_lb_listener.https_listener
@@ -239,7 +245,7 @@ resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
   image_id      = local.application_data.accounts[local.environment].ami_image_id
   instance_type = local.application_data.accounts[local.environment].instance_type
-  key_name      = local.application_data.accounts[local.environment].key_name
+  key_name      = "${local.application_name}-ec2"
   ebs_optimized = true
 
   monitoring {

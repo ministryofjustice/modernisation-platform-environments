@@ -13,6 +13,7 @@ variable "env_name" {
   type        = string
 }
 
+
 variable "rds_license_model" {
   description = "RDS license model to use"
   type        = string
@@ -92,18 +93,11 @@ variable "rds_storage_type" {
   default     = "gp2"
 }
 
-variable "rds_maintenance_window" {
-  description = "RDS maintenance window"
+variable "maintenance_window" {
+  description = "RDS/elasticache maintenance window"
   type        = string
   default     = "mon:03:00-mon:04:00"
 }
-
-variable "rds_auto_minor_version_upgrade" {
-  description = "RDS auto minor version upgrade"
-  type        = bool
-  default     = true
-}
-
 
 variable "rds_auto_major_version_upgrade" {
   description = "RDS auto major version upgrade"
@@ -152,8 +146,8 @@ variable "rds_enabled_cloudwatch_logs_exports" {
   type        = list(string)
 }
 
-variable "rds_ingress_security_groups" {
-  description = "Additional RDS ingress security groups"
+variable "ingress_security_groups" {
+  description = "Additional RDS/elasticache ingress security groups"
   type        = list(string)
 }
 
@@ -201,4 +195,57 @@ variable "certificate_arn" {
 variable "microservice_lb_arn" {
   description = "The ARN of the load balancer to use for the target group"
   type        = string
+}
+
+variable "create_rds" {
+  description = "Whether to create an RDS instance"
+  type        = bool
+  default     = false
+}
+
+variable "create_elasticache" {
+  description = "Whether to create an Elasticache instance"
+  type        = bool
+  default     = false
+}
+
+variable "elasticache_node_type" {
+  description = "The Elasticache node type"
+  type        = string
+  default     = "cache.m4.large"
+}
+
+variable "elasticache_engine" {
+  description = "The Elasticache engine"
+  type        = string
+  default     = "redis"
+}
+
+variable "elasticache_engine_version" {
+  description = "The Elasticache engine version"
+  type        = string
+  default     = "5.0.6"
+}
+
+variable "elasticache_port" {
+  description = "The Elasticache port"
+  type        = number
+  default     = 6379
+}
+
+variable "elasticache_parameter_group_name" {
+  description = "The Elasticache parameter group name"
+  type        = string
+  default     = "default.redis5.0"
+}
+
+variable "elasticache_subnet_group_name" {
+  description = "The Elasticache subnet group name"
+  type        = string
+  default     = "default"
+}
+variable "elasticache_num_cache_nodes" {
+  description = "The Elasticache number of cache nodes"
+  type        = number
+  default     = 1
 }
