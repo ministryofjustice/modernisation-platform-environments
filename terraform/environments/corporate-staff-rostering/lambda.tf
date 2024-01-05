@@ -4,6 +4,8 @@ module "lambda_cw_logs_xml_to_json" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function"
 
   application_name = "cw-logs-xml-to-json"
+  function_name    = "cw-logs-xml-to-json"
+  role_name        = "cw-logs-xml-to-json"
 
   package_type     = "Zip"
   filename         = "${path.module}/lambda/cw-xml-to-json/deployment_package.zip"
