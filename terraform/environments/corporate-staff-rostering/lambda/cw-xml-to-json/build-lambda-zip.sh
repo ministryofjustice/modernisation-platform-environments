@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# This script must be executed with the Lambda's
+# python source directory in lambda/ as the working
+# directory ($PWD).
+# The ZIP file must be committed in that same directory.
+
 readonly LOG_FILE=lambda-build-$(date "+%Y%m%dT%H%M%S").log
 
 exec 3>&1 4>&2

@@ -1,11 +1,13 @@
+# START: lambda_cw_logs_xml_to_json
+
 module "lambda_cw_logs_xml_to_json" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function"
 
   application_name = "cw-logs-xml-to-json"
 
   package_type     = "Zip"
-  filename         = "deployment_package.zip"
-  source_code_hash = filebase64sha256("deployment_package.zip")
+  filename         = "${path.module}/lambda/cw-xml-to-json/deployment_package.zip"
+  source_code_hash = filebase64sha256("${path.module}/lambda/cw-xml-to-json/deployment_package.zip")
   runtime          = "python3.12"
   handler          = "lambda_function.lambda_handler"
 
@@ -38,3 +40,5 @@ resource "aws_cloudwatch_log_subscription_filter" "cw_logs_xml_to_json" {
   filter_pattern  = each.value.pattern
   destination_arn = module.lambda_cw_logs_xml_to_json.lambda_function_arn
 }
+
+# END: lambda_cw_logs_xml_to_json
