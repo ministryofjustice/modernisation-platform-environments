@@ -277,3 +277,26 @@ variable "alb_security_group_id" {
   description = "The security group ID of the ALB"
   type        = string
 }
+
+variable "health_check_path" {
+  description = "The health check path for the alb target group"
+  type        = string
+}
+
+variable "health_check_interval" {
+  description = "The health check interval for the alb target group"
+  type        = string
+  default     = "300" 
+}
+
+variable "alb_stickiness_enabled" {
+  description = "Enable or disable stickiness"
+  type        = string
+  default     = true
+}
+
+variable "alb_stickiness_type" {
+  description = "Type of stickiness for the alb target group"
+  type        = string
+  default     = "lb_cookie"
+}
