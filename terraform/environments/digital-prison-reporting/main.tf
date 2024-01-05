@@ -502,7 +502,7 @@ module "s3_schema_registry_bucket" {
   enable_lifecycle          = true
   enable_s3_versioning      = true
   enable_versioning_config  = "Enabled"
-  
+
   tags = merge(
     local.all_tags,
     {
