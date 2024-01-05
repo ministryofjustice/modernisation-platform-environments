@@ -35,7 +35,7 @@ module "baseline_presets" {
     enable_ec2_user_keypair                      = true
     enable_ec2_oracle_enterprise_managed_server  = true
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
-    enable_observability_platform_monitoring     = local.environment_baseline_presets_options[local.environment].enable_observability_platform_monitoring
+    enable_observability_platform_monitoring     = lookup(local.baseline_environment_presets_options, "enable_observability_platform_monitoring", false)
     db_backup_s3                                 = true # adds db backup buckets
     iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
