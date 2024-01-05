@@ -161,7 +161,7 @@ variable "source_app_username" {
 }
 
 variable "source_db_name" {
-  description = "Name of the target database"
+  description = "Name of the Source database"
   default     = "oracle"
 }
 

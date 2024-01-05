@@ -214,6 +214,11 @@ variable "extra_attributes" {
   default = null
 }
 
+variable "source_db_name" {
+  description = "Name of the Source database"
+  default     = "oracle"
+}
+
 variable "dms_source_name" {
   type        = string
   default     = ""  
