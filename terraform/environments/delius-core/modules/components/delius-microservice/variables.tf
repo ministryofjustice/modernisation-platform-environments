@@ -175,6 +175,11 @@ variable "ecs_service_port" {
   default     = 443
 }
 
+variable "ecs_cluster_arn" {
+  description = "The ARN of the ECS cluster"
+  type        = string
+}
+
 variable "task_def_container_port" {
   description = "The port on which the container is exposing the application"
   type        = number
@@ -248,4 +253,27 @@ variable "elasticache_num_cache_nodes" {
   description = "The Elasticache number of cache nodes"
   type        = number
   default     = 1
+}
+
+variable "container_environment_vars" {
+  description = "Environment variables to pass to the container"
+  type        = map(string)
+}
+variable "container_secrets" {
+  description = "Secrets to pass to the container"
+  type        = map(string)
+}
+
+variable "container_port_mappings" {
+  description = "Port mappings to pass to the container"
+  type = list(object({
+    container_port = number
+    host_port      = number
+    protocol       = string
+  }))
+}
+
+variable "alb_security_group_id" {
+  description = "The security group ID of the ALB"
+  type        = string
 }

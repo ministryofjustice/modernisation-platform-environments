@@ -12,9 +12,9 @@ module "container_definition" {
   log_configuration = {
     logDriver = "awslogs"
     options = {
-      "awslogs-group"         = aws_cloudwatch_log_group.delius_core_frontend_log_group.name
+      "awslogs-group"         = aws_cloudwatch_log_group.ecs.name
       "awslogs-region"        = "eu-west-2"
-      "awslogs-stream-prefix" = var.weblogic_config.frontend_fully_qualified_name
+      "awslogs-stream-prefix" = "${var.env_name}-${var.name}"
     }
   }
 }
@@ -26,11 +26,11 @@ module "ecs_policies" {
   tags         = var.tags
 }
 
-module "weblogic_service" {
+module "ecs_service" {
   source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
-  container_definition_json = module.weblogic_container.json_map_encoded_list
-  ecs_cluster_arn           = module.ecs.ecs_cluster_arn
-  name                      = "weblogic"
+  container_definition_json = module.container_definition.json_map_encoded_list
+  ecs_cluster_arn           = var.ecs_cluster_arn
+  name                      = "${var.env_name}-${var.name}"
   vpc_id                    = var.account_config.shared_vpc_id
 
   launch_type  = "FARGATE"
@@ -39,7 +39,6 @@ module "weblogic_service" {
   task_cpu    = "1024"
   task_memory = "4096"
 
-  # terraform will not let you use module.weblogic_ecs_policies.service_role.arn as it is not created yet and can't evaluate the count in this module
   service_role_arn   = module.ecs_policies.service_role.arn
   task_role_arn      = module.ecs_policies.task_role.arn
   task_exec_role_arn = module.ecs_policies.task_exec_role.arn
@@ -51,7 +50,7 @@ module "weblogic_service" {
 
   ecs_load_balancers = [
     {
-      target_group_arn = aws_lb_target_group.delius_core_frontend_target_group.id
+      target_group_arn = aws_lb_target_group.this.arn
       container_name   = "${var.env_name}-weblogic"
       container_port   = var.task_def_container_port
     }

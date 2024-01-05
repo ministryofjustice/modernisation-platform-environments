@@ -1,18 +1,3 @@
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = var.microservice_lb_arn
-  port              = 443
-  protocol          = "HTTPS"
-  certificate_arn   = var.certificate_arn
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.this.id
-    type             = "forward"
-  }
-}
-
-
-
 resource "aws_lb_target_group" "this" {
   # checkov:skip=CKV_AWS_261
 
