@@ -10,16 +10,21 @@ resource "aws_lb_target_group" "this" {
   tags                 = var.tags
 
   stickiness {
-    type = "lb_cookie"
+    enabled = var.alb_stickiness_enabled
+    type    = var.alb_stickiness_type
   }
 
   health_check {
-    path                = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    path                = var.health_check_path
     healthy_threshold   = "5"
-    interval            = "300"
+    interval            = var.health_check_interval
     protocol            = "HTTP"
     unhealthy_threshold = "5"
     matcher             = "200-499"
     timeout             = "5"
   }
+}
+
+output "target_group_arn" {
+  value = aws_lb_target_group.this.arn
 }
