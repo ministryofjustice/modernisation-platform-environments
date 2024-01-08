@@ -40,7 +40,7 @@ module "lambda_cw_logs_xml_to_json" {
   allowed_triggers = {
     AllowExecutionFromCloudWatch = {
       principal  = "logs.amazonaws.com"
-      source_arn = module.baseline.cloudwatch_log_groups[local.lambda_cw_logs_xml_to_json.monitored_log_group].arn
+      source_arn = "${module.baseline.cloudwatch_log_groups[local.lambda_cw_logs_xml_to_json.monitored_log_group].arn}:*"
     }
   }
 
