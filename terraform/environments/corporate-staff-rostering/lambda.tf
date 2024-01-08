@@ -24,6 +24,7 @@ module "lambda_cw_logs_xml_to_json" {
   runtime          = "python3.12"
   handler          = "lambda_function.lambda_handler"
 
+  policy_json_attached = true
   policy_json = jsonencode({
     Version = "2012-10-17",
     Statement = [
