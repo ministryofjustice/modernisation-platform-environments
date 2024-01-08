@@ -947,7 +947,7 @@ module "dms_fake_data_ingestor" {
 
 # DMS Nomis Data Collector
 module "dms_nomis_to_s3_ingestor" {
-  source                       = "./modules/dms_s3"
+  source                       = "./modules/dms"
   setup_dms_instance           = true
   enable_replication_task      = true
   name                         = "${local.project}-dms-nomis-ingestor-s3-target-${local.env}"
