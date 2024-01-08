@@ -6,23 +6,6 @@ parameters:
     type: "String"
     description: "ID of the instance being targetted"
 mainSteps:  
-  - name: InstallPortQry
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          $source = "https://download.microsoft.com/download/0/d/9/0d9d81cf-4ef2-4aa5-8cea-95a935ee09c9/PortQryV2.exe"
-          $filePath = "C:\PortQryV2.exe"
-          $portQryPath = "C:\Program Files\PortQryV2\PortQryV2.exe"
-
-          if (Test-Path $portQryPath -PathType Leaf) {
-            Write-Host "PortQry is installed."
-          } else {
-            Write-Host "PortQry is not installed. Installing now..."
-            Start-BitsTransfer -Source $source -Destination $filePath
-            Start-Process -Wait -FilePath $filePath -Verb runAs -ArgumentList '/s','/v"/qn"'
-          }
-
   - name: installTestPortModule
     action: aws:runPowerShellScript
     inputs: 
