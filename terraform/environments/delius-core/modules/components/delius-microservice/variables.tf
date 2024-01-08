@@ -286,7 +286,7 @@ variable "health_check_path" {
 variable "health_check_interval" {
   description = "The health check interval for the alb target group"
   type        = string
-  default     = "300" 
+  default     = "300"
 }
 
 variable "alb_stickiness_enabled" {

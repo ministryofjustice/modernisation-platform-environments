@@ -106,7 +106,7 @@ locals {
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        ebs_volumes = { # need this config until prod db moves to aws
+        ebs_volumes = {  # need this config until prod db moves to aws
           "/dev/sdb" = { # /u01
             size  = 100
             label = "app"
@@ -122,7 +122,7 @@ locals {
             size  = 2000
             type  = "gp3"
           }
-          "/dev/sdf" = {  # DATA02
+          "/dev/sdf" = { # DATA02
             label = "data"
             size  = 2000
             type  = "gp3"
@@ -139,9 +139,9 @@ locals {
           }
         }
         tags = merge(local.database_a.tags, {
-          bip-db-name                             = "PPBIPINF"
-          instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "PPBIPINF PPOASYS"
+          bip-db-name         = "PPBIPINF"
+          instance-scheduling = "skip-scheduling"
+          oracle-sids         = "PPBIPINF PPOASYS"
         })
       })
     }

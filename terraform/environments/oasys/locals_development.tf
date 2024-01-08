@@ -2,7 +2,7 @@
 locals {
 
   development_baseline_presets_options = {}
-  
+
   development_config = {
 
     ec2_common = {

@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-  allocated_storage	     = local.application_data.accounts[local.environment].db_allocated_storage
+  allocated_storage      = local.application_data.accounts[local.environment].db_allocated_storage
   storage_type           = "gp2"
   engine                 = "sqlserver-web"
   engine_version         = "14.00.3381.3.v1"
@@ -40,9 +40,9 @@ resource "aws_db_subnet_group" "db" {
 }
 
 resource "aws_security_group" "db" {
-  name = "${local.application_name}-db-sg"
+  name        = "${local.application_name}-db-sg"
   description = "Allow DB inbound traffic"
-  vpc_id = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared.id
   ingress {
     from_port   = 1433
     to_port     = 1433
