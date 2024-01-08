@@ -1,6 +1,6 @@
-#DMS Kinesis Endpoint role
-resource "aws_iam_role" "dms-kinesis-role" {
-  name = "dms-${var.short_name}-kenisis-endpoint-role"
+#DMS S3 Endpoint role
+resource "aws_iam_role" "dms-s3-role" {
+  name = "dms-${var.short_name}-s3-endpoint-role"
   path = "/"
 
   assume_role_policy = <<EOF
@@ -19,10 +19,9 @@ resource "aws_iam_role" "dms-kinesis-role" {
 EOF
 }
 
-# Attach an admin policy to the role
-resource "aws_iam_role_policy" "dmskinesispolicy" {
-  name = "dms-${var.short_name}-kinesis-policy"
-  role = aws_iam_role.dms-kinesis-role.id
+# Attach s3 target operation policy to the role
+resource "aws_iam_policy" "dms-s3-target-policy" {
+  name = "dms-${var.short_name}-s3-target-policy"
 
   policy = <<EOF
 {
@@ -41,15 +40,15 @@ resource "aws_iam_role_policy" "dmskinesispolicy" {
 EOF
 }
 
-#DMS Role with kinesis Write Access
-resource "aws_iam_role_policy_attachment" "dms-kinesis-attachment" {
-  role       = aws_iam_role.dms-kinesis-role.name
-  policy_arn = var.kinesis_stream_policy
+#DMS Role with s3 Write Access
+resource "aws_iam_role_policy_attachment" "dms-s3-attachment" {
+  role       = aws_iam_role.dms-s3-role.name
+  policy_arn = aws_iam_policy.dms-s3-target-policy.arn
 }
 
-#DMS DMS Operation role
-resource "aws_iam_role" "dms-operator-role" {
-  name = "dms-${var.short_name}-operator-role"
+#DMS Operation s3 target role
+resource "aws_iam_role" "dms-operator-s3-target-role" {
+  name = "dms-${var.short_name}-operator-s3-target-role"
   path = "/"
 
   assume_role_policy = <<EOF
@@ -69,9 +68,8 @@ EOF
 }
 
 # Attach an admin policy to the Operator role
-resource "aws_iam_role_policy" "dmsoperatorpolicy" {
-  name = "dms-${var.short_name}-operator-policy"
-  role = aws_iam_role.dms-operator-role.id
+resource "aws_iam_policy" "dms-operator-s3-policy" {
+  name = "dms-${var.short_name}-operator-s3-target-policy"
 
   policy = <<EOF
 {
@@ -112,7 +110,7 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
                 "s3:ListAllMyBuckets",
                 "s3:ListAccessPoints",
                 "s3:ListJobs",
-                "s3:ListObjects"          
+                "s3:ListObjects"
             ],
             "Resource": "*"
         }
@@ -121,8 +119,8 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
 EOF
 }
 
-#DMS Role with kinesis Write Access
-resource "aws_iam_role_policy_attachment" "dms-operator-kinesis-attachment" {
-  role       = aws_iam_role.dms-operator-role.name
-  policy_arn = var.kinesis_stream_policy
+#DMS Role with s3 Write Access
+resource "aws_iam_role_policy_attachment" "dms-operator-s3-attachment" {
+  role       = aws_iam_role.dms-operator-s3-target-role.name
+  policy_arn = aws_iam_policy.dms-operator-s3-policy.arn
 }

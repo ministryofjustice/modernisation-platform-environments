@@ -844,7 +844,7 @@ module "s3_file_transfer_lambda_trigger" {
 
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
-  source                       = "./modules/dms"
+  source                       = "modules/dms_dps"
   setup_dms_instance           = local.setup_dms_instance      # Disable all DMS Resources
   enable_replication_task      = local.enable_replication_task # Disable Replication Task
   name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
@@ -896,7 +896,7 @@ module "dms_nomis_ingestor" {
 }
 
 module "dms_fake_data_ingestor" {
-  source                       = "./modules/dms"
+  source                       = "modules/dms_dps"
   setup_dms_instance           = local.setup_fake_data_dms_instance
   enable_replication_task      = local.enable_fake_data_replication_task # Disable Replication Task
   name                         = "${local.project}-dms-fake-data-ingestor-${local.env}"
@@ -947,7 +947,7 @@ module "dms_fake_data_ingestor" {
 
 # DMS Nomis Data Collector
 module "dms_nomis_to_s3_ingestor" {
-  source                       = "./modules/dms_s3"
+  source                       = "modules/dms"
   setup_dms_instance           = true
   enable_replication_task      = true
   name                         = "${local.project}-dms-nomis-ingestor-s3-target-${local.env}"
