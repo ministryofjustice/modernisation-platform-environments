@@ -123,7 +123,7 @@ locals {
     })
 
     instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
-      instance_type          = "t2.large"
+      instance_type          = "t2.xlarge"
       vpc_security_group_ids = ["private-web"]
     })
 

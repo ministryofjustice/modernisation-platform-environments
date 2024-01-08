@@ -346,9 +346,6 @@ locals {
             "Ec2T3WeblogicPolicy",
           ])
         })
-        instance = merge(local.weblogic_ec2.instance, {
-          # instance_type = "t2.xlarge"
-        })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
             branch = "main"
@@ -374,9 +371,6 @@ locals {
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2T3WeblogicPolicy",
           ])
-        })
-        instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.xlarge"
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
