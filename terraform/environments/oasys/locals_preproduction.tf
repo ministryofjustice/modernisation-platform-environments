@@ -106,38 +106,6 @@ locals {
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        ebs_volumes = { # need this config until prod db moves to aws
-          "/dev/sdb" = { # /u01
-            size  = 100
-            label = "app"
-            type  = "gp3"
-          }
-          "/dev/sdc" = { # /u02
-            size  = 1000
-            label = "app"
-            type  = "gp3"
-          }
-          "/dev/sde" = { # DATA01
-            label = "data"
-            size  = 2000
-            type  = "gp3"
-          }
-          "/dev/sdf" = {  # DATA02
-            label = "data"
-            size  = 2000
-            type  = "gp3"
-          }
-          "/dev/sdj" = { # FLASH01
-            label = "flash"
-            type  = "gp3"
-            size  = 500
-          }
-          "/dev/sds" = {
-            label = "swap"
-            type  = "gp3"
-            size  = 2
-          }
-        }
         tags = merge(local.database_a.tags, {
           bip-db-name                             = "PPBIPINF"
           instance-scheduling                     = "skip-scheduling"
