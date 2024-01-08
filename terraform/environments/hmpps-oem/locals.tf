@@ -40,94 +40,94 @@ locals {
   baseline_ec2_autoscaling_groups        = {}
   baseline_ec2_instances                 = {}
   baseline_iam_policies = {
-    DBRefresherPolicy = {
-      description = "Permissions for the db refresh process"
-      statements = [
-        {
-          sid    = "InstanceAccess"
-          effect = "Allow"
-          actions = [
-            "ec2:DescribeInstances",
-            "ssm:StartSession",
-            "ssm:TerminateSession"
-          ]
-          resources = [
-            "*",
-          ]
-        },
-        {
-          sid    = "KMSAccess"
-          effect = "Allow"
-          actions = [
-            "kms:GenerateDataKey",
-            "kms:Decrypt",
-            "kms:Encrypt",
-          ]
-          resources = [
-            data.aws_kms_key.general_shared.arn,
-          ]
-        },
-        {
-          sid    = "S3ObjectAccess"
-          effect = "Allow"
-          actions = [
-            "s3:GetObject",
-            "s3:PutObject",
-            "s3:DeleteObject",
-          ]
-          resources = [
-            "${module.baseline.s3_buckets["s3-bucket"].bucket.arn}/*",
-          ]
-        },
-        {
-          sid    = "SSMParameterAccess"
-          effect = "Allow"
-          actions = [
-            "ssm:GetParameter",
-            "ssm:GetParameters",
-            "ssm:GetParametersByPath",
-          ]
-          resources = [
-            "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/ansible/*",
-          ]
-        },
-      ]
-    }
+    # DBRefresherPolicy = {
+    #   description = "Permissions for the db refresh process"
+    #   statements = [
+    #     {
+    #       sid    = "InstanceAccess"
+    #       effect = "Allow"
+    #       actions = [
+    #         "ec2:DescribeInstances",
+    #         "ssm:StartSession",
+    #         "ssm:TerminateSession"
+    #       ]
+    #       resources = [
+    #         "*",
+    #       ]
+    #     },
+    #     {
+    #       sid    = "KMSAccess"
+    #       effect = "Allow"
+    #       actions = [
+    #         "kms:GenerateDataKey",
+    #         "kms:Decrypt",
+    #         "kms:Encrypt",
+    #       ]
+    #       resources = [
+    #         data.aws_kms_key.general_shared.arn,
+    #       ]
+    #     },
+    #     {
+    #       sid    = "S3ObjectAccess"
+    #       effect = "Allow"
+    #       actions = [
+    #         "s3:GetObject",
+    #         "s3:PutObject",
+    #         "s3:DeleteObject",
+    #       ]
+    #       resources = [
+    #         "${module.baseline.s3_buckets["s3-bucket"].bucket.arn}/*",
+    #       ]
+    #     },
+    #     {
+    #       sid    = "SSMParameterAccess"
+    #       effect = "Allow"
+    #       actions = [
+    #         "ssm:GetParameter",
+    #         "ssm:GetParameters",
+    #         "ssm:GetParametersByPath",
+    #       ]
+    #       resources = [
+    #         "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/ansible/*",
+    #       ]
+    #     },
+    #   ]
+    # }
   }
   baseline_iam_roles = {
-    DBRefresherRole = {
-      assume_role_policy = [
-        {
-          effect = "Allow"
-          actions = [
-            "sts:AssumeRoleWithWebIdentity",
-          ]
-          principals = {
-            type = "Federated"
-            identifiers = [
-              "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
-            ]
+    # DBRefresherRole = {
+    #   assume_role_policy = [
+    #     {
+    #       effect = "Allow"
+    #       actions = [
+    #         "sts:AssumeRoleWithWebIdentity",
+    #       ]
+    #       principals = {
+    #         type = "Federated"
+    #         identifiers = [
+    #           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+    #         ]
 
-          }
-          conditions = [
-            {
-              test     = "StringEquals"
-              values   = ["sts.amazonaws.com"]
-              variable = "token.actions.githubusercontent.com:aud"
-            },
-            {
-              test     = "StringLike"
-              values   = ["repo:ministryofjustice/dso-modernisation-platform-automation:ref:refs/heads/main"]
-              variable = "token.actions.githubusercontent.com:sub"
-            }
-          ]
-        }
-      ]
-      policy_attachments = [
-        "DBRefresherPolicy",
-        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-      ]
-    }
+    #       }
+    #       conditions = [
+    #         {
+    #           test     = "StringEquals"
+    #           values   = ["sts.amazonaws.com"]
+    #           variable = "token.actions.githubusercontent.com:aud"
+    #         },
+    #         {
+    #           test     = "StringLike"
+    #           values   = ["repo:ministryofjustice/dso-modernisation-platform-automation:ref:refs/heads/main"]
+    #           variable = "token.actions.githubusercontent.com:sub"
+    #         }
+    #       ]
+    #     }
+    #   ]
+    #   policy_attachments = [
+    #     "DBRefresherPolicy",
+    #     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    #   ]
+    # }
   }
   baseline_iam_service_linked_roles = {}
   baseline_key_pairs                = {}
