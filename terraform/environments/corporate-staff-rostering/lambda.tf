@@ -7,10 +7,6 @@ locals {
   }
 }
 
-data "aws_cloudwatch_log_group" "cwagent-windows-application" {
-  name = local.lambda_cw_logs_xml_to_json.monitored_log_group
-}
-
 module "lambda_cw_logs_xml_to_json" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function"
 
@@ -44,7 +40,7 @@ module "lambda_cw_logs_xml_to_json" {
   allowed_triggers = {
     AllowExecutionFromCloudWatch = {
       principal  = "logs.amazonaws.com"
-      source_arn = data.aws_cloudwatch_log_group.cwagent-windows-application.arn
+      source_arn = module.baseline.cloudwatch_log_groups[local.lambda_cw_logs_xml_to_json.monitored_log_group].arn
     }
   }
 
