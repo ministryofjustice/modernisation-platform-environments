@@ -547,8 +547,9 @@ locals {
           module.environment.subnet["private"]["eu-west-2b"].id,
         ]
         security_groups                  = ["load-balancer"]
-        access_logs                      = false
+        access_logs                      = true
         enable_cross_zone_load_balancing = true
+        existing_bucket_name             = "nlb-logs-bucket20240104122125199500000001"
 
         instance_target_groups = {
           pd-csr-w-12-80 = {
@@ -715,8 +716,9 @@ locals {
           module.environment.subnet["private"]["eu-west-2b"].id,
         ]
         security_groups                  = ["load-balancer"]
-        access_logs                      = false
+        access_logs                      = true
         enable_cross_zone_load_balancing = true
+        existing_bucket_name             = "nlb-logs-bucket20240104122125199500000001"
 
         instance_target_groups = {
           pd-csr-w-34-80 = {
@@ -883,8 +885,9 @@ locals {
           module.environment.subnet["private"]["eu-west-2b"].id,
         ]
         security_groups                  = ["load-balancer"]
-        access_logs                      = false
+        access_logs                      = true
         enable_cross_zone_load_balancing = true
+        existing_bucket_name             = "nlb-logs-bucket20240104122125199500000001"
 
         instance_target_groups = {
           pd-csr-w-56-80 = {
