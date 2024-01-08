@@ -231,6 +231,7 @@ resource "aws_appautoscaling_policy" "maat_api_scaling_up_policy" {
   step_scaling_policy_configuration {
     adjustment_type         = "ChangeInCapacity"
     cooldown                = 60
+    metric_aggregation_type = "Average"
 
     step_adjustment {
       scaling_adjustment        = 1
@@ -249,6 +250,7 @@ resource "aws_appautoscaling_policy" "maat_api_scaling_down_policy" {
   step_scaling_policy_configuration {
     adjustment_type         = "ChangeInCapacity"
     cooldown                = 60
+    metric_aggregation_type = "Average"
 
     step_adjustment {
       scaling_adjustment        = -1
