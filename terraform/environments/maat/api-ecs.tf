@@ -77,16 +77,15 @@ resource "aws_ssm_parameter" "togdata_datasource_password" {
 ######################################
 # ECS TASK DEFINITION
 ######################################
-# resource "aws_ecs_task_definition" "TaskDefinition" {
-#   family                   = "${local.application_name}-api-task-definition"
-#   cpu                      = local.application_data.accounts[local.environment].ecs_cpu
-#   memory                   = local.application_data.accounts[local.environment].ecs_memory
-#   network_mode             = "awsvpc"
-#   requires_compatibilities = ["FARGATE"]
-#   execution_role_arn       = aws_iam_role.maat_api_ecs_taks_execution_role.arn
-#   task_role_arn            = aws_iam_role.maat_api_ecs_taks_execution_role.arn
+resource "aws_ecs_task_definition" "TaskDefinition" {
+  family                   = "${local.application_name}-api-task-definition"
+  cpu                      = local.application_data.accounts[local.environment].ecs_cpu
+  memory                   = local.application_data.accounts[local.environment].ecs_memory
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.maat_api_ecs_taks_execution_role.arn
+  task_role_arn            = aws_iam_role.maat_api_ecs_taks_execution_role.arn
 
-<<<<<<< HEAD
   container_definitions = jsonencode([
     {
       name        = "${local.application_name}-cd-api",
@@ -102,7 +101,7 @@ resource "aws_ssm_parameter" "togdata_datasource_password" {
           "awslogs-stream-prefix" = "${local.application_name}-api-app"
         }
       },
-      port_mappings = [
+      portMappings = [
         {
           containerPort = 8090
           hostPort = 8090
@@ -208,129 +207,6 @@ resource "aws_ssm_parameter" "togdata_datasource_password" {
     }
   ])
 }
-=======
-#   container_definitions = jsonencode([
-#     {
-#       name        = "${local.application_name}-cd-api",
-#       cpu         = local.application_data.accounts[local.environment].ecs_container_cpu,
-#       essential   = true,
-#       image       = "902837325998.dkr.ecr.eu-west-2.amazonaws.com/maat-cd-api:2b0a2803",
-#       memory      = local.application_data.accounts[local.environment].ecs_container_memory,
-#       log_configuration = {
-#         log_driver = "awslogs",
-#         options = {
-#           "awslogs-group"         = aws_cloudwatch_log_group.maat_api_ecs_cw_group.name,
-#           "awslogs-region"        = "${data.aws_region.current.name}",
-#           "awslogs-stream-prefix" = "${local.application_name}-api-app"
-#         }
-#       },
-#       port_mappings = [
-#         {
-#           containerPort = 8090,
-#           hostPort = 8090,
-#           protocol = "tcp"
-#         }
-#       ],
-#       secrets = [
-#         {
-#           name        = "DATASOURCE_USERNAME",
-#           valueFrom  = aws_ssm_parameter.data_source_username.arn
-#         },
-#         {
-#           name        = "DATASOURCE_PASSWORD",
-#           valueFrom  = aws_ssm_parameter.data_source_password.arn
-#         },
-#         {
-#           name        = "CDA_OAUTH_CLIENT_ID",
-#           valueFrom  = aws_ssm_parameter.cda_client_id.arn
-#         },
-#         {
-#           name        = "CDA_OAUTH_CLIENT_SECRET",
-#           valueFrom  = aws_ssm_parameter.cda_client_secret.arn
-#         },
-#         {
-#           name        = "TOGDATA_DATASOURCE_PASSWORD",
-#           valueFrom  = aws_ssm_parameter.togdata_datasource_password.arn
-#         }
-#       ],
-#       environment = [
-#         {
-#           name  = "DATASOURCE_URL",
-#           value = local.application_data.accounts[local.environment].ecs_env_DatasourceUrl
-#         },
-#         {
-#           name  = "CLOUD_PLATFORM_QUEUE_REGION",
-#           value = local.application_data.accounts[local.environment].ecs_env_CloudPlatformQueueRegion
-#         },
-#         {
-#           name  = "CREATE_LINK_QUEUE",
-#           value = local.application_data.accounts[local.environment].ecs_env_CreateLinkQueue
-#         },
-#         {
-#           name  = "UNLINK_QUEUE",
-#           value = local.application_data.accounts[local.environment].ecs_env_UnlinkQueue
-#         },
-#         {
-#           name  = "HEARING_RESULTED_QUEUE",
-#           value = local.application_data.accounts[local.environment].ecs_env_HearingsResultedQueue
-#         },
-#         {
-#           name  = "CDA_OAUTH_URL",
-#           value = local.application_data.accounts[local.environment].ecs_env_CdaOauthUrl
-#         },
-#         {
-#           name  = "CDA_BASE_URL",
-#           value = local.application_data.accounts[local.environment].ecs_env_CdaBaseUrl
-#         },
-#         {
-#           name  = "SENTRY_ENV",
-#           value = local.application_data.accounts[local.environment].ecs_env_Environment
-#         },
-#         {
-#           name  = "POST_MVP_ENABLED",
-#           value = local.application_data.accounts[local.environment].ecs_env_PostMvpEnabled
-#         },
-#         {
-#           name  = "PROSECUTION_CONCLUDED_LISTENER_ENABLED",
-#           value = local.application_data.accounts[local.environment].ecs_env_ProsecutionConcludedListenerEnabled
-#         },
-#         {
-#           name  = "PROSECUTION_CONCLUDED_SCHEDULE_ENABLED",
-#           value = local.application_data.accounts[local.environment].ecs_env_ProsecutionConcludedScheduleEnabled
-#         },
-#         {
-#           name  = "CREATE_LINK_CP_STATUS_JOB_QUEUE",
-#           value = local.application_data.accounts[local.environment].ecs_env_CreateLinkCpStatusJobQueue
-#         },
-#         {
-#           name  = "LAA_PROSECUTION_CONCLUDED_QUEUE",
-#           value = local.application_data.accounts[local.environment].ecs_env_LaaProsecutionConcludedQueue
-#         },
-#         {
-#           name  = "AWS_DEFAULT_REGION",
-#           value = local.application_data.accounts[local.environment].ecs_env_AwsDefaultRegion
-#         },
-#         {
-#           name  = "CLOUDWATCH_STEP",
-#           value = local.application_data.accounts[local.environment].ecs_env_CloudwatchStep
-#         },
-#         {
-#           name  = "CLOUDWATCH_BATCH_SIZE",
-#           value = local.application_data.accounts[local.environment].ecs_env_CloudwatchBatchSize
-#         },
-#         {
-#           name  = "ENABLE_CLOUDWATCH_METRICS",
-#           value = local.application_data.accounts[local.environment].ecs_env_EnableCloudwatchMetrics
-#         },
-#         {
-#           name  = "TOGDATA_DATASOURCE_USERNAME",
-#           value = local.application_data.accounts[local.environment].ecs_env_TogDataUsername
-#         }
-#       ]
-#     }
-#   ])
-# }
->>>>>>> 98235d09d (commenting out task definition)
 
 
 ######################################
