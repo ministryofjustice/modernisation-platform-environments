@@ -192,7 +192,7 @@ locals {
           vpc_security_group_ids = ["rds-ec2s"]
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
+          "/dev/sda1" = { type = "gp3", size = 128 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
           desired_capacity = 1 # set to 0 while testing
