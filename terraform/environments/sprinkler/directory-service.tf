@@ -17,6 +17,7 @@ resource "aws_directory_service_directory" "mmad" {
 
 resource "aws_secretsmanager_secret" "mmad" {
   name = "active-directory_sprinkler.modernisation-platform.internal"
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "mmad" {
