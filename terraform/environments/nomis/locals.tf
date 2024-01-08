@@ -171,6 +171,7 @@ locals {
       ]
       policy_attachments = [
         "DBRefresherPolicy",
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
       ]
     },
     SasTokenRotatorRole = {
