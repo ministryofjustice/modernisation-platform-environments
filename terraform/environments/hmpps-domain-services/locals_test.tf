@@ -179,6 +179,30 @@ locals {
           server-type = "hmpps-windows_2022"
         }
       }
+
+      rds-session-host-2012 = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "base_windows_server_2012_r2_release_2024-01-01T00-00-47.679Z"
+          availability_zone             = null
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["rds-ec2s"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+        }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
+          desired_capacity = 1 # set to 0 while testing
+        })
+        tags = {
+          description = "Remote Desktop Services 2012 test ASG"
+          os-type     = "Windows"
+          component   = "remotedesktop"
+        }
+      }
     }
 
     baseline_ec2_instances = {
