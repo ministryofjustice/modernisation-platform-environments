@@ -166,39 +166,32 @@ locals {
         type  = "gp3"
       }
       "/dev/sdc" = { # /u02
-        size  = 500
+        size  = 1000
         label = "app"
         type  = "gp3"
       }
       "/dev/sde" = { # DATA01
         label = "data"
-        size  = 500
+        size  = 2000
         type  = "gp3"
       }
-      # "/dev/sdf" = {  # DATA02
-      #   label = "data"
-      #   type = null
-      # }
+      "/dev/sdf" = {  # DATA02
+        label = "data"
+        size  = 2000
+        type  = "gp3"
+      }
       # "/dev/sdg" = {  # DATA03
-      #   label = "data"
-      #   type = null
       # }
       # "/dev/sdh" = {  # DATA04
-      #   label = "data"
-      #   type = null
       # }
       # "/dev/sdi" = {  # DATA05
-      #   label = "data"
-      #   type = null
       # }
       "/dev/sdj" = { # FLASH01
         label = "flash"
         type  = "gp3"
-        size  = 50
+        size  = 1000
       }
       # "/dev/sdk" = { # FLASH02
-      #   label = "flash"
-      #   type = null
       # }
       "/dev/sds" = {
         label = "swap"
