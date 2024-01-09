@@ -10,6 +10,7 @@ locals {
         iam_policies   = module.baseline_presets.s3_iam_policies
       }
       nlb-logs-bucket = {
+        force_destroy = true
         sse_algorithm = "AES256"
         iam_policies  = module.baseline_presets.s3_iam_policies
         bucket_policy_v2 = [
