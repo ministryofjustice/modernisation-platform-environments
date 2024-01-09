@@ -21,7 +21,6 @@ mainSteps:
             Write-Host "Test-Port module is already installed."             
           }
 
-
   - name: installWireshark
     action: aws:runPowerShellScript
     inputs:
