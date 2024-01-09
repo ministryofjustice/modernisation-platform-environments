@@ -134,7 +134,7 @@ locals {
       }
     }
 
-    http8433 = {
+    http8443 = {
       port     = 8433
       protocol = "HTTP"
 
