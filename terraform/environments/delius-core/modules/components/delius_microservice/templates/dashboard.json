@@ -105,7 +105,7 @@
       "x": 12,
       "type": "log",
       "properties": {
-        "query": "SOURCE 'delius-${name}-app' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
+        "query": "SOURCE '${name}' | fields @timestamp, @message, @logStream, @log\n| filter @message like ${cloudwatch_error_pattern}\n| sort @timestamp desc\n| limit 20",
         "region": "eu-west-2",
         "stacked": false,
         "view": "table",

@@ -9,14 +9,14 @@ resource "aws_cloudwatch_dashboard" "jitbit" {
   dashboard_body = templatefile(
     "${path.module}/templates/dashboard.json",
     {
-      name              = var.name,
-      env_name          = var.env_name,
-      load_balancer_arn = var.microservice_lb_arn,
-      target_group_arn  = aws_lb_target_group.this.arn,
-      rds_db_identifier = aws_db_instance.this.identifier,
-      ecs_service_name  = "${var.env_name}-${var.name}"
-      ecs_cluster_name  = local.cluster_name
-
+      name                     = var.name,
+      env_name                 = var.env_name,
+      load_balancer_arn        = var.microservice_lb_arn,
+      target_group_arn         = aws_lb_target_group.this.arn,
+      rds_db_identifier        = aws_db_instance.this.identifier,
+      ecs_service_name         = "${var.env_name}-${var.name}"
+      ecs_cluster_name         = local.cluster_name,
+      cloudwatch_error_pattern = var.cloudwatch_error_pattern,
     }
   )
 }
