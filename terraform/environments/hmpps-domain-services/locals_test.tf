@@ -552,7 +552,7 @@ locals {
                 }]
               }
               test-rdweb3 = {
-                priority = 700
+                priority = 800
                 actions = [{
                   type              = "forward"
                   target_group_name = "test-rdweb-https3"
