@@ -69,7 +69,9 @@ locals {
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
-          ndh-environment = "test"
+          ndh-environment            = "test"
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "test"
         })
       })
 
@@ -80,7 +82,9 @@ locals {
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
-          ndh-environment = "test"
+          ndh-environment            = "test"
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "test"
         })
       })
 
@@ -91,7 +95,9 @@ locals {
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
-          ndh-environment = "t1"
+          ndh-environment            = "t1"
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "t1"
         })
       })
 
@@ -102,7 +108,9 @@ locals {
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
-          ndh-environment = "t1"
+          ndh-environment            = "t1"
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "t1"
         })
       })
 
@@ -113,7 +121,9 @@ locals {
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
-          ndh-environment = "t2"
+          ndh-environment            = "t2"
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "t2"
         })
       })
 
@@ -124,7 +134,9 @@ locals {
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
-          ndh-environment = "t2"
+          ndh-environment            = "t2"
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "t2"
         })
       })
     }
