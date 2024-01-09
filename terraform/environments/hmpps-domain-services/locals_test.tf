@@ -350,7 +350,7 @@ locals {
 
     baseline_lbs = {
       public = {
-        access_logs                      = false
+        access_logs                      = true
         enable_cross_zone_load_balancing = true
         enable_delete_protection         = false
         force_destroy_bucket             = true
