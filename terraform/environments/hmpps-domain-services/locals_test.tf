@@ -306,6 +306,46 @@ locals {
           component   = "remotedesktop"
         }
       }
+      test-rds-6-b = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
+          availability_zone             = "eu-west-2a"
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["rds-ec2s"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description = "Remote Desktop Services test server 6"
+          os-type     = "Windows"
+          component   = "remotedesktop"
+        }
+      }
+      test-rds-7-a = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
+          availability_zone             = "eu-west-2b"
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["rds-ec2s"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description = "Remote Desktop Services test server 7"
+          os-type     = "Windows"
+          component   = "remotedesktop"
+        }
+      }
     }
 
     baseline_lbs = {
@@ -428,7 +468,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "test-rds-4-b" },
+              { ec2_instance_name = "test-rds-5-a" },
             ]
           }
           test-rdweb-https3 = {
@@ -450,7 +490,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "test-rds-4-b" },
+              { ec2_instance_name = "test-rds-5-a" },
             ]
           }
         }
