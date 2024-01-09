@@ -28,6 +28,7 @@ variable "options" {
     enable_ec2_oracle_enterprise_manager         = optional(bool, false)
     enable_ec2_user_keypair                      = optional(bool, false)
     enable_shared_s3                             = optional(bool, false)
+    enable_observability_platform_monitoring     = optional(bool, false)
     db_backup_s3                                 = optional(bool, false)
     route53_resolver_rules                       = optional(map(list(string)), {})
     iam_policies_filter                          = optional(list(string), [])

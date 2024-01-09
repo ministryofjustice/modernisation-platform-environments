@@ -1,5 +1,5 @@
 # Create a new DMS replication instance
-resource "aws_dms_replication_instance" "dms" {
+resource "aws_dms_replication_instance" "dms-s3-target-instance" {
   count = var.setup_dms_instance ? 1 : 0
 
   allocated_storage            = var.replication_instance_storage
@@ -12,8 +12,8 @@ resource "aws_dms_replication_instance" "dms" {
   publicly_accessible          = false
   replication_instance_class   = var.replication_instance_class
   replication_instance_id      = var.name
-  replication_subnet_group_id  = aws_dms_replication_subnet_group.dms[0].id
-  vpc_security_group_ids       = aws_security_group.dms_sec_group[*].id
+  replication_subnet_group_id  = aws_dms_replication_subnet_group.dms-s3-target-subnet-group[0].id
+  vpc_security_group_ids       = aws_security_group.dms_s3_target_sec_group[*].id
 
   tags = var.tags
 
@@ -24,47 +24,46 @@ resource "aws_dms_replication_instance" "dms" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.dms-operator-kinesis-attachment,
-    aws_iam_role_policy_attachment.dms-kinesis-attachment,
     var.cloudwatch_role_dependency,
     var.vpc_role_dependency,
-    aws_dms_replication_subnet_group.dms,
-    aws_security_group.dms_sec_group
+    aws_dms_replication_subnet_group.dms-s3-target-subnet-group,
+    aws_security_group.dms_s3_target_sec_group
   ]
 }
 
 data "template_file" "table-mappings" {
   template = file("${path.module}/config/${var.short_name}-table-mappings.json.tpl")
+
+  vars = {
+    input_schema = var.rename_rule_source_schema
+    output_space = var.rename_rule_output_space
+  }
 }
 
 resource "aws_dms_replication_task" "dms-replication" {
   count = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
 
   migration_type            = var.migration_type
-  replication_instance_arn  = aws_dms_replication_instance.dms[0].replication_instance_arn
-  replication_task_id       = "${var.project_id}-dms-task-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
-  source_endpoint_arn       = aws_dms_endpoint.source[0].endpoint_arn
-  target_endpoint_arn       = aws_dms_endpoint.target[0].endpoint_arn
+  replication_instance_arn  = aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_arn
+  replication_task_id       = "${var.project_id}-dms-s3-target-task-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
+  source_endpoint_arn       = aws_dms_endpoint.dms-s3-target-source[0].endpoint_arn
+  target_endpoint_arn       = aws_dms_s3_endpoint.dms-s3-target-endpoint[0].endpoint_arn
   table_mappings            = data.template_file.table-mappings.rendered
   replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings.json")
 
-  #lifecycle {
-  #  ignore_changes = [replication_task_settings]
-  #}
-
   depends_on = [
-    aws_dms_replication_instance.dms,
-    aws_dms_endpoint.source,
-    aws_dms_endpoint.target
+    aws_dms_replication_instance.dms-s3-target-instance,
+    aws_dms_endpoint.dms-s3-target-source,
+    aws_dms_s3_endpoint.dms-s3-target-endpoint
   ]
 }
 
 # Create an endpoint for the source database
-resource "aws_dms_endpoint" "source" {
+resource "aws_dms_endpoint" "dms-s3-target-source" {
   count = var.setup_dms_instance ? 1 : 0
 
   database_name = var.source_db_name
-  endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-source"
+  endpoint_id   = "${var.project_id}-dms-s3-target-${var.short_name}-${var.dms_source_name}-source"
   endpoint_type = "source"
   engine_name   = var.source_engine_name
   password      = var.source_app_password
@@ -78,54 +77,48 @@ resource "aws_dms_endpoint" "source" {
   tags = var.tags
 
   depends_on = [
-    aws_dms_replication_instance.dms
+    aws_dms_replication_instance.dms-s3-target-instance
   ]
 }
 
-# Create an endpoint for the target Kinesis
-resource "aws_dms_endpoint" "target" {
+resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   count = var.setup_dms_instance ? 1 : 0
 
-  endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_target_name}-target"
-  endpoint_type = "target"
-  engine_name   = var.target_engine
+  endpoint_id                      = "${var.project_id}-dms-${var.short_name}-s3-target"
+  endpoint_type                    = "target"
+  bucket_name                      = var.bucket_name
+  service_access_role_arn          = aws_iam_role.dms-s3-role.arn
+  data_format                      = "parquet"
+  cdc_path                         = "cdc"
+  timestamp_column_name            = "_timestamp"
+  parquet_timestamp_in_millisecond = false
+  include_op_for_full_load         = true
 
-  dynamic "kinesis_settings" {
-    for_each = var.kinesis_settings != null ? [true] : []
-    content {
-      include_control_details        = lookup(var.kinesis_settings, "include_control_details", null)
-      include_null_and_empty         = lookup(var.kinesis_settings, "include_null_and_empty", null)
-      include_partition_value        = lookup(var.kinesis_settings, "include_partition_value", null)
-      include_table_alter_operations = lookup(var.kinesis_settings, "include_table_alter_operations", null)
-      include_transaction_details    = lookup(var.kinesis_settings, "include_transaction_details", null)
-      message_format                 = lookup(var.kinesis_settings, "message_format", null)
-      partition_include_schema_table = lookup(var.kinesis_settings, "partition_include_schema_table", null)
-      service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
-      stream_arn                     = lookup(var.kinesis_settings, "kinesis_target_stream", null)
-    }
+  max_file_size           = 120000
+  cdc_max_batch_interval  = 10
+  cdc_inserts_and_updates = true
+
+  depends_on = [aws_iam_policy.dms-s3-target-policy, aws_iam_policy.dms-operator-s3-policy]
+
+  tags = {
+    Resource_Type = "DMS Target"
   }
-
-  tags = var.tags
-
-  depends_on = [
-    aws_dms_replication_instance.dms
-  ]
 }
 
 # Create a subnet group using existing VPC subnets
-resource "aws_dms_replication_subnet_group" "dms" {
+resource "aws_dms_replication_subnet_group" "dms-s3-target-subnet-group" {
   count = var.setup_dms_instance ? 1 : 0
 
   replication_subnet_group_description = "DMS replication subnet group"
-  replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-subnet-group"
+  replication_subnet_group_id          = "${var.project_id}-dms-s3-target-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-subnet-group"
   subnet_ids                           = var.subnet_ids
 }
 
 # Security Groups
-resource "aws_security_group" "dms_sec_group" {
+resource "aws_security_group" "dms_s3_target_sec_group" {
   count = var.setup_dms_instance ? 1 : 0
 
-  name   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"
+  name   = "${var.project_id}-dms-s3-target-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"
   vpc_id = var.vpc
 
   ingress {

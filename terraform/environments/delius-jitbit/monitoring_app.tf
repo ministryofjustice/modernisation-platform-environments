@@ -21,12 +21,12 @@ resource "aws_cloudwatch_log_metric_filter" "error" {
 
 resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume" {
   alarm_name          = "jitbit-high-error-count"
-  alarm_description   = "Triggers alarm if there are more than 5 errors in the last 5 minutes"
+  alarm_description   = "Triggers alarm if there are more than 10 errors for 2 consecitive periods"
   namespace           = "JitbitMetrics"
   metric_name         = "ErrorCount"
   statistic           = "Sum"
   period              = "300"
-  evaluation_periods  = "1"
+  evaluation_periods  = "2"  # number of periods over which CloudWatch evaluates the metric data
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
   threshold           = "10"

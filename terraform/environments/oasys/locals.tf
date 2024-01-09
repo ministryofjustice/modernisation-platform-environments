@@ -15,14 +15,24 @@ locals {
   business_unit  = "hmpps"
   networking_set = "general"
 
-  accounts = {
+  environment_baseline_presets_options = {
+    development   = local.development_baseline_presets_options
+    test          = local.test_baseline_presets_options
+    preproduction = local.preproduction_baseline_presets_options
+    production    = local.production_baseline_presets_options
+  }
+
+  environment_configs = {
     development   = local.development_config
     test          = local.test_config
     preproduction = local.preproduction_config
     production    = local.production_config
   }
 
-  environment_config = local.accounts[local.environment]
+  environment_config = local.environment_configs[local.environment]
+  
+  baseline_environment_presets_options = local.environment_baseline_presets_options[local.environment]
+  baseline_environment_config          = local.environment_configs[local.environment]
 
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
@@ -156,39 +166,32 @@ locals {
         type  = "gp3"
       }
       "/dev/sdc" = { # /u02
-        size  = 500
+        size  = 1000
         label = "app"
         type  = "gp3"
       }
       "/dev/sde" = { # DATA01
         label = "data"
-        size  = 500
+        size  = 2000
         type  = "gp3"
       }
-      # "/dev/sdf" = {  # DATA02
-      #   label = "data"
-      #   type = null
-      # }
+      "/dev/sdf" = {  # DATA02
+        label = "data"
+        size  = 2000
+        type  = "gp3"
+      }
       # "/dev/sdg" = {  # DATA03
-      #   label = "data"
-      #   type = null
       # }
       # "/dev/sdh" = {  # DATA04
-      #   label = "data"
-      #   type = null
       # }
       # "/dev/sdi" = {  # DATA05
-      #   label = "data"
-      #   type = null
       # }
       "/dev/sdj" = { # FLASH01
         label = "flash"
         type  = "gp3"
-        size  = 50
+        size  = 1000
       }
       # "/dev/sdk" = { # FLASH02
-      #   label = "flash"
-      #   type = null
       # }
       "/dev/sds" = {
         label = "swap"

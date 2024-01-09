@@ -47,6 +47,10 @@ variable "short_name" {
   type = string
 }
 
+variable "bucket_name" {
+  type = string
+}
+
 variable "migration_type" {
   type        = string
   description = "DMS Migration Type"
@@ -56,10 +60,18 @@ variable "availability_zones" {
   default = [
     {
       0 = "eu-west-2a"
-      1 = "eu-west-2b"
-      2 = "eu-west-2c"
     }
   ]
+}
+
+variable "rename_rule_source_schema" {
+  description = "The source schema we will rename to a target output 'space'"
+  type        = string
+}
+
+variable "rename_rule_output_space" {
+  description = "The name of the target output 'space' that the source schema will be renamed to"
+  type        = string
 }
 
 
@@ -72,8 +84,6 @@ variable "subnet_ids" {
 variable "source_address" {}
 
 variable "vpc" {}
-
-variable "kinesis_stream_policy" {}
 
 variable "availability_zone" {
   default = null
@@ -125,23 +135,13 @@ variable "target_backup_retention_period" {
 }
 
 variable "target_backup_window" {
-  # 12:00AM-03:00AM AEST
   default     = "14:00-17:00"
   description = "RDS backup window"
 }
 
-#variable "target_db_name" {
-#  description = "Name of the target database"
-#}
-
 variable "target_db_port" {
   description = "The port the Application Server will access the database on"
   default     = 5432
-}
-
-variable "target_engine" {
-  default     = "kinesis"
-  description = "Engine type, example values mysql, postgres"
 }
 
 variable "target_engine_version" {
@@ -158,10 +158,6 @@ variable "target_maintenance_window" {
   default     = "Mon:00:00-Mon:03:00"
   description = "RDS maintenance window"
 }
-
-#variable "target_password" {
-#  description = "Password of the target database"
-#}
 
 variable "target_rds_is_multi_az" {
   description = "Create backup database in separate availability zone"
@@ -182,11 +178,6 @@ variable "target_storage_encrypted" {
 #  description = "Username to access the target database"
 #}
 
-variable "kinesis_settings" {
-  type        = map(any)
-  description = "Configuration block for Kinesis settings"
-  default     = null
-}
 #--------------------------------------------------------------
 # DMS source config
 #--------------------------------------------------------------
