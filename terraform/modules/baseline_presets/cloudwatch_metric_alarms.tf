@@ -31,7 +31,7 @@ locals {
         period              = "86400"
         statistic           = "Minimum"
         threshold           = "14"
-        alarm_description   = "Triggers if an ACM certificate has notautomatically renewed and is expiring soon. Automatic renewal should happen 60 days prior to expiration. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340266"
+        alarm_description   = "Triggers if an ACM certificate has not automatically renewed and is expiring soon. Automatic renewal should happen 60 days prior to expiration. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340266"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }

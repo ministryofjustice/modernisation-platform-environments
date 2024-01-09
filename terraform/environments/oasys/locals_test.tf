@@ -1,5 +1,12 @@
 # environment specific settings
 locals {
+
+  # baseline presets config
+  test_baseline_presets_options = {
+    enable_observability_platform_monitoring = true
+  }
+
+  # baseline config
   test_config = {
 
     ec2_common = {
@@ -156,6 +163,38 @@ locals {
             "Ec2T2DatabasePolicy",
           ])
         })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdf" = {  # DATA02
+            label = "data"
+            size  = 50
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 50
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
         tags = merge(local.database_a.tags, {
           description                             = "t2 ${local.application_name} database"
           "${local.application_name}-environment" = "t2"
@@ -198,6 +237,38 @@ locals {
             "Ec2T1DatabasePolicy",
           ])
         })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdf" = {  # DATA02
+            label = "data"
+            size  = 50
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 50
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
         tags = merge(local.database_a.tags, {
           description                             = "t1 ${local.application_name} database"
           "${local.application_name}-environment" = "t1"

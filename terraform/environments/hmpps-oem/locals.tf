@@ -40,7 +40,7 @@ locals {
   baseline_ec2_autoscaling_groups        = {}
   baseline_ec2_instances                 = {}
   baseline_iam_policies = {
-    DbRefresherPolicy = {
+    DBRefresherPolicy = {
       description = "Permissions for the db refresh process"
       statements = [
         {
@@ -124,7 +124,8 @@ locals {
         }
       ]
       policy_attachments = [
-        "DbRefresherPolicy",
+        "DBRefresherPolicy",
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
       ]
     }
   }
