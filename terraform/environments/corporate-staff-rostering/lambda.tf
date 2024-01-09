@@ -50,6 +50,7 @@ module "lambda_cw_logs_xml_to_json" {
 resource "aws_cloudwatch_log_subscription_filter" "cw_logs_xml_to_json" {
   name            = "cw-logs-xml-to-json"
   log_group_name  = local.lambda_cw_logs_xml_to_json.monitored_log_group
+  filter_pattern  = ""
   destination_arn = module.lambda_cw_logs_xml_to_json.lambda_function_arn
 }
 
