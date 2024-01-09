@@ -266,7 +266,7 @@ locals {
           component   = "remotedesktop"
         }
       }
-      test-rds-4-a = {
+      test-rds-4-b = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
@@ -286,7 +286,7 @@ locals {
           component   = "remotedesktop"
         }
       }
-      test-rds-5-b = {
+      test-rds-5-a = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
@@ -428,7 +428,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "test-rds-4-a" },
+              { ec2_instance_name = "test-rds-4-b" },
             ]
           }
           test-rdweb-https3 = {
@@ -450,7 +450,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "test-rds-4-a" },
+              { ec2_instance_name = "test-rds-4-b" },
             ]
           }
         }
