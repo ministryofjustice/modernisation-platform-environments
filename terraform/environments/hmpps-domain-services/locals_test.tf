@@ -630,7 +630,7 @@ locals {
                 priority = 900
                 actions = [{
                   type              = "forward"
-                  target_group_name = "test-rdgateway-http3"
+                  target_group_name = "test-rdgateway-http4"
                 }]
                 conditions = [{
                   host_header = {
