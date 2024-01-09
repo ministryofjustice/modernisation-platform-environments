@@ -48,15 +48,8 @@ module "lambda_cw_logs_xml_to_json" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cw_logs_xml_to_json" {
-  for_each = {
-    "iwfm-scheduler" = {
-      pattern = "%iWFM Scheduler.+service started%"
-    },
-  }
-
-  name            = "cw-logs-xml-to-json-${each.key}"
+  name            = "cw-logs-xml-to-json"
   log_group_name  = local.lambda_cw_logs_xml_to_json.monitored_log_group
-  filter_pattern  = each.value.pattern
   destination_arn = module.lambda_cw_logs_xml_to_json.lambda_function_arn
 }
 
