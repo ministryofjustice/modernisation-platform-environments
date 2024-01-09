@@ -438,6 +438,14 @@ resource "aws_security_group" "ecs_service" {
     security_groups = [aws_security_group.chaps_lb_sc.id]
   }
 
+  ingress {
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    description     = "Allow traffic on port 443 from load balancer"
+    security_groups = [aws_security_group.chaps_lb_sc.id]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
