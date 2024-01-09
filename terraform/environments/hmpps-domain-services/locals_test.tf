@@ -469,6 +469,7 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "test-rds-4-b" },
+              { ec2_instance_name = "test-rds-5-a" },
             ]
           }
           test-rdweb-https3 = {
