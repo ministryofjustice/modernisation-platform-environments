@@ -215,10 +215,10 @@ locals {
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
 
     lb_target_groups = {
-      http-7777 = local.tomcat_target_group_http_7777
-      admin     = local.tomcat_target_group_http_7010
-      redirect  = local.tomcat_target_group_http_8443
-      shutdown  = local.tomcat_target_group_http_8005
+      http-7777  = local.tomcat_target_group_http_7777
+      http-7010  = local.tomcat_target_group_http_7010
+      http-8443  = local.tomcat_target_group_http_8443
+      http-8005  = local.tomcat_target_group_http_8005
     }
 
     tags = {
