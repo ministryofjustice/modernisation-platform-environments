@@ -468,7 +468,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "test-rds-5-a" },
+              { ec2_instance_name = "test-rds-4-b" },
             ]
           }
           test-rdweb-https3 = {
