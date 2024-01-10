@@ -33,4 +33,4 @@ chown --recursive vscode:vscode /home/vscode/.aws-sso
 
 # Configure
 
-echo "export AWS_SSO_FILE_PASSWORD=\"\"" >> /home/vscode/.bashrc
+echo "export AWS_SSO_FILE_PASSWORD=\"aws_sso_123456789\"" >> /home/vscode/.bashrc
