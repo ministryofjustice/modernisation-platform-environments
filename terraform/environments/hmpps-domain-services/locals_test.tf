@@ -206,46 +206,6 @@ locals {
     }
 
     baseline_ec2_instances = {
-      test-rds-1-b = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
-          availability_zone             = "eu-west-2b"
-          ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["rds-ec2s"]
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
-        }
-        tags = {
-          description = "Remote Desktop Services test server 1"
-          os-type     = "Windows"
-          component   = "remotedesktop"
-        }
-      }
-      test-rds-2-c = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
-          availability_zone             = "eu-west-2c"
-          ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["rds-ec2s"]
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
-        }
-        tags = {
-          description = "Remote Desktop Services test server 2"
-          os-type     = "Windows"
-          component   = "remotedesktop"
-        }
-      }
       test-rds-3-b = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -364,93 +324,7 @@ locals {
         ]
 
         instance_target_groups = {
-          test-rdgateway-http = {
-            port     = 80
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 10
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 80
-              timeout             = 5
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "test-rds-1-b" },
-            ]
-          }
-          test-rdweb-https = {
-            port     = 443
-            protocol = "HTTPS"
-            health_check = {
-              enabled             = true
-              interval            = 10
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 443
-              protocol            = "HTTPS"
-              timeout             = 5
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "test-rds-1-b" },
-            ]
-          }
-          test-rdgateway-http2 = {
-            port     = 80
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              interval            = 10
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 80
-              timeout             = 5
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "test-rds-2-c" },
-            ]
-          }
-          test-rdweb-https2 = {
-            port     = 443
-            protocol = "HTTPS"
-            health_check = {
-              enabled             = true
-              interval            = 10
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 443
-              protocol            = "HTTPS"
-              timeout             = 5
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "test-rds-2-c" },
-            ]
-          }
-          test-rdgateway-http3 = {
+          test-rdgateway-http4 = {
             port     = 80
             protocol = "HTTP"
             health_check = {
@@ -469,10 +343,9 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "test-rds-4-b" },
-              { ec2_instance_name = "test-rds-5-a" },
             ]
           }
-          test-rdweb-https3 = {
+          test-rdweb-https6 = {
             port     = 443
             protocol = "HTTPS"
             health_check = {
@@ -494,7 +367,7 @@ locals {
               { ec2_instance_name = "test-rds-6-b" },
             ]
           }
-          test-rdgateway-http4 = {
+          test-rdgateway-http5 = {
             port     = 80
             protocol = "HTTP"
             health_check = {
@@ -515,7 +388,28 @@ locals {
               { ec2_instance_name = "test-rds-5-a" },
             ]
           }
-          test-rdweb-https4 = {
+          test-rdgateway-http7 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-5-a" },
+            ]
+          }
+          test-rdweb-https7 = {
             port     = 443
             protocol = "HTTPS"
             health_check = {
@@ -534,6 +428,51 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
+              { ec2_instance_name = "test-rds-7-a" },
+            ]
+          }
+          test-rdgateway-http45 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-4-b" },
+              { ec2_instance_name = "test-rds-5-a" },
+            ]
+          }
+          test-rdweb-http67 = {
+            port     = 443
+            protocol = "HTTPS"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 443
+              protocol            = "HTTPS"
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-6-b" },
               { ec2_instance_name = "test-rds-7-a" },
             ]
           }
@@ -569,7 +508,7 @@ locals {
                 priority = 300
                 actions = [{
                   type              = "forward"
-                  target_group_name = "test-rdgateway-http"
+                  target_group_name = "test-rdgateway-http45"
                 }]
                 conditions = [{
                   host_header = {
@@ -583,7 +522,7 @@ locals {
                 priority = 400
                 actions = [{
                   type              = "forward"
-                  target_group_name = "test-rdweb-https"
+                  target_group_name = "test-rdweb-http67"
                 }]
                 conditions = [{
                   host_header = {
@@ -593,39 +532,11 @@ locals {
                   }
                 }]
               }
-              test-rdgateway2 = {
-                priority = 500
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rdgateway-http2"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdgateway2.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              test-rdweb2 = {
-                priority = 600
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rdweb-https2"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdweb2.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              test-rdgateway3 = {
+              test-rdgateway4 = {
                 priority = 700
                 actions = [{
                   type              = "forward"
-                  target_group_name = "test-rdgateway-http3"
+                  target_group_name = "test-rdgateway-http4"
                 }]
                 conditions = [{
                   host_header = {
@@ -635,25 +546,11 @@ locals {
                   }
                 }]
               }
-              test-rdweb3 = {
-                priority = 800
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rdweb-https3"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdweb3.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              test-rdgateway4 = {
+              test-rdgateway5 = {
                 priority = 900
                 actions = [{
                   type              = "forward"
-                  target_group_name = "test-rdgateway-http4"
+                  target_group_name = "test-rdgateway-http5"
                 }]
                 conditions = [{
                   host_header = {
@@ -663,11 +560,39 @@ locals {
                   }
                 }]
               }
-              test-rdweb4 = {
+              test-rdgateway7 = {
+                priority = 901
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdgateway-http7"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway2.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdweb6 = {
+                priority = 800
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdweb-https6"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb3.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdweb7 = {
                 priority = 999
                 actions = [{
                   type              = "forward"
-                  target_group_name = "test-rdweb-https4"
+                  target_group_name = "test-rdweb-https7"
                 }]
                 conditions = [{
                   host_header = {
@@ -687,12 +612,11 @@ locals {
       "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway.hmpps-domain-services", type = "A", lbs_map_key = "public" },
-          { name = "rdweb.hmpps-domain-services", type = "A", lbs_map_key = "public" },
           { name = "rdgateway2.hmpps-domain-services", type = "A", lbs_map_key = "public" },
-          { name = "rdweb2.hmpps-domain-services", type = "A", lbs_map_key = "public" },
+          { name = "rdweb.hmpps-domain-services", type = "A", lbs_map_key = "public" },
           { name = "rds.hmpps-domain-services", type = "A", lbs_map_key = "public" },
-          { name = "rdweb3.hmpps-domain-services", type = "A", lbs_map_key = "public" },
           { name = "rds2.hmpps-domain-services", type = "A", lbs_map_key = "public" },
+          { name = "rdweb3.hmpps-domain-services", type = "A", lbs_map_key = "public" },
           { name = "rdweb4.hmpps-domain-services", type = "A", lbs_map_key = "public" },
         ]
       }
