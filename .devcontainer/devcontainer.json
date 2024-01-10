@@ -4,6 +4,5 @@
   "features": {
     "./features/src/aws": {},
     "./features/src/terraform": {}
-  },
-  "postStartCommand": "tfswitch"
+  }
 }

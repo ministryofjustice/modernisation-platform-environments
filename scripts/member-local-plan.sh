@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 
+# This is a convenience script for https://user-guide.modernisation-platform.service.justice.gov.uk/user-guide/running-terraform-plan-locally.html#running-terraform-plan-locally
+# Run it from within the environment directory, e.g. terraform/environments/cooker
+
 ENVIRONMENT=$(basename ${PWD})
-STAGE=${1:-"development"}
-ROLE=${2:-"modernisation-platform-developer"}
+STAGE="development"
+ROLE="modernisation-platform-developer"
+
+while getopts s:r: option; do
+  case "${option}" in
+    s) STAGE="${OPTARG}";;
+    r) ROLE="${OPTARG}";;
+  esac
+done
 
 ###
 
