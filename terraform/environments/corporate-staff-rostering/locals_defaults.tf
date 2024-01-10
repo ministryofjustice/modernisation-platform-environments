@@ -16,8 +16,8 @@ locals {
         high-memory-usage = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows["high-memory-usage"], {
           threshold           = "75"
           period              = "60" # seconds
-          evaluation_periods  = "2" # reset from 20 for testing
-          datapoints_to_alarm = "2" # reset from 20 for testing
+          evaluation_periods  = "20"
+          datapoints_to_alarm = "20"
           alarm_description   = "Triggers if the average memory utilization is 75% or above for 20 minutes. Set below the default of 95% to allow enough time to establish an RDP session to fix the issue."
         })
       }
