@@ -491,7 +491,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "test-rds-5-a" },
+              { ec2_instance_name = "test-rds-6-b" },
             ]
           }
           test-rdgateway-http4 = {
@@ -513,6 +513,28 @@ locals {
             }
             attachments = [
               { ec2_instance_name = "test-rds-5-a" },
+            ]
+          }
+          test-rdweb-https4 = {
+            port     = 443
+            protocol = "HTTPS"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 443
+              protocol            = "HTTPS"
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-7-a" },
             ]
           }
         }
@@ -641,6 +663,20 @@ locals {
                   }
                 }]
               }
+              test-rdweb4 = {
+                priority = 999
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdweb-https4"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb4.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           }
         }
@@ -657,6 +693,7 @@ locals {
           { name = "rds.hmpps-domain-services", type = "A", lbs_map_key = "public" },
           { name = "rdweb3.hmpps-domain-services", type = "A", lbs_map_key = "public" },
           { name = "rds2.hmpps-domain-services", type = "A", lbs_map_key = "public" },
+          { name = "rdweb4.hmpps-domain-services", type = "A", lbs_map_key = "public" },
         ]
       }
     }
