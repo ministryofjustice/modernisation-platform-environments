@@ -46,17 +46,17 @@ locals {
       airflow_mail_from_address               = "airflow"
       airflow_weekly_maintenance_window_start = "SAT:00:00"
 
-      powerbi_gateway_role = "${local.application_name}-${local.environment}-powerbi-gateway"
-      powerbi_gateway_target_accounts = [
+      powerbi_gateway_role = "dpat-${local.environment}-powerbi"
+      powerbi_target_accounts = [
         local.environment_management.account_ids["analytical-platform-data-production"]
       ]
       powerbi_gateway_ec2 = {
-        instance_name       = "${local.application_name}-${local.environment}-powerbi-gateway"
+        instance_name       = "dpat-${local.environment}-powerbi"
         most_recent         = true
         name                = ["Windows_Server-2016-English-Core-Base-*"]
         virtualization_type = "hvm"
         owner_account       = "801119661308" # amazon
-        instance_size       = "t3a.xlarge"   # 4vCPU, 16G RAM
+        instance_type       = "t3a.xlarge"   # 4vCPU, 16G RAM
         ssh_pub_key         = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDh7bA7xqZsrhQ/1DnYulEbMzT8ktpcqTZyiTQQ99EVhvyq0jdnP+0CmBj98qGh3wm+ItVTKcQjgqFIbCmNIZ4ow7teSSHcEcpSl9usZC/XEwxiEOaFics25wa9IHAgcNS+XtBZ0Eqtk2BClhXNWMWeoMTjkGG29SVq+CgwlHwoE3+W5O7AW0a3MZmQJ7RgQP7S07tS9fFUSQQ29rLw93V4d5N0ZLp5Y8ZTQ3iiLj6sXaPzzKjzyGfetxcGn7/TQcqS7OCu4bwshjEy/k7n/f55QWIq/MWqkh684BeIKBMgXqlbYkMrTDRilxHTJXPf2EwYQykoXf5+EExl4n9rQGjYMFJnTHEMH2Vf3zFnkTJP7O1s9oHTGvEdCCE9IODChycqBPwCP8BCC2m6sZ7yKuqd5CMlYncUzT9ntbd8NEqL7mI9WBKPHRBsdVM0VxOMsQuXmw1XUzrzokFPfuNDhcnlimdBtFf2m3oLYlXziCblI1fqemQYXaW2imOrqGRXt+4jPrMc35HK7th5YoVMQOaLbBRUJPwULK4vVyLSV06GFWbB29uwVdmYGsqVDt7Qwpa6UZKd0TMwzl6adfxAKttzbUp9L8r0TcC6ubOUxq+ZNTccoLSbG/GLILp2ViTjPmG0EoNZV67gmETlM2VOmXlVO9ucc2r8aW/Dg6LmQXQyKQ== powerbi-gateway-aws-keypair-dev"
       }
 
@@ -148,18 +148,18 @@ locals {
       /* Static Assets */
       static_assets_hostname = "assets.data-platform.service.justice.gov.uk"
       /* PowerBI Gateway*/
-      powerbi_gateway_role = "${local.application_name}-${local.environment}-powerbi-gateway"
+      powerbi_gateway_role = "dpat-${local.environment}-powerbi"
       powerbi_target_accounts = [
         local.environment_management.account_ids["analytical-platform-data-production"]
       ]
 
       powerbi_gateway_ec2 = {
-        instance_name       = "${local.application_name}-${local.environment}-powerbi-gateway"
+        instance_name       = "dpat-${local.environment}-powerbi"
         most_recent         = true
         name                = ["Windows_Server-2016-English-Core-Base-*"]
         virtualization_type = "hvm"
         owner_account       = "801119661308" # amazon
-        instance_size       = "t3a.xlarge"   # 4vCPU, 16G RAM
+        instance_type       = "t3a.xlarge"   # 4vCPU, 16G RAM
         ssh_pub_key         = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC/GZpeWlEowP4P8/+uV27S/zXmFx7ZjrmsRcwa3Q8Kcb7uGACtJU3vvPjOCWW+RSmkaZmwQt4wjssMeXI2iVfSTqhOqoM8J657KhwxKnABfF+h0I9cDyvC1JISiWNVfPue9tCitmRyNtPB1Jq9aX9W0kiYWr35uLs05pzZBP2+IQJmtIWaWfQkca/7tgKIN3T52koWqj0vQdY9Tk9rDtrRuWao9fqrjJCe0f75/FAPBrrtgoJ7WjJRu4BOiBQzkkGHAWoRnlwDQzAHUEMDuOnTJjbu0AaBg3VoKhcBpehA9AAp+6rwmyphyrCrt9hTzyxw6As4F0Q+UQH1P6S4jt3GVh0LvOzLmIZeKf8AnbtkeoO3KK4xVfA8GwyuFTRKaR27Ipp3R2sfDe1US7OX6ha0Ftd70eWv1Fug8A+T/VviBJmFeXY/rE2yTl4gSkUkDggLBfSL7poZKZ18BDEC6RxRZBkPnxLbt5Cl9bmkORfkpducVz3MAF/L3oPYT2hQ1jnajFrKvuOsM2vJ9nFpxNlLoXI462Wr0JbsimuAKWLQoiyOoZLXX3fKqZ8n3KU8yFfbPKnHp66kLiitN46Gtine3sXWrVCwOjLftbZxeyd7SlRFDwVjSfcMole9RPjFDCbwZ0Zow18joqMeXaZo3gxH1ibPj7EAfjGrlwd64v5NVw== powerbi-gateway-aws-keypair"
       }
       ### OLD
