@@ -55,7 +55,7 @@ locals {
         actions = ["sts:AssumeRole"]
         principals = {
           type        = "AWS"
-          identifiers = ["observability-platform-production"]
+          identifiers = ["arn:aws:iam::${var.environment.account_ids["observability-platform-development"]}:root"]
         }
       }]
       policy_attachments = [
