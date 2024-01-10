@@ -46,6 +46,20 @@ locals {
       airflow_mail_from_address               = "airflow"
       airflow_weekly_maintenance_window_start = "SAT:00:00"
 
+      powerbi_gateway_role = "${local.application_name}-${local.environment}-powerbi-gateway"
+      powerbi_gateway_target_accounts = [
+        local.environment_management.account_ids["analytical-platform-data-production"]
+      ]
+      powerbi_gateway_ec2 = {
+        instance_name       = "${local.application_name}-${local.environment}-powerbi-gateway"
+        most_recent         = true
+        name                = ["Windows_Server-2016-English-Core-Base-*"]
+        virtualization_type = "hvm"
+        owner_account       = "801119661308" # amazon
+        instance_size       = "t3a.xlarge"   # 4vCPU, 16G RAM
+        ssh_pub_key         = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDh7bA7xqZsrhQ/1DnYulEbMzT8ktpcqTZyiTQQ99EVhvyq0jdnP+0CmBj98qGh3wm+ItVTKcQjgqFIbCmNIZ4ow7teSSHcEcpSl9usZC/XEwxiEOaFics25wa9IHAgcNS+XtBZ0Eqtk2BClhXNWMWeoMTjkGG29SVq+CgwlHwoE3+W5O7AW0a3MZmQJ7RgQP7S07tS9fFUSQQ29rLw93V4d5N0ZLp5Y8ZTQ3iiLj6sXaPzzKjzyGfetxcGn7/TQcqS7OCu4bwshjEy/k7n/f55QWIq/MWqkh684BeIKBMgXqlbYkMrTDRilxHTJXPf2EwYQykoXf5+EExl4n9rQGjYMFJnTHEMH2Vf3zFnkTJP7O1s9oHTGvEdCCE9IODChycqBPwCP8BCC2m6sZ7yKuqd5CMlYncUzT9ntbd8NEqL7mI9WBKPHRBsdVM0VxOMsQuXmw1XUzrzokFPfuNDhcnlimdBtFf2m3oLYlXziCblI1fqemQYXaW2imOrqGRXt+4jPrMc35HK7th5YoVMQOaLbBRUJPwULK4vVyLSV06GFWbB29uwVdmYGsqVDt7Qwpa6UZKd0TMwzl6adfxAKttzbUp9L8r0TcC6ubOUxq+ZNTccoLSbG/GLILp2ViTjPmG0EoNZV67gmETlM2VOmXlVO9ucc2r8aW/Dg6LmQXQyKQ== powerbi-gateway-aws-keypair-dev"
+      }
+
       ### OLDER
 
       eks_cluster_arn                = "arn:aws:eks:eu-west-2:335889174965:cluster/apps-tools-development"
@@ -133,7 +147,21 @@ locals {
 
       /* Static Assets */
       static_assets_hostname = "assets.data-platform.service.justice.gov.uk"
+      /* PowerBI Gateway*/
+      powerbi_gateway_role = "${local.application_name}-${local.environment}-powerbi-gateway"
+      powerbi_target_accounts = [
+        local.environment_management.account_ids["analytical-platform-data-production"]
+      ]
 
+      powerbi_gateway_ec2 = {
+        instance_name       = "${local.application_name}-${local.environment}-powerbi-gateway"
+        most_recent         = true
+        name                = ["Windows_Server-2016-English-Core-Base-*"]
+        virtualization_type = "hvm"
+        owner_account       = "801119661308" # amazon
+        instance_size       = "t3a.xlarge"   # 4vCPU, 16G RAM
+        ssh_pub_key         = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC/GZpeWlEowP4P8/+uV27S/zXmFx7ZjrmsRcwa3Q8Kcb7uGACtJU3vvPjOCWW+RSmkaZmwQt4wjssMeXI2iVfSTqhOqoM8J657KhwxKnABfF+h0I9cDyvC1JISiWNVfPue9tCitmRyNtPB1Jq9aX9W0kiYWr35uLs05pzZBP2+IQJmtIWaWfQkca/7tgKIN3T52koWqj0vQdY9Tk9rDtrRuWao9fqrjJCe0f75/FAPBrrtgoJ7WjJRu4BOiBQzkkGHAWoRnlwDQzAHUEMDuOnTJjbu0AaBg3VoKhcBpehA9AAp+6rwmyphyrCrt9hTzyxw6As4F0Q+UQH1P6S4jt3GVh0LvOzLmIZeKf8AnbtkeoO3KK4xVfA8GwyuFTRKaR27Ipp3R2sfDe1US7OX6ha0Ftd70eWv1Fug8A+T/VviBJmFeXY/rE2yTl4gSkUkDggLBfSL7poZKZ18BDEC6RxRZBkPnxLbt5Cl9bmkORfkpducVz3MAF/L3oPYT2hQ1jnajFrKvuOsM2vJ9nFpxNlLoXI462Wr0JbsimuAKWLQoiyOoZLXX3fKqZ8n3KU8yFfbPKnHp66kLiitN46Gtine3sXWrVCwOjLftbZxeyd7SlRFDwVjSfcMole9RPjFDCbwZ0Zow18joqMeXaZo3gxH1ibPj7EAfjGrlwd64v5NVw== powerbi-gateway-aws-keypair"
+      }
       ### OLD
       eks_cluster_arn                = "arn:aws:eks:eu-west-1:312423030077:cluster/production-dBSvju9Y"
       eks_certificate_authority_data = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM1ekNDQWMrZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeE1EZ3lOREV5TVRBd05Gb1hEVE14TURneU1qRXlNVEF3TkZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTGtyCllrNVhVT3VyU3M0T2o3aE5XRE0zSC9vUnhUMmY0c014eGJoMEEwM010OXQ5SUtBaWM2TFpiMlZJd3VobG14bUIKaVhuSEtXSHREbi85NUwwdEgvWURnN3VFSXVMa2xMS3F0NjRVWlFFWHNocElaakxpNFU1bW03WWttT1N4VjFYSQo4bXJ4VEhaRGZ1NHZwdURUSWdmR2szTE8rTXBBZVgrTFNFM1JVSWR4UFo1eDVzYloyU29NWkFYekRnaHEzOU9RCjY3WVNFdmRYS1Bkd1JDUnR0d2k4OGVuOGpxanRZMFB5dUVaMVQzRjVPeWhBMjNQWVBMam10aWt2akNwMmNKOTkKZnhUNG1NNWsyUUlxQmxZWTRzR0s3dzhTL1I2VGxtL1g4KzBjeWhyU2FmMjh2dUNVL0dXZVJ6MWhYa05rV2FKTQpkampuWElzeFRkc0tGc1RUMzVVQ0F3RUFBYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZQVkpZMGlHcW9RODlmMy9sbkNsdUQ4NnZvUDNNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFBb2tScklHRzRWbVBGMnBhV3dSdEdhU01NVnBaWDdRRGhEL0tSajY5NXZLOU1YaDJnSgpPeWR3enRJd2tMalNjZUhaZTJocE9DNkt3VUxMbFJYRzJRbXhzUnJtaEM5NU8xWEM1cURZV2JFRUoxUnpsUkJGCkdQT1FMQ0tWTnc4b21KTlRXcDdTTDgxeFBiZCtnNm1KSlB3UHQ2cVJHNTBaMnRVSzZVRnZSbVRUcXl3Z1U4UXkKemp5cFJMVkJtQWc3Tkw3MW9zS0x4T25qUHRHNDl4eVNTVExQaGpDSzlIUnM5bXJDaVJ0RWo1b2EwUHY3d2hIOQpWQS8yYVVmRTA5cjg4dXFYWHIvZlNoY1FXSlhmU1gvYVVIbFZwK0NJU2tHUkJscmFKc3ZHSlZ3UWJRR3ZvTGZmCnMyTFo3M1EzbHpDM2VOajJ6WTcrbTdlazVLOUJEc29oK2lWeAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
