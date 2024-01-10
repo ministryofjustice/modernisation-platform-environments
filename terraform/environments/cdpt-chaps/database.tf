@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-  allocated_storage	     = local.application_data.accounts[local.environment].db_allocated_storage
+  allocated_storage      = local.application_data.accounts[local.environment].db_allocated_storage
   storage_type           = "gp2"
   engine                 = "sqlserver-web"
   engine_version         = "14.00.3381.3.v1"
@@ -13,9 +13,10 @@ resource "aws_db_instance" "database" {
   password               = data.aws_secretsmanager_secret_version.db_password.secret_string
   vpc_security_group_ids = [aws_security_group.db.id]
   depends_on             = [aws_security_group.db]
-  snapshot_identifier    = "arn:aws:rds:eu-west-2:613903586696:snapshot:dev-modplatform-snapshot"
+  snapshot_identifier    = "arn:aws:rds:eu-west-2:613903586696:snapshot:cdpt-dev-staging-snapshot-9-1-24"
   skip_final_snapshot    = true
   db_subnet_group_name   = aws_db_subnet_group.db.id
+  publicly_accessible    = true
 }
 
 resource "aws_db_instance_role_association" "database" {
@@ -40,7 +41,7 @@ resource "aws_db_subnet_group" "db" {
 }
 
 resource "aws_security_group" "db" {
-  name = "${local.application_name}-db-sg"
+  name = "${local.application_name}-db-sg" 
   description = "Allow DB inbound traffic"
   vpc_id = data.aws_vpc.shared.id
   ingress {
