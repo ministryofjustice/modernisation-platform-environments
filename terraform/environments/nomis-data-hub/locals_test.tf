@@ -58,7 +58,7 @@ locals {
 
       test-management-server-2022 = merge(local.management_server_2022, {
         tags = merge(local.management_server_2022.tags, {
-          ndh-environment = "test"
+          nomis-data-hub-environment = "test"
         })
       })
 
@@ -69,7 +69,6 @@ locals {
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
-          ndh-environment            = "test"
           os-type                    = "Linux"
           nomis-data-hub-environment = "test"
         })
@@ -82,7 +81,6 @@ locals {
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
-          ndh-environment            = "test"
           os-type                    = "Linux"
           nomis-data-hub-environment = "test"
         })
@@ -95,7 +93,6 @@ locals {
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
-          ndh-environment            = "t1"
           os-type                    = "Linux"
           nomis-data-hub-environment = "t1"
         })
@@ -108,7 +105,6 @@ locals {
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
-          ndh-environment            = "t1"
           os-type                    = "Linux"
           nomis-data-hub-environment = "t1"
         })
@@ -121,7 +117,6 @@ locals {
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
-          ndh-environment            = "t2"
           os-type                    = "Linux"
           nomis-data-hub-environment = "t2"
         })
@@ -134,7 +129,6 @@ locals {
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
-          ndh-environment            = "t2"
           os-type                    = "Linux"
           nomis-data-hub-environment = "t2"
         })
