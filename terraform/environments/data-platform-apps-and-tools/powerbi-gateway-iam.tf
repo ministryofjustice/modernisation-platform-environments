@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "powerbi_gateway_data_access" {
 
 
 resource "aws_iam_policy" "powerbi_gateway_data_access" {
-  name   = local.environment_configuration.powerbi_gateway_ec2.instance_name
+  name   = "DataPlatformAppsToolsPowerBIPolicy"
   path   = "/"
   policy = data.aws_iam_policy_document.powerbi_gateway_data_access.json
 }

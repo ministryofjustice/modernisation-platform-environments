@@ -21,7 +21,7 @@ locals {
         addon_coredns             = "v1.10.1-eksbuild.5"
         addon_kube_proxy          = "v1.28.2-eksbuild.2"
         addon_vpc_cni             = "v1.15.3-eksbuild.1"
-        addon_aws_guardduty_agent = "v1.3.1-eksbuild.1"
+        addon_aws_guardduty_agent = "v1.4.0-eksbuild.1"
         addon_ebs_csi_driver      = "v1.24.1-eksbuild.1"
         addon_efs_csi_driver      = "v1.7.0-eksbuild.1"
       }
