@@ -324,6 +324,158 @@ locals {
         ]
 
         instance_target_groups = {
+          test-rdgateway-http4 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-4-b" },
+            ]
+          }
+          test-rdweb-https6 = {
+            port     = 443
+            protocol = "HTTPS"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 443
+              protocol            = "HTTPS"
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-6-b" },
+            ]
+          }
+          test-rdgateway-http5 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-5-a" },
+            ]
+          }
+          test-rdgateway-http7 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-5-a" },
+            ]
+          }
+          test-rdweb-https7 = {
+            port     = 443
+            protocol = "HTTPS"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 443
+              protocol            = "HTTPS"
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-7-a" },
+            ]
+          }
+          test-rdgateway-http45 = {
+            port     = 80
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-4-b" },
+              { ec2_instance_name = "test-rds-5-a" },
+            ]
+          }
+          test-rdweb-http67 = {
+            port     = 443
+            protocol = "HTTPS"
+            health_check = {
+              enabled             = true
+              interval            = 10
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 443
+              protocol            = "HTTPS"
+              timeout             = 5
+              unhealthy_threshold = 2
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "test-rds-6-b" },
+              { ec2_instance_name = "test-rds-7-a" },
+            ]
+          }
         }
         listeners = {
           http = {
@@ -352,6 +504,104 @@ locals {
               }
             }
             rules = {
+              test-rdgateway = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdgateway-http45"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdweb = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdweb-http67"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdgateway4 = {
+                priority = 700
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdgateway-http4"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rds.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdgateway5 = {
+                priority = 900
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdgateway-http5"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rds2.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdgateway7 = {
+                priority = 901
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdgateway-http7"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway2.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdweb6 = {
+                priority = 800
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdweb-https6"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb3.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdweb7 = {
+                priority = 999
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdweb-https7"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb4.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           }
         }
