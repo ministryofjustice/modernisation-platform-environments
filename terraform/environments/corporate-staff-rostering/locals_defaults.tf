@@ -9,10 +9,21 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows
     )
+    app = merge(
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows,
+      {
+        high-memory-usage = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows["high-memory-usage"], {
+          threshold         = "75"
+          period            = "60"
+          alarm_description = "Triggers if the average memory utilization is 75% or above for 60 minutes. Set below the default of 95% to allow enough time to establish an RDP session to fix the issue."
+
+        })
+      }
+    )
   }
 
   defaults_ec2 = {
-    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.windows
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_owner                     = "self"
       ebs_volumes_copy_all_from_ami = false
@@ -64,12 +75,14 @@ locals {
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["domain", "app", "jumpserver"]
     })
+    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.app
   })
 
   defaults_web_ec2 = merge(local.defaults_ec2, {
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["domain", "web", "jumpserver"]
     })
+    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.windows
   })
 
 }
