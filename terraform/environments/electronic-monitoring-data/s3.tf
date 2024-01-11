@@ -4,6 +4,7 @@
 
 resource "aws_s3_bucket" "log_bucket" {
   bucket_prefix = "em-data-store-logs-"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_acl" "log_bucket_acl" {
