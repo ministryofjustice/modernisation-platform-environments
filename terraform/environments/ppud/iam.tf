@@ -217,3 +217,26 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     ]
   }
 }
+
+############################
+# Fleet Manager IAM Policies
+############################
+
+data "aws_iam_policy_document" "fleet-manager-document" {
+  statement {
+    sid    = "FleetManagerAllow"
+    effect = "Allow"
+    actions = [
+      "ssm:*"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "FleetManagerDeny"
+    effect = "Deny"
+    actions = [
+      "ssm:StartSession"
+    ]
+    resources = ["*"]
+  }
+}
