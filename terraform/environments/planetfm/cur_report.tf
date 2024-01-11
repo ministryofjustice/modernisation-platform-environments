@@ -115,7 +115,7 @@ resource "aws_glue_catalog_table" "cur" {
     storage_descriptor {
         input_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
         output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
-        location = "s3://${module.csr-report-bucket.bucket.id}/cur/"
+        location = "s3://${module.csr-report-bucket.bucket.id}/cur/planetfm-cur-report-definition/cost_and_usage_data_status/"
         ser_de_info {
             serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
             parameters = {
