@@ -218,11 +218,36 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
   }
 }
 
-############################
-# Fleet Manager IAM Policies
-############################
+####################################
+# IAM Policy, Role for Fleet Manager
+####################################
+resource "aws_iam_role" "fleet_manager_role" {
+  name = "fleet_manager_role"
 
-data "aws_iam_policy_document" "fleet-manager-document" {
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ssm.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+# Attach necessary policies to the fleet_manager role
+resource "aws_iam_role_policy_attachment" "fleet_manager_policy_attachment" {
+  role       = aws_iam_role.fleet_manager_role.name
+  policy_arn = data.aws_iam_policy_document.fleet_manager_document_policy.arn
+}
+
+data "aws_iam_policy_document" "fleet_manager_document_policy" {
   statement {
     sid    = "FleetManagerAllow"
     effect = "Allow"
