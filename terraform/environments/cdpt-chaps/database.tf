@@ -40,6 +40,15 @@ resource "aws_db_subnet_group" "db" {
   )
 }
 
+resource "aws_security_group_rule" "ecs_to_rds" {
+  type = "ingress"
+  from_port = 1433
+  to_port = 1433
+  protocol = "tcp"
+  security_group_id = aws_db_instance.database.security_group_names[0]
+  source_security_group_id = aws_security_group.cluster_ec2.id
+}
+
 resource "aws_security_group" "db" {
   name = "${local.application_name}-db-sg" 
   description = "Allow DB inbound traffic"

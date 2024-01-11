@@ -35,7 +35,10 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "kms:GenerateDataKey",
                 "kms:ReEncrypt",
                 "kms:GenerateDataKey",
-                "kms:DescribeKey"
+                "kms:DescribeKey",
+                "rds:Connect",
+                "rds:DescribeDBInstances",
+
             ],
             "Resource": "*"
         }
