@@ -111,7 +111,7 @@ resource "aws_iam_role" "capita_transfer_user_iam_role" {
   assume_role_policy  = data.aws_iam_policy_document.capita_assume_role.json
 }
 
-data "aws_iam_policy_document" "capita_iam_policy_document" {
+data "aws_iam_policy_document" "capita_transfer_user_iam_policy_document" {
   statement {
     sid       = "AllowPutAccesstoCapitaS3"
     effect    = "Allow"
@@ -120,10 +120,10 @@ data "aws_iam_policy_document" "capita_iam_policy_document" {
   }
 }
 
-resource "aws_iam_role_policy" "capita_iam_policy" {
-  name   = "tf-test-transfer-user-iam-policy"
+resource "aws_iam_role_policy" "capita_transfer_user_iam_policy" {
+  name   = "capita-transfer-user-iam-policy"
   role   = aws_iam_role.capita_transfer_user_iam_role.id
-  policy = data.aws_iam_policy_document.capita_iam_policy_document.json
+  policy = data.aws_iam_policy_document.capita_transfer_user_iam_policy_document.json
 }
 
 #------------------------------------------------------------------------------
