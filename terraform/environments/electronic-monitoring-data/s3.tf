@@ -6,10 +6,10 @@ resource "aws_s3_bucket" "log_bucket" {
   bucket_prefix = "em-data-store-logs-"
 }
 
-#resource "aws_s3_bucket_acl" "log_bucket_acl" {
-#  bucket = aws_s3_bucket.log_bucket.id
-#  acl    = "log-delivery-write"
-#}
+resource "aws_s3_bucket_acl" "log_bucket_acl" {
+  bucket = aws_s3_bucket.log_bucket.id
+  acl    = "log-delivery-write"
+}
 
 #------------------------------------------------------------------------------
 # S3 bucket for landing Capita data
@@ -29,11 +29,6 @@ resource "random_string" "capita_random_string" {
 resource "aws_s3_bucket" "capita_landing_bucket" {
   bucket = "capita-${random_string.capita_random_string.result}"
 }
-
-#resource "aws_s3_bucket_acl" "capita_landing_bucket" {
-#  bucket = aws_s3_bucket.capita_landing_bucket.id
-#  acl    = "private"
-#}
 
 resource "aws_s3_bucket_versioning" "capita_landing_bucket" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
