@@ -1,2 +1,0 @@
-xmltodict~=0.13
-boto3

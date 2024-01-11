@@ -55,7 +55,7 @@ locals {
         actions = ["sts:AssumeRole"]
         principals = {
           type        = "AWS"
-          identifiers = ["observability-platform-production"]
+          identifiers = ["observability-platform-development"]
         }
       }]
       policy_attachments = [

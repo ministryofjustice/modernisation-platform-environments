@@ -320,7 +320,7 @@
       "ebs_iops_ebsdb_dbf01": 24000,
       "ebs_size_ebsdb_dbf01": 4000,
       "ebs_iops_ebsdb_dbf02": 24000,
-      "ebs_size_ebsdb_dbf02": 4000,
+      "ebs_size_ebsdb_dbf02": 5000,
       "ebs_iops_ebsdb_dbf03": 24000,
       "ebs_size_ebsdb_dbf03": 3000,
       "ebs_size_ebsdb_redoA": 100,

@@ -22,13 +22,43 @@ locals {
           }
         ]
       }
+
+      Ec2t1Policy = {
+        description = "Permissions required for t1 EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/ndh/t1/*",
+            ]
+          }
+        ]
+      }
+
+      Ec2t2Policy = {
+        description = "Permissions required for t2 EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/ndh/t2/*",
+            ]
+          }
+        ]
+      }
     }
 
     baseline_ec2_instances = {
 
       test-management-server-2022 = merge(local.management_server_2022, {
         tags = merge(local.management_server_2022.tags, {
-          ndh-environment = "test"
+          nomis-data-hub-environment = "test"
         })
       })
 
@@ -39,7 +69,8 @@ locals {
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
-          ndh-environment = "test"
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "test"
         })
       })
 
@@ -50,7 +81,56 @@ locals {
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
-          ndh-environment = "test"
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "test"
+        })
+      })
+
+      t1-ndh-app-a = merge(local.ndh_app_a, {
+        config = merge(local.ndh_app_a.config, {
+          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
+            "Ec2t1Policy",
+          ])
+        })
+        tags = merge(local.ndh_app_a.tags, {
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "t1"
+        })
+      })
+
+      t1-ndh-ems-a = merge(local.ndh_ems_a, {
+        config = merge(local.ndh_ems_a.config, {
+          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
+            "Ec2t1Policy",
+          ])
+        })
+        tags = merge(local.ndh_ems_a.tags, {
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "t1"
+        })
+      })
+
+      t2-ndh-app-a = merge(local.ndh_app_a, {
+        config = merge(local.ndh_app_a.config, {
+          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
+            "Ec2t2Policy",
+          ])
+        })
+        tags = merge(local.ndh_app_a.tags, {
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "t2"
+        })
+      })
+
+      t2-ndh-ems-a = merge(local.ndh_ems_a, {
+        config = merge(local.ndh_ems_a.config, {
+          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
+            "Ec2t2Policy",
+          ])
+        })
+        tags = merge(local.ndh_ems_a.tags, {
+          os-type                    = "Linux"
+          nomis-data-hub-environment = "t2"
         })
       })
     }
