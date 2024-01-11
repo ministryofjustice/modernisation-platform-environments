@@ -244,10 +244,16 @@ EOF
 # Attach necessary policies to the fleet_manager role
 resource "aws_iam_role_policy_attachment" "fleet_manager_policy_attachment" {
   role       = aws_iam_role.fleet_manager_role.name
-  policy_arn = aws_iam_policy_document.fleet_manager_document_policy.arn
+  policy_arn = aws_iam_policy.fleet_manager_policy.arn
 }
 
-resource "aws_iam_policy_document" "fleet_manager_document_policy" {
+resource "aws_iam_policy" "fleet_manager_policy" {
+  name   = "fleet_manager_policy"
+  path   = "/"
+  policy = data.aws_iam_policy_document.fleet_manager_document.json
+}
+
+data "aws_iam_policy_document" "fleet_manager_document" {
   statement {
     sid    = "FleetManagerAllow"
     effect = "Allow"
