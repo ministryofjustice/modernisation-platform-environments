@@ -123,5 +123,9 @@ resource "aws_glue_catalog_table" "cur" {
             "serialization.format" = "1"
             }
         }
+        columns {
+            name = "status"
+            type = "string"
+        }
     }
 }
