@@ -17,3 +17,7 @@ output "db_key_pair" {
 output "db_ssh_key_ssm_parameter" {
   value = aws_ssm_parameter.ec2_user_ssh_key
 }
+
+output "ssh_keys_bucket_name" {
+  value = module.s3_bucket_ssh_keys.bucket.id
+}

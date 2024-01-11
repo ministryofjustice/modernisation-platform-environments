@@ -1,9 +1,15 @@
+locals {
+  db_public_key_data = jsondecode(file("./db_users.json"))
+}
+
+
 module "oracle_db_shared" {
   source             = "../components/oracle_db_shared"
   account_config     = var.account_config
   environment_config = var.environment_config
   env_name           = var.env_name
   tags               = local.tags
+  public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
 
   providers = {
     aws.bucket-replication    = aws
@@ -97,17 +103,17 @@ module "oracle_db_primary" {
   environment_config = var.environment_config
   subnet_id          = var.account_config.ordered_private_subnet_ids[count.index % 3]
   tags               = local.tags
-  user_data = base64encode(
-    templatefile(
-      "${path.module}/templates/userdata.sh.tftpl",
-      {
-        branch               = "main"
-        ansible_repo         = "modernisation-platform-configuration-management"
-        ansible_repo_basedir = "ansible"
-        ansible_args         = "oracle_19c_install"
-      }
-    )
+  user_data = templatefile(
+    "${path.module}/templates/userdata.sh.tftpl",
+    {
+      branch               = "main"
+      ansible_repo         = "modernisation-platform-configuration-management"
+      ansible_repo_basedir = "ansible"
+      ansible_args         = "oracle_19c_install"
+    }
   )
+
+  ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
   providers = {
     aws.bucket-replication    = aws
@@ -212,6 +218,9 @@ module "oracle_db_standby" {
       }
     )
   )
+
+  ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
+
   providers = {
     aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc

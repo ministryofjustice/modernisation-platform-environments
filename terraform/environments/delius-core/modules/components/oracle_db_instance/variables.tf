@@ -116,3 +116,8 @@ variable "security_group_ids" {
   description = "A list of security group IDs to attach"
   type        = list(string)
 }
+
+variable "ssh_keys_bucket_name" {
+  description = "The name of the S3 bucket containing the SSH keys"
+  type        = string
+}
