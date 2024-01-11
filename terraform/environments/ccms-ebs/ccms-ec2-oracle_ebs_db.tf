@@ -262,7 +262,6 @@ resource "aws_volume_attachment" "diag_att" {
 }
 
 resource "aws_ebs_volume" "dbf01" {
-  count = local.is-production ? 0 : 1
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -278,7 +277,6 @@ resource "aws_ebs_volume" "dbf01" {
 }
 
 resource "aws_volume_attachment" "dbf01_att" {
-  count = local.is-production ? 0 : 1
   depends_on = [
     aws_ebs_volume.dbf01
   ]
@@ -287,9 +285,7 @@ resource "aws_volume_attachment" "dbf01_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-
 resource "aws_ebs_volume" "dbf02" {
-  count = local.is-production ? 0 : 1
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -305,7 +301,6 @@ resource "aws_ebs_volume" "dbf02" {
 }
 
 resource "aws_volume_attachment" "dbf02_att" {
-  count = local.is-production ? 0 : 1
   depends_on = [
     aws_ebs_volume.dbf02
   ]
@@ -314,9 +309,7 @@ resource "aws_volume_attachment" "dbf02_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-
 resource "aws_ebs_volume" "dbf03" {
-  count = local.is-production ? 0 : 1
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -332,7 +325,6 @@ resource "aws_ebs_volume" "dbf03" {
 }
 
 resource "aws_volume_attachment" "dbf03_att" {
-  count = local.is-production ? 0 : 1
   depends_on = [
     aws_ebs_volume.dbf03
   ]
