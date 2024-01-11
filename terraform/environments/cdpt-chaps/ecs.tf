@@ -200,6 +200,15 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   }
 }
 
+resource "aws_security_group_rule" "ecs_to_rds" {
+  type              = "ingress"
+  from_port         = 1433
+  to_port           = 1433
+  protocol          = "tcp"
+  source_security_group_id = aws_security_group.cdpt-chaps-db-sg.id
+  security_group_id = aws_security_group.cluster_ec2.id  
+}
+
 resource "aws_security_group" "cluster_ec2" {
   name        = "${local.application_name}-cluster-ec2-security-group"
   description = "controls access to the cluster ec2 instance"
@@ -220,14 +229,6 @@ resource "aws_security_group" "cluster_ec2" {
     to_port         = 3389
     protocol        = "tcp"
     security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
-  ingress {
-    description     = "Allow access to RDS on port 1433"
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    security_groups = [aws_security_group.db.id]
   }
 
   egress {
