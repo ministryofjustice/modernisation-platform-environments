@@ -244,7 +244,7 @@ EOF
 # Attach necessary policies to the fleet_manager role
 resource "aws_iam_role_policy_attachment" "fleet_manager_policy_attachment" {
   role       = aws_iam_role.fleet_manager_role.name
-  policy_arn = data.aws_iam_policy_document.fleet_manager_document_policy.arn
+  policy_arn = data.aws_iam_policy_document.fleet_manager_document_policy.json
 }
 
 data "aws_iam_policy_document" "fleet_manager_document_policy" {
