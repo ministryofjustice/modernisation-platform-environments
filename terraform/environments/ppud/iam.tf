@@ -222,7 +222,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
 # IAM Policy, Role for Fleet Manager
 ####################################
 resource "aws_iam_role" "fleet_manager_role" {
-  name = "fleet_manager_role"
+  name = "fleet-manager-role"
 
   assume_role_policy = <<EOF
 {
@@ -232,7 +232,9 @@ resource "aws_iam_role" "fleet_manager_role" {
       "Sid": "",
       "Effect": "Allow",
       "Principal": {
-        "Service": "ssm.amazonaws.com"
+        "AWS": [
+          "arn:aws:iam::946070829339:root"
+        ]
       },
       "Action": "sts:AssumeRole"
     }
