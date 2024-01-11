@@ -86,53 +86,53 @@ locals {
         })
       })
 
-      t1-ndh-app-a = merge(local.ndh_app_a, {
-        config = merge(local.ndh_app_a.config, {
-          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
-            "Ec2t1Policy",
-          ])
-        })
-        tags = merge(local.ndh_app_a.tags, {
-          os-type                    = "Linux"
-          nomis-data-hub-environment = "t1"
-        })
-      })
-
-      t1-ndh-ems-a = merge(local.ndh_ems_a, {
-        config = merge(local.ndh_ems_a.config, {
-          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
-            "Ec2t1Policy",
-          ])
-        })
-        tags = merge(local.ndh_ems_a.tags, {
-          os-type                    = "Linux"
-          nomis-data-hub-environment = "t1"
-        })
-      })
-
-      t2-ndh-app-a = merge(local.ndh_app_a, {
-        config = merge(local.ndh_app_a.config, {
-          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
-            "Ec2t2Policy",
-          ])
-        })
-        tags = merge(local.ndh_app_a.tags, {
-          os-type                    = "Linux"
-          nomis-data-hub-environment = "t2"
-        })
-      })
-
-      t2-ndh-ems-a = merge(local.ndh_ems_a, {
-        config = merge(local.ndh_ems_a.config, {
-          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
-            "Ec2t2Policy",
-          ])
-        })
-        tags = merge(local.ndh_ems_a.tags, {
-          os-type                    = "Linux"
-          nomis-data-hub-environment = "t2"
-        })
-      })
+      #      t1-ndh-app-a = merge(local.ndh_app_a, {
+      #        config = merge(local.ndh_app_a.config, {
+      #          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
+      #            "Ec2t1Policy",
+      #          ])
+      #        })
+      #        tags = merge(local.ndh_app_a.tags, {
+      #          os-type                    = "Linux"
+      #          nomis-data-hub-environment = "t1"
+      #        })
+      #      })
+      #
+      #      t1-ndh-ems-a = merge(local.ndh_ems_a, {
+      #        config = merge(local.ndh_ems_a.config, {
+      #          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
+      #            "Ec2t1Policy",
+      #          ])
+      #        })
+      #        tags = merge(local.ndh_ems_a.tags, {
+      #          os-type                    = "Linux"
+      #          nomis-data-hub-environment = "t1"
+      #        })
+      #      })
+      #
+      #      t2-ndh-app-a = merge(local.ndh_app_a, {
+      #        config = merge(local.ndh_app_a.config, {
+      #          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
+      #            "Ec2t2Policy",
+      #          ])
+      #        })
+      #        tags = merge(local.ndh_app_a.tags, {
+      #          os-type                    = "Linux"
+      #          nomis-data-hub-environment = "t2"
+      #        })
+      #      })
+      #
+      #      t2-ndh-ems-a = merge(local.ndh_ems_a, {
+      #        config = merge(local.ndh_ems_a.config, {
+      #          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
+      #            "Ec2t2Policy",
+      #          ])
+      #        })
+      #        tags = merge(local.ndh_ems_a.tags, {
+      #          os-type                    = "Linux"
+      #          nomis-data-hub-environment = "t2"
+      #        })
+      #      })
     }
 
     baseline_s3_buckets = {
