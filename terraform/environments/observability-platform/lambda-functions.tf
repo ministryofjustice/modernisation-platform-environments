@@ -7,6 +7,7 @@ module "grafana_api_key_rotator" {
   publish = true
 
   function_name = "grafana-api-key-rotator"
+  description   = "Rotates the Grafana API key used by Terraform"
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
   timeout       = 300
