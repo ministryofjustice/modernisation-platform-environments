@@ -1,6 +1,6 @@
 # Dev Container
 
-> This is a community supported product
+> This is a community supported feature
 
 To assist in the development of `modernisation-platform-environments`, the community have built a [dev container](https://containers.dev/) with the required tooling
 
