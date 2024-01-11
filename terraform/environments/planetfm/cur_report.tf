@@ -5,13 +5,13 @@ resource "aws_cur_report_definition" "cur_planetfm" {
   format                     = "Parquet"
   compression                = "Parquet"
   additional_schema_elements = ["RESOURCES", "SPLIT_COST_ALLOCATION_DATA"]
-  s3_bucket                  = module.cur-report-bucket.bucket.id
+  s3_bucket                  = module.s3-bucket.bucket.id
   s3_region                  = "eu-west-2"
   additional_artifacts       = ["ATHENA"]
   report_versioning          = "OVERWRITE_REPORT" 
 }
 
-module "cur-report-bucket" {
+module "s3-bucket" {
     source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
     bucket_prefix = "planetfm"
