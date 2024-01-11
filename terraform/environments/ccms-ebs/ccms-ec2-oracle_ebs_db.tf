@@ -281,7 +281,7 @@ resource "aws_volume_attachment" "dbf01_att" {
     aws_ebs_volume.dbf01
   ]
   device_name = "/dev/sdq"
-  volume_id   = aws_ebs_volume.dbf01[0].id
+  volume_id   = aws_ebs_volume.dbf01.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
@@ -305,7 +305,7 @@ resource "aws_volume_attachment" "dbf02_att" {
     aws_ebs_volume.dbf02
   ]
   device_name = "/dev/sdr"
-  volume_id   = aws_ebs_volume.dbf02[0].id
+  volume_id   = aws_ebs_volume.dbf02.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
@@ -329,7 +329,7 @@ resource "aws_volume_attachment" "dbf03_att" {
     aws_ebs_volume.dbf03
   ]
   device_name = "/dev/sds"
-  volume_id   = aws_ebs_volume.dbf03[0].id
+  volume_id   = aws_ebs_volume.dbf03.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
