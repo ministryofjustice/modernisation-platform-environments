@@ -13,8 +13,9 @@ module "grafana_api_key_rotator" {
   source_path = "${path.module}/src/lambda/grafana-api-key-rotator"
 
   environment_variables = {
-    WORKSPACE_ID = module.managed_grafana.workspace_id
-    SECRET_ID    = aws_secretsmanager_secret.grafana_api_key.id
+    WORKSPACE_API_KEY_NAME = "observability-platform-automation"
+    WORKSPACE_ID           = module.managed_grafana.workspace_id
+    SECRET_ID              = aws_secretsmanager_secret.grafana_api_key.id
   }
 
   attach_policy_statements = true
