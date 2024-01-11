@@ -45,7 +45,7 @@ resource "aws_security_group_rule" "ecs_to_rds" {
   from_port = 1433
   to_port = 1433
   protocol = "tcp"
-  security_group_ids = [aws_security_group.db.id]
+  security_group_id = [aws_security_group.db.id]
   source_security_group_id = aws_security_group.cluster_ec2.id
 }
 
