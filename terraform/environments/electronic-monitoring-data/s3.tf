@@ -7,10 +7,10 @@ resource "aws_s3_bucket" "log_bucket" {
   force_destroy = true
 }
 
-resource "aws_s3_bucket_acl" "log_bucket_acl" {
-  bucket = aws_s3_bucket.log_bucket.id
-  acl    = "log-delivery-write"
-}
+# resource "aws_s3_bucket_acl" "log_bucket_acl" {
+#   bucket = aws_s3_bucket.log_bucket.id
+#   acl    = "log-delivery-write"
+# }
 
 #------------------------------------------------------------------------------
 # S3 bucket for landing Capita data
