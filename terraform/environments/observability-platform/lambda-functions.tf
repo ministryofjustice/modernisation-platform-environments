@@ -17,6 +17,7 @@ module "grafana_api_key_rotator" {
     SECRET_ID    = aws_secretsmanager_secret.grafana_api_key.id
   }
 
+  attach_policy_statements = true
   policy_statements = {
     "amazonmanagedgrafana" = {
       sid    = "AmazonManagedGrafana"
