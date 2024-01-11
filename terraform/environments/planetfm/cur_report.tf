@@ -113,13 +113,13 @@ resource "aws_glue_catalog_table" "cur" {
     table_type = "EXTERNAL_TABLE"
 
     storage_descriptor {
-        input_format = "org.apache.hadoop.mapred.TextInputFormat"
-        output_format = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+        input_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+        output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
         location = "s3://${module.csr-report-bucket.bucket.id}/cur/"
         ser_de_info {
             serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
             parameters = {
-            "serialization.format" = "1"
+            "serialization.format" = 1
             }
         }
     }
