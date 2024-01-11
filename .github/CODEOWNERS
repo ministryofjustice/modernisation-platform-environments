@@ -15,7 +15,7 @@
 /terraform/environments/data-platform-apps-and-tools @ministryofjustice/data-platform-apps-and-tools-airflow-users @ministryofjustice/data-platform-apps-and-tools-development-sandbox @ministryofjustice/data-platform-apps-and-tools-production-developer @ministryofjustice/data-platform-audit-and-security @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-compute @ministryofjustice/data-platform-core-infra @ministryofjustice/data-tech-archs @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-audit-and-security @ministryofjustice/data-platform-development-sandbox @ministryofjustice/data-platform-preproduction-developer @ministryofjustice/data-platform-production-developer @ministryofjustice/data-platform-test-developer @ministryofjustice/modernisation-platform
-/terraform/environments/delius-core @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/unilink @ministryofjustice/modernisation-platform
+/terraform/environments/delius-core @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-iaps @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-jitbit @ministryofjustice/hmpps-delius-jitbit-devs @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting-non-cleared-team @ministryofjustice/modernisation-platform
