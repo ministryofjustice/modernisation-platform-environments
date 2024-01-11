@@ -17,7 +17,7 @@
       "ec2_desired_capacity": 1,
       "ec2_max_size": 2,
       "ec2_min_size": 1,
-      "ami_image_id": "ami-06cdd5b44c17085ed",
+      "ami_image_id": "ami-068f57ffaf2c06454",
       "instance_type": "t3.medium",
       "container_port": 80,
       "s3_bucket_name": "chaps-dev-bucket"
@@ -39,7 +39,7 @@
       "ec2_desired_capacity": 2,
       "ec2_max_size": 3,
       "ec2_min_size": 2,
-      "ami_image_id": "ami-06cdd5b44c17085ed",
+      "ami_image_id": "ami-068f57ffaf2c06454",
       "instance_type": "t3.medium",
       "container_port": 80,
       "s3_bucket_name": "chaps-staging-bucket"
@@ -61,7 +61,7 @@
       "ec2_desired_capacity": 2,
       "ec2_max_size": 3,
       "ec2_min_size": 2,
-      "ami_image_id": "ami-06cdd5b44c17085ed",
+      "ami_image_id": "ami-068f57ffaf2c06454",
       "instance_type": "t3.medium",
       "container_port": 80,
       "s3_bucket_name": "chaps-production-bucket"
