@@ -1,6 +1,6 @@
 # Dev Container
 
-> This is not a supported product of Modernisation Platform
+> This is a community supported product
 
 To assist in the development of `modernisation-platform-environments`, the community have built a [dev container](https://containers.dev/) with the required tooling
 
@@ -71,3 +71,5 @@ bash ../../../scripts/member-local-plan.sh -r modernisation-platform-sandbox
 ## Maintainers
 
 - [@jacobwoffenden](https://github.com/jacobwoffenden)
+
+- [@Gary-H9](https://github.com/Gary-H9)
