@@ -222,6 +222,14 @@ resource "aws_security_group" "cluster_ec2" {
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
+  ingress {
+    description     = "Allow access to RDS on port 1433"
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    security_groups = [aws_security_group.db.id]
+  }
+
   egress {
     description     = "Cluster EC2 loadbalancer egress rule"
     from_port       = 0
