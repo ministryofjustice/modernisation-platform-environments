@@ -53,7 +53,7 @@ locals {
       powerbi_gateway_ec2 = {
         instance_name       = "dpat-${local.environment}-powerbi"
         most_recent         = true
-        name                = ["Windows_Server-2022-English-Core-Base-*"]
+        name                = ["Windows_Server-2022-English-Full-Base-*"]
         virtualization_type = "hvm"
         owner_account       = "801119661308" # amazon
         instance_type       = "t3a.xlarge"   # 4vCPU, 16G RAM
@@ -156,7 +156,7 @@ locals {
       powerbi_gateway_ec2 = {
         instance_name       = "dpat-${local.environment}-powerbi"
         most_recent         = true
-        name                = ["Windows_Server-2022-English-Core-Base-*"]
+        name                = ["Windows_Server-2022-English-Full-Base-*"]
         virtualization_type = "hvm"
         owner_account       = "801119661308" # amazon
         instance_type       = "t3a.xlarge"   # 4vCPU, 16G RAM
