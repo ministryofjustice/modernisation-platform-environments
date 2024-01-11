@@ -7,8 +7,9 @@ module "grafana_api_key_rotator" {
   publish = true
 
   function_name = "grafana-api-key-rotator"
-  handler       = "index.lambda_handler"
+  handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
+  timeout       = 300
 
   source_path = "${path.module}/src/lambda/grafana-api-key-rotator"
 
