@@ -1,7 +1,7 @@
 resource "aws_cur_report_definition" "cur_planetfm" {
   provider                   = aws.us-east-1
   report_name                = "planetfm-cur-report-definition"
-  time_unit                  = "HOURLY"
+  time_unit                  = "DAILY"
   format                     = "Parquet"
   compression                = "Parquet"
   additional_schema_elements = ["RESOURCES", "SPLIT_COST_ALLOCATION_DATA"]
@@ -113,9 +113,9 @@ resource "aws_glue_catalog_table" "cur" {
     table_type = "EXTERNAL_TABLE"
 
     storage_descriptor {
-        input_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
-        output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
-        location = "s3://${module.csr-report-bucket.bucket.id}/cur/planetfm-cur-report-definition/cost_and_usage_data_status/"
+        # input_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+        # output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+        location = "s3://${module.csr-report-bucket.bucket.id}/${aws_cur_report_definition.cur_planetfm.s3_prefix}/${aws_cur_report_definition.cur_planetfm.report_name}/cost_and_usage_data_status/"
         ser_de_info {
             serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
             parameters = {
