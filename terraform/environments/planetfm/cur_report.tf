@@ -8,7 +8,8 @@ resource "aws_cur_report_definition" "cur_planetfm" {
   s3_bucket                  = module.csr-report-bucket.bucket.id
   s3_region                  = "eu-west-2"
   additional_artifacts       = ["ATHENA"]
-  report_versioning          = "OVERWRITE_REPORT" 
+  report_versioning          = "OVERWRITE_REPORT"
+  s3_prefix                  = "cur" 
 }
 
 module "csr-report-bucket" {
@@ -101,7 +102,7 @@ resource "aws_athena_workgroup" "cur" {
             selected_engine_version = "Athena engine version 3"    
         }
         result_configuration {
-            output_location = "s3://${module.csr-report-bucket.bucket.id}/cur/"
+            output_location = "s3://${module.csr-report-bucket.bucket.id}/output/"
         }
     }
 }
@@ -114,7 +115,7 @@ resource "aws_glue_catalog_table" "cur" {
     storage_descriptor {
         input_format = "org.apache.hadoop.mapred.TextInputFormat"
         output_format = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
-        location = "s3://${module.csr-report-bucket.bucket.id}/"
+        location = "s3://${module.csr-report-bucket.bucket.id}/cur/"
         ser_de_info {
             serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
             parameters = {
