@@ -1,0 +1,13 @@
+---
+schemaVersion: "2.2"
+description: "SSM Document for configuring an RDS collection"
+mainSteps:
+  - name: DeployRDS
+    action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
+    inputs:
+    runCommand:
+      - |
