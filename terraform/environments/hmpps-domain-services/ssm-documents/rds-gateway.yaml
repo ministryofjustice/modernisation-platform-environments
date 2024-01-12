@@ -9,5 +9,5 @@ mainSteps:
         - platformType
         - Windows
     inputs:
-    runCommand:
-      - |
+      runCommand:
+        - |
