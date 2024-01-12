@@ -18,6 +18,7 @@ def lambda_handler(event, context):
         delete_workspace_api_key = grafana_client.delete_workspace_api_key(
             keyName=workspace_api_key_name, workspaceId=workspace_id
         )
+
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "ResourceNotFoundException":
             pass
