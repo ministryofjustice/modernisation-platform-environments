@@ -40,7 +40,7 @@ locals {
   baseline_ec2_autoscaling_groups        = {}
   baseline_ec2_instances                 = {}
   baseline_iam_policies = {
-    DBRefresherPolicy = {
+    DbRefresherPolicy = {
       description = "Permissions for the db refresh process"
       statements = [
         {
