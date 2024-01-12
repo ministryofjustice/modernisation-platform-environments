@@ -4,7 +4,7 @@
       "db_enabled": true,
       "db_instance_class": "db.t3.small",
       "db_user": "dbadmin",
-      "db_allocated_storage": "75",
+      "db_allocated_storage": "100",
       "db_name": "chaps-dev",
       "env_name": "development",
       "db_instance_identifier": "db-chaps-dev",
