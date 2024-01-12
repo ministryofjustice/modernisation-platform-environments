@@ -253,7 +253,7 @@ locals {
         ]
       },
       {
-        sid    = "SecretsmanagerReadWriteOracle"
+        sid    = "SecretsmanagerReadWriteOracleOem"
         effect = "Allow"
         actions = [
           "secretsmanager:GetSecretValue",
@@ -284,6 +284,20 @@ locals {
         ]
         resources = [
           "arn:aws:ssm:*:*:parameter/oracle/*",
+        ]
+      }
+    ]
+
+    DBSecrets = [
+      {
+        sid    = "SecretsmanagerReadWriteOracle"
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:PutSecretValue",
+        ]
+        resources = [
+          "arn:aws:secretsmanager:*:${var.environment.account_id}:secret:/oracle/*",
         ]
       }
     ]
