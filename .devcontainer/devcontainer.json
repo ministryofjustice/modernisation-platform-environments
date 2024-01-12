@@ -1,0 +1,8 @@
+{
+  "name": "modernisation-platform-environments",
+  "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu",
+  "features": {
+    "./features/src/aws": {},
+    "./features/src/terraform": {}
+  }
+}
