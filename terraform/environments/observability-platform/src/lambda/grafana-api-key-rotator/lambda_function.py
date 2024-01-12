@@ -23,40 +23,20 @@ def lambda_handler(event, context):
         if e.response["Error"]["Code"] == "ResourceNotFoundException":
             pass
         else:
-            print(e)
-            return {
-                "statusCode": 500,
-                "body": "Failed to delete Grafana API key",
-            }  # noqa E501
+            raise e
 
-    try:
-        create_workspace_api_key = grafana_client.create_workspace_api_key(
-            keyName=workspace_api_key_name,
-            keyRole="ADMIN",
-            secondsToLive=workspace_api_key_ttl,
-            workspaceId=workspace_id,
-        )
+    create_workspace_api_key = grafana_client.create_workspace_api_key(
+        keyName=workspace_api_key_name,
+        keyRole="ADMIN",
+        secondsToLive=workspace_api_key_ttl,
+        workspaceId=workspace_id,
+    )
 
-    except Exception as e:
-        print(e)
-        return {"statusCode": 500, "body": "Failed to create Grafana API key"}
+    update_secret = secretsmanager_client.update_secret(
+        SecretId=secret_id, SecretString=create_workspace_api_key["key"]
+    )
 
-    api_key = create_workspace_api_key["key"]
-
-    try:
-        update_secret = secretsmanager_client.update_secret(
-            SecretId=secret_id, SecretString=api_key
-        )
-
-    except Exception as e:
-        print(e)
-        return {
-            "statusCode": 500,
-            "body": "Failed to update AWS Secrets Manager secret",
-        }
-
-    else:
-        return {
-            "statusCode": 200,
-            "body": "Successfully updated AWS Secrets Manager secret",
-        }
+    return {
+        "statusCode": 200,
+        "body": "Successfully updated AWS Secrets Manager secret",
+    }
