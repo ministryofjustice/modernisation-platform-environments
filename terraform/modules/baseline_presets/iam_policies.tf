@@ -1,18 +1,18 @@
 locals {
 
-  iam_policies_filter = flatten([
-    var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
-    var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
-    var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
-    var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
-    var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
-    var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
+  iam_policies_filter = distinct(flatten([
+    var.options.enable_business_unit_kms_cmks               ? ["BusinessUnitKmsCmkPolicy"] : [],
+    var.options.enable_image_builder                        ? ["ImageBuilderLaunchTemplatePolicy"] : [],
+    var.options.enable_ec2_cloud_watch_agent                ? ["CloudWatchAgentServerReducedPolicy"] : [],
+    var.options.enable_ec2_self_provision                   ? ["Ec2SelfProvisionPolicy"] : [],
+    var.options.enable_shared_s3                            ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_ec2_reduced_ssm_policy               ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
-    var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
+    var.options.enable_ec2_oracle_enterprise_manager        ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagerPolicy"] : [],
     var.options.iam_policies_filter,
     "EC2Default",
     "EC2Db",
-  ])
+  ]))
 
   # for adding policies - be careful not to run into the limit
   iam_policies_ec2_default = flatten([
