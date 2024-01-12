@@ -24,35 +24,35 @@ resource "aws_vpc_security_group_ingress_rule" "capita_allowed_ip_1" {
   security_group_id = aws_security_group.capita_security_group.id
 
   cidr_ipv4   = "82.203.33.112/28"
-  ip_protocol = "ssh"
+  ip_protocol = "tcp"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_allowed_ip_2" {
   security_group_id = aws_security_group.capita_security_group.id
 
   cidr_ipv4   = "82.203.33.128/28"
-  ip_protocol = "ssh"
+  ip_protocol = "tcp"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_allowed_ip_3" {
   security_group_id = aws_security_group.capita_security_group.id
 
   cidr_ipv4   = "85.115.52.0/24"
-  ip_protocol = "ssh"
+  ip_protocol = "tcp"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_allowed_ip_4" {
   security_group_id = aws_security_group.capita_security_group.id
 
   cidr_ipv4   = "85.115.53.0/24"
-  ip_protocol = "ssh"
+  ip_protocol = "tcp"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_allowed_ip_5" {
   security_group_id = aws_security_group.capita_security_group.id
 
   cidr_ipv4   = "85.115.54.0/24"
-  ip_protocol = "ssh"
+  ip_protocol = "tcp"
 }
 
 #------------------------------------------------------------------------------
