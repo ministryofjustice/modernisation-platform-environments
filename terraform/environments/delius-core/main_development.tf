@@ -63,8 +63,3 @@ module "environment_test" {
 
   tags = local.tags
 }
-
-
-provider "template" {
-  # Configuration options
-}
