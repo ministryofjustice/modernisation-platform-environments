@@ -2,7 +2,7 @@ locals {
 
   iam_roles_filter = flatten([
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],
-    var.options.enable_ec2_oracle_enterprise_managed_server ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
+    var.options.enable_ec2_oracle_enterprise_managed_server || var.options.enable_ec2_oracle_enterprise_manager ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     var.options.enable_observability_platform_monitoring ? ["observability-platform"] : [],
   ])
 
