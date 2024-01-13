@@ -3,6 +3,7 @@
     "development": {
       "example_var": "dev-data",
       "mlra_vpc_cidr": "10.26.56.0/21",
+      "env_short_name": "dev",
       "ecs_service_count": 1,
       "ecs_cpu": 1024,
       "ecs_memory": 2048,
@@ -25,7 +26,8 @@
       "ecs_env_CloudwatchStep": "1m",
       "ecs_env_CloudwatchBatchSize": "10",
       "ecs_env_EnableCloudwatchMetrics": "true",
-      "ecs_env_TogDataUsername": "togdata"
+      "ecs_env_TogDataUsername": "togdata",
+      "api_scope": "standard"
     },
     "test": {
       "example_var": "test-data",
