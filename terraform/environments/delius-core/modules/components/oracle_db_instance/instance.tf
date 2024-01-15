@@ -43,4 +43,6 @@ resource "aws_instance" "db_ec2" {
     { server-type = "delius_core_db" },
     { database = local.database_tag }
   )
+
+  user_data_replace_on_change = var.user_data_replace_on_change
 }

@@ -121,3 +121,9 @@ variable "ssh_keys_bucket_name" {
   description = "The name of the S3 bucket containing the SSH keys"
   type        = string
 }
+
+variable "user_data_replace_on_change" {
+  description = "Whether to replace the instances when the user data changes"
+  type        = bool
+  default     = false
+}
