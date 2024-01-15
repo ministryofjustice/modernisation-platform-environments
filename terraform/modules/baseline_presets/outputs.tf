@@ -84,7 +84,7 @@ output "iam_policies" {
 output "iam_policies_all" {
   description = "Map of iam policies"
 
-  local.iam_policies
+  value = local.iam_policies
 }
 
 output "iam_policy_statements_ec2" {
