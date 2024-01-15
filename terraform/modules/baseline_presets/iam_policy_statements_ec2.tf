@@ -240,54 +240,6 @@ locals {
       }
     ]
 
-    OracleEnterpriseManager = [
-      {
-        sid    = "S3ListLocation"
-        effect = "Allow"
-        actions = [
-          "s3:ListAllMyBuckets",
-          "s3:GetBucketLocation",
-        ]
-        resources = [
-          "arn:aws:s3:::*"
-        ]
-      },
-      {
-        sid    = "SecretsmanagerReadWriteOracleOem"
-        effect = "Allow"
-        actions = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:PutSecretValue",
-        ]
-        resources = [
-          "arn:aws:secretsmanager:*:*:secret:/oracle/*",
-        ]
-      },
-      {
-        sid    = "SSMReadAccountIdsOracle"
-        effect = "Allow"
-        actions = [
-          "ssm:GetParameter",
-          "ssm:GetParameters",
-        ]
-        resources = [
-          "arn:aws:ssm:*:*:parameter/account_ids",
-          "arn:aws:ssm:*:*:parameter/oracle/*",
-        ]
-      },
-      {
-        sid    = "SSMWriteOracle"
-        effect = "Allow"
-        actions = [
-          "ssm:PutParameter",
-          "ssm:PutParameters",
-        ]
-        resources = [
-          "arn:aws:ssm:*:*:parameter/oracle/*",
-        ]
-      }
-    ]
-
     DBSecrets = [
       {
         sid    = "SecretsmanagerReadWriteOracle"

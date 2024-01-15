@@ -40,6 +40,54 @@ locals {
   baseline_ec2_autoscaling_groups        = {}
   baseline_ec2_instances                 = {}
   baseline_iam_policies = {
+    Ec2OracleEnterpriseManagerPolicy = {
+      description = "Permissions required for Oracle Enterprise Manager"
+      statements  = {
+        sid    = "S3ListLocation"
+        effect = "Allow"
+        actions = [
+          "s3:ListAllMyBuckets",
+          "s3:GetBucketLocation",
+        ]
+        resources = [
+          "arn:aws:s3:::*"
+        ]
+      },
+      {
+        sid    = "SecretsmanagerReadWriteOracleOem"
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:PutSecretValue",
+        ]
+        resources = [
+          "arn:aws:secretsmanager:*:*:secret:/oracle/*",
+        ]
+      },
+      {
+        sid    = "SSMReadAccountIdsOracle"
+        effect = "Allow"
+        actions = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+        ]
+        resources = [
+          "arn:aws:ssm:*:*:parameter/account_ids",
+          "arn:aws:ssm:*:*:parameter/oracle/*",
+        ]
+      },
+      {
+        sid    = "SSMWriteOracle"
+        effect = "Allow"
+        actions = [
+          "ssm:PutParameter",
+          "ssm:PutParameters",
+        ]
+        resources = [
+          "arn:aws:ssm:*:*:parameter/oracle/*",
+        ]
+      }
+    }
     DBRefresherPolicy = {
       description = "Permissions for the db refresh process"
       statements = [
