@@ -25,7 +25,6 @@ locals {
         })
       })
     }
-    
 
     baseline_ec2_instances = {
       test-oem-a = merge(local.oem_ec2_default, {
