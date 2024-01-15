@@ -10,6 +10,7 @@ resource "aws_db_instance" "database" {
   instance_class         = local.application_data.accounts[local.environment].db_instance_class
   identifier             = local.application_data.accounts[local.environment].db_instance_identifier
   username               = local.application_data.accounts[local.environment].db_user
+  db_name                = local.application_data.accounts[local.environment].db_name
   password               = data.aws_secretsmanager_secret_version.db_password.secret_string
   vpc_security_group_ids = [aws_security_group.db.id]
   depends_on             = [aws_security_group.db]
