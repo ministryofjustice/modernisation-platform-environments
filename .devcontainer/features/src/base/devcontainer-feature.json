@@ -1,0 +1,7 @@
+{
+  "id": "base",
+  "version": "1.0.0",
+  "name": "base",
+  "description": "Base",
+  "installsAfter": ["ghcr.io/devcontainers/features/common-utils"]
+}
