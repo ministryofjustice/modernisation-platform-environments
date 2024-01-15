@@ -35,7 +35,6 @@ locals {
     var.options.enable_shared_s3 ? local.iam_policy_statements_ec2.S3ReadSharedWrite : [],
     var.options.enable_ec2_reduced_ssm_policy ? local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? local.iam_policy_statements_ec2.OracleEnterpriseManagedServer : [],
-    local.iam_policy_statements_ec2.DBSecrets,
     var.options.iam_policy_statements_ec2_default
   ])
 
