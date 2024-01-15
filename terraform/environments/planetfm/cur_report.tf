@@ -1,22 +1,22 @@
-resource "aws_cur_report_definition" "cur_planetfm" {
+resource "aws_cur_report_definition" "cost_usage_report" {
   provider                   = aws.us-east-1
-  report_name                = "planetfm-cur-report-definition"
-  time_unit                  = "DAILY"
+  report_name                = lower(format("%s-%s-cost-usage-report", local.application_name, local.environment))
+  time_unit                  = "HOURLY" # DAILY, MONTHLY
   format                     = "Parquet"
   compression                = "Parquet"
   additional_schema_elements = ["RESOURCES", "SPLIT_COST_ALLOCATION_DATA"]
-  s3_bucket                  = module.csr-report-bucket.bucket.id
+  s3_bucket                  = module.s3-bucket.bucket.id
   s3_region                  = "eu-west-2"
   additional_artifacts       = ["ATHENA"]
   report_versioning          = "OVERWRITE_REPORT"
   s3_prefix                  = "cur"
-  depends_on = [ module.csr-report-bucket]
+  depends_on = [ module.s3-bucket] #ensures bucket permissions are applied before validation checks run
 }
 
-module "csr-report-bucket" {
+module "s3-bucket" {
     source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
-    bucket_prefix = "planetfm"
+    bucket_prefix = "cost-usage-report-"
     versioning_enabled = false
     bucket_policy = [data.aws_iam_policy_document.cur_bucket_policy.json]
     force_destroy  = true
@@ -27,7 +27,7 @@ module "csr-report-bucket" {
     }
 
     tags = merge(local.tags, {
-        Name = lower(format("cur-report-bucket-%s-%s", local.application_name, local.environment))
+        Name = lower(format("cost-usage-report-bucket-%s-%s", local.application_name, local.environment))
     })
 }
 
@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "cur_bucket_policy" {
     statement {
         sid       = "EnsureBucketOwnedByAccountForCURDelivery"
         effect    = "Allow"
-        resources = [module.csr-report-bucket.bucket.arn]
+        resources = [module.s3-bucket.bucket.arn]
 
         actions = [
         "s3:GetBucketAcl",
@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "cur_bucket_policy" {
     statement {
         sid       = "GrantAccessToDeliverCURFiles"
         effect    = "Allow"
-        resources = ["${module.csr-report-bucket.bucket.arn}/*"]
+        resources = ["${module.s3-bucket.bucket.arn}/*"]
         actions   = ["s3:PutObject"]
 
         condition {
@@ -86,8 +86,8 @@ data "aws_iam_policy_document" "cur_bucket_policy" {
 }
 
 resource "aws_athena_database" "cur" {
-    name = "cur"
-    bucket = module.csr-report-bucket.bucket.id
+    name = "cost_usage_report"
+    bucket = module.s3-bucket.bucket.id
     encryption_configuration {
         encryption_option = "SSE_S3"
     }
@@ -95,7 +95,7 @@ resource "aws_athena_database" "cur" {
 }
 
 resource "aws_athena_workgroup" "cur" {
-    name = "cur"
+    name = "cost_usage_report"
     configuration {
         enforce_workgroup_configuration = true
         publish_cloudwatch_metrics_enabled = true
@@ -104,7 +104,7 @@ resource "aws_athena_workgroup" "cur" {
             selected_engine_version = "Athena engine version 3"    
         }
         result_configuration {
-            output_location = "s3://${module.csr-report-bucket.bucket.id}/output/"
+            output_location = "s3://${module.s3-bucket.bucket.id}/output/"
         }
     }
     force_destroy = true
@@ -118,7 +118,7 @@ resource "aws_glue_catalog_table" "report_status" {
     storage_descriptor {
         input_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
         output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
-        location = "s3://${module.csr-report-bucket.bucket.id}/${aws_cur_report_definition.cur_planetfm.s3_prefix}/${aws_cur_report_definition.cur_planetfm.report_name}/cost_and_usage_data_status/"
+        location = "s3://${module.s3-bucket.bucket.id}/${aws_cur_report_definition.cost_usage_report.s3_prefix}/${aws_cur_report_definition.cost_usage_report.report_name}/cost_and_usage_data_status/"
         ser_de_info {
             name = "status_table"
             serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
@@ -150,7 +150,7 @@ resource "aws_glue_catalog_table" "report" {
     storage_descriptor {
         input_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
         output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
-        location = "s3://${module.csr-report-bucket.bucket.id}/${aws_cur_report_definition.cur_planetfm.s3_prefix}/${aws_cur_report_definition.cur_planetfm.report_name}/planetfm-cur-report-definition/"
+        location = "s3://${module.s3-bucket.bucket.id}/${aws_cur_report_definition.cost_usage_report.s3_prefix}/${aws_cur_report_definition.cost_usage_report.report_name}/${local.application_name}-cur-report-definition/"
         ser_de_info {
             name = "report_table"
             serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
