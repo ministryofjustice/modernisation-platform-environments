@@ -21,7 +21,7 @@ get_user_name () {
   echo "$1" | sed -e "s/.*\///g" | sed -e "s/\.pub//g"
 }
 # For each public key available in the S3 bucket
-aws s3api list-objects --bucket ${bucket_name} --prefix public-keys/ --region ${aws_region} --output text --query 'Contents[?Size>`0`].Key' | tr '\t' '\n' > ~/keys_retrieved_from_s3
+/usr/local/bin/aws s3api list-objects --bucket ${bucket_name} --prefix public-keys/ --region ${aws_region} --output text --query 'Contents[?Size>`0`].Key' | tr '\t' '\n' > ~/keys_retrieved_from_s3
 while read line; do
   USER_NAME="`get_user_name "$line"`"
   # Make sure the user name is alphanumeric
@@ -39,7 +39,7 @@ while read line; do
     if [ -f ~/keys_installed ]; then
       grep -qx "$line" ~/keys_installed
       if [ $? -eq 0 ]; then
-        aws s3 cp s3://${bucket_name}/$line /home/$USER_NAME/.ssh/authorized_keys --region ${aws_region}
+        /usr/local/bin/aws s3 cp s3://${bucket_name}/$line /home/$USER_NAME/.ssh/authorized_keys --region ${aws_region}
         chmod 600 /home/$USER_NAME/.ssh/authorized_keys
         chown $USER_NAME:$USER_NAME /home/$USER_NAME/.ssh/authorized_keys
       fi
