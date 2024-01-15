@@ -30,7 +30,7 @@ locals {
   }
 
   environment_config = local.environment_configs[local.environment]
-  
+
   baseline_environment_presets_options = local.environment_baseline_presets_options[local.environment]
   baseline_environment_config          = local.environment_configs[local.environment]
 
@@ -174,7 +174,7 @@ locals {
         size  = 2000
         type  = "gp3"
       }
-      "/dev/sdf" = {  # DATA02
+      "/dev/sdf" = { # DATA02
         label = "data"
         size  = 2000
         type  = "gp3"
