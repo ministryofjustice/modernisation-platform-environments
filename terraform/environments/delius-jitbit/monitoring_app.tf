@@ -26,7 +26,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume" {
   metric_name         = "ErrorCount"
   statistic           = "Sum"
   period              = "300"
-  evaluation_periods  = "2"  # number of periods over which CloudWatch evaluates the metric data
+  evaluation_periods  = "2" # number of periods over which CloudWatch evaluates the metric data
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
   threshold           = "10"
