@@ -40,6 +40,8 @@ locals {
   baseline_ec2_autoscaling_groups        = {}
   baseline_ec2_instances                 = {}
   baseline_iam_policies = {
+    OracleEnterpriseManagementSecretsPolicy = module.baseline_presets.iam_policies.OracleEnterpriseManagementSecretsPolicy,
+
     Ec2OracleEnterpriseManagerPolicy = {
       description = "Permissions required for Oracle Enterprise Manager"
       statements  = [
