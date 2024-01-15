@@ -25,12 +25,12 @@ resource "aws_cognito_user_pool_domain" "maat_api_cognito_user_pool_domain" {
 # MAAT API COGNITO USER POOL SERVER
 ######################################
 
-resource "aws_cognito_user_pool_resource_server" "maat_api_cognito_user_pool_server" {
+resource "aws_cognito_resource_server" "maat_api_cognito_user_pool_server" {
   user_pool_id   = aws_cognito_user_pool.maat_api_cognito_user_pool.id
   identifier     = "${local.application_name}-cd-api"
   name           = "${local.application_name}-cd-api-ResourceServer1"
 
-  scopes {
+  scope {
     scope_name        = "${local.application_data.accounts[local.environment].api_scope}"
     scope_description = "${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"
   }
@@ -42,7 +42,7 @@ resource "aws_cognito_user_pool_resource_server" "maat_api_cognito_user_pool_ser
 ######################################
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_default" {
-  depends_on                            = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on                            = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "DEFAULT"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -56,7 +56,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_default" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_cda" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "CDA"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -70,7 +70,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_cda" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_cma" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "Crime Means Assessment"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -84,7 +84,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_cma" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ccp" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "Crown Court Proceeding"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -98,7 +98,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ccp" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ccc" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "Crown Court Contribution"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -112,7 +112,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ccc" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ce" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "Crime Evidence"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -126,7 +126,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ce" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_caa" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "Crime Apply Adapter"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -140,7 +140,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_caa" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ats" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "Application Tracking Service"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -154,7 +154,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ats" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_dcrs" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "DCES Debt collection Report Service"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -168,7 +168,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_dcrs" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_dirs" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "DCES DRC Integration Report Service"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -182,7 +182,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_dirs" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_chs" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "Crime Hardship Service"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -196,7 +196,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_chs" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_cvs" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "Crime Validation Service"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
@@ -210,7 +210,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_cvs" {
 }
 
 resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_maatos" {
-  depends_on               = [aws_cognito_user_pool_resource_server.maat_api_cognito_user_pool]
+  depends_on               = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
 
   name                                  = "MAAT Orchestration Service"
   user_pool_id                          = aws_cognito_user_pool.maat_api_cognito_user_pool.id
