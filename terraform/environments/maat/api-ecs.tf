@@ -13,11 +13,11 @@ resource "aws_ecs_cluster" "app_ecs_cluster" {
 resource "aws_ecs_service" "maat_api_ecs_service" {
   depends_on = [aws_lb_listener.maat_api_alb_http_listener]
 
-  name            = "${local.application_name}-api-ecs-service"
-  cluster         = aws_ecs_cluster.app_ecs_cluster.id
-  launch_type     = "FARGATE"
-  desired_count   = local.application_data.accounts[local.environment].ecs_service_count
-  task_definition = aws_ecs_task_definition.TaskDefinition.arn
+  name                              = "${local.application_name}-api-ecs-service"
+  cluster                           = aws_ecs_cluster.app_ecs_cluster.id
+  launch_type                       = "FARGATE"
+  desired_count                     = local.application_data.accounts[local.environment].ecs_service_count
+  task_definition                   = aws_ecs_task_definition.TaskDefinition.arn
   health_check_grace_period_seconds = 120
 
   network_configuration {
@@ -26,10 +26,10 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
       data.aws_subnets.shared-private.ids[1],
       data.aws_subnets.shared-private.ids[2],
     ]
-    security_groups = [aws_security_group.maat_api_ecs_security_group.id]
+    security_groups  = [aws_security_group.maat_api_ecs_security_group.id]
     assign_public_ip = false
   }
-  
+
   ######## ADD LB DETAILS HERE
   load_balancer {
     container_name   = "${local.application_name}-cd-api"
@@ -43,36 +43,6 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
       Name = "${local.application_name}-api-ecs-service"
     }
   )
-}
-##### PARAMETER STORE SECRETS
-resource "aws_ssm_parameter" "data_source_username" {
-  name  = "/maat-cd-api/DATASOURCE_USERNAME"
-  type  = "SecureString"
-  value = "replace in console"
-}
-
-resource "aws_ssm_parameter" "data_source_password" {
-  name  = "APP_MAATDB_DBPASSWORD_MLA1"
-  type  = "SecureString"
-  value = "replace in console"
-}
-
-resource "aws_ssm_parameter" "cda_client_id" {
-  name  = "/maat-cd-api/CDA_OAUTH_CLIENT_ID"
-  type  = "SecureString"
-  value = "replace in console"
-}
-
-resource "aws_ssm_parameter" "cda_client_secret" {
-  name  = "/maat-cd-api/CDA_OAUTH_CLIENT_SECRET"
-  type  = "SecureString"
-  value = "replace in console"
-}
-
-resource "aws_ssm_parameter" "togdata_datasource_password" {
-  name  = "APP_MAATDB_DBPASSWORD_TOGDATA"
-  type  = "SecureString"
-  value = "replace in console"
 }
 ######################################
 # ECS TASK DEFINITION
@@ -88,11 +58,11 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
 
   container_definitions = jsonencode([
     {
-      name        = "${local.application_name}-cd-api",
-      cpu         = local.application_data.accounts[local.environment].ecs_container_cpu,
-      essential   = true,
-      image       = "902837325998.dkr.ecr.eu-west-2.amazonaws.com/maat-cd-api:2b0a2803",
-      memory      = local.application_data.accounts[local.environment].ecs_container_memory,
+      name      = "${local.application_name}-cd-api",
+      cpu       = local.application_data.accounts[local.environment].ecs_container_cpu,
+      essential = true,
+      image     = "902837325998.dkr.ecr.eu-west-2.amazonaws.com/maat-cd-api:2b0a2803",
+      memory    = local.application_data.accounts[local.environment].ecs_container_memory,
       log_configuration = {
         log_driver = "awslogs",
         options = {
@@ -104,30 +74,30 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
       portMappings = [
         {
           containerPort = 8090
-          hostPort = 8090
-          protocol = "tcp"
+          hostPort      = 8090
+          protocol      = "tcp"
         }
       ],
       secrets = [
         {
-          name        = "DATASOURCE_USERNAME",
-          valueFrom  = aws_ssm_parameter.data_source_username.arn
+          name      = "DATASOURCE_USERNAME",
+          valueFrom = aws_ssm_parameter.data_source_username.arn
         },
         {
-          name        = "DATASOURCE_PASSWORD",
-          valueFrom  = aws_ssm_parameter.data_source_password.arn
+          name      = "DATASOURCE_PASSWORD",
+          valueFrom = aws_ssm_parameter.data_source_password.arn
         },
         {
-          name        = "CDA_OAUTH_CLIENT_ID",
-          valueFrom  = aws_ssm_parameter.cda_client_id.arn
+          name      = "CDA_OAUTH_CLIENT_ID",
+          valueFrom = aws_ssm_parameter.cda_client_id.arn
         },
         {
-          name        = "CDA_OAUTH_CLIENT_SECRET",
-          valueFrom  = aws_ssm_parameter.cda_client_secret.arn
+          name      = "CDA_OAUTH_CLIENT_SECRET",
+          valueFrom = aws_ssm_parameter.cda_client_secret.arn
         },
         {
-          name        = "TOGDATA_DATASOURCE_PASSWORD",
-          valueFrom  = aws_ssm_parameter.togdata_datasource_password.arn
+          name      = "TOGDATA_DATASOURCE_PASSWORD",
+          valueFrom = aws_ssm_parameter.togdata_datasource_password.arn
         }
       ],
       environment = [
@@ -213,12 +183,12 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
 # ECS Scaling
 ######################################
 resource "aws_appautoscaling_target" "ecs_service_scaling_target" {
-  max_capacity = 5
-  min_capacity = local.application_data.accounts[local.environment].ecs_service_count
-  resource_id          = "service/${aws_ecs_cluster.app_ecs_cluster.id}/${aws_ecs_service.maat_api_ecs_service.name}"
-  role_arn             = aws_iam_role.maat_api_ecs_autoscaling_role.arn
-  scalable_dimension   = "ecs:service:DesiredCount"
-  service_namespace    = "ecs"
+  max_capacity       = 5
+  min_capacity       = local.application_data.accounts[local.environment].ecs_service_count
+  resource_id        = "service/${aws_ecs_cluster.app_ecs_cluster.id}/${aws_ecs_service.maat_api_ecs_service.name}"
+  role_arn           = aws_iam_role.maat_api_ecs_autoscaling_role.arn
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
 }
 
 resource "aws_appautoscaling_policy" "maat_api_scaling_up_policy" {
@@ -234,7 +204,7 @@ resource "aws_appautoscaling_policy" "maat_api_scaling_up_policy" {
     metric_aggregation_type = "Average"
 
     step_adjustment {
-      scaling_adjustment        = 1
+      scaling_adjustment          = 1
       metric_interval_lower_bound = 0
     }
   }
@@ -253,7 +223,7 @@ resource "aws_appautoscaling_policy" "maat_api_scaling_down_policy" {
     metric_aggregation_type = "Average"
 
     step_adjustment {
-      scaling_adjustment        = -1
+      scaling_adjustment          = -1
       metric_interval_lower_bound = 0
     }
   }
@@ -266,7 +236,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_high_cpu_service_alarm" {
   alarm_name          = "${local.application_name}-api-high-cpu-service-alarm"
   alarm_description   = "CPUUtilization exceeding threshold. Triggers scale up"
   actions_enabled     = true
-  namespace           = "AWS/ECS" 
+  namespace           = "AWS/ECS"
   metric_name         = "CPUUtilization"
   statistic           = "Average"
   period              = 60
@@ -275,7 +245,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_high_cpu_service_alarm" {
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_up_policy.arn]
-  
+
   dimensions = {
     ClusterName = aws_ecs_cluster.app_ecs_cluster.name
     ServiceName = aws_ecs_service.maat_api_ecs_service.name
@@ -286,7 +256,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_low_cpu_service_alarm" {
   alarm_name          = "${local.application_name}-api-low-cpu-service-alarm"
   alarm_description   = "CPUUtilization lower than threshold. Triggers scale down"
   actions_enabled     = true
-  namespace           = "AWS/ECS" 
+  namespace           = "AWS/ECS"
   metric_name         = "CPUUtilization"
   statistic           = "Average"
   period              = 60
@@ -295,7 +265,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_low_cpu_service_alarm" {
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_down_policy.arn]
-  
+
   dimensions = {
     ClusterName = aws_ecs_cluster.app_ecs_cluster.name
     ServiceName = aws_ecs_service.maat_api_ecs_service.name

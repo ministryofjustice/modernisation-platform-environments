@@ -1,1 +1,3 @@
-#### This file can be used to store secrets specific to the member account ####
+resource "aws_secretsmanager_secret" "grafana_api_key" {
+  name = "grafana/api-key"
+}
