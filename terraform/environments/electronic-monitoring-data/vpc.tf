@@ -25,6 +25,13 @@ module "endpoints" {
   vpc_id             = module.vpc.vpc_id
 
   endpoints = {
+    logs = {
+      security_group_ids = [aws_security_group.vpc-endpoints.id]
+      service            = "logs"
+      service_type       = "Interface"
+      subnet_ids         = module.vpc.private_subnets
+      tags               = { Name = format("%s-logs-api-vpc-endpoint", local.application_name) }
+    },
     sagemaker-api = {
       security_group_ids = [aws_security_group.vpc-endpoints.id]
       service            = "sagemaker.api"
@@ -45,6 +52,13 @@ module "endpoints" {
       service_type       = "Interface"
       subnet_ids         = module.vpc.private_subnets
       tags               = { Name = format("%s-servicecatalog-vpc-endpoint", local.application_name) }
+    },
+    sts = {
+      security_group_ids = [aws_security_group.vpc-endpoints.id]
+      service            = "sts"
+      service_type       = "Interface"
+      subnet_ids         = module.vpc.private_subnets
+      tags               = { Name = format("%s-sts-vpc-endpoint", local.application_name) }
     },
     s3 = {
       service         = "s3"
