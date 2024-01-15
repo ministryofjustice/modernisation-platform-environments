@@ -108,7 +108,7 @@ data "aws_iam_policy_document" "db_ssh_keys_s3_policy_document" {
 }
 
 resource "aws_iam_policy" "db_ssh_keys_s3" {
-  name   = "db_ssh_keys_s3"
+  name   = "${var.env_name}_db_ssh_keys_s3"
   policy = data.aws_iam_policy_document.db_ssh_keys_s3_policy_document.json
 }
 
