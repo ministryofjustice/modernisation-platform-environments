@@ -26,8 +26,6 @@ module "environment_dev" {
   delius_db_container_config = local.delius_db_container_config_dev
   bastion                    = local.bastion
 
-  user_data_replace_on_change = local.is-development ? true : false
-
   account_info = local.account_info
 
   environments_in_account = local.delius_environments_per_account.dev

@@ -36,6 +36,8 @@ module "oracle_db_primary" {
 
   ec2_key_pair_name = module.oracle_db_shared.db_key_pair.key_name
 
+  user_data_replace_on_change = var.account_info.mp_environment == "development" ? true : false
+
   ebs_volumes = {
     kms_key_id = var.account_config.kms_keys.ebs_shared
     tags       = local.tags
