@@ -9,7 +9,8 @@ resource "aws_cur_report_definition" "cur_planetfm" {
   s3_region                  = "eu-west-2"
   additional_artifacts       = ["ATHENA"]
   report_versioning          = "OVERWRITE_REPORT"
-  s3_prefix                  = "cur" 
+  s3_prefix                  = "cur"
+  depends_on = [ module.csr-report-bucket]
 }
 
 module "csr-report-bucket" {
