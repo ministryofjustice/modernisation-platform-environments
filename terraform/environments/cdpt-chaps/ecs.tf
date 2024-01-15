@@ -107,7 +107,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.database.db_name}"
+          value = "${local.application_data.accounts[local.environment].db_name}"
         },
         {
           name  = "CLIENT_ID"
