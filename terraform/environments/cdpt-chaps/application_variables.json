@@ -20,7 +20,8 @@
       "ami_image_id": "ami-06cdd5b44c17085ed",
       "instance_type": "t3.medium",
       "container_port": 80,
-      "s3_bucket_name": "chaps-dev-bucket"
+      "s3_bucket_name": "chaps-dev-bucket",
+      "client_id": "aa335a21-40a9-45a0-b0ef-16d65584b024"
     },
     "preproduction": {
       "db_enabled": true,
@@ -42,7 +43,8 @@
       "ami_image_id": "ami-06cdd5b44c17085ed",
       "instance_type": "t3.medium",
       "container_port": 80,
-      "s3_bucket_name": "chaps-staging-bucket"
+      "s3_bucket_name": "chaps-staging-bucket",
+      "client_id": ""
     },
     "production": {
       "db_enabled": true,
@@ -64,7 +66,8 @@
       "ami_image_id": "ami-06cdd5b44c17085ed",
       "instance_type": "t3.medium",
       "container_port": 80,
-      "s3_bucket_name": "chaps-production-bucket"
+      "s3_bucket_name": "chaps-production-bucket",
+      "client_id": ""
     }
   }
 }
