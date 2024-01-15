@@ -9,12 +9,12 @@ resource "aws_instance" "db_ec2" {
   monitoring                  = var.monitoring
   ebs_optimized               = true
   key_name                    = var.ec2_key_pair_name
-  user_data_base64 = templatefile("${path.module}/templates/concatenated_user_data.sh",
+  user_data_base64 = base64encode(templatefile("${path.module}/templates/concatenated_user_data.sh",
     {
       default   = var.user_data
       ssh_setup = templatefile("${path.module}/templates/ssh_key_setup.sh", { aws_region = "eu-west-2", bucket_name = var.ssh_keys_bucket_name })
     }
-  )
+  ))
 
   metadata_options {
     http_endpoint = var.metadata_options.http_endpoint
