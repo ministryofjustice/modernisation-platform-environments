@@ -41,14 +41,6 @@ variable "alb_4xx_alarm_threshold" {
   type = number
   default = 10
 }
-variable "sns_topic_name" {
-  default = "${local.application_name}-${local.environment}-alerting-topic"
-
-}
-variable "pagerduty_integration_key" {
-  default = local.pagerduty_integration_keys[local.pagerduty_integration_key_name]
-}
-
 resource "aws_cloudwatch_log_group" "maat_api_ecs_cw_group" {
   name              = "${local.application_name}-ECS"
   retention_in_days = 90
@@ -243,13 +235,13 @@ resource "aws_cloudwatch_metric_alarm" "application_elb_4xx_error" {
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "maat_api_alerting_topic" {
-  name = var.sns_topic_name
+  name = "${local.application_name}-${local.environment}-alerting-topic"
 }
 
 resource "aws_sns_topic_subscription" "pagerduty_subscription" {
   topic_arn = aws_sns_topic.maat_api_alerting_topic.arn
   protocol  = "https"
-  endpoint  = "https://events.pagerduty.com/integration/${var.pagerduty_integration_key}/enqueue"
+  endpoint  = "https://events.pagerduty.com/integration/${local.pagerduty_integration_keys[local.pagerduty_integration_key_name]}/enqueue"
 }
 
 # Pager duty integration
@@ -267,14 +259,24 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 # Add a local to get the keys
 locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
 }
 
 # link the sns topic to the service
-module "pagerduty_core_alerts" {
+module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.maat_api_alerting_topic
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.maat_api_alerting_topic.name]
-  pagerduty_integration_key = local.pagerduty_integration_keys["<my integration key name>"]
+  pagerduty_integration_key = local.pagerduty_integration_keys["laa_maat_api_nonprod_alarms"]
+}
+
+module "pagerduty_core_alerts_prod" {
+  depends_on = [
+    aws_sns_topic.maat_api_alerting_topic
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.maat_api_alerting_topic.name]
+  pagerduty_integration_key = local.pagerduty_integration_keys["laa_maat_api_prod_alarms"]
 }
