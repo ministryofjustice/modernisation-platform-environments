@@ -101,7 +101,7 @@ resource "aws_cloudwatch_metric_alarm" "target_response_time" {
   alarm_actions       = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions          = [aws_sns_topic.maat_api_alerting_topic.arn]
   dimensions = {
-    LoadBalancer = var.LoadBalancer.LoadBalancerFullName
+    LoadBalancer = aws_lb.maat_api_ecs_lb.name
   }
   comparison_operator = "GreaterThanThreshold"
 }
