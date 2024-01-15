@@ -169,10 +169,10 @@ locals {
           security_groups = []
           cidr_blocks     = local.security_group_cidrs.http8555
         }
-        tcp7474 = {
-          description     = "Allow tcp7474 ingress"
-          from_port       = 7474
-          to_port         = 7474
+        tcp-ems = {
+          description     = "Allow all ems ingress"
+          from_port       = 0
+          to_port         = 0
           protocol        = "tcp"
           security_groups = ["ndh_ems"]
           cidr_blocks     = []
@@ -222,10 +222,10 @@ locals {
           cidr_blocks     = local.security_group_cidrs.tcp7222
           security_groups = []
         }
-        tcp7474 = {
-          description     = "Allow tcp7474 ingress"
-          from_port       = 7474
-          to_port         = 7474
+        tcp-app = {
+          description     = "Allow all app ingress"
+          from_port       = 0
+          to_port         = 0
           protocol        = "tcp"
           security_groups = ["ndh_app"]
           cidr_blocks     = []

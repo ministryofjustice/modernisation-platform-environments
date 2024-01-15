@@ -160,11 +160,11 @@ locals {
       description = "Security group for Windows App Servers"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
           security_groups = ["web"]
         }
         rdp_tcp_app = {
@@ -414,11 +414,11 @@ locals {
       description = "Security group for WINDOWS SQL database servers"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
           security_groups = ["web", "app"]
         }
         netbios_udp_enduser = {
