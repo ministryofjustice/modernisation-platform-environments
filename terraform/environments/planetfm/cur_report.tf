@@ -90,6 +90,7 @@ resource "aws_athena_database" "cur" {
     encryption_configuration {
         encryption_option = "SSE_S3"
     }
+    force_destroy = true
 }
 
 resource "aws_athena_workgroup" "cur" {
@@ -105,6 +106,7 @@ resource "aws_athena_workgroup" "cur" {
             output_location = "s3://${module.csr-report-bucket.bucket.id}/output/"
         }
     }
+    force_destroy = true
 }
 
 resource "aws_glue_catalog_table" "report_status" {
