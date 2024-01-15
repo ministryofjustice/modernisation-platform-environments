@@ -93,6 +93,26 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
         }
       }
       environment = [
+        {
+          name  = "RDS_HOSTNAME"
+          value = "${aws_db_instance.database.address}"
+        },
+        {
+          name  = "RDS_USERNAME"
+          value = "${aws_db_instance.database.username}"
+        },
+        {
+          name  = "RDS_PASSWORD"
+          value = "${aws_db_instance.database.password}"
+        },
+        {
+          name  = "DB_NAME"
+          value = "${aws_db_instance.database.db_name}"
+        },
+        {
+          name  = "CLIENT_ID"
+          value = "${local.application_data.accounts[local.environment].client_id}"
+        }
       ]
     }
   ])
@@ -227,7 +247,7 @@ resource "aws_security_group" "cluster_ec2" {
     from_port       = 1433
     to_port         = 1433
     protocol        = "tcp"
-    security_groups = [aws_security_group.db.id]   
+    security_groups = [aws_security_group.db.id]
   }
 
   egress {
