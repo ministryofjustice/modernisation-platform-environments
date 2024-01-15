@@ -335,309 +335,1221 @@ resource "aws_glue_catalog_table" "report" {
             name = "product_awsresource"
             type = "string"
         }
-	product_backupservice STRING,
-	product_best_practices STRING,
-	product_brioproductid STRING,
-	product_broker_engine STRING,
-	product_bundle STRING,
-	product_bundle_description STRING,
-	product_bundle_group STRING,
-	product_cache_engine STRING,
-	product_cache_type STRING,
-	product_calling_type STRING,
-	product_capacity STRING,
-	product_capacitystatus STRING,
-	product_case_severityresponse_times STRING,
-	product_category STRING,
-	product_chargeid STRING,
-	product_ci_type STRING,
-	product_classicnetworkingsupport STRING,
-	product_clock_speed STRING,
-	product_component STRING,
-	product_compute_family STRING,
-	product_compute_type STRING,
-	product_connection_type STRING,
-	product_content_type STRING,
-	product_country STRING,
-	product_counts_against_quota STRING,
-	product_cputype STRING,
-	product_current_generation STRING,
-	product_customer_service_and_communities STRING,
-	product_data STRING,
-	product_data_transfer_quota STRING,
-	product_data_type STRING,
-	product_database_edition STRING,
-	product_database_engine STRING,
-	product_datatransferout STRING,
-	product_dedicated_ebs_throughput STRING,
-	product_deployment_option STRING,
-	product_describes STRING,
-	product_description STRING,
-	product_direct_connect_location STRING,
-	product_directory_size STRING,
-	product_directory_type STRING,
-	product_directory_type_description STRING,
-	product_disableactivationconfirmationemail STRING,
-	product_durability STRING,
-	product_ecu STRING,
-	product_edition STRING,
-	product_endpoint STRING,
-	product_endpoint_type STRING,
-	product_engine_code STRING,
-	product_enhanced_infrastructure_metrics STRING,
-	product_enhanced_networking_support STRING,
-	product_enhanced_networking_supported STRING,
-	product_entity_type STRING,
-	product_equivalentondemandsku STRING,
-	product_event_type STRING,
-	product_feature STRING,
-	product_fee_code STRING,
-	product_fee_description STRING,
-	product_file_system_type STRING,
-	product_finding_group STRING,
-	product_finding_source STRING,
-	product_finding_storage STRING,
-	product_finding_type STRING,
-	product_free_overage STRING,
-	product_free_query_types STRING,
-	product_free_tier STRING,
-	product_free_trial STRING,
-	product_free_usage_included STRING,
-	product_from_location STRING,
-	product_from_location_type STRING,
-	product_from_region_code STRING,
-	product_georegioncode STRING,
-	product_gets STRING,
-	product_gpu STRING,
-	product_gpu_memory STRING,
-	product_granularity STRING,
-	product_group STRING,
-	product_group_description STRING,
-	product_included_services STRING,
-	product_inference_type STRING,
-	product_input_mode STRING,
-	product_insightstype STRING,
-	product_instance STRING,
-	product_instance_family STRING,
-	product_instance_function STRING,
-	product_instance_name STRING,
-	product_instance_type STRING,
-	product_instance_type_family STRING,
-	product_instances STRING,
-	product_intel_avx2_available STRING,
-	product_intel_avx_available STRING,
-	product_intel_turbo_available STRING,
-	product_invocation STRING,
-	product_io STRING,
-	product_iscommitcpsku STRING,
-	product_job_type STRING,
-	product_launch_support STRING,
-	product_license STRING,
-	product_license_model STRING,
-	product_line_type STRING,
-	product_location STRING,
-	product_location_type STRING,
-	product_logs_destination STRING,
-	product_mailbox_storage STRING,
-	product_marketoption STRING,
-	product_max_iops_burst_performance STRING,
-	product_max_iopsvolume STRING,
-	product_max_throughputvolume STRING,
-	product_max_volume_size STRING,
-	product_maximum_extended_storage STRING,
-	product_maximum_storage_volume STRING,
-	product_memory STRING,
-	product_memory_gib STRING,
-	product_memorytype STRING,
-	product_message_delivery_frequency STRING,
-	product_message_delivery_order STRING,
-	product_min_volume_size STRING,
-	product_minimum_storage_volume STRING,
-	product_multi_session STRING,
-	product_network_performance STRING,
-	product_normalization_size_factor STRING,
-	product_operating_system STRING,
-	product_operation STRING,
-	product_operations_support STRING,
-	product_ops_items STRING,
-	product_origin STRING,
-	product_os_license_model STRING,
-	product_output_mode STRING,
-	product_overage_type STRING,
-	product_overhead STRING,
-	product_pack_size STRING,
-	product_parameter_type STRING,
-	product_physical_cpu STRING,
-	product_physical_gpu STRING,
-	product_physical_processor STRING,
-	product_platoclassificationtype STRING,
-	product_platodataanalyzedtype STRING,
-	product_platofeaturetype STRING,
-	product_platoinstancename STRING,
-	product_platoinstancetype STRING,
-	product_platopagedatatype STRING,
-	product_platopricingtype STRING,
-	product_platoprotectionpolicytype STRING,
-	product_platoprotocoltype STRING,
-	product_platostoragename STRING,
-	product_platostoragetype STRING,
-	product_platotrafficdirection STRING,
-	product_platotransfertype STRING,
-	product_platousagetype STRING,
-	product_platovolumetype STRING,
-	product_port_speed STRING,
-	product_pre_installed_sw STRING,
-	product_pricing_unit STRING,
-	product_primaryplaceofuse STRING,
-	product_proactive_guidance STRING,
-	product_processor_architecture STRING,
-	product_processor_features STRING,
-	product_product_family STRING,
-	product_product_schema_description STRING,
-	product_product_type STRING,
-	product_productgroupid STRING,
-	product_productsubgroup STRING,
-	product_programmatic_case_management STRING,
-	product_provisioned STRING,
-	product_purchaseterm STRING,
-	product_q_present STRING,
-	product_queue_type STRING,
-	product_ratetype STRING,
-	product_recipient STRING,
-	product_region STRING,
-	product_region_code STRING,
-	product_replication_type STRING,
-	product_request_description STRING,
-	product_request_type STRING,
-	product_resource STRING,
-	product_resource_assessment STRING,
-	product_resource_endpoint STRING,
-	product_resource_price_group STRING,
-	product_resource_type STRING,
-	product_response STRING,
-	product_rootvolume STRING,
-	product_routing_target STRING,
-	product_routing_type STRING,
-	product_running_mode STRING,
-	product_scan_type STRING,
-	product_servicecode STRING,
-	product_servicename STRING,
-	product_size STRING,
-	product_sku STRING,
-	product_snapshotarchivefeetype STRING,
-	product_software_included STRING,
-	product_standard_group STRING,
-	product_standard_storage STRING,
-	product_standard_storage_retention_included STRING,
-	product_steps STRING,
-	product_storage STRING,
-	product_storage_class STRING,
-	product_storage_media STRING,
-	product_storage_type STRING,
-	product_subcategory STRING,
-	product_subscription_type STRING,
-	product_supported_modes STRING,
-	product_technical_support STRING,
-	product_tenancy STRING,
-	product_thirdparty_software_support STRING,
-	product_throughput STRING,
-	product_throughput_capacity STRING,
-	product_throughput_class STRING,
-	product_tickettype STRING,
-	product_tiertype STRING,
-	product_time_window STRING,
-	product_titan_model STRING,
-	product_to_location STRING,
-	product_to_location_type STRING,
-	product_to_region_code STRING,
-	product_training STRING,
-	product_transaction_type STRING,
-	product_transfer_type STRING,
-	product_type STRING,
-	product_type_description STRING,
-	product_updates STRING,
-	product_usage_family STRING,
-	product_usage_group STRING,
-	product_usage_volume STRING,
-	product_usagetype STRING,
-	product_uservolume STRING,
-	product_vcpu STRING,
-	product_version STRING,
-	product_video_memory_gib STRING,
-	product_virtual_interface_type STRING,
-	product_vmwareproductid STRING,
-	product_vmwareregion STRING,
-	product_volume_api_name STRING,
-	product_volume_type STRING,
-	product_vpcnetworkingsupport STRING,
-	product_who_can_open_cases STRING,
-	product_with_active_users STRING,
-	pricing_lease_contract_length STRING,
-	pricing_offering_class STRING,
-	pricing_purchase_option STRING,
-	pricing_rate_code STRING,
-	pricing_rate_id STRING,
-	pricing_currency STRING,
-	pricing_public_on_demand_cost DOUBLE,
-	pricing_public_on_demand_rate STRING,
-	pricing_term STRING,
-	pricing_unit STRING,
-	reservation_amortized_upfront_cost_for_usage DOUBLE,
-	reservation_amortized_upfront_fee_for_billing_period DOUBLE,
-	reservation_effective_cost DOUBLE,
-	reservation_end_time STRING,
-	reservation_modification_status STRING,
-	reservation_net_amortized_upfront_cost_for_usage DOUBLE,
-	reservation_net_amortized_upfront_fee_for_billing_period DOUBLE,
-	reservation_net_effective_cost DOUBLE,
-	reservation_net_recurring_fee_for_usage DOUBLE,
-	reservation_net_unused_amortized_upfront_fee_for_billing_period DOUBLE,
-	reservation_net_unused_recurring_fee DOUBLE,
-	reservation_net_upfront_value DOUBLE,
-	reservation_normalized_units_per_reservation STRING,
-	reservation_number_of_reservations STRING,
-	reservation_recurring_fee_for_usage DOUBLE,
-	reservation_start_time STRING,
-	reservation_subscription_id STRING,
-	reservation_total_reserved_normalized_units STRING,
-	reservation_total_reserved_units STRING,
-	reservation_units_per_reservation STRING,
-	reservation_unused_amortized_upfront_fee_for_billing_period DOUBLE,
-	reservation_unused_normalized_unit_quantity DOUBLE,
-	reservation_unused_quantity DOUBLE,
-	reservation_unused_recurring_fee DOUBLE,
-	reservation_upfront_value DOUBLE,
-	discount_edp_discount DOUBLE,
-	discount_total_discount DOUBLE,
-	savings_plan_total_commitment_to_date DOUBLE,
-	savings_plan_savings_plan_a_r_n STRING,
-	savings_plan_savings_plan_rate DOUBLE,
-	savings_plan_used_commitment DOUBLE,
-	savings_plan_savings_plan_effective_cost DOUBLE,
-	savings_plan_amortized_upfront_commitment_for_billing_period DOUBLE,
-	savings_plan_recurring_commitment_for_billing_period DOUBLE,
-	savings_plan_start_time STRING,
-	savings_plan_end_time STRING,
-	savings_plan_offering_type STRING,
-	savings_plan_payment_option STRING,
-	savings_plan_purchase_term STRING,
-	savings_plan_region STRING,
-	savings_plan_net_savings_plan_effective_cost DOUBLE,
-	savings_plan_net_amortized_upfront_commitment_for_billing_period DOUBLE,
-	savings_plan_net_recurring_commitment_for_billing_period DOUBLE,
-	resource_tags_aws_created_by STRING,
-	resource_tags_user_stack STRING,
-	resource_tags_user_app_kubernetes_io_name STRING,
-	resource_tags_user_application STRING,
-	resource_tags_user_business_unit STRING,
-	resource_tags_user_component STRING,
-	resource_tags_user_eks_cluster_name STRING,
-	resource_tags_user_environment_name STRING,
-	resource_tags_user_infrastructure_support STRING,
-	resource_tags_user_is_production STRING,
-	resource_tags_user_namespace STRING,
-	resource_tags_user_owner STRING,
-	resource_tags_user_runbook STRING,
-	resource_tags_user_source_code STRING
+        columns {
+            name = "product_backupservice"
+            type = "string"
+        }
+        columns {
+            name = "product_best_practices"
+            type = "string"
+        }
+        columns {
+            name = "product_brioproductid"
+            type = "string"
+        }
+        columns {
+            name = "product_broker_engine"
+            type = "string"
+        }
+        columns {
+            name = "product_bundle"
+            type = "string"
+        }
+        columns {
+            name = "product_bundle_description"
+            type = "string"
+        }
+        columns {
+            name = "product_bundle_group"
+            type = "string"
+        }
+        columns {
+            name = "product_cache_engine"
+            type = "string"
+        }
+        columns {
+            name = "product_cache_type"
+            type = "string"
+        }
+        columns {
+            name = "product_calling_type"
+            type = "string"
+        }
+        columns {
+            name = "product_capacity"
+            type = "string"
+        }
+        columns {
+            name = "product_capacitystatus"
+            type = "string"
+        }
+        columns {
+            name = "product_case_severityresponse_times"
+            type = "string"
+        }
+        columns {
+            name = "product_category"
+            type = "string"
+        }
+        columns {
+            name = "product_chargeid"
+            type = "string"
+        }
+        columns {
+            name = "product_ci_type"
+            type = "string"
+        }
+        columns {
+            name = "product_classicnetworkingsupport"
+            type = "string"
+        }
+        columns {
+            name = "product_clock_speed"
+            type = "string"
+        }
+        columns {
+            name = "product_component"
+            type = "string"
+        }
+        columns {
+            name = "product_compute_family"
+            type = "string"
+        }
+        columns {
+            name = "product_compute_type"
+            type = "string"
+        }
+        columns {
+            name = "product_connection_type"
+            type = "string"
+        }
+        columns {
+            name = "product_content_type"
+            type = "string"
+        }
+        columns {
+            name = "product_country"
+            type = "string"
+        }
+        columns {
+            name = "product_counts_against_quota"
+            type = "string"
+        }
+        columns {
+            name = "product_cputype"
+            type = "string"
+        }
+        columns {
+            name = "product_current_generation"
+            type = "string"
+        }
+        columns {
+            name = "product_customer_service_and_communities"
+            type = "string"
+        }
+        columns {
+            name = "product_data"
+            type = "string"
+        }
+        columns {
+            name = "product_data_transfer_quota"
+            type = "string"
+        }
+        columns {
+            name = "product_data_type"
+            type = "string"
+        }
+        columns {
+            name = "product_database_edition"
+            type = "string"
+        }
+        columns {
+            name = "product_database_engine"
+            type = "string"
+        }
+        columns {
+            name = "product_datatransferout"
+            type = "string"
+        }
+        columns {
+            name = "product_dedicated_ebs_throughput"
+            type = "string"
+        }
+        columns {
+            name = "product_deployment_option"
+            type = "string"
+        }
+        columns {
+            name = "product_describes"
+            type = "string"
+        }
+        columns {
+            name = "product_description"
+            type = "string"
+        }
+        columns {
+            name = "product_direct_connect_location"
+            type = "string"
+        }
+        columns {
+            name = "product_directory_size"
+            type = "string"
+        }
+        columns {
+            name = "product_directory_type"
+            type = "string"
+        }
+        columns {
+            name = "product_directory_type_description"
+            type = "string"
+        }
+        columns {
+            name = "product_disableactivationconfirmationemail"
+            type = "string"
+        }
+        columns {
+            name = "product_durability"
+            type = "string"
+        }
+        columns {
+            name = "product_ecu"
+            type = "string"
+        }
+        columns {
+            name = "product_edition"
+            type = "string"
+        }
+        columns {
+            name = "product_endpoint"
+            type = "string"
+        }
+        columns {
+            name = "product_endpoint_type"
+            type = "string"
+        }
+        columns {
+            name = "product_engine_code"
+            type = "string"
+        }
+        columns {
+            name = "product_enhanced_infrastructure_metrics"
+            type = "string"
+        }
+        columns {
+            name = "product_enhanced_networking_support"
+            type = "string"
+        }
+        columns {
+            name = "product_enhanced_networking_supported"
+            type = "string"
+        }
+        columns {
+            name = "product_entity_type"
+            type = "string"
+        }
+        columns {
+            name = "product_equivalentondemandsku"
+            type = "string"
+        }
+        columns {
+            name = "product_event_type"
+            type = "string"
+        }
+        columns {
+            name = "product_feature"
+            type = "string"
+        }
+        columns {
+            name = "product_fee_code"
+            type = "string"
+        }
+        columns {
+            name = "product_fee_description"
+            type = "string"
+        }
+        columns {
+            name = "product_file_system_type"
+            type = "string"
+        }
+        columns {
+            name = "product_finding_group"
+            type = "string"
+        }
+        columns {
+            name = "product_finding_source"
+            type = "string"
+        }
+        columns {
+            name = "product_finding_storage"
+            type = "string"
+        }
+        columns {
+            name = "product_finding_type"
+            type = "string"
+        }
+        columns {
+            name = "product_free_overage"
+            type = "string"
+        }
+        columns {
+            name = "product_free_query_types"
+            type = "string"
+        }
+        columns {
+            name = "product_free_tier"
+            type = "string"
+        }
+        columns {
+            name = "product_free_trial"
+            type = "string"
+        }
+        columns {
+            name = "product_free_usage_included"
+            type = "string"
+        }
+        columns {
+            name = "product_from_location"
+            type = "string"
+        }
+        columns {
+            name = "product_from_location_type"
+            type = "string"
+        }
+        columns {
+            name = "product_from_region_code"
+            type = "string"
+        }
+        columns {
+            name = "product_georegioncode"
+            type = "string"
+        }
+        columns {
+            name = "product_gets"
+            type = "string"
+        }
+        columns {
+            name = "product_gpu"
+            type = "string"
+        }
+        columns {
+            name = "product_gpu_memory"
+            type = "string"
+        }
+        columns {
+            name = "product_granularity"
+            type = "string"
+        }
+        columns {
+            name = "product_group"
+            type = "string"
+        }
+        columns {
+            name = "product_group_description"
+            type = "string"
+        }
+        columns {
+            name = "product_included_services"
+            type = "string"
+        }
+        columns {
+            name = "product_inference_type"
+            type = "string"
+        }
+        columns {
+            name = "product_input_mode"
+            type = "string"
+        }
+        columns {
+            name = "product_insightstype"
+            type = "string"
+        }
+        columns {
+            name = "product_instance"
+            type = "string"
+        }
+        columns {
+            name = "product_instance_family"
+            type = "string"
+        }
+        columns {
+            name = "product_instance_function"
+            type = "string"
+        }
+        columns {
+            name = "product_instance_name"
+            type = "string"
+        }
+        columns {
+            name = "product_instance_type"
+            type = "string"
+        }
+        columns {
+            name = "product_instance_type_family"
+            type = "string"
+        }
+        columns {
+            name = "product_instances"
+            type = "string"
+        }
+        columns {
+            name = "product_intel_avx2_available"
+            type = "string"
+        }
+        columns {
+            name = "product_intel_avx_available"
+            type = "string"
+        }
+        columns {
+            name = "product_intel_turbo_available"
+            type = "string"
+        }
+        columns {
+            name = "product_invocation"
+            type = "string"
+        }
+        columns {
+            name = "product_io"
+            type = "string"
+        }
+        columns {
+            name = "product_iscommitcpsku"
+            type = "string"
+        }
+        columns {
+            name = "product_job_type"
+            type = "string"
+        }
+        columns {
+            name = "product_launch_support"
+            type = "string"
+        }
+        columns {
+            name = "product_license"
+            type = "string"
+        }
+        columns {
+            name = "product_license_model"
+            type = "string"
+        }
+        columns {
+            name = "product_line_type"
+            type = "string"
+        }
+        columns {
+            name = "product_location"
+            type = "string"
+        }
+        columns {
+            name = "product_location_type"
+            type = "string"
+        }
+        columns {
+            name = "product_logs_destination"
+            type = "string"
+        }
+        columns {
+            name = "product_mailbox_storage"
+            type = "string"
+        }
+        columns {
+            name = "product_marketoption"
+            type = "string"
+        }
+        columns {
+            name = "product_max_iops_burst_performance"
+            type = "string"
+        }
+        columns {
+            name = "product_max_iopsvolume"
+            type = "string"
+        }
+        columns {
+            name = "product_max_throughputvolume"
+            type = "string"
+        }
+        columns {
+            name = "product_max_volume_size"
+            type = "string"
+        }
+        columns {
+            name = "product_maximum_extended_storage"
+            type = "string"
+        }
+        columns {
+            name = "product_maximum_storage_volume"
+            type = "string"
+        }
+        columns {
+            name = "product_memory"
+            type = "string"
+        }
+        columns {
+            name = "product_memory_gib"
+            type = "string"
+        }
+        columns {
+            name = "product_memorytype"
+            type = "string"
+        }
+        columns {
+            name = "product_message_delivery_frequency"
+            type = "string"
+        }
+        columns {
+            name = "product_message_delivery_order"
+            type = "string"
+        }
+        columns {
+            name = "product_min_volume_size"
+            type = "string"
+        }
+        columns {
+            name = "product_minimum_storage_volume"
+            type = "string"
+        }
+        columns {
+            name = "product_multi_session"
+            type = "string"
+        }
+        columns {
+            name = "product_network_performance"
+            type = "string"
+        }
+        columns {
+            name = "product_normalization_size_factor"
+            type = "string"
+        }
+        columns {
+            name = "product_operating_system"
+            type = "string"
+        }
+        columns {
+            name = "product_operation"
+            type = "string"
+        }
+        columns {
+            name = "product_operations_support"
+            type = "string"
+        }
+        columns {
+            name = "product_ops_items"
+            type = "string"
+        }
+        columns {
+            name = "product_origin"
+            type = "string"
+        }
+        columns {
+            name = "product_os_license_model"
+            type = "string"
+        }
+        columns {
+            name = "product_output_mode"
+            type = "string"
+        }
+        columns {
+            name = "product_overage_type"
+            type = "string"
+        }
+        columns {
+            name = "product_overhead"
+            type = "string"
+        }
+        columns {
+            name = "product_pack_size"
+            type = "string"
+        }
+        columns {
+            name = "product_parameter_type"
+            type = "string"
+        }
+        columns {
+            name = "product_physical_cpu"
+            type = "string"
+        }
+        columns {
+            name = "product_physical_gpu"
+            type = "string"
+        }
+        columns {
+            name = "product_physical_processor"
+            type = "string"
+        }
+        columns {
+            name = "product_platoclassificationtype"
+            type = "string"
+        }
+        columns {
+            name = "product_platodataanalyzedtype"
+            type = "string"
+        }
+        columns {
+            name = "product_platofeaturetype"
+            type = "string"
+        }
+        columns {
+            name = "product_platoinstancename"
+            type = "string"
+        }
+        columns {
+            name = "product_platoinstancetype"
+            type = "string"
+        }
+        columns {
+            name = "product_platopagedatatype"
+            type = "string"
+        }
+        columns {
+            name = "product_platopricingtype"
+            type = "string"
+        }
+        columns {
+            name = "product_platoprotectionpolicytype"
+            type = "string"
+        }
+        columns {
+            name = "product_platoprotocoltype"
+            type = "string"
+        }
+        columns {
+            name = "product_platostoragename"
+            type = "string"
+        }
+        columns {
+            name = "product_platostoragetype"
+            type = "string"
+        }
+        columns {
+            name = "product_platotrafficdirection"
+            type = "string"
+        }
+        columns {
+            name = "product_platotransfertype"
+            type = "string"
+        }
+        columns {
+            name = "product_platousagetype"
+            type = "string"
+        }
+        columns {
+            name = "product_platovolumetype"
+            type = "string"
+        }
+        columns {
+            name = "product_port_speed"
+            type = "string"
+        }
+        columns {
+            name = "product_pre_installed_sw"
+            type = "string"
+        }
+        columns {
+            name = "product_pricing_unit"
+            type = "string"
+        }
+        columns {
+            name = "product_primaryplaceofuse"
+            type = "string"
+        }
+        columns {
+            name = "product_proactive_guidance"
+            type = "string"
+        }
+        columns {
+            name = "product_processor_architecture"
+            type = "string"
+        }
+        columns {
+            name = "product_processor_features"
+            type = "string"
+        }
+        columns {
+            name = "product_product_family"
+            type = "string"
+        }
+        columns {
+            name = "product_product_schema_description"
+            type = "string"
+        }
+        columns {
+            name = "product_product_type"
+            type = "string"
+        }
+        columns {
+            name = "product_productgroupid"
+            type = "string"
+        }
+        columns {
+            name = "product_productsubgroup"
+            type = "string"
+        }
+        columns {
+            name = "product_programmatic_case_management"
+            type = "string"
+        }
+        columns {
+            name = "product_provisioned"
+            type = "string"
+        }
+        columns {
+            name = "product_purchaseterm"
+            type = "string"
+        }
+        columns {
+            name = "product_q_present"
+            type = "string"
+        }
+        columns {
+            name = "product_queue_type"
+            type = "string"
+        }
+        columns {
+            name = "product_ratetype"
+            type = "string"
+        }
+        columns {
+            name = "product_recipient"
+            type = "string"
+        }
+        columns {
+            name = "product_region"
+            type = "string"
+        }
+        columns {
+            name = "product_region_code"
+            type = "string"
+        }
+        columns {
+            name = "product_replication_type"
+            type = "string"
+        }
+        columns {
+            name = "product_request_description"
+            type = "string"
+        }
+        columns {
+            name = "product_request_type"
+            type = "string"
+        }
+        columns {
+            name = "product_resource"
+            type = "string"
+        }
+        columns {
+            name = "product_resource_assessment"
+            type = "string"
+        }
+        columns {
+            name = "product_resource_endpoint"
+            type = "string"
+        }
+        columns {
+            name = "product_resource_price_group"
+            type = "string"
+        }
+        columns {
+            name = "product_resource_type"
+            type = "string"
+        }
+        columns {
+            name = "product_response"
+            type = "string"
+        }
+        columns {
+            name = "product_rootvolume"
+            type = "string"
+        }
+        columns {
+            name = "product_routing_target"
+            type = "string"
+        }
+        columns {
+            name = "product_routing_type"
+            type = "string"
+        }
+        columns {
+            name = "product_running_mode"
+            type = "string"
+        }
+        columns {
+            name = "product_scan_type"
+            type = "string"
+        }
+        columns {
+            name = "product_servicecode"
+            type = "string"
+        }
+        columns {
+            name = "product_servicename"
+            type = "string"
+        }
+        columns {
+            name = "product_size"
+            type = "string"
+        }
+        columns {
+            name = "product_sku"
+            type = "string"
+        }
+        columns {
+            name = "product_snapshotarchivefeetype"
+            type = "string"
+        }
+        columns {
+            name = "product_software_included"
+            type = "string"
+        }
+        columns {
+            name = "product_standard_group"
+            type = "string"
+        }
+        columns {
+            name = "product_standard_storage"
+            type = "string"
+        }
+        columns {
+            name = "product_standard_storage_retention_included"
+            type = "string"
+        }
+        columns {
+            name = "product_steps"
+            type = "string"
+        }
+        columns {
+            name = "product_storage"
+            type = "string"
+        }
+        columns {
+            name = "product_storage_class"
+            type = "string"
+        }
+        columns {
+            name = "product_storage_media"
+            type = "string"
+        }
+        columns {
+            name = "product_storage_type"
+            type = "string"
+        }
+        columns {
+            name = "product_subcategory"
+            type = "string"
+        }
+        columns {
+            name = "product_subscription_type"
+            type = "string"
+        }
+        columns {
+            name = "product_supported_modes"
+            type = "string"
+        }
+        columns {
+            name = "product_technical_support"
+            type = "string"
+        }
+        columns {
+            name = "product_tenancy"
+            type = "string"
+        }
+        columns {
+            name = "product_thirdparty_software_support"
+            type = "string"
+        }
+        columns {
+            name = "product_throughput"
+            type = "string"
+        }
+        columns {
+            name = "product_throughput_capacity"
+            type = "string"
+        }
+        columns {
+            name = "product_throughput_class"
+            type = "string"
+        }
+        columns {
+            name = "product_tickettype"
+            type = "string"
+        }
+        columns {
+            name = "product_tiertype"
+            type = "string"
+        }
+        columns {
+            name = "product_time_window"
+            type = "string"
+        }
+        columns {
+            name = "product_titan_model"
+            type = "string"
+        }
+        columns {
+            name = "product_to_location"
+            type = "string"
+        }
+        columns {
+            name = "product_to_location_type"
+            type = "string"
+        }
+        columns {
+            name = "product_to_region_code"
+            type = "string"
+        }
+        columns {
+            name = "product_training"
+            type = "string"
+        }
+        columns {
+            name = "product_transaction_type"
+            type = "string"
+        }
+        columns {
+            name = "product_transfer_type"
+            type = "string"
+        }
+        columns {
+            name = "product_type"
+            type = "string"
+        }
+        columns {
+            name = "product_type_description"
+            type = "string"
+        }
+        columns {
+            name = "product_updates"
+            type = "string"
+        }
+        columns {
+            name = "product_usage_family"
+            type = "string"
+        }
+        columns {
+            name = "product_usage_group"
+            type = "string"
+        }
+        columns {
+            name = "product_usage_volume"
+            type = "string"
+        }
+        columns {
+            name = "product_usagetype"
+            type = "string"
+        }
+        columns {
+            name = "product_uservolume"
+            type = "string"
+        }
+        columns {
+            name = "product_vcpu"
+            type = "string"
+        }
+        columns {
+            name = "product_version"
+            type = "string"
+        }
+        columns {
+            name = "product_video_memory_gib"
+            type = "string"
+        }
+        columns {
+            name = "product_virtual_interface_type"
+            type = "string"
+        }
+        columns {
+            name = "product_vmwareproductid"
+            type = "string"
+        }
+        columns {
+            name = "product_vmwareregion"
+            type = "string"
+        }
+        columns {
+            name = "product_volume_api_name"
+            type = "string"
+        }
+        columns {
+            name = "product_volume_type"
+            type = "string"
+        }
+        columns {
+            name = "product_vpcnetworkingsupport"
+            type = "string"
+        }
+        columns {
+            name = "product_who_can_open_cases"
+            type = "string"
+        }
+        columns {
+            name = "product_with_active_users"
+            type = "string"
+        }
+        columns {
+            name = "pricing_lease_contract_length"
+            type = "string"
+        }
+        columns {
+            name = "pricing_offering_class"
+            type = "string"
+        }
+        columns {
+            name = "pricing_purchase_option"
+            type = "string"
+        }
+        columns {
+            name = "pricing_rate_code"
+            type = "string"
+        }
+        columns {
+            name = "pricing_rate_id"
+            type = "string"
+        }
+        columns {
+            name = "pricing_currency"
+            type = "string"
+        }
+        columns {
+            name = "pricing_public_on_demand_cost"
+            type = "double"
+        }
+        columns {
+            name = "pricing_public_on_demand_rate"
+            type = "string"
+        }
+        columns {
+            name = "pricing_term"
+            type = "string"
+        }
+        columns {
+            name = "pricing_unit"
+            type = "string"
+        }
+        columns {
+            name = "reservation_amortized_upfront_cost_for_usage"
+            type = "double"
+        }
+        columns {
+            name = "reservation_amortized_upfront_fee_for_billing_period"
+            type = "double"
+        }
+        columns {
+            name = "reservation_effective_cost"
+            type = "double"
+        }
+        columns {
+            name = "reservation_end_time"
+            type = "string"
+        }
+        columns {
+            name = "reservation_modification_status"
+            type = "string"
+        }
+        columns {
+            name = "reservation_net_amortized_upfront_cost_for_usage"
+            type = "double"
+        }
+        columns {
+            name = "reservation_net_amortized_upfront_fee_for_billing_period"
+            type = "double"
+        }
+        columns {
+            name = "reservation_net_effective_cost"
+            type = "double"
+        }
+        columns {
+            name = "reservation_net_recurring_fee_for_usage"
+            type = "double"
+        }
+        columns {
+            name = "reservation_net_unused_amortized_upfront_fee_for_billing_period"
+            type = "double"
+        }
+        columns {
+            name = "reservation_net_unused_recurring_fee"
+            type = "double"
+        }
+        columns {
+            name = "reservation_net_upfront_value"
+            type = "double"
+        }
+        columns {
+            name = "reservation_normalized_units_per_reservation"
+            type = "string"
+        }
+        columns {
+            name = "reservation_number_of_reservations"
+            type = "string"
+        }
+        columns {
+            name = "reservation_recurring_fee_for_usage"
+            type = "double"
+        }
+        columns {
+            name = "reservation_start_time"
+            type = "string"
+        }
+        columns {
+            name = "reservation_subscription_id"
+            type = "string"
+        }
+        columns {
+            name = "reservation_total_reserved_normalized_units"
+            type = "string"
+        }
+        columns {
+            name = "reservation_total_reserved_units"
+            type = "string"
+        }
+        columns {
+            name = "reservation_units_per_reservation"
+            type = "string"
+        }
+        columns {
+            name = "reservation_unused_amortized_upfront_fee_for_billing_period"
+            type = "double"
+        }
+        columns {
+            name = "reservation_unused_normalized_unit_quantity"
+            type = "double"
+        }
+        columns {
+            name = "reservation_unused_quantity"
+            type = "double"
+        }
+        columns {
+            name = "reservation_unused_recurring_fee"
+            type = "double"
+        }
+        columns {
+            name = "reservation_upfront_value"
+            type = "double"
+        }
+        columns {
+            name = "discount_edp_discount"
+            type = "double"
+        }
+        columns {
+            name = "discount_total_discount"
+            type = "double"
+        }
+        columns {
+            name = "savings_plan_total_commitment_to_date"
+            type = "double"
+        }
+        columns {
+            name = "savings_plan_savings_plan_a_r_n"
+            type = "string"
+        }
+        columns {
+            name = "savings_plan_savings_plan_rate"
+            type = "double"
+        }
+        columns {
+            name = "savings_plan_used_commitment"
+            type = "double"
+        }
+        columns {
+            name = "savings_plan_savings_plan_effective_cost"
+            type = "double"
+        }
+        columns {
+            name = "savings_plan_amortized_upfront_commitment_for_billing_period"
+            type = "double"
+        }
+        columns {
+            name = "savings_plan_recurring_commitment_for_billing_period"
+            type = "double"
+        }
+        columns {
+            name = "savings_plan_start_time"
+            type = "string"
+        }
+        columns {
+            name = "savings_plan_end_time"
+            type = "string"
+        }
+        columns {
+            name = "savings_plan_offering_type"
+            type = "string"
+        }
+        columns {
+            name = "savings_plan_payment_option"
+            type = "string"
+        }
+        columns {
+            name = "savings_plan_purchase_term"
+            type = "string"
+        }
+        columns {
+            name = "savings_plan_region"
+            type = "string"
+        }
+        columns {
+            name = "savings_plan_net_savings_plan_effective_cost"
+            type = "double"
+        }
+        columns {
+            name = "savings_plan_net_amortized_upfront_commitment_for_billing_period"
+            type = "double"
+        }
+        columns {
+            name = "savings_plan_net_recurring_commitment_for_billing_period"
+            type = "double"
+        }
+        columns {
+            name = "resource_tags_aws_created_by"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_stack"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_app_kubernetes_io_name"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_application"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_business_unit"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_component"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_eks_cluster_name"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_environment_name"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_infrastructure_support"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_is_production"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_namespace"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_owner"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_runbook"
+            type = "string"
+        }
+        columns {
+            name = "resource_tags_user_source_code"
+            type = "string"
+        }
     }
 }
