@@ -2,17 +2,18 @@
 ## SYNCHRONIZE USERS AND PUBLIC KEYS ##
 #######################################\
 
-# Source: https://github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux/blob/main/templates/user_data.sh.tftpl
+# Source: https://github.com/ministryofjustice/modernisation-platform-terraform-db-linux/blob/main/templates/user_data.sh.tftpl
 
-# Bastion host users should log in to the bastion host with their personal SSH key pair.
+# db host users should log in to the db host with their personal SSH key pair.
 # The public keys are stored on S3 with the following naming convention: "username.pub".
 # This script retrieves the public keys, creates or deletes local user accounts as needed,
 # and copies the public key to /home/username/.ssh/authorized_keys
-
-cat > /usr/bin/bastion/sync_users << 'EOF'
+mkdir -p /usr/bin/db
+touch /usr/bin/db/sync_users
+cat > /usr/bin/db/sync_users << 'EOF'
 #!/usr/bin/env bash
 # The file will log user changes
-LOG_FILE="/var/log/bastion/users_changelog.txt"
+LOG_FILE="/var/log/db/users_changelog.txt"
 # The function returns the user name from the public key file name.
 # Example: public-keys/sshuser.pub => sshuser
 get_user_name () {
@@ -58,4 +59,6 @@ if [ -f ~/keys_installed ]; then
 fi
 EOF
 
-chmod 700 /usr/bin/bastion/sync_users
+chmod 700 /usr/bin/db/sync_users
+
+./usr/bin/db/sync_users
