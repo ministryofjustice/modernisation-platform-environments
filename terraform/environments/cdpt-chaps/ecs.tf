@@ -132,7 +132,7 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   network_configuration {
-    subnets         = data.aws_subnets.shared-public.ids
+    subnets         = data.aws_subnets.shared-private.ids
     security_groups = [aws_security_group.ecs_service.id]
   }
 
