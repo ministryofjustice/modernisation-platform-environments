@@ -9,6 +9,6 @@ check "aws completions existence" stat /home/vscode/.devcontainer/feature-comple
 
 check "aws-sso version" aws-sso version
 check "aws-sso completions existence" stat /home/vscode/.devcontainer/feature-completion/aws-sso.sh
-check "aws-sso configuration existence" stat /home/vscode/.aw-sso/config.yaml
+check "aws-sso configuration existence" stat /home/vscode/.aws-sso/config.yaml
 
 reportResults
