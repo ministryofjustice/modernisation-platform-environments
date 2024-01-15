@@ -63,3 +63,56 @@ resource "aws_s3_object" "user_public_keys" {
 
 }
 
+data "aws_iam_policy_document" "db_ssh_keys_s3_policy_document" {
+
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:GetObject"
+    ]
+    resources = ["${module.s3_bucket_ssh_keys.bucket.arn}/logs/*"]
+  }
+
+  statement {
+    actions = [
+      "s3:GetObject"
+    ]
+    resources = ["${module.s3_bucket_ssh_keys.bucket.arn}/public-keys/*"]
+  }
+
+  statement {
+    actions = [
+      "s3:ListBucket"
+    ]
+    resources = [module.s3_bucket_ssh_keys.bucket.arn]
+
+    condition {
+      test = "ForAnyValue:StringEquals"
+      values = [
+        "public-keys/",
+        "logs/"
+      ]
+      variable = "s3:prefix"
+    }
+  }
+
+  statement {
+    actions = [
+
+      "kms:Encrypt",
+      "kms:Decrypt",
+    ]
+    resources = [var.account_config.kms_keys.general_shared]
+  }
+}
+
+resource "aws_iam_policy" "db_ssh_keys_s3" {
+  name   = "db_ssh_keys_s3"
+  policy = data.aws_iam_policy_document.db_ssh_keys_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "db_ssh_keys_s3" {
+  policy_arn = aws_iam_policy.db_ssh_keys_s3.arn
+  role       = aws_iam_role.db_ec2_instance_iam_role.name
+}
