@@ -148,27 +148,7 @@ locals {
   }
   baseline_iam_roles = {
     # allow EC2 instance profiles ability to assume this role
-    EC2OracleEnterpriseManagementSecretsRole = {
-      assume_role_policy = [{
-        effect  = "Allow"
-        actions = ["sts:AssumeRole"]
-        principals = {
-          type        = "AWS"
-          identifiers = ["*"]
-        }
-        conditions = [{
-          test     = "ForAnyValue:ArnLike"
-          variable = "aws:PrincipalArn"
-          values = [
-            "arn:aws:iam::${var.environment.account_id}:role/ec2-*",
-          ]
-        }]
-      }]
-      policy_attachments = [
-        "OracleEnterpriseManagementSecretsPolicy",
-        "BusinessUnitKmsCmkPolicy",
-      ]
-    }
+    EC2OracleEnterpriseManagementSecretsRole = module.baseline_presets.iam_roles.EC2OracleEnterpriseManagementSecretsRole
     DBRefresherRole = {
       assume_role_policy = [
         {
