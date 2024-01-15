@@ -4,7 +4,7 @@
 resource "aws_lb" "maat_api_ecs_lb" {
   name               = "${local.application_name}-api-ecs-lb"
   load_balancer_type = "application"
-  subnets            = [data.aws_subnets.shared-private.ids[0], data.aws_subnets.shared-private.ids[1], data.aws_subnets.shared-private.ids[2],]
+  subnets            = [data.aws_subnets.shared-private.ids[0], data.aws_subnets.shared-private.ids[1], data.aws_subnets.shared-private.ids[2], ]
   security_groups    = [aws_security_group.maat_api_alb_sg.id]
   idle_timeout       = 65
 
@@ -16,13 +16,13 @@ resource "aws_lb" "maat_api_ecs_lb" {
 }
 
 resource "aws_lb_target_group" "maat_api_ecs_target_group" {
-  name       = "${local.application_name}-api-ecs-target-group"
-  port       = 8090
-  protocol   = "HTTP"
-  vpc_id     = data.aws_vpc.shared.id
+  name                 = "${local.application_name}-api-ecs-target-group"
+  port                 = 8090
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
   deregistration_delay = 30
-  target_type = "ip"
-  depends_on = [aws_lb.maat_api_ecs_lb]
+  target_type          = "ip"
+  depends_on           = [aws_lb.maat_api_ecs_lb]
 
   health_check {
     path                = "/actuator"
@@ -35,8 +35,8 @@ resource "aws_lb_target_group" "maat_api_ecs_target_group" {
   }
 
   stickiness {
-    enabled         = false
-    type            = "lb_cookie"
+    enabled = false
+    type    = "lb_cookie"
   }
 }
 

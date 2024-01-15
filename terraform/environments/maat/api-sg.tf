@@ -5,19 +5,19 @@
 resource "aws_security_group" "maat_api_ecs_security_group" {
   name        = "${local.application_name}-api-ecs-sg"
   description = "MAAT API ECS Security Group"
-  vpc_id      = data.aws_vpc.shared.id 
+  vpc_id      = data.aws_vpc.shared.id
 }
 
 resource "aws_security_group" "maat_api_alb_sg" {
   name        = "${local.application_name}-api-alb-sg"
   description = "MAAT API ALB Security Group"
-  vpc_id      = data.aws_vpc.shared.id 
+  vpc_id      = data.aws_vpc.shared.id
 }
 
 resource "aws_security_group" "maat_api_gw_sg" {
   name        = "${local.application_name}-api-gw-sg"
   description = "MAAT API GW Security Group"
-  vpc_id      = data.aws_vpc.shared.id 
+  vpc_id      = data.aws_vpc.shared.id
 }
 
 ######################################
@@ -25,20 +25,20 @@ resource "aws_security_group" "maat_api_gw_sg" {
 ######################################
 
 resource "aws_security_group_rule" "AppEcsSecurityGroup1ALBport" {
-  type              = "ingress"
-  from_port         = 8090
-  to_port           = 8090
-  protocol          = "tcp"
-  security_group_id = aws_security_group.maat_api_ecs_security_group.id
+  type                     = "ingress"
+  from_port                = 8090
+  to_port                  = 8090
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.maat_api_ecs_security_group.id
   source_security_group_id = aws_security_group.maat_api_alb_sg.id
 }
 
 resource "aws_security_group_rule" "AppAlbSecurityGroupApiGatewayIngress" {
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  security_group_id = aws_security_group.maat_api_alb_sg.id
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.maat_api_alb_sg.id
   source_security_group_id = aws_security_group.maat_api_gw_sg.id
 }
 

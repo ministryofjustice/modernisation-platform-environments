@@ -23,7 +23,7 @@ resource "aws_iam_role" "maat_api_ecs_taks_execution_role" {
 
 resource "aws_iam_policy" "maat_api_ecs_taks_execution_policy" {
   name = "${local.application_name}-api-task-execution-policy"
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

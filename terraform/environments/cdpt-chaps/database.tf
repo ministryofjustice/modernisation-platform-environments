@@ -41,9 +41,9 @@ resource "aws_db_subnet_group" "db" {
 }
 
 resource "aws_security_group" "db" {
-  name = "${local.application_name}-db-sg" 
+  name        = "${local.application_name}-db-sg"
   description = "Allow DB inbound traffic"
-  vpc_id = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared.id
   ingress {
     from_port   = 1433
     to_port     = 1433
@@ -56,6 +56,15 @@ resource "aws_security_group" "db" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_security_group_rule" "allow_ec2_to_rds" {
+  type              = "ingress"
+  from_port         = 1433
+  to_port           = 1433
+  protocol          = "tcp"
+  source_security_group_id = aws_security_group.cluster_ec2.id
+  security_group_id = aws_security_group.db.id
 }
 
 data "aws_secretsmanager_secret" "db_password" {

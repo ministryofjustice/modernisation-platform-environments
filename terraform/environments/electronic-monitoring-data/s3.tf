@@ -46,7 +46,7 @@ resource "aws_s3_bucket_logging" "capita_bucket_logging" {
 
   target_object_key_format {
     partitioned_prefix {
-        partition_date_source = "EventTime"
+      partition_date_source = "EventTime"
     }
   }
 }
