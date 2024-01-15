@@ -160,6 +160,11 @@ output "ssm_parameters" {
   }
 }
 
+output "ssm_parameters_all" {
+  description = "Map of common ssm parameters"
+  value = local.ssm_parameters
+}
+
 output "sns_topics" {
   description = "Map of sns_topics to create depending on options provided"
   value       = local.sns_topics

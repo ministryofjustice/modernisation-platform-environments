@@ -207,6 +207,7 @@ locals {
         }
       }
     }
+    "account" = module.baseline_presets.ssm_parameters_all.account
   }
 
   baseline_security_groups = {
