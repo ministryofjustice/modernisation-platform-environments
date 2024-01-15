@@ -67,6 +67,12 @@ output "iam_roles" {
   }
 }
 
+output "iam_roles_all" {
+  description = "Map of iam roles to create depending on options provided"
+
+  value = local.iam_roles
+}
+
 output "iam_service_linked_roles" {
   description = "Map of common service linked roles to create"
 

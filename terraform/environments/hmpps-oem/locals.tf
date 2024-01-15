@@ -148,7 +148,7 @@ locals {
   }
   baseline_iam_roles = {
     # allow EC2 instance profiles ability to assume this role
-    EC2OracleEnterpriseManagementSecretsRole = module.baseline_presets.iam_roles.EC2OracleEnterpriseManagementSecretsRole
+    EC2OracleEnterpriseManagementSecretsRole = module.baseline_presets.iam_roles_all.EC2OracleEnterpriseManagementSecretsRole
     DBRefresherRole = {
       assume_role_policy = [
         {
