@@ -1,53 +1,47 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -e
 
+source /usr/local/bin/devcontainer-utils
+
+get_system_architecture
+
+TERRAFORM_SWITCHER_GITHUB_REPOSITORY="warrensbox/terraform-switcher"
 TERRAFORM_SWITCHER_VERSION=${TERRAFORMSWITCHERVERSION:-"latest"}
+
+TERRAFORM_GITHUB_REPOSITORY="hashicorp/terraform"
 TERRAFORM_VERSION=${TERRAFORMVERSION:-"latest"}
 
-case "$( uname -m )" in
-  x86_64)
-    export ARCHITECTURE="amd64" ;;
-  aarch64 | armv8*)
-    export ARCHITECTURE="arm64" ;;
-  *)
-  echo "(!) Architecture $( uname -m ) unsupported"; exit 1 ;;
-esac
 
 if [[ "${TERRAFORM_SWITCHER_VERSION}" == "latest" ]]; then
-  TERRAFORM_SWITCHER_VERSION=$(curl --silent "https://api.github.com/repos/warrensbox/terraform-switcher/releases/latest" | jq -r '.tag_name')
-  TERRAFORM_SWITCHER_VERSION_STRIP_V=$(echo "${TERRAFORM_SWITCHER_VERSION}" | sed 's/v//g')
+  get_github_latest_tag "${TERRAFORM_SWITCHER_GITHUB_REPOSITORY}"
+  TERRAFORM_SWITCHER_VERSION="${GITHUB_LATEST_TAG}"
+  TERRAFORM_SWITCHER_VERSION_STRIP_V="${GITHUB_LATEST_TAG_STRIP_V}"
+else
+  TERRAFORM_SWITCHER_VERSION_STRIP_V="${TERRAFORM_SWITCHER_VERSION#v}"
 fi
 
 if [[ "${TERRAFORM_VERSION}" == "latest" ]]; then
-  TERRAFORM_VERSION=$(curl --silent "https://api.github.com/repos/hashicorp/terraform/releases/latest" | jq -r '.tag_name' | sed 's/v//g')
+  get_github_latest_tag "${TERRAFORM_GITHUB_REPOSITORY}"
+  TERRAFORM_VERSION="${GITHUB_LATEST_TAG}"
+  TERRAFORM_VERSION_STRIP_V="${GITHUB_LATEST_TAG_STRIP_V}"
+else
+  TERRAFORM_VERSION_STRIP_V="${TERRAFORM_VERSION#v}"
 fi
 
-# Install
+curl --fail-with-body --location "https://github.com/${TERRAFORM_SWITCHER_GITHUB_REPOSITORY}/releases/download/${TERRAFORM_SWITCHER_VERSION}/terraform-switcher_${TERRAFORM_SWITCHER_VERSION}_linux_${ARCHITECTURE}.tar.gz" \
+  --output "terraform-switcher_${TERRAFORM_SWITCHER_VERSION}_linux_${ARCHITECTURE}.tar.gz"
 
-curl --location https://github.com/warrensbox/terraform-switcher/releases/download/${TERRAFORM_SWITCHER_VERSION}/terraform-switcher_${TERRAFORM_SWITCHER_VERSION}_linux_${ARCHITECTURE}.tar.gz \
-  --output terraform-switcher_${TERRAFORM_SWITCHER_VERSION}_linux_${ARCHITECTURE}.tar.gz
+tar --gzip --extract --file "terraform-switcher_${TERRAFORM_SWITCHER_VERSION}_linux_${ARCHITECTURE}.tar.gz"
 
-tar --gzip --extract --file terraform-switcher_${TERRAFORM_SWITCHER_VERSION}_linux_${ARCHITECTURE}.tar.gz
+install --owner=vscode --group=vscode --mode=775 tfswitch /usr/local/bin/tfswitch
 
-mv tfswitch /usr/local/bin/tfswitch
+rm --force --recursive CHANGELOG.md LICENSE README.md "terraform-switcher_${TERRAFORM_SWITCHER_VERSION}_linux_${ARCHITECTURE}.tar.gz"
 
-chmod +x /usr/local/bin/tfswitch
+install --directory --owner=vscode --group=vscode /home/vscode/.terraform-bin
 
-rm --force --recursive CHANGELOG.md LICENSE README.md terraform-switcher_${TERRAFORM_SWITCHER_VERSION}_linux_${ARCHITECTURE}.tar.gz
+install --owner=vscode --group=vscode --mode=775 "$(dirname "${0}")"/src/home/vscode/.tfswitch.toml /home/vscode/.tfswitch.toml
 
-# Configure
+install --owner=vscode --group=vscode --mode=775 "$(dirname "${0}")"/src/home/vscode/.devcontainer/feature-completion/terraform.sh /home/vscode/.devcontainer/feature-completion/terraform.sh
 
-mkdir --parents /home/vscode/.terraform-bin
-
-chown --recursive vscode:vscode /home/vscode/.terraform-bin
-
-cp $( dirname $0 )/src/home/vscode/.tfswitch.toml /home/vscode/.tfswitch.toml
-
-chown vscode:vscode /home/vscode/.tfswitch.toml
-
-su - vscode --command "tfswitch ${TERRAFORM_VERSION}"
-
-echo "export PATH=\"\${PATH}:\${HOME}/.terraform-bin\"" >> /home/vscode/.bashrc
-
-echo "complete -o nospace -C \${HOME}/.terraform-bin/terraform terraform" >> /home/vscode/.bashrc
+su - vscode --command "tfswitch ${TERRAFORM_VERSION_STRIP_V}"

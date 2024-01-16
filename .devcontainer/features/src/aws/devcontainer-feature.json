@@ -16,5 +16,6 @@
       "proposals": ["latest"],
       "default": "latest"
     }
-  }
+  },
+  "installsAfter": ["./features/src/base"]
 }
