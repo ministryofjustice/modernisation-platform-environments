@@ -9,6 +9,7 @@ data "aws_iam_policy_document" "this" {
     for_each = each.value.statements
 
     content {
+      sid       = statement.value.sid
       effect    = statement.value.effect
       actions   = statement.value.actions
       resources = statement.value.resources

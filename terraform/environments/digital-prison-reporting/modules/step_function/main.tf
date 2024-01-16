@@ -5,4 +5,6 @@ resource "aws_sfn_state_machine" "data_ingestion_step_function" {
   role_arn = aws_iam_role.step_function_role[0].arn
 
   definition = var.definition
+
+  tags = var.tags
 }

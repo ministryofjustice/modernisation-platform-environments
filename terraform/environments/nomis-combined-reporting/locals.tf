@@ -25,10 +25,10 @@ locals {
     #   outbound-data-and-private-subnets = ["azure-fixngo-domain"]
     # }
   }
-  baseline_acm_certificates         = {}
-  baseline_cloudwatch_log_groups    = {}
-  baseline_ec2_autoscaling_groups   = {}
-  baseline_ec2_instances            = {}
+  baseline_acm_certificates       = {}
+  baseline_cloudwatch_log_groups  = {}
+  baseline_ec2_autoscaling_groups = {}
+  baseline_ec2_instances          = {}
   baseline_iam_policies = {
     SasTokenRotatorPolicy = {
       description = "Allows updating of secrets in SSM"
@@ -89,7 +89,7 @@ locals {
   baseline_lbs                      = {}
   baseline_rds_instances            = {}
   baseline_route53_resolvers        = {}
-  baseline_route53_zones            = {"${local.environment}.reporting.nomis.service.justice.gov.uk" = {}}
+  baseline_route53_zones            = { "${local.environment}.reporting.nomis.service.justice.gov.uk" = {} }
   baseline_ssm_parameters           = {}
   baseline_s3_buckets = {
     s3-bucket = {

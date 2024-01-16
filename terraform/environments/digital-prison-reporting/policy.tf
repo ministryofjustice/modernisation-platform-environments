@@ -162,7 +162,8 @@ resource "aws_iam_policy" "dynamodb_access_policy" {
         "Action" : [
           "dynamodb:PutItem",
           "dynamodb:DescribeTable",
-          "dynamodb:GetItem"
+          "dynamodb:GetItem",
+          "dynamodb:DeleteItem"
         ],
         "Effect" : "Allow",
         "Resource" : [

@@ -40,6 +40,12 @@ locals {
       local.moj_cidr.moj_digital_studio_office,
       local.moj_cidr.moj_digital_service_desk_vpn,
       local.moj_cidr.moj_aws_digital_macos_globalprotect_alpha,
+      local.moj_cidr.mojo_aws_preprod_byoip_cidr,
+      local.moj_cidr.mojo_aws_prod_byoip_cidr,
+      local.moj_cidr.mojo_arkc_internet_egress_exponential_e,
+      local.moj_cidr.mojo_arkc_internet_egress_vodafone,
+      local.moj_cidr.mojo_arkf_internet_egress_exponential_e,
+      local.moj_cidr.mojo_arkf_internet_egress_vodafone,
     ]
 
     trusted_moj_enduser_internal = [

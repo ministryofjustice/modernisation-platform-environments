@@ -41,7 +41,7 @@ on:
         type: string
         required: false
         description: "The terraform version to use"
-        default: "~1.5"
+        default: "~1.6"
       plan_apply_tfargs:
         type: string
         required: false

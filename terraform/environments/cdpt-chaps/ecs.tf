@@ -35,7 +35,9 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "kms:GenerateDataKey",
                 "kms:ReEncrypt",
                 "kms:GenerateDataKey",
-                "kms:DescribeKey"
+                "kms:DescribeKey",
+                "rds:Connect",
+                "rds:DescribeDBInstances"
             ],
             "Resource": "*"
         }
@@ -78,55 +80,88 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       essential = true
       portMappings = [
         {
-          containerPort = 80
+          containerPort = local.application_data.accounts[local.environment].container_port
           protocol      = "tcp"
-          hostPort      = 80
         }
       ]
       logConfiguration = {
         logDriver = "awslogs",
         options = {
-          awslogs-group = "${local.application_name}-ecs",
-          awslogs-region = "eu-west-2",
+          awslogs-group         = "${local.application_name}-ecs",
+          awslogs-region        = "eu-west-2",
           awslogs-stream-prefix = local.application_name
         }
       }
       environment = [
+        {
+          name  = "RDS_HOSTNAME"
+          value = "${aws_db_instance.database.address}"
+        },
+        {
+          name  = "RDS_USERNAME"
+          value = "${aws_db_instance.database.username}"
+        },
+        {
+          name  = "RDS_PASSWORD"
+          value = "${aws_db_instance.database.password}"
+        },
+        {
+          name  = "DB_NAME"
+          value = "${local.application_data.accounts[local.environment].db_name}"
+        },
+        {
+          name  = "CLIENT_ID"
+          value = "${local.application_data.accounts[local.environment].client_id}"
+        }
       ]
     }
   ])
-  runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
-    cpu_architecture        = "X86_64"
-  }
+}
+
+resource "aws_key_pair" "ec2-user" {
+  key_name   = "${local.application_name}-ec2"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDmRtGHtGEQN/zg8Di50nphpu9IQAujIlDjX+Xp1pi7ojxxpQ2V2ag/EacncsvfIMOb2dDavnV8ysx2iw/RTH9+qPAwdnCPrJ4oKagE5PU6tR4TZhQTjZshomP692U6Hy6LbSknxVnC7mPiaOtPLdF4Dcguv6yrSlO7UNdV83sTSl2bDbkQ+OW5x0CwH1IdOcuo+Mxq5fHPUxW+JKD5reYoqo0cL2++zavX60KyQgRWLOdHPPP9Jqs5lEGrKMXo1ECTWpdK6Gn/vfZBA5d4VZ1hiBe7DRPoEzjE6R5evMRQEnmn3Y8RJhX7qRPbwGsNlWiAFwR951f8B+yiEygSbw3ckr16iGdj6fRYBVTHdE3+AQt6hvNAFDMituUXQqfzDFnR9IXF0TRNNTHPSL5Mt+u+P2D3ElDbJGZwr9HTZTiLr94XCZSdv7FESisBSWSkEXBCKMSkpAXhw4z0zW0nPQicrZ72d5SQ5vmTb82/cES3sQ6WtBI9RuzfEP9qtGtmACq0pUFLM319QZiWyZRbmWqRSub5WwsWba407KnIQM9m6cwfB41CfOt95ziAGGEc3b6dB9CzOs6hb/S14Ufu2CNJWR6zZS1PamXioagpDhlv8BziMGhZge8jF46RlsSz3DgMfs188VF/7qVNaPneBOtbURqUR5QZueoYfrW9OzGZAQ== andrew.pepler@MJ003740"
+  tags       = local.tags
 }
 
 resource "aws_ecs_service" "ecs_service" {
   depends_on = [
-    aws_lb_listener.listener
+    aws_lb_listener.https_listener
   ]
 
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
-  health_check_grace_period_seconds = 180
+  health_check_grace_period_seconds = 60
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.chaps.name
     weight            = 1
   }
 
-  network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
-    security_groups  = [aws_security_group.ecs_service.id]
+  ordered_placement_strategy {
+    field = "attribute:ecs.availability-zone"
+    type  = "spread"
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.chaps_target_group.arn
     container_name   = "${local.application_name}-container"
-    container_port   = 80
+    container_port   = local.application_data.accounts[local.environment].container_port
   }
+
+  network_configuration {
+    subnets         = data.aws_subnets.shared-private.ids
+    security_groups = [aws_security_group.ecs_service.id]
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}"
+    }
+  )
 }
 
 resource "aws_ecs_capacity_provider" "chaps" {
@@ -158,10 +193,10 @@ resource "aws_ecs_cluster_capacity_providers" "cdpt-chaps" {
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier       = sort(data.aws_subnets.shared-private.ids)
   name                      = "${local.application_name}-cluster-scaling-group"
-  desired_capacity          = 2
-  max_size                  = 3
-  min_size                  = 1
-  health_check_grace_period = 300
+  desired_capacity          = local.application_data.accounts[local.environment].ec2_desired_capacity
+  max_size                  = local.application_data.accounts[local.environment].ec2_max_size
+  min_size                  = local.application_data.accounts[local.environment].ec2_min_size
+  health_check_grace_period = 60
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
@@ -191,19 +226,28 @@ resource "aws_security_group" "cluster_ec2" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow access on HTTP"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "allow access on HTTP from load balancer"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks     = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.chaps_lb_sc.id]
   }
 
   ingress {
-    description = "allow access on HTTPS"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "Allow RDP ingress"
+    from_port       = 3389
+    to_port         = 3389
+    protocol        = "tcp"
+    security_groups = [module.bastion_linux.bastion_security_group]
+  }
+
+  ingress {
+    description     = "Allow RDS access"
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    security_groups = [aws_security_group.db.id]
   }
 
   egress {
@@ -228,19 +272,19 @@ resource "aws_security_group" "cluster_ec2" {
 # so that the autoscaling group creates new ones using the new launch template
 
 resource "aws_launch_template" "ec2-launch-template" {
-  name_prefix            = "${local.application_name}-ec2-launch-template"
-  image_id               = local.application_data.accounts[local.environment].ami_image_id
-  instance_type          = local.application_data.accounts[local.environment].instance_type
-  key_name               = local.application_data.accounts[local.environment].key_name
-  ebs_optimized          = true
+  name_prefix   = "${local.application_name}-ec2-launch-template"
+  image_id      = local.application_data.accounts[local.environment].ami_image_id
+  instance_type = local.application_data.accounts[local.environment].instance_type
+  key_name      = "${local.application_name}-ec2"
+  ebs_optimized = true
 
   monitoring {
     enabled = true
   }
 
   metadata_options {
-    http_endpoint               = "enabled"
-    http_tokens                 = "optional"
+    http_endpoint = "enabled"
+    http_tokens   = "optional"
   }
 
   iam_instance_profile {
@@ -249,7 +293,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [aws_security_group.cluster_ec2.id]
+    security_groups             = [aws_security_group.cluster_ec2.id, aws_security_group.db.id]
   }
 
   block_device_mappings {

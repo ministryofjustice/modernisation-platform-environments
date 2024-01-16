@@ -1,6 +1,17 @@
 # nomis-production environment settings
 locals {
 
+  # baseline presets config
+  production_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "nomis_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
+      }
+    }
+  }
+
   # baseline config
   production_config = {
 
@@ -141,9 +152,6 @@ locals {
             "Ec2ProdWeblogicPolicy",
           ])
         })
-        instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.xlarge"
-        })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
             branch = "main"
@@ -171,9 +179,6 @@ locals {
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
           ])
-        })
-        instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.xlarge"
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {

@@ -7,6 +7,11 @@ locals {
     ]
     domain_controllers = module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers
     jumpservers        = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
+    remotedesktop_gateways = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name]
+    ])
+    remotedesktop_connectionbrokers = [module.ip_addresses.mp_cidr[module.environment.vpc_name]]
   }
 
   security_group_cidrs_preprod_prod = {
@@ -16,6 +21,11 @@ locals {
     ]
     domain_controllers = module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers
     jumpservers        = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
+    remotedesktop_gateways = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name]
+    ])
+    remotedesktop_connectionbrokers = [module.ip_addresses.mp_cidr[module.environment.vpc_name]]
   }
 
   security_group_cidrs_by_environment = {
@@ -136,14 +146,14 @@ locals {
           from_port   = 3389
           to_port     = 3389
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
+          cidr_blocks = local.security_group_cidrs.remotedesktop_gateways
         }
         rdp_udp_web = {
           description = "3389: Allow RDP UDP ingress from jumpserver"
           from_port   = 3389
           to_port     = 3389
           protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
+          cidr_blocks = local.security_group_cidrs.remotedesktop_gateways
         }
       }
       egress = {
@@ -160,25 +170,26 @@ locals {
       description = "Security group for Windows App Servers"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
+          security_groups = ["web"]
         }
         rdp_tcp_app = {
           description = "3389: Allow RDP UDP ingress from jumpserver"
           from_port   = 3389
           to_port     = 3389
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
+          cidr_blocks = local.security_group_cidrs.remotedesktop_gateways
         }
         rdp_udp_app = {
           description = "3389: Allow RDP UDP ingress from jumpserver"
           from_port   = 3389
           to_port     = 3389
           protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
+          cidr_blocks = local.security_group_cidrs.remotedesktop_gateways
         }
         web_access_cafm_5504 = {
           description     = "All web access inbound on 5504"
@@ -308,6 +319,76 @@ locals {
         }
       }
     }
+    remotedesktop_sessionhost = {
+      description = "Security group required for AWS remote desktop solution"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        rpc_udp_remotedesktop = {
+          description = "135: TCP RPC ingress for remote management"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.remotedesktop_connectionbrokers
+        }
+        rpc_tcp_remotedesktop = {
+          description = "135: TCP RPC ingress for remote management"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.remotedesktop_connectionbrokers
+        }
+        smb_tcp_remotedesktop = {
+          description = "445: TCP SMB ingress for remote management"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.remotedesktop_connectionbrokers
+        }
+        smb_udp_remotedesktop = {
+          description = "445: UDP SMB ingress for remote management"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.remotedesktop_connectionbrokers
+        }
+        winrm_tcp_remotedesktop = {
+          description = "5985: TCP WinRM ingress for remote management"
+          from_port   = 5985
+          to_port     = 5986
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.remotedesktop_connectionbrokers
+        }
+        rpc_dynamic_udp_remotedesktop = {
+          description = "49152-65535: UDP Dynamic Port ingress for remote management"
+          from_port   = 49152
+          to_port     = 65535
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.remotedesktop_connectionbrokers
+        }
+        rpc_dynamic_tcp_remotedesktop = {
+          description = "49152-65535: TCP Dynamic Port ingress for remote management"
+          from_port   = 49152
+          to_port     = 65535
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.remotedesktop_connectionbrokers
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
     jumpserver = {
       description = "New security group for jump-servers"
       ingress = {
@@ -413,25 +494,40 @@ locals {
       description = "Security group for WINDOWS SQL database servers"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
+          security_groups = ["web", "app"]
+        }
+        netbios_udp_enduser = {
+          description = "137-139: UDP NetBIOS ingress from enduserclient"
+          from_port   = 137
+          to_port     = 139
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        smb_tcp_445_enduser = {
+          description = "445: TCP SMB ingress from enduserclient"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
         rdp_tcp_db = {
           description = "3389: Allow RDP TCP ingress from azure jumpservers"
           from_port   = 3389
           to_port     = 3389
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
+          cidr_blocks = local.security_group_cidrs.remotedesktop_gateways
         }
         rdp_udp_db = {
           description = "3389: Allow RDP UDP ingress from azure jumpservers"
           from_port   = 3389
           to_port     = 3389
           protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
+          cidr_blocks = local.security_group_cidrs.remotedesktop_gateways
         }
         sql_tcp_1433_enduser = {
           description = "1433: Allow SQL Server TCP ingress from enduserclient for authentication"

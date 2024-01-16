@@ -1,5 +1,8 @@
 # environment specific settings
 locals {
+
+  preproduction_baseline_presets_options = {}
+
   preproduction_config = {
     ec2_common = {
       patch_approval_delay_days = 3
@@ -21,7 +24,7 @@ locals {
       "/oracle/bip/preprod"       = local.secretsmanager_secrets_bip
 
       # for azure, remove when migrated to aws db
-      "/oracle/database/OASPROD"  = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
     }
 
     baseline_iam_policies = {
@@ -52,7 +55,7 @@ locals {
               "s3:ListBucket",
             ]
             resources = [
-              "arn:aws:s3:::prod-{local.application_name}-db-backup-bucket*",
+              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
             ]
           },
           {
@@ -97,39 +100,35 @@ locals {
     }
 
     baseline_ec2_instances = {
-    }
-
-    baseline_ec2_autoscaling_groups = {
       "pp-${local.application_name}-db-a" = merge(local.database_a, {
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "main"
-          })
-        })
         tags = merge(local.database_a.tags, {
+          bip-db-name         = "PPBIPINF"
           instance-scheduling = "skip-scheduling"
+          oracle-sids         = "PPBIPINF PPOASYS"
         })
       })
+    }
 
-      "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "oasys_webserver_release_*"
-          ssm_parameters_prefix     = "ec2-web-pp/"
-          iam_resource_names_prefix = "ec2-web-pp"
-          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
-            "Ec2PreprodWebPolicy",
-          ])
-        })
-        tags = merge(local.webserver_a.tags, {
-          oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
-          oracle-db-sid      = "OASPROD" # "PPOASYS"
-        })
-      })
+    baseline_ec2_autoscaling_groups = {
+      # "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
+      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #     ami_name                  = "oasys_webserver_release_*"
+      #     ssm_parameters_prefix     = "ec2-web-pp/"
+      #     iam_resource_names_prefix = "ec2-web-pp"
+      #     instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+      #       "Ec2PreprodWebPolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.webserver_a.tags, {
+      #     oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
+      #     oracle-db-sid      = "PPOASYS" # "OASPROD"
+      #   })
+      # })
     }
 
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
@@ -229,8 +228,8 @@ locals {
         }
       }
       private = {
-        internal_lb = true
-        access_logs = true
+        internal_lb              = true
+        access_logs              = true
         s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
@@ -327,8 +326,8 @@ locals {
           id = module.environment.vpc.id
         }
         records = [
-          { name = "db.pp.${local.application_name}", type = "A", ttl = "300", records = ["10.40.40.133"] }, # for azure 
-          # { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
+          # { name = "db.pp.${local.application_name}", type = "A", ttl = "300", records = ["10.40.40.133"] }, # for azure 
+          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
         ]
         lb_alias_records = [
           # { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },
