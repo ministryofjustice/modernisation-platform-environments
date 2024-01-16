@@ -47,3 +47,12 @@ provider "aws" {
     role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccessUSEast"
   }
 }
+
+# Provider for creating resources in eu-central-1, eg Bedrock resources
+provider "aws" {
+  alias  = "eu-central-1"
+  region = "eu-central-1"
+  assume_role {
+    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureBedrockEuCentral"
+  }
+}

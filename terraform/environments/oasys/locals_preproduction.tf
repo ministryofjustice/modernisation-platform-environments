@@ -1,5 +1,8 @@
 # environment specific settings
 locals {
+
+  preproduction_baseline_presets_options = {}
+
   preproduction_config = {
     ec2_common = {
       patch_approval_delay_days = 3
@@ -52,7 +55,7 @@ locals {
               "s3:ListBucket",
             ]
             resources = [
-              "arn:aws:s3:::prod-{local.application_name}-db-backup-bucket*",
+              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
             ]
           },
           {
@@ -97,25 +100,21 @@ locals {
     }
 
     baseline_ec2_instances = {
-    }
-
-    baseline_ec2_autoscaling_groups = {
       "pp-${local.application_name}-db-a" = merge(local.database_a, {
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "main"
-          })
-        })
         tags = merge(local.database_a.tags, {
+          bip-db-name         = "PPBIPINF"
           instance-scheduling = "skip-scheduling"
+          oracle-sids         = "PPBIPINF PPOASYS"
         })
       })
+    }
 
+    baseline_ec2_autoscaling_groups = {
       "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "oasys_webserver_release_*"

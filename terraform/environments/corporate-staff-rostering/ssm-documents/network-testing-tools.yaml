@@ -6,23 +6,6 @@ parameters:
     type: "String"
     description: "ID of the instance being targetted"
 mainSteps:  
-  - name: InstallPortQry
-    action: aws:runPowerShellScript
-    inputs:
-      runCommand:
-        - |
-          $source = "https://download.microsoft.com/download/0/d/9/0d9d81cf-4ef2-4aa5-8cea-95a935ee09c9/PortQryV2.exe"
-          $filePath = "C:\PortQryV2.exe"
-          $portQryPath = "C:\Program Files\PortQryV2\PortQryV2.exe"
-
-          if (Test-Path $portQryPath -PathType Leaf) {
-            Write-Host "PortQry is installed."
-          } else {
-            Write-Host "PortQry is not installed. Installing now..."
-            Start-BitsTransfer -Source $source -Destination $filePath
-            Start-Process -Wait -FilePath $filePath -ArgumentList "/S"
-          }
-
   - name: installTestPortModule
     action: aws:runPowerShellScript
     inputs: 
@@ -38,21 +21,23 @@ mainSteps:
             Write-Host "Test-Port module is already installed."             
           }
 
-
   - name: installWireshark
     action: aws:runPowerShellScript
     inputs:
       runCommand:
         - |
-          $source = "https://1.eu.dl.wireshark.org/win64/Wireshark-win64-4.0.10.exe"
-          $filePath = "C:\Wireshark-win64-3.6.0.exe"
-          $wiresharkPath = "C:\Program Files\Wireshark\Wireshark.exe"
+          $source = "https://1.eu.dl.wireshark.org/win64/Wireshark-latest-x64.exe"
+          $downloadDir = "$ENV:TEMP\WiresharkInstaller"
+          $fileName = "Wireshark-win64-latest.exe"
+          $fullDownloadPath = "$downloadDir\$filename"
+          $wiresharkPath = "C:\\Program Files\\Wireshark\\Wireshark.exe"
 
-          if (Test-Path $wiresharkPath -PathType Leaf) {
-            Write-Host "Wireshark is installed."
+          if ($wiresharkPath -and (Test-Path $wiresharkPath -PathType Leaf)) {
+              Write-Host "Wireshark is installed."
           } else {
-            Write-Host "Wireshark is not installed. Installing now..."
-            Start-BitsTransfer -Source $source -Destination $filePath
-            Start-Process -Wait -FilePath $filePath -ArgumentList "/S"
+              Write-Host "Wireshark is not installed. Installing now..."
+              New-Item -ItemType Directory -Force -Path $downloadDir
+              Start-BitsTransfer -Source $source -Destination $fullDownloadPath
+              Start-Process -Wait -FilePath $fullDownloadPath -ArgumentList "/S"
           }
       timeoutSeconds: 14,400

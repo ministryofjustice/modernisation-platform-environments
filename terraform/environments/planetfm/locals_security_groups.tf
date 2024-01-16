@@ -160,11 +160,12 @@ locals {
       description = "Security group for Windows App Servers"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
+          security_groups = ["web"]
         }
         rdp_tcp_app = {
           description = "3389: Allow RDP UDP ingress from jumpserver"
@@ -413,11 +414,26 @@ locals {
       description = "Security group for WINDOWS SQL database servers"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
+          security_groups = ["web", "app"]
+        }
+        netbios_udp_enduser = {
+          description = "137-139: UDP NetBIOS ingress from enduserclient"
+          from_port   = 137
+          to_port     = 139
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        smb_tcp_445_enduser = {
+          description = "445: TCP SMB ingress from enduserclient"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
         rdp_tcp_db = {
           description = "3389: Allow RDP TCP ingress from azure jumpservers"

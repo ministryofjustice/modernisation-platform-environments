@@ -233,6 +233,7 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.large"
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
@@ -260,6 +261,7 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.large"
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {

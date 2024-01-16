@@ -31,18 +31,18 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
       local.environment == "production" ? {} : {
-        cpu-utilization-high = {
-          comparison_operator = "GreaterThanOrEqualToThreshold"
+        cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2["cpu-utilization-high"], {
           evaluation_periods  = "480"
           datapoints_to_alarm = "480"
-          metric_name         = "CPUUtilization"
-          namespace           = "AWS/EC2"
-          period              = "60"
-          statistic           = "Maximum"
           threshold           = "95"
-          alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 8 hours to allow for DB refreshes"
-          alarm_actions       = ["dba_pagerduty"]
-        }
+          alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 8 hours to allow for DB refreshes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326064583"
+        })
+        cpu-iowait-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux["cpu-iowait-high"], {
+          evaluation_periods  = "480"
+          datapoints_to_alarm = "480"
+          threshold           = "40"
+          alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 8 hours allowing for DB refreshes.  See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
+        })
       },
     )
     connectivity_test = merge(
@@ -136,15 +136,16 @@ locals {
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ansible
 
     tags = {
-      ami                  = "nomis_rhel_7_9_oracledb_11_2"
-      backup               = "false" # disable mod platform backup since we use our own policies
-      component            = "data"
-      server-type          = "nomis-db"
-      os-type              = "Linux"
-      os-major-version     = 7
-      os-version           = "RHEL 7.9"
-      licence-requirements = "Oracle Database"
-      "Patch Group"        = "RHEL"
+      ami                         = "nomis_rhel_7_9_oracledb_11_2"
+      backup                      = "false" # disable mod platform backup since we use our own policies
+      component                   = "data"
+      server-type                 = "nomis-db"
+      os-type                     = "Linux"
+      os-major-version            = 7
+      os-version                  = "RHEL 7.9"
+      licence-requirements        = "Oracle Database"
+      "Patch Group"               = "RHEL"
+      OracleDbLTS-ManagedInstance = true # oracle license tracking
     }
   }
 }

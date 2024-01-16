@@ -15,16 +15,16 @@ resource "aws_security_group" "chaps_lb_sc" {
     description = "Open all outbound ports"
     from_port   = 0
     to_port     = 0
-    protocol    = "tcp"
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 resource "aws_lb" "chaps_lb" {
-  name                       = "chaps-load-balancer"
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.chaps_lb_sc.id]
-  subnets                    = data.aws_subnets.shared-public.ids
+  name               = "chaps-load-balancer"
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.chaps_lb_sc.id]
+  subnets            = data.aws_subnets.shared-public.ids
 }
 
 resource "aws_lb_target_group" "chaps_target_group" {
