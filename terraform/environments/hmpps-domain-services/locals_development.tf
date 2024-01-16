@@ -34,7 +34,7 @@ locals {
           user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private-dc"]
+          vpc_security_group_ids = ["rds-ec2s"]
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
