@@ -67,12 +67,6 @@ output "iam_roles" {
   }
 }
 
-output "iam_roles_all" {
-  description = "Map of iam roles to create depending on options provided"
-
-  value = local.iam_roles
-}
-
 output "iam_service_linked_roles" {
   description = "Map of common service linked roles to create"
 
@@ -85,12 +79,6 @@ output "iam_policies" {
   value = {
     for key, value in local.iam_policies : key => value if contains(local.iam_policies_filter, key)
   }
-}
-
-output "iam_policies_all" {
-  description = "Map of iam policies"
-
-  value = local.iam_policies
 }
 
 output "iam_policy_statements_ec2" {

@@ -19,6 +19,7 @@ locals {
     enable_ec2_self_provision                    = true
     enable_ec2_reduced_ssm_policy                = true
     enable_ec2_user_keypair                      = true
+    enable_ec2_oracle_enterprise_managed_server  = true # the oem manager manages itself, so it needs all of these permissions too
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = true # adds db backup buckets
     cloudwatch_metric_alarms                     = {}
@@ -39,8 +40,6 @@ locals {
   baseline_ec2_autoscaling_groups        = {}
   baseline_ec2_instances                 = {}
   baseline_iam_policies = {
-    OracleEnterpriseManagementSecretsPolicy = module.baseline_presets.iam_policies_all.OracleEnterpriseManagementSecretsPolicy,
-
     Ec2OracleEnterpriseManagerPolicy = {
       description = "Permissions required for Oracle Enterprise Manager"
       statements  = [
@@ -146,8 +145,6 @@ locals {
     }
   }
   baseline_iam_roles = {
-    # allow EC2 instance profiles ability to assume this role
-    EC2OracleEnterpriseManagementSecretsRole = module.baseline_presets.iam_roles_all.EC2OracleEnterpriseManagementSecretsRole
     DBRefresherRole = {
       assume_role_policy = [
         {
@@ -206,7 +203,6 @@ locals {
         }
       }
     }
-    "account" = module.baseline_presets.ssm_parameters_all.account
   }
 
   baseline_security_groups = {

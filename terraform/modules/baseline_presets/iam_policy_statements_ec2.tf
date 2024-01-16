@@ -240,20 +240,6 @@ locals {
       }
     ]
 
-    DBSecrets = [
-      {
-        sid    = "SecretsmanagerReadWriteOracle"
-        effect = "Allow"
-        actions = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:PutSecretValue",
-        ]
-        resources = [
-          "arn:aws:secretsmanager:*:${var.environment.account_id}:secret:/oracle/*",
-        ]
-      }
-    ]
-
     OracleLicenseTracking = [
       {
         sid    = "OracleLicenseTracking"
