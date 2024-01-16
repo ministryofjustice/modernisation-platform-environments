@@ -3,7 +3,7 @@ locals {
   rds_ec2_instance = {
     # ami has unwanted ephemeral device, don't copy all the ebs_volumess
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                      = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
+      ami_name                      = "hmpps_windows_server_2022_release_2024-01-16T09-48-13.663Z"
       availability_zone             = "eu-west-2a"
       ebs_volumes_copy_all_from_ami = false
       user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
