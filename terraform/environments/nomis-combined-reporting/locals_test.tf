@@ -132,7 +132,7 @@ locals {
           ])
         })
         tags = merge(local.tomcat_admin_ec2_default.tags, {
-          description                          = "For testing SAP BIP tomcat admin installation and configurations"
+          description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })
@@ -149,7 +149,7 @@ locals {
           ])
         })
         tags = merge(local.bip_cms_ec2_default.tags, {
-          description                          = "For testing SAP BIP CMS installation and configurations"
+          description                          = "For testing SAP BI Platform CMS installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })
