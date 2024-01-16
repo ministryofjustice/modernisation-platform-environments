@@ -32,6 +32,7 @@ locals {
 
   ldap_config_test = {
     name                         = try(local.ldap_config_lower_environments.name, "ldap")
+    encrypted                    = true
     migration_source_account_id  = local.ldap_config_lower_environments.migration_source_account_id
     migration_lambda_role        = local.ldap_config_lower_environments.migration_lambda_role
     efs_throughput_mode          = local.ldap_config_lower_environments.efs_throughput_mode
