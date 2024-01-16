@@ -11,3 +11,24 @@ mainSteps:
     inputs:
       runCommand:
         - |
+          $username = "username@AZURE.NOMS.ROOT"
+          $password =  ConvertTo-SecureString "password" -AsPlainText -Force
+          $credential = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
+          
+          Invoke-Command -ComputerName rdscore4.azure.noms.root  -credential $credential -scriptblock {
+            Add-WindowsFeature -Name RDS-Connection-Broker -IncludeManagementTools
+            Add-WindowsFeature -Name RDS-Licensing, RDS-Licensing-UI
+            Add-WindowsFeature -Name RDS-Web-Access -IncludeManagementTools
+            
+            $RDGWFQDN = "rdsgateway4.hmpps-domain-services.hmpps-development.modernisation-platform.service.justice.gov.uk"
+            $RDSH = @("rdsshaws4.azure.noms.root")
+            $RDSCORE =  "$env:computername.azure.noms.root"
+            
+            New-RDSessionDeployment -ConnectionBroker $RDSCORE -SessionHost rdsshaws4.azure.noms.root -WebAccessServer $RDSCORE
+            Add-RDServer -Server $RDSCORE -Role RDS-Licensing -ConnectionBroker $RDSCORE
+            Set-RDLicenseConfiguration -Mode PerUser -LicenseServer $RDSCORE -ConnectionBroker $RDSCORE -Force
+            
+            
+            Add-RDServer -Server $RDSCORE -Role RDS-Gateway -ConnectionBroker $RDSCORE -GatewayExternalFqdn $RDGWFQDN
+
+          }

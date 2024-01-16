@@ -11,3 +11,16 @@ mainSteps:
     inputs:
       runCommand:
         - |
+          $username = "username@AZURE.NOMS.ROOT"
+          $password =  ConvertTo-SecureString "password" -AsPlainText -Force
+          $credential = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
+          
+          Invoke-Command -ComputerName rdscore4.azure.noms.root  -credential $credential -scriptblock {
+            $CollectionName = "Test1"
+            $RDAppAlias = "Calc2022"
+            $RDAppDisplayName = "Calc2022"
+            $RDAppFilePath = "C:\Windows\System32\win32calc.exe"
+            $RDSCORE =  "$env:computername.azure.noms.root"
+            
+            New-RDRemoteApp -Alias $RDAppAlias -DisplayName $RDAppDisplayName -FilePath $RDAppFilePath -ShowInWebAccess 1 -CollectionName $CollectionName -ConnectionBroker $RDSCORE
+          }

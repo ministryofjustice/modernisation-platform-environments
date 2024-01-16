@@ -11,3 +11,16 @@ mainSteps:
     inputs:
       runCommand:
         - |
+          $username = "username@AZURE.NOMS.ROOT"
+          $password =  ConvertTo-SecureString "password" -AsPlainText -Force
+          $credential = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
+          
+          Invoke-Command -ComputerName rdscore4.azure.noms.root  -credential $credential -scriptblock {
+            $CollectionName = "Test1"
+            $CollectionDescription = "Test1"
+            $CollectionSessionHost = @("rdsshaws3.azure.noms.root")
+            $CollectionUserGroup = @("Azure\Domain Users")
+            $RDSCORE =  "$env:computername.azure.noms.root"
+            New-RDSessionCollection -CollectionName $CollectionName -SessionHost $CollectionSessionHost -ConnectionBroker $RDSCORE  -CollectionDescription $CollectionDescription
+            Set-RDSessionCollectionConfiguration -CollectionName $CollectionName -ConnectionBroker $RDSCORE -UserGroup $CollectionUserGroup
+          }
