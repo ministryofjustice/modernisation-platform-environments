@@ -77,13 +77,13 @@ locals {
 
 resource "aws_cloudwatch_event_rule" "instance-state" {
   name        = "InstanceState"
-  description = "Trigger AdCleanUp Lambda function"
+  description = "Trigger AdCleanUp Lambda function in domain services account"
 
   event_pattern = jsonencode({
     source      = ["aws.ec2"],
     detail-type = ["EC2 Instance State-change Notification"],
     detail = {
-      state = ["stopped"] # "terminated" eventually, stopped during testing
+      state = ["stopped"] # "terminated" eventually, "stopped" during testing
     }
   })
 
@@ -91,3 +91,23 @@ resource "aws_cloudwatch_event_rule" "instance-state" {
     { Name = "instance-state-${local.environment}" }
   )
 }
+
+# resource "aws_cloud_watch_event_target" "lambda" {
+#   rule = aws_cloudwatch_event_rule.instance-state.InstanceState
+#   arn  = module.ad-clean-up-lambda.arn
+#   depends_on = [ module.ad-clean-up-lambda ]
+# }
+
+# data "aws_kms_key" "ad-service-account" {
+#   key_id     = "aws/secretsmanager"
+#   depends_on = [aws_secretsmanager_secret.ad-service-account]
+# }
+
+# resource "aws_secretsmanager_secret" "ad-service-account" {
+#   name        = "ad-service-account-credentials"
+#   description = "Credentials for lambda to interact with dev/test Active Directory."
+
+#   tags = merge(local.tags,
+#     { Name = "ad-service-account-credentials-${local.environment}" }
+#   )
+# }
