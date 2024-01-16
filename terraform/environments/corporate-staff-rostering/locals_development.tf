@@ -74,3 +74,20 @@ locals {
     }
   }
 }
+
+resource "aws_cloudwatch_event_rule" "instance-state" {
+  name        = "InstanceState"
+  description = "Trigger AdCleanUp Lambda function"
+
+  event_pattern = jsonencode({
+    source      = ["aws.ec2"],
+    detail-type = ["EC2 Instance State-change Notification"],
+    detail = {
+      state = ["stopped"] # "terminated" eventually, stopped during testing
+    }
+  })
+
+  tags = merge(local.tags,
+    { Name = "instance-state-${local.environment}" }
+  )
+}
