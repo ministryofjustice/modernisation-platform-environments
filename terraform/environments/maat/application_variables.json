@@ -25,7 +25,8 @@
       "ecs_env_CloudwatchStep": "1m",
       "ecs_env_CloudwatchBatchSize": "10",
       "ecs_env_EnableCloudwatchMetrics": "true",
-      "ecs_env_TogDataUsername": "togdata"
+      "ecs_env_TogDataUsername": "togdata",
+      "pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms"
     },
     "test": {
       "example_var": "test-data",
@@ -34,7 +35,8 @@
       "ecs_cpu": 1024,
       "ecs_memory": 2048,
       "ecs_container_cpu": 922,
-      "ecs_container_memory": 1792
+      "ecs_container_memory": 1792,
+      "pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms"
     },
     "preproduction": {
       "example_var": "preproduction-data",
@@ -43,7 +45,8 @@
       "ecs_cpu": 1024,
       "ecs_memory": 3072,
       "ecs_container_cpu": 922,
-      "ecs_container_memory": 2816
+      "ecs_container_memory": 2816,
+      "pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms"
     },
     "production": {
       "example_var": "production-data",
@@ -52,7 +55,8 @@
       "ecs_cpu": 1024,
       "ecs_memory": 3072,
       "ecs_container_cpu": 922,
-      "ecs_container_memory": 2816
+      "ecs_container_memory": 2816,
+      "pagerduty_integration_key_name": "laa_maat_api_prod_alarms"
     }
   }
 }

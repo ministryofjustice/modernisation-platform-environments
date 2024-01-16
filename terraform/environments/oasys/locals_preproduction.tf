@@ -107,9 +107,9 @@ locals {
           ])
         })
         tags = merge(local.database_a.tags, {
-          bip-db-name                             = "PPBIPINF"
-          instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "PPBIPINF PPOASYS"
+          bip-db-name         = "PPBIPINF"
+          instance-scheduling = "skip-scheduling"
+          oracle-sids         = "PPBIPINF PPOASYS"
         })
       })
     }
