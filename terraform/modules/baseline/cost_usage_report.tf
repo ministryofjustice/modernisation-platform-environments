@@ -1,24 +1,28 @@
 resource "aws_cur_report_definition" "cost_usage_report" {
-  provider                   = aws.us-east-1
-  report_name                = lower(format("%s-%s-cost-usage-report", local.application_name, local.environment))
-  time_unit                  = "HOURLY" # DAILY, MONTHLY
-  format                     = "Parquet"
-  compression                = "Parquet"
-  additional_schema_elements = ["RESOURCES", "SPLIT_COST_ALLOCATION_DATA"]
-  s3_bucket                  = module.s3-bucket.bucket.id
-  s3_region                  = "eu-west-2"
-  additional_artifacts       = ["ATHENA"]
-  report_versioning          = "OVERWRITE_REPORT"
-  s3_prefix                  = "cur"
-  depends_on = [ module.s3-bucket] #ensures bucket permissions are applied before validation checks run
+    count = var.cost_usage_report ? 1 : 0
+    provider                   = aws.us-east-1
+    report_name                = lower(format("%s-cost-usage-report", var.environment.application_name))
+    time_unit                  = "HOURLY" # DAILY, MONTHLY
+    format                     = "Parquet"
+    compression                = "Parquet"
+    additional_schema_elements = ["RESOURCES", "SPLIT_COST_ALLOCATION_DATA"]
+    s3_bucket                  = module.s3-bucket[0].bucket.id
+    s3_region                  = "eu-west-2"
+    additional_artifacts       = ["ATHENA"]
+    report_versioning          = "OVERWRITE_REPORT"
+    s3_prefix                  = "cur"
+    depends_on = [ module.s3-bucket ] #ensures bucket permissions are applied before athena bucket access validation checks run
 }
 
 module "s3-bucket" {
+    count = var.cost_usage_report ? 1 : 0
+
     source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
     bucket_prefix = "cost-usage-report-"
     versioning_enabled = false
-    bucket_policy = [data.aws_iam_policy_document.cur_bucket_policy.json]
+    bucket_policy = [data.aws_iam_policy_document.cur_bucket_policy[count.index].json]
+
     force_destroy  = true
     replication_enabled = false
     sse_algorithm = "AES256"
@@ -27,15 +31,16 @@ module "s3-bucket" {
     }
 
     tags = merge(local.tags, {
-        Name = lower(format("cost-usage-report-bucket-%s-%s", local.application_name, local.environment))
+        Name = lower(format("cost-usage-report-bucket-%s", var.environment.application_name))
     })
 }
 
 data "aws_iam_policy_document" "cur_bucket_policy" {
+    count = var.cost_usage_report ? 1 : 0
     statement {
         sid       = "EnsureBucketOwnedByAccountForCURDelivery"
         effect    = "Allow"
-        resources = [module.s3-bucket.bucket.arn]
+        resources = [module.s3-bucket[0].bucket.arn]
 
         actions = [
         "s3:GetBucketAcl",
@@ -45,13 +50,13 @@ data "aws_iam_policy_document" "cur_bucket_policy" {
         condition {
         test     = "StringEquals"
         variable = "aws:SourceArn"
-        values   = ["arn:aws:cur:us-east-1:${local.environment_management.account_ids[terraform.workspace]}:definition/*"]
+        values   = ["arn:aws:cur:us-east-1:${module.s3-bucket[0].bucket.hosted_zone_id}:definition/*"]
         }
 
         condition {
         test     = "StringEquals"
         variable = "aws:SourceAccount"
-        values   = ["${local.environment_management.account_ids[terraform.workspace]}"]
+        values   = ["${module.s3-bucket[0].bucket.hosted_zone_id}"]
         }
 
         principals {
@@ -63,19 +68,19 @@ data "aws_iam_policy_document" "cur_bucket_policy" {
     statement {
         sid       = "GrantAccessToDeliverCURFiles"
         effect    = "Allow"
-        resources = ["${module.s3-bucket.bucket.arn}/*"]
+        resources = ["${module.s3-bucket[0].bucket.arn}/*"]
         actions   = ["s3:PutObject"]
 
         condition {
         test     = "StringEquals"
         variable = "aws:SourceArn"
-        values   = ["arn:aws:cur:us-east-1:${local.environment_management.account_ids[terraform.workspace]}:definition/*"]
+        values   = ["arn:aws:cur:us-east-1:${module.s3-bucket[0].bucket.hosted_zone_id}:definition/*"]
         }
 
         condition {
         test     = "StringEquals"
         variable = "aws:SourceAccount"
-        values   = ["${local.environment_management.account_ids[terraform.workspace]}"]
+        values   = ["${module.s3-bucket[0].bucket.hosted_zone_id}"]
         }
 
         principals {
@@ -86,8 +91,9 @@ data "aws_iam_policy_document" "cur_bucket_policy" {
 }
 
 resource "aws_athena_database" "cur" {
+    count = var.cost_usage_report ? 1 : 0
     name = "cost_usage_report"
-    bucket = module.s3-bucket.bucket.id
+    bucket = module.s3-bucket[0].bucket.id
     encryption_configuration {
         encryption_option = "SSE_S3"
     }
@@ -95,6 +101,7 @@ resource "aws_athena_database" "cur" {
 }
 
 resource "aws_athena_workgroup" "cur" {
+    count = var.cost_usage_report ? 1 : 0
     name = "cost_usage_report"
     configuration {
         enforce_workgroup_configuration = true
@@ -104,21 +111,22 @@ resource "aws_athena_workgroup" "cur" {
             selected_engine_version = "Athena engine version 3"    
         }
         result_configuration {
-            output_location = "s3://${module.s3-bucket.bucket.id}/output/"
+            output_location = "s3://${module.s3-bucket[0].bucket.id}/output/"
         }
     }
     force_destroy = true
 }
 
 resource "aws_glue_catalog_table" "report_status" {
+    count = var.cost_usage_report ? 1 : 0
     name = "status-table"
-    database_name = aws_athena_database.cur.name
+    database_name = aws_athena_database.cur[count.index].name
     table_type = "EXTERNAL_TABLE"
 
     storage_descriptor {
         input_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
         output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
-        location = "s3://${module.s3-bucket.bucket.id}/${aws_cur_report_definition.cost_usage_report.s3_prefix}/${aws_cur_report_definition.cost_usage_report.report_name}/cost_and_usage_data_status/"
+        location = "s3://${module.s3-bucket[0].bucket.id}/${aws_cur_report_definition.cost_usage_report[count.index].s3_prefix}/${aws_cur_report_definition.cost_usage_report[count.index].report_name}/cost_and_usage_data_status/"
         ser_de_info {
             name = "status_table"
             serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
@@ -134,8 +142,9 @@ resource "aws_glue_catalog_table" "report_status" {
 }
 
 resource "aws_glue_catalog_table" "report" {
+    count = var.cost_usage_report ? 1 : 0
     name = "report-table"
-    database_name = aws_athena_database.cur.name
+    database_name = aws_athena_database.cur[count.index].name
     table_type = "EXTERNAL_TABLE"
 
     partition_keys {
@@ -147,10 +156,15 @@ resource "aws_glue_catalog_table" "report" {
         type = "string"
     }
 
+    parameters = {
+        EXTERNAL = "TRUE"
+        "parquet.compression" = "SNAPPY"
+    }
+
     storage_descriptor {
         input_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
         output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
-        location = "s3://${module.s3-bucket.bucket.id}/${aws_cur_report_definition.cost_usage_report.s3_prefix}/${aws_cur_report_definition.cost_usage_report.report_name}/${local.application_name}-cur-report-definition/"
+        location = "s3://${module.s3-bucket[0].bucket.id}/${aws_cur_report_definition.cost_usage_report[count.index].s3_prefix}/${aws_cur_report_definition.cost_usage_report[count.index].report_name}/${aws_cur_report_definition.cost_usage_report[count.index].report_name}/"
         ser_de_info {
             name = "report_table"
             serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"

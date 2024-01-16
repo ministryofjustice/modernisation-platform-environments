@@ -132,4 +132,6 @@ module "baseline" {
     local.baseline_ssm_parameters,
     lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
   )
+
+  cost_usage_report = lookup(local.baseline_environment_config, "baseline_cost_usage_report", false)
 }
