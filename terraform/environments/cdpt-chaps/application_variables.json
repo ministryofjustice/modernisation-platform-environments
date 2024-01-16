@@ -44,7 +44,7 @@
       "instance_type": "t3.medium",
       "container_port": 80,
       "s3_bucket_name": "chaps-staging-bucket",
-      "client_id": ""
+      "client_id": "2e2cc8ad-7b64-41b9-93a1-c16b9a00b34f"
     },
     "production": {
       "db_enabled": true,
@@ -67,7 +67,7 @@
       "instance_type": "t3.medium",
       "container_port": 80,
       "s3_bucket_name": "chaps-production-bucket",
-      "client_id": ""
+      "client_id": "0a5da4a0-a108-4ca5-a45c-440b72b323e6"
     }
   }
 }
