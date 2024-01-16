@@ -5,7 +5,6 @@ locals {
   # the relevant account ids.
   account_names_for_account_ids_ssm_parameter = distinct(flatten([
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["hmpps-oem-${var.environment.environment}"] : [],
-    var.options.enable_ec2_oracle_enterprise_manager ? ["hmpps-oem-${var.environment.environment}"] : [],
   ]))
 
   # add a cloud watch windows SSM param if the file is present
