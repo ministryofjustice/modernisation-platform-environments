@@ -709,7 +709,7 @@ module "win2022_STD_multiple" {
   for_each = local.win2022_STD_instances
 
   name                   = "${local.name}-${each.key}"
-  ami                    = data.aws_ami.windows_2022_std_ami.image_id
+  ami                    = "ami-088bb7db420bf535c"
   instance_type          = each.value.instance_type
   vpc_security_group_ids = each.value.vpc_security_group_ids
   subnet_id              = each.value.subnet_id
