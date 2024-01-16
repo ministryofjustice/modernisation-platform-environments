@@ -44,7 +44,7 @@ locals {
 
   defaults_web_ec2 = merge(local.defaults_ec2, {
     instance = merge(local.defaults_ec2.instance, {
-      vpc_security_group_ids = ["domain", "web", "jumpserver"]
+      vpc_security_group_ids = ["domain", "web", "jumpserver", "remotedesktop_sessionhost"]
     })
     tags = merge(local.defaults_ec2.tags, {
       component = "web"
