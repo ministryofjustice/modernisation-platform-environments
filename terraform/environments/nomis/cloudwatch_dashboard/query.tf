@@ -190,7 +190,7 @@ locals {
     height = 15
     properties = {
       region  = local.region
-      title   = "EBS Volumes Total IOPs"
+      title   = "All EBS Volume Stats"
       stat    = "Sum"
       period  = local.cloudwatch_period
       widgetOptions = {
