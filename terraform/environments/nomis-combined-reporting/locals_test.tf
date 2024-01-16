@@ -136,6 +136,23 @@ locals {
           nomis-combined-reporting-environment = "t1"
         })
       })
+      t1-ncr-tomcat-admin = merge(local.tomcat_admin_ec2_default, {
+        autoscaling_group = {
+          desired_capacity    = 1
+          max_size            = 1
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
+        config = merge(local.tomcat_admin_ec2_default.config, {
+          instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
+        tags = merge(local.tomcat_admin_ec2_default.tags, {
+          description                          = "For testing BIP tomcat admin installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
       t1-ncr-bip-cms = merge(local.bip_cms_ec2_default, {
         autoscaling_group = {
           desired_capacity    = 1
@@ -163,9 +180,9 @@ locals {
         subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private"]
         listeners = {
-          http = merge(local.bip_cms_lb_listeners.http, local.tomcat_lb_listeners.http)
+          http = merge(local.bip_cms_lb_listeners.http, local.tomcat_admin_lb_listeners.http)
 
-          http7777 = merge(local.bip_cms_lb_listeners.http7777, local.tomcat_lb_listeners.http7777, {
+          http7777 = merge(local.bip_cms_lb_listeners.http7777, local.tomcat_admin_lb_listeners.http7777, {
             rules = {
               t1-ncr-bip-cms = {
                 priority = 100
@@ -181,11 +198,29 @@ locals {
                   }
                 }]
               }
-              t1-ncr-tomcat = {
+              t1-ncr-tomcat-admin = {
                 priority = 300
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-tomcat-http-7777"
+                  target_group_name = "t1-ncr-tomcat-admin-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-web.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+          http7010 = merge(local.tomcat_admin_lb_listeners.http7010, {
+            rules = {
+              t1-ncr-bip-cms = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-admin-http-7010"
                 }]
                 conditions = [{
                   host_header = {
@@ -269,13 +304,13 @@ locals {
               }
             }
           })
-          http8443 = merge(local.tomcat_lb_listeners.http8443, {
+          http8443 = merge(local.tomcat_admin_lb_listeners.http8443, {
             rules = {
               t1-ncr-bip-cms = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-tomcat-http-8443"
+                  target_group_name = "t1-ncr-tomcat-admin-http-8443"
                 }]
                 conditions = [{
                   host_header = {
@@ -287,7 +322,7 @@ locals {
               }
             }
           })
-          https = merge(local.bip_cms_lb_listeners.https, local.tomcat_lb_listeners.https, {
+          https = merge(local.bip_cms_lb_listeners.https, local.tomcat_admin_lb_listeners.https, {
             rules = {
               t1-ncr-bip-cms-http-7777 = {
                 priority = 100
@@ -303,11 +338,11 @@ locals {
                   }
                 }]
               }
-              t1-ncr-tomcat-http-7777 = {
+              t1-ncr-tomcat-admin-http-7777 = {
                 priority = 300
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-tomcat-http-7777"
+                  target_group_name = "t1-ncr-tomcat-admin-http-7777"
                 }]
                 conditions = [{
                   host_header = {
