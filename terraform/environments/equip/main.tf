@@ -698,50 +698,6 @@ locals {
         Role = "Nimbus Application Services" }
       )
     }
-    COR-A-EQP06 = {
-      instance_type          = "t3a.xlarge"
-      subnet_id              = data.aws_subnet.private_subnets_c.id
-      vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id]
-      root_block_device = [
-        {
-          encrypted   = true
-          volume_type = "gp3"
-          volume_size = 90
-          kms_key_id  = aws_kms_key.this.arn
-          tags = merge(local.tags,
-            { Name = "${local.name}-COR-A-EQP06-root-block" }
-          )
-        }
-      ]
-      ebs_block_device = [
-        {
-          device_name = "/dev/sdf"
-          volume_type = "gp3"
-          volume_size = 500
-          encrypted   = true
-          kms_key_id  = aws_kms_key.this.arn
-          tags = merge(local.tags,
-            { Name = "${local.name}-COR-A-EQP06-ebs-block-1" }
-          )
-        }
-      ]
-      ebs_block_device = [
-        {
-          device_name = "/dev/sdg"
-          volume_type = "gp3"
-          volume_size = 500
-          encrypted   = true
-          kms_key_id  = aws_kms_key.this.arn
-          tags = merge(local.tags,
-            { Name = "${local.name}-COR-A-EQP06-ebs-block-2" }
-          )
-        }
-      ]
-      tags = merge(local.tags,
-        { Name = "${local.name}-COR-A-EQP06"
-        Role = "Nimbus Application Services" }
-      )
-    }
   }
 }
 
