@@ -21,6 +21,7 @@ resource "aws_lambda_function" "this" {
   publish     = var.publish
   timeout     = var.timeout
   layers      = var.layers
+  source_code_hash = data.archive_file.lambda.output_base64sha256
 
   tracing_config {
     mode = var.tracing

@@ -255,6 +255,34 @@ locals {
     "arn:aws:iam::${local.account_id}:policy/${local.dynamo_db_access_policy}"
   ]
 
+  # Stop glue job lambda
+  enable_stop_glue_job_lambda         = local.application_data.accounts[local.environment].enable_stop_glue_job_lambda
+  stop_glue_job_lambda_name           = "${local.project}-stop-glue-job-lambda"
+  stop_glue_job_lambda_handler        = "uk.gov.justice.digital.lambda.StopGlueJobLambda::handleRequest"
+  stop_glue_job_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  stop_glue_job_lambda_runtime        = "java11"
+  stop_glue_job_lambda_tracing        = "Active"
+
+  stop_glue_job_lambda_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.all_state_machine_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.trigger_glue_job_policy}"
+  ]
+
+  # Delete data files lambda
+  enable_delete_data_files_lambda         = local.application_data.accounts[local.environment].enable_delete_data_files_lambda
+  delete_data_files_lambda_name           = "${local.project}-delete-data-files-lambda"
+  delete_data_files_lambda_handler        = "uk.gov.justice.digital.lambda.S3DataDeletionLambda::handleRequest"
+  delete_data_files_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  delete_data_files_lambda_runtime        = "java11"
+  delete_data_files_lambda_tracing        = "Active"
+
+  delete_data_files_lambda_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.all_state_machine_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.trigger_glue_job_policy}"
+  ]
+
   # Data Ingestion Pipeline Step Function
   enable_data_ingestion_step_function = local.application_data.accounts[local.environment].enable_data_ingestion_step_function
   data_ingestion_step_function_name   = "${local.project}-data-ingestion-step-function-${local.environment}"

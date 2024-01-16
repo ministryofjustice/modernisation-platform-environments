@@ -842,6 +842,88 @@ module "s3_file_transfer_lambda_trigger" {
   ]
 }
 
+# Lambda which stops a Glue Job notify step functions when completed
+module "stop_glue_job_lambda" {
+  source = "./modules/lambdas/generic"
+
+  enable_lambda = local.enable_stop_glue_job_lambda
+  name          = local.stop_glue_job_lambda_name
+  handler       = local.stop_glue_job_lambda_handler
+  runtime       = local.stop_glue_job_lambda_runtime
+  policies      = local.stop_glue_job_lambda_policies
+  tracing       = local.stop_glue_job_lambda_tracing
+  timeout       = 900 # Max timeout of 15 minutes
+
+  vpc_settings = {
+    subnet_ids = [
+      data.aws_subnet.data_subnets_a.id,
+      data.aws_subnet.data_subnets_b.id,
+      data.aws_subnet.data_subnets_c.id
+    ]
+
+    security_group_ids = [
+      aws_security_group.lambda_generic[0].id
+    ]
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "reload-pipeline"
+      Jira           = "DPR2-46"
+      Resource_Type  = "Lambda"
+      Name           = local.stop_glue_job_lambda_name
+    }
+  )
+
+  depends_on = [
+    aws_iam_policy.kms_read_access_policy,
+    aws_iam_policy.all_state_machine_policy,
+    aws_iam_policy.trigger_glue_job_policy
+  ]
+}
+
+# Lambda which deletes the data files for a configured domain
+module "delete_data_files_lambda" {
+  source = "./modules/lambdas/generic"
+
+  enable_lambda = local.enable_delete_data_files_lambda
+  name          = local.delete_data_files_lambda_name
+  handler       = local.delete_data_files_lambda_handler
+  runtime       = local.delete_data_files_lambda_runtime
+  policies      = local.delete_data_files_lambda_policies
+  tracing       = local.delete_data_files_lambda_tracing
+  timeout       = 900 # Max timeout of 15 minutes
+
+  vpc_settings = {
+    subnet_ids = [
+      data.aws_subnet.data_subnets_a.id,
+      data.aws_subnet.data_subnets_b.id,
+      data.aws_subnet.data_subnets_c.id
+    ]
+
+    security_group_ids = [
+      aws_security_group.lambda_generic[0].id
+    ]
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "reload-pipeline"
+      Jira           = "DPR2-46"
+      Resource_Type  = "Lambda"
+      Name           = local.delete_data_files_lambda_name
+    }
+  )
+
+  depends_on = [
+    aws_iam_policy.kms_read_access_policy,
+    aws_iam_policy.all_state_machine_policy,
+    aws_iam_policy.s3_all_object_actions_policy
+  ]
+}
+
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
   source                       = "./modules/dms_dps"
