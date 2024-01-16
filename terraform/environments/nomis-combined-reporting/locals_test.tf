@@ -87,8 +87,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip-cms/t1/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/t1/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-tomcat/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-tomcat-admin/t1/*",
             ]
           }
         ]
@@ -189,7 +188,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-web.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-tomcat-admin.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -207,7 +206,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-web.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-tomcat-admin.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -329,7 +328,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-tomcat.reporting.test.nomis.service.justice.gov.uk",
+                      "t1-ncr-tomcat-admin.reporting.test.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -350,7 +349,7 @@ locals {
           # T1
           { name = "t1-ncr-bip-cms", type = "A", lbs_map_key = "private" },
           { name = "t1-ncr-bip", type = "A", lbs_map_key = "private" },
-          { name = "t1-ncr-tomcat", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-tomcat-admin", type = "A", lbs_map_key = "private" },
         ]
       }
     }
