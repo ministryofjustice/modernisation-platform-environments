@@ -13,7 +13,7 @@ locals {
           "*.${module.environment.domains.public.application_environment}",
           "*.preproduction.hmpps-domain.service.justice.gov.uk",
         ]
-        external_validation_records_created = false
+        external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for hmpps domain load balancer"
@@ -21,54 +21,75 @@ locals {
       }
     }
 
+    baseline_ec2_instances = {
+      pp-rdgw-1-a = merge(local.rds_ec2_instance, {
+        config = merge(local.rds_ec2_instance.config, {
+          availability_zone = "eu-west-2a"
+        })
+        tags = merge(local.rds_ec2_instance.tags, {
+          description = "Remote Desktop Gateway for hmpp.noms.root domain"
+        })
+      })
+      pp-rds-1-a = merge(local.rds_ec2_instance, {
+        config = merge(local.rds_ec2_instance.config, {
+          availability_zone = "eu-west-2a"
+        })
+        tags = merge(local.rds_ec2_instance.tags, {
+          description = "Remote Desktop Services for hmpp.noms.root domain"
+        })
+      })
+    }
+
     baseline_lbs = {
-      public = {
-        access_logs                      = true
-        enable_cross_zone_load_balancing = true
-        enable_delete_protection         = false
-        force_destroy_bucket             = true
-        internal_lb                      = false
-        load_balancer_type               = "application"
-        security_groups                  = ["public-lb"]
-        subnets = [
-          module.environment.subnet["public"]["eu-west-2a"].id,
-          module.environment.subnet["public"]["eu-west-2b"].id,
-        ]
-
+      public = merge(local.rds_lbs.public, {
         instance_target_groups = {
+          pp-rdgw-1-http = merge(local.rds_target_groups.http, {
+            attachments = [
+              { ec2_instance_name = "pp-rdgw-1-a" },
+            ]
+          })
+          pp-rds-1-https = merge(local.rds_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "pp-rds-1-a" },
+            ]
+          })
         }
-
         listeners = {
-          http = {
-            port     = 80
-            protocol = "HTTP"
-            default_action = {
-              type = "redirect"
-              redirect = {
-                port        = 443
-                protocol    = "HTTPS"
-                status_code = "HTTP_301"
-              }
-            }
-          }
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-            certificate_names_or_arns = ["application_environment_wildcard_cert"]
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
+          http = local.rds_lb_listeners.http
+          https = merge(local.rds_lb_listeners.https, {
             rules = {
+              pp-rdgw-1-http = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-rdgw-1-http"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway1.preproduction.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              pp-rds-1-https = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-rds-1-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb1.preproduction.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
-          }
+          })
         }
-      }
+      })
     }
 
     baseline_route53_zones = {
