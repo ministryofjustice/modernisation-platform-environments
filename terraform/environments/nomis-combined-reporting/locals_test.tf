@@ -119,23 +119,6 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
 
-      t1-ncr-tomcat = merge(local.tomcat_ec2_default, {
-        autoscaling_group = {
-          desired_capacity    = 1
-          max_size            = 1
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
-        cloudwatch_metric_alarms = local.tomcat_cloudwatch_metric_alarms
-        config = merge(local.tomcat_ec2_default.config, {
-          instance_profile_policies = concat(local.tomcat_ec2_default.config.instance_profile_policies, [
-            "Ec2T1BipPolicy",
-          ])
-        })
-        tags = merge(local.tomcat_ec2_default.tags, {
-          description                          = "For testing BIP tomcat installation and configurations"
-          nomis-combined-reporting-environment = "t1"
-        })
-      })
       t1-ncr-tomcat-admin = merge(local.tomcat_admin_ec2_default, {
         autoscaling_group = {
           desired_capacity    = 1
@@ -149,7 +132,7 @@ locals {
           ])
         })
         tags = merge(local.tomcat_admin_ec2_default.tags, {
-          description                          = "For testing BIP tomcat admin installation and configurations"
+          description                          = "For testing SAP BIP tomcat admin installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })
@@ -166,7 +149,7 @@ locals {
           ])
         })
         tags = merge(local.bip_cms_ec2_default.tags, {
-          description                          = "For testing SAP BI CMS installation and configurations"
+          description                          = "For testing SAP BIP CMS installation and configurations"
           nomis-combined-reporting-environment = "t1"
         })
       })
