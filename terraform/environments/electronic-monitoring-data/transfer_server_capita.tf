@@ -15,7 +15,7 @@ resource "aws_eip" "capita_eip" {
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "capita_security_group" {
-  name        = "capita_inbound_ips"
+  name        = "capita_allowed_inbound_IPs"
   description = "Allowed IP addresses from Capita"
   vpc_id      = data.aws_vpc.shared.id
 }
@@ -80,7 +80,7 @@ resource "aws_transfer_server" "capita_transfer_server" {
     vpc_id                 = data.aws_vpc.shared.id
     subnet_ids             = [data.aws_subnet.public_subnets_b.id]
     address_allocation_ids = [aws_eip.capita_eip.id]
-    security_group_ids     = [aws_security_group.capita_security_group.id, aws_security_group.test_security_group]
+    security_group_ids     = [aws_security_group.capita_security_group.id, aws_security_group.test_security_group.id]
   }
 
   domain = "S3"
@@ -101,6 +101,11 @@ resource "aws_transfer_user" "capita_transfer_user" {
   server_id = aws_transfer_server.capita_transfer_server.id
   user_name = "capita"
   role      = aws_iam_role.capita_transfer_user_iam_role.arn
+
+  home_directory_mappings {
+      entry  = "/"
+      target = "/${aws_s3_bucket.capita_landing_bucket.id}/"
+  }
 }
 
 data "aws_iam_policy_document" "capita_assume_role" {
