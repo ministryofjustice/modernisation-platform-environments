@@ -15,7 +15,7 @@ resource "aws_eip" "capita_eip" {
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "capita_security_group" {
-  name        = "capita_allowed_inbound_IPs"
+  name        = "capita_inbound_ips"
   description = "Allowed IP addresses from Capita"
   vpc_id      = data.aws_vpc.shared.id
 }
