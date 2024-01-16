@@ -4,7 +4,8 @@ resource "aws_cloudwatch_dashboard" "nomis" {
 }
 
 locals {
-  cloudwatch_period = local.environment == "production" ? 300 : 300
+  cloudwatch_period = 300
+  region            = "eu-west-2"
 
   dashboard_body = {
     widgets = [
@@ -22,7 +23,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = local.region
       title   = "Top 5 instances by highest CPU Utilization"
       stat    = "Maximum"
       period  = local.cloudwatch_period
@@ -41,7 +42,7 @@ locals {
     properties = {
       view    = "bar"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = local.region
       title   = "EC2 Memory Utilization %"
       stat    = "Maximum"
       period  = local.cloudwatch_period
@@ -60,7 +61,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = local.region
       title   = "EC2 Memory Utilization %"
       stat    = "Maximum"
       period  = local.cloudwatch_period

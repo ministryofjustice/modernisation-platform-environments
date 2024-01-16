@@ -169,5 +169,5 @@ module "baseline" {
 }
 
 module "cloudwatch_dashboard" {
-  source = "./cloudwatch-dashboard-query.tf"
+  source = "./cloudwatch_dashboard"
 }
