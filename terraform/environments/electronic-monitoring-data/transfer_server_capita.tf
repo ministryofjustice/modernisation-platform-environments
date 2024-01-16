@@ -97,44 +97,44 @@ resource "aws_transfer_server" "capita_transfer_server" {
 # bucket.
 #------------------------------------------------------------------------------
 
-# resource "aws_transfer_user" "capita_transfer_user" {
-#   server_id = aws_transfer_server.capita_transfer_server.id
-#   user_name = "capita"
-#   role      = aws_iam_role.capita_transfer_user_iam_role.arn
-# }
+resource "aws_transfer_user" "capita_transfer_user" {
+  server_id = aws_transfer_server.capita_transfer_server.id
+  user_name = "capita"
+  role      = aws_iam_role.capita_transfer_user_iam_role.arn
+}
 
-# data "aws_iam_policy_document" "capita_assume_role" {
-#   statement {
-#     effect = "Allow"
+data "aws_iam_policy_document" "capita_assume_role" {
+  statement {
+    effect = "Allow"
 
-#     principals {
-#       type        = "Service"
-#       identifiers = ["transfer.amazonaws.com"]
-#     }
+    principals {
+      type        = "Service"
+      identifiers = ["transfer.amazonaws.com"]
+    }
 
-#     actions = ["sts:AssumeRole"]
-#   }
-# }
+    actions = ["sts:AssumeRole"]
+  }
+}
 
-# resource "aws_iam_role" "capita_transfer_user_iam_role" {
-#   name                = "capita-transfer-user-iam-role"
-#   assume_role_policy  = data.aws_iam_policy_document.capita_assume_role.json
-# }
+resource "aws_iam_role" "capita_transfer_user_iam_role" {
+  name                = "capita-transfer-user-iam-role"
+  assume_role_policy  = data.aws_iam_policy_document.capita_assume_role.json
+}
 
-# data "aws_iam_policy_document" "capita_transfer_user_iam_policy_document" {
-#   statement {
-#     sid       = "AllowPutAccesstoCapitaS3"
-#     effect    = "Allow"
-#     actions   = ["s3:PutObject"]
-#     resources = [aws_s3_bucket.capita_landing_bucket.arn]
-#   }
-# }
+data "aws_iam_policy_document" "capita_transfer_user_iam_policy_document" {
+  statement {
+    sid       = "AllowPutAccesstoCapitaS3"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = [aws_s3_bucket.capita_landing_bucket.arn]
+  }
+}
 
-# resource "aws_iam_role_policy" "capita_transfer_user_iam_policy" {
-#   name   = "capita-transfer-user-iam-policy"
-#   role   = aws_iam_role.capita_transfer_user_iam_role.id
-#   policy = data.aws_iam_policy_document.capita_transfer_user_iam_policy_document.json
-# }
+resource "aws_iam_role_policy" "capita_transfer_user_iam_policy" {
+  name   = "capita-transfer-user-iam-policy"
+  role   = aws_iam_role.capita_transfer_user_iam_role.id
+  policy = data.aws_iam_policy_document.capita_transfer_user_iam_policy_document.json
+}
 
 #------------------------------------------------------------------------------
 # AWS transfer ssh key
@@ -142,8 +142,8 @@ resource "aws_transfer_server" "capita_transfer_server" {
 # Set the public ssh key for the supplier user profile to access SFTP server.
 #------------------------------------------------------------------------------
 
-# resource "aws_transfer_ssh_key" "capita_ssh_key" {
-#   server_id = aws_transfer_server.capita_transfer_server.id
-#   user_name = aws_transfer_user.capita_transfer_user.user_name
-#   body      = "... PUBLIC SSH key ..."
-# }
+resource "aws_transfer_ssh_key" "capita_ssh_key" {
+  server_id = aws_transfer_server.capita_transfer_server.id
+  user_name = aws_transfer_user.capita_transfer_user.user_name
+  body      = "... PUBLIC SSH key ..."
+}
