@@ -44,8 +44,7 @@ locals {
 
     baseline_secretsmanager_secrets = {
       "/ec2/ncr-bip-cms/t1" = local.bip_cms_secretsmanager_secrets
-      "/ec2/ncr-bip/t1"     = local.bip_secretsmanager_secrets
-      "/ec2/ncr-tomcat/t1"  = local.tomcat_secretsmanager_secrets
+      "/ec2/ncr-tomcat-admin/t1"  = local.tomcat_admin_secretsmanager_secrets
 
       "/oracle/database/T1BIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/T1BIPAUD" = local.database_secretsmanager_secrets
