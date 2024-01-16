@@ -17,9 +17,9 @@ locals {
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
-    enable_ec2_oracle_enterprise_manager         = true
     enable_ec2_reduced_ssm_policy                = true
     enable_ec2_user_keypair                      = true
+    enable_ec2_oracle_enterprise_managed_server  = true # the oem manager manages itself, so it needs all of these permissions too
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = true # adds db backup buckets
     cloudwatch_metric_alarms                     = {}
@@ -40,6 +40,56 @@ locals {
   baseline_ec2_autoscaling_groups        = {}
   baseline_ec2_instances                 = {}
   baseline_iam_policies = {
+    Ec2OracleEnterpriseManagerPolicy = {
+      description = "Permissions required for Oracle Enterprise Manager"
+      statements  = [
+        {
+          sid    = "S3ListLocation"
+          effect = "Allow"
+          actions = [
+            "s3:ListAllMyBuckets",
+            "s3:GetBucketLocation",
+          ]
+          resources = [
+            "arn:aws:s3:::*"
+          ]
+        },
+        {
+          sid    = "SecretsmanagerReadWriteOracleOem"
+          effect = "Allow"
+          actions = [
+            "secretsmanager:GetSecretValue",
+            "secretsmanager:PutSecretValue",
+          ]
+          resources = [
+            "arn:aws:secretsmanager:*:*:secret:/oracle/*",
+          ]
+        },
+        {
+          sid    = "SSMReadAccountIdsOracle"
+          effect = "Allow"
+          actions = [
+            "ssm:GetParameter",
+            "ssm:GetParameters",
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/account_ids",
+            "arn:aws:ssm:*:*:parameter/oracle/*",
+          ]
+        },
+        {
+          sid    = "SSMWriteOracle"
+          effect = "Allow"
+          actions = [
+            "ssm:PutParameter",
+            "ssm:PutParameters",
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/oracle/*",
+          ]
+        }
+      ]
+    }
     DBRefresherPolicy = {
       description = "Permissions for the db refresh process"
       statements = [

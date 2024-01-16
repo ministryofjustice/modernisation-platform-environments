@@ -1,6 +1,6 @@
 locals {
 
-  iam_policies_filter = flatten([
+  iam_policies_filter = distinct(flatten([
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
@@ -8,11 +8,10 @@ locals {
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
-    var.options.enable_ec2_oracle_enterprise_manager ? ["Ec2OracleEnterpriseManagerPolicy"] : [],
     var.options.iam_policies_filter,
     "EC2Default",
     "EC2Db",
-  ])
+  ]))
 
   # for adding policies - be careful not to run into the limit
   iam_policies_ec2_default = flatten([
@@ -35,7 +34,6 @@ locals {
     var.options.enable_shared_s3 ? local.iam_policy_statements_ec2.S3ReadSharedWrite : [],
     var.options.enable_ec2_reduced_ssm_policy ? local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? local.iam_policy_statements_ec2.OracleEnterpriseManagedServer : [],
-    var.options.enable_ec2_oracle_enterprise_manager ? local.iam_policy_statements_ec2.OracleEnterpriseManager : [],
     var.options.iam_policy_statements_ec2_default
   ])
 
@@ -114,11 +112,6 @@ locals {
     Ec2OracleEnterpriseManagedServerPolicy = {
       description = "Permissions required for Oracle Enterprise Managed Server"
       statements  = local.iam_policy_statements_ec2.OracleEnterpriseManagedServer
-    }
-
-    Ec2OracleEnterpriseManagerPolicy = {
-      description = "Permissions required for Oracle Enterprise Manager"
-      statements  = local.iam_policy_statements_ec2.OracleEnterpriseManager
     }
 
     SSMManagedInstanceCoreReducedPolicy = {

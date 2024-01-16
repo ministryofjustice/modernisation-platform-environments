@@ -179,7 +179,7 @@ locals {
             size  = 500
             type  = "gp3"
           }
-          "/dev/sdf" = {  # DATA02
+          "/dev/sdf" = { # DATA02
             label = "data"
             size  = 50
             type  = "gp3"
@@ -253,7 +253,7 @@ locals {
             size  = 500
             type  = "gp3"
           }
-          "/dev/sdf" = {  # DATA02
+          "/dev/sdf" = { # DATA02
             label = "data"
             size  = 50
             type  = "gp3"
@@ -629,6 +629,7 @@ locals {
         }
       }
     }
+
 
     # The following zones can be found on azure:
     # az.justice.gov.uk

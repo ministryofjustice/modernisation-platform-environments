@@ -55,13 +55,14 @@ locals {
   }
 
   baseline_security_groups = {
-    migration_cutover = local.security_groups.migration_cutover
-    loadbalancer      = local.security_groups.loadbalancer
-    web               = local.security_groups.web
-    app               = local.security_groups.app
-    database          = local.security_groups.database
-    domain            = local.security_groups.domain
-    jumpserver        = local.security_groups.jumpserver
+    migration_cutover         = local.security_groups.migration_cutover
+    loadbalancer              = local.security_groups.loadbalancer
+    web                       = local.security_groups.web
+    app                       = local.security_groups.app
+    database                  = local.security_groups.database
+    domain                    = local.security_groups.domain
+    jumpserver                = local.security_groups.jumpserver
+    remotedesktop_sessionhost = local.security_groups.remotedesktop_sessionhost
   }
 
   baseline_sns_topics     = {}

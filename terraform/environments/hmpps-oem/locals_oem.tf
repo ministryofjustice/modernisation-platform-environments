@@ -63,6 +63,9 @@ locals {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name  = "hmpps_ol_8_5_oracledb_19c_release_2023-08-07T16-14-04.275Z"
       ami_owner = "self"
+      instance_profile_policies = concat(module.baseline_presets.ec2_instance.config.db.instance_profile_policies, [
+        "Ec2OracleEnterpriseManagerPolicy",
+      ])
     })
 
     instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {

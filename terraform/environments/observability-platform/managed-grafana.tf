@@ -37,32 +37,6 @@ module "managed_grafana" {
   tags = local.tags
 }
 
-/* Grafana API */
-locals {
-  grafana_api_key_expiration_days    = 30
-  grafana_api_key_expiration_seconds = 60 * 60 * 24 * local.grafana_api_key_expiration_days
-}
-
-resource "time_rotating" "grafana_api_key_rotation" {
-  rotation_days = local.grafana_api_key_expiration_days
-}
-
-resource "time_static" "grafana_api_key_rotation" {
-  rfc3339 = time_rotating.grafana_api_key_rotation.rfc3339
-}
-
-resource "aws_grafana_workspace_api_key" "automation_key" {
-  workspace_id = module.managed_grafana.workspace_id
-
-  key_name        = "automation"
-  key_role        = "ADMIN"
-  seconds_to_live = local.grafana_api_key_expiration_seconds
-
-  lifecycle {
-    replace_triggered_by = [time_static.grafana_api_key_rotation]
-  }
-}
-
 /* Prometheus Source */
 resource "grafana_data_source" "observability_platform_prometheus" {
   type       = "prometheus"
