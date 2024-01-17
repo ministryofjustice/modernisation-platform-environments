@@ -11,6 +11,8 @@
 cd /etc/ssh
 # Generate a new SSH host key
 ssh-keygen -A
+# enable and start sshd
+systemctl enable --now sshd
 
 cd ~
 mkdir -p /usr/bin/db
