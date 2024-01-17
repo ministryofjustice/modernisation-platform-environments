@@ -490,3 +490,31 @@ module "delete_data_product_lambda" {
     }
   }
 }
+
+module "data_product_jml_lambda_execution" {
+  source                         = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=a4392c1" # ref for V2.1
+  application_name               = "automate_generating_sending_JML_extracts"
+  tags                           = local.tags
+  description                    = "Automate generating and sending JML extracts monthly"
+  role_name                      = "jml_lambda_execution_role_${local.environment}"
+  policy_json                    = data.aws_iam_policy_document.iam_policy_document_for_jml_lambda_execution.json
+  policy_json_attached           = true
+  function_name                  = "jml-extract-lambda_${local.environment}"
+  create_role                    = true
+  reserved_concurrent_executions = 1
+
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/jml-extract-lambda-lambda-ecr-repo:${local.delete_data_product_version}"
+  timeout      = 600
+  tracing_mode = "Active"
+  memory_size  = 128
+
+  environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
+  allowed_triggers = {
+
+    AllowExecutionFromAPIGateway = {
+      action     = "lambda:InvokeFunction"
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.delete_data_product.http_method}${aws_api_gateway_resource.data_product_name.path}"
+    }
+  }
+}
