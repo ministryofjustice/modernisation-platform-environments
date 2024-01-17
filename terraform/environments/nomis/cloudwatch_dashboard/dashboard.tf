@@ -10,8 +10,8 @@ locals {
 
   dashboard_body = {
     widgets = [
-      local.NomisEC2CPUUtilWidget,
-      local.NomisEC2MemoryUtilWidget,
+      local.NomisEC2CPUUtil,
+      local.NomisEC2MemoryUtil,
       local.NomisEC2DiskUsed,
       local.NomisLoadBalancerTargetResponseTime,
       local.NomisLoadBalancerRequestCount,
@@ -25,7 +25,7 @@ locals {
     ]
   }
 
-  NomisEC2CPUUtilWidget = {
+  NomisEC2CPUUtil = {
     type   = "metric"
     x      = 0
     y      = 1
@@ -44,7 +44,7 @@ locals {
     }
   }
 
-  NomisEC2MemoryUtilWidget = {
+  NomisEC2MemoryUtil = {
     type   = "metric"
     x      = 7
     y      = 1
