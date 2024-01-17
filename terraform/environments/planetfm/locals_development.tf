@@ -2,9 +2,6 @@
 locals {
 
   # baseline config
-  development_config = {
+  development_config = {}
 
-    baseline_cost_usage_report = true
-
-  }
 }
