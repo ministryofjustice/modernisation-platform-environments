@@ -11,8 +11,8 @@ mainSteps:
     inputs:
       runCommand:
         - |
-          # Fetch 'TestUser' , 'Developer' and 'Migration' local users
-          $usersToRemove = @('TestUser', 'Developer', 'Migration')
+          # Fetch 'Developer' and 'Migration' local users
+          $usersToRemove = @('Developer', 'Migration') # any other users to be removed can be added to this list
 
           # Remove each user
           foreach ($userToRemove in $usersToRemove) {
