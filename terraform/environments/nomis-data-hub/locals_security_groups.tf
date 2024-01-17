@@ -172,7 +172,7 @@ locals {
         tcp-ems = {
           description     = "Allow all ems ingress"
           from_port       = 0
-          to_port         = 0
+          to_port         = 65535
           protocol        = "tcp"
           security_groups = ["ndh_ems"]
           cidr_blocks     = []
@@ -225,7 +225,7 @@ locals {
         tcp-app = {
           description     = "Allow all app ingress"
           from_port       = 0
-          to_port         = 0
+          to_port         = 65535
           protocol        = "tcp"
           security_groups = ["ndh_app"]
           cidr_blocks     = []
