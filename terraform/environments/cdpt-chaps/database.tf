@@ -15,6 +15,7 @@ resource "aws_db_instance" "database" {
   depends_on             = [aws_security_group.db]
   snapshot_identifier    = "arn:aws:rds:eu-west-2:613903586696:snapshot:cdpt-dev-staging-snapshot-9-1-24"
   db_subnet_group_name   = aws_db_subnet_group.db.id
+  skip_final_snapshot    = false
   final_snapshot_identifier = "preprod-db-snapshot"
   publicly_accessible    = true
 }
