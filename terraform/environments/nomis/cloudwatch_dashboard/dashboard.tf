@@ -19,7 +19,9 @@ locals {
       local.NomisEBSVolumeDiskIOPS,
       local.NomisEBSVolumeDiskThroughput,
       local.NomisAllEBSVolumeStats,
-      local.TitlePanels,
+      local.LBGraphedMetricsHeading,
+      local.EC2GraphedMetricsHeading,
+      local.EBSGraphedMetricsHeading,
     ]
   }
 
@@ -233,40 +235,40 @@ locals {
     }
   }
 
-  TitlePanels = [
-    {
-      type   = "text"
-      x      = 0
-      y      = 9
-      width  = 24
-      height = 1
-      properties = {
-        markdown   = "## LoadBalancer Graphed Metrics"
-        background = "solid"
+  LBGraphedMetricsHeading = {
+    type   = "text"
+    x      = 0
+    y      = 9
+    width  = 24
+    height = 1
+    properties = {
+      markdown   = "## LoadBalancer Graphed Metrics"
+      background = "solid"
       }
-    },
-    {
-      type   = "text"
-      x      = 0
-      y      = 0
-      width  = 24
-      height = 1
-      properties = {
-        markdown   = "## EC2 Graphed Metrics"
-        background = "solid"
-      }
-    },
-    {
-      type   = "text"
-      x      = 0
-      y      = 18
-      width  = 24
-      height = 1
-      properties = {
-        markdown   = "## EBS Volume Graphed Metrics"
-        background = "solid"
-      }
-    },
-  ]
-}
+  }
 
+  EC2GraphedMetricsHeading = {
+    type   = "text"
+    x      = 0
+    y      = 0
+    width  = 24
+    height = 1
+    properties = {
+      markdown   = "## EC2 Graphed Metrics"
+      background = "solid"
+    }
+  }
+
+  EBSGraphedMetricsHeading = {
+    type   = "text"
+    x      = 0
+    y      = 18
+    width  = 24
+    height = 1
+    properties = {
+      markdown   = "## EBS Volume Graphed Metrics"
+      background = "solid"
+    }
+  }
+
+}
