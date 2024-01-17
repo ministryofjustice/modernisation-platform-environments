@@ -103,7 +103,7 @@ locals {
 
   NomisLoadBalancerRequestCount = {
     type   = "metric"
-    x      = 14
+    x      = 7
     y      = 10
     width  = 6
     height = 8
@@ -122,7 +122,7 @@ locals {
 
   NomisLoadBalancerHTTP5XXsCount = {
     type   = "metric"
-    x      = 14
+    x      = 13
     y      = 10
     width  = 6
     height = 8
