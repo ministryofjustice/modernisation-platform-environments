@@ -28,6 +28,14 @@ resource "aws_vpc_security_group_ingress_rule" "test_petty_france_ip" {
   from_port   = 22
   to_port     = 22
 }
+resource "aws_vpc_security_group_ingress_rule" "test_global_protect_ip" {
+  security_group_id = aws_security_group.test_security_group.id
+
+  cidr_ipv4   = "35.176.93.186/32"
+  ip_protocol = "tcp"
+  from_port   = 22
+  to_port     = 22
+}
 
 
 #------------------------------------------------------------------------------
