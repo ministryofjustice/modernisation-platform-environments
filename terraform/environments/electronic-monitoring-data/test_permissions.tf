@@ -34,10 +34,7 @@ resource "aws_transfer_user" "test_transfer_user" {
   user_name = "test"
   role      = aws_iam_role.test_transfer_user_iam_role.arn
 
-  home_directory_mappings {
-      entry  = "/"
-      target = "/${aws_s3_bucket.capita_landing_bucket.id}/"
-  }
+  home_directory = "/${aws_s3_bucket.capita_landing_bucket.id}/"
 }
 
 data "aws_iam_policy_document" "test_assume_role" {
