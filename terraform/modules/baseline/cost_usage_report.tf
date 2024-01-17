@@ -1,6 +1,6 @@
 module "cost_usage_report" {
-    # for_each = var.cost_usage_report
-    count = var.cost_usage_report == true ? 1 : 0
+
+    count = lookup(var.cost_usage_report, "create", false) ? 1 : 0
 
     source = "../../modules/cost_usage_report"
 

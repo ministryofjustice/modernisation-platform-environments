@@ -133,6 +133,8 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
   )
 
-  cost_usage_report = true
+  cost_usage_report = merge(
+    lookup(local.baseline_environment_config, "baseline_cost_usage_report", {}),
+  )
 
 }
