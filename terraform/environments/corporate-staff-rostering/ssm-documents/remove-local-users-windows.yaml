@@ -15,7 +15,7 @@ mainSteps:
           $users = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True'" -Namespace 'root\cimv2'
 
           # Filter users using Where-Object based on the specified pattern
-          $usersToRemove = $users | Where-Object { $_.Name -match '(?i)migration\d+' -or $_.Name -match 'Migration' -or $_.Name -match '(?i)developer\d+' -or $_.Name -match 'Developer' -and $_.Name -notin @('Administrator', 'Guest', 'DefaultAccount') }
+          $usersToRemove = $users | Where-Object { $_.Name -match '(?i)migration\d+' -or $_.Name -match 'Migration' -or $_.Name -match '(?i)developer\d+' -or $_.Name -match 'Developer' -and $_.Name -notin @('Administrator', 'Guest', 'DefaultAccount', 'abootstrap') }
 
           foreach ($user in $usersToRemove) {
             $username = $user.Name
