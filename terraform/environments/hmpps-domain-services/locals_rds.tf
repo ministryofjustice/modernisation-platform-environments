@@ -15,8 +15,9 @@ locals {
       "/dev/sda1" = { type = "gp3", size = 100 }
     }
     tags = {
-      os-type   = "Windows"
-      component = "remotedesktop"
+      os-type     = "Windows"
+      component   = "remotedesktop"
+      backup-plan = "daily-and-weekly"
     }
   }
 
