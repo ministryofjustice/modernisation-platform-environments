@@ -4,7 +4,7 @@ locals {
   # baseline config
   development_config = {
     baseline_cost_usage_report = {
-      create = false
+      create = true
     }
   }
 }
