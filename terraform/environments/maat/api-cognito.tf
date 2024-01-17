@@ -17,7 +17,7 @@ resource "aws_cognito_user_pool" "maat_api_cognito_user_pool" {
 
 resource "aws_cognito_user_pool_domain" "maat_api_cognito_user_pool_domain" {
   user_pool_id = aws_cognito_user_pool.maat_api_cognito_user_pool.id
-  domain       = "${local.application_name}-cd-api-${local.application_data.accounts[local.environment].env_short_name}"
+  domain       = "${local.application_name}-cd-api-${local.application_data.accounts[local.environment].env_short_name}-mp"
 }
 
 
