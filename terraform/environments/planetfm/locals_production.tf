@@ -5,6 +5,7 @@ locals {
   production_config = {
 
     baseline_ec2_instances = {
+      # database servers
       pd-cafm-db-b = merge(local.defaults_database_ec2, {
         config = merge(local.defaults_database_ec2.config, {
           ami_name          = "pd-cafm-db-b"
@@ -27,6 +28,32 @@ locals {
           app-config-status = "pending"
           ami               = "pd-cafm-db-b"
         })
+      })
+
+      # web servers
+      pd-cafm-w-38-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-w-38-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.large"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description       = "CAFM Web Training migrated server PDFWW3QCP660001"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-w-38-b"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
       })
     }
     baseline_route53_zones = {
