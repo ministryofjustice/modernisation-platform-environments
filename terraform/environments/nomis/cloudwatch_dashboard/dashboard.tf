@@ -1,5 +1,5 @@
-resource "aws_cloudwatch_dashboard" "nomis" {
-  dashboard_name = "nomis"
+resource "aws_cloudwatch_dashboard" "nomis_cloudwatch_dashboard" {
+  dashboard_name = "CloudWatch-Default"
   dashboard_body = jsonencode(local.dashboard_body)
 }
 
