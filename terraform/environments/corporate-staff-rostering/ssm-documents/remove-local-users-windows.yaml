@@ -6,7 +6,7 @@ parameters:
     type: "String"
     description: "ID of the instance being targetted"
 mainSteps:
-  - name: RemoveLocalTestUsers
+  - name: RemoveLocalUsers
     action: "aws:runPowerShellScript"
     inputs:
       runCommand:
