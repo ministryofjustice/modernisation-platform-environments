@@ -359,7 +359,7 @@ locals {
       #   })
       #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "oasys-ords-secrets"
+      #       branch = "ords_parameter_file_update"
       #     })
       #   })
       #   #autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
@@ -390,6 +390,28 @@ locals {
           oracle-db-sid                           = "T1OASYS" # for each env using azure DB will need to be OASPROD
         })
       })
+
+      # "t1-${local.application_name}-web-b" = merge(local.webserver_b, {
+      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #     ami_name                  = "oasys_webserver_release_*"
+      #     ssm_parameters_prefix     = "ec2-web-t1/"
+      #     iam_resource_names_prefix = "ec2-web-t1"
+      #     instance_profile_policies = concat(local.webserver_b.config.instance_profile_policies, [
+      #       "Ec2T1WebPolicy",
+      #     ])
+      #   })
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "ords_parameter_file_update"
+      #     })
+      #   })
+      #   tags = merge(local.webserver_b.tags, {
+      #     description                             = "t1 ${local.application_name} web"
+      #     "${local.application_name}-environment" = "t1"
+      #     oracle-db-hostname                      = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
+      #     oracle-db-sid                           = "T1OASYS" # for each env using azure DB will need to be OASPROD
+      #   })
+      # })
 
       ##
       ## test
