@@ -747,6 +747,6 @@ data "aws_iam_policy_document" "iam_policy_document_for_jml_lambda_execution" {
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecrets"
     ]
-    resources = "arn:aws:logs:eu-west-2:096705367497:log-group:/aws/events/auth0/*"
+    resources = "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/events/auth0/*"
   }
 }
