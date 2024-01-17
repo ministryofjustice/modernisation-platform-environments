@@ -1145,3 +1145,30 @@ module "dynamo_tab_application_tf_state" {
     }
   )
 }
+
+# Dynamo table for Glue job instrumentation
+module "dynamo_tab_job_instrumentation" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-job-instrumentation-${local.environment}"
+
+  hash_key    = "table"
+  table_class = "STANDARD"
+  ttl_enabled = false
+
+  attributes = [
+    {
+      name = "table"
+      type = "S"
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-job-instrumentation-${local.environment}"
+      Resource_Type = "Dynamo Table"
+    }
+  )
+}
