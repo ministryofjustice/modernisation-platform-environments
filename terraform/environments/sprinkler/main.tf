@@ -820,3 +820,104 @@ resource "aws_acm_certificate" "us_east_1_test" {
 
   tags = local.tags
 }
+
+
+
+# Create a security group for the bastion host
+resource "aws_security_group" "bastion_sg" {
+  vpc_id = data.aws_vpc.shared.id
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "bastion-sg"
+  }
+}
+# Create a key pair
+resource "tls_private_key" "tls_key_pair" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+# Store the private key in AWS Systems Manager Parameter Store
+resource "aws_ssm_parameter" "private_key_parameter" {
+  name  = "/cymulate/ec2keypair/privatekey_2"
+  type  = "SecureString"
+  value = tls_private_key.tls_key_pair.private_key_pem
+}
+resource "aws_ssm_parameter" "public_key_parameter" {
+  name  = "/cymulate/ec2keypair/publickey_2"
+  type  = "SecureString"
+  value = tls_private_key.tls_key_pair.public_key_pem
+}
+resource "aws_key_pair" "key_pair" {
+  key_name   = "cymulatekey_2"
+  public_key = tls_private_key.tls_key_pair.public_key_openssh
+  depends_on = [tls_private_key.tls_key_pair]
+}
+# Create a public EC2 instance (bastion host)
+resource "aws_instance" "bastion" {
+  ami                    = "ami-0a398a6b09d71fecc" # Replace this with a suitable AMI ID
+  instance_type          = "t2.micro"
+  subnet_id              = data.aws_subnet.public_subnets_a.id
+  key_name               = aws_key_pair.key_pair.key_name
+  vpc_security_group_ids = [aws_security_group.bastion_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  user_data              = file("user_data/linux_cymulate_user_data_private.sh")
+}
+
+# Define an IAM policy for EC2
+resource "aws_iam_policy" "ec2_policy" {
+  name        = "EC2FullAccessPolicy_cymulate"
+  description = "Policy granting full access to EC2 resources"
+  policy = <<-JSON
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "ec2:*",
+      "Resource": "*"
+    }
+  ]
+}
+JSON
+}
+# Define an IAM role for EC2
+resource "aws_iam_role" "ec2_role" {
+  name = "EC2InstanceRole_cymulate"
+  assume_role_policy = <<-JSON
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+JSON
+}
+# Attach the EC2 policy to the EC2 role
+resource "aws_iam_role_policy_attachment" "ec2_policy_attachment" {
+  policy_arn = aws_iam_policy.ec2_policy.arn
+  role      = aws_iam_role.ec2_role.name
+  depends_on = [aws_iam_role.ec2_role]
+}
+# Define an IAM instance profile for EC2
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "EC2InstanceProfile_cymulate"
+  role = aws_iam_role.ec2_role.name
+  depends_on = [aws_iam_role_policy_attachment.ec2_policy_attachment]
+}
