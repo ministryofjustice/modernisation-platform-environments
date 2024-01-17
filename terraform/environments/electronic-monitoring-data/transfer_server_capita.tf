@@ -89,7 +89,7 @@ resource "aws_transfer_server" "capita_transfer_server" {
   security_policy_name = "TransferSecurityPolicy-2023-05"
 
   pre_authentication_login_banner = "Hello there"
-  logging_role  = aws_iam_role.iam_for_transfer.arn
+  logging_role  = aws_iam_role.test_transfer_user_iam_role.arn
   structured_log_destinations = [
     "${aws_cloudwatch_log_group.transfer.arn}:*"
   ]
