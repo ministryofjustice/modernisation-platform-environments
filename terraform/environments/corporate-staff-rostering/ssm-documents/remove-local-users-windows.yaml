@@ -16,7 +16,8 @@ mainSteps:
 
           # Remove each user
           foreach ($userToRemove in $usersToRemove) {
-            $users = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True' AND Name='$userToRemove' AND Name<>'Administrator' AND Name<>'Guest' AND Name<>'DefaultAccount'" -Namespace 'root\cimv2'
+            $users = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True' AND (Name -match '(?i)Test\d*' -or Name -match '(?i)User\d*') AND Name<>'Administrator' AND Name<>'Guest' AND Name<>'DefaultAccount'" -Namespace 'root\cimv2'
+
 
             foreach ($user in $users) {
               $username = $user.Name
