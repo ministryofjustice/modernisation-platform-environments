@@ -7,6 +7,7 @@
     },
     "./features/src/base": {},
     "./features/src/aws": {},
+    "./features/src/static-analysis": {},
     "./features/src/terraform": {}
   },
   "overrideFeatureInstallOrder": [
