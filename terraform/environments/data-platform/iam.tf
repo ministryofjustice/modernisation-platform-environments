@@ -626,7 +626,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_pr
   ]
 
   statement {
-    sid    = "s3ListGetDeleteRawFailCurated"
+    sid    = "s3ListGetDeletePutRawFailCurated"
     effect = "Allow"
     actions = [
       "s3:PutObject",
