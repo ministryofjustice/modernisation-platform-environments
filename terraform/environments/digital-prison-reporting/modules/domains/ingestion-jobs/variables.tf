@@ -18,22 +18,22 @@ variable "glue_batch_arguments" {
 variable "setup_batch_job" {
   description = "Enable Batch Job, True or False"
   type        = bool
-  default     = false  
+  default     = false
 }
 
 variable "glue_batch_job_name" {
   description = "Name of the Glue CDC Job"
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_batch_job_short_name" {
   description = "Name of the Glue CDC Job"
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_batch_description" {
   description = "Job Description"
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_batch_create_sec_conf" {
@@ -143,22 +143,22 @@ variable "glue_cdc_arguments" {
 variable "setup_cdc_job" {
   description = "Enable CDC Job, True or False"
   type        = bool
-  default     = false  
+  default     = false
 }
 
 variable "glue_cdc_job_name" {
   description = "Name of the Glue CDC Job"
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_cdc_job_short_name" {
   description = "Name of the Glue CDC Job"
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_cdc_description" {
   description = "Job Description"
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_cdc_create_sec_conf" {
@@ -290,28 +290,28 @@ variable "s3_file_transfer_lambda_code_s3_bucket" {
   default     = ""
 }
 
-variable "reporting_lambda_code_s3_key"{
+variable "reporting_lambda_code_s3_key" {
   description = "S3 File Transfer Lambda Code Bucket KEY"
   type        = string
-  default     = ""  
+  default     = ""
 }
 
 variable "step_function_notification_lambda_handler" {
   description = "Notification Lambda Handler"
   type        = string
-  default     = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest" 
+  default     = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
 }
 
 variable "step_function_notification_lambda_runtime" {
   description = "Lambda Runtime"
   type        = string
-  default     = "java11"    
+  default     = "java11"
 }
 
 variable "step_function_notification_lambda_policies" {
   description = "An List of Notification Lambda Policies"
   type        = list(string)
-  default     = []  
+  default     = []
 }
 
 variable "step_function_notification_lambda_tracing" {
@@ -357,22 +357,22 @@ variable "glue_hive_arguments" {
 variable "setup_hive_job" {
   description = "Enable hive Job, True or False"
   type        = bool
-  default     = false  
+  default     = false
 }
 
 variable "glue_hive_job_name" {
   description = "Name of the Glue CDC Job"
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_hive_job_short_name" {
   description = "Name of the Glue CDC Job"
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_hive_description" {
   description = "Job Description"
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_hive_create_sec_conf" {

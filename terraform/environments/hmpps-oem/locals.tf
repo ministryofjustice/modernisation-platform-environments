@@ -42,7 +42,7 @@ locals {
   baseline_iam_policies = {
     Ec2OracleEnterpriseManagerPolicy = {
       description = "Permissions required for Oracle Enterprise Manager"
-      statements  = [
+      statements = [
         {
           sid    = "S3ListLocation"
           effect = "Allow"

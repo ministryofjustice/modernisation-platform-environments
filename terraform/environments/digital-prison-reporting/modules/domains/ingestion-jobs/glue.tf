@@ -32,7 +32,7 @@ module "glue_reporting_hub_cdc_job" {
     {
       Resource_Type = "Glue Job"
     }
-  )  
+  )
 }
 
 # Batch JOB
@@ -62,14 +62,14 @@ module "glue_reporting_hub_batch_job" {
   account                       = var.account_id
   log_group_retention_in_days   = var.glue_batch_log_group_retention_in_days
 
-  arguments                     = var.glue_batch_arguments
+  arguments = var.glue_batch_arguments
 
   tags = merge(
     var.tags,
     {
       Resource_Type = "Glue Job"
     }
-  ) 
+  )
 }
 
 # Hive Tables Creation JOB
@@ -97,7 +97,7 @@ module "glue_hive_table_setup_job" {
   account                       = var.account_id
   log_group_retention_in_days   = var.glue_hive_log_group_retention_in_days
 
-  arguments                     = var.glue_hive_arguments
+  arguments = var.glue_hive_arguments
 
   tags = merge(
     var.tags,

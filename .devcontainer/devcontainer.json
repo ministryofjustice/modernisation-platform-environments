@@ -3,7 +3,7 @@
   "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
-      "configureZshAsDefaultShell": true 
+      "configureZshAsDefaultShell": true
     },
     "./features/src/base": {},
     "./features/src/aws": {},

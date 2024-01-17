@@ -1,10 +1,10 @@
 # DMS Module to Provision Endpoints
 module "dms_instance" {
-  source                       = "../../dms_s3_v2"
+  source = "../../dms_s3_v2"
 
   name                         = var.name
   project_id                   = var.project_id
-  env                          = var.env  
+  env                          = var.env
   setup_dms_instance           = var.setup_dms_instance
   availability_zones           = var.availability_zones
   replication_instance_version = var.replication_instance_version

@@ -53,8 +53,8 @@ variable "subnet_ids" {
 }
 
 variable "vpc" {
-  type        = string
-  default     = ""  
+  type    = string
+  default = ""
 }
 
 variable "availability_zone" {
@@ -139,13 +139,13 @@ variable "vpc_cidr" {
 # DMS Task
 #--------------------------------------------------------------
 variable "table_mappings" {
-  type        = any
-  default     = ""
+  type    = any
+  default = ""
 }
 
 variable "replication_task_settings" {
-  type        = any
-  default     = {}
+  type    = any
+  default = {}
 }
 
 variable "rename_rule_source_schema" {
@@ -180,13 +180,13 @@ variable "dms_replication_instance" {
 }
 
 variable "dms_source_endpoint" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 variable "dms_target_endpoint" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 #--------------------------------------------------------------
@@ -196,7 +196,7 @@ variable "dms_target_endpoint" {
 variable "setup_dms_endpoints" {
   description = "Enable DMS Endpoints, True or False"
   type        = bool
-  default     = false    
+  default     = false
 }
 
 variable "setup_dms_iam" {
@@ -226,29 +226,29 @@ variable "source_db_name" {
 }
 
 variable "dms_source_name" {
-  type        = string
-  default     = ""  
+  type    = string
+  default = ""
 }
 
 variable "dms_target_name" {
-  type        = string
-  default     = ""  
+  type    = string
+  default = ""
 }
 
 
 variable "short_name" {
-  type        = string
-  default     = ""  
+  type    = string
+  default = ""
 }
 
 variable "source_address" {
   default     = ""
-  description = "Default Source Address"    
+  description = "Default Source Address"
 }
 
 variable "bucket_name" {
-  type        = string
-  default     = ""  
+  type    = string
+  default = ""
 }
 
 
@@ -270,10 +270,10 @@ variable "source_engine_name" {
 
 variable "source_app_password" {
   description = "Password for the endpoint to access the source database"
-  default     = ""  
+  default     = ""
 }
 
 variable "source_app_username" {
   description = "Username for the endpoint to access the source database"
-  default     = ""  
+  default     = ""
 }

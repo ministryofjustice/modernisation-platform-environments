@@ -17,28 +17,28 @@ variable "s3_file_transfer_lambda_code_s3_bucket" {
   default     = ""
 }
 
-variable "reporting_lambda_code_s3_key"{
+variable "reporting_lambda_code_s3_key" {
   description = "S3 File Transfer Lambda Code Bucket KEY"
   type        = string
-  default     = ""  
+  default     = ""
 }
 
 variable "step_function_notification_lambda_handler" {
   description = "Notification Lambda Handler"
   type        = string
-  default     = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest" 
+  default     = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
 }
 
 variable "step_function_notification_lambda_runtime" {
   description = "Lambda Runtime"
   type        = string
-  default     = "java11"    
+  default     = "java11"
 }
 
 variable "step_function_notification_lambda_policies" {
   description = "An List of Notification Lambda Policies"
   type        = list(string)
-  default     = []  
+  default     = []
 }
 
 variable "step_function_notification_lambda_tracing" {
