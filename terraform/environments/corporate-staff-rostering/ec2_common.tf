@@ -68,19 +68,19 @@ resource "aws_ssm_document" "leave_windows_domain" {
   )
 }
 
-resource "aws_ssm_document" "remove_local_users_windows" {
-  name            = "remove-local-users-windows"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/remove-local-users-windows.yaml")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "remove-local-users-windows"
-    },
-  )
-}
+#resource "aws_ssm_document" "remove_local_users_windows" {
+#  name            = "remove-local-users-windows"
+#  document_type   = "Command"
+#  document_format = "YAML"
+#  content         = file("./ssm-documents/remove-local-users-windows.yaml")
+#
+#  tags = merge(
+#    local.tags,
+#    {
+#      Name = "remove-local-users-windows"
+#    },
+#  )
+#}
 
 resource "aws_ssm_document" "network-testing-tools" {
   name            = "network-testing-tools"
