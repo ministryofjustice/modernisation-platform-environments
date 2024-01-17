@@ -19,15 +19,16 @@ locals {
       local.NomisEBSVolumeDiskIOPS,
       local.NomisEBSVolumeDiskThroughput,
       local.NomisAllEBSVolumeStats,
+      local.TitlePanels,
     ]
   }
 
   NomisEC2CPUUtilWidget = {
     type   = "metric"
     x      = 0
-    y      = 2
-    width  = 6
-    height = 6
+    y      = 1
+    width  = 7
+    height = 8
     properties = {
       view    = "timeSeries"
       stacked = false
@@ -43,8 +44,8 @@ locals {
 
   NomisEC2MemoryUtilWidget = {
     type   = "metric"
-    x      = 6
-    y      = 0
+    x      = 7
+    y      = 1
     width  = 6
     height = 8
     properties = {
@@ -62,10 +63,10 @@ locals {
 
   NomisEC2DiskUsed = {
     type   = "metric"
-    x      = 0
-    y      = 8
+    x      = 13
+    y      = 1
     width  = 6
-    height = 7
+    height = 8
     properties = {
       view    = "timeSeries"
       stacked = false
@@ -81,8 +82,8 @@ locals {
 
   NomisLoadBalancerTargetResponseTime = {
     type   = "metric"
-    x      = 12
-    y      = 0
+    x      = 0
+    y      = 10
     width  = 7
     height = 8
     properties = {
@@ -100,9 +101,9 @@ locals {
 
   NomisLoadBalancerRequestCount = {
     type   = "metric"
-    x      = 12
-    y      = 8
-    width  = 7
+    x      = 14
+    y      = 10
+    width  = 6
     height = 8
     properties = {
       view    = "timeSeries"
@@ -119,10 +120,10 @@ locals {
 
   NomisLoadBalancerHTTP5XXsCount = {
     type   = "metric"
-    x      = 19
-    y      = 0
-    width  = 5
-    height = 7
+    x      = 14
+    y      = 10
+    width  = 6
+    height = 8
     properties = {
       view    = "timeSeries"
       stacked = true
@@ -139,7 +140,7 @@ locals {
   NomisEBSVolumeDiskIOPS = {
     type   = "metric"
     x      = 0
-    y      = 15
+    y      = 19
     width  = 12
     height = 6
     properties = {
@@ -162,14 +163,14 @@ locals {
   NomisEBSVolumeDiskThroughput = {
     type   = "metric"
     x      = 0
-    y      = 15
+    y      = 25
     width  = 12
     height = 6
     properties = {
       view    = "timeSeries"
       stacked = false
       region  = local.region
-      title   = "EBS Volumes Total IOPs"
+      title   = "EBS Volumes Throughput"
       stat    = "Sum"
       period  = local.cloudwatch_period
       metrics = [
@@ -185,7 +186,7 @@ locals {
   NomisAllEBSVolumeStats = {
     type   = "explorer"
     x      = 0
-    y      = 21
+    y      = 31
     width  = 24
     height = 15
     properties = {
@@ -231,5 +232,41 @@ locals {
       ]
     }
   }
+
+  TitlePanels = [
+    {
+      type   = "text"
+      x      = 0
+      y      = 9
+      width  = 24
+      height = 1
+      properties = {
+        markdown   = "## LoadBalancer Graphed Metrics"
+        background = "solid"
+      }
+    },
+    {
+      type   = "text"
+      x      = 0
+      y      = 0
+      width  = 24
+      height = 1
+      properties = {
+        markdown   = "## EC2 Graphed Metrics"
+        background = "solid"
+      }
+    },
+    {
+      type   = "text"
+      x      = 0
+      y      = 18
+      width  = 24
+      height = 1
+      properties = {
+        markdown   = "## EBS Volume Graphed Metrics"
+        background = "solid"
+      }
+    },
+  ]
 }
 
