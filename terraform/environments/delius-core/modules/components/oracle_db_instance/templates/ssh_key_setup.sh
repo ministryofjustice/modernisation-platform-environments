@@ -8,7 +8,11 @@
 # The public keys are stored on S3 with the following naming convention: "username.pub".
 # This script retrieves the public keys, creates or deletes local user accounts as needed,
 # and copies the public key to /home/username/.ssh/authorized_keys
+cd /etc/ssh
+# Generate a new SSH host key
+ssh-keygen -A
 
+cd ~
 mkdir -p /usr/bin/db
 touch /usr/bin/db/sync_users
 cat > /usr/bin/db/sync_users << 'EOF'
