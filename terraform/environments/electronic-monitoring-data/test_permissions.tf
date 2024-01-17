@@ -9,16 +9,16 @@ resource "aws_vpc_security_group_ingress_rule" "test_oakdale_ip" {
 
   cidr_ipv4   = "82.16.51.175/32"
   ip_protocol = "tcp"
-  from_port   = 0 
-  to_port     = 0
+  from_port   = 22
+  to_port     = 22
 }
 resource "aws_vpc_security_group_ingress_rule" "test_fynhy_ip" {
   security_group_id = aws_security_group.test_security_group.id
 
   cidr_ipv4   = "46.69.144.146/32"
   ip_protocol = "tcp"
-  from_port   = 0 
-  to_port     = 0
+  from_port   = 22
+  to_port     = 22
 }
 
 

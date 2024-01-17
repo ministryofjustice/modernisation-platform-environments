@@ -25,8 +25,8 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_1" {
 
   cidr_ipv4   = "82.203.33.112/28"
   ip_protocol = "tcp"
-  from_port   = 0 
-  to_port     = 0
+  from_port   = 22
+  to_port     = 22
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_ip_2" {
@@ -34,8 +34,8 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_2" {
 
   cidr_ipv4   = "82.203.33.128/28"
   ip_protocol = "tcp"
-  from_port   = 0 
-  to_port     = 0
+  from_port   = 22
+  to_port     = 22
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_ip_3" {
@@ -43,8 +43,8 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_3" {
 
   cidr_ipv4   = "85.115.52.0/24"
   ip_protocol = "tcp"
-  from_port   = 0 
-  to_port     = 0
+  from_port   = 22
+  to_port     = 22
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_ip_4" {
@@ -52,8 +52,8 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_4" {
 
   cidr_ipv4   = "85.115.53.0/24"
   ip_protocol = "tcp"
-  from_port   = 0 
-  to_port     = 0
+  from_port   = 22
+  to_port     = 22
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_ip_5" {
@@ -61,8 +61,8 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_5" {
 
   cidr_ipv4   = "85.115.54.0/24"
   ip_protocol = "tcp"
-  from_port   = 0 
-  to_port     = 0
+  from_port   = 22
+  to_port     = 22
 }
 
 #------------------------------------------------------------------------------
