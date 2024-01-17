@@ -20,6 +20,3 @@ mainSteps:
             Write-Output 'Removing user: $username'
             net user $username /delete
           }
-    runbook: "Name: AWS-RunPowerShellScript"
-    timeoutSeconds: 600
-    onFailure: "Continue"
