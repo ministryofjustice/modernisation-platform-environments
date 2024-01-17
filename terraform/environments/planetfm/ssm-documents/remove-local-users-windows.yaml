@@ -1,8 +1,10 @@
 ---
 schemaVersion: "2.2"
-description: "Remove all local users from Windows servers"
-#parameters: 
-
+description:  "Powershell doc to remove all local users from Windows servers"
+parameters:
+  InstanceId:
+    type: "String"
+    description: "ID of the instance being targetted"
 mainSteps:
   - name: RemoveLocalUsers
     action: "aws:runPowerShellScript"
