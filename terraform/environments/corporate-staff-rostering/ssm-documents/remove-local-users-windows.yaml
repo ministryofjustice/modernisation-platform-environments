@@ -13,7 +13,6 @@ mainSteps:
         - |
           # Fetch 'TestUser' , 'Developer' and 'Migration' local users
           $usersToRemove = @('TestUser', 'Developer', 'Migration')
-          $users = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True' AND Name='TestUser' AND Name<>'Administrator' AND Name<>'Guest' AND Name<>'DefaultAccount'" -Namespace 'root\cimv2'
 
           # Remove each user
           foreach ($userToRemove in $usersToRemove) {
@@ -25,32 +24,3 @@ mainSteps:
               net user $username /delete
             }
           }
-
-#  - name: RemoveLocalMigrationUsers
-#    action: "aws:runPowerShellScript"
-#    inputs:
-#      runCommand:
-#        - |
-#          # Fetch all local users except the default system accounts
-#          $users = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True' AND Name='Migration' AND Name<>'Administrator' AND Name<>'Guest' AND Name<>'DefaultAccount'" -Namespace 'root\cimv2'
-#
-#          # Remove each user
-#          foreach ($user in $users) {
-#            $username = $user.Name
-#            Write-Output 'Removing user: $username'
-#            net user $username /delete
-#          }
-#  - name: RemoveLocalDeveloperUsers
-#    action: "aws:runPowerShellScript"
-#    inputs:
-#      runCommand:
-#        - |
-#          # Fetch all local users except the default system accounts
-#          $users = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True' AND Name='Developer' AND Name<>'Administrator' AND Name<>'Guest' AND Name<>'DefaultAccount'" -Namespace 'root\cimv2'
-#
-#          # Remove each user
-#          foreach ($user in $users) {
-#            $username = $user.Name
-#            Write-Output 'Removing user: $username'
-#            net user $username /delete
-#          }
