@@ -71,6 +71,7 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_5" {
 # Configure SFTP server for supplier that only allows supplier specified IPs.
 #------------------------------------------------------------------------------
 
+
 resource "aws_transfer_server" "capita_transfer_server" {
   protocols = ["SFTP"]
   identity_provider_type = "SERVICE_MANAGED"
@@ -88,6 +89,13 @@ resource "aws_transfer_server" "capita_transfer_server" {
   security_policy_name = "TransferSecurityPolicy-2023-05"
 
   pre_authentication_login_banner = "Hello there"
+  logging_role  = aws_iam_role.iam_for_transfer.arn
+  structured_log_destinations = [
+    "${aws_cloudwatch_log_group.transfer.arn}:*"
+  ]
+}
+resource "aws_cloudwatch_log_group" "transfer" {
+  name_prefix = "transfer_test_"
 }
 
 #------------------------------------------------------------------------------
@@ -121,6 +129,7 @@ data "aws_iam_policy_document" "capita_assume_role" {
 resource "aws_iam_role" "capita_transfer_user_iam_role" {
   name                = "capita-transfer-user-iam-role"
   assume_role_policy  = data.aws_iam_policy_document.capita_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
 data "aws_iam_policy_document" "capita_transfer_user_iam_policy_document" {
