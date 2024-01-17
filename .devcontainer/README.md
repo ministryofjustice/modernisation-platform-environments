@@ -46,6 +46,14 @@ Launch from GitHub
 
 <https://tfswitch.warrensbox.com/>
 
+### Trivy
+
+<https://trivy.dev/>
+
+### Checkov
+
+<https://www.checkov.io/>
+
 ## Scripts
 
 ### `member-local-plan.sh`

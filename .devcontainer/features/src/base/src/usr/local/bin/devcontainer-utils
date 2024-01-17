@@ -73,3 +73,9 @@ apt_install() {
 
   rm --force --recursive /var/lib/apt/lists/*
 }
+
+pip_install() {
+  local packages="${1}"
+
+  python3 -m pip install --no-cache-dir --upgrade "${packages}"
+}
