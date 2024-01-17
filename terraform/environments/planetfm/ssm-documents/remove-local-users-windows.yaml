@@ -19,6 +19,7 @@ mainSteps:
 
           foreach ($user in $usersToRemove) {
             $username = $user.Name
-            Write-Output "Removing user: $username"
+            Write-Output "User $username should be removed. Removing now..."
             net user $username /delete
+            Write-Output "User $username is removed."
           }
