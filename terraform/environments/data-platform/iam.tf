@@ -733,3 +733,20 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_data_product_lamb
     ]
   }
 }
+
+data "aws_iam_policy_document" "iam_policy_document_for_jml_lambda_execution" {
+  statement {
+    sid    = "AllowLambdaExecution"
+    effect = "Allow"
+    actions = [
+          "cloudwatch:GenerateQuery",
+          "logs:DescribeLogStreams",
+          "logs:DescribeLogGroups",
+          "logs:GetLogEvents",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecrets"
+    ]
+    resources = "arn:aws:logs::${local.environment_management.account_ids["data-platform-apps-and-tools-production"]}:log-group:/aws/events/auth0/*"
+  }
+}
