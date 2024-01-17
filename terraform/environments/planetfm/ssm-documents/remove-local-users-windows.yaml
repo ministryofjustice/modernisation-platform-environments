@@ -11,16 +11,14 @@ mainSteps:
     inputs:
       runCommand:
         - |
-          # Fetch 'Developer' and 'Migration' local users
-          $usersToRemove = @('Developer', 'Migration') # any other users to be removed can be added to this list
+          # Fetch 'Developer' and 'Migration' local users (case-insensitive, user name might also have a number appended to it)
+          $users = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True'" -Namespace 'root\cimv2'
 
-          # Remove each user
-          foreach ($userToRemove in $usersToRemove) {
-            $users = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True' AND Name='$userToRemove' AND Name<>'Administrator' AND Name<>'Guest' AND Name<>'DefaultAccount'" -Namespace 'root\cimv2'
+          # Filter users using Where-Object based on the specified pattern
+          $usersToRemove = $users | Where-Object { $_.Name -match '(?i)migration\d+' -or $_.Name -match 'Migration' -or $_.Name -match '(?i)developer\d+' -or $_.Name -match 'Developer' -and $_.Name -notin @('Administrator', 'Guest', 'DefaultAccount') }
 
-            foreach ($user in $users) {
-              $username = $user.Name
-              Write-Output "Removing user: $username"
-              net user $username /delete
-            }
+          foreach ($user in $usersToRemove) {
+            $username = $user.Name
+            Write-Output "Removing user: $username"
+            net user $username /delete
           }
