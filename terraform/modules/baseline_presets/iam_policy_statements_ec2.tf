@@ -216,6 +216,19 @@ locals {
       }
     ]
 
+    DeliusDbaSecrets = [
+      {
+        sid    = "OracleEnterpriseManagementSecrets"
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecretValue",
+        ]
+        resources = [
+          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.delius}:secret:*delius-dba*",
+        ]
+      }
+    ]
+
     HmppsDomainSecrets = [
       {
         sid    = "HmppsDomainSecrets"

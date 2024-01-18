@@ -64,6 +64,7 @@ output "account_ids" {
 output "cross_account_secret_account_ids" {
   description = "account id lookup for cross-account secrets"
   value = {
+    delius    = var.environment_management.account_ids["delius-core-${var.environment}"]
     hmpps_oem = var.environment_management.account_ids["hmpps-oem-${var.environment}"]
     hmpps_domain = (contains(["development", "test"], var.environment) ?
       var.environment_management.account_ids["hmpps-domain-services-test"] :
