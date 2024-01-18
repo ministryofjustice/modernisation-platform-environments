@@ -1,6 +1,6 @@
 module "container_definition" {
   source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.61.1"
-  container_name           = "${var.name}-${var.env_name}"
+  container_name           = var.name
   container_image          = var.container_image
   container_memory         = 4096
   container_cpu            = 1024
@@ -30,7 +30,7 @@ module "ecs_service" {
   source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
   container_definition_json = module.container_definition.json_map_encoded_list
   ecs_cluster_arn           = var.ecs_cluster_arn
-  name                      = "${var.name}-${var.env_name}"
+  name                      = var.name
   vpc_id                    = var.account_config.shared_vpc_id
 
   launch_type  = "FARGATE"
@@ -51,7 +51,7 @@ module "ecs_service" {
   ecs_load_balancers = [
     {
       target_group_arn = aws_lb_target_group.this.arn
-      container_name   = "${var.name}-${var.env_name}"
+      container_name   = var.name
       container_port   = var.task_def_container_port
     }
   ]
