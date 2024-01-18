@@ -74,7 +74,7 @@ resource "aws_iam_role" "test_transfer_user_iam_role" {
 
 data "aws_iam_policy_document" "test_transfer_user_iam_policy_document" {
   statement {
-    sid       = "AllowPutAccesstoCapitaS3"
+    sid       = "AllowListAccesstoCapitaS3"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
     resources = [aws_s3_bucket.capita_landing_bucket.arn]
