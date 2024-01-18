@@ -513,7 +513,7 @@ module "data_product_jml_lambda_execution" {
 
     "eventbridge" = {
       principal  = "events.amazonaws.com"
-      source_arn = aws_cloudwatch_event_rule.jml_lambda_trigger.arn
+      source_arn = data-platform-apps-and-tools.jml-event-rules.aws_cloudwatch_event_rule.jml_lambda_trigger.arn
     }
   }
 }
