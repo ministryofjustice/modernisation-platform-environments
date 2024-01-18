@@ -75,7 +75,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ssh_ing
   description                  = "bastion to testing db"
   from_port                    = 22
   to_port                      = 22
-  ip_protocol                  = "-1"
+  ip_protocol                  = "tcp"
   referenced_security_group_id = var.account_config.bastion.bastion_security_group
 }
 
