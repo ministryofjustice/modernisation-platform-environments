@@ -20,6 +20,7 @@ variable "options" {
     enable_application_environment_wildcard_cert = optional(bool, false)
     enable_backup_plan_daily_and_weekly          = optional(bool, false)
     enable_business_unit_kms_cmks                = optional(bool, false)
+    enable_hmpps_domain                          = optional(bool, false)
     enable_image_builder                         = optional(bool, false)
     enable_ec2_cloud_watch_agent                 = optional(bool, false)
     enable_ec2_self_provision                    = optional(bool, false)

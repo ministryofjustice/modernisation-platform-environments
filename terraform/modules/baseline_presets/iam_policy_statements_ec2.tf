@@ -202,14 +202,30 @@ locals {
       }
     ]
 
-    SecretsCrossAccount = [
+    OracleEnterpriseManagementSecrets = [
       {
-        sid    = "SecretsCrossAccount"
+        sid    = "OracleEnterpriseManagementSecrets"
         effect = "Allow"
         actions = [
           "secretsmanager:GetSecretValue",
         ]
-        resources = ["*"]
+        resources = [
+          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.hmpps_oem}:secret:/oracle/oem/shared-*",
+          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.hmpps_oem}:secret:/oracle/database/*/shared-*",
+        ]
+      }
+    ]
+
+    HmppsDomainSecrets = [
+      {
+        sid    = "HmppsDomainSecrets"
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecretValue",
+        ]
+        resources = [
+          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.hmpps_domain}:secret:/microsoft/AD/*/shared-*",
+        ]
       }
     ]
 
