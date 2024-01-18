@@ -1,6 +1,11 @@
 # nomis-development environment settings
 locals {
 
+  # baseline presets config
+  development_baseline_presets_options = {
+    enable_ec2_delius_dba_secrets_access = true # additional permissions to access delius secrets
+  }
+
   # baseline config
   development_config = {
 
