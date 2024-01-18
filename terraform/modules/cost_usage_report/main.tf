@@ -15,7 +15,7 @@ resource "aws_cur_report_definition" "cost_usage_report" {
 }
 
 module "s3_bucket" {
-
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
@@ -111,7 +111,10 @@ resource "aws_athena_workgroup" "cur" {
       selected_engine_version = "Athena engine version 3"
     }
     result_configuration {
-      output_location = "s3://${module.s3_bucket.bucket.id}/output/"
+        output_location = "s3://${module.s3_bucket.bucket.id}/output/"
+        encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
     }
   }
   force_destroy = true
