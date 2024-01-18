@@ -26,10 +26,10 @@ locals {
   }
 
   domain_secretsmanager_secrets = {
+    recovery_window_in_days = 0
     secrets = {
       passwords = {
         description = "domain passwords only accessible by this account"
-        recovery_window_in_days = 0
       }
       shared-passwords = {
         description = "domain passwords shared with other accounts"
@@ -42,7 +42,6 @@ locals {
         policy = [
           local.domain_secret_policy_read,
         ]
-        recovery_window_in_days = 0
       }
     }
   }
