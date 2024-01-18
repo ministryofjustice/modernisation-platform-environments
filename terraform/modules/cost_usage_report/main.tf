@@ -159,12 +159,12 @@ resource "aws_glue_catalog_table" "report" {
     parameters = {
         EXTERNAL = "TRUE"
         "parquet.compression" = "SNAPPY"
-        projection.enabled = "true"
-        projection.year.type = "integer"
-        projection.year.range = "2024,2030"
-        projection.month.type = "integer"
-        projection.month.range = "1,12"
-        storage.location.template = "s3://${module.s3_bucket.bucket.id}/${aws_cur_report_definition.cost_usage_report.s3_prefix}/${aws_cur_report_definition.cost_usage_report.report_name}/${aws_cur_report_definition.cost_usage_report.report_name}/year=$${year}/month=$${month}"
+        "projection.enabled" = "true"
+        "projection.year.type" = "integer"
+        "projection.year.range" = "2024,2030"
+        "projection.month.type" = "integer"
+        "projection.month.range" = "1,12"
+        "storage.location.template" = "s3://${module.s3_bucket.bucket.id}/${aws_cur_report_definition.cost_usage_report.s3_prefix}/${aws_cur_report_definition.cost_usage_report.report_name}/${aws_cur_report_definition.cost_usage_report.report_name}/year=$${year}/month=$${month}"
     }
 
     storage_descriptor {
