@@ -2,7 +2,7 @@ resource "aws_cur_report_definition" "cost_usage_report" {
 
     provider                   = aws.us-east-1
     report_name                = lower(format("%s-cost-usage-report", var.application_name))
-    time_unit                  = "HOURLY" # DAILY, MONTHLY
+    time_unit                  = "DAILY"
     format                     = "Parquet"
     compression                = "Parquet"
     additional_schema_elements = ["RESOURCES", "SPLIT_COST_ALLOCATION_DATA"]
