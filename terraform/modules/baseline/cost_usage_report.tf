@@ -12,6 +12,6 @@ module "cost_usage_report" {
     application_name = var.environment.application_name
     account_number   = var.environment.account_id
     environment      = var.environment.environment
-    tags = merge(local.tags)
+    tags = local.tags
 
 }
