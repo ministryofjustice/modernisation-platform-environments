@@ -133,6 +133,7 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
   )
 
+  # example code for creating a cost usage report - locals_development.tf
   cost_usage_report = merge(
     lookup(local.baseline_environment_config, "baseline_cost_usage_report", {}),
   )
