@@ -3,8 +3,11 @@ locals {
 
   # baseline config
   development_config = {
-    baseline_cost_usage_report = {
-      create = false
-    }
+
+    # example code for creating a cost usage report in the development environment
+    # 
+    # baseline_cost_usage_report = {
+    #   create = true
+    # }
   }
 }
