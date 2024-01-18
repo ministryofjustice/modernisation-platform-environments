@@ -28,7 +28,7 @@
       "db_instance_class": "db.t3.xlarge",
       "db_user": "dbadmin",
       "db_allocated_storage": "100",
-      "db_name": "chaps-preproduction",
+      "db_name": "chaps-staging",
       "env_name": "preproduction",
       "db_instance_identifier": "chaps-preprod-instance",
       "friendly_name": "Chaps preproduction",
