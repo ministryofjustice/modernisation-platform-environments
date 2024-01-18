@@ -1024,8 +1024,8 @@ variable "resource_explorer" {
 
 variable "cost_usage_report" {
   description = "Enables AWS Cost Usage Report"
-  type        = map(object({
-    create = optional(bool, false)
-  }))
-  default     = {}
+  type        = map(any)  
+  default     = {
+    create = false
+  }
 }
