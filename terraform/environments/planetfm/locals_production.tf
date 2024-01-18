@@ -31,12 +31,12 @@ locals {
       })
 
       # web servers
-      pd-cafm-w-38-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pd-cafm-w-38-b = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-cafm-w-38-b"
           availability_zone = "${local.region}b"
         })
-        instance = merge(local.defaults_app_ec2.instance, {
+        instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "t3.large"
         })
         ebs_volumes = {
