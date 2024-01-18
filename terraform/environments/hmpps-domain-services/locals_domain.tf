@@ -20,7 +20,7 @@ locals {
     ]
     principals = {
       type        = "AWS"
-      identifiers = local.domain_share_secret_principal_ids
+      identifiers = local.domain_share_secret_principal_ids[local.environment]
     }
     resources = ["*"]
   }
