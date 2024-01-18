@@ -9,32 +9,32 @@ resource "aws_vpc_security_group_ingress_rule" "test_oakdale_ip" {
 
   cidr_ipv4   = "82.16.51.175/32"
   ip_protocol = "tcp"
-  from_port   = 22
-  to_port     = 22
+  from_port   = 2222
+  to_port     = 2222
 }
 resource "aws_vpc_security_group_ingress_rule" "test_fynhy_ip" {
   security_group_id = aws_security_group.test_security_group.id
 
   cidr_ipv4   = "46.69.144.146/32"
   ip_protocol = "tcp"
-  from_port   = 22
-  to_port     = 22
+  from_port   = 2222
+  to_port     = 2222
 }
 resource "aws_vpc_security_group_ingress_rule" "test_petty_france_ip" {
   security_group_id = aws_security_group.test_security_group.id
 
   cidr_ipv4   = "81.134.202.29/32"
   ip_protocol = "tcp"
-  from_port   = 22
-  to_port     = 22
+  from_port   = 2222
+  to_port     = 2222
 }
 resource "aws_vpc_security_group_ingress_rule" "test_global_protect_ip" {
   security_group_id = aws_security_group.test_security_group.id
 
   cidr_ipv4   = "35.176.93.186/32"
   ip_protocol = "tcp"
-  from_port   = 22
-  to_port     = 22
+  from_port   = 2222
+  to_port     = 2222
 }
 
 
@@ -95,7 +95,7 @@ resource "aws_iam_role_policy" "test_transfer_user_iam_policy" {
 resource "aws_transfer_ssh_key" "test_ssh_key_mp" {
   server_id = aws_transfer_server.capita_transfer_server.id
   user_name = aws_transfer_user.test_transfer_user.user_name
-  body      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqXTKqBVVBQX5lvCdCdws4t7lCVaniv3FGCaJQOKMYAzBzwcVD9MKz0RzH7FMMA/iBayw/+13Mb79paBkJdT8T/Wg9lER/YE/lPKZcyT2IJ6myW5kDShQAY9lQliRoJ4oVx9x95hGx48eE9jWsCtwEaQT7pH2aK5l2THqfFCDQEMmT84CaSmJzuxsaYxuohlVcMqnGdU/oq+E76gLm3Z0gvh3NwFHd0RTIzqlVgwEUbTcHqZBON5229VypuvqfIcD9WIPEMnza/rA/6FX5luniqh+h/PCF7HH3Qiveui3PZV64fQtqd2pVnK8llW7CLjXKC1/TkWx1QkWyGzGYBZUXEctNbOBMixFcVbj49CucWMztPC88gZl2bHlJPqdBLMt6sakigCLWJLIvB/oeXGhzCN7XkfKWXDTu4mHuQ+UHPbXzsPvPRxidfxxRVk758M+GB15nQq2Fm3lRtYgZ2mnjQT7dwhhCaiqJiy0qs5kQ4Hs9Jnex6afoPQlqrhamtu8= matthew.price@L1057"
+  body      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqXTKqBVVBQX5lvCdCdws4t7lCVaniv3FGCaJQOKMYAzBzwcVD9MKz0RzH7FMMA/iBayw/+13Mb79paBkJdT8T/Wg9lER/YE/lPKZcyT2IJ6myW5kDShQAY9lQliRoJ4oVx9x95hGx48eE9jWsCtwEaQT7pH2aK5l2THqfFCDQEMmT84CaSmJzuxsaYxuohlVcMqnGdU/oq+E76gLm3Z0gvh3NwFHd0RTIzqlVgwEUbTcHqZBON522229VypuvqfIcD9WIPEMnza/rA/6FX5luniqh+h/PCF7HH3Qiveui3PZV64fQtqd2pVnK8llW7CLjXKC1/TkWx1QkWyGzGYBZUXEctNbOBMixFcVbj49CucWMztPC88gZl2bHlJPqdBLMt6sakigCLWJLIvB/oeXGhzCN7XkfKWXDTu4mHuQ+UHPbXzsPvPRxidfxxRVk758M+GB15nQq2Fm3lRtYgZ2mnjQT7dwhhCaiqJiy0qs5kQ4Hs9Jnex6afoPQlqrhamtu8= matthew.price@L1057"
 }
 
 resource "aws_transfer_ssh_key" "test_ssh_key_mh" {

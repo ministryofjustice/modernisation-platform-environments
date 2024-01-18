@@ -25,8 +25,8 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_1" {
 
   cidr_ipv4   = "82.203.33.112/28"
   ip_protocol = "tcp"
-  from_port   = 22
-  to_port     = 22
+  from_port   = 2222
+  to_port     = 2222
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_ip_2" {
@@ -34,8 +34,8 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_2" {
 
   cidr_ipv4   = "82.203.33.128/28"
   ip_protocol = "tcp"
-  from_port   = 22
-  to_port     = 22
+  from_port   = 2222
+  to_port     = 2222
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_ip_3" {
@@ -43,8 +43,8 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_3" {
 
   cidr_ipv4   = "85.115.52.0/24"
   ip_protocol = "tcp"
-  from_port   = 22
-  to_port     = 22
+  from_port   = 2222
+  to_port     = 2222
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_ip_4" {
@@ -52,8 +52,8 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_4" {
 
   cidr_ipv4   = "85.115.53.0/24"
   ip_protocol = "tcp"
-  from_port   = 22
-  to_port     = 22
+  from_port   = 2222
+  to_port     = 2222
 }
 
 resource "aws_vpc_security_group_ingress_rule" "capita_ip_5" {
@@ -61,8 +61,8 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_5" {
 
   cidr_ipv4   = "85.115.54.0/24"
   ip_protocol = "tcp"
-  from_port   = 22
-  to_port     = 22
+  from_port   = 2222
+  to_port     = 2222
 }
 
 #------------------------------------------------------------------------------
@@ -156,5 +156,28 @@ resource "aws_iam_role_policy" "capita_transfer_user_iam_policy" {
 resource "aws_transfer_ssh_key" "capita_ssh_key" {
   server_id = aws_transfer_server.capita_transfer_server.id
   user_name = aws_transfer_user.capita_transfer_user.user_name
-  body      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqXTKqBVVBQX5lvCdCdws4t7lCVaniv3FGCaJQOKMYAzBzwcVD9MKz0RzH7FMMA/iBayw/+13Mb79paBkJdT8T/Wg9lER/YE/lPKZcyT2IJ6myW5kDShQAY9lQliRoJ4oVx9x95hGx48eE9jWsCtwEaQT7pH2aK5l2THqfFCDQEMmT84CaSmJzuxsaYxuohlVcMqnGdU/oq+E76gLm3Z0gvh3NwFHd0RTIzqlVgwEUbTcHqZBON5229VypuvqfIcD9WIPEMnza/rA/6FX5luniqh+h/PCF7HH3Qiveui3PZV64fQtqd2pVnK8llW7CLjXKC1/TkWx1QkWyGzGYBZUXEctNbOBMixFcVbj49CucWMztPC88gZl2bHlJPqdBLMt6sakigCLWJLIvB/oeXGhzCN7XkfKWXDTu4mHuQ+UHPbXzsPvPRxidfxxRVk758M+GB15nQq2Fm3lRtYgZ2mnjQT7dwhhCaiqJiy0qs5kQ4Hs9Jnex6afoPQlqrhamtu8= test.user@K9999"
+  body      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqXTKqBVVBQX5lvCdCdws4t7lCVaniv3FGCaJQOKMYAzBzwcVD9MKz0RzH7FMMA/iBayw/+13Mb79paBkJdT8T/Wg9lER/YE/lPKZcyT2IJ6myW5kDShQAY9lQliRoJ4oVx9x95hGx48eE9jWsCtwEaQT7pH2aK5l2THqfFCDQEMmT84CaSmJzuxsaYxuohlVcMqnGdU/oq+E76gLm3Z0gvh3NwFHd0RTIzqlVgwEUbTcHqZBON522229VypuvqfIcD9WIPEMnza/rA/6FX5luniqh+h/PCF7HH3Qiveui3PZV64fQtqd2pVnK8llW7CLjXKC1/TkWx1QkWyGzGYBZUXEctNbOBMixFcVbj49CucWMztPC88gZl2bHlJPqdBLMt6sakigCLWJLIvB/oeXGhzCN7XkfKWXDTu4mHuQ+UHPbXzsPvPRxidfxxRVk758M+GB15nQq2Fm3lRtYgZ2mnjQT7dwhhCaiqJiy0qs5kQ4Hs9Jnex6afoPQlqrhamtu8= test.user@K9999"
+}
+
+
+
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Action": "s3:*",
+			"Effect": "Allow",
+			"Resource": "arn:aws:s3:::capita-dyx3807oi4",
+			"Sid": "AllowPutAccesstoCapitaS3"
+		},
+		{
+			"Sid": "AllowFileTransfer",
+			"Effect": "Allow",
+			"Action": [
+				"transfer:StartFileTransfer",
+				"transfer:TestConnection"
+			],
+			"Resource": "arn:aws:s3:::capita-dyx3807oi4"
+		}
+	]
 }
