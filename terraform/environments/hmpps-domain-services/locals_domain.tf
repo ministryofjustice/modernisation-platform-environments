@@ -26,7 +26,6 @@ locals {
   }
 
   domain_secretsmanager_secrets = {
-    recovery_window_in_days = 0
     secrets = {
       # passwords = {
       #   description = "domain passwords only accessible by this account"
