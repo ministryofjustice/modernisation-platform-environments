@@ -24,7 +24,3 @@ resource "aws_lb_target_group" "this" {
     timeout             = "5"
   }
 }
-
-output "target_group_arn" {
-  value = aws_lb_target_group.this.arn
-}

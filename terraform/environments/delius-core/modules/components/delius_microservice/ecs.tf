@@ -1,7 +1,7 @@
 module "container_definition" {
   source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.61.1"
   container_name           = "${var.name}-${var.env_name}"
-  container_image          = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${var.weblogic_config.frontend_image_tag}"
+  container_image          = var.container_image
   container_memory         = 4096
   container_cpu            = 1024
   essential                = true
@@ -39,9 +39,9 @@ module "ecs_service" {
   task_cpu    = "1024"
   task_memory = "4096"
 
-  service_role_arn   = module.ecs_policies.service_role.arn
-  task_role_arn      = module.ecs_policies.task_role.arn
-  task_exec_role_arn = module.ecs_policies.task_exec_role.arn
+  service_role_arn   = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.service_role.name}"
+  task_role_arn      = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_role.name}"
+  task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_exec_role.name}"
 
   environment = var.env_name
   namespace   = "delius-core"
