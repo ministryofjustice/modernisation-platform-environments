@@ -1,7 +1,7 @@
 variable "setup_dms_endpoints" {
   description = "Enable DMS Endpoints, True or False"
   type        = bool
-  default     = false    
+  default     = false
 }
 
 variable "setup_dms_iam" {
@@ -42,23 +42,23 @@ variable "extra_attributes" {
 }
 
 variable "dms_source_name" {
-  type        = string
-  default     = ""  
+  type    = string
+  default = ""
 }
 
 variable "dms_target_name" {
-  type        = string
-  default     = ""  
+  type    = string
+  default = ""
 }
 
 variable "short_name" {
-  type        = string
-  default     = ""  
+  type    = string
+  default = ""
 }
 
 variable "source_address" {
   default     = ""
-  description = "Default Source Address"    
+  description = "Default Source Address"
 }
 
 variable "bucket_name" {

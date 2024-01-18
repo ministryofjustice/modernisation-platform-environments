@@ -13,7 +13,7 @@ module "step_function_notification_lambda" {
   timeout       = 300 # 5 minutes
 
   vpc_settings = {
-    subnet_ids = var.lambda_subnet_ids   # NEW
+    subnet_ids         = var.lambda_subnet_ids         # NEW
     security_group_ids = var.lambda_security_group_ids # NEW
   }
 
@@ -32,9 +32,9 @@ module "step_function_notification_lambda_trigger" {
 
   enable_lambda_trigger = var.setup_step_function_notification_lambda
 
-  event_name            = var.step_function_notification_lambda_trigger
-  lambda_function_arn   = module.step_function_notification_lambda.lambda_function
-  lambda_function_name  = module.step_function_notification_lambda.lambda_name
+  event_name           = var.step_function_notification_lambda_trigger
+  lambda_function_arn  = module.step_function_notification_lambda.lambda_function
+  lambda_function_name = module.step_function_notification_lambda.lambda_name
 
   trigger_event_pattern = jsonencode(
     {

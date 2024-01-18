@@ -3,6 +3,84 @@ locals {
 
   # baseline config
   production_config = {
+
+    baseline_ec2_instances = {
+      # database servers
+      pd-cafm-db-b = merge(local.defaults_database_ec2, {
+        config = merge(local.defaults_database_ec2.config, {
+          ami_name          = "pd-cafm-db-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_database_ec2.instance, {
+          instance_type = "r6i.4xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 500 }
+          "/dev/sdc"  = { type = "gp3", size = 112 }
+          "/dev/sdd"  = { type = "gp3", size = 500 }
+          "/dev/sde"  = { type = "gp3", size = 50 }
+          "/dev/sdf"  = { type = "gp3", size = 85 }
+          "/dev/sdg"  = { type = "gp3", size = 100 }
+        }
+        tags = merge(local.defaults_database_ec2.tags, {
+          description       = "copy of PDFDW0031 SQL resilient Server"
+          app-config-status = "pending"
+          ami               = "pd-cafm-db-b"
+        })
+      })
+
+      # app servers 
+      pd-cafm-a-11-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-a-11-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        tags = {
+          description       = "CAFM App server copy of PDFWW0011"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-11-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      # web servers
+      pd-cafm-w-38-b = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-cafm-w-38-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "t3.large"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description       = "CAFM Web Training migrated server PDFWW3QCP660001"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-w-38-b"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+    }
     baseline_route53_zones = {
       "planetfm.service.justice.gov.uk" = {
         records = [

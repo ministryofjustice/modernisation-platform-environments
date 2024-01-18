@@ -84,7 +84,7 @@ module "data_ingestion_pipeline" {
               "config" : {
                 "bucket" : var.s3_glue_bucket_id,
                 "key" : var.domain
-              }              
+              }
             },
             "FunctionName" : var.s3_file_transfer_lambda_function
           },
@@ -111,14 +111,14 @@ module "data_ingestion_pipeline" {
             "Arguments" : {
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
-            }            
+            }
           },
           "Next" : "Resume DMS Replication Task"
         },
         "Resume DMS Replication Task" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
-          "Parameters" : { 
+          "Parameters" : {
             "ReplicationTaskArn" : var.dms_replication_task_arn,
             "StartReplicationTaskType" : "resume-processing"
           },
@@ -132,7 +132,7 @@ module "data_ingestion_pipeline" {
             "Arguments" : {
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
-            }            
+            }
           },
           "End" : true
         }

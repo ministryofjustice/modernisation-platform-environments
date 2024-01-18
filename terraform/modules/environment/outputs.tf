@@ -61,6 +61,18 @@ output "account_ids" {
   value       = nonsensitive(var.environment_management.account_ids)
 }
 
+output "cross_account_secret_account_ids" {
+  description = "account id lookup for cross-account secrets"
+  value = {
+    delius    = try(var.environment_management.account_ids["delius-core-${var.environment}"], "delius-core-${var.environment}-not-found")
+    hmpps_oem = var.environment_management.account_ids["hmpps-oem-${var.environment}"]
+    hmpps_domain = (contains(["development", "test"], var.environment) ?
+      var.environment_management.account_ids["hmpps-domain-services-test"] :
+      var.environment_management.account_ids["hmpps-domain-services-production"]
+    )
+  }
+}
+
 output "account_root_arns" {
   description = "account arn map where the key is the account name and the value is the account id"
   value       = nonsensitive({ for name, id in var.environment_management.account_ids : name => "arn:aws:iam::${id}:root" })
