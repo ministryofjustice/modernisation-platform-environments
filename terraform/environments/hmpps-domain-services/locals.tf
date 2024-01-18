@@ -14,11 +14,10 @@ locals {
     enable_application_environment_wildcard_cert = false
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
+    enable_hmpps_domain                          = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
-    enable_oracle_secure_web                     = false
-    enable_ec2_put_parameter                     = false
     enable_ec2_user_keypair                      = true
     enable_shared_s3                             = false # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = false # adds db backup buckets
