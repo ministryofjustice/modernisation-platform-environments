@@ -30,6 +30,31 @@ locals {
         })
       })
 
+      # app servers 
+      pd-cafm-a-11-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-a-11-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        tags = {
+          description       = "CAFM App server copy of PDFWW0011"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-11-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
       # web servers
       pd-cafm-w-38-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
