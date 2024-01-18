@@ -3,8 +3,8 @@ locals {
   domain_share_secret_principal_ids = {
     development = []
     test = [
-      # "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-development}:role/EC2HmppsDomainSecretsRole",
-      # "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-development}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/EC2HmppsDomainSecretsRole",
     ]
     preproduction = []
     production = [
@@ -32,9 +32,9 @@ locals {
       }
       shared-passwords = {
         description = "domain passwords shared with other accounts"
-        # policy = [
-        #   local.domain_secret_policy_read,
-        # ]
+        policy = [
+          local.domain_secret_policy_read,
+        ]
       }
       shared-config = {
         description = "domain related config shared with other accounts"
