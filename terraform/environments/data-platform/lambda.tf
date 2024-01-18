@@ -503,7 +503,7 @@ module "data_product_jml_lambda_execution" {
   create_role                    = true
   reserved_concurrent_executions = 1
 
-  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/jml-extract-lambda-lambda-ecr-repo:${local.delete_data_product_version}"
+  image_uri    = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-jml-extract-lambda:1.0.0"
   timeout      = 600
   tracing_mode = "Active"
   memory_size  = 128
@@ -511,10 +511,9 @@ module "data_product_jml_lambda_execution" {
   environment_variables = merge(local.logger_environment_vars, local.storage_environment_vars)
   allowed_triggers = {
 
-    AllowExecutionFromAPIGateway = {
-      action     = "lambda:InvokeFunction"
-      principal  = "apigateway.amazonaws.com"
-      source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.delete_data_product.http_method}${aws_api_gateway_resource.data_product_name.path}"
+    "eventbridge" = {
+      principal  = "events.amazonaws.com"
+      source_arn = aws_cloudwatch_event_rule.jml_lambda_trigger.arn
     }
   }
 }
