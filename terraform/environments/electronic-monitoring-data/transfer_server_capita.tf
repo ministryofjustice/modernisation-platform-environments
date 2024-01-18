@@ -158,26 +158,3 @@ resource "aws_transfer_ssh_key" "capita_ssh_key" {
   user_name = aws_transfer_user.capita_transfer_user.user_name
   body      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqXTKqBVVBQX5lvCdCdws4t7lCVaniv3FGCaJQOKMYAzBzwcVD9MKz0RzH7FMMA/iBayw/+13Mb79paBkJdT8T/Wg9lER/YE/lPKZcyT2IJ6myW5kDShQAY9lQliRoJ4oVx9x95hGx48eE9jWsCtwEaQT7pH2aK5l2THqfFCDQEMmT84CaSmJzuxsaYxuohlVcMqnGdU/oq+E76gLm3Z0gvh3NwFHd0RTIzqlVgwEUbTcHqZBON522229VypuvqfIcD9WIPEMnza/rA/6FX5luniqh+h/PCF7HH3Qiveui3PZV64fQtqd2pVnK8llW7CLjXKC1/TkWx1QkWyGzGYBZUXEctNbOBMixFcVbj49CucWMztPC88gZl2bHlJPqdBLMt6sakigCLWJLIvB/oeXGhzCN7XkfKWXDTu4mHuQ+UHPbXzsPvPRxidfxxRVk758M+GB15nQq2Fm3lRtYgZ2mnjQT7dwhhCaiqJiy0qs5kQ4Hs9Jnex6afoPQlqrhamtu8= test.user@K9999"
 }
-
-
-
-{
-	"Version": "2012-10-17",
-	"Statement": [
-		{
-			"Action": "s3:*",
-			"Effect": "Allow",
-			"Resource": "arn:aws:s3:::capita-dyx3807oi4",
-			"Sid": "AllowPutAccesstoCapitaS3"
-		},
-		{
-			"Sid": "AllowFileTransfer",
-			"Effect": "Allow",
-			"Action": [
-				"transfer:StartFileTransfer",
-				"transfer:TestConnection"
-			],
-			"Resource": "arn:aws:s3:::capita-dyx3807oi4"
-		}
-	]
-}
