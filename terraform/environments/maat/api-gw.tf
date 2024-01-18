@@ -9,8 +9,8 @@ locals {
 # API Gateway configuration
 resource "aws_apigatewayv2_vpc_link" "maat_api_gateway_vpc_link" {
   name             = "${local.application_name}_VPC_Link"
-  security_group_ids = [aws_security_group.maat_api_gw_sg]
-  subnet_ids        = [data.aws_subnet.private_subnets_a, data.aws_subnet.private_subnets_b, data.aws_subnet.private_subnets_c]
+  security_group_ids = [aws_security_group.maat_api_gw_sg.id]
+  subnet_ids        = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
 }
 
 resource "aws_cloudwatch_log_group" "maat_api_gateway_cloudwatch_log_group" {
@@ -89,15 +89,15 @@ resource "aws_apigatewayv2_authorizer" "maat_api_authorizer" {
 
   jwt_configuration {
     audience = [
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_default,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_cda,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_cma,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_ccp,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_ccc,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_ce,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_chs,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_maatos,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_cvs
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_default.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_cda.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_cma.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_ccp.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_ccc.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_ce.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_chs.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_maatos.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_cvs.id
     ]
     issuer   = aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint
   }
@@ -111,8 +111,8 @@ resource "aws_apigatewayv2_authorizer" "maat_api_authorizer_for_dces" {
 
   jwt_configuration {
     audience = [
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_dcrs,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_dirs
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_dcrs.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_dirs.id
     ]
     issuer   = aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint
   }
@@ -126,8 +126,8 @@ resource "aws_apigatewayv2_authorizer" "maat_api_authorizer_for_ats_and_caa" {
 
   jwt_configuration {
     audience = [
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_caa,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_ats
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_caa.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_ats.id
     ]
     issuer   = aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint
   }
