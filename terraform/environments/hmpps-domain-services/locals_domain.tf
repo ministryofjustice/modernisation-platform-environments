@@ -8,8 +8,8 @@ locals {
     ]
     preproduction = []
     production = [
-      # "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-preproduction}:role/EC2HmppsDomainSecretsRole",
-      # "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-production}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-preproduction}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-production}:role/EC2HmppsDomainSecretsRole",
     ]
   }
 
