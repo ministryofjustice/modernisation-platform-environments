@@ -27,21 +27,23 @@ locals {
 
   domain_secretsmanager_secrets = {
     secrets = {
-      # passwords = {
-      #   description = "domain passwords only accessible by this account"
-      # }
+      passwords = {
+        description = "domain passwords only accessible by this account"
+        recovery_window_in_days = 0
+      }
       shared-passwords = {
         description = "domain passwords shared with other accounts"
         policy = [
           local.domain_secret_policy_read,
         ]
       }
-      # shared-config = {
-      #   description = "domain related config shared with other accounts"
-      #   policy = [
-      #     local.domain_secret_policy_read,
-      #   ]
-      # }
+      shared-config = {
+        description = "domain related config shared with other accounts"
+        policy = [
+          local.domain_secret_policy_read,
+        ]
+        recovery_window_in_days = 0
+      }
     }
   }
 }
