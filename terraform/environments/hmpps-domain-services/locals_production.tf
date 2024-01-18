@@ -4,6 +4,10 @@ locals {
   # baseline config
   production_config = {
 
+    baseline_secretsmanager_secrets = {
+      "/microsoft/AD/azure.hmpp.root" = local.domain_secretsmanager_secrets
+    }
+
     baseline_acm_certificates = {
       remote_desktop_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this

@@ -9,6 +9,7 @@ locals {
           passwords = {}
         }
       }
+      "/microsoft/AD/azure.noms.root" = local.domain_secretsmanager_secrets
     }
 
     baseline_acm_certificates = {
