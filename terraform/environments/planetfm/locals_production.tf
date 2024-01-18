@@ -31,6 +31,31 @@ locals {
       })
 
       # app servers 
+      pd-cafm-a-10-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-a-10-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        tags = {
+          description       = "RDS Session Host and CAFM App Server/PFME Licence Server copy of PDFAW0010"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-10-b"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+
       pd-cafm-a-11-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-cafm-a-11-a"
@@ -44,7 +69,7 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         tags = {
-          description       = "CAFM App server copy of PDFWW0011"
+          description       = "CAFM App server copy of PDFWA0011"
           app-config-status = "pending"
           os-type           = "Windows"
           ami               = "pd-cafm-a-11-a"
