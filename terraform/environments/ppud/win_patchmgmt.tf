@@ -13,6 +13,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   name             = "WindowsOSAndMicrosoftApps"
   description      = "Patch both Windows and Microsoft apps"
   operating_system = "WINDOWS"
+  approved_patches = ["KB890830"]
 
   approval_rule {
     approve_after_days = 5
@@ -43,7 +44,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     # Filter on Microsoft product if necessary
     patch_filter {
       key    = "PRODUCT"
-      values = ["Office2003", "Office2007", "Office2010", "Office 2013", "Office 2016", "Office2019", "Office2021"]
+      values = ["Office 2003", "Office 2007", "Office 2010", "Office 2013", "Office 2016", "Office 2019", "Office 2021", "Office 365"]
     }
   }
 }
