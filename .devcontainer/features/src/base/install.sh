@@ -4,6 +4,10 @@ set -e
 
 source "$(dirname "${0}")"/src/usr/local/bin/devcontainer-utils
 
+apt_install "python3-pip"
+
+pip_install "pip"
+
 install --owner=vscode --group=vscode --mode=775 "$(dirname "${0}")"/src/usr/local/bin/devcontainer-utils /usr/local/bin/devcontainer-utils
 
 install --owner=vscode --group=vscode --mode=755 "$(dirname "${0}")"/src/usr/local/etc/vscode-dev-containers/first-run-notice.txt /usr/local/etc/vscode-dev-containers/first-run-notice.txt
