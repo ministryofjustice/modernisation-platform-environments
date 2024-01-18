@@ -32,15 +32,15 @@ locals {
       }
       shared-passwords = {
         description = "domain passwords shared with other accounts"
-        policy = [
-          local.domain_secret_policy_read,
-        ]
+        # policy = [
+        #   local.domain_secret_policy_read,
+        # ]
       }
       shared-config = {
         description = "domain related config shared with other accounts"
-        policy = [
-          local.domain_secret_policy_read,
-        ]
+        # policy = [
+        #   local.domain_secret_policy_read,
+        # ]
       }
     }
   }
