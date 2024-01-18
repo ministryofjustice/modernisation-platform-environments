@@ -1,6 +1,9 @@
 # nomis-production environment settings
 locals {
 
+  # baseline presets config
+  production_baseline_presets_options = {}
+
   # baseline config
   production_config = {
 

@@ -2,8 +2,10 @@ locals {
 
   iam_policies_filter = distinct(flatten([
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
+    var.options.enable_hmpps_domain ? ["HmppsDomainSecretsPolicy"] : [],
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
+    var.options.enable_ec2_delius_dba_secrets_access ? ["DeliusDbaSecretsPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
@@ -104,7 +106,17 @@ locals {
 
     OracleEnterpriseManagementSecretsPolicy = {
       description = "For cross account secret access identity policy"
-      statements  = local.iam_policy_statements_ec2.SecretsCrossAccount
+      statements  = local.iam_policy_statements_ec2.OracleEnterpriseManagementSecrets
+    }
+
+    DeliusDbaSecretsPolicy = {
+      description = "Permissions to access Delius DBA secrets in delius-core account"
+      statements  = local.iam_policy_statements_ec2.DeliusDbaSecrets
+    }
+
+    HmppsDomainSecretsPolicy = {
+      description = "Permissions to access secrets in hmpps-domain-services account"
+      statements  = local.iam_policy_statements_ec2.HmppsDomainSecrets
     }
 
     # NOTE, this doesn't include GetSecretValue since the EC2 must assume

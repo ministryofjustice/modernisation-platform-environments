@@ -1,6 +1,9 @@
 # nomis-test environment settings
 locals {
 
+  # baseline presets config
+  test_baseline_presets_options = {}
+
   # baseline config
   test_config = {
 
