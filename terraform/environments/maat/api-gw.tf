@@ -39,7 +39,7 @@ resource "aws_apigatewayv2_route" "maat_api_route1" {
   api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /link/validate"
   authorization_type   = "JWT"
-  authorization_scopes = [local.application_name/local.api_scope]
+  authorization_scopes = ["${local.application_name}/${local.api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer.id
   target               = "/integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
   depends_on           = [aws_apigatewayv2_integration.maat_api_integration]
@@ -49,16 +49,16 @@ resource "aws_apigatewayv2_route" "maat_api_route_crime_means_assessment" {
   api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /api/internal/v1/{proxy+}"
   authorization_type   = "JWT"
-  authorization_scopes = [local.application_name/local.api_scope]
+  authorization_scopes = ["${local.application_name}/${local.api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer.id
   target               = "/integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
 
 resource "aws_apigatewayv2_route" "maat_api_route_crown_court_proceeding" {
-  api_id               = aws_apigatewayv2_api.ApiGateway.id
+  api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /api/internal/v1/crowncourtproceeding"
   authorization_type   = "JWT"
-  authorization_scopes = [local.application_name/local.api_scope]
+  authorization_scopes = ["${local.application_name}/${local.api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer.id
   target               = "/integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
@@ -67,7 +67,7 @@ resource "aws_apigatewayv2_route" "maat_api_route_eform_staging" {
   api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /api/eform/{proxy+}"
   authorization_type   = "JWT"
-  authorization_scopes = [local.application_name/local.api_scope]
+  authorization_scopes = ["${local.application_name}/${local.api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer_for_ats_and_caa.id
   target               = "/integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
@@ -76,7 +76,7 @@ resource "aws_apigatewayv2_route" "maat_api_route_dces_service" {
   api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /api/internal/v1/debt-collection-enforcement/{proxy+}"
   authorization_type   = "JWT"
-  authorization_scopes = [local.application_name/local.api_scope]
+  authorization_scopes = ["${local.application_name}/${local.api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer_for_dces.id
   target               = "/integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
@@ -155,16 +155,16 @@ resource "aws_apigatewayv2_domain_name" "maat_api_external_domain_name" {
 }
 
 resource "aws_route53_record" "maat_api_external_dns_record" {
-  zone_id = data.aws_route53_zone.dns.HostedZoneId
+  zone_id = data.aws_route53_zone.external.zone_id
   name           = local.api_gateway_fqdn
   type           = "CNAME"
   ttl            = "60"
-  records        = [aws_apigatewayv2_domain_name.maat_api_external_domain_name.regional_domain_name]
+  records        = [aws_apigatewayv2_domain_name.maat_api_external_domain_name.id]
 }
 
 resource "aws_apigatewayv2_api_mapping" "maat_api_mapping" {
-  domain_name = aws_apigatewayv2_domain_name.maat_api_external_domain_name.domain_name
+  domain_name = aws_apigatewayv2_domain_name.maat_api_external_domain_name.id
   api_id      = aws_apigatewayv2_api.maat_api_gateway.id
-  stage       = aws_apigatewayv2_stage.maat_api_stage.stage_name
+  stage       = aws_apigatewayv2_stage.maat_api_stage.id
   depends_on  = [aws_apigatewayv2_domain_name.maat_api_external_domain_name]
 }
