@@ -6,6 +6,29 @@ locals {
 
     baseline_ec2_instances = {
       # database servers
+      pd-cafm-db-a = merge(local.defaults_database_ec2, {
+        config = merge(local.defaults_database_ec2.config, {
+          ami_name          = "pd-cafm-db-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_database_ec2.instance, {
+          instance_type = "r6i.4xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 500 }
+          "/dev/sdc"  = { type = "gp3", size = 50 }
+          "/dev/sdd"  = { type = "gp3", size = 224 }
+          "/dev/sde"  = { type = "gp3", size = 500 }
+          "/dev/sdf"  = { type = "gp3", size = 100 }
+          "/dev/sdg"  = { type = "gp3", size = 85 }
+        }
+        tags = merge(local.defaults_database_ec2.tags, {
+          description       = "Copy of PDFDW0030 SQL Server"
+          app-config-status = "pending"
+          ami               = "pd-cafm-db-a"
+        })
+      })
       pd-cafm-db-b = merge(local.defaults_database_ec2, {
         config = merge(local.defaults_database_ec2.config, {
           ami_name          = "pd-cafm-db-b"
