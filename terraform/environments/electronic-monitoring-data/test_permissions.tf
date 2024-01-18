@@ -75,8 +75,14 @@ data "aws_iam_policy_document" "test_transfer_user_iam_policy_document" {
   statement {
     sid       = "AllowPutAccesstoCapitaS3"
     effect    = "Allow"
-    actions   = ["s3:PutObject"]
+    actions   = ["s3:ListBucket"]
     resources = [aws_s3_bucket.capita_landing_bucket.arn]
+  }
+  statement {
+    sid       = "AllowPutAccesstoCapitaS3"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.capita_landing_bucket.arn}/*"]
   }
 }
 
