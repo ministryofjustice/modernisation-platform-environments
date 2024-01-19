@@ -147,7 +147,7 @@ resource "aws_apigatewayv2_stage" "maat_api_stage" {
 }
 
 resource "aws_apigatewayv2_domain_name" "maat_api_external_domain_name" {
-  domain_name = local.api_gateway_fqdn
+  domain_name = "maat-cd-api-gateway.${data.aws_route53_zone.external.name}"
   domain_name_configuration {
     endpoint_type = "Regional"
     certificate_arn = local.certificate_arn
@@ -157,15 +157,14 @@ resource "aws_apigatewayv2_domain_name" "maat_api_external_domain_name" {
 
 resource "aws_route53_record" "maat_api_external_dns_record" {
   zone_id = data.aws_route53_zone.external.zone_id
-  name           = local.api_gateway_fqdn
+  name           = aws_apigatewayv2_domain_name.maat_api_external_domain_name.domain_name
   type           = "CNAME"
   ttl            = "60"
   records        = [aws_apigatewayv2_domain_name.maat_api_external_domain_name.id]
 }
 
 resource "aws_apigatewayv2_api_mapping" "maat_api_mapping" {
-  domain_name = local.api_gateway_fqdn
+  domain_name = aws_apigatewayv2_domain_name.maat_api_external_domain_name.domain_name
   api_id      = aws_apigatewayv2_api.maat_api_gateway.id
   stage       = aws_apigatewayv2_stage.maat_api_stage.id
-  depends_on  = [aws_apigatewayv2_domain_name.maat_api_external_domain_name]
 }
