@@ -99,7 +99,7 @@ resource "aws_apigatewayv2_authorizer" "maat_api_authorizer" {
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_maatos.id,
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_cvs.id
     ]
-    issuer   = aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint
+    issuer   = "https://${aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint}"
   }
 }
 
@@ -114,7 +114,7 @@ resource "aws_apigatewayv2_authorizer" "maat_api_authorizer_for_dces" {
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_dcrs.id,
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_dirs.id
     ]
-    issuer   = aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint
+    issuer   = "https://${aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint}"
   }
 }
 
@@ -129,7 +129,7 @@ resource "aws_apigatewayv2_authorizer" "maat_api_authorizer_for_ats_and_caa" {
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_caa.id,
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_ats.id
     ]
-    issuer   = aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint
+    issuer   = "https://${aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint}"
   }
 }
 
