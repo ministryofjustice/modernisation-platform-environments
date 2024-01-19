@@ -156,15 +156,6 @@ resource "aws_apigatewayv2_domain_name" "maat_api_external_domain_name" {
   depends_on = [aws_acm_certificate.maat_api_acm_certificate]
 }
 
-resource "aws_route53_record" "maat_api_external_dns_record" {
-  provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name           = aws_apigatewayv2_domain_name.maat_api_external_domain_name.domain_name
-  type           = "CNAME"
-  ttl            = "60"
-  records        = [aws_apigatewayv2_domain_name.maat_api_external_domain_name.id]
-}
-
 resource "aws_acm_certificate" "maat_api_acm_certificate" {
   domain_name               = "modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
