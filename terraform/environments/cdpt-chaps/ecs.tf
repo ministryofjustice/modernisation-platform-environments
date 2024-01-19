@@ -112,6 +112,10 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
         {
           name  = "CLIENT_ID"
           value = "${local.application_data.accounts[local.environment].client_id}"
+        },
+        {
+          name  = "CurServer"
+          value = "${local.application_data.accounts[local.environment].env_name}"
         }
       ]
     }
@@ -240,14 +244,6 @@ resource "aws_security_group" "cluster_ec2" {
     to_port         = 3389
     protocol        = "tcp"
     security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
-  ingress {
-    description     = "Allow RDS access"
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    security_groups = [aws_security_group.db.id]
   }
 
   egress {

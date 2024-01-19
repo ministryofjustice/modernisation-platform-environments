@@ -17,8 +17,8 @@ resource "aws_dms_replication_instance" "dms-s3-target-instance" {
 
   tags = merge(
     var.tags,
-  {
-    name = "${var.name}-instance-${var.env}"
+    {
+      name = "${var.name}-instance-${var.env}"
   })
 
   timeouts {
@@ -87,8 +87,8 @@ resource "aws_dms_replication_task" "dms-replication" {
 
   tags = merge(
     var.tags,
-  {
-    name = "${var.name}-task-${var.env}"
+    {
+      name = "${var.name}-task-${var.env}"
   })
 
 }
@@ -111,9 +111,9 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
   extra_connection_attributes = var.extra_attributes
 
   tags = merge(
-  var.tags,
-  {
-    Resource_Type = "DMS Source Endpoint"
+    var.tags,
+    {
+      Resource_Type = "DMS Source Endpoint"
   })
 }
 
@@ -135,8 +135,8 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   cdc_inserts_and_updates = true
 
   tags = merge(
-  var.tags,
-  {
-    Resource_Type = "DMS Target Endpoint"
+    var.tags,
+    {
+      Resource_Type = "DMS Target Endpoint"
   })
 }

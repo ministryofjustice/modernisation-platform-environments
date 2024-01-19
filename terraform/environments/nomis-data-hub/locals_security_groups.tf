@@ -89,7 +89,6 @@ locals {
           to_port         = 0
           protocol        = "-1"
           cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
         }
       }
     }
@@ -118,7 +117,6 @@ locals {
           to_port         = 0
           protocol        = "-1"
           cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
         }
       }
     }
@@ -140,7 +138,6 @@ locals {
           to_port         = 0
           protocol        = "-1"
           cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
         }
       }
     }
@@ -166,16 +163,14 @@ locals {
           from_port       = 8555
           to_port         = 8555
           protocol        = "tcp"
-          security_groups = []
           cidr_blocks     = local.security_group_cidrs.http8555
         }
         tcp-ems = {
           description     = "Allow all ems ingress"
           from_port       = 0
-          to_port         = 0
+          to_port         = 65535
           protocol        = "tcp"
           security_groups = ["ndh_ems"]
-          cidr_blocks     = []
         }
       }
       egress = {
@@ -185,7 +180,6 @@ locals {
           to_port         = 0
           protocol        = "-1"
           cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
         }
       }
     }
@@ -212,7 +206,6 @@ locals {
           to_port         = 7222
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.tcp7222
-          security_groups = []
         }
         tcp7224 = {
           description     = "Allow port 7224 ingress"
@@ -220,15 +213,13 @@ locals {
           to_port         = 7224
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.tcp7222
-          security_groups = []
         }
         tcp-app = {
           description     = "Allow all app ingress"
           from_port       = 0
-          to_port         = 0
+          to_port         = 65535
           protocol        = "tcp"
           security_groups = ["ndh_app"]
-          cidr_blocks     = []
         }
       }
       egress = {
@@ -238,7 +229,6 @@ locals {
           to_port         = 0
           protocol        = "-1"
           cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
         }
       }
     }
@@ -268,7 +258,6 @@ locals {
           to_port         = 0
           protocol        = "-1"
           cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
         }
       }
     }

@@ -1,11 +1,11 @@
 variable "table_mappings" {
-  type        = any
-  default     = ""
+  type    = any
+  default = ""
 }
 
 variable "replication_task_settings" {
-  type        = any
-  default     = {}
+  type    = any
+  default = {}
 }
 
 variable "rename_rule_source_schema" {
@@ -39,18 +39,18 @@ variable "dms_replication_instance" {
 }
 
 variable "dms_source_endpoint" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 variable "dms_target_endpoint" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 variable "name" {
-  description   = "DMS Replication name."
-  default       = ""
+  description = "DMS Replication name."
+  default     = ""
 }
 
 variable "env" {
@@ -71,6 +71,6 @@ variable "tags" {
 
 
 variable "short_name" {
-  type        = string
-  default     = ""  
+  type    = string
+  default = ""
 }

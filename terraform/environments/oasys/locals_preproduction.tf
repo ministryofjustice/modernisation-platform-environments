@@ -25,6 +25,8 @@ locals {
 
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
+
+      "/oracle/bip/pp" = local.secretsmanager_secrets_bip
     }
 
     baseline_iam_policies = {
@@ -80,7 +82,6 @@ locals {
           },
         ]
       }
-
       Ec2PreprodBipPolicy = {
         description = "Permissions required for preprod Bip EC2s"
         statements = [
@@ -115,20 +116,20 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      # "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name                  = "oasys_webserver_release_*"
-      #     ssm_parameters_prefix     = "ec2-web-pp/"
-      #     iam_resource_names_prefix = "ec2-web-pp"
-      #     instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
-      #       "Ec2PreprodWebPolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.webserver_a.tags, {
-      #     oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
-      #     oracle-db-sid      = "PPOASYS" # "OASPROD"
-      #   })
-      # })
+      "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "oasys_webserver_release_*"
+          ssm_parameters_prefix     = "ec2-web-pp/"
+          iam_resource_names_prefix = "ec2-web-pp"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2PreprodWebPolicy",
+          ])
+        })
+        tags = merge(local.webserver_a.tags, {
+          oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
+          oracle-db-sid      = "PPOASYS" # "OASPROD"
+        })
+      })
     }
 
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
@@ -148,7 +149,7 @@ locals {
           "pp-oasys.az.justice.gov.uk",
           "*.pp-oasys.az.justice.gov.uk",
         ]
-        external_validation_records_created = false
+        external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "cert for ${local.application_name} ${local.environment} domains"
@@ -156,6 +157,7 @@ locals {
       }
     }
 
+    # options for LBs https://docs.google.com/presentation/d/1RpXpfNY_hw7FjoMw0sdMAdQOF7kZqLUY6qVVtLNavWI/edit?usp=sharing
     baseline_lbs = {
       public = {
         internal_lb              = false
@@ -171,60 +173,60 @@ locals {
         tags            = local.tags
 
         listeners = {
-          # https = {
-          #   port                      = 443
-          #   protocol                  = "HTTPS"
-          #   ssl_policy                = "ELBSecurityPolicy-2016-08"
-          #   certificate_names_or_arns = ["pp_${local.application_name}_cert"]
-          #   default_action = {
-          #     type = "fixed-response"
-          #     fixed_response = {
-          #       content_type = "text/plain"
-          #       message_body = "Use pp.oasys.service.justice.gov.uk"
-          #       status_code  = "200"
-          #     }
-          #   }
-          #   # default_action = {
-          #   #   type              = "forward"
-          #   #   target_group_name = "pp-${local.application_name}-web-a-pb-http-8080"
-          #   # }
-          #   rules = {
-          #     pp-web-http-8080 = {
-          #       priority = 100
-          #       actions = [{
-          #         type              = "forward"
-          #         target_group_name = "pp-${local.application_name}-web-a-pb-http-8080"
-          #       }]
-          #       conditions = [
-          #         {
-          #           host_header = {
-          #             values = [
-          #               "pp.oasys.service.justice.gov.uk",
-          #               "pp-a.oasys.service.justice.gov.uk",
-          #               "bridge-pp-oasys.az.justice.gov.uk"
-          #             ]
-          #           }
-          #         }
-          #       ]
-          #     }
-          #     # pp-web-b-http-8080 = {
-          #     #   priority = 200
-          #     #   actions = [{
-          #     #     type              = "forward"
-          #     #     target_group_name = "pp-${local.application_name}-web-b-pb-http-8080"
-          #     #   }]
-          #     #   conditions = [
-          #     #     {
-          #     #       host_header = {
-          #     #         values = [
-          #     #           "pp-b.oasys.service.justice.gov.uk",
-          #     #         ]
-          #     #       }
-          #     #     }
-          #     #   ]
-          #     # }
-          #   }
-          # }
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["pp_${local.application_name}_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Use pp.oasys.service.justice.gov.uk"
+                status_code  = "200"
+              }
+            }
+            # default_action = {
+            #   type              = "forward"
+            #   target_group_name = "pp-${local.application_name}-web-a-pb-http-8080"
+            # }
+            rules = {
+              pp-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-${local.application_name}-web-a-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "pp.oasys.service.justice.gov.uk",
+                        "pp-a.oasys.service.justice.gov.uk",
+                        "bridge-pp-oasys.az.justice.gov.uk"
+                      ]
+                    }
+                  }
+                ]
+              }
+              # pp-web-b-http-8080 = {
+              #   priority = 200
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "pp-${local.application_name}-web-b-pb-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "pp-b.oasys.service.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
+            }
+          }
         }
       }
       private = {
@@ -239,61 +241,61 @@ locals {
         subnets                  = module.environment.subnets["private"].ids
         tags                     = local.tags
         listeners = {
-          # https = {
-          #   port                      = 443
-          #   protocol                  = "HTTPS"
-          #   ssl_policy                = "ELBSecurityPolicy-2016-08"
-          #   certificate_names_or_arns = ["pp_${local.application_name}_cert"]
-          #   default_action = {
-          #     type = "fixed-response"
-          #     fixed_response = {
-          #       content_type = "text/plain"
-          #       message_body = "use pp-int.oasys.service.justice.gov.uk"
-          #       status_code  = "200"
-          #     }
-          #   }
-          #   # default_action = {
-          #   #   type              = "forward"
-          #   #   target_group_name = "pp-${local.application_name}-web-a-pv-http-8080"
-          #   # }
-          #   rules = {
-          #     pp-web-http-8080 = {
-          #       priority = 100
-          #       actions = [{
-          #         type              = "forward"
-          #         target_group_name = "pp-${local.application_name}-web-a-pv-http-8080"
-          #       }]
-          #       conditions = [
-          #         {
-          #           host_header = {
-          #             values = [
-          #               "pp-int.oasys.service.justice.gov.uk",
-          #               "pp-a-int.oasys.service.justice.gov.uk",
-          #               "pp-oasys.az.justice.gov.uk",
-          #               "oasys-ukwest.pp-oasys.az.justice.gov.uk",
-          #             ]
-          #           }
-          #         }
-          #       ]
-          #     }
-          #     # pp-web-b-http-8080 = {
-          #     #   priority = 200
-          #     #   actions = [{
-          #     #     type              = "forward"
-          #     #     target_group_name = "pp-${local.application_name}-web-b-pv-http-8080"
-          #     #   }]
-          #     #   conditions = [
-          #     #     {
-          #     #       host_header = {
-          #     #         values = [
-          #     #           "pp-b-int.oasys.service.justice.gov.uk",
-          #     #         ]
-          #     #       }
-          #     #     }
-          #     #   ]
-          #     # }
-          #   }
-          # }
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["pp_${local.application_name}_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "use pp-int.oasys.service.justice.gov.uk"
+                status_code  = "200"
+              }
+            }
+            # default_action = {
+            #   type              = "forward"
+            #   target_group_name = "pp-${local.application_name}-web-a-pv-http-8080"
+            # }
+            rules = {
+              pp-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-${local.application_name}-web-a-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "pp-int.oasys.service.justice.gov.uk",
+                        "pp-a-int.oasys.service.justice.gov.uk",
+                        "pp-oasys.az.justice.gov.uk",
+                        "oasys-ukwest.pp-oasys.az.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              # pp-web-b-http-8080 = {
+              #   priority = 200
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "pp-${local.application_name}-web-b-pv-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "pp-b-int.oasys.service.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
+            }
+          }
         }
       }
     }
@@ -310,7 +312,7 @@ locals {
       # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-preproduction.modernisation-platform.service.justice.gov.uk
         records = [
-          # { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] }, # uncomment when db in aws is set up
+          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] }, # uncomment when db in aws is set up
         ]
         # lb_alias_records = [
         #   { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },     # pp.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk

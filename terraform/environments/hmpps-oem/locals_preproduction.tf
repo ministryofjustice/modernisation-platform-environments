@@ -1,6 +1,9 @@
 # nomis-preproduction environment settings
 locals {
 
+  # baseline presets config
+  preproduction_baseline_presets_options = {}
+
   # baseline config
   preproduction_config = {
 

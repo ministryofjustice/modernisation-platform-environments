@@ -1,10 +1,12 @@
 locals {
 
-  iam_roles_filter = flatten([
+  iam_roles_filter = distinct(flatten([
+    var.options.enable_hmpps_domain ? ["EC2HmppsDomainSecretsRole"] : [],
+    var.options.enable_ec2_delius_dba_secrets_access ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     var.options.enable_observability_platform_monitoring ? ["observability-platform"] : [],
-  ])
+  ]))
 
   iam_roles = {
     # prereq: ImageBuilderLaunchTemplatePolicy and BusinessUnitKmsCmkPolicy 
@@ -42,8 +44,32 @@ locals {
           ]
         }]
       }]
+      policy_attachments = flatten([
+        var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy"] : [],
+        var.options.enable_ec2_delius_dba_secrets_access ? ["DeliusDbaSecretsPolicy"] : [],
+        "BusinessUnitKmsCmkPolicy",
+      ])
+    }
+
+    # allow EC2 instance profiles ability to assume this role
+    EC2HmppsDomainSecretsRole = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
+        principals = {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+        conditions = [{
+          test     = "ForAnyValue:ArnLike"
+          variable = "aws:PrincipalArn"
+          values = [
+            "arn:aws:iam::${var.environment.account_id}:role/ec2-*",
+          ]
+        }]
+      }]
       policy_attachments = [
-        "OracleEnterpriseManagementSecretsPolicy",
+        "HmppsDomainSecretsPolicy",
         "BusinessUnitKmsCmkPolicy",
       ]
     }

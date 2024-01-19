@@ -4,11 +4,7 @@ locals {
   test_config = {
 
     baseline_secretsmanager_secrets = {
-      "/join_domain_linux_service_account" = {
-        secrets = {
-          passwords = {}
-        }
-      }
+      "/microsoft/AD/azure.noms.root" = local.domain_secretsmanager_secrets
     }
 
     baseline_acm_certificates = {
