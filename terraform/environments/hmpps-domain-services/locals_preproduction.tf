@@ -1,11 +1,7 @@
 locals {
 
   # baseline presets config
-  preproduction_baseline_presets_options = {
-    route53_resolver_rules = {
-      outbound-data-and-private-subnets = ["infra-int-domain"]
-    }
-  }
+  preproduction_baseline_presets_options = {}
 
   # baseline config
   preproduction_config = {
