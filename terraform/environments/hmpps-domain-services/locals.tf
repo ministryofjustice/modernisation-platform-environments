@@ -14,7 +14,8 @@ locals {
     preproduction = local.preproduction_config
     production    = local.production_config
   }
-  baseline_environment_config = local.environment_configs[local.environment]
+  baseline_environment_presets_options = local.environment_baseline_presets_options[local.environment]
+  baseline_environment_config          = local.environment_configs[local.environment]
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
