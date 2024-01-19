@@ -1,5 +1,7 @@
-# nomis-development environment settings
 locals {
+
+  # baseline presets config
+  development_baseline_presets_options = {}
 
   # baseline config
   development_config = {
