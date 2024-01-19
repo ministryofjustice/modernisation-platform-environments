@@ -31,7 +31,7 @@ module "jml_extract" {
         "logs:GetLogEvents"
       ]
       resources = [
-        replacemewithauth0arn
+        "arn:aws:logs:eu-west-2:096705367497:log-group:/aws/events/auth0/*"
       ]
     }
     "secretsmanager" = {
@@ -43,8 +43,8 @@ module "jml_extract" {
         "secretsmanager:ListSecrets"
       ]
       resources = [
-        aws_secretsmanager_secret.govuk_notify_api_key.arn,
-        aws_secretsmanager_secret.email_secret.arn
+        arn:aws:secretsmanager:eu-west-2:096705367497:secret:gov-uk-notify/production/api-key-WSSdUR,
+        arn:aws:secretsmanager:eu-west-2:096705367497:secret:jml/email-uQGTzR
       ]
     }
   }
