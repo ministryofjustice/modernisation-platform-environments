@@ -13,9 +13,9 @@ resource "aws_db_instance" "database" {
   password               = aws_secretsmanager_secret_version.db_password.secret_string
   vpc_security_group_ids = [aws_security_group.db.id]
   depends_on             = [aws_security_group.db]
-  snapshot_identifier    = "arn:aws:rds:eu-west-2:613903586696:snapshot:cdpt-dev-staging-snapshot-9-1-24"
+  # snapshot_identifier    = "arn:aws:rds:eu-west-2:613903586696:snapshot:chaps-prod-snapshot-2024-01-19"
   db_subnet_group_name   = aws_db_subnet_group.db.id
-  final_snapshot_identifier = "${local.application_data.accounts[local.environment].db_instance_identifier}-db-snapshot"
+  final_snapshot_identifier = "final-snapshot"
   publicly_accessible    = true
 }
 
