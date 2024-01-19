@@ -43,8 +43,8 @@ module "jml_extract" {
         "secretsmanager:ListSecrets"
       ]
       resources = [
-        arn:aws:secretsmanager:eu-west-2:096705367497:secret:gov-uk-notify/production/api-key-WSSdUR,
-        arn:aws:secretsmanager:eu-west-2:096705367497:secret:jml/email-uQGTzR
+        "arn:aws:secretsmanager:eu-west-2:096705367497:secret:gov-uk-notify/production/api-key-WSSdUR",
+        "arn:aws:secretsmanager:eu-west-2:096705367497:secret:jml/email-uQGTzR"
       ]
     }
   }
