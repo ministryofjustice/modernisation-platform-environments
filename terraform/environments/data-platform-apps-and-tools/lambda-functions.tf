@@ -52,7 +52,7 @@ module "jml_extract" {
   allowed_triggers = {
     "eventbridge" = {
       principal  = "events.amazonaws.com"
-      source_arn = aws_cloudwatch_event_rule.grafana_api_key_rotator.arn
+      source_arn = aws_cloudwatch_event_rule.jml_lambda_trigger.arn
     }
   }
 }
