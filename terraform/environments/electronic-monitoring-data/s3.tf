@@ -56,7 +56,7 @@ resource "aws_s3_bucket_logging" "capita_bucket_logging" {
 #------------------------------------------------------------------------------
 
 resource "aws_s3_bucket" "data_store_bucket" {
-  bucket_prefix = "em-data-store"
+  bucket_prefix = "em-data-store-"
 }
 
 # resource "aws_s3_bucket_versioning" "data_store_bucket" {
