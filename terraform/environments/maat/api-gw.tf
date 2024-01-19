@@ -164,7 +164,7 @@ resource "aws_route53_record" "maat_api_external_dns_record" {
 }
 
 resource "aws_apigatewayv2_api_mapping" "maat_api_mapping" {
-  domain_name = aws_apigatewayv2_domain_name.maat_api_external_domain_name.id
+  domain_name = local.api_gateway_fqdn
   api_id      = aws_apigatewayv2_api.maat_api_gateway.id
   stage       = aws_apigatewayv2_stage.maat_api_stage.id
   depends_on  = [aws_apigatewayv2_domain_name.maat_api_external_domain_name]
