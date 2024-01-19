@@ -153,6 +153,7 @@ resource "aws_apigatewayv2_domain_name" "maat_api_external_domain_name" {
     certificate_arn = aws_acm_certificate.maat_api_acm_certificate.arn
     security_policy = "TLS_1_2"
   }
+  depends_on = [aws_acm_certificate.maat_api_acm_certificate]
 }
 
 resource "aws_route53_record" "maat_api_external_dns_record" {
@@ -172,7 +173,6 @@ resource "aws_acm_certificate" "maat_api_acm_certificate" {
   # lifecycle {
   #   prevent_destroy = false
   # }
-  depends_on = [aws_apigatewayv2_domain_name.maat_api_external_domain_name]
 }
 
 resource "aws_route53_record" "external_validation" {
