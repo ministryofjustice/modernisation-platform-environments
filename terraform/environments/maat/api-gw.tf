@@ -41,7 +41,7 @@ resource "aws_apigatewayv2_route" "maat_api_route1" {
   authorization_type   = "JWT"
   authorization_scopes = ["${local.application_name}/${local.api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer.id
-  target               = "/integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
+  target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
   depends_on           = [aws_apigatewayv2_integration.maat_api_integration]
 }
 
@@ -51,7 +51,7 @@ resource "aws_apigatewayv2_route" "maat_api_route_crime_means_assessment" {
   authorization_type   = "JWT"
   authorization_scopes = ["${local.application_name}/${local.api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer.id
-  target               = "/integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
+  target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
 
 resource "aws_apigatewayv2_route" "maat_api_route_crown_court_proceeding" {
@@ -60,7 +60,7 @@ resource "aws_apigatewayv2_route" "maat_api_route_crown_court_proceeding" {
   authorization_type   = "JWT"
   authorization_scopes = ["${local.application_name}/${local.api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer.id
-  target               = "/integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
+  target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
 
 resource "aws_apigatewayv2_route" "maat_api_route_eform_staging" {
@@ -69,7 +69,7 @@ resource "aws_apigatewayv2_route" "maat_api_route_eform_staging" {
   authorization_type   = "JWT"
   authorization_scopes = ["${local.application_name}/${local.api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer_for_ats_and_caa.id
-  target               = "/integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
+  target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
 
 resource "aws_apigatewayv2_route" "maat_api_route_dces_service" {
@@ -78,7 +78,7 @@ resource "aws_apigatewayv2_route" "maat_api_route_dces_service" {
   authorization_type   = "JWT"
   authorization_scopes = ["${local.application_name}/${local.api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer_for_dces.id
-  target               = "/integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
+  target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
 
 resource "aws_apigatewayv2_authorizer" "maat_api_authorizer" {
@@ -106,6 +106,7 @@ resource "aws_apigatewayv2_authorizer" "maat_api_authorizer" {
 resource "aws_apigatewayv2_authorizer" "maat_api_authorizer_for_dces" {
   name              = "${local.application_name}_DCES_Authorizer"
   api_id            = aws_apigatewayv2_api.maat_api_gateway.id
+  identity_sources   = ["$request.header.Authorization"]
   authorizer_type   = "JWT"
 
 
