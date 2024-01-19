@@ -94,7 +94,7 @@ resource "aws_security_group" "vpc-endpoints" {
   tags        = local.tags
 }
 
-resource "aws_security_group_rule" "allow-vpc-in" {
+resource "aws_security_group_rule" "allow_all_vpc" {
   cidr_blocks       = [module.vpc.vpc_cidr_block]
   description       = "Allow all traffic in from VPC CIDR"
   from_port         = 0
