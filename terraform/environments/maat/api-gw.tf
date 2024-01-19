@@ -156,6 +156,7 @@ resource "aws_apigatewayv2_domain_name" "maat_api_external_domain_name" {
 }
 
 resource "aws_route53_record" "maat_api_external_dns_record" {
+  provider = aws.core-vpc
   zone_id = data.aws_route53_zone.external.zone_id
   name           = aws_apigatewayv2_domain_name.maat_api_external_domain_name.domain_name
   type           = "CNAME"
