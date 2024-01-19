@@ -112,6 +112,10 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
         {
           name  = "CLIENT_ID"
           value = "${local.application_data.accounts[local.environment].client_id}"
+        },
+        {
+          name  = "CurServer"
+          value = "${local.application_data.accounts[local.environment].env_name}"
         }
       ]
     }
