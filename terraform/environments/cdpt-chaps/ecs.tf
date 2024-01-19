@@ -102,16 +102,18 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
           value = "${aws_db_instance.database.username}"
         },
         {
-          name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.database.password}"
-        },
-        {
           name  = "DB_NAME"
           value = "${local.application_data.accounts[local.environment].db_name}"
         },
         {
           name  = "CLIENT_ID"
           value = "${local.application_data.accounts[local.environment].client_id}"
+        }
+      ],
+      secrets = [
+        {
+          name: "RDS_PASSWORD",
+          valueFrom: data.aws_secretsmanager_secret.db_password.id
         }
       ]
     }
