@@ -4,14 +4,6 @@ resource "aws_security_group" "test_security_group" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "test_oakdale_ip" {
-  security_group_id = aws_security_group.test_security_group.id
-
-  cidr_ipv4   = "82.16.51.175/32"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-}
 resource "aws_vpc_security_group_ingress_rule" "test_fynhy_ip" {
   security_group_id = aws_security_group.test_security_group.id
 
@@ -24,14 +16,6 @@ resource "aws_vpc_security_group_ingress_rule" "test_petty_france_ip" {
   security_group_id = aws_security_group.test_security_group.id
 
   cidr_ipv4   = "81.134.202.29/32"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-}
-resource "aws_vpc_security_group_ingress_rule" "test_global_protect_ip" {
-  security_group_id = aws_security_group.test_security_group.id
-
-  cidr_ipv4   = "35.176.93.186/32"
   ip_protocol = "tcp"
   from_port   = 2222
   to_port     = 2222
