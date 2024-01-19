@@ -176,6 +176,30 @@ locals {
           create_external_record = true
         }
       })
+      pd-cafm-w-37-a = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-cafm-w-37-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 28 }
+        }
+        tags = {
+          description       = "CAFM Assessment Management copy of PFWW00037"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-w-37-a"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
       pd-cafm-w-38-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-cafm-w-38-b"
