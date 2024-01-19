@@ -1,4 +1,6 @@
 module "observability_platform_tenant" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
   source  = "ministryofjustice/observability-platform-tenant/aws"
   version = "1.0.0"
 
