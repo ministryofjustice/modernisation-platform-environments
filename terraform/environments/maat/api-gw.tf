@@ -203,6 +203,7 @@ resource "aws_acm_certificate" "maat_api_acm_certificate" {
   # lifecycle {
   #   prevent_destroy = false
   # }
+  depends_on = [aws_apigatewayv2_domain_name.maat_api_external_domain_name]
 }
 
 resource "aws_route53_record" "external_validation" {
