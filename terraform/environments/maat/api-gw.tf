@@ -205,27 +205,33 @@ resource "aws_acm_certificate" "maat_api_acm_certificate" {
   # }
 }
 
-resource "aws_route53_record" "maat_api_network_services_dns_record" {
+resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
-  for_each = {
-    for dvo in aws_acm_certificate.maat_api_acm_certificate.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
 
+  count = local.environment == "production" ? 0 : 1
   allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
+  name            = local.domain_name_main[0]
+  records         = local.domain_record_main
   ttl             = 60
-  type            = each.value.type
+  type            = local.domain_type_main[0]
   zone_id         = data.aws_route53_zone.network-services.zone_id
+}
+
+resource "aws_route53_record" "external_validation_subdomain" {
+  provider = aws.core-vpc
+
+  count = local.environment == "production" ? 0 : 1
+  allow_overwrite = true
+  name            = local.domain_name_sub[0]
+  records         = local.domain_record_sub
+  ttl             = 60
+  type            = local.domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 resource "aws_acm_certificate_validation" "maat_api_acm_certificate_validation" {
   certificate_arn         = aws_acm_certificate.maat_api_acm_certificate.arn
-  validation_record_fqdns = [for record in aws_route53_record.maat_api_network_services_dns_record : record.fqdn]
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
 resource "aws_apigatewayv2_api_mapping" "maat_api_mapping" {

@@ -5,7 +5,7 @@ locals {
   env_account_region = data.aws_region.current.id
 
   # create name, record,type for monitoring lb aka maat_api_lb
-  domain_types = { for dvo in aws_acm_certificate.maat_api_acm_certificate.domain_validation_options : dvo.domain_name => {
+  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value
     type   = dvo.resource_record_type
