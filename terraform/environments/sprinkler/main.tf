@@ -867,7 +867,7 @@ resource "aws_key_pair" "key_pair" {
 resource "aws_instance" "bastion" {
   ami                    = "ami-0a398a6b09d71fecc" # Replace this with a suitable AMI ID
   instance_type          = "t2.micro"
-  subnet_id              = data.aws_subnet.public_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnets_a.id
   key_name               = aws_key_pair.key_pair.key_name
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
