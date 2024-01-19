@@ -129,27 +129,6 @@ resource "aws_volume_attachment" "arch_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "dbf" {
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf
-  type              = "io2"
-  iops              = local.application_data.accounts[local.environment].ebs_default_iops
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = "dbf" }
-  )
-}
-
-resource "aws_volume_attachment" "dbf_att" {
-  device_name = "/dev/sdk"
-  volume_id   = aws_ebs_volume.dbf.id
-  instance_id = aws_instance.ec2_oracle_ebs.id
-}
-
 resource "aws_ebs_volume" "redoA" {
   lifecycle {
     ignore_changes = [kms_key_id]
