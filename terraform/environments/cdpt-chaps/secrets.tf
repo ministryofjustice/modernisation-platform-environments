@@ -5,11 +5,24 @@ resource "aws_secretsmanager_secret" "chaps_secret" {
   description = "Simple secret created through Terraform"
 }
 
+resource "aws_secretsmanager_secret" "db_password" {
+  name        = "database_password"
+}
+
 resource "random_password" "password" {
   length = 10
+}
+
+resource "random_password" "password_long" {
+  length = 32
 }
 
 resource "aws_secretsmanager_secret_version" "chaps_secret" {
   secret_id     = aws_secretsmanager_secret.chaps_secret.id
   secret_string = random_password.password.result
+}
+
+resource "aws_secretsmanager_secret_version" "db_password" {
+  secret_id     = aws_secretsmanager_secret.db_password.id
+  secret_string = random_password.password_long.result
 }

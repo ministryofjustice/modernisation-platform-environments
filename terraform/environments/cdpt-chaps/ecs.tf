@@ -117,7 +117,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       secrets = [
         {
           name: "RDS_PASSWORD",
-          valueFrom: data.aws_secretsmanager_secret.db_password.id
+          valueFrom: aws_secretsmanager_secret_version.db_password.arn
         }
       ]
     }
