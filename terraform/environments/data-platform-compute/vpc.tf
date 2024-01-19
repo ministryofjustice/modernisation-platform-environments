@@ -21,55 +21,46 @@ module "vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "~> 5.0"
 
-  security_group_ids = []
+  security_group_ids = [aws_security_group.vpc_endpoints.id]
+  subnet_ids         = module.vpc.private_subnets
   vpc_id             = module.vpc.vpc_id
 
   endpoints = {
     logs = {
-      security_group_ids = [aws_security_group.vpc-endpoints.id]
       service            = "logs"
       service_type       = "Interface"
-      subnet_ids         = module.vpc.private_subnets
       tags = merge(
         local.tags,
         { Name = format("%s-logs-api-vpc-endpoint", local.application_name) }
       )
     },
     sagemaker-api = {
-      security_group_ids = [aws_security_group.vpc-endpoints.id]
       service            = "sagemaker.api"
       service_type       = "Interface"
-      subnet_ids         = module.vpc.private_subnets
       tags = merge(
         local.tags,
         { Name = format("%s-sagemaker-api-vpc-endpoint", local.application_name) }
       )
     },
     sagemaker-runtime = {
-      security_group_ids = [aws_security_group.vpc-endpoints.id]
       service            = "sagemaker.runtime"
       service_type       = "Interface"
-      subnet_ids         = module.vpc.private_subnets
       tags = merge(
         local.tags,
         { Name = format("%s-sagemaker-runtime-vpc-endpoint", local.application_name) }
       )
     },
     sagemaker-catalog = {
-      security_group_ids = [aws_security_group.vpc-endpoints.id]
       service            = "servicecatalog"
       service_type       = "Interface"
-      subnet_ids         = module.vpc.private_subnets
       tags = merge(
         local.tags,
         { Name = format("%s-servicecatalog-vpc-endpoint", local.application_name) }
       )
     },
     sts = {
-      security_group_ids = [aws_security_group.vpc-endpoints.id]
       service            = "sts"
       service_type       = "Interface"
-      subnet_ids         = module.vpc.private_subnets
       tags = merge(
         local.tags,
         { Name = format("%s-sts-vpc-endpoint", local.application_name) }
@@ -99,7 +90,7 @@ resource "aws_security_group_rule" "allow_all_vpc" {
   description       = "Allow all traffic in from VPC CIDR"
   from_port         = 0
   protocol          = -1
-  security_group_id = aws_security_group.vpc-endpoints.id
+  security_group_id = aws_security_group.vpc_endpoints.id
   to_port           = 65535
   type              = "ingress"
 }
