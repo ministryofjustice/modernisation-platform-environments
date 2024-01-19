@@ -1,5 +1,11 @@
-# nomis-production environment settings
 locals {
+
+  # baseline presets config
+  production_baseline_presets_options = {
+    route53_resolver_rules = {
+      outbound-data-and-private-subnets = ["infra-int-domain"]
+    }
+  }
 
   # baseline config
   production_config = {
