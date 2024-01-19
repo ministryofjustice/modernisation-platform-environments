@@ -195,6 +195,39 @@ resource "aws_acm_certificate_validation" "maat_api_acm_certificate_validation" 
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
+resource "aws_acm_certificate" "maat_api_acm_certificate" {
+  domain_name               = "modernisation-platform.service.justice.gov.uk"
+  validation_method         = "DNS"
+  subject_alternative_names = local.environment == "production" ? null : ["${aws_apigatewayv2_domain_name.maat_api_external_domain_name.domain_name}"]
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+  # lifecycle {
+  #   prevent_destroy = false
+  # }
+}
+
+resource "aws_route53_record" "maat_api_network_services_dns_record" {
+  provider = aws.core-network-services
+  for_each = {
+    for dvo in aws_acm_certificate.maat_api_acm_certificate.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+resource "aws_acm_certificate_validation" "maat_api_acm_certificate_validation" {
+  certificate_arn         = aws_acm_certificate.maat_api_acm_certificate.arn
+  validation_record_fqdns = [for record in aws_route53_record.maat_api_network_services_dns_record : record.fqdn]
+}
+
 resource "aws_apigatewayv2_api_mapping" "maat_api_mapping" {
   domain_name = aws_apigatewayv2_domain_name.maat_api_external_domain_name.domain_name
   api_id      = aws_apigatewayv2_api.maat_api_gateway.id
