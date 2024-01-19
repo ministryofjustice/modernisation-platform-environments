@@ -88,7 +88,7 @@ data "aws_secretsmanager_secret_version" "openmetadata_entra_id_tenant_id" {
 ##################################################
 
 data "aws_secretsmanager_secret_version" "govuk_notify_api_key" {
-  secret_id = aws_secretsmanager_secret.govuk_notify_api_key[0].id
+  secret_id = aws_secretsmanager_secret.govuk_notify_api_key.id
 }
 
 data "aws_secretsmanager_secret_version" "email_secret" {
