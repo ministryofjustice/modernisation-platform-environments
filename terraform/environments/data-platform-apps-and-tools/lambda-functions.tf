@@ -1,5 +1,6 @@
-module "jml_extract" {
+module "jml_extract_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  count = terraform.workspace == "data-platform-apps-and-tools-production" ? 1 : 0
 
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 6.0"
@@ -13,10 +14,10 @@ module "jml_extract" {
   image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-jml-extract-lambda-ecr-repo:1.0.1"
 
   environment_variables = {
-    SECRET_ID       = data.aws_secretsmanager_secret_version.govuk_notify_api_key.secret_string
-    LOG_GROUP_NAMES = "CHANGEME"
-    EMAIL_SECRET    = data.aws_secretsmanager_secret_version.email_secret.secret_string
-    TEMPLATE_ID     = "CHANGEME"
+    SECRET_ID       = data.aws_secretsmanager_secret_version.govuk_notify_api_key[0].secret_string
+    LOG_GROUP_NAMES = module.auth0_log_streams.cloudwatch_log_group_name
+    EMAIL_SECRET    = data.aws_secretsmanager_secret_version.jml_email[0].secret_string
+    TEMPLATE_ID     = "de618989-db86-4d9a-aa55-4724d5485fa5"
   }
 
   attach_policy_statements = true
@@ -31,7 +32,7 @@ module "jml_extract" {
         "logs:GetLogEvents"
       ]
       resources = [
-        "arn:aws:logs:eu-west-2:096705367497:log-group:/aws/events/auth0/*"
+        "${module.auth0_log_streams.cloudwatch_log_group_arn}/*"
       ]
     }
     "secretsmanager" = {
@@ -43,8 +44,8 @@ module "jml_extract" {
         "secretsmanager:ListSecrets"
       ]
       resources = [
-        "arn:aws:secretsmanager:eu-west-2:096705367497:secret:gov-uk-notify/production/api-key-WSSdUR",
-        "arn:aws:secretsmanager:eu-west-2:096705367497:secret:jml/email-uQGTzR" #api-key value manually added
+        aws_secretsmanager_secret.govuk_notify_api_key[0].arn,
+        aws_secretsmanager_secret.jml_email[0].arn        
       ]
     }
   }
@@ -52,7 +53,7 @@ module "jml_extract" {
   allowed_triggers = {
     "eventbridge" = {
       principal  = "events.amazonaws.com"
-      source_arn = aws_cloudwatch_event_rule.jml_lambda_trigger.arn
+      source_arn = aws_cloudwatch_event_rule.jml_lambda_trigger[0].arn
     }
   }
 }
