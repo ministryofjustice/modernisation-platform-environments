@@ -103,6 +103,30 @@ locals {
           create_external_record = true
         }
       })
+      pd-cafm-a-12-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-a-12-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        tags = {
+          description       = "RDS Session Host and CAFM App Server.Copy of PDFAW0012"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-12-b"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
       pd-cafm-a-13-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-cafm-a-13-a"
@@ -151,7 +175,80 @@ locals {
           create_external_record = true
         }
       })
+      pd-cafm-a-15-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-a-15-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.large"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 28 }
+        }
+        tags = {
+          description       = "RDS Session Broker / RDS Licence Server. Copy of PDFAW0015"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-15-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+
       # web servers
+      pd-cafm-w-5-a = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-cafm-w-5-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description       = "CAFM Web Portal Server. Copy of PDFWW0005"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-w-5-a"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      pd-cafm-w-36-b = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-cafm-w-36-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description       = "CAFM Asset Management. Copy of PDFWW00036"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-w-36-b"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
       pd-cafm-w-38-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-cafm-w-38-b"
