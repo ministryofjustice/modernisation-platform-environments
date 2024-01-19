@@ -166,7 +166,7 @@ resource "aws_route53_record" "maat_api_external_dns_record" {
 resource "aws_acm_certificate" "maat_api_acm_certificate" {
   domain_name               = "modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
-  subject_alternative_names = local.environment == "production" ? null : ["${aws_apigatewayv2_domain_name.maat_api_external_domain_name.domain_name}"]
+  subject_alternative_names = local.environment == "production" ? null : ["maat-cd-api-gateway.${data.aws_route53_zone.external.name}"]
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   # lifecycle {
   #   prevent_destroy = false
