@@ -425,26 +425,11 @@ locals {
               }
             }
             rules = {
-              web-23-80 = {
-                priority = 2380
+              web-56-80 = {
+                priority = 5680
                 actions = [{
                   type              = "forward"
-                  target_group_name = "web-23-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmtx.planetfm.service.justice.gov.uk",
-                      "cafmtx.az.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-45-80 = {
-                priority = 4580
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-45-80"
+                  target_group_name = "web-56-80"
                 }]
                 conditions = [{
                   host_header = {
@@ -471,7 +456,7 @@ locals {
                 }]
               }
               web-38-80 = {
-                priority = 38
+                priority = 3880
                 actions = [{
                   type              = "forward"
                   target_group_name = "web-38-80"
@@ -497,7 +482,6 @@ locals {
           { name = "pp", type = "NS", ttl = "86400", records = ["ns-1407.awsdns-47.org", "ns-1645.awsdns-13.co.uk", "ns-63.awsdns-07.com", "ns-730.awsdns-27.net"] },
         ]
         # lb_alias_records = [
-        #   { name = "cafmtx", type = "A", lbs_map_key = "private" },
         #   { name = "cafmwebx", type = "A", lbs_map_key = "private" },
         #   { name = "cafmwebx2", type = "A", lbs_map_key = "private" },
         #   { name = "cafmtrainweb", type = "A", lbs_map_key = "private" },
