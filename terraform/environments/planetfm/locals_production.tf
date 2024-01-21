@@ -350,8 +350,8 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pd-cafm-w-6-b" },
               { ec2_instance_name = "pd-cafm-w-5-a" },
+              { ec2_instance_name = "pd-cafm-w-6-b" },
             ]
           }
           web-3637-80 = {
