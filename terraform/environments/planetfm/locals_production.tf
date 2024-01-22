@@ -6,6 +6,29 @@ locals {
 
     baseline_ec2_instances = {
       # database servers
+      pd-cafm-db-a = merge(local.defaults_database_ec2, {
+        config = merge(local.defaults_database_ec2.config, {
+          ami_name          = "pd-cafm-db-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_database_ec2.instance, {
+          instance_type = "r6i.4xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 500 }
+          "/dev/sdc"  = { type = "gp3", size = 50 }
+          "/dev/sdd"  = { type = "gp3", size = 224 }
+          "/dev/sde"  = { type = "gp3", size = 500 }
+          "/dev/sdf"  = { type = "gp3", size = 100 }
+          "/dev/sdg"  = { type = "gp3", size = 85 }
+        }
+        tags = merge(local.defaults_database_ec2.tags, {
+          description       = "Copy of PDFDW0030 SQL Server"
+          app-config-status = "pending"
+          ami               = "pd-cafm-db-a"
+        })
+      })
       pd-cafm-db-b = merge(local.defaults_database_ec2, {
         config = merge(local.defaults_database_ec2.config, {
           ami_name          = "pd-cafm-db-b"
@@ -30,13 +53,255 @@ locals {
         })
       })
 
-      # web servers
-      pd-cafm-w-38-b = merge(local.defaults_app_ec2, {
+      # app servers 
+      pd-cafm-a-10-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pd-cafm-w-38-b"
+          ami_name          = "pd-cafm-a-10-b"
           availability_zone = "${local.region}b"
         })
         instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        tags = {
+          description       = "RDS Session Host and CAFM App Server/PFME Licence Server copy of PDFAW0010"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-10-b"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      pd-cafm-a-11-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-a-11-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        tags = {
+          description       = "CAFM App server copy of PDFWA0011"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-11-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      pd-cafm-a-12-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-a-12-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        tags = {
+          description       = "RDS Session Host and CAFM App Server. Copy of PDFAW0012"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-12-b"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      pd-cafm-a-13-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-a-13-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 28 }
+        }
+        tags = {
+          description       = "RDS Session Host and CAFM App Server. Copy of PDFAW0013"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-13-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      pd-cafm-a-14-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-a-14-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        tags = {
+          description       = "RDS Session Host and CAFM App Server copy of PDFAW0014"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-14-b"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      pd-cafm-a-15-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pd-cafm-a-15-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.large"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description       = "RDS Session Broker / RDS Licence Server. Copy of PDFAW0015"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-a-15-a"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+
+      # web servers
+      pd-cafm-w-5-a = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-cafm-w-5-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "t3.large"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description       = "CAFM Web Portal Server. Copy of PDFWW0005"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-w-5-a"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      pd-cafm-w-6-b = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-cafm-w-6-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "t3.large"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+        }
+        tags = {
+          description       = "CAFM Web Portal Server copy of PDFWW0006"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-w-6-b"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      pd-cafm-w-36-b = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-cafm-w-36-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 28 }
+        }
+        tags = {
+          description       = "CAFM Asset Management. Copy of PDFWW00036"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-w-36-b"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      pd-cafm-w-37-a = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-cafm-w-37-a"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "t3.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 28 }
+        }
+        tags = {
+          description       = "CAFM Assessment Management copy of PFWW00037"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "pd-cafm-w-37-a"
+          component         = "web"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
+      pd-cafm-w-38-b = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pd-cafm-w-38-b"
+          availability_zone = "${local.region}b"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "t3.large"
         })
         ebs_volumes = {
@@ -85,8 +350,8 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pd-cafm-w-6-b" },
               { ec2_instance_name = "pd-cafm-w-5-a" },
+              { ec2_instance_name = "pd-cafm-w-6-b" },
             ]
           }
           web-3637-80 = {
@@ -160,26 +425,11 @@ locals {
               }
             }
             rules = {
-              web-23-80 = {
-                priority = 2380
+              web-56-80 = {
+                priority = 5680
                 actions = [{
                   type              = "forward"
-                  target_group_name = "web-23-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmtx.planetfm.service.justice.gov.uk",
-                      "cafmtx.az.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-45-80 = {
-                priority = 4580
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-45-80"
+                  target_group_name = "web-56-80"
                 }]
                 conditions = [{
                   host_header = {
@@ -206,7 +456,7 @@ locals {
                 }]
               }
               web-38-80 = {
-                priority = 38
+                priority = 3880
                 actions = [{
                   type              = "forward"
                   target_group_name = "web-38-80"
@@ -231,12 +481,6 @@ locals {
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1128.awsdns-13.org", "ns-2027.awsdns-61.co.uk", "ns-854.awsdns-42.net", "ns-90.awsdns-11.com"] },
           { name = "pp", type = "NS", ttl = "86400", records = ["ns-1407.awsdns-47.org", "ns-1645.awsdns-13.co.uk", "ns-63.awsdns-07.com", "ns-730.awsdns-27.net"] },
         ]
-        # lb_alias_records = [
-        #   { name = "cafmtx", type = "A", lbs_map_key = "private" },
-        #   { name = "cafmwebx", type = "A", lbs_map_key = "private" },
-        #   { name = "cafmwebx2", type = "A", lbs_map_key = "private" },
-        #   { name = "cafmtrainweb", type = "A", lbs_map_key = "private" },
-        # ]
       }
     }
     baseline_acm_certificates = {

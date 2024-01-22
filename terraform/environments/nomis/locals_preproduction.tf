@@ -10,6 +10,9 @@ locals {
         dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
       }
     }
+    route53_resolver_rules = {
+      outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
+    }
   }
 
   # baseline config

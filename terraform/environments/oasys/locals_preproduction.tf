@@ -25,6 +25,8 @@ locals {
 
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
+
+      "/oracle/bip/pp" = local.secretsmanager_secrets_bip
     }
 
     baseline_iam_policies = {
@@ -80,7 +82,6 @@ locals {
           },
         ]
       }
-
       Ec2PreprodBipPolicy = {
         description = "Permissions required for preprod Bip EC2s"
         statements = [
