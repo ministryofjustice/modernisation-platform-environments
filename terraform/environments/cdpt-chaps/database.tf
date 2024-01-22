@@ -3,20 +3,20 @@
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-  allocated_storage      = local.application_data.accounts[local.environment].db_allocated_storage
-  storage_type           = "gp2"
-  engine                 = "sqlserver-web"
-  engine_version         = "14.00.3381.3.v1"
-  instance_class         = local.application_data.accounts[local.environment].db_instance_class
-  identifier             = local.application_data.accounts[local.environment].db_instance_identifier
+  allocated_storage = local.application_data.accounts[local.environment].db_allocated_storage
+  storage_type      = "gp2"
+  engine            = "sqlserver-web"
+  engine_version    = "14.00.3381.3.v1"
+  instance_class    = local.application_data.accounts[local.environment].db_instance_class
+  identifier        = local.application_data.accounts[local.environment].db_instance_identifier
   # username               = local.application_data.accounts[local.environment].db_user
   password               = aws_secretsmanager_secret_version.db_password.secret_string
   vpc_security_group_ids = [aws_security_group.db.id]
   depends_on             = [aws_security_group.db]
   # snapshot_identifier    = "arn:aws:rds:eu-west-2:613903586696:snapshot:chaps-prod-snapshot-2024-01-19"
-  db_subnet_group_name   = aws_db_subnet_group.db.id
+  db_subnet_group_name      = aws_db_subnet_group.db.id
   final_snapshot_identifier = "final-snapshot"
-  publicly_accessible    = true
+  publicly_accessible       = true
 }
 
 resource "aws_db_instance_role_association" "database" {
