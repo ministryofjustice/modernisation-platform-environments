@@ -163,6 +163,38 @@ locals {
             "Ec2T2DatabasePolicy",
           ])
         })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdf" = { # DATA02
+            label = "data"
+            size  = 50
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 50
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
         tags = merge(local.database_a.tags, {
           description                             = "t2 ${local.application_name} database"
           "${local.application_name}-environment" = "t2"
@@ -205,6 +237,38 @@ locals {
             "Ec2T1DatabasePolicy",
           ])
         })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdf" = { # DATA02
+            label = "data"
+            size  = 50
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 50
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
         tags = merge(local.database_a.tags, {
           description                             = "t1 ${local.application_name} database"
           "${local.application_name}-environment" = "t1"
@@ -295,7 +359,7 @@ locals {
       #   })
       #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "oasys-ords-secrets"
+      #       branch = "ords_parameter_file_update"
       #     })
       #   })
       #   #autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
@@ -326,6 +390,28 @@ locals {
           oracle-db-sid                           = "T1OASYS" # for each env using azure DB will need to be OASPROD
         })
       })
+
+      # "t1-${local.application_name}-web-b" = merge(local.webserver_b, {
+      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #     ami_name                  = "oasys_webserver_release_*"
+      #     ssm_parameters_prefix     = "ec2-web-t1/"
+      #     iam_resource_names_prefix = "ec2-web-t1"
+      #     instance_profile_policies = concat(local.webserver_b.config.instance_profile_policies, [
+      #       "Ec2T1WebPolicy",
+      #     ])
+      #   })
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "ords_parameter_file_update"
+      #     })
+      #   })
+      #   tags = merge(local.webserver_b.tags, {
+      #     description                             = "t1 ${local.application_name} web"
+      #     "${local.application_name}-environment" = "t1"
+      #     oracle-db-hostname                      = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
+      #     oracle-db-sid                           = "T1OASYS" # for each env using azure DB will need to be OASPROD
+      #   })
+      # })
 
       ##
       ## test
@@ -565,6 +651,7 @@ locals {
         }
       }
     }
+
 
     # The following zones can be found on azure:
     # az.justice.gov.uk

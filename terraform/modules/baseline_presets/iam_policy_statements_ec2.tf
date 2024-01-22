@@ -202,14 +202,43 @@ locals {
       }
     ]
 
-    SecretsCrossAccount = [
+    OracleEnterpriseManagementSecrets = [
       {
-        sid    = "SecretsCrossAccount"
+        sid    = "OracleEnterpriseManagementSecrets"
         effect = "Allow"
         actions = [
           "secretsmanager:GetSecretValue",
         ]
-        resources = ["*"]
+        resources = [
+          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.hmpps_oem}:secret:/oracle/oem/shared-*",
+          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.hmpps_oem}:secret:/oracle/database/*/shared-*",
+        ]
+      }
+    ]
+
+    DeliusDbaSecrets = [
+      {
+        sid    = "OracleEnterpriseManagementSecrets"
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecretValue",
+        ]
+        resources = [
+          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.delius}:secret:*delius-dba*",
+        ]
+      }
+    ]
+
+    HmppsDomainSecrets = [
+      {
+        sid    = "HmppsDomainSecrets"
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecretValue",
+        ]
+        resources = [
+          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.hmpps_domain}:secret:/microsoft/AD/*/shared-*",
+        ]
       }
     ]
 
@@ -236,54 +265,6 @@ locals {
         ]
         resources = [
           "arn:aws:ssm:*:*:parameter/account_ids",
-        ]
-      }
-    ]
-
-    OracleEnterpriseManager = [
-      {
-        sid    = "S3ListLocation"
-        effect = "Allow"
-        actions = [
-          "s3:ListAllMyBuckets",
-          "s3:GetBucketLocation",
-        ]
-        resources = [
-          "arn:aws:s3:::*"
-        ]
-      },
-      {
-        sid    = "SecretsmanagerReadWriteOracle"
-        effect = "Allow"
-        actions = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:PutSecretValue",
-        ]
-        resources = [
-          "arn:aws:secretsmanager:*:*:secret:/oracle/*",
-        ]
-      },
-      {
-        sid    = "SSMReadAccountIdsOracle"
-        effect = "Allow"
-        actions = [
-          "ssm:GetParameter",
-          "ssm:GetParameters",
-        ]
-        resources = [
-          "arn:aws:ssm:*:*:parameter/account_ids",
-          "arn:aws:ssm:*:*:parameter/oracle/*",
-        ]
-      },
-      {
-        sid    = "SSMWriteOracle"
-        effect = "Allow"
-        actions = [
-          "ssm:PutParameter",
-          "ssm:PutParameters",
-        ]
-        resources = [
-          "arn:aws:ssm:*:*:parameter/oracle/*",
         ]
       }
     ]

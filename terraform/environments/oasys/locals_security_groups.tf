@@ -244,7 +244,7 @@ locals {
           security_groups = [
             "private_lb",
             # "private-jumpserver",
-            # "private-web",
+            "private_web",
             # "bastion-linux",
           ]
         }
@@ -257,7 +257,7 @@ locals {
           security_groups = [
             "private_lb",
             "bip",
-            # "private-web",
+            "private_web",
             # "bastion-linux",
           ]
         }

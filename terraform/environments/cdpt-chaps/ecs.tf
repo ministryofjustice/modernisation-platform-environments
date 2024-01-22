@@ -35,7 +35,9 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "kms:GenerateDataKey",
                 "kms:ReEncrypt",
                 "kms:GenerateDataKey",
-                "kms:DescribeKey"
+                "kms:DescribeKey",
+                "rds:Connect",
+                "rds:DescribeDBInstances"
             ],
             "Resource": "*"
         }
@@ -91,6 +93,32 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
         }
       }
       environment = [
+        {
+          name  = "RDS_HOSTNAME"
+          value = "${aws_db_instance.database.address}"
+        },
+        {
+          name  = "RDS_USERNAME"
+          value = "${aws_db_instance.database.username}"
+        },
+        {
+          name  = "DB_NAME"
+          value = "${local.application_data.accounts[local.environment].db_name}"
+        },
+        {
+          name  = "CLIENT_ID"
+          value = "${local.application_data.accounts[local.environment].client_id}"
+        },
+        {
+          name  = "CurServer"
+          value = "${local.application_data.accounts[local.environment].env_name}"
+        }
+      ],
+      secrets = [
+        {
+          name : "RDS_PASSWORD",
+          valueFrom : aws_secretsmanager_secret_version.db_password.arn
+        }
       ]
     }
   ])
@@ -130,7 +158,7 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   network_configuration {
-    subnets         = data.aws_subnets.shared-public.ids
+    subnets         = data.aws_subnets.shared-private.ids
     security_groups = [aws_security_group.ecs_service.id]
   }
 
@@ -263,7 +291,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [aws_security_group.cluster_ec2.id]
+    security_groups             = [aws_security_group.cluster_ec2.id, aws_security_group.db.id]
   }
 
   block_device_mappings {

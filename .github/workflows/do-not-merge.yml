@@ -4,6 +4,9 @@ on:
   pull_request:
     types: [synchronize, opened, reopened, labeled, unlabeled]
 
+permissions:
+  contents: read
+
 jobs:
   do-not-merge:
     if: ${{ contains(github.event.*.labels.*.name, 'DO NOT MERGE') }}

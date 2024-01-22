@@ -172,6 +172,8 @@ module "ap_landing_bucket" {
   versioning_enabled  = false
   replication_enabled = false
 
+  bucket_policy = [data.aws_iam_policy_document.allow_ap_write_to_landing.json]
+
   providers = {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
@@ -210,6 +212,7 @@ resource "aws_s3_object" "prison_performance" {
 }
 
 data "aws_iam_policy_document" "allow_ap_write_to_landing" {
+  # See also: https://github.com/moj-analytical-services/data-engineering-exports/tree/main/push_datasets
   statement {
     principals {
       type = "AWS"
@@ -230,10 +233,11 @@ data "aws_iam_policy_document" "allow_ap_write_to_landing" {
   }
 }
 
-resource "aws_s3_bucket_policy" "allow_ap_write_to_landing" {
-  bucket = module.ap_landing_bucket.bucket.id
-  policy = data.aws_iam_policy_document.allow_ap_write_to_landing.json
-}
+# don't attach poicy directly - use the module
+# resource "aws_s3_bucket_policy" "allow_ap_write_to_landing" {
+#   bucket = module.ap_landing_bucket.bucket.id
+#   policy = data.aws_iam_policy_document.allow_ap_write_to_landing.json
+# }
 
 #------------------------------------------------------------------------------
 # KMS setup for S3

@@ -30,7 +30,7 @@ locals {
   }
 
   environment_config = local.environment_configs[local.environment]
-  
+
   baseline_environment_presets_options = local.environment_baseline_presets_options[local.environment]
   baseline_environment_config          = local.environment_configs[local.environment]
 
@@ -129,7 +129,6 @@ locals {
       availability_zone = "${local.region}a"
       instance_profile_policies = flatten([
         module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
-        "Ec2OracleEnterpriseManagerPolicy"
       ])
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
@@ -166,39 +165,32 @@ locals {
         type  = "gp3"
       }
       "/dev/sdc" = { # /u02
-        size  = 500
+        size  = 1000
         label = "app"
         type  = "gp3"
       }
       "/dev/sde" = { # DATA01
         label = "data"
-        size  = 500
+        size  = 2000
         type  = "gp3"
       }
-      # "/dev/sdf" = {  # DATA02
-      #   label = "data"
-      #   type = null
-      # }
+      "/dev/sdf" = { # DATA02
+        label = "data"
+        size  = 2000
+        type  = "gp3"
+      }
       # "/dev/sdg" = {  # DATA03
-      #   label = "data"
-      #   type = null
       # }
       # "/dev/sdh" = {  # DATA04
-      #   label = "data"
-      #   type = null
       # }
       # "/dev/sdi" = {  # DATA05
-      #   label = "data"
-      #   type = null
       # }
       "/dev/sdj" = { # FLASH01
         label = "flash"
         type  = "gp3"
-        size  = 50
+        size  = 1000
       }
       # "/dev/sdk" = { # FLASH02
-      #   label = "flash"
-      #   type = null
       # }
       "/dev/sds" = {
         label = "swap"
@@ -274,8 +266,8 @@ locals {
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-      desired_capacity = 2
-      max_size         = 2
+      desired_capacity = 1
+      max_size         = 1
     })
     lb_target_groups       = {}
     secretsmanager_secrets = {}

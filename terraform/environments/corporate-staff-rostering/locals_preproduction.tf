@@ -9,61 +9,6 @@ locals {
         custom_kms_key = module.environment.kms_keys["general"].arn
         iam_policies   = module.baseline_presets.s3_iam_policies
       }
-      nlb-logs-bucket = {
-        sse_algorithm = "AES256"
-        iam_policies  = module.baseline_presets.s3_iam_policies
-        bucket_policy_v2 = [
-          {
-            effect = "Allow"
-            actions = [
-              "s3:PutObject"
-            ]
-            principals = {
-              identifiers = ["delivery.logs.amazonaws.com"]
-              type        = "Service"
-            }
-            conditions = [
-              {
-                test     = "StringEquals"
-                variable = "s3:x-amz-acl"
-                values   = ["bucket-owner-full-control"]
-              },
-              {
-                test     = "StringEquals"
-                variable = "aws:SourceAccount"
-                values   = [module.environment.account_id]
-              },
-              {
-                test     = "ArnLike"
-                variable = "aws:SourceArn"
-                values   = ["arn:aws:logs:${module.environment.region}:${module.environment.account_id}:*"]
-              }
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "s3:GetBucketAcl"
-            ]
-            principals = {
-              identifiers = ["delivery.logs.amazonaws.com"]
-              type        = "Service"
-            }
-            conditions = [
-              {
-                test     = "StringEquals"
-                variable = "aws:SourceAccount"
-                values   = [module.environment.account_id]
-              },
-              {
-                test     = "ArnLike"
-                variable = "aws:SourceArn"
-                values   = ["arn:aws:logs:${module.environment.region}:${module.environment.account_id}:*"]
-              }
-            ]
-          }
-        ]
-      }
     }
 
     baseline_secretsmanager_secrets = {
@@ -140,7 +85,7 @@ locals {
           data = {
             iops       = 3000
             throughput = 125
-            total_size = 1000
+            total_size = 1500
           }
           flash = {
             iops       = 3000

@@ -22,7 +22,6 @@ locals {
           "/dev/sdf"  = { type = "gp3", size = 250 }
           "/dev/sdg"  = { type = "gp3", size = 200 }
         }
-        cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_database_ec2.tags, {
           description       = "copy of PPFDW0030 SQL Server"
           app-config-status = "pending"
@@ -42,7 +41,6 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
-        cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_app_ec2.tags, {
           description       = "Migrated server PPFAW0010 PFME Licence Server"
           ami               = "pp-cafm-a-10-b"
@@ -61,7 +59,6 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
-        cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_app_ec2.tags, {
           description       = "Migrated server PPFAW011 RDS session host app server"
           ami               = "pp-cafm-a-11-a"
@@ -84,7 +81,6 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 100 }
         }
-        cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_web_ec2.tags, {
           description       = "Migrated server PPFWW0002 Web Access Server / RDS Gateway Server"
           ami               = "pp-cafm-w-2-b"
@@ -104,7 +100,6 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 100 }
         }
-        cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_web_ec2.tags, {
           description       = "Migrated server PPFWW0003 Web Access Server / RDS Gateway Server"
           ami               = "pp-cafm-w-2-b"
@@ -123,7 +118,6 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
-        cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_web_ec2.tags, {
           description       = "Migrated server PPFWW0004 Web Portal Server"
           ami               = "pp-cafm-w-4-b"
@@ -142,7 +136,6 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
-        cloudwatch_metric_alarms = {} # TODO: remove this later when @Dominic has added finished changing the alarms
         tags = merge(local.defaults_web_ec2.tags, {
           description       = "Migrated server PPFWW0005 Web Portal Server"
           ami               = "pp-cafm-w-5-a"
