@@ -189,7 +189,7 @@ resource "aws_transfer_workflow" "transfer_capita_to_store" {
       destination_file_location {
         s3_file_location {
           bucket = aws_s3_bucket.data_store_bucket.bucket
-          key = "$${transfer:UserName}/"
+          key = "capita/"
         }  
       }
     }
@@ -221,8 +221,8 @@ data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
   statement {
     sid       = "AllowDataStoreWrite"
     effect    = "Allow"
-    actions   = ["s3:PutBucket"]
-    resources = ["${aws_s3_bucket.data_store_bucket.arn}/capita/"]
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.data_store_bucket.arn}/capita/*"]
   }
   statement {
     sid       = "AllowCapitaLandingZoneRead"
