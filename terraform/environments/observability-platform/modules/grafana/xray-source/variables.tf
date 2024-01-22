@@ -5,8 +5,3 @@ variable "name" {
 variable "account_id" {
   type = string
 }
-
-variable "xray_enabled" {
-  type    = bool
-  default = false
-}

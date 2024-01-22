@@ -23,6 +23,19 @@ locals {
           ]
         }
       }
+      tenant_configuration = {
+        "observability-platform" = {
+          identity_centre_team = "observability-platform" # dependent on access to IdC
+          aws_accounts = {
+            "observability-platform-development" = {
+              cloudwatch_enabled           = true                                # default is true
+              cloudwatch_custom_namespaces = "CustomNamespace1,CustomNamespace2" # default is ""
+              prometheus_enabled           = true                                # default is false
+              xray_enabled                 = true                                # default is false
+            }
+          }
+        }
+      }
     }
     production = {
       observability_platform_configuration = {
@@ -37,6 +50,7 @@ locals {
           ]
         }
       }
+      tenant_configuration = {}
     }
   }
 }
