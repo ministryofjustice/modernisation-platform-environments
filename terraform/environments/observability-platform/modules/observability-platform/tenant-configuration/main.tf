@@ -29,4 +29,7 @@ module "team" {
 
   name                 = var.name
   identity_centre_team = var.identity_centre_team
+  aws_accounts         = var.aws_accounts
+
+  depends_on = [module.xray_source, module.cloudwatch_source]
 }
