@@ -9,6 +9,7 @@
       "ecs_memory": 2048,
       "ecs_container_cpu": 922,
       "ecs_container_memory": 1792,
+      "ecs_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/maat-cd-api-ecr-repo:development",
       "ecs_env_DatasourceUrl": "jdbc:oracle:thin:@rds.maat.aws.dev.legalservices.gov.uk:1521:MAATDB",
       "ecs_env_CloudPlatformQueueRegion": "eu-west-2",
       "ecs_env_CreateLinkQueue": "https://sqs.eu-west-2.amazonaws.com/754256621582/crime-apps-dev-create-link-queue-m",
