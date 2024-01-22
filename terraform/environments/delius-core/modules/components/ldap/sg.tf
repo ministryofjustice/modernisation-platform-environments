@@ -2,7 +2,7 @@ resource "aws_security_group" "ldap" {
   name        = "${var.env_name}-ldap-sg"
   description = "Security group for the ${var.env_name} ldap service"
   vpc_id      = var.account_info.vpc_id
-  tags        = local.tags
+  tags        = var.tags
   lifecycle {
     create_before_destroy = true
   }
