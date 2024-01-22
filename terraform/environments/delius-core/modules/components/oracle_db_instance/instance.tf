@@ -47,5 +47,3 @@ resource "aws_instance" "db_ec2" {
 
   user_data_replace_on_change = var.user_data_replace_on_change
 }
-
-resource "aws_ebs_snapshot_import
