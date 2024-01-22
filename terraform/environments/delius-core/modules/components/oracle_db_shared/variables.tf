@@ -22,3 +22,9 @@ variable "account_config" {
   description = "Account config to pass to the instance"
   type        = any
 }
+
+
+variable "public_keys" {
+  description = "Public keys to add to the instance"
+  type        = map(any)
+}
