@@ -13,10 +13,11 @@ resource "grafana_data_source" "this" {
   name = local.name
 
   json_data_encoded = jsonencode({
-    defaultRegion        = "eu-west-2"
-    authType             = "ec2_iam_role"
-    assumeRoleArn        = "arn:aws:iam::${var.account_id}:role/observability-platform"
-    externalId           = var.name
-    tracingDatasourceUid = try(data.grafana_data_source.this[0].uid, null)
+    defaultRegion           = "eu-west-2"
+    authType                = "ec2_iam_role"
+    assumeRoleArn           = "arn:aws:iam::${var.account_id}:role/observability-platform"
+    externalId              = var.name
+    customMetricsNamespaces = try(var.cloudwatch_custom_namespaces, "")
+    tracingDatasourceUid    = try(data.grafana_data_source.this[0].uid, null)
   })
 }

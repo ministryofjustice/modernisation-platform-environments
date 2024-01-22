@@ -16,9 +16,10 @@ module "cloudwatch_source" {
 
   source = "../../grafana/cloudwatch-source"
 
-  name         = each.key
-  account_id   = var.environment_management.account_ids[each.key]
-  xray_enabled = each.value.xray_enabled
+  name                         = each.key
+  account_id                   = var.environment_management.account_ids[each.key]
+  cloudwatch_custom_namespaces = try(each.value.cloudwatch_custom_namespaces, null)
+  xray_enabled                 = try(each.value.xray_enabled, false)
 
   depends_on = [module.xray_source]
 }
