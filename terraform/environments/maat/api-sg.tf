@@ -39,6 +39,7 @@ resource "aws_security_group_rule" "ecs_outbound" {
   to_port           = 0
   protocol          = "-1"
   security_group_id        = aws_security_group.maat_api_ecs_security_group.id
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "AppAlbSecurityGroupApiGatewayIngress" {
@@ -56,6 +57,7 @@ resource "aws_security_group_rule" "alb_outbound" {
   to_port           = 0
   protocol          = "-1"
   security_group_id        = aws_security_group.maat_api_alb_sg.id
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "AppAlbSecurityGroupModPlatformIngress" {
@@ -73,6 +75,7 @@ resource "aws_security_group_rule" "api_gateway_outbound" {
   to_port           = 0
   protocol          = "-1"
   security_group_id        = aws_security_group.maat_api_gw_sg.id
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 
