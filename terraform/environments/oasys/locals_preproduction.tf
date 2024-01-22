@@ -92,7 +92,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/bip/preprod/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/bip-*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/bip-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/bip/preproduction",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/bip/preproduction*",
             ]
           }
         ]
