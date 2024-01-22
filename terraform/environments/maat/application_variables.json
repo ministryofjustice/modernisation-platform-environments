@@ -28,7 +28,9 @@
       "ecs_env_EnableCloudwatchMetrics": "true",
       "ecs_env_TogDataUsername": "togdata",
       "pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms",
-      "api_scope": "standard"
+      "api_scope": "standard",
+      "api_gateway_fqdn": "maat-cd-api.dev.legalservices.gov.uk",
+      "certificate_arn": "arn:aws:acm:eu-west-2:411213865113:certificate/0184743f-c424-4d2e-bd87-f2ac439c38ad"
     },
     "test": {
       "example_var": "test-data",

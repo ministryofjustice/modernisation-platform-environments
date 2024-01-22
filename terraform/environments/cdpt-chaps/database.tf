@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------
 # Database
-#------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
   allocated_storage      = local.application_data.accounts[local.environment].db_allocated_storage
@@ -13,10 +13,11 @@ resource "aws_db_instance" "database" {
   password               = aws_secretsmanager_secret_version.db_password.secret_string
   vpc_security_group_ids = [aws_security_group.db.id]
   depends_on             = [aws_security_group.db]
-  snapshot_identifier    = local.application_data.accounts[local.environment].db_snapshot_identifier
+  skip_final_snapshot    = true
+  # snapshot_identifier  = local.application_data.accounts[local.environment].db_snapshot_identifier
   db_subnet_group_name   = aws_db_subnet_group.db.id
-  final_snapshot_identifier = "final-snapshot"
-  publicly_accessible       = true
+  # final_snapshot_identifier = "final"
+  publicly_accessible    = true
 }
 
 resource "aws_db_instance_role_association" "database" {
