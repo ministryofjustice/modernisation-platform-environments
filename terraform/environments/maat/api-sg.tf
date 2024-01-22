@@ -33,6 +33,14 @@ resource "aws_security_group_rule" "AppEcsSecurityGroup1ALBport" {
   source_security_group_id = aws_security_group.maat_api_alb_sg.id
 }
 
+resource "aws_security_group_rule" "AppEcsSecurityGroup_outbound" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id        = aws_security_group.maat_api_ecs_security_group.id
+}
+
 resource "aws_security_group_rule" "AppAlbSecurityGroupApiGatewayIngress" {
   type                     = "ingress"
   from_port                = 80
@@ -42,6 +50,14 @@ resource "aws_security_group_rule" "AppAlbSecurityGroupApiGatewayIngress" {
   source_security_group_id = aws_security_group.maat_api_gw_sg.id
 }
 
+resource "aws_security_group_rule" "AppAlbSecurityGroupApiGateway_outbound" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id        = aws_security_group.maat_api_alb_sg.id
+}
+
 resource "aws_security_group_rule" "AppAlbSecurityGroupModPlatformIngress" {
   type              = "ingress"
   from_port         = 80
@@ -49,6 +65,14 @@ resource "aws_security_group_rule" "AppAlbSecurityGroupModPlatformIngress" {
   protocol          = "tcp"
   security_group_id = aws_security_group.maat_api_alb_sg.id
   cidr_blocks       = [local.application_data.accounts[local.environment].mlra_vpc_cidr]
+}
+
+resource "aws_security_group_rule" "api_gateway_outbound" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id        = aws_security_group.maat_api_gw_sg.id
 }
 
 
