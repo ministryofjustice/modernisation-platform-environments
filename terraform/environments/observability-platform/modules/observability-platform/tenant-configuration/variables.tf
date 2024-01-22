@@ -1,5 +1,5 @@
 variable "environment_management" {
-  type = any # TODO: review this
+  type = any
 }
 
 variable "name" {
@@ -14,7 +14,7 @@ variable "aws_accounts" {
   type = map(object({
     cloudwatch_enabled           = optional(bool)
     cloudwatch_custom_namespaces = optional(string)
-    prometheus_enabled           = optional(bool)
+    prometheus_push_enabled      = optional(bool)
     xray_enabled                 = optional(bool)
   }))
 }

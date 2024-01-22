@@ -24,6 +24,17 @@ module "cloudwatch_source" {
   depends_on = [module.xray_source]
 }
 
+module "prometheus_push" {
+  for_each = {
+    for name, account in var.aws_accounts : name => account if account.prometheus_push_enabled
+  }
+
+  source = "../../prometheus/iam-role"
+
+  name       = each.key
+  account_id = var.environment_management.account_ids[each.key]
+}
+
 module "team" {
   source = "../../grafana/team"
 

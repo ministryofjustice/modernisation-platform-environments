@@ -25,12 +25,12 @@ locals {
       }
       tenant_configuration = {
         "observability-platform" = {
-          identity_centre_team = "16a2d234-1031-70b5-2657-7f744c55e48f" # This is current hard coded to their UUID as we can't lookup by name from our account
+          identity_centre_team = "16a2d234-1031-70b5-2657-7f744c55e48f"
           aws_accounts = {
             "observability-platform-development" = {
-              cloudwatch_enabled = true
-              prometheus_enabled = true
-              xray_enabled       = true
+              cloudwatch_enabled      = true
+              prometheus_push_enabled = true
+              xray_enabled            = true
             }
           }
         }
@@ -49,7 +49,18 @@ locals {
           ]
         }
       }
-      tenant_configuration = {}
+      tenant_configuration = {
+        "observability-platform" = {
+          identity_centre_team = "16a2d234-1031-70b5-2657-7f744c55e48f"
+          aws_accounts = {
+            "observability-platform-production" = {
+              cloudwatch_enabled      = true
+              prometheus_push_enabled = true
+              xray_enabled            = true
+            }
+          }
+        }
+      }
     }
   }
 }

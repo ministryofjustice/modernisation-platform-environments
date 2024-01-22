@@ -18,7 +18,6 @@ module "prometheus_roles" {
 
   source = "./modules/prometheus/iam-role"
 
-  name                     = each.key
-  account_id               = local.environment_management.account_ids[each.key]
-  prometheus_workspace_arn = module.managed_prometheus.workspace_arn
+  name       = each.key
+  account_id = local.environment_management.account_ids[each.key]
 }
