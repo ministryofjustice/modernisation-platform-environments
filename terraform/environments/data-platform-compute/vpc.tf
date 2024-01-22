@@ -27,40 +27,40 @@ module "vpc_endpoints" {
 
   endpoints = {
     logs = {
-      service            = "logs"
-      service_type       = "Interface"
+      service      = "logs"
+      service_type = "Interface"
       tags = merge(
         local.tags,
         { Name = format("%s-logs-api-vpc-endpoint", local.application_name) }
       )
     },
     sagemaker-api = {
-      service            = "sagemaker.api"
-      service_type       = "Interface"
+      service      = "sagemaker.api"
+      service_type = "Interface"
       tags = merge(
         local.tags,
         { Name = format("%s-sagemaker-api-vpc-endpoint", local.application_name) }
       )
     },
     sagemaker-runtime = {
-      service            = "sagemaker.runtime"
-      service_type       = "Interface"
+      service      = "sagemaker.runtime"
+      service_type = "Interface"
       tags = merge(
         local.tags,
         { Name = format("%s-sagemaker-runtime-vpc-endpoint", local.application_name) }
       )
     },
     sagemaker-catalog = {
-      service            = "servicecatalog"
-      service_type       = "Interface"
+      service      = "servicecatalog"
+      service_type = "Interface"
       tags = merge(
         local.tags,
         { Name = format("%s-servicecatalog-vpc-endpoint", local.application_name) }
       )
     },
     sts = {
-      service            = "sts"
-      service_type       = "Interface"
+      service      = "sts"
+      service_type = "Interface"
       tags = merge(
         local.tags,
         { Name = format("%s-sts-vpc-endpoint", local.application_name) }
