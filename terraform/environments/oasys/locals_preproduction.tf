@@ -112,19 +112,19 @@ locals {
         })
       })
 
-      # "pp-${local.application_name}-bip-a" = merge(local.bip_a, {
-      #   config = merge(local.bip_a.config, {
-      #     instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
-      #       "Ec2PreprodBipPolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.bip_a.tags, {
-      #     bip-db-name       = "PPBIPINF"
-      #     bip-db-hostname   = "pp-oasys-db-a"
-      #     oasys-db-name     = "PPOASYS"
-      #     oasys-db-hostname = "pp-oasys-db-a"
-      #   })
-      # })
+      "pp-${local.application_name}-bip-a" = merge(local.bip_a, {
+        config = merge(local.bip_a.config, {
+          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+            "Ec2PreprodBipPolicy",
+          ])
+        })
+        tags = merge(local.bip_a.tags, {
+          bip-db-name       = "PPBIPINF"
+          bip-db-hostname   = "pp-oasys-db-a"
+          oasys-db-name     = "PPOASYS"
+          oasys-db-hostname = "pp-oasys-db-a"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
