@@ -1024,10 +1024,10 @@ variable "resource_explorer" {
 
 variable "cost_usage_report" {
   description = "Enables AWS Cost Usage Report"
-  type        = object({
+  type = object({
     create = bool
-  })  
-  default     = {
+  })
+  default = {
     create = false
   }
 }

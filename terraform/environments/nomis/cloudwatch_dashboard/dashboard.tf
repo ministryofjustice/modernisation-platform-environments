@@ -39,7 +39,7 @@ locals {
       stat    = "Maximum"
       period  = local.cloudwatch_period
       metrics = [
-        [ { "expression": "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 5", "label": "", "id": "q1" } ]
+        [{ "expression" : "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 5", "label" : "", "id" : "q1" }]
       ]
     }
   }
@@ -58,7 +58,7 @@ locals {
       stat    = "Maximum"
       period  = local.cloudwatch_period
       metrics = [
-        [ { "expression": "SELECT MAX(mem_used_percent) FROM SCHEMA(CWAgent, InstanceId,name,server_type) GROUP BY InstanceId ORDER BY MAX() DESC", "label": "", "id": "q1", "yAxis": "left" } ]
+        [{ "expression" : "SELECT MAX(mem_used_percent) FROM SCHEMA(CWAgent, InstanceId,name,server_type) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
       ]
     }
   }
@@ -77,7 +77,7 @@ locals {
       stat    = "Maximum"
       period  = local.cloudwatch_period
       metrics = [
-        [ { "expression": "SELECT MAX(disk_used_percent) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label": "", "id": "q1" } ]
+        [{ "expression" : "SELECT MAX(disk_used_percent) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
       ]
     }
   }
@@ -96,7 +96,7 @@ locals {
       stat    = "Maximum"
       period  = local.cloudwatch_period
       metrics = [
-        [ { "expression": "SELECT MAX(TargetResponseTime) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer,TargetGroup) GROUP BY TargetGroup ORDER BY MAX() DESC", "label": "", "id": "q1" } ]
+        [{ "expression" : "SELECT MAX(TargetResponseTime) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer,TargetGroup) GROUP BY TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
       ]
     }
   }
@@ -115,7 +115,7 @@ locals {
       stat    = "Maximum"
       period  = local.cloudwatch_period
       metrics = [
-        [ { "expression": "SELECT COUNT(RequestCount) FROM \"AWS/ApplicationELB\" GROUP BY LoadBalancer ORDER BY COUNT() DESC", "label": "", "id": "q1" } ]
+        [{ "expression" : "SELECT COUNT(RequestCount) FROM \"AWS/ApplicationELB\" GROUP BY LoadBalancer ORDER BY COUNT() DESC", "label" : "", "id" : "q1" }]
       ]
     }
   }
@@ -134,7 +134,7 @@ locals {
       stat    = "Maximum"
       period  = local.cloudwatch_period
       metrics = [
-        [ { "expression": "SELECT COUNT(HTTPCode_ELB_5XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", AvailabilityZone,LoadBalancer,TargetGroup) GROUP BY LoadBalancer ORDER BY COUNT() DESC", "label": "", "id": "q1" } ]
+        [{ "expression" : "SELECT COUNT(HTTPCode_ELB_5XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", AvailabilityZone,LoadBalancer,TargetGroup) GROUP BY LoadBalancer ORDER BY COUNT() DESC", "label" : "", "id" : "q1" }]
       ]
     }
   }
@@ -153,11 +153,11 @@ locals {
       stat    = "Sum"
       period  = local.cloudwatch_period
       metrics = [
-        [ { "expression": "m1/PERIOD(m1)", "label": "Read IOPs", "id": "e1" } ],
-        [ { "expression": "m2/PERIOD(m2)", "label": "Write IOPs", "id": "e2" } ],
-        [ { "expression": "e1+e2", "label": "Total IOPs", "id": "e3" } ],
-        [ "AWS/EBS", "VolumeReadOps", "VolumeId", "*", { "id": "m1", "visible": false } ],
-        [ "AWS/EBS", "VolumeWriteOps", "VolumeId", "*", { "id": "m2", "visible": false } ]
+        [{ "expression" : "m1/PERIOD(m1)", "label" : "Read IOPs", "id" : "e1" }],
+        [{ "expression" : "m2/PERIOD(m2)", "label" : "Write IOPs", "id" : "e2" }],
+        [{ "expression" : "e1+e2", "label" : "Total IOPs", "id" : "e3" }],
+        ["AWS/EBS", "VolumeReadOps", "VolumeId", "*", { "id" : "m1", "visible" : false }],
+        ["AWS/EBS", "VolumeWriteOps", "VolumeId", "*", { "id" : "m2", "visible" : false }]
       ]
     }
   }
@@ -176,11 +176,11 @@ locals {
       stat    = "Sum"
       period  = local.cloudwatch_period
       metrics = [
-        [ { "expression": "SELECT SUM(VolumeWriteBytes)\nFROM SCHEMA(\"AWS/EBS\", VolumeId)\nGROUP BY VolumeId\nORDER BY SUM() DESC\nLIMIT 10", "label": "VolumeWriteBytes", "id": "m3", "stat": "Sum", "visible": false } ],
-        [ { "expression": "SELECT SUM(VolumeReadBytes) FROM SCHEMA(\"AWS/EBS\", VolumeId) GROUP BY VolumeId ORDER BY SUM() DESC LIMIT 10", "label": "VolumeReadBytes", "id": "m4", "stat": "Sum", "visible": false } ],
-        [ { "expression": "(m4/(1024*1024))/PERIOD(m4)", "label": "MB Read Per Second", "id": "e4" } ],
-        [ { "expression": "(m3/(1024*1024))/PERIOD(m3)", "label": "MB Write Per Second", "id": "e5" } ],
-        [ { "expression": "e4+e5", "label": "Total Consumed MB/s", "id": "e6" } ]
+        [{ "expression" : "SELECT SUM(VolumeWriteBytes)\nFROM SCHEMA(\"AWS/EBS\", VolumeId)\nGROUP BY VolumeId\nORDER BY SUM() DESC\nLIMIT 10", "label" : "VolumeWriteBytes", "id" : "m3", "stat" : "Sum", "visible" : false }],
+        [{ "expression" : "SELECT SUM(VolumeReadBytes) FROM SCHEMA(\"AWS/EBS\", VolumeId) GROUP BY VolumeId ORDER BY SUM() DESC LIMIT 10", "label" : "VolumeReadBytes", "id" : "m4", "stat" : "Sum", "visible" : false }],
+        [{ "expression" : "(m4/(1024*1024))/PERIOD(m4)", "label" : "MB Read Per Second", "id" : "e4" }],
+        [{ "expression" : "(m3/(1024*1024))/PERIOD(m3)", "label" : "MB Write Per Second", "id" : "e5" }],
+        [{ "expression" : "e4+e5", "label" : "Total Consumed MB/s", "id" : "e6" }]
       ]
     }
   }
@@ -192,10 +192,10 @@ locals {
     width  = 24
     height = 15
     properties = {
-      region  = local.region
-      title   = "All EBS Volume Stats"
-      stat    = "Sum"
-      period  = local.cloudwatch_period
+      region = local.region
+      title  = "All EBS Volume Stats"
+      stat   = "Sum"
+      period = local.cloudwatch_period
       widgetOptions = {
         view          = "timeSeries"
         stacked       = false
@@ -203,33 +203,33 @@ locals {
         widgetsPerRow = 2
       }
       labels = [
-        { key: "application", value: "nomis" }
+        { key : "application", value : "nomis" }
       ]
       metrics = [
-        { 
-          "metricName": "VolumeReadBytes",
-          "resourceType": "AWS::EC2::Volume",
-          "stat": "Sum"
+        {
+          "metricName" : "VolumeReadBytes",
+          "resourceType" : "AWS::EC2::Volume",
+          "stat" : "Sum"
         },
         {
-          "metricName": "VolumeWriteBytes",
-          "resourceType": "AWS::EC2::Volume",
-          "stat": "Sum"
+          "metricName" : "VolumeWriteBytes",
+          "resourceType" : "AWS::EC2::Volume",
+          "stat" : "Sum"
         },
         {
-          "metricName": "VolumeIdleTime",
-          "resourceType": "AWS::EC2::Volume",
-          "stat": "Average"
+          "metricName" : "VolumeIdleTime",
+          "resourceType" : "AWS::EC2::Volume",
+          "stat" : "Average"
         },
         {
-          "metricName": "VolumeReadOps",
-          "resourceType": "AWS::EC2::Volume",
-          "stat": "Sum"
+          "metricName" : "VolumeReadOps",
+          "resourceType" : "AWS::EC2::Volume",
+          "stat" : "Sum"
         },
         {
-          "metricName": "VolumeWriteOps",
-          "resourceType": "AWS::EC2::Volume",
-          "stat": "Sum"
+          "metricName" : "VolumeWriteOps",
+          "resourceType" : "AWS::EC2::Volume",
+          "stat" : "Sum"
         }
       ]
     }
@@ -244,7 +244,7 @@ locals {
     properties = {
       markdown   = "## LoadBalancer Graphed Metrics"
       background = "solid"
-      }
+    }
   }
 
   EC2GraphedMetricsHeading = {
