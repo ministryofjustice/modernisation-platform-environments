@@ -164,3 +164,26 @@ resource "aws_transfer_ssh_key" "capita_ssh_key" {
   user_name = aws_transfer_user.capita_transfer_user.user_name
   body      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqXTKqBVVBQX5lvCdCdws4t7lCVaniv3FGCaJQOKMYAzBzwcVD9MKz0RzH7FMMA/iBayw/+13Mb79paBkJdT8T/Wg9lER/YE/lPKZcyT2IJ6myW5kDShQAY9lQliRoJ4oVx9x95hGx48eE9jWsCtwEaQT7pH2aK5l2THqfFCDQEMmT84CaSmJzuxsaYxuohlVcMqnGdU/oq+E76gLm3Z0gvh3NwFHd0RTIzqlVgwEUbTcHqZBON522229VypuvqfIcD9WIPEMnza/rA/6FX5luniqh+h/PCF7HH3Qiveui3PZV64fQtqd2pVnK8llW7CLjXKC1/TkWx1QkWyGzGYBZUXEctNbOBMixFcVbj49CucWMztPC88gZl2bHlJPqdBLMt6sakigCLWJLIvB/oeXGhzCN7XkfKWXDTu4mHuQ+UHPbXzsPvPRxidfxxRVk758M+GB15nQq2Fm3lRtYgZ2mnjQT7dwhhCaiqJiy0qs5kQ4Hs9Jnex6afoPQlqrhamtu8= test.user@K9999"
 }
+
+#------------------------------------------------------------------------------
+# AWS transfer workflow
+#
+# For files that arrive in the landing bucket:
+# 1. copy the file to the internal data store bucket
+# 2. delete the file from the landing bucket
+#------------------------------------------------------------------------------
+
+resource "aws_transfer_workflow" "transfer_capita_to_store" {
+  steps {
+    copy_step_details {
+      source_file_location = "$${original.file}"
+      destination_file_location {
+        s3_file_location {
+          bucket = aws_s3_bucket.data_store_bucket.bucket
+          key = "$${transfer:UserName}/"
+        }  
+      }
+    }
+    type = "COPY"
+  }
+}
