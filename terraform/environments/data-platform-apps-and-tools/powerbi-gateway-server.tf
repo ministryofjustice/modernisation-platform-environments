@@ -15,8 +15,9 @@ module "powerbi_gateway" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "v5.6.0"
 
-  name                        = local.environment_configuration.powerbi_gateway_ec2.instance_name
-  ami                         = data.aws_ami.windows_server_2022.id
+  name = local.environment_configuration.powerbi_gateway_ec2.instance_name
+  # ami                         = data.aws_ami.windows_server_2022.id
+  ami                         = "ami-00ffeb610527f540b" # Hardcoded AMI ID for Windows Server 2022
   instance_type               = local.environment_configuration.powerbi_gateway_ec2.instance_type
   key_name                    = aws_key_pair.powerbi_gateway_keypair.key_name
   monitoring                  = true

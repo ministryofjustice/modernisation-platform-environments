@@ -42,6 +42,8 @@ resource "aws_secretsmanager_secret" "govuk_notify_api_key" {
 }
 
 # Email secret for Lambda function
-resource "aws_secretsmanager_secret" "email_secret" {
+resource "aws_secretsmanager_secret" "jml_email" {
+  count = terraform.workspace == "data-platform-apps-and-tools-production" ? 1 : 0
+
   name = "jml/email"
 }
