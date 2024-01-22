@@ -12,7 +12,7 @@ resource "aws_instance" "db_ec2" {
   user_data_base64 = base64encode(templatefile("${path.module}/templates/concatenated_user_data.sh",
     {
       default   = var.user_data
-#      ssh_setup = templatefile("${path.module}/templates/ssh_key_setup.sh", { aws_region = "eu-west-2", bucket_name = var.ssh_keys_bucket_name })
+      ssh_setup = templatefile("${path.module}/templates/ssh_key_setup.sh", { aws_region = "eu-west-1", bucket_name = var.ssh_keys_bucket_name })
     }
   ))
 
