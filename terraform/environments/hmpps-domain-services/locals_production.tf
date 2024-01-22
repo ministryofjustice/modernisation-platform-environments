@@ -59,13 +59,13 @@ locals {
     baseline_lbs = {
       public = merge(local.rds_lbs.public, {
         instance_target_groups = {
-          http1 = merge(local.rds_target_groups.http, {
+          pd-rdgw-1-http = merge(local.rds_target_groups.http, {
             attachments = [
               { ec2_instance_name = "pd-rdgw-1-a" },
               { ec2_instance_name = "pd-rdgw-1-b" },
             ]
           })
-          https1 = merge(local.rds_target_groups.https, {
+          pd-rds-1-https = merge(local.rds_target_groups.https, {
             attachments = [
               { ec2_instance_name = "pd-rds-1-a" },
             ]
