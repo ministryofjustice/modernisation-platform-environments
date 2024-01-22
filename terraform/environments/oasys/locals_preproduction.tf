@@ -15,18 +15,16 @@ locals {
     baseline_secretsmanager_secrets = {
       "/oracle/database/PPOASYS"  = local.secretsmanager_secrets_oasys_db
       "/oracle/database/PPOASREP" = local.secretsmanager_secrets_db
-      "/oracle/database/PPAZBIPI" = local.secretsmanager_secrets_bip_db
       "/oracle/database/PPBIPINF" = local.secretsmanager_secrets_bip_db
       "/oracle/database/PPMISTRN" = local.secretsmanager_secrets_db
       "/oracle/database/PPONRSYS" = local.secretsmanager_secrets_db
       "/oracle/database/PPONRAUD" = local.secretsmanager_secrets_db
       "/oracle/database/PPONRBDS" = local.secretsmanager_secrets_db
-      "/oracle/bip/preprod"       = local.secretsmanager_secrets_bip
 
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
 
-      "/oracle/bip/pp" = local.secretsmanager_secrets_bip
+      "/oracle/bip/preproduction" = local.secretsmanager_secrets_bip
     }
 
     baseline_iam_policies = {
@@ -114,19 +112,19 @@ locals {
         })
       })
 
-      "pp-${local.application_name}-bip-a" = merge(local.bip_a, {
-        config = merge(local.bip_a.config, {
-          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
-            "Ec2PreprodBipPolicy",
-          ])
-        })
-        tags = merge(local.bip_a.tags, {
-          bip-db-name       = "PPBIPINF"
-          bip-db-hostname   = "pp-oasys-db-a"
-          oasys-db-name     = "PPOASYS"
-          oasys-db-hostname = "pp-oasys-db-a"
-        })
-      })
+      # "pp-${local.application_name}-bip-a" = merge(local.bip_a, {
+      #   config = merge(local.bip_a.config, {
+      #     instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+      #       "Ec2PreprodBipPolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.bip_a.tags, {
+      #     bip-db-name       = "PPBIPINF"
+      #     bip-db-hostname   = "pp-oasys-db-a"
+      #     oasys-db-name     = "PPOASYS"
+      #     oasys-db-hostname = "pp-oasys-db-a"
+      #   })
+      # })
     }
 
     baseline_ec2_autoscaling_groups = {
