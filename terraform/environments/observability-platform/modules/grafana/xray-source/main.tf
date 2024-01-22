@@ -3,7 +3,7 @@ locals {
 }
 
 resource "grafana_data_source" "this" {
-  type = "xray"
+  type = "x-ray"
   name = local.name
 
   json_data_encoded = jsonencode({
