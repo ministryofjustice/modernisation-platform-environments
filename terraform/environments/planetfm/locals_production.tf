@@ -481,12 +481,12 @@ locals {
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1128.awsdns-13.org", "ns-2027.awsdns-61.co.uk", "ns-854.awsdns-42.net", "ns-90.awsdns-11.com"] },
           { name = "pp", type = "NS", ttl = "86400", records = ["ns-1407.awsdns-47.org", "ns-1645.awsdns-13.co.uk", "ns-63.awsdns-07.com", "ns-730.awsdns-27.net"] },
         ]
-        # lb_alias_records = [
-        #   { name = "cafmtx", type = "A", lbs_map_key = "private" },
-        #   { name = "cafmwebx", type = "A", lbs_map_key = "private" },
-        #   { name = "cafmwebx2", type = "A", lbs_map_key = "private" },
-        #   { name = "cafmtrainweb", type = "A", lbs_map_key = "private" },
-        # ]
+        lb_alias_records = [
+          { name = "cafmtx", type = "A", lbs_map_key = "private" },
+          { name = "cafmwebx", type = "A", lbs_map_key = "private" },
+          { name = "cafmwebx2", type = "A", lbs_map_key = "private" },
+          { name = "cafmtrainweb", type = "A", lbs_map_key = "private" },
+        ]
       }
     }
     baseline_acm_certificates = {
