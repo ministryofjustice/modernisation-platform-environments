@@ -47,3 +47,11 @@ resource "aws_instance" "db_ec2" {
 
   user_data_replace_on_change = var.user_data_replace_on_change
 }
+
+
+# attach root volume
+resource "aws_volume_attachment" "root_volume_attachment" {
+  device_name = "/dev/sda1"
+  volume_id   = aws_instance.db_ec2.root_block_device.0.volume_id
+  instance_id = aws_instance.db_ec2.id
+}
