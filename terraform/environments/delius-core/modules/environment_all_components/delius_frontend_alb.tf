@@ -44,14 +44,14 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   cidr_ipv4         = "35.176.93.186/32" # Global Protect VPN
 }
 
-resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_service" {
-  security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
-  description                  = "access delius core frontend service from alb"
-  from_port                    = var.weblogic_config.frontend_container_port
-  to_port                      = var.weblogic_config.frontend_container_port
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.weblogic_service.id
-}
+#resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_service" {
+#  security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
+#  description                  = "access delius core frontend service from alb"
+#  from_port                    = var.weblogic_config.frontend_container_port
+#  to_port                      = var.weblogic_config.frontend_container_port
+#  ip_protocol                  = "tcp"
+#  referenced_security_group_id = aws_security_group.weblogic_service.id
+#}
 
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_frontend" {
@@ -77,7 +77,7 @@ resource "aws_lb_listener" "listener" {
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
-    target_group_arn = aws_lb_target_group.delius_core_frontend_target_group.id
+    target_group_arn = module.weblogic.target_group_arn
     type             = "forward"
   }
 }
@@ -98,31 +98,31 @@ resource "aws_lb_listener" "listener_http" {
   }
 }
 
-resource "aws_lb_target_group" "delius_core_frontend_target_group" {
-  # checkov:skip=CKV_AWS_261
-
-  name                 = var.weblogic_config.frontend_fully_qualified_name
-  port                 = var.weblogic_config.frontend_container_port
-  protocol             = "HTTP"
-  vpc_id               = var.account_config.shared_vpc_id
-  target_type          = "ip"
-  deregistration_delay = 30
-  tags                 = local.tags
-
-  stickiness {
-    type = "lb_cookie"
-  }
-
-  health_check {
-    path                = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
-    healthy_threshold   = "5"
-    interval            = "300"
-    protocol            = "HTTP"
-    unhealthy_threshold = "5"
-    matcher             = "200-499"
-    timeout             = "5"
-  }
-}
+#resource "aws_lb_target_group" "delius_core_frontend_target_group" {
+#  # checkov:skip=CKV_AWS_261
+#
+#  name                 = var.weblogic_config.frontend_fully_qualified_name
+#  port                 = var.weblogic_config.frontend_container_port
+#  protocol             = "HTTP"
+#  vpc_id               = var.account_config.shared_vpc_id
+#  target_type          = "ip"
+#  deregistration_delay = 30
+#  tags                 = local.tags
+#
+#  stickiness {
+#    type = "lb_cookie"
+#  }
+#
+#  health_check {
+#    path                = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+#    healthy_threshold   = "5"
+#    interval            = "300"
+#    protocol            = "HTTP"
+#    unhealthy_threshold = "5"
+#    matcher             = "200-499"
+#    timeout             = "5"
+#  }
+#}
 
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
