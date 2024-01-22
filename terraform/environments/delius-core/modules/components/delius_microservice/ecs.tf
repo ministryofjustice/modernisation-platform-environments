@@ -1,7 +1,7 @@
 module "container_definition" {
   source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.61.1"
-  container_name           = "${var.name}-${var.env_name}"
-  container_image          = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${var.weblogic_config.frontend_image_tag}"
+  container_name           = var.name
+  container_image          = var.container_image
   container_memory         = 4096
   container_cpu            = 1024
   essential                = true
@@ -30,7 +30,7 @@ module "ecs_service" {
   source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
   container_definition_json = module.container_definition.json_map_encoded_list
   ecs_cluster_arn           = var.ecs_cluster_arn
-  name                      = "${var.env_name}-${var.name}"
+  name                      = var.name
   vpc_id                    = var.account_config.shared_vpc_id
 
   launch_type  = "FARGATE"
@@ -39,9 +39,9 @@ module "ecs_service" {
   task_cpu    = "1024"
   task_memory = "4096"
 
-  service_role_arn   = module.ecs_policies.service_role.arn
-  task_role_arn      = module.ecs_policies.task_role.arn
-  task_exec_role_arn = module.ecs_policies.task_exec_role.arn
+  service_role_arn   = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.service_role.name}"
+  task_role_arn      = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_role.name}"
+  task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_exec_role.name}"
 
   environment = var.env_name
   namespace   = "delius-core"
@@ -51,7 +51,7 @@ module "ecs_service" {
   ecs_load_balancers = [
     {
       target_group_arn = aws_lb_target_group.this.arn
-      container_name   = "${var.env_name}-weblogic"
+      container_name   = var.name
       container_port   = var.task_def_container_port
     }
   ]

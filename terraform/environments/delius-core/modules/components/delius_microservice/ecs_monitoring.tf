@@ -3,7 +3,7 @@ locals {
   cluster_name = split("/", var.ecs_cluster_arn)[1]
 }
 # Alarm for high CPU usage
-resource "aws_cloudwatch_metric_alarm" "cpu_over_threshold" {
+resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
   alarm_name                = "${var.name}-ecs-cpu-threshold"
   comparison_operator       = "GreaterThanUpperThreshold"
   evaluation_periods        = "5"
