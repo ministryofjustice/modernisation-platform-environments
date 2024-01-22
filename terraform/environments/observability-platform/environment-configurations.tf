@@ -25,13 +25,12 @@ locals {
       }
       tenant_configuration = {
         "observability-platform" = {
-          identity_centre_team = "observability-platform" # dependent on access to IdC
+          identity_centre_team = "16a2d234-1031-70b5-2657-7f744c55e48f" # This is current hard coded to their UUID as we can't lookup by name from our account
           aws_accounts = {
             "observability-platform-development" = {
-              cloudwatch_enabled           = true                                # default is true
-              cloudwatch_custom_namespaces = "CustomNamespace1,CustomNamespace2" # default is ""
-              prometheus_enabled           = true                                # default is false
-              xray_enabled                 = true                                # default is false
+              cloudwatch_enabled = true
+              prometheus_enabled = true
+              xray_enabled       = true
             }
           }
         }

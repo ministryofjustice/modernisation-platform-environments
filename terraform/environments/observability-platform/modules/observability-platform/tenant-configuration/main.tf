@@ -23,3 +23,10 @@ module "cloudwatch_source" {
 
   depends_on = [module.xray_source]
 }
+
+module "team" {
+  source = "../../grafana/team"
+
+  name                 = var.name
+  identity_centre_team = var.identity_centre_team
+}
