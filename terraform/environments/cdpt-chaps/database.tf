@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------
 # Database
-#------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
   allocated_storage      = local.application_data.accounts[local.environment].db_allocated_storage
@@ -15,7 +15,7 @@ resource "aws_db_instance" "database" {
   depends_on             = [aws_security_group.db]
   snapshot_identifier    = local.application_data.accounts[local.environment].db_snapshot_identifier
   db_subnet_group_name   = aws_db_subnet_group.db.id
-  final_snapshot_identifier = "final-snapshot"
+  final_snapshot_identifier = "final"
   publicly_accessible       = true
 }
 
