@@ -1,4 +1,5 @@
-resource "aws_cloudwatch_metric_alarm" "cpu_over_threshold" {
+resource "aws_cloudwatch_metric_alarm" "rds_cpu_over_threshold" {
+  count              = var.create_rds ? 1 : 0
   alarm_name         = "${var.name}-rds-cpu-threshold"
   alarm_description  = "Triggers alarm if RDS CPU crosses a threshold"
   namespace          = "AWS/RDS"
@@ -14,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.this.identifier
+    DBInstanceIdentifier = aws_db_instance.this[0].identifier
   }
 
   tags = merge(
@@ -26,6 +27,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_over_threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
+  count              = var.create_rds ? 1 : 0
   alarm_name         = "${var.name}-rds-ram-threshold"
   alarm_description  = "Triggers alarm if RDS RAM crosses a threshold"
   namespace          = "AWS/RDS"
@@ -41,7 +43,7 @@ resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
   comparison_operator = "LessThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.this.identifier
+    DBInstanceIdentifier = aws_db_instance.this[0].identifier
   }
 
   tags = merge(
@@ -53,6 +55,7 @@ resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
+  count              = var.create_rds ? 1 : 0
   alarm_name         = "${var.name}-rds-read-latency-threshold"
   alarm_description  = "Triggers alarm if RDS read latency crosses a threshold"
   namespace          = "AWS/RDS"
@@ -68,7 +71,7 @@ resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.this.identifier
+    DBInstanceIdentifier = aws_db_instance.this[0].identifier
   }
 
   tags = merge(
@@ -80,6 +83,7 @@ resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "write_latency_over_threshold" {
+  count              = var.create_rds ? 1 : 0
   alarm_name         = "${var.name}-rds-write-latency-threshold"
   alarm_description  = "Triggers alarm if RDS write latency crosses a threshold"
   namespace          = "AWS/RDS"
@@ -95,7 +99,7 @@ resource "aws_cloudwatch_metric_alarm" "write_latency_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.this.identifier
+    DBInstanceIdentifier = aws_db_instance.this[0].identifier
   }
 
   tags = merge(
@@ -107,6 +111,7 @@ resource "aws_cloudwatch_metric_alarm" "write_latency_over_threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "db_connections_over_threshold" {
+  count              = var.create_rds ? 1 : 0
   alarm_name         = "${var.name}-rds-db-connections-threshold"
   alarm_description  = "Triggers alarm if RDS database connections crosses a threshold"
   namespace          = "AWS/RDS"
@@ -122,7 +127,7 @@ resource "aws_cloudwatch_metric_alarm" "db_connections_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.this.identifier
+    DBInstanceIdentifier = aws_db_instance.this[0].identifier
   }
 
   tags = merge(
@@ -134,6 +139,7 @@ resource "aws_cloudwatch_metric_alarm" "db_connections_over_threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "db_queue_depth_over_threshold" {
+  count              = var.create_rds ? 1 : 0
   alarm_name         = "${var.name}-rds-db-queue-depth-threshold"
   alarm_description  = "Triggers alarm if RDS database queue depth crosses a threshold"
   namespace          = "AWS/RDS"
@@ -149,7 +155,7 @@ resource "aws_cloudwatch_metric_alarm" "db_queue_depth_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.this.identifier
+    DBInstanceIdentifier = aws_db_instance.this[0].identifier
   }
 
   tags = merge(

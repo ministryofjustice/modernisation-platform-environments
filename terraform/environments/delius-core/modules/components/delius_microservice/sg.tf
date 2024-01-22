@@ -2,7 +2,7 @@
 resource "aws_security_group" "ecs_service" {
   name        = "ecs-service-${var.name}-${var.env_name}"
   description = "Security group for the ${var.env_name} ${var.name} service"
-  vpc_id      = var.account_config.vpc_id
+  vpc_id      = var.account_config.shared_vpc_id
   tags        = var.tags
   lifecycle {
     create_before_destroy = true
@@ -10,12 +10,13 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_service_to_db" {
+  count                        = var.create_rds ? 1 : 0
   security_group_id            = aws_security_group.ecs_service.id
   description                  = "weblogic service to db"
   from_port                    = var.rds_port ? var.rds_port : var.elasticache_port ? var.elasticache_port : null
   to_port                      = var.rds_port ? var.rds_port : var.elasticache_port ? var.elasticache_port : null
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.db.id
+  referenced_security_group_id = aws_security_group.db[0].id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "alb_to_ecs_service" {

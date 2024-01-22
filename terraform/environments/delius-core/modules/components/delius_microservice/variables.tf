@@ -3,6 +3,11 @@ variable "account_config" {
   type        = any
 }
 
+variable "account_info" {
+  description = "Account info to pass to the instance"
+  type        = any
+}
+
 variable "name" {
   description = "Name of the application"
   type        = string
@@ -23,21 +28,25 @@ variable "rds_license_model" {
 variable "rds_engine" {
   description = "RDS engine to use"
   type        = string
+  default     = null
 }
 
 variable "rds_engine_version" {
   description = "RDS engine version to use"
   type        = string
+  default     = null
 }
 
 variable "rds_instance_class" {
   description = "RDS instance class to use"
   type        = string
+  default     = null
 }
 
 variable "rds_username" {
   description = "RDS database username"
   type        = string
+  default     = null
 }
 
 variable "snapshot_identifier" {
@@ -73,6 +82,7 @@ variable "rds_skip_final_snapshot" {
 variable "rds_port" {
   description = "RDS port"
   type        = number
+  default     = null
 }
 
 variable "rds_allocated_storage" {
@@ -144,6 +154,7 @@ variable "rds_performance_insights_enabled" {
 variable "rds_enabled_cloudwatch_logs_exports" {
   description = "RDS enabled cloudwatch logs exports"
   type        = list(string)
+  default     = null
 }
 
 variable "ingress_security_groups" {
@@ -257,19 +268,25 @@ variable "elasticache_num_cache_nodes" {
 
 variable "container_environment_vars" {
   description = "Environment variables to pass to the container"
-  type        = map(string)
+  type = list(object({
+    name  = string
+    value = string
+  }))
 }
 variable "container_secrets" {
   description = "Secrets to pass to the container"
-  type        = map(string)
+  type = list(object({
+    name      = string
+    valueFrom = string
+  }))
 }
 
 variable "container_port_mappings" {
   description = "Port mappings to pass to the container"
   type = list(object({
-    container_port = number
-    host_port      = number
-    protocol       = string
+    containerPort = number
+    hostPort      = number
+    protocol      = string
   }))
 }
 
@@ -305,4 +322,9 @@ variable "cloudwatch_error_pattern" {
   description = "The cloudwatch error pattern to use for the alarm"
   type        = string
   default     = "/error/"
+}
+
+variable "container_image" {
+  description = "The container image to use"
+  type        = string
 }
