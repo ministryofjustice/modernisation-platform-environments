@@ -7,6 +7,9 @@ resource "aws_ebs_volume" "this" {
   encrypted         = true
   kms_key_id        = var.kms_key_id
   tags              = var.tags
+  lifecycle {
+    ignore_changes = [availability_zone]
+  }
 }
 
 resource "aws_volume_attachment" "this" {

@@ -15,8 +15,8 @@ resource "aws_db_instance" "database" {
   depends_on             = [aws_security_group.db]
   snapshot_identifier    = local.application_data.accounts[local.environment].db_snapshot_identifier
   db_subnet_group_name   = aws_db_subnet_group.db.id
-  final_snapshot_identifier = "final"
-  publicly_accessible    = true
+  final_snapshot_identifier = "final-snapshot"
+  publicly_accessible       = true
 }
 
 resource "aws_db_instance_role_association" "database" {

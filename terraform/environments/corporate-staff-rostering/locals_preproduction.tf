@@ -85,7 +85,7 @@ locals {
           data = {
             iops       = 3000
             throughput = 125
-            total_size = 1000
+            total_size = 1500
           }
           flash = {
             iops       = 3000

@@ -34,10 +34,10 @@ resource "aws_security_group" "elasticache" {
     description = "Allow elasticache traffic"
     from_port   = var.elasticache_port
     to_port     = var.elasticache_port
-    security_groups = [
+    security_groups = concat(
       var.account_config.bastion.bastion_security_group,
       var.ingress_security_groups
-    ]
+    )
   }
 
   tags = merge(
