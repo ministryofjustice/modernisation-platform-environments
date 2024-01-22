@@ -166,13 +166,13 @@ resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
 module "ap_landing_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
-  bucket_name         = "${local.application_name}-land-${local.environment}"
-  ownership_controls  = "BucketOwnerEnforced"
+  bucket_name        = "${local.application_name}-land-${local.environment}"
+  ownership_controls = "BucketOwnerEnforced"
 
   versioning_enabled  = false
   replication_enabled = false
 
-  bucket_policy       = [data.aws_iam_policy_document.allow_ap_write_to_landing.json]
+  bucket_policy = [data.aws_iam_policy_document.allow_ap_write_to_landing.json]
 
   providers = {
     # Leave this provider block in even if you are not using replication
@@ -215,7 +215,7 @@ data "aws_iam_policy_document" "allow_ap_write_to_landing" {
   # See also: https://github.com/moj-analytical-services/data-engineering-exports/tree/main/push_datasets
   statement {
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::593291632749:role/service-role/export_prison_incidents-move",
         "arn:aws:iam::593291632749:role/service-role/export_prison_performance-move"
@@ -223,8 +223,8 @@ data "aws_iam_policy_document" "allow_ap_write_to_landing" {
     }
 
     actions = [
-        "s3:PutObject",
-        "s3:PutObjectAcl"
+      "s3:PutObject",
+      "s3:PutObjectAcl"
     ]
 
     resources = [

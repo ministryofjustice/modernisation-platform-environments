@@ -5,7 +5,7 @@
 #------------------------------------------------------------------------------
 
 resource "aws_eip" "capita_eip" {
-  domain   = "vpc"
+  domain = "vpc"
 }
 
 #------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ resource "aws_vpc_security_group_ingress_rule" "capita_ip_5" {
 
 
 resource "aws_transfer_server" "capita_transfer_server" {
-  protocols = ["SFTP"]
+  protocols              = ["SFTP"]
   identity_provider_type = "SERVICE_MANAGED"
 
   endpoint_type = "VPC"
@@ -89,7 +89,7 @@ resource "aws_transfer_server" "capita_transfer_server" {
   security_policy_name = "TransferSecurityPolicy-2023-05"
 
   pre_authentication_login_banner = "Hello there"
-  logging_role  = aws_iam_role.test_transfer_user_iam_role.arn
+  logging_role                    = aws_iam_role.test_transfer_user_iam_role.arn
   structured_log_destinations = [
     "${aws_cloudwatch_log_group.transfer.arn}:*"
   ]
@@ -159,10 +159,10 @@ resource "aws_iam_role_policy" "capita_transfer_user_iam_policy" {
 # Set the public ssh key for the supplier user profile to access SFTP server.
 #------------------------------------------------------------------------------
 
-resource "aws_transfer_ssh_key" "capita_ssh_key" {
+resource "aws_transfer_ssh_key" "capita_ssh_key_ecdsa_sha2_nistp384" {
   server_id = aws_transfer_server.capita_transfer_server.id
   user_name = aws_transfer_user.capita_transfer_user.user_name
-  body      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqXTKqBVVBQX5lvCdCdws4t7lCVaniv3FGCaJQOKMYAzBzwcVD9MKz0RzH7FMMA/iBayw/+13Mb79paBkJdT8T/Wg9lER/YE/lPKZcyT2IJ6myW5kDShQAY9lQliRoJ4oVx9x95hGx48eE9jWsCtwEaQT7pH2aK5l2THqfFCDQEMmT84CaSmJzuxsaYxuohlVcMqnGdU/oq+E76gLm3Z0gvh3NwFHd0RTIzqlVgwEUbTcHqZBON522229VypuvqfIcD9WIPEMnza/rA/6FX5luniqh+h/PCF7HH3Qiveui3PZV64fQtqd2pVnK8llW7CLjXKC1/TkWx1QkWyGzGYBZUXEctNbOBMixFcVbj49CucWMztPC88gZl2bHlJPqdBLMt6sakigCLWJLIvB/oeXGhzCN7XkfKWXDTu4mHuQ+UHPbXzsPvPRxidfxxRVk758M+GB15nQq2Fm3lRtYgZ2mnjQT7dwhhCaiqJiy0qs5kQ4Hs9Jnex6afoPQlqrhamtu8= test.user@K9999"
+  body      = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIhggGYKbOk6BH7fpEs6JGRnMyLRK/9/tAMQOVYOZtehKTRcM5vGsJFRGjjm2wEan3/uYOuto0NoVkbRfIi0AIG6EWrp1gvHNQlUTtxQVp7rFeOnZAjVEE9xVUEgHhMNLw=="
 }
 
 #------------------------------------------------------------------------------

@@ -1,5 +1,7 @@
-# nomis-production environment settings
 locals {
+
+  # baseline presets config
+  production_baseline_presets_options = {}
 
   # baseline config
   production_config = {
@@ -27,15 +29,45 @@ locals {
       }
     }
 
+    baseline_ec2_instances = {
+      pd-rdgw-1-a = merge(local.rds_ec2_instance, {
+        config = merge(local.rds_ec2_instance.config, {
+          availability_zone = "eu-west-2a"
+        })
+        tags = merge(local.rds_ec2_instance.tags, {
+          description = "Remote Desktop Gateway for hmpp.noms.root domain"
+        })
+      })
+      pd-rdgw-1-b = merge(local.rds_ec2_instance, {
+        config = merge(local.rds_ec2_instance.config, {
+          availability_zone = "eu-west-2b"
+        })
+        tags = merge(local.rds_ec2_instance.tags, {
+          description = "Remote Desktop Gateway for hmpp.noms.root domain"
+        })
+      })
+      pd-rds-1-a = merge(local.rds_ec2_instance, {
+        config = merge(local.rds_ec2_instance.config, {
+          availability_zone = "eu-west-2a"
+        })
+        tags = merge(local.rds_ec2_instance.tags, {
+          description = "Remote Desktop Services for hmpp.noms.root domain"
+        })
+      })
+    }
+
     baseline_lbs = {
       public = merge(local.rds_lbs.public, {
         instance_target_groups = {
-          http1 = merge(local.rds_target_groups.http, {
+          pd-rdgw-1-http = merge(local.rds_target_groups.http, {
             attachments = [
+              { ec2_instance_name = "pd-rdgw-1-a" },
+              { ec2_instance_name = "pd-rdgw-1-b" },
             ]
           })
-          https1 = merge(local.rds_target_groups.https, {
+          pd-rds-1-https = merge(local.rds_target_groups.https, {
             attachments = [
+              { ec2_instance_name = "pd-rds-1-a" },
             ]
           })
         }
@@ -43,6 +75,34 @@ locals {
           http = local.rds_lb_listeners.http
           https = merge(local.rds_lb_listeners.https, {
             rules = {
+              pd-rdgw-1-http = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-rdgw-1-http"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway1.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              pd-rds-1-https = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-rds-1-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb1.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }

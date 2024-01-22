@@ -111,8 +111,8 @@ resource "aws_athena_workgroup" "cur" {
       selected_engine_version = "Athena engine version 3"
     }
     result_configuration {
-        output_location = "s3://${module.s3_bucket.bucket.id}/output/"
-        encryption_configuration {
+      output_location = "s3://${module.s3_bucket.bucket.id}/output/"
+      encryption_configuration {
         encryption_option = "SSE_S3"
       }
     }

@@ -102,10 +102,6 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
           value = "${aws_db_instance.database.username}"
         },
         {
-          name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.database.password}"
-        },
-        {
           name  = "DB_NAME"
           value = "${local.application_data.accounts[local.environment].db_name}"
         },
@@ -116,6 +112,12 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
         {
           name  = "CurServer"
           value = "${local.application_data.accounts[local.environment].env_name}"
+        }
+      ],
+      secrets = [
+        {
+          name : "RDS_PASSWORD",
+          valueFrom : aws_secretsmanager_secret_version.db_password.arn
         }
       ]
     }
