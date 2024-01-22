@@ -33,7 +33,7 @@ resource "aws_security_group_rule" "AppEcsSecurityGroup1ALBport" {
   source_security_group_id = aws_security_group.maat_api_alb_sg.id
 }
 
-resource "aws_security_group_rule" "AppEcsSecurityGroup_outbound" {
+resource "aws_security_group_rule" "ecs_outbound" {
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -50,7 +50,7 @@ resource "aws_security_group_rule" "AppAlbSecurityGroupApiGatewayIngress" {
   source_security_group_id = aws_security_group.maat_api_gw_sg.id
 }
 
-resource "aws_security_group_rule" "AppAlbSecurityGroupApiGateway_outbound" {
+resource "aws_security_group_rule" "alb_outbound" {
   type              = "egress"
   from_port         = 0
   to_port           = 0
