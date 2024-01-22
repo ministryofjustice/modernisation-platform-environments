@@ -15,7 +15,6 @@ locals {
     baseline_secretsmanager_secrets = {
       "/oracle/database/PPOASYS"  = local.secretsmanager_secrets_oasys_db
       "/oracle/database/PPOASREP" = local.secretsmanager_secrets_db
-      "/oracle/database/PPAZBIPI" = local.secretsmanager_secrets_bip_db
       "/oracle/database/PPBIPINF" = local.secretsmanager_secrets_bip_db
       "/oracle/database/PPMISTRN" = local.secretsmanager_secrets_db
       "/oracle/database/PPONRSYS" = local.secretsmanager_secrets_db
@@ -24,8 +23,6 @@ locals {
 
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
-
-      "/oracle/bip/preproduction" = local.secretsmanager_secrets_bip
     }
 
     baseline_iam_policies = {
