@@ -1,20 +1,20 @@
 resource "aws_datasync_location_efs" "destination" {
   ec2_config {
     # security_group_arns = [aws_security_group.ldap_efs.arn]
-    security_group_arns = [module.efs.ldap_efs_security_group_arn]
+    security_group_arns = [module.efs.sg_arn]
     subnet_arn          = "arn:aws:ec2:${var.account_info.region}:${var.account_info.id}:subnet/${var.account_config.private_subnet_ids[0]}"
   }
-  efs_file_system_arn = module.efs.ldap_efs_location
+  efs_file_system_arn = module.efs.fs_id
 }
 
 resource "aws_datasync_location_efs" "source" {
   ec2_config {
     # security_group_arns = [aws_security_group.ldap_efs.arn]
-    security_group_arns = [module.efs.ldap_efs_security_group_arn]
+    security_group_arns = [module.efs.sg_arn]
     subnet_arn          = "arn:aws:ec2:${var.account_info.region}:${var.account_info.id}:subnet/${var.account_config.private_subnet_ids[0]}"
   }
   # efs_file_system_arn = aws_efs_file_system.ldap.arn
-  efs_file_system_arn = module.efs.ldap_efs_security_group_arn
+  efs_file_system_arn = module.efs.sg_arn
 }
 
 resource "aws_datasync_task" "ldap_refresh_task" {

@@ -1,6 +1,6 @@
 # module for efs file system
 
-resource "aws_efs_file_system" "ldap" {
+resource "aws_efs_file_system" "this" {
   creation_token                  = var.creation_token
   encrypted                       = var.encrypted
   kms_key_id                      = var.kms_key_arn
@@ -14,16 +14,16 @@ resource "aws_efs_file_system" "ldap" {
 }
 
 # module for mount target
-resource "aws_efs_mount_target" "ldap" {
-  for_each        = toset(var.account_config.private_subnet_ids)
-  file_system_id  = aws_efs_file_system.ldap.id
+resource "aws_efs_mount_target" this {
+  for_each        = toset(var.subnet_ids)
+  file_system_id  = aws_efs_file_system.this.id
   subnet_id       = each.value
-  security_groups = [aws_security_group.ldap_efs.id]
+  security_groups = [aws_security_group.default.id]
 }
 
 # module for efs access point
 resource "aws_efs_access_point" "ldap" {
-  file_system_id = aws_efs_file_system.ldap.id
+  file_system_id = aws_efs_file_system.this.id
   root_directory {
     path = "/"
   }
@@ -36,10 +36,10 @@ resource "aws_efs_access_point" "ldap" {
 }
 
 # Security Group
-resource "aws_security_group" "ldap_efs" {
+resource "aws_security_group" "default" {
   name        = "ldap-efs-${var.env_name}"
   description = "Allow traffic between ldap service and efs in ${var.env_name}"
-  vpc_id      = var.account_info.vpc_id
+  vpc_id      = var.vpc_id
 
   tags = merge(
     var.tags,
@@ -55,12 +55,12 @@ resource "aws_security_group" "ldap_efs" {
 
 resource "aws_security_group_rule" "efs_ingress_vpc" {
 
-  security_group_id = aws_security_group.ldap_efs.id
+  security_group_id = aws_security_group.default.id
   description       = "ingress vpc rules in ${var.env_name}"
 
   type        = "ingress"
   from_port   = 2049
   to_port     = 2049
   protocol    = "tcp"
-  cidr_blocks = [var.account_config.shared_vpc_cidr]
+  cidr_blocks = [var.vpc_cidr]
 }

@@ -34,20 +34,6 @@ variable "throughput_mode" {
   type        = string
 }
 
-variable "account_config" {
-  description = "Account config to pass to the instance"
-  type = any
-}
-
-variable "account_info" {
-  description = "Account info to pass to the instance"
-  type = any
-}
-
-variable "ldap_config" {
-  description = "ldap config to pass to the instance"
-  type = any
-}
 
 variable "tags" {
   description = "tags to add for all resources"
@@ -62,3 +48,17 @@ variable source_security_group_id {
   default = null
 }
 
+variable "vpc_id" {
+  description = "vpc id"
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "subnet ids"
+  type        = list(string)
+}
+
+variable "vpc_cidr" {
+    description = "vpc cidr"
+    type        = string
+}

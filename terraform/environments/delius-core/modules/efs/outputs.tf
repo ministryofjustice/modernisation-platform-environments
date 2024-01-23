@@ -1,16 +1,16 @@
-output "ldap_efs_location" {
-  value = aws_efs_file_system.ldap.arn
+output "arn" {
+  value = aws_efs_file_system.this.arn
 }
 
-output "efs_file_system_id" {
+output "fs_id" {
   description = "id that identifies the file system"
-  value       = aws_efs_file_system.ldap.id
+  value       = aws_efs_file_system.this.id
 }
 
-output "ldap_security_group_id" {
-  value = aws_security_group.ldap_efs.id
+output "sg_id" {
+  value = aws_security_group.default.id
 }
 
-output "ldap_efs_security_group_arn" {
-  value = aws_security_group.ldap_efs.arn
+output "sg_arn" {
+  value = aws_security_group.default.arn
 }

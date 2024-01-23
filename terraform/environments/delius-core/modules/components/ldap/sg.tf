@@ -56,6 +56,6 @@ resource "aws_security_group_rule" "efs_ingress_ldap" {
   from_port                = 2049
   to_port                  = 2049
   protocol                 = "tcp"
-  source_security_group_id = module.efs.ldap_security_group_id
+  source_security_group_id = module.efs.sg_id
   security_group_id        = aws_security_group.ldap.id
 }

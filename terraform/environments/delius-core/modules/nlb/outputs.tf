@@ -1,3 +1,3 @@
-output "ldap_aws_lb_dns" {
+output "dns_name" {
   value = aws_lb.ldap.dns_name
 }

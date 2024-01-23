@@ -41,7 +41,7 @@ resource "aws_backup_selection" "efs_backup" {
   iam_role_arn = aws_iam_role.ldap_efs_backup_role.arn
   plan_id      = aws_backup_plan.ldap_backup_plan.id
   resources = [
-    module.efs.ldap_efs_location
+    module.efs.fs_id
   ]
 }
 
