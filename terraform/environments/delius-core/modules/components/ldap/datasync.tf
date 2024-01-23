@@ -14,7 +14,7 @@ resource "aws_datasync_location_efs" "source" {
     subnet_arn          = "arn:aws:ec2:${var.account_info.region}:${var.account_info.id}:subnet/${var.account_config.private_subnet_ids[0]}"
   }
   # efs_file_system_arn = aws_efs_file_system.ldap.arn
-  efs_file_system_arn = module.efs.sg_arn
+  efs_file_system_arn = module.efs.fs_arn
 }
 
 resource "aws_datasync_task" "ldap_refresh_task" {
