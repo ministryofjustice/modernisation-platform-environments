@@ -22,9 +22,9 @@ module "reload_pipeline" {
               "--dpr.stop.glue.instance.job.name" : var.glue_reporting_hub_cdc_jobname
             }
           },
-          "Next" : "Copy Data To Temp Reload Bucket"
+          "Next" : "Copy Data to Temp-Reload Bucket"
         },
-        "Copy Data to Temp Reload Bucket" : {
+        "Copy Data to Temp-Reload Bucket" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
@@ -58,7 +58,7 @@ module "reload_pipeline" {
           "Parameters" : {
             "JobName" : var.glue_s3_data_deletion_job,
             "Arguments" : {
-              "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}"
+              "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
               "--dpr.config.key" : var.domain
             }
           },
@@ -166,7 +166,7 @@ module "reload_pipeline" {
           "Parameters" : {
             "JobName" : var.glue_s3_data_deletion_job,
             "Arguments" : {
-              "--dpr.file.deletion.buckets" : var.s3_temp_reload_bucket_id
+              "--dpr.file.deletion.buckets" : var.s3_temp_reload_bucket_id,
               "--dpr.config.key" : var.domain
             }
           },
