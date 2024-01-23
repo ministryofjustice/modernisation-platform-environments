@@ -1,4 +1,4 @@
-output "arn" {
+output "fs_arn" {
   value = aws_efs_file_system.this.arn
 }
 
