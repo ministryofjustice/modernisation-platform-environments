@@ -66,6 +66,33 @@ locals {
           server-type = "test-server"
         }
       }
+      dev-tst-2022 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "hmpps_windows_server_2022_test_2024-01-23T13-29-40.501Z"
+          ami_owner                     = "self"
+          ebs_volumes_copy_all_from_ami = false
+          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
+          # user_data_raw                 = base64encode(file("./templates/user-data-new.yaml"))
+        })
+        cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.windows
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["app", "domain", "jumpserver"]
+          instance_type          = "t3.medium"
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0 # set to 0 while testing
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 192 } # minimum size has to be 128 due to snapshot sizes
+        }
+        tags = {
+          description = "Test AWS AMI Windows Server 2022"
+          os-type     = "Windows"
+          component   = "appserver"
+          server-type = "test-server"
+        }
+      }
     }
 
     baseline_ec2_instances = {
