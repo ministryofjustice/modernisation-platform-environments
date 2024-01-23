@@ -27,7 +27,7 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
 
-      dev-windows-2022 = {
+      dev-win-2022 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
@@ -42,15 +42,38 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 2
-          max_size         = 2
+          desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "Windows Server 2022 for connecting to Azure domain"
           os-type     = "Windows"
           component   = "test"
-          server-type = "hmpps-windows_2022"
+        }
+      }
+
+      dev-rhel85 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "hmpps_rhel_8_5*"
+          availability_zone = null
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["rds-ec2s"]
+        })
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "main"
+          })
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description = "RHEL8.5 for connection to Azure domain"
+          ami         = "hmpps_rhel_8_5"
+          os-type     = "Linux"
+          component   = "test"
         }
       }
     }
