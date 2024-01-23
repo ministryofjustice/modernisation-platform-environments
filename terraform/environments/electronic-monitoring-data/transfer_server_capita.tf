@@ -224,7 +224,7 @@ resource "aws_iam_role" "capita_transfer_workflow_iam_role" {
 
 data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
   statement {
-    sid       = "AllowSourceCopyRead"
+    sid       = "AllowCopyReadSource"
     effect    = "Allow"
     actions   = [
       "s3:GetObject",
@@ -233,7 +233,7 @@ data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
     resources = ["${aws_s3_bucket.capita_landing_bucket.arn}/*"]
   }
   statement {
-    sid       = "AllowDestinationCopyWrite"
+    sid       = "AllowCopyWriteDestination"
     effect    = "Allow"
     actions   = [
       "s3:PutObject",
@@ -253,23 +253,26 @@ data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
     ]
   }
   statement {
-    sid       = "AllowDestinationTag"
+    sid       = "AllowTag"
     effect    = "Allow"
     actions   = [
       "s3:PutObjectTagging",
       "s3:PutObjectVersionTagging"
     ]
-    resources = ["${aws_s3_bucket.data_store_bucket.arn}/*"]
+    resources = [
+      "${aws_s3_bucket.data_store_bucket.arn}/*",
+      "${aws_s3_bucket.capita_landing_bucket.arn}/*",
+    ]
     # condition {}
   }
   statement {
-    sid       = "AllowSourceDelete"
+    sid       = "AllowDeleteSource"
     effect    = "Allow"
     actions   = [
       "s3:DeleteObject",
       "s3:DeleteObjectVersion"
     ]
-    resources = [aws_s3_bucket.capita_landing_bucket.arn]
+    resources = ["${aws_s3_bucket.capita_landing_bucket.arn}/*"]
   }
 }
 
