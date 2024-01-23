@@ -43,8 +43,8 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "/ec2/ncr-bip-cms/t1"      = local.bip_cms_secretsmanager_secrets
-      "/ec2/ncr-tomcat-admin/t1" = local.tomcat_admin_secretsmanager_secrets
+      "/ec2/ncr-bip-cms/t1" = local.bip_cms_secretsmanager_secrets
+      "/ec2/ncr-tomcat-admin/t1"  = local.tomcat_admin_secretsmanager_secrets
 
       "/oracle/database/T1BIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/T1BIPAUD" = local.database_secretsmanager_secrets
@@ -77,7 +77,7 @@ locals {
         ]
       }
       Ec2T1BipPolicy = {
-        description = "Permissions required for T1 Weblogic EC2s"
+        description = "Permissions required for T1 reporting EC2s"
         statements = [
           {
             effect = "Allow"
@@ -117,9 +117,9 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
 
-      t1-ncr-tomcat-admin = merge(local.tomcat_admin_ec2_default, {
+      t1-ncr-tomcat-admin-a = merge(local.tomcat_admin_ec2_default, {
         autoscaling_group = {
-          desired_capacity    = 1
+          desired_capacity    = 0
           max_size            = 1
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
@@ -132,11 +132,30 @@ locals {
         tags = merge(local.tomcat_admin_ec2_default.tags, {
           description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
           nomis-combined-reporting-environment = "t1"
+          deployment                           = "blue"
         })
       })
-      t1-ncr-bip-cms = merge(local.bip_cms_ec2_default, {
+      t1-ncr-tomcat-admin-b = merge(local.tomcat_admin_ec2_default, {
         autoscaling_group = {
-          desired_capacity    = 1
+          desired_capacity    = 0
+          max_size            = 1
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
+        config = merge(local.tomcat_admin_ec2_default.config, {
+          instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
+        tags = merge(local.tomcat_admin_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+          deployment                           = "green"
+        })
+      })
+      t1-ncr-bip-cms-a = merge(local.bip_cms_ec2_default, {
+        autoscaling_group = {
+          desired_capacity    = 0
           max_size            = 1
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
@@ -149,6 +168,25 @@ locals {
         tags = merge(local.bip_cms_ec2_default.tags, {
           description                          = "For testing SAP BI Platform CMS installation and configurations"
           nomis-combined-reporting-environment = "t1"
+          deployment                           = "blue"
+        })
+      })
+      t1-ncr-bip-cms-b = merge(local.bip_cms_ec2_default, {
+        autoscaling_group = {
+          desired_capacity    = 0
+          max_size            = 1
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
+        config = merge(local.bip_cms_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
+        tags = merge(local.bip_cms_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform CMS installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+          deployment                           = "green"
         })
       })
     }
@@ -165,11 +203,11 @@ locals {
 
           http7777 = merge(local.bip_cms_lb_listeners.http7777, local.tomcat_admin_lb_listeners.http7777, {
             rules = {
-              t1-ncr-bip-cms = {
+              t1-ncr-bip-cms-a = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-bip-cms-http-7777"
+                  target_group_name = "t1-ncr-bip-cms-a-http-7777"
                 }]
                 conditions = [{
                   host_header = {
@@ -179,16 +217,44 @@ locals {
                   }
                 }]
               }
-              t1-ncr-tomcat-admin = {
-                priority = 300
+              t1-ncr-bip-cms-b = {
+                priority = 200
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-tomcat-admin-http-7777"
+                  target_group_name = "t1-ncr-bip-cms-b-http-7777"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-tomcat-admin.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-bip-cms-b.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat-admin-a = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-admin-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat-admin-a.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat-admin-b = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-admin-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat-admin-b.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -197,16 +263,30 @@ locals {
           })
           http6455 = merge(local.bip_cms_lb_listeners.http6455, {
             rules = {
-              t1-ncr-bip-cms = {
+              t1-ncr-bip-cms-a = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-bip-cms-http-6455"
+                  target_group_name = "t1-ncr-bip-cms-a-http-6455"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-bip-cms.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-bip-cms-a.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-bip-cms-b = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-cms-b-http-6455"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip-cms-b.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -215,16 +295,30 @@ locals {
           })
           http6410 = merge(local.bip_cms_lb_listeners.http6410, {
             rules = {
-              t1-ncr-bip-cms = {
+              t1-ncr-bip-cms-a = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-bip-cms-http-6410"
+                  target_group_name = "t1-ncr-bip-cms-a-http-6410"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-bip-cms.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-bip-cms-a.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-bip-cms-b = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-cms-b-http-6410"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip-cms-b.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -233,16 +327,30 @@ locals {
           })
           http6400 = merge(local.bip_cms_lb_listeners.http6400, {
             rules = {
-              t1-ncr-bip-cms = {
+              t1-ncr-bip-cms-a = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-bip-cms-http-6400"
+                  target_group_name = "t1-ncr-bip-cms-a-http-6400"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-bip-cms.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-bip-cms-a.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-bip-cms-b = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-bip-cms-b-http-6400"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-bip-cms-b.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -251,16 +359,30 @@ locals {
           })
           http7010 = merge(local.tomcat_admin_lb_listeners.http7010, {
             rules = {
-              t1-ncr-tomcat-admin = {
+              t1-ncr-tomcat-admin-a = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-tomcat-admin-http-7010"
+                  target_group_name = "t1-ncr-tomcat-admin-a-http-7010"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-tomcat-admin.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-tomcat-admin-a.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat-admin-b = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-admin-b-http-7010"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat-admin-b.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -269,16 +391,30 @@ locals {
           })
           http8005 = merge(local.tomcat_admin_lb_listeners.http8005, {
             rules = {
-              t1-ncr-tomcat-admin = {
+              t1-ncr-tomcat-admin-a = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-tomcat-admin-http-8005"
+                  target_group_name = "t1-ncr-tomcat-admin-a-http-8005"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-tomcat-admin.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-tomcat-admin-a.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat-admin-b = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-admin-b-http-8005"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat-admin-b.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -287,16 +423,30 @@ locals {
           })
           http8443 = merge(local.tomcat_admin_lb_listeners.http8443, {
             rules = {
-              t1-ncr-tomcat-admin = {
+              t1-ncr-tomcat-admin-a = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-tomcat-admin-http-8443"
+                  target_group_name = "t1-ncr-tomcat-admin-a-http-8443"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-tomcat-admin.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-tomcat-admin-a.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat-admin-b = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-admin-b-http-8443"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat-admin-b.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -305,30 +455,58 @@ locals {
           })
           https = merge(local.bip_cms_lb_listeners.https, local.tomcat_admin_lb_listeners.https, {
             rules = {
-              t1-ncr-bip-cms-http-7777 = {
+              t1-ncr-bip-cms-a-http-7777 = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-bip-cms-http-7777"
+                  target_group_name = "t1-ncr-bip-cms-a-http-7777"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-bip-cms.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-bip-cms-a.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
               }
-              t1-ncr-tomcat-admin-http-7777 = {
-                priority = 300
+              t1-ncr-bip-cms-b-http-7777 = {
+                priority = 150
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-tomcat-admin-http-7777"
+                  target_group_name = "t1-ncr-bip-cms-b-http-7777"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-tomcat-admin.test.reporting.nomis.service.justice.gov.uk",
+                      "t1-ncr-bip-cms-b.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat-admin-a-http-7777 = {
+                priority = 500
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-admin-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat-admin-a.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-ncr-tomcat-admin-b-http-7777 = {
+                priority = 550
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-tomcat-admin-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-tomcat-admin-b.test.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -347,9 +525,10 @@ locals {
         ]
         lb_alias_records = [
           # T1
-          { name = "t1-ncr-bip-cms", type = "A", lbs_map_key = "private" },
-          { name = "t1-ncr-bip", type = "A", lbs_map_key = "private" },
-          { name = "t1-ncr-tomcat-admin", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-bip-cms-a", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-bip-cms-b", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-tomcat-admin-a", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-tomcat-admin-b", type = "A", lbs_map_key = "private" },
         ]
       }
     }
