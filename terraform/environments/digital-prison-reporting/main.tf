@@ -357,6 +357,7 @@ module "glue_switch_prisons_hive_data_location_job" {
     "--extra-jars"                             = local.glue_jobs_latest_jar_location
     "--class"                                  = "uk.gov.justice.digital.job.SwitchHiveTableJob"
     "--dpr.aws.region"                         = local.account_region
+    "--dpr.config.s3.bucket"                   = module.s3_glue_job_bucket.bucket_id,
 #    "--dpr.config.key"                         = "(Required) config key. Will be specified at point of call in the reload step-functions"
     "--dpr.prisons.data.switch.target.s3.path" = "s3://${module.s3_temp_reload_bucket.bucket_id}"
     "--dpr.prisons.database"                   = module.glue_prisons_database.db_name
@@ -369,6 +370,7 @@ module "glue_switch_prisons_hive_data_location_job" {
     module.s3_raw_archive_bucket.bucket_id,
     module.s3_structured_bucket.bucket_id,
     module.s3_curated_bucket.bucket_id,
+    module.s3_glue_job_bucket.bucket_id,
     module.glue_raw_archive_database.db_name,
     module.glue_structured_zone_database.db_name,
     module.glue_curated_zone_database.db_name,
@@ -377,6 +379,74 @@ module "glue_switch_prisons_hive_data_location_job" {
   ]
 }
 
+<<<<<<< HEAD
+=======
+# Glue Job, S3 File Archive Job
+module "glue_s3_file_transfer_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-s3-file-transfer-job-${local.env}"
+  short_name                    = "${local.project}-s3-file-transfer-job"
+  command_type                  = "glueetl"
+  description                   = "Transfers s3 data from one bucket to another"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-s3-file-transfer-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-s3-file-transfer-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-s3-file-transfer-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-46"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                            = local.glue_jobs_latest_jar_location
+    "--class"                                 = "uk.gov.justice.digital.job.S3FileTransferJob"
+    "--dpr.aws.region"                        = local.account_region
+    "--dpr.config.s3.bucket"                  = module.s3_glue_job_bucket.bucket_id,
+#    "--dpr.config.key"                        = "(Optional) config key, when provided, the job will only transfer data belonging to config otherwise all data will be transferred"
+    "--dpr.file.transfer.source.bucket"       = module.s3_raw_bucket.bucket_id
+    "--dpr.file.transfer.destination.bucket"  = module.s3_raw_archive_bucket.bucket_id
+    "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
+    "--dpr.file.transfer.delete.copied.files" = true,
+    "--dpr.log.level"                         = local.refresh_job_log_level
+  }
+
+  depends_on = [
+    module.s3_raw_bucket.bucket_id,
+    module.s3_raw_archive_bucket.bucket_id,
+    module.s3_glue_job_bucket
+  ]
+}
+
+resource "aws_glue_trigger" "glue_s3_file_transfer_job_trigger" {
+  name     = "${module.glue_s3_file_transfer_job.name}-trigger"
+  schedule = local.scheduled_s3_file_transfer_schedule
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.glue_s3_file_transfer_job.name
+  }
+}
+
+>>>>>>> 579405afa (DPR2-46: Add config bucket arg to jobs)
 # Glue Job, S3 Data Deletion Job
 module "glue_s3_data_deletion_job" {
   source                        = "./modules/glue_job"

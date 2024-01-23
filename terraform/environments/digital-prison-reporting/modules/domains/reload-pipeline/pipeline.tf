@@ -121,7 +121,6 @@ module "reload_pipeline" {
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.retention.days" : "0",
               "--dpr.file.transfer.delete.copied.files" : "true",
-              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
           },
