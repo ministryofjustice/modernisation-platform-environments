@@ -42,7 +42,7 @@
       "db_instance_class": "db.m5.xlarge",
       "db_user": "dbadmin",
       "db_allocated_storage": "100",
-      "db_name": "chaps-prod",
+      "db_name": "CHAPS_Prod",
       "env_name": "PRODUCTION",
       "db_instance_identifier": "chaps-prod-instance",
       "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:chaps-prod-snapshot-2024-01-22",
