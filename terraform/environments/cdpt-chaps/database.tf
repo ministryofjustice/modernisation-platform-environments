@@ -13,10 +13,9 @@ resource "aws_db_instance" "database" {
   password               = aws_secretsmanager_secret_version.db_password.secret_string
   vpc_security_group_ids = [aws_security_group.db.id]
   depends_on             = [aws_security_group.db]
-  skip_final_snapshot    = true
-  # snapshot_identifier  = local.application_data.accounts[local.environment].db_snapshot_identifier
+  snapshot_identifier  = local.application_data.accounts[local.environment].db_snapshot_identifier
   db_subnet_group_name   = aws_db_subnet_group.db.id
-  # final_snapshot_identifier = "final"
+  final_snapshot_identifier = "final-snapshot-${formatdate("YYYYMMDDhhmmss", timestamp())}"
   publicly_accessible    = true
 }
 
