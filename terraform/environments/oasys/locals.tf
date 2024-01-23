@@ -135,6 +135,7 @@ locals {
       tags = {
         backup-plan = "daily-and-weekly"
       }
+      instance_type = "r6i.4xlarge"
     })
     cloudwatch_metric_alarms = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
