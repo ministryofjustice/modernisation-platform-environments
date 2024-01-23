@@ -132,6 +132,7 @@ locals {
         tags = merge(local.tomcat_admin_ec2_default.tags, {
           description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
           nomis-combined-reporting-environment = "t1"
+          deployment                           = "blue"
         })
       })
       t1-ncr-tomcat-admin-b = merge(local.tomcat_admin_ec2_default, {
@@ -149,6 +150,7 @@ locals {
         tags = merge(local.tomcat_admin_ec2_default.tags, {
           description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
           nomis-combined-reporting-environment = "t1"
+          deployment                           = "green"
         })
       })
       t1-ncr-bip-cms-a = merge(local.bip_cms_ec2_default, {
@@ -166,6 +168,7 @@ locals {
         tags = merge(local.bip_cms_ec2_default.tags, {
           description                          = "For testing SAP BI Platform CMS installation and configurations"
           nomis-combined-reporting-environment = "t1"
+          deployment                           = "blue"
         })
       })
       t1-ncr-bip-cms-b = merge(local.bip_cms_ec2_default, {
@@ -183,6 +186,7 @@ locals {
         tags = merge(local.bip_cms_ec2_default.tags, {
           description                          = "For testing SAP BI Platform CMS installation and configurations"
           nomis-combined-reporting-environment = "t1"
+          deployment                           = "green"
         })
       })
     }
