@@ -13,4 +13,4 @@ mainSteps:
         - |
           $ErrorActionPreference = "Stop" # all errors will terminate the script
 
-          Install-Module -Name PSReadLine -Repository PSGallery -MinimumVersion 2.2.2 -Force
+          Install-Module -Name PSReadLine -Repository PSGallery -MinimumVersion 2.2.2 -Force -AllowClobber -Confirm:$false
