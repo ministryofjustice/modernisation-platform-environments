@@ -37,7 +37,7 @@ resource "aws_efs_access_point" "ldap" {
 
 # Security Group
 resource "aws_security_group" "default" {
-  name        = "ldap-efs-${var.env_name}"
+  name        = "${var.env_name}-ldap-efs"
   description = "Allow traffic between ldap service and efs in ${var.env_name}"
   vpc_id      = var.vpc_id
 

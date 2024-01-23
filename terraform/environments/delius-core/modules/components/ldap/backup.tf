@@ -1,18 +1,18 @@
 resource "aws_backup_vault" "ldap_backup_vault" {
-  name = "${var.env_name}-ldap-efs-backup-vault"
+  name = "${var.env_name}-ldap-efs-vault"
   tags = merge(
     var.tags,
     {
-      Name = "${var.env_name}-ldap-efs-backup-vault"
+      Name = "${var.env_name}-ldap-efs-vault"
     },
   )
 }
 
 resource "aws_backup_plan" "ldap_backup_plan" {
-  name = "${var.env_name}-ldap-efs-backup-plan"
+  name = "${var.env_name}-ldap-efs-plan"
 
   rule {
-    rule_name         = "${var.env_name}-ldap-efs-backup-retain-${var.ldap_config.efs_backup_retention_period}-days"
+    rule_name         = "${var.env_name}-ldap-efs-retain-${var.ldap_config.efs_backup_retention_period}-days"
     target_vault_name = aws_backup_vault.ldap_backup_vault.name
 
     schedule = var.ldap_config.efs_backup_schedule
@@ -31,7 +31,7 @@ resource "aws_backup_plan" "ldap_backup_plan" {
   tags = merge(
     var.tags,
     {
-      Name = "${var.env_name}-ldap-efs-backup-plan"
+      Name = "${var.env_name}-ldap-efs-plan"
     },
   )
 }
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "delius_core_backup" {
 }
 
 resource "aws_iam_role" "ldap_efs_backup_role" {
-  name               = "${var.env_name}-ldap-efs-backup-role"
+  name               = "${var.env_name}-ldap-efs-awsbackup-role"
   assume_role_policy = data.aws_iam_policy_document.delius_core_backup.json
   tags               = var.tags
 }
@@ -89,7 +89,7 @@ data "aws_iam_policy_document" "delius_core_backup_policy" {
 }
 
 resource "aws_iam_role_policy" "delius_core_backups" {
-  name   = "${var.env_name}-backup-policy"
+  name   = "${var.env_name}-awsbackup-policy"
   policy = data.aws_iam_policy_document.delius_core_backup_policy.json
   role   = aws_iam_role.ldap_efs_backup_role.id
 }
@@ -134,7 +134,7 @@ data "aws_iam_policy_document" "efs_backup_policy" {
 }
 
 resource "aws_iam_role_policy" "efs_backups" {
-  name   = "${var.env_name}-efs-backup-policy"
+  name   = "${var.env_name}-efs-awsbackup-policy"
   policy = data.aws_iam_policy_document.efs_backup_policy.json
   role   = aws_iam_role.ldap_efs_backup_role.id
 }
