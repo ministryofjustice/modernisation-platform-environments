@@ -34,7 +34,7 @@ resource "aws_s3_bucket" "capita_landing_bucket" {
 resource "aws_s3_bucket_versioning" "capita_landing_bucket" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
   versioning_configuration {
-    status = "Enabled"
+    status = "Disabled"
   }
 }
 
@@ -50,3 +50,18 @@ resource "aws_s3_bucket_logging" "capita_bucket_logging" {
     }
   }
 }
+
+#------------------------------------------------------------------------------
+# S3 bucket for landed data (internal facing)
+#------------------------------------------------------------------------------
+
+resource "aws_s3_bucket" "data_store_bucket" {
+  bucket_prefix = "em-data-store-"
+}
+
+# resource "aws_s3_bucket_versioning" "data_store_bucket" {
+#   bucket = aws_s3_bucket.data_store_bucket.id
+#   versioning_configuration {
+#     status = "Enabled"
+#   }
+# }

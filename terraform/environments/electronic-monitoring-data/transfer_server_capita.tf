@@ -89,11 +89,20 @@ resource "aws_transfer_server" "capita_transfer_server" {
   security_policy_name = "TransferSecurityPolicy-2023-05"
 
   pre_authentication_login_banner = "Hello there"
-  logging_role                    = aws_iam_role.test_transfer_user_iam_role.arn
+  
+  workflow_details {
+    on_upload {
+      workflow_id = aws_transfer_workflow.transfer_capita_to_store.id
+      execution_role = aws_iam_role.capita_transfer_workflow_iam_role.arn
+    }
+  }
+  
+  logging_role = aws_iam_role.test_transfer_user_iam_role.arn
   structured_log_destinations = [
     "${aws_cloudwatch_log_group.transfer.arn}:*"
   ]
 }
+
 resource "aws_cloudwatch_log_group" "transfer" {
   name_prefix = "transfer_test_"
 }
@@ -163,4 +172,68 @@ resource "aws_transfer_ssh_key" "capita_ssh_key_ecdsa_sha2_nistp384" {
   server_id = aws_transfer_server.capita_transfer_server.id
   user_name = aws_transfer_user.capita_transfer_user.user_name
   body      = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIhggGYKbOk6BH7fpEs6JGRnMyLRK/9/tAMQOVYOZtehKTRcM5vGsJFRGjjm2wEan3/uYOuto0NoVkbRfIi0AIG6EWrp1gvHNQlUTtxQVp7rFeOnZAjVEE9xVUEgHhMNLw=="
+}
+
+#------------------------------------------------------------------------------
+# AWS transfer workflow
+#
+# For files that arrive in the landing bucket:
+# 1. copy the file to the internal data store bucket
+# 2. delete the file from the landing bucket
+#------------------------------------------------------------------------------
+
+resource "aws_transfer_workflow" "transfer_capita_to_store" {
+  steps {
+    copy_step_details {
+      source_file_location = "$${original.file}"
+      destination_file_location {
+        s3_file_location {
+          bucket = aws_s3_bucket.data_store_bucket.bucket
+          key = "capita/"
+        }  
+      }
+    }
+    type = "COPY"
+  }
+}
+
+
+data "aws_iam_policy_document" "capita_transfer_workflow_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["transfer.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "capita_transfer_workflow_iam_role" {
+  name                = "capita-transfer-workflow-iam-role"
+  assume_role_policy  = data.aws_iam_policy_document.capita_transfer_workflow_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
+}
+
+data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
+  statement {
+    sid       = "AllowDataStoreWrite"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.data_store_bucket.arn}/capita/*"]
+  }
+  statement {
+    sid       = "AllowCapitaLandingZoneRead"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = [aws_s3_bucket.capita_landing_bucket.arn]
+  }
+}
+
+resource "aws_iam_role_policy" "capita_transfer_workflow_iam_policy" {
+  name   = "capita-transfer-workflow-iam-policy"
+  role   = aws_iam_role.capita_transfer_workflow_iam_role.id
+  policy = data.aws_iam_policy_document.capita_transfer_workflow_iam_policy_document.json
 }
