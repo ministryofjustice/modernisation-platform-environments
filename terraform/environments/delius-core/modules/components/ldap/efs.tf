@@ -1,13 +1,6 @@
 module "efs" {
   source = "../../efs"
 
-  providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
-  }
-
   name           = "ldap-efs-${var.env_name}"
   env_name       = var.env_name
   creation_token = "${var.env_name}-ldap"

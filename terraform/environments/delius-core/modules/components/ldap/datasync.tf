@@ -4,7 +4,7 @@ resource "aws_datasync_location_efs" "destination" {
     security_group_arns = [module.efs.ldap_efs_security_group_arn]
     subnet_arn          = "arn:aws:ec2:${var.account_info.region}:${var.account_info.id}:subnet/${var.account_config.private_subnet_ids[0]}"
   }
-  efs_file_system_arn = var.efs_datasync_destination_arn
+  efs_file_system_arn = module.efs.ldap_efs_location
 }
 
 resource "aws_datasync_location_efs" "source" {

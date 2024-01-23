@@ -45,9 +45,3 @@ variable "environment_config" {
   description = "environment config to pass to the instance"
   type        = any
 }
-
-variable "efs_datasync_destination_arn" {
-  description = "arn of the destination for datasync"
-  type        = string
-  default     = null
-}
