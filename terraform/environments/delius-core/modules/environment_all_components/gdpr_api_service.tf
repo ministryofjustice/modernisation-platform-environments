@@ -1,14 +1,14 @@
-module "gdpr_ui_service" {
+module "gdpr_api_service" {
   source = "../components/delius_microservice"
 
-  name = "gdpr-ui"
+  name = "gdpr-api"
   certificate_arn = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name = var.env_name
   container_port_mappings = [
     {
-      containerPort = 5000
-      hostPort      = 5000
+      containerPort = 80
+      hostPort      = 80 # check this
       protocol      = "tcp"
     }
   ]
@@ -34,7 +34,7 @@ module "gdpr_ui_service" {
   tags = var.tags
   microservice_lb_arn = aws_lb.delius_core_frontend.arn
   platform_vars = var.platform_vars
-  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-gdpr-ui-ecr-repo:${var.gdpr_api_config.image_tag}"
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-gdpr-api-ecr-repo:${var.gdpr_config.api_image_tag}"
   account_config = var.account_config
   health_check_path = "/gdpr/api/actuator/health"
   account_info = var.account_info
@@ -89,31 +89,31 @@ module "gdpr_ui_service" {
 #    },
 #    {
 #      name  = "SCHEDULE_IDENTIFYDUPLICATES"
-#      value = local.gdpr_api_config["cron_identifyduplicates"]
+#      value = local.gdpr_config["cron_identifyduplicates"]
 #    },
 #    {
 #      name  = "SCHEDULE_RETAINEDOFFENDERS"
-#      value = local.gdpr_api_config["cron_retainedoffenders"]
+#      value = local.gdpr_config["cron_retainedoffenders"]
 #    },
 #    {
 #      name  = "SCHEDULE_RETAINEDOFFENDERSIICSA"
-#      value = local.gdpr_api_config["cron_retainedoffendersiicsa"]
+#      value = local.gdpr_config["cron_retainedoffendersiicsa"]
 #    },
 #    {
 #      name  = "SCHEDULE_ELIGIBLEFORDELETION"
-#      value = local.gdpr_api_config["cron_eligiblefordeletion"]
+#      value = local.gdpr_config["cron_eligiblefordeletion"]
 #    },
 #    {
 #      name  = "SCHEDULE_DELETEOFFENDERS"
-#      value = local.gdpr_api_config["cron_deleteoffenders"]
+#      value = local.gdpr_config["cron_deleteoffenders"]
 #    },
 #    {
 #      name  = "SCHEDULE_DESTRUCTIONLOGCLEARING"
-#      value = local.gdpr_api_config["cron_destructionlogclearing"]
+#      value = local.gdpr_config["cron_destructionlogclearing"]
 #    },
 #    {
 #      name  = "SCHEDULE_ELIGIBLEFORDELETIONSOFTDELETED"
-#      value = local.gdpr_api_config["cron_eligiblefordeletionsoftdeleted"]
+#      value = local.gdpr_config["cron_eligiblefordeletionsoftdeleted"]
 #    },
     {
       name  = "SECURITY_OAUTH2_RESOURCE_ID"
@@ -129,7 +129,7 @@ module "gdpr_ui_service" {
     },
 #    {
 #      name  = "LOGGING_LEVEL_UK_GOV_JUSTICE"
-#      value = local.gdpr_api_config["log_level"]
+#      value = local.gdpr_config["log_level"]
 #    },
     {
       name  = "SPRING_FLYWAY_ENABLED"

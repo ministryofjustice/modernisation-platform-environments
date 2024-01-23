@@ -28,8 +28,9 @@ locals {
     }
   }
 
-  gdpr_api_config_lower_environments = {
-    image_tag = "REPLACE"
+  gdpr_config_lower_environments = {
+    api_image_tag = "REPLACE"
+    ui_image_tag  = "REPLACE"
   }
 
   weblogic_config_lower_environments = {
