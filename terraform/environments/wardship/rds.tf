@@ -40,6 +40,14 @@ resource "aws_security_group" "postgresql_db_sc" {
   }
 
   ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    description = "Allows MoJ VPN to access RDS"
+    cidr_blocks = ["81.134.202.29/32"]
+  }
+
+  ingress {
     protocol    = "tcp"
     description = "Allow PSQL traffic from bastion"
     from_port   = 5432
