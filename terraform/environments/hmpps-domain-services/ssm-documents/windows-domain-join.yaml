@@ -39,7 +39,7 @@ mainSteps:
           If ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) {
             $existingDomain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
             if ($existingDomain -Eq $domainNameFQDN) {
-              Write-Output "Already joined to domain"
+              Write-Output "Joined to domain $domainNameFQDN"
               Exit 0
             } Else {
               Write-Error "Joined to a different domain $existingDomain. Expected $domainNameFQDN"
@@ -81,29 +81,12 @@ mainSteps:
 
           # Rename host to match the Name tag
           If ($nameTag -ne $env:COMPUTERNAME) {
-            Write-Output "Renaming EC2 instance to $nameTag and rebooting"
             Write-Host "INFO: Renaming EC2 instance to $newHostname and then rebooting"
             Rename-Computer -NewName $nameTag -Force
             Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot
           }
 
           # Join the domain
-          Write-Output "Joining $nameTag to $domainNameFQDN domain and rebooting"
           Write-Host "INFO: Joining $nameTag to $domainNameFQDN domain and rebooting"
           Add-Computer -DomainName $domainNameFQDN -Credential $credentials -Verbose -Force
           Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot
-
-          # Sanity check joined to domain
-          If ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) {
-            $existingDomain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
-            if ($existingDomain -Eq $domainNameFQDN) {
-              Write-Output "Successfully joined to domain"
-              Exit 0
-            } Else {
-              Write-Error "Joined to a different domain $existingDomain. Expected $domainNameFQDN"
-              Exit 1
-            }
-          } Else {
-            Write-Error "Error: still not part of domain"
-            Exit 1
-          }

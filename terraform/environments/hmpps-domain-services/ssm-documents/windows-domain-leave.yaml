@@ -43,7 +43,7 @@ mainSteps:
               Exit 1
             }
           } Else {
-            Write-Output "Already unjoined from domain"
+            Write-Output "Unjoined from domain"
             Exit 0
           }
 
@@ -78,18 +78,3 @@ mainSteps:
           Write-Host "INFO: Removing $nameTag from $domainNameFQDN domain and rebooting"
           Remove-Computer -Credential $credentials -Verbose -Force
           Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot
-
-          # Sanity check left domain
-          If ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) {
-            $existingDomain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
-            if ($existingDomain -Eq $domainNameFQDN) {
-              Write-Error "Error: still joined to domain"
-              Exit 1
-            } Else {
-              Write-Error "Joined to a different domain $existingDomain. Expected $domainNameFQDN"
-              Exit 1
-            }
-          } Else {
-            Write-Output "Successfully left domain"
-            Exit 0
-          }
