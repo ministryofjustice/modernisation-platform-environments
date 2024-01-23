@@ -9,68 +9,10 @@ resource "aws_eip" "capita_eip" {
 }
 
 #------------------------------------------------------------------------------
-# AWS security group 
-#
-# Set the allowed IP addresses for the supplier.
-#------------------------------------------------------------------------------
-
-resource "aws_security_group" "capita_security_group" {
-  name        = "capita_inbound_ips"
-  description = "Allowed IP addresses from Capita"
-  vpc_id      = data.aws_vpc.shared.id
-}
-
-resource "aws_vpc_security_group_ingress_rule" "capita_ip_1" {
-  security_group_id = aws_security_group.capita_security_group.id
-
-  cidr_ipv4   = "82.203.33.112/28"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-}
-
-resource "aws_vpc_security_group_ingress_rule" "capita_ip_2" {
-  security_group_id = aws_security_group.capita_security_group.id
-
-  cidr_ipv4   = "82.203.33.128/28"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-}
-
-resource "aws_vpc_security_group_ingress_rule" "capita_ip_3" {
-  security_group_id = aws_security_group.capita_security_group.id
-
-  cidr_ipv4   = "85.115.52.0/24"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-}
-
-resource "aws_vpc_security_group_ingress_rule" "capita_ip_4" {
-  security_group_id = aws_security_group.capita_security_group.id
-
-  cidr_ipv4   = "85.115.53.0/24"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-}
-
-resource "aws_vpc_security_group_ingress_rule" "capita_ip_5" {
-  security_group_id = aws_security_group.capita_security_group.id
-
-  cidr_ipv4   = "85.115.54.0/24"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-}
-
-#------------------------------------------------------------------------------
 # AWS transfer server 
 #
 # Configure SFTP server for supplier that only allows supplier specified IPs.
 #------------------------------------------------------------------------------
-
 
 resource "aws_transfer_server" "capita_transfer_server" {
   protocols              = ["SFTP"]
@@ -163,18 +105,6 @@ resource "aws_iam_role_policy" "capita_transfer_user_iam_policy" {
 }
 
 #------------------------------------------------------------------------------
-# AWS transfer ssh key
-#
-# Set the public ssh key for the supplier user profile to access SFTP server.
-#------------------------------------------------------------------------------
-
-resource "aws_transfer_ssh_key" "capita_ssh_key_ecdsa_sha2_nistp384" {
-  server_id = aws_transfer_server.capita_transfer_server.id
-  user_name = aws_transfer_user.capita_transfer_user.user_name
-  body      = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIhggGYKbOk6BH7fpEs6JGRnMyLRK/9/tAMQOVYOZtehKTRcM5vGsJFRGjjm2wEan3/uYOuto0NoVkbRfIi0AIG6EWrp1gvHNQlUTtxQVp7rFeOnZAjVEE9xVUEgHhMNLw=="
-}
-
-#------------------------------------------------------------------------------
 # AWS transfer workflow
 #
 # For files that arrive in the landing bucket:
@@ -195,8 +125,13 @@ resource "aws_transfer_workflow" "transfer_capita_to_store" {
     }
     type = "COPY"
   }
+  steps {
+    delete_step_details {
+      source_file_location = "$${original.file}"
+    }
+    type = "DELETE"
+  }
 }
-
 
 data "aws_iam_policy_document" "capita_transfer_workflow_assume_role" {
   statement {
@@ -219,16 +154,55 @@ resource "aws_iam_role" "capita_transfer_workflow_iam_role" {
 
 data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
   statement {
-    sid       = "AllowDataStoreWrite"
+    sid       = "AllowCopyReadSource"
     effect    = "Allow"
-    actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.data_store_bucket.arn}/capita/*"]
+    actions   = [
+      "s3:GetObject",
+      "s3:GetObjectTagging"
+    ]
+    resources = ["${aws_s3_bucket.capita_landing_bucket.arn}/*"]
   }
   statement {
-    sid       = "AllowCapitaLandingZoneRead"
+    sid       = "AllowCopyWriteDestination"
     effect    = "Allow"
-    actions   = ["s3:GetObject"]
-    resources = [aws_s3_bucket.capita_landing_bucket.arn]
+    actions   = [
+      "s3:PutObject",
+      "s3:PutObjectTagging"
+    ]
+    resources = ["${aws_s3_bucket.data_store_bucket.arn}/*"]
+  }
+  statement {
+    sid       = "AllowCopyList"
+    effect    = "Allow"
+    actions   = [
+      "s3:ListBucket"
+    ]
+    resources = [
+      aws_s3_bucket.capita_landing_bucket.arn,
+      aws_s3_bucket.data_store_bucket.arn
+    ]
+  }
+  statement {
+    sid       = "AllowTag"
+    effect    = "Allow"
+    actions   = [
+      "s3:PutObjectTagging",
+      "s3:PutObjectVersionTagging"
+    ]
+    resources = [
+      "${aws_s3_bucket.data_store_bucket.arn}/*",
+      "${aws_s3_bucket.capita_landing_bucket.arn}/*",
+    ]
+    # condition {}
+  }
+  statement {
+    sid       = "AllowDeleteSource"
+    effect    = "Allow"
+    actions   = [
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion"
+    ]
+    resources = ["${aws_s3_bucket.capita_landing_bucket.arn}/*"]
   }
 }
 
