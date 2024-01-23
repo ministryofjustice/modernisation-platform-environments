@@ -34,7 +34,7 @@ resource "aws_iam_policy" "maat_api_ecs_taks_execution_policy" {
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage"
         ]
-        Resource = "arn:aws:ecr:${local.env_account_region}:${local.env_account_id}:repository/${local.application_name}-api"
+        Resource = "arn:aws:ecr:${local.env_account_region}:374269020027:repository/${local.application_name}-cd-api-ecr-repo"
       },
       {
         Effect = "Allow"
