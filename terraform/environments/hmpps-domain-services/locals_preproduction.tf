@@ -23,6 +23,34 @@ locals {
       }
     }
 
+    baseline_ec2_autoscaling_groups = {
+
+      pp-rds-2012 = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "base_windows_server_2012_r2_release*"
+          availability_zone             = null
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["rds-ec2s"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 2
+          max_size         = 2
+        })
+        tags = {
+          description = "Windows Server 2012 for testing"
+          os-type     = "Windows"
+          component   = "test"
+        }
+      }
+    }
+
     baseline_ec2_instances = {
       pp-rdgw-1-a = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
