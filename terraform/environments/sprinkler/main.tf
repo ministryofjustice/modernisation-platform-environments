@@ -863,7 +863,7 @@ resource "aws_key_pair" "key_pair" {
   public_key = tls_private_key.tls_key_pair.public_key_openssh
   depends_on = [tls_private_key.tls_key_pair]
 }
-# Create a public EC2 instance (bastion host)
+# Create a private EC2 instance (bastion host)
 resource "aws_instance" "cymulate-test" {
   ami                    = "ami-0a398a6b09d71fecc" # Replace this with a suitable AMI ID
   instance_type          = "t2.micro"
