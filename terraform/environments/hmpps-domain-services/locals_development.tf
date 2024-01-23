@@ -79,7 +79,7 @@ locals {
 
       dev-rhel85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name          = "hmpps_rhel_8_5*"
+          ami_name          = "base_rhel_8_5*"
           availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
