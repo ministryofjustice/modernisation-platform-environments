@@ -1,5 +1,5 @@
 ---
-schemaVersion: "2.3"
+schemaVersion: "2.2"
 description: "SSM Document for removing Windows EC2 instances from hmpp noms domain."
 mainSteps:
   - name: WindowsDomainLeave

@@ -1,5 +1,5 @@
 ---
-schemaVersion: "2.3"
+schemaVersion: "2.2"
 description: "SSM Document for joining Windows EC2 instances to the hmpp noms domain. Moving Computers to a different OU must be done manually on the relevant domain controller."
 mainSteps:
   - name: WindowsDomainJoin
