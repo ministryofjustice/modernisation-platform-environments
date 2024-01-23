@@ -185,7 +185,7 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
 resource "aws_appautoscaling_target" "ecs_service_scaling_target" {
   max_capacity       = 5
   min_capacity       = local.application_data.accounts[local.environment].ecs_service_count
-  resource_id        = "service/${aws_ecs_cluster.app_ecs_cluster.id}/${aws_ecs_service.maat_api_ecs_service.name}"
+  resource_id        = "service/${aws_ecs_cluster.app_ecs_cluster.name}/${aws_ecs_service.maat_api_ecs_service.name}"
   role_arn           = aws_iam_role.maat_api_ecs_autoscaling_role.arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
