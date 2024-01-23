@@ -63,8 +63,8 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
       essential = true,
       image     = local.application_data.accounts[local.environment].ecs_image,
       memory    = local.application_data.accounts[local.environment].ecs_container_memory,
-      log_configuration = {
-        log_driver = "awslogs",
+      logConfiguration = {
+        logDriver = "awslogs",
         options = {
           "awslogs-group"         = aws_cloudwatch_log_group.maat_api_ecs_cw_group.name,
           "awslogs-region"        = "${data.aws_region.current.name}",
