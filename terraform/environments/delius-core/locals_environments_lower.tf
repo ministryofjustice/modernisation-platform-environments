@@ -27,6 +27,10 @@ locals {
     }
   }
 
+  gdpr_api_config_lower_environments = {
+    image_tag = "REPLACE"
+  }
+
   weblogic_config_lower_environments = {
     name                          = "weblogic_for_lower_environments"
     frontend_service_name         = "weblogic"

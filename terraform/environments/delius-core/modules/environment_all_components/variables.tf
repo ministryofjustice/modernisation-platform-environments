@@ -219,6 +219,15 @@ variable "db_config" {
   #  }
 }
 
+variable "gdpr_api_config" {
+  type = object({
+    image_tag = string
+  })
+  default = {
+    image_tag = "default_image_tag"
+  }
+}
+
 variable "weblogic_config" {
   type = object({
     name                          = string
