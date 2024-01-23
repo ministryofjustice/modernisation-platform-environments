@@ -39,11 +39,42 @@ variable "tags" {
   type = any
 }
 
-variable account_config {
-  type = any
+variable "vpc_id" {
+  description = "vpc id"
+  type        = string
 }
 
-variable account_info {
-  type = any
+variable "subnet_ids" {
+  description = "subnet ids"
+  type        = list(string)
 }
 
+variable "vpc_cidr" {
+    description = "vpc cidr"
+    type        = string
+}
+
+variable "port" {
+    description = "port"
+    type        = number
+}
+
+variable "protocol" {
+    description = "protocol"
+    type        = string
+}
+
+variable "mp_application_name" {
+    description = "mp_application_name"
+    type        = string
+}
+
+variable "zone_id" {
+    description = "zone_id"
+    type        = string
+}
+
+variable "app_name" {
+    description = "app_name"
+    type        = string
+}
