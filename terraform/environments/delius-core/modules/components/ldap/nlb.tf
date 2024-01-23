@@ -12,7 +12,7 @@ module "nlb" {
   internal       = true
   tags           = var.tags
   port           = 389
-  protocol       = "tcp"
+  protocol       = "TCP"
   subnet_ids     = var.account_config.private_subnet_ids
   vpc_cidr       = var.account_config.shared_vpc_cidr
   vpc_id         = var.account_config.shared_vpc_id
