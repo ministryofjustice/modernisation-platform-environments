@@ -219,12 +219,14 @@ variable "db_config" {
   #  }
 }
 
-variable "gdpr_api_config" {
+variable "gdpr_config" {
   type = object({
-    image_tag = string
+    api_image_tag = string
+    ui_image_tag  = string
   })
   default = {
-    image_tag = "default_image_tag"
+    api_image_tag = "default_image_tag"
+    ui_image_tag = "default_image_tag"
   }
 }
 
