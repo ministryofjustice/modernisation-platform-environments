@@ -28,7 +28,7 @@ resource "aws_lb_listener" "ldap" {
 }
 
 resource "aws_lb_target_group" "this" {
-  name     = var.app_name
+  name     = "${var.app_name}-${var.env_name}"
   port     = var.port
   protocol = var.protocol
   vpc_id   = var.vpc_id
