@@ -13,7 +13,7 @@ variable "reload_pipeline"  {
 variable "pipeline_dms_task_time_out"  {
   description = "DMS Task Timeout"
   type        = number
-  default     = 36000 # 10 hours
+  default     = 43200 # 12 hours
 }
 
 variable "pipeline_additional_policies" {
