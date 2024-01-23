@@ -16,7 +16,7 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
   name                              = "${local.application_name}-api-ecs-service"
   cluster                           = aws_ecs_cluster.app_ecs_cluster.id
   launch_type                       = "FARGATE"
-  desired_count                     = local.application_data.accounts[local.environment].ecs_service_count
+  desired_count                     = local.application_data.accounts[local.environment].ecs_service_desired_count
   task_definition                   = aws_ecs_task_definition.TaskDefinition.arn
   health_check_grace_period_seconds = 120
 
@@ -183,8 +183,8 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
 # ECS Scaling
 ######################################
 resource "aws_appautoscaling_target" "ecs_service_scaling_target" {
-  max_capacity       = 5
-  min_capacity       = local.application_data.accounts[local.environment].ecs_service_count
+  max_capacity       = local.application_data.accounts[local.environment].ecs_service_max_count
+  min_capacity       = local.application_data.accounts[local.environment].ecs_service_min_count
   resource_id        = "service/${aws_ecs_cluster.app_ecs_cluster.name}/${aws_ecs_service.maat_api_ecs_service.name}"
   role_arn           = aws_iam_role.maat_api_ecs_autoscaling_role.arn
   scalable_dimension = "ecs:service:DesiredCount"
