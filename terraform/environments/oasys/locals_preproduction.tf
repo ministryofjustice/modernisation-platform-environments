@@ -137,6 +137,9 @@ locals {
             "Ec2PreprodWebPolicy",
           ])
         })
+        instance = merge(local.webserver_a.instance, {
+          instance_type          = "r7g.medium"
+        })
         tags = merge(local.webserver_a.tags, {
           oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
           oracle-db-sid      = "PPOASYS" # "OASPROD"

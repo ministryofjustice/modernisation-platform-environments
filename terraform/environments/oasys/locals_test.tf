@@ -341,6 +341,9 @@ locals {
             "Ec2T2WebPolicy",
           ])
         })
+        instance = merge(local.webserver_a.instance, {
+          instance_type          = "r7g.medium"
+        })
         tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
           "${local.application_name}-environment" = "t2"
@@ -382,6 +385,9 @@ locals {
           instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
             "Ec2T1WebPolicy",
           ])
+        })
+        instance = merge(local.webserver_a.instance, {
+          instance_type          = "r7g.medium"
         })
         tags = merge(local.webserver_a.tags, {
           description                             = "t1 ${local.application_name} web"

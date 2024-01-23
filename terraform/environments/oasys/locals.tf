@@ -55,6 +55,7 @@ locals {
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       monitoring             = true
       vpc_security_group_ids = ["private_web"]
+      instance_type          = "r7g.large"
     })
     cloudwatch_metric_alarms = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
