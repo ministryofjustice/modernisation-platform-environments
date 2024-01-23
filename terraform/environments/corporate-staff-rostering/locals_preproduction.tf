@@ -945,7 +945,6 @@ locals {
               type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
@@ -967,7 +966,6 @@ locals {
               type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
@@ -989,7 +987,6 @@ locals {
               type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
@@ -1011,7 +1008,6 @@ locals {
               type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
@@ -1033,7 +1029,6 @@ locals {
               type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
