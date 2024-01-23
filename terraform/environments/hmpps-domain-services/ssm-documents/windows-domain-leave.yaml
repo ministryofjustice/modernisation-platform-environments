@@ -1,8 +1,8 @@
 ---
 schemaVersion: "2.3"
-description: "SSM Document for joining Windows EC2 instances to the hmpp noms domain. Moving Computers to a different OU must be done manually on the relevant domain controller."
+description: "SSM Document for removing Windows EC2 instances from hmpp noms domain."
 mainSteps:
-  - name: WindowsDomainJoin
+  - name: WindowsDomainLeave
     action: aws:runPowerShellScript
     precondition:
       StringEquals:
@@ -38,13 +38,13 @@ mainSteps:
           # Check if already domain joined
           If ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) {
             $existingDomain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
-            if ($existingDomain -Eq $domainNameFQDN) {
-              Write-Output "Already joined to domain"
-              Exit 0
-            } Else {
+            if ($existingDomain -Ne $domainNameFQDN) {
               Write-Error "Joined to a different domain $existingDomain. Expected $domainNameFQDN"
               Exit 1
             }
+          } Else {
+            Write-Output "Already unjoined from domain"
+            Exit 0
           }
 
           # Install powershell features if missing
@@ -73,38 +73,23 @@ mainSteps:
           $domainJoinPasswordSecureString = ConvertTo-SecureString $secretValue.$domainJoinUsername -AsPlainText -Force
           $credentials = New-Object System.Management.Automation.PSCredential ("$domainNameNetbios\$domainJoinUsername", $domainJoinPasswordSecureString)
 
-          # Check if server with same name already exists
-          $adComputer = Get-ADComputer -Filter 'Name -eq $nameTag' -Credential $credentials -Server $domainNameFQDN
-          If ($adComputer) {
-            Write-Ouput "Computer $nameTag object found in domain $domainNameFQDN"
-            Exit 1
-          }
-
-          # Rename host to match the Name tag
-          If ($nameTag -ne $env:COMPUTERNAME) {
-            Write-Output "Renaming EC2 instance to $nameTag and rebooting"
-            Write-Host "INFO: Renaming EC2 instance to $newHostname and then rebooting"
-            Rename-Computer -NewName $nameTag -Force
-            Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot
-          }
-
-          # Join the domain
-          Write-Output "Joining $nameTag to $domainNameFQDN domain and rebooting"
-          Write-Host "INFO: Joining $nameTag to $domainNameFQDN domain and rebooting"
-          Add-Computer -DomainName $domainNameFQDN -Credential $credentials -Verbose -Force
+          # Leave the domain
+          Write-Output "Removing $nameTag from $domainNameFQDN domain and rebooting"
+          Write-Host "INFO: Removing $nameTag from $domainNameFQDN domain and rebooting"
+          Remove-Computer -Credential $credentials -Verbose -Force
           Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot
 
-          # Sanity check joined to domain
+          # Sanity check left domain
           If ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) {
             $existingDomain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
             if ($existingDomain -Eq $domainNameFQDN) {
-              Write-Output "Successfully joined to domain"
-              Exit 0
+              Write-Error "Error: still joined to domain"
+              Exit 1
             } Else {
               Write-Error "Joined to a different domain $existingDomain. Expected $domainNameFQDN"
               Exit 1
             }
           } Else {
-            Write-Error "Error: still not part of domain"
-            Exit 1
+            Write-Output "Successfully left domain"
+            Exit 0
           }
