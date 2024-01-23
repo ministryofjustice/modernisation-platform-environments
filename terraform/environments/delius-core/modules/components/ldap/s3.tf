@@ -6,7 +6,7 @@ module "s3_bucket_migration" {
     aws.bucket-replication = aws.bucket-replication
   }
 
-  bucket_prefix      = "${var.app_name}-${var.env_name}-ldap-"
+  bucket_prefix      = "${var.app_name}-${var.env_name}-migration"
   versioning_enabled = true
   sse_algorithm      = "AES256"
   # Useful guide - https://aws.amazon.com/blogs/storage/how-to-use-aws-datasync-to-migrate-data-between-amazon-s3-buckets/
@@ -95,12 +95,7 @@ module "s3_bucket_migration" {
     }
   ]
 
-  tags = merge(
-    var.tags,
-    {
-      Name = "${var.env_name}-ldap-migration-s3-bucket"
-    },
-  )
+  tags = var.tags
 }
 
 # Create s3 bucket for deployment state
@@ -108,7 +103,7 @@ module "s3_bucket_app_deployment" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
-  bucket_prefix        = "${var.app_name}-${var.env_name}-openldap-deployment"
+  bucket_prefix        = "${var.app_name}-${var.env_name}-deployment-state"
   versioning_enabled = true
 
   providers = {

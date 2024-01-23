@@ -10,7 +10,7 @@ module "ldap" {
   }
 
   env_name                     = var.env_name
-  app_name                     = var.app_name
+  app_name                     = "ldap"
   account_config               = var.account_config
   account_info                 = var.account_info
   environment_config           = var.environment_config
