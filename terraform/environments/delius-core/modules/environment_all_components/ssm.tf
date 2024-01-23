@@ -211,3 +211,28 @@ resource "aws_ssm_parameter" "delius_core_weblogic_ndelius_domain_umt_client_sec
 
   tags = local.tags
 }
+
+resource "aws_ssm_parameter" "delius_core_gdpr_db_admin_password" {
+  name  = format("/%s-%s/gdpr/api/db_admin_password", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_gdpr_db_pool_password" {
+  name  = format("/%s-%s/gdpr/api/db_pool_password", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
+}
+

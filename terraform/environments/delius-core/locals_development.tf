@@ -222,6 +222,10 @@ locals {
     }
   ]
 
+  gdpr_api_config_dev = {
+    image_tag = try(local.gdpr_api_config_lower_environments.image_tag, "REPLACE")
+  }
+
   weblogic_config_dev = {
     name                          = "weblogic"
     frontend_service_name         = "weblogic"
