@@ -76,8 +76,7 @@ mainSteps:
           # Check if server with same name already exists
           $adComputer = Get-ADComputer -Filter 'Name -eq $nameTag' -Credential $credentials -Server $domainNameFQDN
           If ($adComputer) {
-            Write-Ouput "Computer $nameTag object found in domain $domainNameFQDN"
-            Exit 1
+            Write-Output "Computer $nameTag object found in domain $domainNameFQDN"
           }
 
           # Rename host to match the Name tag
