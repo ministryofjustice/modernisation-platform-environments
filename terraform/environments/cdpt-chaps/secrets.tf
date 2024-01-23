@@ -6,7 +6,7 @@ resource "aws_secretsmanager_secret" "db_password" {
 
 resource "random_password" "password_long" {
   length = 32
-  special = false
+  override_special = "!@#$%&*()-_=+[]{}<>:?@/ "
 }
 
 resource "aws_secretsmanager_secret_version" "db_password" {
