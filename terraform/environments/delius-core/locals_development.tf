@@ -222,8 +222,9 @@ locals {
     }
   ]
 
-  gdpr_api_config_dev = {
-    image_tag = try(local.gdpr_api_config_lower_environments.image_tag, "REPLACE")
+  gdpr_config_dev = {
+    api_image_tag = try(local.gdpr_config_lower_environments.api_image_tag, "REPLACE")
+    ui_image_tag = try(local.gdpr_config_lower_environments.ui_image_tag, "REPLACE")
   }
 
   weblogic_config_dev = {
