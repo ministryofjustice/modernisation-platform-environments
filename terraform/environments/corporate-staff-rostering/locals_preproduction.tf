@@ -437,31 +437,31 @@ locals {
         }
       })
 
-      pp-csr-w-7-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-csr-w-7-b"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          description       = "Migrated server PPCWW00006"
-          app-config-status = "pending"
-          csr-region        = "Region 5 and 6"
-          os-type           = "Windows"
-          ami               = "pp-csr-w-7-b"
-          component         = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
+      # pp-csr-w-7-a = merge(local.defaults_web_ec2, {
+      #   config = merge(local.defaults_web_ec2.config, {
+      #     ami_name          = "pp-csr-w-7-b"
+      #     availability_zone = "${local.region}a"
+      #   })
+      #   instance = merge(local.defaults_web_ec2.instance, {
+      #     instance_type = "m5.2xlarge"
+      #   })
+      #   ebs_volumes = {
+      #     "/dev/sda1" = { type = "gp3", size = 128 }
+      #     "/dev/sdb"  = { type = "gp3", size = 56 }
+      #   }
+      #   tags = {
+      #     description       = "Migrated server PPCWW00006"
+      #     app-config-status = "pending"
+      #     csr-region        = "Region 5 and 6"
+      #     os-type           = "Windows"
+      #     ami               = "pp-csr-w-7-b"
+      #     component         = "web"
+      #   }
+      #   route53_records = {
+      #     create_internal_record = true
+      #     create_external_record = true
+      #   }
+      # })
 
       pp-csr-w-8-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
@@ -945,7 +945,6 @@ locals {
               type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
@@ -967,7 +966,6 @@ locals {
               type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
@@ -989,7 +987,6 @@ locals {
               type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
@@ -1011,7 +1008,6 @@ locals {
               type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
@@ -1033,7 +1029,6 @@ locals {
               type    = "source_ip"
             }
             attachments = [
-              { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
           }
