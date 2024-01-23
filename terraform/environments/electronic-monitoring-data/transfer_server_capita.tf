@@ -183,18 +183,18 @@ resource "aws_transfer_ssh_key" "capita_ssh_key_ecdsa_sha2_nistp384" {
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_workflow" "transfer_capita_to_store" {
-  # steps {
-  #   copy_step_details {
-  #     source_file_location = "$${original.file}"
-  #     destination_file_location {
-  #       s3_file_location {
-  #         bucket = aws_s3_bucket.data_store_bucket.bucket
-  #         key = "capita/"
-  #       }  
-  #     }
-  #   }
-  #   type = "COPY"
-  # }
+  steps {
+    copy_step_details {
+      source_file_location = "$${original.file}"
+      destination_file_location {
+        s3_file_location {
+          bucket = aws_s3_bucket.data_store_bucket.bucket
+          key = "capita/"
+        }  
+      }
+    }
+    type = "COPY"
+  }
   steps {
     delete_step_details {
       source_file_location = "$${original.file}"
