@@ -23,6 +23,7 @@ module "environment_dev" {
   ldap_config                = local.ldap_config_dev
   db_config                  = local.db_config_dev
   gdpr_config                = local.gdpr_config_dev
+  merge_config               = local.merge_config_dev
   weblogic_config            = local.weblogic_config_dev
   delius_db_container_config = local.delius_db_container_config_dev
   bastion_config             = local.bastion_config_dev
