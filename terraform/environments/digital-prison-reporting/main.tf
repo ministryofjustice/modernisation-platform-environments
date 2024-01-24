@@ -886,30 +886,6 @@ module "s3_file_transfer_lambda" {
   ]
 }
 
-module "s3_file_transfer_lambda_trigger" {
-  source = "./modules/lambda_trigger"
-
-  enable_lambda_trigger = local.enable_s3_file_transfer_trigger
-
-  event_name           = "${local.project}-s3-transfer-lambda-trigger-${local.env}"
-  lambda_function_arn  = module.s3_file_transfer_lambda.lambda_function
-  lambda_function_name = module.s3_file_transfer_lambda.lambda_name
-
-  trigger_input_event = jsonencode(
-    {
-      "sourceBucket" : module.s3_raw_bucket.bucket_id,
-      "destinationBucket" : module.s3_raw_archive_bucket.bucket_id,
-      "retentionDays" : tostring(local.scheduled_s3_file_transfer_retention_days)
-    }
-  )
-
-  trigger_schedule_expression = local.scheduled_s3_file_transfer_schedule
-
-  depends_on = [
-    module.s3_file_transfer_lambda
-  ]
-}
-
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
   source                       = "./modules/dms_dps"
