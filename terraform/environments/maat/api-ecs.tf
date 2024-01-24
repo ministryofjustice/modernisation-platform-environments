@@ -273,8 +273,8 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_low_cpu_service_alarm" {
 }
 
 ## Memory Based Scaling
-resource "aws_cloudwatch_metric_alarm" "maat_api_high_cpu_service_alarm" {
-  alarm_name          = "${local.application_name}-api-high-cpu-service-alarm"
+resource "aws_cloudwatch_metric_alarm" "maat_api_high_memory_service_alarm" {
+  alarm_name          = "${local.application_name}-api-high-memory-service-alarm"
   alarm_description   = "MemoryUtlization exceeding threshold. Triggers scale up"
   actions_enabled     = true
   namespace           = "AWS/ECS"
@@ -293,8 +293,8 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_high_cpu_service_alarm" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "maat_api_low_cpu_service_alarm" {
-  alarm_name          = "${local.application_name}-api-low-cpu-service-alarm"
+resource "aws_cloudwatch_metric_alarm" "maat_api_low_memory_service_alarm" {
+  alarm_name          = "${local.application_name}-api-low-memory-service-alarm"
   alarm_description   = "MemoryUtilization lower than threshold. Triggers scale down"
   actions_enabled     = true
   namespace           = "AWS/ECS"
