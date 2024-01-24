@@ -19,7 +19,6 @@ mainSteps:
           $tagsRaw = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId"
           $tags = "$tagsRaw" | ConvertFrom-Json
           $environmentNameTag = ($tags.Tags | Where-Object  {$_.Key -eq "environment-name"}).Value
-          $nameTag = ($tags.Tags | Where-Object  {$_.Key -eq "Name"}).Value
           $environment = $environmentNameTag.Split("-")[-1]
           If ($environment -Eq "development" -Or $environment -Eq "test") {
             $secretAccountName = "hmpps-domain-services-test"
@@ -50,7 +49,7 @@ mainSteps:
 
           # Install powershell features if missing
           if (-Not (Get-Module -ListAvailable -Name "ActiveDirectory")) {
-            Write-Output "Installing RSAT-AD-PowerShell feature"
+            Write-Host "INFO: Installing RSAT-AD-PowerShell feature"
             Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
           }
 
@@ -78,7 +77,6 @@ mainSteps:
           $credentials = New-Object System.Management.Automation.PSCredential ("$domainNameNetbios\$domainJoinUsername", $domainJoinPasswordSecureString)
 
           # Leave the domain
-          Write-Output "Removing $nameTag from $domainNameFQDN domain and rebooting"
-          Write-Host "INFO: Removing $nameTag from $domainNameFQDN domain and rebooting"
+          Write-Host "INFO: Removing $env:COMPUTERNAME from $domainNameFQDN domain and rebooting"
           Remove-Computer -Credential $credentials -Verbose -Force
           Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot

@@ -1,6 +1,12 @@
 ---
 schemaVersion: "2.2"
 description: "SSM Document for joining Windows EC2 instances to the hmpp noms domain. Moving Computers to a different OU must be done manually on the relevant domain controller."
+parameters:
+  newHostname:
+    type: "String"
+    description: "By default uses the Name tag. Otherwise set to keep-existing or the desired hostname 15 chars or less"
+    default: "tag:Name"
+    maxChars: 15
 mainSteps:
   - name: WindowsDomainJoin
     action: aws:runPowerShellScript
@@ -12,6 +18,7 @@ mainSteps:
       runCommand:
         - |
           $ErrorActionPreference = "Stop" # all errors will terminate the script
+          $newHostname = "{{newHostname}}"
 
           # Lookup domain configuration based on environment-name tag
           $token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
@@ -19,7 +26,6 @@ mainSteps:
           $tagsRaw = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId"
           $tags = "$tagsRaw" | ConvertFrom-Json
           $environmentNameTag = ($tags.Tags | Where-Object  {$_.Key -eq "environment-name"}).Value
-          $nameTag = ($tags.Tags | Where-Object  {$_.Key -eq "Name"}).Value
           $environment = $environmentNameTag.Split("-")[-1]
           If ($environment -Eq "development" -Or $environment -Eq "test") {
             $secretAccountName = "hmpps-domain-services-test"
@@ -50,7 +56,7 @@ mainSteps:
 
           # Install powershell features if missing
           if (-Not (Get-Module -ListAvailable -Name "ActiveDirectory")) {
-            Write-Output "Installing RSAT-AD-PowerShell feature"
+            Write-Host "INFO: Installing RSAT-AD-PowerShell feature"
             Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
           }
 
@@ -77,14 +83,19 @@ mainSteps:
           $domainJoinPasswordSecureString = ConvertTo-SecureString $secretValue.$domainJoinUsername -AsPlainText -Force
           $credentials = New-Object System.Management.Automation.PSCredential ("$domainNameNetbios\$domainJoinUsername", $domainJoinPasswordSecureString)
 
-          # Rename host to match the Name tag
-          If ($nameTag -ne $env:COMPUTERNAME) {
+          # Rename host
+          If ($newHostname -Eq "tag:Name") {
+            $newHostname = ($tags.Tags | Where-Object  {$_.Key -eq "Name"}).Value
+          } ElseIf ($newHostname -Eq "keep-existing") {
+            $newHostname = $env:COMPUTERNAME
+          }
+          If ($newHostname -Ne $env:COMPUTERNAME) {
             Write-Host "INFO: Renaming EC2 instance to $newHostname and then rebooting"
-            Rename-Computer -NewName $nameTag -Force
+            Rename-Computer -NewName $newHostname -Force
             Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot
           }
 
           # Join the domain
-          Write-Host "INFO: Joining $nameTag to $domainNameFQDN domain and rebooting"
+          Write-Host "INFO: Joining $env:COMPUTERNAME to $domainNameFQDN domain and rebooting"
           Add-Computer -DomainName $domainNameFQDN -Credential $credentials -Verbose -Force
           Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot
