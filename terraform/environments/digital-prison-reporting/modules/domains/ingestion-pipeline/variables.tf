@@ -14,7 +14,7 @@ variable "data_ingestion_pipeline" {
 variable "pipeline_dms_task_time_out" {
   description = "DMS Task Timeout"
   type        = number
-  default     = 300
+  default     = 43200 # 12 hours
 }
 
 variable "pipeline_additional_policies" {
@@ -61,8 +61,8 @@ variable "s3_raw_archive_bucket_id" {
   default     = ""
 }
 
-variable "s3_file_transfer_lambda_function" {
-  description = "S3 File Transfer Lambda Function Name"
+variable "glue_s3_file_transfer_job" {
+  description = "Name of s3 file transfer job"
   type        = string
   default     = ""
 }

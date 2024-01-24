@@ -156,7 +156,7 @@ variable "aws_kms_key" {
 
 variable "create_role" {
   type        = bool
-  default     = false
+  default     = true
   description = "(Optional) Create AWS IAM role associated with the job."
 }
 
