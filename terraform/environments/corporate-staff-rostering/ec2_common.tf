@@ -96,16 +96,16 @@ resource "aws_ssm_document" "network-testing-tools" {
   )
 }
 
-resource "aws_ssm_document" "windows-psreadline-fix" {
-  name            = "windows-psreadline-fix"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/windows-psreadline-fix.yaml")
+# resource "aws_ssm_document" "windows-psreadline-fix" {
+#   name            = "windows-psreadline-fix"
+#   document_type   = "Command"
+#   document_format = "YAML"
+#   content         = file("./ssm-documents/windows-psreadline-fix.yaml")
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "windows-psreadline-fix"
-    },
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "windows-psreadline-fix"
+#     },
+#   )
+# }
