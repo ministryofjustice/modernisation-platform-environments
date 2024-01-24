@@ -13,4 +13,23 @@ mainSteps:
         - |
           $ErrorActionPreference = "Stop" # all errors will terminate the script
 
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
           Install-Module -Name PSReadLine -Repository PSGallery -MinimumVersion 2.2.2 -Force -AllowClobber -Confirm:$false
+
+          # delete old versions of Windows PowerShell PSReadline which are the issue
+
+          $moduleDirectories = Get-ChildItem -Path "C:\Program Files\WindowsPowerShell\Modules\PSReadline" -Directory -Depth 0
+
+          foreach ($psreadlineModuleDirectory in $psreadlineModuleDirectories) {
+            $moduleDirectoryPath = $psreadlineModuleDirectory.FullName
+            $moduleDirectoryName = $psresdlineModuleDirectory.Name
+
+            if ($moduleDirectoryName -le "2.2.2") {
+              Remove-Item -Recurse -Force -Path $moduleDirectoryPath
+            }
+          }
+
+          $PSReadlineVersion = (Get-Module -ListAvailable PSReadLine).Version.ToString()
+
+          Write-Host "PSReadline Module Version: $PSReadlineVersion"
