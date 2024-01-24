@@ -134,7 +134,7 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : "${module.glue_reporting_hub_batch_job.name}"
+            "JobName" : module.glue_reporting_hub_batch_job.name
           },
           "Next" : "Archive Raw Data"
         },
@@ -142,7 +142,7 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : module.glue_s3_file_transfer_job,
+            "JobName" : module.glue_s3_file_transfer_job.name,
             "Arguments" : {
               "--dpr.file.transfer.source.bucket" : module.s3_raw_bucket.bucket_id,
               "--dpr.file.transfer.destination.bucket" : module.s3_raw_archive_bucket.bucket_id,
