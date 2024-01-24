@@ -68,7 +68,7 @@ locals {
       }
       dev-tst-2022 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "	hmpps_windows_server_2022_test_2024-01-24T11-35-44.347Z"
+          ami_name                      = "hmpps_windows_server_2022_test_2024-01-24T11-35-44.347Z"
           ami_owner                     = "self"
           ebs_volumes_copy_all_from_ami = false
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
