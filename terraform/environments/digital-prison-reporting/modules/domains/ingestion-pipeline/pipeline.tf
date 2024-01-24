@@ -17,7 +17,6 @@ module "data_ingestion_pipeline" {
   #  module.glue_reporting_hub_batch_job.name,
   #  module.glue_reporting_hub_cdc_job.name,
   #  module.glue_hive_table_creation_job.name,
-  #  module.s3_file_transfer_lambda.lambda_function,
   #  module.step_function_notification_lambda.lambda_function
   #]
 
@@ -71,36 +70,22 @@ module "data_ingestion_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Invoke S3 File Transfer Lambda"
+          "Next" : "Archive Raw Data"
         },
-        "Invoke S3 File Transfer Lambda" : {
+        "Archive Raw Data" : {
           "Type" : "Task",
-          "Resource" : "arn:aws:states:::lambda:invoke.waitForTaskToken",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "Payload" : {
-              "token.$" : "$$.Task.Token",
-              "sourceBucket" : var.s3_raw_bucket_id,
-              "destinationBucket" : var.s3_raw_archive_bucket_id,
-              "config" : {
-                "bucket" : var.s3_glue_bucket_id,
-                "key" : var.domain
-              }
-            },
-            "FunctionName" : var.s3_file_transfer_lambda_function
-          },
-          "Retry" : [
-            {
-              "ErrorEquals" : [
-                "Lambda.ServiceException",
-                "Lambda.AWSLambdaException",
-                "Lambda.SdkClientException",
-                "Lambda.TooManyRequestsException"
-              ],
-              "IntervalSeconds" : 600,
-              "MaxAttempts" : 2,
-              "BackoffRate" : 2
+            "JobName" : var.glue_s3_file_transfer_job,
+            "Arguments" : {
+              "--dpr.file.transfer.source.bucket" : var.s3_raw_bucket_id,
+              "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
+              "--dpr.file.transfer.retention.days" : "0",
+              "--dpr.file.transfer.delete.copied.files" : "true",
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
             }
-          ],
+          },
           "Next" : "Create Hive Tables"
         },
         "Create Hive Tables" : {
