@@ -19,17 +19,17 @@ mainSteps:
 
           # delete old versions of Windows PowerShell PSReadline which are the issue
 
-          $moduleDirectories = Get-ChildItem -Path "C:\Program Files\WindowsPowerShell\Modules\PSReadline" -Directory -Depth 0
+          $psreadlineModuleDirectories = Get-ChildItem -Path "C:\Program Files\WindowsPowerShell\Modules\PSReadline" -Directory
 
           foreach ($psreadlineModuleDirectory in $psreadlineModuleDirectories) {
             $moduleDirectoryPath = $psreadlineModuleDirectory.FullName
-            $moduleDirectoryName = $psresdlineModuleDirectory.Name
+            $moduleDirectoryName = $psreadlineModuleDirectory.Name
 
             if ($moduleDirectoryName -le "2.2.2") {
               Remove-Item -Recurse -Force -Path $moduleDirectoryPath
             }
           }
 
-          $PSReadlineVersion = (Get-Module -ListAvailable PSReadLine).Version.ToString()
+          $PSReadlineVersion = (Get-Module -ListAvailable PSReadLine).Version
 
           Write-Host "PSReadline Module Version: $PSReadlineVersion"
