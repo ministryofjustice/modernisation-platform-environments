@@ -149,7 +149,7 @@ resource "aws_apigatewayv2_stage" "maat_api_stage" {
 resource "aws_apigatewayv2_domain_name" "maat_api_external_domain_name" {
   domain_name = "maat-cd-api-gateway.${data.aws_route53_zone.external.name}"
   domain_name_configuration {
-    endpoint_type = "Regional"
+    endpoint_type = "REGIONAL"
     certificate_arn = aws_acm_certificate.maat_api_acm_certificate.arn
     security_policy = "TLS_1_2"
   }
