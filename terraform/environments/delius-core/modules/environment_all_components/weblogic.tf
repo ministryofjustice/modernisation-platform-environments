@@ -11,7 +11,7 @@ module "weblogic" {
     },
     {
       name  = "LDAP_HOST"
-      value = aws_lb.ldap.dns_name
+      value = module.ldap.nlb_dns_name
     }
   ]
   container_secrets = [

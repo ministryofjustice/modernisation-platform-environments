@@ -6,6 +6,12 @@ variable "app_name" {
   type = string
 }
 
+variable "internal" {
+  description = "whether the LB is internal or not. Defaults to `true`"
+  type        = bool
+  default     = true
+}
+
 # Account level info
 variable "account_info" {
   type = object({
@@ -72,24 +78,26 @@ variable "environment_config" {
 
 variable "ldap_config" {
   type = object({
-    name                         = string
-    migration_source_account_id  = string
-    migration_lambda_role        = string
-    efs_throughput_mode          = string
-    efs_provisioned_throughput   = string
-    efs_backup_schedule          = string
-    efs_backup_retention_period  = string
-    efs_datasync_destination_arn = any
+    name                        = string
+    encrypted                   = bool
+    migration_source_account_id = string
+    migration_lambda_role       = string
+    efs_throughput_mode         = string
+    efs_provisioned_throughput  = string
+    efs_backup_schedule         = string
+    efs_backup_retention_period = string
+    port                        = optional(number)
   })
   default = {
-    name                         = "default_name"
-    migration_source_account_id  = "default_migration_source_account_id"
-    migration_lambda_role        = "default_migration_lambda_role"
-    efs_throughput_mode          = "default_efs_throughput_mode"
-    efs_provisioned_throughput   = "default_efs_provisioned_throughput"
-    efs_backup_schedule          = "default_efs_backup_schedule"
-    efs_backup_retention_period  = "default_efs_backup_retention_period"
-    efs_datasync_destination_arn = null
+    name                        = "default_name"
+    encrypted                   = true
+    migration_source_account_id = "default_migration_source_account_id"
+    migration_lambda_role       = "default_migration_lambda_role"
+    efs_throughput_mode         = "default_efs_throughput_mode"
+    efs_provisioned_throughput  = "default_efs_provisioned_throughput"
+    efs_backup_schedule         = "default_efs_backup_schedule"
+    efs_backup_retention_period = "default_efs_backup_retention_period"
+    port                        = 389
   }
 }
 
@@ -137,86 +145,6 @@ variable "db_config" {
       }
     )
   )
-  #  default = {
-  #    primary = {
-  #      ami_name_regex = "ami_name_example"
-  #      user_data_raw  = "user_data_raw_example"
-  #      instance = {
-  #        associate_public_ip_address  = false
-  #        disable_api_termination      = false
-  #        instance_type                = "instance_type_example"
-  #        metadata_endpoint_enabled    = "enabled"
-  #        metadata_options_http_tokens = "required"
-  #        monitoring                   = true
-  #        ebs_block_device_inline      = false
-  #        vpc_security_group_ids       = []
-  #        private_dns_name_options = {
-  #          enable_resource_name_dns_aaaa_record = false
-  #          enable_resource_name_dns_a_record    = false
-  #          hostname_type                        = "hostname_type_example"
-  #        }
-  #      }
-  #      ebs_volumes = {
-  #        kms_key_id = "id"
-  #        tags       = { "key" = "value" }
-  #        iops       = 3000
-  #        throughput = 125
-  #        root_volume = {
-  #          volume_type = "gp3"
-  #          volume_size = 30
-  #        }
-  #        ebs_non_root_volumes = {
-  #          "/dev/sdb" = {
-  #            volume_type = "gp3"
-  #            volume_size = 200
-  #          }
-  #        }
-  #      }
-  #      route53_records = {
-  #        create_internal_record = false
-  #        create_external_record = false
-  #      }
-  #    }
-  #    standby = {
-  #      ami_name_regex = "ami_name_example"
-  #      user_data_raw  = "user_data_raw_example"
-  #      instance = {
-  #        associate_public_ip_address  = false
-  #        disable_api_termination      = false
-  #        instance_type                = "instance_type_example"
-  #        metadata_endpoint_enabled    = "enabled"
-  #        metadata_options_http_tokens = "required"
-  #        monitoring                   = true
-  #        ebs_block_device_inline      = false
-  #        vpc_security_group_ids       = []
-  #        private_dns_name_options = {
-  #          enable_resource_name_dns_aaaa_record = false
-  #          enable_resource_name_dns_a_record    = false
-  #          hostname_type                        = "hostname_type_example"
-  #        }
-  #      }
-  #      ebs_volumes = {
-  #        kms_key_id = "id"
-  #        tags       = { "key" = "value" }
-  #        iops       = 3000
-  #        throughput = 125
-  #        root_volume = {
-  #          volume_type = "gp3"
-  #          volume_size = 30
-  #        }
-  #        ebs_non_root_volumes = {
-  #          "/dev/sdb" = {
-  #            volume_type = "gp3"
-  #            volume_size = 200
-  #          }
-  #        }
-  #      }
-  #      route53_records = {
-  #        create_internal_record = false
-  #        create_external_record = false
-  #      }
-  #    }
-  #  }
 }
 
 variable "weblogic_config" {
