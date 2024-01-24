@@ -46,7 +46,7 @@ module "reload_pipeline" {
           "Parameters" : {
             "JobName" : var.glue_switch_prisons_hive_data_location_job,
             "Arguments" : {
-              "--dpr.prisons.data.switch.target.s3.path" : var.s3_temp_reload_bucket_id,
+              "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_temp_reload_bucket_id}",
               "--dpr.config.key" : var.domain
             }
           },
@@ -59,6 +59,7 @@ module "reload_pipeline" {
             "JobName" : var.glue_s3_data_deletion_job,
             "Arguments" : {
               "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+              "--dpr.allowed.s3.file.extensions" : "*",
               "--dpr.config.key" : var.domain
             }
           },
@@ -121,6 +122,7 @@ module "reload_pipeline" {
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.retention.days" : "0",
               "--dpr.file.transfer.delete.copied.files" : "true",
+              "--dpr.allowed.s3.file.extensions" : ".parquet",
               "--dpr.config.key" : var.domain
             }
           },
@@ -153,7 +155,7 @@ module "reload_pipeline" {
           "Parameters" : {
             "JobName" : var.glue_switch_prisons_hive_data_location_job,
             "Arguments" : {
-              "--dpr.prisons.data.switch.target.s3.path" : var.s3_curated_bucket_id,
+              "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_curated_bucket_id}",
               "--dpr.config.key" : var.domain
             }
           },
@@ -166,6 +168,7 @@ module "reload_pipeline" {
             "JobName" : var.glue_s3_data_deletion_job,
             "Arguments" : {
               "--dpr.file.deletion.buckets" : var.s3_temp_reload_bucket_id,
+              "--dpr.allowed.s3.file.extensions" : "*",
               "--dpr.config.key" : var.domain
             }
           },
