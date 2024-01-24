@@ -12,6 +12,20 @@ resource "aws_ssm_document" "windows_domain_join" {
   )
 }
 
+resource "aws_ssm_document" "windows_domain_leave" {
+  name            = "windows-domain-leave"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/windows-domain-leave.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "windows-domain-leave"
+    },
+  )
+}
+
 resource "aws_ssm_document" "rds_gateway" {
   name            = "rds-gateway"
   document_type   = "Command"
