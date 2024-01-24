@@ -5,8 +5,6 @@ version: 1.0 # version 1.0 is required as this executes AFTER the SSM Agent is r
 tasks:
   - task: executeScript
     inputs:
-  - task: executeScript
-    inputs:
       - frequency: aonce
         type: powershell
         runAs: admin
