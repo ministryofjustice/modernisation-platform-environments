@@ -16,9 +16,9 @@ mainSteps:
           # Lookup domain configuration based on environment-name tag
           $token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
           $instanceId = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -Uri http://169.254.169.254/latest/meta-data/instance-id
-          $tags = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" | ConvertFrom-Json
+          $tagsRaw = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId"
+          $tags = "$tagsRaw" | ConvertFrom-Json
           $environmentNameTag = ($tags.Tags | Where-Object  {$_.Key -eq "environment-name"}).Value
-          $nameTag = ($tags.Tags | Where-Object  {$_.Key -eq "Name"}).Value
           $environment = $environmentNameTag.Split("-")[-1]
           If ($environment -Eq "development" -Or $environment -Eq "test") {
             $secretAccountName = "hmpps-domain-services-test"
@@ -49,23 +49,26 @@ mainSteps:
 
           # Install powershell features if missing
           if (-Not (Get-Module -ListAvailable -Name "ActiveDirectory")) {
-            Write-Output "Installing RSAT-AD-PowerShell feature"
+            Write-Host "INFO: Installing RSAT-AD-PowerShell feature"
             Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
           }
 
           # Lookup domain join secrets
-          $accountIds = aws ssm get-parameter --name account_ids --with-decryption --query Parameter.Value --output text | ConvertFrom-Json
+          $accountIdsRaw = aws ssm get-parameter --name account_ids --with-decryption --query Parameter.Value --output text
+          $accountIds = "$accountIdsRaw" | ConvertFrom-Json
           $secretAccountId = $accountIds.$secretAccountName
           $secretName = "/microsoft/AD/$domainNameFQDN/shared-passwords"
           $secretArn = "arn:aws:secretsmanager:eu-west-2:${secretAccountId}:secret:${secretName}"
           $accountId = aws sts get-caller-identity --query Account --output text
           $roleArn = "arn:aws:iam::${accountId}:role/EC2HmppsDomainSecretsRole"
           $session = "ssm-windows-domain-join"
-          $creds = aws sts assume-role --role-arn "${roleArn}" --role-session-name "${session}" | ConvertFrom-Json
+          $credsRaw = aws sts assume-role --role-arn "${roleArn}" --role-session-name "${session}"
+          $creds = "$credsRaw" | ConvertFrom-Json
           $env:AWS_ACCESS_KEY_ID = $creds.Credentials.AccessKeyId
           $env:AWS_SECRET_ACCESS_KEY = $creds.Credentials.SecretAccessKey
           $env:AWS_SESSION_TOKEN = $creds.Credentials.SessionToken
-          $secretValue = aws secretsmanager get-secret-value --secret-id "${secretArn}" --query SecretString --output text | ConvertFrom-Json
+          $secretValueRaw = aws secretsmanager get-secret-value --secret-id "${secretArn}" --query SecretString --output text
+          $secretValue = "$secretValueRaw" | ConvertFrom-Json
           $env:AWS_ACCESS_KEY_ID = ""
           $env:AWS_SECRET_ACCESS_KEY = ""
           $env:AWS_SESSION_TOKEN = ""
@@ -74,7 +77,6 @@ mainSteps:
           $credentials = New-Object System.Management.Automation.PSCredential ("$domainNameNetbios\$domainJoinUsername", $domainJoinPasswordSecureString)
 
           # Leave the domain
-          Write-Output "Removing $nameTag from $domainNameFQDN domain and rebooting"
-          Write-Host "INFO: Removing $nameTag from $domainNameFQDN domain and rebooting"
+          Write-Host "INFO: Removing $env:COMPUTERNAME from $domainNameFQDN domain and rebooting"
           Remove-Computer -Credential $credentials -Verbose -Force
           Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot
