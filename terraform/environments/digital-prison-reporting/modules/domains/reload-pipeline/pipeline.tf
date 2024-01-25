@@ -59,7 +59,6 @@ module "reload_pipeline" {
             "JobName" : var.glue_s3_data_deletion_job,
             "Arguments" : {
               "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
-              "--dpr.allowed.s3.file.extensions" : "*",
               "--dpr.config.key" : var.domain
             }
           },
@@ -168,7 +167,6 @@ module "reload_pipeline" {
             "JobName" : var.glue_s3_data_deletion_job,
             "Arguments" : {
               "--dpr.file.deletion.buckets" : var.s3_temp_reload_bucket_id,
-              "--dpr.allowed.s3.file.extensions" : "*",
               "--dpr.config.key" : var.domain
             }
           },

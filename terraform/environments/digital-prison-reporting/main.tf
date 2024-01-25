@@ -422,6 +422,7 @@ module "glue_s3_data_deletion_job" {
     "--dpr.config.s3.bucket"                 = module.s3_glue_job_bucket.bucket_id,
 #    "--dpr.config.key"                       = "(Required) config key. Will be specified at point of call in the reload step-functions"
 #    "--dpr.file.deletion.buckets"            = "(Required) comma separated set of s3 buckets from which to delete data from"
+    "--dpr.allowed.s3.file.extensions"       = "*"
     "--dpr.log.level"                        = local.refresh_job_log_level
   }
 
