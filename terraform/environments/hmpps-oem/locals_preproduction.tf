@@ -14,16 +14,16 @@ locals {
     }
 
     baseline_ec2_instances = {
-      preprod-oem-a = merge(local.oem_ec2_default, {
-        config = merge(local.oem_ec2_default.config, {
-          availability_zone = "eu-west-2a"
-        })
-        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
-          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "cb226d7bc7cbce9a252cb4ea79e237f4c074d66d" # 2023-09-27 preprod ansible config
-          })
-        })
-      })
+      # preprod-oem-a = merge(local.oem_ec2_default, {
+      #   config = merge(local.oem_ec2_default.config, {
+      #     availability_zone = "eu-west-2a"
+      #   })
+      #   user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
+      #     args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
+      #       branch = "cb226d7bc7cbce9a252cb4ea79e237f4c074d66d" # 2023-09-27 preprod ansible config
+      #     })
+      #    })
+      #  })
     }
 
     baseline_route53_zones = {
