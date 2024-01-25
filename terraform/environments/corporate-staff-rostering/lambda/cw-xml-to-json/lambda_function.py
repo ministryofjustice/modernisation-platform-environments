@@ -3,6 +3,7 @@ import json
 import zlib
 
 import boto3
+from botocore.exceptions import ClientError
 import xmltodict
 
 
@@ -15,6 +16,24 @@ def xml_to_dict(xml_string):
         return xml_dict
     except Exception as e:
         return f"Error: {e}"
+
+
+def create_log_stream(log_group_name, log_stream_name):
+    client = boto3.client("logs")
+
+    try:
+        response = client.describe_log_streams(
+            logGroupName=log_group_name, logStreamNamePrefix=log_stream_name, limit=1
+        )
+
+        streams = response.get("logStreams", [])
+        if not any(s["logStreamName"] == log_stream_name for s in streams):
+            client.create_log_stream(
+                logGroupName=log_group_name, logStreamName=log_stream_name
+            )
+
+    except ClientError as e:
+        print(f"An error occurred: {e}")
 
 
 def lambda_handler(event, context):
@@ -41,6 +60,8 @@ def lambda_handler(event, context):
 
     dest_log_group = DEST_LOG_GROUP
     dest_log_stream = log_data["logStream"]
+
+    create_log_stream(dest_log_group, dest_log_stream)
 
     for log_event in log_data["logEvents"]:
         new_log_message = xml_to_dict(log_event)
