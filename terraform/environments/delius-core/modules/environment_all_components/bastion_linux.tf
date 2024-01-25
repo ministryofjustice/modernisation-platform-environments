@@ -15,11 +15,11 @@ module "bastion_linux" {
   }
 
   # s3 - used for logs and user ssh public keys
-  bucket_name          = "bastion"
+  bucket_name          = "bastion-${var.env_name}"
   bucket_versioning    = true
   bucket_force_destroy = true
   # public keys
-  public_key_data = local.public_key_data.keys[local.environment]
+  public_key_data = local.public_key_data.keys[var.env_name]
   # logs
   log_auto_clean       = "Enabled"
   log_standard_ia_days = 30  # days before moving to IA storage
@@ -28,16 +28,15 @@ module "bastion_linux" {
   # bastion
   allow_ssh_commands = false
 
-  app_name      = var.networking[0].application
-  business_unit = local.vpc_name
-  subnet_set    = local.subnet_set
-  environment   = local.environment
+  app_name      = var.app_name
+  business_unit = var.bastion_config.business_unit
+  subnet_set    = var.bastion_config.subnet_set
+  environment   = var.bastion_config.environment
   region        = "eu-west-2"
 
-  extra_user_data_content = "yum install -y openldap-clients"
-
+  extra_user_data_content = var.bastion_config.extra_user_data_content
   # Tags
-  tags_common = local.tags
+  tags_common = var.tags
   tags_prefix = terraform.workspace
 }
 

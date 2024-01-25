@@ -36,13 +36,11 @@ variable "account_config" {
     route53_inner_zone_info       = any
     route53_network_services_zone = any
     route53_external_zone         = any
-    bastion                       = any
     kms_keys = object({
       ebs_shared     = any
       general_shared = any
       rds_shared     = any
     })
-
     general_shared_kms_key_arn = optional(string)
   })
   default = {
@@ -58,7 +56,6 @@ variable "account_config" {
     route53_external_zone          = {}
     migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
     general_shared_kms_key_arn     = "default_general_shared_kms_key_arn"
-    bastion                        = {}
     kms_keys = {
       ebs_shared     = {}
       general_shared = {}
@@ -196,13 +193,8 @@ variable "delius_db_container_config" {
 
 }
 
-variable "bastion" {
-  type = object({
-    security_group_id = string
-  })
-  default = {
-    security_group_id = "default_security_group_id"
-  }
+variable "bastion_config" {
+  type = any
 }
 
 variable "environments_in_account" {

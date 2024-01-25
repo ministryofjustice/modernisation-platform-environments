@@ -15,7 +15,6 @@ locals {
     route53_external_zone         = data.aws_route53_zone.external
     general_shared_kms_key_arn    = data.aws_kms_key.general_shared.arn
     shared_vpc_id                 = data.aws_vpc.shared.id
-    bastion                       = module.bastion_linux
     kms_keys = {
       ebs_shared     = data.aws_kms_key.ebs_shared.arn
       general_shared = data.aws_kms_key.general_shared.arn
@@ -146,6 +145,14 @@ locals {
     db_image_tag                  = "5.7.4"
     db_port                       = 1521
     db_name                       = "MODNDA"
+  }
+
+
+  bastion_config_test = {
+    business_unit           = local.vpc_name
+    subnet_set              = local.subnet_set
+    environment             = local.environment
+    extra_user_data_content = "yum install -y openldap-clients"
   }
 
   delius_db_container_config_test = {
