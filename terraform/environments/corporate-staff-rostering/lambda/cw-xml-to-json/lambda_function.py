@@ -64,7 +64,7 @@ def lambda_handler(event, context):
     create_log_stream(dest_log_group, dest_log_stream)
 
     for log_event in log_data["logEvents"]:
-        new_log_message = xml_to_dict(log_event)
+        new_log_message = xml_to_dict(log_event["message"])
 
         logs_client.put_log_events(
             logGroupName=dest_log_group,
