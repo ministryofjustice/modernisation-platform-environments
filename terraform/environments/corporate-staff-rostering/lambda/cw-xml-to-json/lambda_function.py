@@ -6,6 +6,9 @@ import boto3
 import xmltodict
 
 
+DEST_LOG_GROUP = "cwagent-windows-application-json"
+
+
 def xml_to_dict(xml_string):
     try:
         xml_dict = xmltodict.parse(xml_string)
@@ -36,7 +39,7 @@ def lambda_handler(event, context):
     print("==>", "log_data")
     print(log_data)
 
-    dest_log_group = log_data["logGroup"] + "-json"
+    dest_log_group = DEST_LOG_GROUP
     dest_log_stream = log_data["logStream"]
 
     for log_event in log_data["logEvents"]:
