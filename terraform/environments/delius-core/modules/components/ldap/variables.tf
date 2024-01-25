@@ -45,3 +45,8 @@ variable "environment_config" {
   description = "environment config to pass to the instance"
   type        = any
 }
+
+variable "bastion_sg_id" {
+  description = "Security group id of the bastion"
+  type        = string
+}
