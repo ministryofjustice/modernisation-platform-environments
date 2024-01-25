@@ -33,7 +33,7 @@ resource "aws_s3_bucket" "capita_landing_bucket" {
 
 resource "aws_s3_bucket_policy" "capita_landing_bucket_policy" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
-  policy = aws_iam_policy_document.capita_landing_bucket_policy_document.json
+  policy = data.aws_iam_policy_document.capita_landing_bucket_policy_document.json
 }
 
 data "aws_iam_policy_document" "capita_landing_bucket_policy_document" {
@@ -50,7 +50,6 @@ data "aws_iam_policy_document" "capita_landing_bucket_policy_document" {
       variable = "s3:TlsVersion"
       values = [1.2]
     }
-
   }
 }
 
