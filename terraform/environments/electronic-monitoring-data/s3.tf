@@ -47,7 +47,7 @@ data "aws_iam_policy_document" "capita_landing_bucket_policy_document" {
     actions = ["s3:*"]
     resources = [
       aws_s3_bucket.capita_landing_bucket.arn,
-      "aws_s3_bucket.capita_landing_bucket.arn}/*"
+      "${aws_s3_bucket.capita_landing_bucket.arn}/*"
     ]
     condition {
       test = "NumericLessThan"
