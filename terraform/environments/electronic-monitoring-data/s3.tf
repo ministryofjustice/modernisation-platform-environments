@@ -33,32 +33,25 @@ resource "aws_s3_bucket" "capita_landing_bucket" {
 
 resource "aws_s3_bucket_policy" "capita_landing_bucket_policy" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Deny",
-            "Principal": {
-                "AWS": "*"
-            },
-            "Action": "s3:*",
-            "Resource": [
-                "arn:aws:s3:::capita-dyx3807oi4/*",
-                "arn:aws:s3:::capita-dyx3807oi4"
-            ],
-            "Condition": {
-                "Bool": {
-                    "aws:SecureTransport": "true"
-                },
-                "NumericLessThan": {
-                    "s3:TlsVersion": "1.2"
-                }
-            }
-        }
-    ]
+  policy = aws_iam_policy_document.capita_landing_bucket_policy_document.json
 }
-EOF
+
+data "aws_iam_policy_document" "capita_landing_bucket_policy_document" {
+  statement {
+    sid       = "EnforceTLSv12orHigher"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = [
+      aws_s3_bucket.capita_landing_bucket.arn,
+      "aws_s3_bucket.capita_landing_bucket.arn}/*"
+    ]
+    condition {
+      test = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values = [1.2]
+    }
+
+  }
 }
 
 resource "aws_s3_bucket_versioning" "capita_landing_bucket" {
