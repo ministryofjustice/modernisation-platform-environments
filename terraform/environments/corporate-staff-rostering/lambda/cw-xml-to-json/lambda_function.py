@@ -47,8 +47,6 @@ def lambda_handler(event, context):
             logStreamName=dest_log_stream,
             logEvents=[
                 {
-                    "originalLogGroup": log_data["logGroup"],
-                    "originalLogStream": log_data["logStream"],
                     "timestamp": log_event["timestamp"],
                     "message": json.dumps(new_log_message),
                 }
