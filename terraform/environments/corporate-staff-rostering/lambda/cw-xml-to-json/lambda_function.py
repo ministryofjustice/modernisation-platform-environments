@@ -24,39 +24,35 @@ def lambda_handler(event, context):
     print("==>", 'event["awslogs"]["data"]')
     print(event["awslogs"]["data"])
 
-    for record in event["awslogs"]["data"]:
-        print("==>", "record")
-        print(record)
+    compressed_payload = base64.b64decode(event["awslogs"]["data"])
+    print("==>", "compressed_payload")
+    print(compressed_payload)
 
-        compressed_payload = base64.b64decode(record)
-        print("==>", "compressed_payload")
-        print(compressed_payload)
+    uncompressed_payload = zlib.decompress(compressed_payload, 16 + zlib.MAX_WBITS)
+    print("==>", "uncompressed_payload")
+    print(uncompressed_payload)
 
-        uncompressed_payload = zlib.decompress(compressed_payload, 16 + zlib.MAX_WBITS)
-        print("==>", "uncompressed_payload")
-        print(uncompressed_payload)
+    log_data = json.loads(uncompressed_payload)
+    print("==>", "log_data")
+    print(log_data)
 
-        log_data = json.loads(uncompressed_payload)
-        print("==>", "log_data")
-        print(log_data)
+    dest_log_group = log_data["logGroup"] + "-json"
+    dest_log_stream = log_data["logStream"]
 
-        dest_log_group = log_data["logGroup"] + "-json"
-        dest_log_stream = log_data["logStream"]
+    for log_event in log_data["logEvents"]:
+        new_log_message = xml_to_dict(log_event)
 
-        for log_event in log_data["logEvents"]:
-            new_log_message = xml_to_dict(log_event)
-
-            logs_client.put_log_events(
-                logGroupName=dest_log_group,
-                logStreamName=dest_log_stream,
-                logEvents=[
-                    {
-                        "originalLogGroup": log_data["logGroup"],
-                        "originalLogStream": log_data["logStream"],
-                        "timestamp": log_event["timestamp"],
-                        "message": json.dumps(new_log_message),
-                    }
-                ],
-            )
+        logs_client.put_log_events(
+            logGroupName=dest_log_group,
+            logStreamName=dest_log_stream,
+            logEvents=[
+                {
+                    "originalLogGroup": log_data["logGroup"],
+                    "originalLogStream": log_data["logStream"],
+                    "timestamp": log_event["timestamp"],
+                    "message": json.dumps(new_log_message),
+                }
+            ],
+        )
 
     return {"statusCode": 200, "body": json.dumps("Log processing complete")}
