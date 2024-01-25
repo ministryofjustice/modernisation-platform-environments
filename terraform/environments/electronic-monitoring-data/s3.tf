@@ -38,9 +38,13 @@ resource "aws_s3_bucket_policy" "capita_landing_bucket_policy" {
 
 data "aws_iam_policy_document" "capita_landing_bucket_policy_document" {
   statement {
-    sid       = "EnforceTLSv12orHigher"
-    effect    = "Deny"
-    actions   = ["s3:*"]
+    sid = "EnforceTLSv12orHigher"
+    principals {
+      type = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Deny"
+    actions = ["s3:*"]
     resources = [
       aws_s3_bucket.capita_landing_bucket.arn,
       "aws_s3_bucket.capita_landing_bucket.arn}/*"
