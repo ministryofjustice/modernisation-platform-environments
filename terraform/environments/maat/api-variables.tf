@@ -38,3 +38,19 @@ variable "alb_4xx_alarm_threshold" {
   type    = number
   default = 10
 }
+variable "ecs_high_cpu_scaling_threshold" {
+  type    = number
+  default = 70
+}
+variable "ecs_low_cpu_scaling_threshold" {
+  type    = number
+  default = 20
+}
+variable "ecs_high_memory_scaling_threshold" {
+  type    = number
+  default = 70
+}
+variable "ecs_low_memory_scaling_threshold" {
+  type    = number
+  default = 20
+}
