@@ -97,7 +97,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "95"
-        alarm_description   = "Triggers if memory usage is continually high for one hour. See See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326523370"
+        alarm_description   = "Triggers if memory usage is continually high for one hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326523370"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       instance-or-cloudwatch-agent-stopped = {
@@ -110,7 +110,7 @@ locals {
         statistic           = "SampleCount"
         threshold           = "0"
         treat_missing_data  = "breaching"
-        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped since the metric will not be collected."
+        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
@@ -162,7 +162,7 @@ locals {
         statistic           = "SampleCount"
         threshold           = "0"
         treat_missing_data  = "breaching"
-        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped since the metric will not be collected."
+        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
