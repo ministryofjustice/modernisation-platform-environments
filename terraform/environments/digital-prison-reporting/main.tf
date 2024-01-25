@@ -298,6 +298,7 @@ module "glue_s3_file_transfer_job" {
     "--dpr.file.transfer.destination.bucket"  = module.s3_raw_archive_bucket.bucket_id
     "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
     "--dpr.file.transfer.delete.copied.files" = true,
+    "--dpr.allowed.s3.file.extensions"        = "*",
     "--dpr.log.level"                         = local.refresh_job_log_level
   }
 
