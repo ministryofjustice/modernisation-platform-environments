@@ -241,7 +241,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_high_cpu_service_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = var.ecs_high_cpu_scaling_threshold
+  threshold           = local.application_data.accounts[local.environment].ecs_high_cpu_scaling_threshold
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_up_policy.arn]
@@ -261,7 +261,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_low_cpu_service_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = var.ecs_low_cpu_scaling_threshold
+  threshold           = local.application_data.accounts[local.environment].ecs_low_cpu_scaling_threshold
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_down_policy.arn]
@@ -282,7 +282,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_high_memory_service_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = var.ecs_high_memory_scaling_threshold
+  threshold           = local.application_data.accounts[local.environment].ecs_high_memory_scaling_threshold
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_up_policy.arn]
@@ -302,7 +302,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_low_memory_service_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = var.ecs_low_memory_scaling_threshold
+  threshold           = local.application_data.accounts[local.environment].ecs_low_memory_scaling_threshold
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_down_policy.arn]

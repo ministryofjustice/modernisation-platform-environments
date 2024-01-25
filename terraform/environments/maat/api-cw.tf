@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
   statistic          = "Average"
   period             = 60
   evaluation_periods = 5
-  threshold          = var.ecs_cpu_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].ecs_cpu_alarm_threshold
   treat_missing_data = "breaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_threshold" {
   statistic          = "Average"
   period             = 60
   evaluation_periods = 5
-  threshold          = var.ecs_memory_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].ecs_memory_alarm_threshold
   treat_missing_data = "breaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -56,7 +56,7 @@ resource "aws_cloudwatch_metric_alarm" "target_response_time" {
   extended_statistic = "p99"
   period             = 60
   evaluation_periods = 5
-  threshold          = var.alb_target_response_time_threshold
+  threshold          = local.application_data.accounts[local.environment].alb_target_response_time_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -74,7 +74,7 @@ resource "aws_cloudwatch_metric_alarm" "target_response_time_maximum" {
   statistic          = "Maximum"
   period             = 60
   evaluation_periods = 1
-  threshold          = var.alb_target_response_time_threshold_maximum
+  threshold          = local.application_data.accounts[local.environment].alb_target_response_time_threshold_maximum
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -92,7 +92,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_hosts" {
   statistic          = "Average"
   period             = 60
   evaluation_periods = 5
-  threshold          = var.alb_unhealthy_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].alb_unhealthy_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -111,7 +111,7 @@ resource "aws_cloudwatch_metric_alarm" "rejected_connection_count" {
   statistic          = "Sum"
   period             = 60
   evaluation_periods = 5
-  threshold          = var.alb_rejected_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].alb_rejected_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -129,7 +129,7 @@ resource "aws_cloudwatch_metric_alarm" "http_5xx_error" {
   statistic          = "Sum"
   period             = 60
   evaluation_periods = 5
-  threshold          = var.alb_target_5xx_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].alb_target_5xx_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -147,7 +147,7 @@ resource "aws_cloudwatch_metric_alarm" "application_elb_5xx_error" {
   statistic          = "Sum"
   period             = 60
   evaluation_periods = 5
-  threshold          = var.alb_5xx_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].alb_5xx_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -165,7 +165,7 @@ resource "aws_cloudwatch_metric_alarm" "http4xxError" {
   statistic          = "Sum"
   period             = 60
   evaluation_periods = 5
-  threshold          = var.alb_target_4xx_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].alb_target_4xx_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -183,7 +183,7 @@ resource "aws_cloudwatch_metric_alarm" "application_elb_4xx_error" {
   statistic          = "Sum"
   period             = 60
   evaluation_periods = 5
-  threshold          = var.alb_4xx_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].alb_4xx_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
