@@ -135,7 +135,7 @@ locals {
                 }]
               }
               pd-rdgw-2-http = {
-                priority = 100
+                priority = 300
                 actions = [{
                   type              = "forward"
                   target_group_name = "pd-rds-2012-http"
@@ -149,7 +149,7 @@ locals {
                 }]
               }
               pd-rds-2-https = {
-                priority = 200
+                priority = 400
                 actions = [{
                   type              = "forward"
                   target_group_name = "pd-rds-2012-https"
