@@ -11,6 +11,9 @@ RESOURCES_TO_CHECK_FOR=(
   "aws_iam_user"
   "aws_iam_user_policy"
   "aws_iam_policy_document"
+  "aws_iam_user_policy_attachment"
+  "aws_iam_access_key"
+  "aws_iam_role"
 )
 
 resourcesFound=false
