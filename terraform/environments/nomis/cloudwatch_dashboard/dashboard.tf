@@ -1,3 +1,23 @@
+resource "aws_ssm_document" "calculate_ebs_performance_metrics" {
+  name          = "AWSSupport-CalculateEBSPerformanceMetrics"
+  document_type = "Automation"
+  content = <<EOF
+{
+  "schemaVersion": "0.3",
+  "description": "Calculates EBS performance metrics.",
+  "parameters": {}
+}
+  EOF
+}
+
+resource "aws_ssm_association" "automation_execution" {
+  name                 = "calculate_ebs_performance_metrics"
+  instance_id_target   = "*"
+  targets              = [{ key = "InstanceIds", values = ["*"] }]
+  schedule_expression  = "rate(12 hour)"
+  document_version     = "$LATEST"
+}
+
 resource "aws_cloudwatch_dashboard" "nomis_cloudwatch_dashboard" {
   dashboard_name = "CloudWatch-Default"
   dashboard_body = jsonencode(local.dashboard_body)
