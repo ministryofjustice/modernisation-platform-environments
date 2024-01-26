@@ -31,8 +31,8 @@ resource "aws_cognito_resource_server" "maat_api_cognito_user_pool_server" {
   name         = "${local.application_name}-cd-api-ResourceServer1"
 
   scope {
-    scope_name        = local.application_data.accounts[local.environment].api_scope
-    scope_description = "${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"
+    scope_name        = local.application_data.accounts[local.environment].maat_api_api_scope
+    scope_description = "${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"
   }
 }
 
@@ -50,7 +50,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_default" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -64,7 +64,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_cda" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -78,7 +78,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_cma" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -92,7 +92,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ccp" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -106,7 +106,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ccc" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -120,7 +120,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ce" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -134,7 +134,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_caa" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -148,7 +148,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_ats" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -162,7 +162,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_dcrs" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -176,7 +176,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_dirs" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -190,7 +190,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_chs" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -204,7 +204,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_cvs" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
@@ -218,7 +218,7 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_maatos" {
   generate_secret                      = true
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows                  = ["client_credentials"]
-  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].api_scope}"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
   prevent_user_existence_errors        = "ENABLED"
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
