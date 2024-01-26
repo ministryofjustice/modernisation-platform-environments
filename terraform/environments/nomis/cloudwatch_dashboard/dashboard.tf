@@ -5,17 +5,26 @@ resource "aws_ssm_document" "calculate_ebs_performance_metrics" {
 {
   "schemaVersion": "0.3",
   "description": "Calculates EBS performance metrics.",
-  "parameters": {}
+  "parameters": {
+    "resourceId": "*"
+  }
 }
   EOF
 }
 
 resource "aws_ssm_association" "automation_execution" {
   name                 = "calculate_ebs_performance_metrics"
-  instance_id_target   = "*"
-  targets              = [{ key = "InstanceIds", values = ["*"] }]
   schedule_expression  = "rate(12 hour)"
   document_version     = "$LATEST"
+  parameters = {
+    resourceId = "*"
+    startTime  = local.ebs_performance_start_time
+    endTime    = local.ebs_performance_end_time
+  }
+  targets {
+    key = "ResourceId"
+    values = ["*"]
+  }
 }
 
 resource "aws_cloudwatch_dashboard" "nomis_cloudwatch_dashboard" {
@@ -25,6 +34,9 @@ resource "aws_cloudwatch_dashboard" "nomis_cloudwatch_dashboard" {
 
 locals {
 
+  ebs_performance_start_time = formatdate("YYYY-MM-DDTHH:MM:SS", timestamp())
+  ebs_performance_end_time = formatdate("YYYY-MM-DDTHH:MM:SS", timestamp() - 48*60*60)
+  
   cloudwatch_period = 300
   region            = "eu-west-2"
 
