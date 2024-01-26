@@ -30,7 +30,7 @@ module "bastion_linux" {
   # bastion
   allow_ssh_commands = false
 
-  app_name      = "${var.app_name}-${var.env_name}"
+  app_name      = var.app_name
   business_unit = var.bastion_config.business_unit
   subnet_set    = var.bastion_config.subnet_set
   environment   = var.bastion_config.environment
