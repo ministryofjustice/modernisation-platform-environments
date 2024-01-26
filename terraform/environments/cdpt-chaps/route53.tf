@@ -5,7 +5,7 @@ resource "aws_acm_certificate" "external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.application_data.accounts[local.environment].environment_name}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -48,7 +48,7 @@ resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.application_data.accounts[local.environment].environment_name}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
