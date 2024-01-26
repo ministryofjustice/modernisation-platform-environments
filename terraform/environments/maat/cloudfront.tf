@@ -1,7 +1,7 @@
 locals {
     application_url_prefix = "meansassessment"
     lower_env_url = "${local.application_url_prefix}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
-    custom_header = "X-Custom-Header-LAA-${upper(var.application_name)}"
+    custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
     cloudfront_alias = local.environment == "production" ? local.application_data.accounts[local.environment].domain_name : local.lower_env_url
 
 
@@ -86,7 +86,7 @@ resource "random_password" "cloudfront" {
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
-  name        = "cloudfront-secret-${var.application_name}" # ${formatdate("DDMMMYYYYhhmm", timestamp())}
+  name        = "cloudfront-secret-${local.application_name}" # ${formatdate("DDMMMYYYYhhmm", timestamp())}
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
 }
 
@@ -107,7 +107,7 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
 
 # Mirroring laa-cloudfront-logging-development in laa-dev
 resource "aws_s3_bucket" "cloudfront" { 
-  bucket = "laa-${var.application_name}-cloudfront-logging-${local.environment}"
+  bucket = "laa-${local.application_name}-cloudfront-logging-${local.environment}"
   # force_destroy = true # Enable to recreate bucket deleting everything inside
   tags = merge(
     local.tags,
@@ -176,22 +176,22 @@ resource "aws_cloudfront_distribution" "external" {
   aliases = [local.cloudfront_alias]
   default_cache_behavior {
     target_origin_id = aws_lb.loadbalancer.id # TODO update with the actual LB
-    smooth_streaming = lookup(var.cloudfront_default_cache_behavior, "smooth_streaming", null)
-    allowed_methods  = lookup(var.cloudfront_default_cache_behavior, "allowed_methods", null)
-    cached_methods   = lookup(var.cloudfront_default_cache_behavior, "cached_methods", null)
+    smooth_streaming = lookup(local.cloudfront_default_cache_behavior, "smooth_streaming", null)
+    allowed_methods  = lookup(local.cloudfront_default_cache_behavior, "allowed_methods", null)
+    cached_methods   = lookup(local.cloudfront_default_cache_behavior, "cached_methods", null)
     forwarded_values {
-      query_string = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_query_string", null)
-      headers      = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_headers", null)
+      query_string = lookup(local.cloudfront_default_cache_behavior, "forwarded_values_query_string", null)
+      headers      = lookup(local.cloudfront_default_cache_behavior, "forwarded_values_headers", null)
       cookies {
-        forward           = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
-        whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
+        forward           = lookup(local.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
+        whitelisted_names = lookup(local.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
       }
     }
-    viewer_protocol_policy = lookup(var.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
+    viewer_protocol_policy = lookup(local.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
   }
 
   dynamic "ordered_cache_behavior" {
-    for_each = var.cloudfront_ordered_cache_behavior
+    for_each = local.cloudfront_ordered_cache_behavior
     content {
       target_origin_id = aws_lb.loadbalancer.id # TODO update with the actual LB
       smooth_streaming = lookup(ordered_cache_behavior.value, "smooth_streaming", null)
