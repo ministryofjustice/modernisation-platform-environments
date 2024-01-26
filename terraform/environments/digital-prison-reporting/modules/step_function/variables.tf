@@ -21,7 +21,7 @@ variable "step_function_name" {
 
 variable "dms_task_time_out" {
   description = "(Optional) The duration after which the DMS load step is deemed to have failed."
-  default     = 43200 # 12 hours
+  default     = 86400 # 24 hours
   type        = number
 }
 
