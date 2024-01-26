@@ -208,7 +208,7 @@ module "glue_hive_table_creation_job" {
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
   number_of_workers           = 2
-  max_concurrent              = 1
+  max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
   log_group_retention_in_days = 1
@@ -226,6 +226,8 @@ module "glue_hive_table_creation_job" {
     "--extra-jars"                = local.glue_jobs_latest_jar_location
     "--class"                     = "uk.gov.justice.digital.job.HiveTableCreationJob"
     "--dpr.aws.region"            = local.account_region
+    "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id,
+#    "--dpr.config.key"            = "(Required) config key. Will be specified at point of call in the reload step-functions"
     "--dpr.raw.archive.s3.path"   = "s3://${module.s3_raw_archive_bucket.bucket_id}"
     "--dpr.structured.s3.path"    = "s3://${module.s3_structured_bucket.bucket_id}"
     "--dpr.curated.s3.path"       = "s3://${module.s3_curated_bucket.bucket_id}"
@@ -242,12 +244,239 @@ module "glue_hive_table_creation_job" {
     module.s3_raw_archive_bucket.bucket_id,
     module.s3_structured_bucket.bucket_id,
     module.s3_curated_bucket.bucket_id,
+    module.s3_glue_job_bucket.bucket_id,
     module.glue_raw_archive_database.db_name,
     module.glue_structured_zone_database.db_name,
     module.glue_curated_zone_database.db_name,
     module.glue_prisons_database.db_name,
     module.glue_registry_avro.registry_name
   ]
+}
+
+# Glue Job, S3 File Archive Job
+module "glue_s3_file_transfer_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-s3-file-transfer-job-${local.env}"
+  short_name                    = "${local.project}-s3-file-transfer-job"
+  command_type                  = "glueetl"
+  description                   = "Transfers s3 data from one bucket to another"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-s3-file-transfer-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-s3-file-transfer-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-s3-file-transfer-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-46"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                            = local.glue_jobs_latest_jar_location
+    "--class"                                 = "uk.gov.justice.digital.job.S3FileTransferJob"
+    "--dpr.aws.region"                        = local.account_region
+    "--dpr.config.s3.bucket"                  = module.s3_glue_job_bucket.bucket_id,
+#    "--dpr.config.key"                        = "(Optional) config key, when provided, the job will only transfer data belonging to config otherwise all data will be transferred"
+    "--dpr.file.transfer.source.bucket"       = module.s3_raw_bucket.bucket_id
+    "--dpr.file.transfer.destination.bucket"  = module.s3_raw_archive_bucket.bucket_id
+    "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
+    "--dpr.file.transfer.delete.copied.files" = true,
+    "--dpr.allowed.s3.file.extensions"        = "*",
+    "--dpr.log.level"                         = local.refresh_job_log_level
+  }
+
+  depends_on = [
+    module.s3_raw_bucket.bucket_id,
+    module.s3_raw_archive_bucket.bucket_id,
+    module.s3_glue_job_bucket
+  ]
+}
+
+resource "aws_glue_trigger" "glue_s3_file_transfer_job_trigger" {
+  name     = "${module.glue_s3_file_transfer_job.name}-trigger"
+  schedule = local.scheduled_s3_file_transfer_schedule
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.glue_s3_file_transfer_job.name
+  }
+}
+
+# Glue Job, Switch Prisons Hive Data Location
+module "glue_switch_prisons_hive_data_location_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-switch-prisons-hive-data-location-${local.env}"
+  short_name                    = "${local.project}-switch-prisons-hive-data-location"
+  command_type                  = "glueetl"
+  description                   = "Switch Prisons Hive tables data location"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-switch-prisons-hive-data-location-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-switch-prisons-hive-data-location-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-switch-prisons-hive-data-location-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-46"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                             = local.glue_jobs_latest_jar_location
+    "--class"                                  = "uk.gov.justice.digital.job.SwitchHiveTableJob"
+    "--dpr.aws.region"                         = local.account_region
+    "--dpr.config.s3.bucket"                   = module.s3_glue_job_bucket.bucket_id,
+#    "--dpr.config.key"                         = "(Required) config key. Will be specified at point of call in the reload step-functions"
+#    "--dpr.prisons.data.switch.target.s3.path" = "(Required) s3 path to point the prisons data to"
+    "--dpr.prisons.database"                   = module.glue_prisons_database.db_name
+    "--dpr.contract.registryName"              = module.s3_schema_registry_bucket.bucket_id
+    "--dpr.schema.cache.max.size"              = local.hive_table_creation_job_schema_cache_max_size
+    "--dpr.log.level"                          = local.refresh_job_log_level
+  }
+
+  depends_on = [
+    module.s3_raw_archive_bucket.bucket_id,
+    module.s3_structured_bucket.bucket_id,
+    module.s3_curated_bucket.bucket_id,
+    module.s3_glue_job_bucket.bucket_id,
+    module.glue_raw_archive_database.db_name,
+    module.glue_structured_zone_database.db_name,
+    module.glue_curated_zone_database.db_name,
+    module.glue_prisons_database.db_name,
+    module.glue_registry_avro.registry_name
+  ]
+}
+
+# Glue Job, S3 Data Deletion Job
+module "glue_s3_data_deletion_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-s3-data-deletion-job-${local.env}"
+  short_name                    = "${local.project}-s3-data-deletion-job"
+  command_type                  = "glueetl"
+  description                   = "Deletes s3 data belonging to a configured domain from specified bucket"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-s3-data-deletion-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-s3-data-deletion-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-s3-data-deletion-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-46"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                           = local.glue_jobs_latest_jar_location
+    "--class"                                = "uk.gov.justice.digital.job.S3DataDeletionJob"
+    "--dpr.aws.region"                       = local.account_region
+    "--dpr.config.s3.bucket"                 = module.s3_glue_job_bucket.bucket_id,
+#    "--dpr.config.key"                       = "(Required) config key. Will be specified at point of call in the reload step-functions"
+#    "--dpr.file.deletion.buckets"            = "(Required) comma separated set of s3 buckets from which to delete data from"
+    "--dpr.allowed.s3.file.extensions"       = "*"
+    "--dpr.log.level"                        = local.refresh_job_log_level
+  }
+
+  depends_on = [
+    module.s3_raw_bucket.bucket_id,
+    module.s3_raw_archive_bucket.bucket_id,
+    module.s3_structured_bucket.bucket_id,
+    module.s3_curated_bucket.bucket_id,
+    module.s3_temp_reload_bucket.bucket_id
+  ]
+}
+
+# Glue Job, Stop Glue Instance Job
+module "glue_stop_glue_instance_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-stop-glue-instance-job-${local.env}"
+  short_name                    = "${local.project}-stop-glue-instance-job"
+  command_type                  = "glueetl"
+  description                   = "Stops a running Glue job instance"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-stop-glue-instance-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-stop-glue-instance-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-stop-glue-instance-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-46"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                           = local.glue_jobs_latest_jar_location
+    "--class"                                = "uk.gov.justice.digital.job.StopGlueInstanceJob"
+    "--dpr.aws.region"                       = local.account_region
+#    "--dpr.stop.glue.instance.job.name"      = "(Required) name of the glue job whose running instance is to be stopped"
+    "--dpr.log.level"                        = local.refresh_job_log_level
+  }
 }
 
 # kinesis Data Stream Ingestor
@@ -470,6 +699,25 @@ module "s3_curated_bucket" {
     {
       Name          = "${local.project}-curated-zone-${local.env}"
       Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# S3 Curated
+module "s3_temp_reload_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-temp-reload-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-temp-reload-${local.env}"
+      Resource_Type = "S3 Bucket",
+      Jira          = "DPR2-46"
     }
   )
 }
@@ -815,30 +1063,6 @@ module "s3_file_transfer_lambda" {
   depends_on = [
     aws_iam_policy.s3_all_object_actions_policy,
     aws_iam_policy.kms_read_access_policy
-  ]
-}
-
-module "s3_file_transfer_lambda_trigger" {
-  source = "./modules/lambda_trigger"
-
-  enable_lambda_trigger = local.enable_s3_file_transfer_lambda_trigger
-
-  event_name           = "${local.project}-s3-transfer-lambda-trigger-${local.env}"
-  lambda_function_arn  = module.s3_file_transfer_lambda.lambda_function
-  lambda_function_name = module.s3_file_transfer_lambda.lambda_name
-
-  trigger_input_event = jsonencode(
-    {
-      "sourceBucket" : module.s3_raw_bucket.bucket_id,
-      "destinationBucket" : module.s3_raw_archive_bucket.bucket_id,
-      "retentionDays" : tostring(local.scheduled_s3_file_transfer_lambda_retention_days)
-    }
-  )
-
-  trigger_schedule_expression = local.scheduled_s3_file_transfer_lambda_schedule
-
-  depends_on = [
-    module.s3_file_transfer_lambda
   ]
 }
 

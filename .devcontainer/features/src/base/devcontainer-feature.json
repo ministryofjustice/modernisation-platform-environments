@@ -5,7 +5,11 @@
   "description": "Base",
   "customizations": {
     "vscode": {
-      "extensions": ["GitHub.vscode-pull-request-github", "GitHub.vscode-github-actions", "ms-vsliveshare.vsliveshare"]
+      "extensions": [
+        "GitHub.vscode-pull-request-github",
+        "GitHub.vscode-github-actions",
+        "ms-vsliveshare.vsliveshare"
+      ]
     }
   },
   "installsAfter": ["ghcr.io/devcontainers/features/common-utils"]

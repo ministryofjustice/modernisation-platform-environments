@@ -1,6 +1,7 @@
 locals {
   ldap_config_lower_environments = {
     name                        = "ldap_for_lower_environments"
+    encrypted                   = true
     migration_source_account_id = local.application_data.accounts[local.environment].migration_source_account_id # legacy pre-prod account
     migration_lambda_role       = "ldap-data-migration-lambda-role"                                              # IAM role in legacy pre-prod account
     efs_throughput_mode         = "bursting"

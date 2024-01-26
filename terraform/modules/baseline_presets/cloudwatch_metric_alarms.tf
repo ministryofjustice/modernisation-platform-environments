@@ -97,7 +97,20 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "95"
-        alarm_description   = "Triggers if memory usage is continually high for one hour. See See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326523370"
+        alarm_description   = "Triggers if memory usage is continually high for one hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326523370"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      instance-or-cloudwatch-agent-stopped = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "CPU_IDLE"
+        period              = "60"
+        namespace           = "CWAgent"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 5 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
@@ -137,6 +150,19 @@ locals {
         statistic           = "Maximum"
         threshold           = "40"
         alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 3 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      instance-or-cloudwatch-agent-stopped = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "cpu_usage_idle"
+        period              = "60"
+        namespace           = "CWAgent"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 5 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }

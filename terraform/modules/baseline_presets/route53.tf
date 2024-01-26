@@ -26,6 +26,11 @@ locals {
       target_ips  = var.ip_addresses.azure_fixngo_ips.prod.domain_controllers
       rule_type   = "FORWARD"
     }
+    infra-int-domain-hmpp-forest-trust = {
+      domain_name = "infra.int"
+      target_ips  = var.ip_addresses.azure_fixngo_ips.prod.domain_controllers
+      rule_type   = "FORWARD"
+    }
   }
 
   route53_resolvers_rules_by_environment = {
@@ -37,9 +42,11 @@ locals {
     }
     preproduction = {
       azure-fixngo-domain = local.route53_resolver_rules_all.azure-fixngo-production-domain
+      infra-int-domain    = local.route53_resolver_rules_all.infra-int-domain-hmpp-forest-trust
     }
     production = {
       azure-fixngo-domain = local.route53_resolver_rules_all.azure-fixngo-production-domain
+      infra-int-domain    = local.route53_resolver_rules_all.infra-int-domain-hmpp-forest-trust
     }
   }
 

@@ -22,3 +22,14 @@ variable "account_config" {
   description = "Account config to pass to the instance"
   type        = any
 }
+
+
+variable "public_keys" {
+  description = "Public keys to add to the instance"
+  type        = map(any)
+}
+
+variable "bastion_sg_id" {
+  description = "Security group id of the bastion"
+  type        = string
+}

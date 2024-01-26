@@ -135,6 +135,7 @@ locals {
       tags = {
         backup-plan = "daily-and-weekly"
       }
+      instance_type = "r6i.4xlarge"
     })
     cloudwatch_metric_alarms = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
@@ -266,8 +267,8 @@ locals {
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-      desired_capacity = 2
-      max_size         = 2
+      desired_capacity = 1
+      max_size         = 1
     })
     lb_target_groups       = {}
     secretsmanager_secrets = {}

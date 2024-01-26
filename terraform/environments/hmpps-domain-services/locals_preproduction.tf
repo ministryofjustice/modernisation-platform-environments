@@ -1,5 +1,7 @@
-# nomis-preproduction environment settings
 locals {
+
+  # baseline presets config
+  preproduction_baseline_presets_options = {}
 
   # baseline config
   preproduction_config = {
@@ -21,6 +23,34 @@ locals {
       }
     }
 
+    baseline_ec2_autoscaling_groups = {
+
+      pp-rds-2012 = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "base_windows_server_2012_r2_release*"
+          availability_zone             = null
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["rds-ec2s"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+        }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 2
+          max_size         = 2
+        })
+        tags = {
+          description = "Windows Server 2012 for testing"
+          os-type     = "Windows"
+          component   = "test"
+        }
+      }
+    }
+
     baseline_ec2_instances = {
       pp-rdgw-1-a = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
@@ -30,7 +60,7 @@ locals {
           description = "Remote Desktop Gateway for hmpp.noms.root domain"
         })
       })
-      pp-rds-1-a = merge(local.rds_ec2_instance, {
+      pp-rds-1-b = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
           availability_zone = "eu-west-2a"
         })
@@ -50,7 +80,7 @@ locals {
           })
           pp-rds-1-https = merge(local.rds_target_groups.https, {
             attachments = [
-              { ec2_instance_name = "pp-rds-1-a" },
+              { ec2_instance_name = "pp-rds-1-b" },
             ]
           })
         }

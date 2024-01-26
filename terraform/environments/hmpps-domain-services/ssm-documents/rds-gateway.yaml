@@ -1,8 +1,18 @@
 ---
 schemaVersion: "2.2"
-description: "SSM Document for configuring an RDS app"
+description: "SSM Document for configuring an RDS gateway"
+parameters:
+  domainUsername:
+    type: "String"
+    description: "Username with domain join permissions"
+  domainPassword:
+    type: "String"
+    description: "Password for the domain join user (NOTE: Do not use a password containing quotes)"
+  rdsGatewayHostname:
+    type: "String"
+    description: "Hostname of the gateway for the RDS deployment"
 mainSteps:
-  - name: DeployRDS
+  - name: ConfigureRDSGateway
     action: aws:runPowerShellScript
     precondition:
       StringEquals:
@@ -11,3 +21,53 @@ mainSteps:
     inputs:
       runCommand:
         - |
+          $username = "{{domainUsername}}@AZURE.NOMS.ROOT"
+          $password =  ConvertTo-SecureString "{{domainPassword}}" -AsPlainText -Force
+          $credential = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
+
+          Invoke-Command -ComputerName {{rdsGatewayHostname}}.azure.noms.root  -credential $credential -scriptblock {
+              $GroupName="Domain Users@azure.noms.root"
+              $ManagedComputers="RDG_RDCBComputers"
+              $CAPPath="RDS:\GatewayServer\CAP"
+              $RAPPath="RDS:\GatewayServer\RAP"
+              $MCGPath="RDS:\GatewayServer\GatewayManagedComputerGroups"
+              $FilePath="C:\temp\export.cer"
+
+              Import-Module RemoteDesktopServices
+              Add-WindowsFeature -Name RDS-Gateway -IncludeManagementTools
+
+              # Set Transport and SSL Bridging
+              $config = Get-CimInstance -ClassName Win32_TSGatewayServerSettings -Namespace root\cimv2\terminalservices
+              Invoke-CimMethod -MethodName EnableTransport -Arguments @{TransportType=[uint16]2;enable=$false} -InputObject $config
+              Invoke-CimMethod -MethodName SetSslBridging -Arguments @{SslBridging=[uint32]1} -InputObject $config
+
+              # Managed Computer Groups
+              $MCGComputers=@($env:COMPUTERNAME,"MGMRW0008")
+              $MCGs=@(@{Name="RDG_RDCBComputers";Desc="All RDCB Computers in the deployment";Computers=$MCGComputers})
+
+              # Connection Authorization Policies (CAP)
+              $CAPs=@(@{Name="RDG_CAP_AllUsers";UserGroups=$GroupName;AuthMethod=1;Status=1})
+
+              # Resource Authorization Policies (RAP
+              $RAPs=@(@{Name="RDG_AllComputers";UserGroups=$GroupName;ComputerGroupType=2;ComputerGroup=$null})
+
+              # Clean existing config
+              $CAPs | ForEach-Object { if (Test-Path -Path "$CAPPath\$($_.Name)") { Remove-Item -Path "$CAPPath\$($_.Name)" -Recurse } }
+              $RAPs | ForEach-Object { if (Test-Path -Path "$RAPPath\$($_.Name)") { Remove-Item -Path "$RAPPath\$($_.Name)" -Recurse } }
+              $MCGs | ForEach-Object { if (Test-Path -Path "$MCGPath\$($_.Name)") { Remove-Item -Path "$MCGPath\$($_.Name)" -Recurse } }
+
+              # Set CAPs / RAPs
+              $MCGs | ForEach-Object { New-Item -Path $MCGPath -Name $_.Name -Description $_.Desc -Computers $_.Computers > $null }
+              $CAPs | ForEach-Object { New-Item -Path $CAPPath -Name $_.Name -UserGroups $_.UserGroups -AuthMethod $_.AuthMethod -Status $_.Status > $null }
+              $RAPs | ForEach-Object { New-Item -Path $RAPPath -Name $_.Name -UserGroups $_.UserGroups -ComputerGroupType $_.ComputerGroupType > $null }
+
+              # Create self signed certificate for gateway
+              $SelfSigned=New-SelfSignedCertificate -CertStoreLocation "Cert:\LocalMachine\My" -DnsName $env:COMPUTERNAME -FriendlyName $env:COMPUTERNAME -KeyAlgorithm "RSA" -HashAlgorithm "SHA256" -KeyDescription "RDG Key" -KeyLength 4096 -KeyUsage KeyEncipherment,DataEncipherment -KeyUsageProperty All
+              $CertPassword=ConvertTo-SecureString -String "password" -Force –AsPlainText
+              Export-PfxCertificate -Cert $SelfSigned.PSPath -FilePath $FilePath -Password $CertPassword > $null
+              Import-PfxCertificate -CertStoreLocation "Cert:\LocalMachine\Root" -FilePath $FilePath -Password $CertPassword > $null
+              Remove-Item -Path $FilePath
+
+              $Certificate=$SelfSigned
+              Set-Item -Path "RDS:\GatewayServer\SSLCertificate\Thumbprint" -Value $Certificate.Thumbprint
+          }

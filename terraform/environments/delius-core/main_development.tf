@@ -24,7 +24,7 @@ module "environment_dev" {
   db_config                  = local.db_config_dev
   weblogic_config            = local.weblogic_config_dev
   delius_db_container_config = local.delius_db_container_config_dev
-  bastion                    = local.bastion
+  bastion_config             = local.bastion_config_dev
 
   account_info = local.account_info
 
@@ -55,7 +55,7 @@ module "environment_test" {
   db_config                  = local.db_config_test
   weblogic_config            = local.weblogic_config_test
   delius_db_container_config = local.delius_db_container_config_test
-  bastion                    = local.bastion
+  bastion_config             = local.bastion_config_test
 
   account_info = local.account_info
 

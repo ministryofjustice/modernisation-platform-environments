@@ -74,7 +74,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   container_definitions = jsonencode([
     {
       name      = "${local.application_name}-container"
-      image     = "${local.ecr_url}:${local.application_data.accounts[local.environment].docker_image_tag}"
+      image     = "${local.ecr_url}:${local.application_data.accounts[local.environment].environment_name}"
       cpu       = 1024
       memory    = 1024
       essential = true
@@ -102,16 +102,22 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
           value = "${aws_db_instance.database.username}"
         },
         {
-          name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.database.password}"
-        },
-        {
           name  = "DB_NAME"
           value = "${local.application_data.accounts[local.environment].db_name}"
         },
         {
           name  = "CLIENT_ID"
           value = "${local.application_data.accounts[local.environment].client_id}"
+        },
+        {
+          name  = "CurServer"
+          value = "${local.application_data.accounts[local.environment].env_name}"
+        }
+      ],
+      secrets = [
+        {
+          name : "RDS_PASSWORD",
+          valueFrom : aws_secretsmanager_secret_version.db_password.arn
         }
       ]
     }
@@ -240,14 +246,6 @@ resource "aws_security_group" "cluster_ec2" {
     to_port         = 3389
     protocol        = "tcp"
     security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
-  ingress {
-    description     = "Allow RDS access"
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    security_groups = [aws_security_group.db.id]
   }
 
   egress {

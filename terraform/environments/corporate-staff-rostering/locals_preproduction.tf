@@ -85,7 +85,7 @@ locals {
           data = {
             iops       = 3000
             throughput = 125
-            total_size = 1000
+            total_size = 1500
           }
           flash = {
             iops       = 3000
@@ -439,22 +439,22 @@ locals {
 
       pp-csr-w-7-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-csr-w-7-b"
+          ami_name          = "pp-csr-w-8-b"
           availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m5.2xlarge"
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sda1" = { type = "gp3", size = 200 }
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          description       = "Migrated server PPCWW00006"
+          description       = "Rebuild of PP-csr-w-7-a using pp-csr-w-8-b ami "
           app-config-status = "pending"
           csr-region        = "Region 5 and 6"
           os-type           = "Windows"
-          ami               = "pp-csr-w-7-b"
+          ami               = "pp-csr-w-8-b"
           component         = "web"
         }
         route53_records = {

@@ -311,7 +311,7 @@ locals {
           from_port       = 9704
           to_port         = 9704
           protocol        = "tcp"
-          security_groups = []
+          security_groups = ["data"]
           cidr_blocks     = local.security_group_cidrs.http7xxx
         }
       }

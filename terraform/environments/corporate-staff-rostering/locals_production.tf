@@ -81,7 +81,7 @@ locals {
 
         ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
           data = {
-            total_size = 1000
+            total_size = 1500
           }
           flash = {
             total_size = 100

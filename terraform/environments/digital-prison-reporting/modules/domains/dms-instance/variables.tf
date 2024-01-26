@@ -10,13 +10,13 @@ variable "account_id" {
 }
 
 variable "dms_source_endpoint" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 variable "dms_target_endpoint" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 variable "name" {
@@ -57,17 +57,17 @@ variable "extra_attributes" {
 }
 
 variable "dms_source_name" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "dms_target_name" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "short_name" {
-  type = string
+  type    = string
   default = ""
 }
 
@@ -105,8 +105,8 @@ variable "subnet_ids" {
 }
 
 variable "vpc" {
-  type        = string
-  default     = ""  
+  type    = string
+  default = ""
 }
 
 variable "availability_zone" {

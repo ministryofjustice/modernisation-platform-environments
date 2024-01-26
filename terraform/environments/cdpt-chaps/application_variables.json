@@ -1,18 +1,14 @@
 {
   "accounts": {
     "development": {
-      "db_enabled": true,
       "db_instance_class": "db.t3.small",
       "db_user": "dbadmin",
       "db_allocated_storage": "100",
       "db_name": "chaps-dev",
-      "env_name": "development",
+      "env_name": "DEVELOPMENT",
       "db_instance_identifier": "db-chaps-dev",
-      "friendly_name": "Chaps development",
-      "container_instance_type": "windows",
-      "container_version": "preproduction",
-      "region": "eu-west-2",
-      "docker_image_tag": "development",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:cdpt-dev-staging-2024-jan-24",
+      "environment_name": "development",
       "app_count": 1,
       "ec2_desired_capacity": 1,
       "ec2_max_size": 2,
@@ -24,18 +20,14 @@
       "client_id": "aa335a21-40a9-45a0-b0ef-16d65584b024"
     },
     "preproduction": {
-      "db_enabled": true,
       "db_instance_class": "db.t3.xlarge",
       "db_user": "dbadmin",
-      "db_allocated_storage": "75",
-      "db_name": "chaps-preproduction",
-      "env_name": "preproduction",
+      "db_allocated_storage": "100",
+      "db_name": "chaps-staging",
+      "env_name": "STAGING",
       "db_instance_identifier": "chaps-preprod-instance",
-      "friendly_name": "Chaps preproduction",
-      "container_instance_type": "windows",
-      "container_version": "preproduction",
-      "region": "eu-west-2",
-      "docker_image_tag": "preproduction",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:cdpt-dev-staging-2024-jan-24",
+      "environment_name": "staging",
       "app_count": 2,
       "ec2_desired_capacity": 2,
       "ec2_max_size": 3,
@@ -44,21 +36,17 @@
       "instance_type": "t3.medium",
       "container_port": 80,
       "s3_bucket_name": "chaps-staging-bucket",
-      "client_id": ""
+      "client_id": "2e2cc8ad-7b64-41b9-93a1-c16b9a00b34f"
     },
     "production": {
-      "db_enabled": true,
       "db_instance_class": "db.m5.xlarge",
       "db_user": "dbadmin",
       "db_allocated_storage": "100",
-      "db_name": "chaps-prod",
-      "env_name": "production",
+      "db_name": "CHAPS_Prod",
+      "env_name": "PRODUCTION",
       "db_instance_identifier": "chaps-prod-instance",
-      "friendly_name": "Chaps Production",
-      "container_instance_type": "windows",
-      "container_version": "production",
-      "region": "eu-west-2",
-      "docker_image_tag": "production",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:chaps-prod-snapshot-2024-01-22",
+      "environment_name": "production",
       "app_count": 2,
       "ec2_desired_capacity": 2,
       "ec2_max_size": 3,
@@ -67,7 +55,7 @@
       "instance_type": "t3.medium",
       "container_port": 80,
       "s3_bucket_name": "chaps-production-bucket",
-      "client_id": ""
+      "client_id": "0a5da4a0-a108-4ca5-a45c-440b72b323e6"
     }
   }
 }

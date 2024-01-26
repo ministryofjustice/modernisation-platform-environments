@@ -67,7 +67,16 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
   from_port                    = 1521
   to_port                      = 1521
   ip_protocol                  = "tcp"
-  referenced_security_group_id = var.account_config.bastion.bastion_security_group
+  referenced_security_group_id = var.bastion_sg_id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ssh_ingress_bastion" {
+  security_group_id            = aws_security_group.db_ec2.id
+  description                  = "bastion to testing db"
+  from_port                    = 22
+  to_port                      = 22
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = var.bastion_sg_id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_db" {

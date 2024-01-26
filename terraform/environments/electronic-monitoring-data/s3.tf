@@ -31,10 +31,36 @@ resource "aws_s3_bucket" "capita_landing_bucket" {
   bucket = "capita-${random_string.capita_random_string.result}"
 }
 
+resource "aws_s3_bucket_policy" "capita_landing_bucket_policy" {
+  bucket = aws_s3_bucket.capita_landing_bucket.id
+  policy = data.aws_iam_policy_document.capita_landing_bucket_policy_document.json
+}
+
+data "aws_iam_policy_document" "capita_landing_bucket_policy_document" {
+  statement {
+    sid = "EnforceTLSv12orHigher"
+    principals {
+      type = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.capita_landing_bucket.arn,
+      "${aws_s3_bucket.capita_landing_bucket.arn}/*"
+    ]
+    condition {
+      test = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values = [1.2]
+    }
+  }
+}
+
 resource "aws_s3_bucket_versioning" "capita_landing_bucket" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
   versioning_configuration {
-    status = "Enabled"
+    status = "Disabled"
   }
 }
 
@@ -50,3 +76,18 @@ resource "aws_s3_bucket_logging" "capita_bucket_logging" {
     }
   }
 }
+
+#------------------------------------------------------------------------------
+# S3 bucket for landed data (internal facing)
+#------------------------------------------------------------------------------
+
+resource "aws_s3_bucket" "data_store_bucket" {
+  bucket_prefix = "em-data-store-"
+}
+
+# resource "aws_s3_bucket_versioning" "data_store_bucket" {
+#   bucket = aws_s3_bucket.data_store_bucket.id
+#   versioning_configuration {
+#     status = "Enabled"
+#   }
+# }

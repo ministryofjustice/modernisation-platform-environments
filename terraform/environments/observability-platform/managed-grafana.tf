@@ -30,7 +30,7 @@ module "managed_grafana" {
       "group_ids" = ["16a2d234-1031-70b5-2657-7f744c55e48f"] # observability-platform
     }
     "EDITOR" = {
-      "group_ids" = local.all_sso_uuids
+      "group_ids" = local.all_identity_centre_teams
     }
   }
 
@@ -49,31 +49,4 @@ resource "grafana_data_source" "observability_platform_prometheus" {
     sigV4AuthType = "ec2_iam_role"
     sigV4Region   = "eu-west-2"
   })
-}
-
-/* CloudWatch Sources */
-module "cloudwatch_sources" {
-  for_each = {
-    for account in local.all_cloudwatch_accounts : account => {
-      account_id = account
-    }
-  }
-
-  source = "./modules/grafana/cloudwatch-source"
-
-  name       = each.key
-  account_id = local.environment_management.account_ids[each.key]
-}
-
-/* Tenant RBAC */
-module "tenant_rbac" {
-  for_each = local.environment_configuration.observability_platform_configuration
-
-  source = "./modules/grafana/tenant-rbac"
-
-  name                = each.key
-  sso_uuid            = each.value.sso_uuid
-  cloudwatch_accounts = each.value.cloudwatch_accounts
-
-  depends_on = [module.cloudwatch_sources]
 }
