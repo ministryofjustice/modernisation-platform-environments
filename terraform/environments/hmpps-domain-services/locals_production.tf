@@ -48,6 +48,10 @@ locals {
           desired_capacity = 2
           max_size         = 2
         })
+        lb_target_groups = {
+          http  = local.rds_target_groups.http
+          https = local.rds_target_groups.https
+        }
         tags = {
           description = "Windows Server 2012 for testing"
           os-type     = "Windows"
@@ -130,6 +134,34 @@ locals {
                   }
                 }]
               }
+              pd-rdgw-2-http = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-rds-2012-http"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway2.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              pd-rds-2-https = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-rds-2012-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb2.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }
@@ -147,6 +179,8 @@ locals {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
+          { name = "rdgateway2", type = "A", lbs_map_key = "public" },
+          { name = "rdweb2", type = "A", lbs_map_key = "public" },
         ]
       }
     }
