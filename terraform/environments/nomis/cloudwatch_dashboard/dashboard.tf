@@ -9,7 +9,7 @@ resource "aws_ssm_association" "calculate_ebs_performance_metrics" {
     EndTime              = local.ebs_performance_end_time
   }
   targets {
-    key = "All Instances"
+    key = "InstanceIds"
     values = ["*"]
   }
 }
