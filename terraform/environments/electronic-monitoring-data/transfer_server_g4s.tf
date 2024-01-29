@@ -4,7 +4,7 @@
 # Assign unique IP for each supplier to connect to.
 #------------------------------------------------------------------------------
 
-resource "aws_eip" "g4s_eip" {
+resource "aws_eip" "g4s" {
   domain = "vpc"
 }
 
@@ -22,7 +22,7 @@ resource "aws_transfer_server" "g4s_transfer_server" {
   endpoint_details {
     vpc_id                 = data.aws_vpc.shared.id
     subnet_ids             = [data.aws_subnet.public_subnets_b.id]
-    address_allocation_ids = [aws_eip.g4s_eip.id]
+    address_allocation_ids = [aws_eip.g4s.id]
     security_group_ids     = [
       aws_security_group.g4s_security_group.id,
       aws_security_group.test_security_group.id

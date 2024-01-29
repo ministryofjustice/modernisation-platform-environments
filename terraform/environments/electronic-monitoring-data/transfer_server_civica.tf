@@ -4,7 +4,7 @@
 # Assign unique IP for each supplier to connect to.
 #------------------------------------------------------------------------------
 
-resource "aws_eip" "civica_eip" {
+resource "aws_eip" "civica" {
   domain = "vpc"
 }
 
@@ -22,7 +22,7 @@ resource "aws_transfer_server" "civica_transfer_server" {
   endpoint_details {
     vpc_id                 = data.aws_vpc.shared.id
     subnet_ids             = [data.aws_subnet.public_subnets_b.id]
-    address_allocation_ids = [aws_eip.civica_eip.id]
+    address_allocation_ids = [aws_eip.civica.id]
     security_group_ids     = [
       aws_security_group.civica_security_group.id,
       aws_security_group.test_security_group.id
