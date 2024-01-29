@@ -19,20 +19,29 @@
                 "awslogs-stream-prefix": "MAAT-app"
             }
         }
+
     },
     {
         "name": "MAAT",
         "image": "${ecr_url}:${docker_image_tag}",
+        "essential": true,
         "cpu": 992,
-        "memory": 3000,
-        "links": ["xray-daemon"],
         "portMappings": [
             {
                 "containerPort": 8080,
                 "protocol": "tcp"
             }
         ],
-        "essential": true,
+        "links": ["xray-daemon"],
+        "memory": 3000,
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": "MAAT-ECS",
+                "awslogs-region": "${region}",
+                "awslogs-stream-prefix": "MAAT-app"
+            }
+        },
         "environment": [
             {
                 "name": "APP_CMA_OAUTH_SCOPE",
@@ -210,14 +219,6 @@
                 "name": "APP_CAA_ENDPOINT",
                 "value": "/api/internal/v1/crimeapply"
             }
-        ],
-        "logConfiguration": {
-            "logDriver": "awslogs",
-            "options": {
-                "awslogs-group": "MAAT-ECS",
-                "awslogs-region": "${region}",
-                "awslogs-stream-prefix": "MAAT-app"
-            }
-        }
+        ]
     }
 ]
