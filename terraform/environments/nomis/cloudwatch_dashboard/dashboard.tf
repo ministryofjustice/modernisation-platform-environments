@@ -33,9 +33,9 @@ resource "aws_cloudwatch_dashboard" "nomis_cloudwatch_dashboard" {
 }
 
 locals {
-
-  ebs_performance_start_time = formatdate("YYYY-MM-DDTHH:MM:SS", timestamp())
-  ebs_performance_end_time = formatdate("YYYY-MM-DDTHH:MM:SS", timestamp() - 48*60*60)
+  sanitized_timestamp = replace(timestamp(), "/[Z]/", "")
+  ebs_performance_start_time = timeadd(local.sanitized_timestamp, "-24h")
+  ebs_performance_end_time = local.sanitized_timestamp
   
   cloudwatch_period = 300
   region            = "eu-west-2"
