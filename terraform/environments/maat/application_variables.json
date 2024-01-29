@@ -55,7 +55,6 @@
       "ec2_asg_max_size": "2",
       "ec2_cpu_scaling_up_threshold": "74",
       "ec2_cpu_scaling_down_threshold": "51",
-      "ecr_url": "902837325998.dkr.ecr.eu-west-2.amazonaws.com/maat",
       "docker_image_tag": "19af94e9",
       "region": "eu-west-2",
       "maat_orch_base_url": "https://laa-maat-orchestration-dev.apps.live.cloud-platform.service.justice.gov.uk",
