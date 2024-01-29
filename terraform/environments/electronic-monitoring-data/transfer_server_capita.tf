@@ -23,7 +23,10 @@ resource "aws_transfer_server" "capita_transfer_server" {
     vpc_id                 = data.aws_vpc.shared.id
     subnet_ids             = [data.aws_subnet.public_subnets_b.id]
     address_allocation_ids = [aws_eip.capita_eip.id]
-    security_group_ids     = [aws_security_group.capita_security_group.id, aws_security_group.test_security_group.id]
+    security_group_ids     = [
+      aws_security_group.capita_security_group.id,
+      aws_security_group.test_security_group.id
+    ]
   }
 
   domain = "S3"
@@ -47,61 +50,6 @@ resource "aws_transfer_server" "capita_transfer_server" {
 
 resource "aws_cloudwatch_log_group" "transfer" {
   name_prefix = "transfer_test_"
-}
-
-#------------------------------------------------------------------------------
-# AWS transfer user
-#
-# Create supplier user profile that has put access to only their landing zone
-# bucket.
-#------------------------------------------------------------------------------
-
-resource "aws_transfer_user" "capita_transfer_user" {
-  server_id = aws_transfer_server.capita_transfer_server.id
-  user_name = "capita"
-  role      = aws_iam_role.capita_transfer_user_iam_role.arn
-
-  home_directory = "/${aws_s3_bucket.capita_landing_bucket.id}/"
-}
-
-data "aws_iam_policy_document" "capita_assume_role" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["transfer.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role" "capita_transfer_user_iam_role" {
-  name                = "capita-transfer-user-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.capita_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
-}
-
-data "aws_iam_policy_document" "capita_transfer_user_iam_policy_document" {
-  statement {
-    sid       = "AllowListAccesstoCapitaS3"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.capita_landing_bucket.arn]
-  }
-  statement {
-    sid       = "AllowPutAccesstoCapitaS3"
-    effect    = "Allow"
-    actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.capita_landing_bucket.arn}/*"]
-  }
-}
-
-resource "aws_iam_role_policy" "capita_transfer_user_iam_policy" {
-  name   = "capita-transfer-user-iam-policy"
-  role   = aws_iam_role.capita_transfer_user_iam_role.id
-  policy = data.aws_iam_policy_document.capita_transfer_user_iam_policy_document.json
 }
 
 #------------------------------------------------------------------------------
