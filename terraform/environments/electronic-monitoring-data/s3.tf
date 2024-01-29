@@ -143,6 +143,71 @@ resource "aws_s3_bucket_logging" "civica_bucket_logging" {
 }
 
 #------------------------------------------------------------------------------
+# S3 bucket for landing G4S data
+#
+# Lifecycle management not implemented for this bucket as everything will be
+# moved to a different bucket once landed.
+#------------------------------------------------------------------------------
+
+resource "random_string" "g4s_random_string" {
+  length  = 10
+  lower   = true
+  upper   = false
+  numeric = true
+  special = false
+}
+
+resource "aws_s3_bucket" "g4s_landing_bucket" {
+  bucket = "g4s-${random_string.g4s_random_string.result}"
+}
+
+resource "aws_s3_bucket_policy" "g4s_landing_bucket_policy" {
+  bucket = aws_s3_bucket.g4s_landing_bucket.id
+  policy = data.aws_iam_policy_document.g4s_landing_bucket_policy_document.json
+}
+
+data "aws_iam_policy_document" "g4s_landing_bucket_policy_document" {
+  statement {
+    sid = "EnforceTLSv12orHigher"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect  = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.g4s_landing_bucket.arn,
+      "${aws_s3_bucket.g4s_landing_bucket.arn}/*"
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = [1.2]
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "g4s_landing_bucket" {
+  bucket = aws_s3_bucket.g4s_landing_bucket.id
+  versioning_configuration {
+    status = "Disabled"
+  }
+}
+
+resource "aws_s3_bucket_logging" "g4s_bucket_logging" {
+  bucket = aws_s3_bucket.g4s_landing_bucket.id
+
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = "log/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
+#------------------------------------------------------------------------------
 # S3 bucket for landed data (internal facing)
 #------------------------------------------------------------------------------
 
