@@ -1,7 +1,7 @@
 locals {
 
   iam_roles_filter = distinct(flatten([
-    var.options.enable_azure_sas_token ? "SasTokenRotatorRole" : [],
+    var.options.enable_azure_sas_token ? ["SasTokenRotatorRole"] : [],
     var.options.enable_hmpps_domain ? ["EC2HmppsDomainSecretsRole"] : [],
     var.options.enable_ec2_delius_dba_secrets_access ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],

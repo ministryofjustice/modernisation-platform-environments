@@ -1,7 +1,7 @@
 locals {
 
   iam_policies_filter = distinct(flatten([
-    var.options.enable_azure_sas_token ? "SasTokenRotatorPolicy" : [],
+    var.options.enable_azure_sas_token ? ["SasTokenRotatorPolicy"] : [],
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_hmpps_domain ? ["HmppsDomainSecretsPolicy"] : [],
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
