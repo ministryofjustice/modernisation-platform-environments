@@ -311,6 +311,9 @@ resource "aws_cloudwatch_log_metric_filter" "QuickScan-Started" {
     name      = "QuickScan"
     namespace = "WindowsDefender"
     value     = "1"
+     dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
@@ -323,5 +326,68 @@ resource "aws_cloudwatch_log_metric_filter" "QuickScan-Finished" {
     name      = "QuickScan"
     namespace = "WindowsDefender"
     value     = "0"
+     dimensions = {
+      Instance = "$Instance"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Failed" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareScan-Failed"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "An antimalware scan failed."
+  metric_transformation {
+    name      = "MalwareScan"
+    namespace = "WindowsDefender"
+    value     = "1"
+     dimensions = {
+      Instance = "$Instance"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "Malware-Detected" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "Malware-Detected"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The antimalware engine found malware or other potentially unwanted software."
+  metric_transformation {
+    name      = "Malware-Detected"
+    namespace = "WindowsDefender"
+    value     = "1"
+     dimensions = {
+      Instance = "$Instance"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareBehavior-Detected" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareBehavior-Detected"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The antimalware platform detected suspicious behavior."
+  metric_transformation {
+    name      = "MalwareBehavior-Detected"
+    namespace = "WindowsDefender"
+    value     = "1"
+     dimensions = {
+      Instance = "$Instance"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareState-Detected" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareState-Detected"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The antimalware platform detected malware or other potentially unwanted software."
+  metric_transformation {
+    name      = "MalwareState-Detected"
+    namespace = "WindowsDefender"
+    value     = "1"
+     dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
