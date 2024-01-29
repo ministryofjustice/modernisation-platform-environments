@@ -25,9 +25,7 @@
         "image": "${ecr_url}:${docker_image_tag}",
         "cpu": 992,
         "memory": 3000,
-        "links": [
-            "xray-daemon"
-        ],
+        "links": ["xray-daemon"],
         "portMappings": [
             {
                 "containerPort": 8080,
@@ -106,7 +104,7 @@
             },
             {
                 "name": "APP_TEMP_TRIGGER_GARBAGE",
-                "value": "a random string"
+                "value": "arandomstring"
             },
             {
                 "name": "APP_ORCH_CLIENT_SECRET",
