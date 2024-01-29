@@ -19,9 +19,9 @@ resource "aws_cloudwatch_dashboard" "nomis_cloudwatch_dashboard" {
 }
 
 locals {
-  sanitized_timestamp = replace(timestamp(), "/[Z]/", "")
-  ebs_performance_start_time = timeadd(local.sanitized_timestamp, "-24h")
-  ebs_performance_end_time = local.sanitized_timestamp
+  start_time = timeadd(timestamp(), "-24h")
+  ebs_performance_start_time = replace(local.start_time, "/[Z]/", "")
+  ebs_performance_end_time = replace(timestamp(), "/[Z]/", "")
   
   cloudwatch_period = 300
   region            = "eu-west-2"
