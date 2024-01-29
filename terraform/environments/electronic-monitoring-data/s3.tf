@@ -19,7 +19,7 @@ resource "aws_s3_bucket" "log_bucket" {
 # moved to a different bucket once landed.
 #------------------------------------------------------------------------------
 
-resource "random_string" "capita_random_string" {
+resource "random_string" "capita" {
   length  = 10
   lower   = true
   upper   = false
@@ -28,15 +28,15 @@ resource "random_string" "capita_random_string" {
 }
 
 resource "aws_s3_bucket" "capita_landing_bucket" {
-  bucket = "capita-${random_string.capita_random_string.result}"
+  bucket = "capita-${random_string.capita.result}"
 }
 
 resource "aws_s3_bucket_policy" "capita_landing_bucket_policy" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
-  policy = data.aws_iam_policy_document.capita_landing_bucket_policy_document.json
+  policy = data.aws_iam_policy_document.capita_landing_bucket.json
 }
 
-data "aws_iam_policy_document" "capita_landing_bucket_policy_document" {
+data "aws_iam_policy_document" "capita_landing_bucket" {
   statement {
     sid = "EnforceTLSv12orHigher"
     principals {
@@ -57,14 +57,14 @@ data "aws_iam_policy_document" "capita_landing_bucket_policy_document" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "capita_landing_bucket" {
+resource "aws_s3_bucket_versioning" "capita" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
   versioning_configuration {
     status = "Disabled"
   }
 }
 
-resource "aws_s3_bucket_logging" "capita_bucket_logging" {
+resource "aws_s3_bucket_logging" "capita" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
 
   target_bucket = aws_s3_bucket.log_bucket.id
@@ -84,7 +84,7 @@ resource "aws_s3_bucket_logging" "capita_bucket_logging" {
 # moved to a different bucket once landed.
 #------------------------------------------------------------------------------
 
-resource "random_string" "civica_random_string" {
+resource "random_string" "civica" {
   length  = 10
   lower   = true
   upper   = false
@@ -93,15 +93,15 @@ resource "random_string" "civica_random_string" {
 }
 
 resource "aws_s3_bucket" "civica_landing_bucket" {
-  bucket = "civica-${random_string.civica_random_string.result}"
+  bucket = "civica-${random_string.civica.result}"
 }
 
 resource "aws_s3_bucket_policy" "civica_landing_bucket_policy" {
   bucket = aws_s3_bucket.civica_landing_bucket.id
-  policy = data.aws_iam_policy_document.civica_landing_bucket_policy_document.json
+  policy = data.aws_iam_policy_document.civica_landing_bucket.json
 }
 
-data "aws_iam_policy_document" "civica_landing_bucket_policy_document" {
+data "aws_iam_policy_document" "civica_landing_bucket" {
   statement {
     sid = "EnforceTLSv12orHigher"
     principals {
@@ -122,14 +122,14 @@ data "aws_iam_policy_document" "civica_landing_bucket_policy_document" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "civica_landing_bucket" {
+resource "aws_s3_bucket_versioning" "civica" {
   bucket = aws_s3_bucket.civica_landing_bucket.id
   versioning_configuration {
     status = "Disabled"
   }
 }
 
-resource "aws_s3_bucket_logging" "civica_bucket_logging" {
+resource "aws_s3_bucket_logging" "civica" {
   bucket = aws_s3_bucket.civica_landing_bucket.id
 
   target_bucket = aws_s3_bucket.log_bucket.id
@@ -149,7 +149,7 @@ resource "aws_s3_bucket_logging" "civica_bucket_logging" {
 # moved to a different bucket once landed.
 #------------------------------------------------------------------------------
 
-resource "random_string" "g4s_random_string" {
+resource "random_string" "g4s" {
   length  = 10
   lower   = true
   upper   = false
@@ -158,15 +158,15 @@ resource "random_string" "g4s_random_string" {
 }
 
 resource "aws_s3_bucket" "g4s_landing_bucket" {
-  bucket = "g4s-${random_string.g4s_random_string.result}"
+  bucket = "g4s-${random_string.g4s.result}"
 }
 
 resource "aws_s3_bucket_policy" "g4s_landing_bucket_policy" {
   bucket = aws_s3_bucket.g4s_landing_bucket.id
-  policy = data.aws_iam_policy_document.g4s_landing_bucket_policy_document.json
+  policy = data.aws_iam_policy_document.g4s_landing_bucket.json
 }
 
-data "aws_iam_policy_document" "g4s_landing_bucket_policy_document" {
+data "aws_iam_policy_document" "g4s_landing_bucket" {
   statement {
     sid = "EnforceTLSv12orHigher"
     principals {
@@ -187,14 +187,14 @@ data "aws_iam_policy_document" "g4s_landing_bucket_policy_document" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "g4s_landing_bucket" {
+resource "aws_s3_bucket_versioning" "g4s" {
   bucket = aws_s3_bucket.g4s_landing_bucket.id
   versioning_configuration {
     status = "Disabled"
   }
 }
 
-resource "aws_s3_bucket_logging" "g4s_bucket_logging" {
+resource "aws_s3_bucket_logging" "g4s" {
   bucket = aws_s3_bucket.g4s_landing_bucket.id
 
   target_bucket = aws_s3_bucket.log_bucket.id
@@ -215,9 +215,9 @@ resource "aws_s3_bucket" "data_store_bucket" {
   bucket_prefix = "em-data-store-"
 }
 
-# resource "aws_s3_bucket_versioning" "data_store_bucket" {
-#   bucket = aws_s3_bucket.data_store_bucket.id
-#   versioning_configuration {
-#     status = "Enabled"
-#   }
-# }
+resource "aws_s3_bucket_versioning" "data_store" {
+  bucket = aws_s3_bucket.data_store_bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
