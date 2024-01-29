@@ -19,13 +19,13 @@ module "environment_test" {
   app_name      = local.application_name
   platform_vars = local.platform_vars
 
-  account_config             = local.account_config_test
-  environment_config         = local.environment_config_test
-  ldap_config                = local.ldap_config_test
-  db_config                  = local.db_config_test
-  weblogic_config            = local.weblogic_config_test
-  delius_db_container_config = local.delius_db_container_config_test
-  bastion_config             = local.bastion_config_test
+  account_config      = local.account_config
+  environment_config  = local.environment_config_test
+  ldap_config         = local.ldap_config_test
+  db_config           = local.db_config_test
+  weblogic_config     = local.weblogic_config_test
+  weblogic_eis_config = local.weblogic_eis_config_test
+  bastion_config      = local.bastion_config_test
 
   account_info = local.account_info
 

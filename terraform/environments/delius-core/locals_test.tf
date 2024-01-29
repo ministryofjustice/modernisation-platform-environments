@@ -134,17 +134,13 @@ locals {
   ]
 
   weblogic_config_test = {
-    name                          = "weblogic"
-    frontend_service_name         = "weblogic"
-    frontend_fully_qualified_name = "${local.application_name}-test-${local.frontend_service_name}"
-    frontend_image_tag            = "5.7.6"
-    frontend_container_port       = 8080
-    frontend_url_suffix           = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-    db_service_name               = "testing-db"
-    db_fully_qualified_name       = "${local.application_name}-${local.db_service_name}"
-    db_image_tag                  = "5.7.4"
-    db_port                       = 1521
-    db_name                       = "MODNDA"
+    image_tag      = "5.7.6"
+    container_port = 8080
+  }
+
+  weblogic_eis_config_test = {
+    image_tag      = "5.7.6"
+    container_port = 8080
   }
 
 
@@ -153,13 +149,5 @@ locals {
     subnet_set              = local.subnet_set
     environment             = local.environment
     extra_user_data_content = "yum install -y openldap-clients"
-  }
-
-  delius_db_container_config_test = {
-    image_tag            = "5.7.4"
-    image_name           = "delius-core-testing-db"
-    fully_qualified_name = "testing-db"
-    port                 = 1521
-    name                 = "MODNDA"
   }
 }

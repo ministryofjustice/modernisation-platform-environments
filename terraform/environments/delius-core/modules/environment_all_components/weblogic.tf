@@ -12,6 +12,14 @@ module "weblogic" {
     {
       name  = "LDAP_HOST"
       value = module.ldap.nlb_dns_name
+    },
+    {
+      name  = "USER_CONTEXT"
+      value = "ou=Users,dc=moj,dc=com"
+    },
+    {
+      name  = "EIS_USER_CONTEXT"
+      value = "cn=EISUsers,ou=Users,dc=moj,dc=com"
     }
   ]
   container_secrets = [
@@ -24,29 +32,17 @@ module "weblogic" {
       valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_password.arn
     },
     {
-      name      = "TEST_MODE"
-      valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_test_mode.arn
-    },
-    {
       name      = "LDAP_PRINCIPAL"
       valueFrom = aws_ssm_parameter.delius_core_ldap_principal.arn
     },
     { name      = "LDAP_CREDENTIAL"
       valueFrom = aws_secretsmanager_secret.delius_core_ldap_credential.arn
-    },
-    {
-      name      = "USER_CONTEXT"
-      valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_user_context.arn
-    },
-    {
-      name      = "EIS_USER_CONTEXT"
-      valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_eis_user_context.arn
     }
   ]
   container_port_mappings = [
     {
-      containerPort = var.weblogic_config.frontend_container_port
-      hostPort      = var.weblogic_config.frontend_container_port
+      containerPort = var.weblogic_config.container_port
+      hostPort      = var.weblogic_config.container_port
       protocol      = "tcp"
     },
   ]
@@ -56,7 +52,7 @@ module "weblogic" {
   ingress_security_groups = []
   microservice_lb_arn     = aws_lb.delius_core_frontend.arn
   name                    = "weblogic"
-  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${var.weblogic_config.frontend_image_tag}"
+  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${var.weblogic_config.image_tag}"
   platform_vars           = var.platform_vars
   tags                    = var.tags
 }

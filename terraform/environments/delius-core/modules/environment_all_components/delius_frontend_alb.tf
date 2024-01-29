@@ -1,5 +1,5 @@
 locals {
-  frontend_url = "${var.app_name}.${var.env_name}.${var.weblogic_config.frontend_url_suffix}"
+  frontend_url = "${var.env_name}.${var.account_config.dns_suffix}"
 }
 resource "aws_security_group" "delius_frontend_alb_security_group" {
   name        = format("%s - Delius Core Frontend Load Balancer", var.env_name)
