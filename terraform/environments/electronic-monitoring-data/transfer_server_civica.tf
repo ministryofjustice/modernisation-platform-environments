@@ -14,7 +14,7 @@ resource "aws_eip" "civica" {
 # Configure SFTP server for supplier that only allows supplier specified IPs.
 #------------------------------------------------------------------------------
 
-resource "aws_transfer_server" "civica_transfer_server" {
+resource "aws_transfer_server" "civica" {
   protocols              = ["SFTP"]
   identity_provider_type = "SERVICE_MANAGED"
 

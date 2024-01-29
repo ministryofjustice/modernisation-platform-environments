@@ -14,7 +14,7 @@ resource "aws_eip" "g4s" {
 # Configure SFTP server for supplier that only allows supplier specified IPs.
 #------------------------------------------------------------------------------
 
-resource "aws_transfer_server" "g4s_transfer_server" {
+resource "aws_transfer_server" "g4s" {
   protocols              = ["SFTP"]
   identity_provider_type = "SERVICE_MANAGED"
 

@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_user" "g4s_transfer_user" {
-  server_id = aws_transfer_server.g4s_transfer_server.id
+  server_id = aws_transfer_server.g4s.id
   user_name = "g4s"
   role      = aws_iam_role.g4s_transfer_user_iam_role.arn
 
@@ -60,7 +60,7 @@ resource "aws_iam_role_policy" "g4s_transfer_user_iam_policy" {
 #------------------------------------------------------------------------------
 
 # resource "aws_transfer_ssh_key" "g4s_ssh_key" {
-#   server_id = aws_transfer_server.g4s_transfer_server.id
+#   server_id = aws_transfer_server.g4s.id
 #   user_name = aws_transfer_user.g4s_transfer_user.user_name
 #   body      = ""
 # }

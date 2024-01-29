@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_user" "capita_transfer_user" {
-  server_id = aws_transfer_server.capita_transfer_server.id
+  server_id = aws_transfer_server.capita.id
   user_name = "capita"
   role      = aws_iam_role.capita_transfer_user_iam_role.arn
 
@@ -60,7 +60,7 @@ resource "aws_iam_role_policy" "capita_transfer_user_iam_policy" {
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_ssh_key" "capita_ssh_key" {
-  server_id = aws_transfer_server.capita_transfer_server.id
+  server_id = aws_transfer_server.capita.id
   user_name = aws_transfer_user.capita_transfer_user.user_name
   body      = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIhggGYKbOk6BH7fpEs6JGRnMyLRK/9/tAMQOVYOZtehKTRcM5vGsJFRGjjm2wEan3/uYOuto0NoVkbRfIi0AIG6EWrp1gvHNQlUTtxQVp7rFeOnZAjVEE9xVUEgHhMNLw=="
 }

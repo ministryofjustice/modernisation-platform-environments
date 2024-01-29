@@ -14,7 +14,7 @@ resource "aws_eip" "capita" {
 # Configure SFTP server for supplier that only allows supplier specified IPs.
 #------------------------------------------------------------------------------
 
-resource "aws_transfer_server" "capita_transfer_server" {
+resource "aws_transfer_server" "capita" {
   protocols              = ["SFTP"]
   identity_provider_type = "SERVICE_MANAGED"
 
