@@ -33,7 +33,7 @@ resource "aws_transfer_server" "g4s" {
 
   security_policy_name = "TransferSecurityPolicy-2023-05"
 
-  pre_authentication_login_banner = "Hello there"
+  pre_authentication_login_banner = "\nHello there\n"
 
   workflow_details {
     on_upload {
@@ -42,16 +42,21 @@ resource "aws_transfer_server" "g4s" {
     }
   }
 
-  logging_role = aws_iam_role.test_transfer_user_iam_role.arn
+  logging_role = aws_iam_role.iam_for_transfer_g4s.arn
   structured_log_destinations = [
     "${aws_cloudwatch_log_group.g4s.arn}:*"
   ]
 }
 
-resource "aws_cloudwatch_log_group" "g4s" {
-  name_prefix = "transfer_test_"
+resource "aws_iam_role" "iam_for_transfer_g4s" {
+  name_prefix         = "iam-for-transfer-g4s-"
+  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
+resource "aws_cloudwatch_log_group" "g4s" {
+  name_prefix = "transfer_g4s_"
+}
 #------------------------------------------------------------------------------
 # AWS transfer workflow
 #
@@ -81,22 +86,9 @@ resource "aws_transfer_workflow" "transfer_g4s_to_store" {
   }
 }
 
-data "aws_iam_policy_document" "g4s_transfer_workflow_assume_role" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["transfer.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
 resource "aws_iam_role" "g4s_transfer_workflow_iam_role" {
   name                = "g4s-transfer-workflow-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.g4s_transfer_workflow_assume_role.json
+  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
