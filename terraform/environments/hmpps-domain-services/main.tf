@@ -163,7 +163,7 @@ module "fsx" {
   source = "./modules/fsx"
 
   common = {
-    environment_name = var.environment_name
+    environment_name = local.environment
     subnet_ids       = local.subnet_ids
     tags             = local.tags
     vpc_id           = local.vpc_id
