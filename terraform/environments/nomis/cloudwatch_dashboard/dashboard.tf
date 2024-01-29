@@ -291,33 +291,3 @@ locals {
   }
 
 }
-
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::374269020027:root"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::374269020027:role/AWS-SSM-AutomationAdministrationRole"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ssm.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
