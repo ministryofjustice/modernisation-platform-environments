@@ -3,14 +3,15 @@
         "name": "xray-daemon",
         "image": "${ecr_url}:xray-daemon",
         "cpu": 32,
-        "memory": 256,
+        "essential": false,
         "portMappings": [
             {
                 "containerPort": 2000,
                 "protocol": "udp"
             }
         ],
-        "essential": false,
+        "memory": 256,
+        "environment": [],
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {

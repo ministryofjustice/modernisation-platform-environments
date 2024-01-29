@@ -256,9 +256,7 @@ resource "aws_cloudwatch_metric_alarm" "low_cpu_service_alarm" {
 
 resource "aws_ecs_task_definition" "maat_task_definition" {
   family                   = "${local.application_name}-task-definition"
-  requires_compatibilities = [
-      "EC2",
-    ]
+  requires_compatibilities = ["EC2"]
   execution_role_arn       = aws_iam_role.ec2_instance_role.arn
   task_role_arn            = aws_iam_role.ec2_instance_role.arn
 
