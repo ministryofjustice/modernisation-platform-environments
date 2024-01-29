@@ -62,7 +62,7 @@ resource "aws_iam_role_policy" "civica_transfer_user_iam_policy" {
 # resource "aws_transfer_ssh_key" "civica_ssh_key" {
 #   server_id = aws_transfer_server.civica_transfer_server.id
 #   user_name = aws_transfer_user.civica_transfer_user.user_name
-#   body      = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIhggGYKbOk6BH7fpEs6JGRnMyLRK/9/tAMQOVYOZtehKTRcM5vGsJFRGjjm2wEan3/uYOuto0NoVkbRfIi0AIG6EWrp1gvHNQlUTtxQVp7rFeOnZAjVEE9xVUEgHhMNLw=="
+#   body      = ""
 # }
 
 #------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ resource "aws_security_group" "civica_security_group" {
 # resource "aws_vpc_security_group_ingress_rule" "civica_ip_1" {
 #   security_group_id = aws_security_group.civica_security_group.id
 
-#   cidr_ipv4   = "82.203.33.112/28"
+#   cidr_ipv4   = ""
 #   ip_protocol = "tcp"
 #   from_port   = 2222
 #   to_port     = 2222
