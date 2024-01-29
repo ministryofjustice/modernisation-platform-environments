@@ -301,7 +301,6 @@ resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Failed" {
   }
 }
 
-
 resource "aws_cloudwatch_log_metric_filter" "QuickScan-Started" {
   count          = local.is-production == true ? 1 : 0
   name           = "QuickScan-Started"
@@ -384,6 +383,51 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareState-Detected" {
   pattern        = "The antimalware platform detected malware or other potentially unwanted software."
   metric_transformation {
     name      = "MalwareState-Detected"
+    namespace = "WindowsDefender"
+    value     = "1"
+     dimensions = {
+      Instance = "$Instance"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareUpdate-Failed" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareUpdate-Failed"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The security intelligence update failed."
+  metric_transformation {
+    name      = "MalwareUpdate-Failed"
+    namespace = "WindowsDefender"
+    value     = "1"
+     dimensions = {
+      Instance = "$Instance"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareEngineUpdate-Failed" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareEngineUpdate-Failed"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The antimalware engine update failed."
+  metric_transformation {
+    name      = "MalwareEngineUpdate-Failed"
+    namespace = "WindowsDefender"
+    value     = "1"
+     dimensions = {
+      Instance = "$Instance"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareUpdate-OutofDate" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareUpdate-OutofDate"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The antimalware engine failed to load because the antimalware platform is out of date."
+  metric_transformation {
+    name      = "MalwareUpdate-OutofDate"
     namespace = "WindowsDefender"
     value     = "1"
      dimensions = {
