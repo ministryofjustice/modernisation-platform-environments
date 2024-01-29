@@ -5,21 +5,27 @@
 # bucket.
 #------------------------------------------------------------------------------
 
-resource "aws_transfer_user" "g4s_transfer_user" {
+resource "aws_transfer_user" "g4s" {
   server_id = aws_transfer_server.g4s.id
   user_name = "g4s"
-  role      = aws_iam_role.g4s_transfer_user_iam_role.arn
+  role      = aws_iam_role.g4s_transfer_user.arn
 
   home_directory = "/${aws_s3_bucket.g4s_landing_bucket.id}/"
 }
 
-resource "aws_iam_role" "g4s_transfer_user_iam_role" {
+resource "aws_iam_role" "g4s_transfer_user" {
   name                = "g4s-transfer-user-iam-role"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
-data "aws_iam_policy_document" "g4s_transfer_user_iam_policy_document" {
+resource "aws_iam_role_policy" "g4s_transfer_user" {
+  name   = "g4s-transfer-user-iam-policy"
+  role   = aws_iam_role.g4s_transfer_user.id
+  policy = data.aws_iam_policy_document.g4s_transfer_user.json
+}
+
+data "aws_iam_policy_document" "g4s_transfer_user" {
   statement {
     sid       = "AllowListAccesstoG4sS3"
     effect    = "Allow"
@@ -34,12 +40,6 @@ data "aws_iam_policy_document" "g4s_transfer_user_iam_policy_document" {
   }
 }
 
-resource "aws_iam_role_policy" "g4s_transfer_user_iam_policy" {
-  name   = "g4s-transfer-user-iam-policy"
-  role   = aws_iam_role.g4s_transfer_user_iam_role.id
-  policy = data.aws_iam_policy_document.g4s_transfer_user_iam_policy_document.json
-}
-
 #------------------------------------------------------------------------------
 # AWS transfer ssh key
 #
@@ -48,7 +48,7 @@ resource "aws_iam_role_policy" "g4s_transfer_user_iam_policy" {
 
 # resource "aws_transfer_ssh_key" "g4s_ssh_key" {
 #   server_id = aws_transfer_server.g4s.id
-#   user_name = aws_transfer_user.g4s_transfer_user.user_name
+#   user_name = aws_transfer_user.g4s.user_name
 #   body      = ""
 # }
 

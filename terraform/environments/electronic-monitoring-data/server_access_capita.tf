@@ -5,21 +5,27 @@
 # bucket.
 #------------------------------------------------------------------------------
 
-resource "aws_transfer_user" "capita_transfer_user" {
+resource "aws_transfer_user" "capita" {
   server_id = aws_transfer_server.capita.id
   user_name = "capita"
-  role      = aws_iam_role.capita_transfer_user_iam_role.arn
+  role      = aws_iam_role.capita_transfer_user.arn
 
   home_directory = "/${aws_s3_bucket.capita_landing_bucket.id}/"
 }
 
-resource "aws_iam_role" "capita_transfer_user_iam_role" {
+resource "aws_iam_role" "capita_transfer_user" {
   name                = "capita-transfer-user-iam-role"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
-data "aws_iam_policy_document" "capita_transfer_user_iam_policy_document" {
+resource "aws_iam_role_policy" "capita_transfer_user" {
+  name   = "capita-transfer-user-iam-policy"
+  role   = aws_iam_role.capita_transfer_user.id
+  policy = data.aws_iam_policy_document.capita_transfer_user.json
+}
+
+data "aws_iam_policy_document" "capita_transfer_user" {
   statement {
     sid       = "AllowListAccesstoCapitaS3"
     effect    = "Allow"
@@ -34,12 +40,6 @@ data "aws_iam_policy_document" "capita_transfer_user_iam_policy_document" {
   }
 }
 
-resource "aws_iam_role_policy" "capita_transfer_user_iam_policy" {
-  name   = "capita-transfer-user-iam-policy"
-  role   = aws_iam_role.capita_transfer_user_iam_role.id
-  policy = data.aws_iam_policy_document.capita_transfer_user_iam_policy_document.json
-}
-
 #------------------------------------------------------------------------------
 # AWS transfer ssh key
 #
@@ -48,7 +48,7 @@ resource "aws_iam_role_policy" "capita_transfer_user_iam_policy" {
 
 resource "aws_transfer_ssh_key" "capita_ssh_key" {
   server_id = aws_transfer_server.capita.id
-  user_name = aws_transfer_user.capita_transfer_user.user_name
+  user_name = aws_transfer_user.capita.user_name
   body      = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIhggGYKbOk6BH7fpEs6JGRnMyLRK/9/tAMQOVYOZtehKTRcM5vGsJFRGjjm2wEan3/uYOuto0NoVkbRfIi0AIG6EWrp1gvHNQlUTtxQVp7rFeOnZAjVEE9xVUEgHhMNLw=="
 }
 

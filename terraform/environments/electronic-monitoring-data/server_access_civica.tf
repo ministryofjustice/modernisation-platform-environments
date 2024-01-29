@@ -5,21 +5,27 @@
 # bucket.
 #------------------------------------------------------------------------------
 
-resource "aws_transfer_user" "civica_transfer_user" {
+resource "aws_transfer_user" "civica" {
   server_id = aws_transfer_server.civica.id
   user_name = "civica"
-  role      = aws_iam_role.civica_transfer_user_iam_role.arn
+  role      = aws_iam_role.civica_transfer_user.arn
 
   home_directory = "/${aws_s3_bucket.civica_landing_bucket.id}/"
 }
 
-resource "aws_iam_role" "civica_transfer_user_iam_role" {
+resource "aws_iam_role" "civica_transfer_user" {
   name                = "civica-transfer-user-iam-role"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
-data "aws_iam_policy_document" "civica_transfer_user_iam_policy_document" {
+resource "aws_iam_role_policy" "civica_transfer_user" {
+  name   = "civica-transfer-user-iam-policy"
+  role   = aws_iam_role.civica_transfer_user.id
+  policy = data.aws_iam_policy_document.civica_transfer_user.json
+}
+
+data "aws_iam_policy_document" "civica_transfer_user" {
   statement {
     sid       = "AllowListAccesstoCivicaS3"
     effect    = "Allow"
@@ -34,12 +40,6 @@ data "aws_iam_policy_document" "civica_transfer_user_iam_policy_document" {
   }
 }
 
-resource "aws_iam_role_policy" "civica_transfer_user_iam_policy" {
-  name   = "civica-transfer-user-iam-policy"
-  role   = aws_iam_role.civica_transfer_user_iam_role.id
-  policy = data.aws_iam_policy_document.civica_transfer_user_iam_policy_document.json
-}
-
 #------------------------------------------------------------------------------
 # AWS transfer ssh key
 #
@@ -48,7 +48,7 @@ resource "aws_iam_role_policy" "civica_transfer_user_iam_policy" {
 
 # resource "aws_transfer_ssh_key" "civica_ssh_key" {
 #   server_id = aws_transfer_server.civica.id
-#   user_name = aws_transfer_user.civica_transfer_user.user_name
+#   user_name = aws_transfer_user.civica.user_name
 #   body      = ""
 # }
 
