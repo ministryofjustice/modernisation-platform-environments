@@ -310,9 +310,6 @@ resource "aws_cloudwatch_log_metric_filter" "QuickScan-Started" {
     name      = "QuickScan"
     namespace = "WindowsDefender"
     value     = "1"
-     dimensions = {
-      Instance = "$Instance"
-    }
   }
 }
 
@@ -325,9 +322,6 @@ resource "aws_cloudwatch_log_metric_filter" "QuickScan-Finished" {
     name      = "QuickScan"
     namespace = "WindowsDefender"
     value     = "0"
-     dimensions = {
-      Instance = "$Instance"
-    }
   }
 }
 
@@ -340,9 +334,6 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Failed" {
     name      = "MalwareScan"
     namespace = "WindowsDefender"
     value     = "1"
-     dimensions = {
-      Instance = "$Instance"
-    }
   }
 }
 
@@ -355,9 +346,6 @@ resource "aws_cloudwatch_log_metric_filter" "Malware-Detected" {
     name      = "Malware-Detected"
     namespace = "WindowsDefender"
     value     = "1"
-     dimensions = {
-      Instance = "$Instance"
-    }
   }
 }
 
@@ -370,9 +358,6 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareBehavior-Detected" {
     name      = "MalwareBehavior-Detected"
     namespace = "WindowsDefender"
     value     = "1"
-     dimensions = {
-      Instance = "$Instance"
-    }
   }
 }
 
@@ -385,9 +370,6 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareState-Detected" {
     name      = "MalwareState-Detected"
     namespace = "WindowsDefender"
     value     = "1"
-     dimensions = {
-      Instance = "$Instance"
-    }
   }
 }
 
@@ -400,9 +382,6 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareUpdate-Failed" {
     name      = "MalwareUpdate-Failed"
     namespace = "WindowsDefender"
     value     = "1"
-     dimensions = {
-      Instance = "$Instance"
-    }
   }
 }
 
@@ -415,9 +394,6 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineUpdate-Failed" {
     name      = "MalwareEngineUpdate-Failed"
     namespace = "WindowsDefender"
     value     = "1"
-     dimensions = {
-      Instance = "$Instance"
-    }
   }
 }
 
@@ -430,8 +406,5 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareUpdate-OutofDate" {
     name      = "MalwareUpdate-OutofDate"
     namespace = "WindowsDefender"
     value     = "1"
-     dimensions = {
-      Instance = "$Instance"
-    }
   }
 }
