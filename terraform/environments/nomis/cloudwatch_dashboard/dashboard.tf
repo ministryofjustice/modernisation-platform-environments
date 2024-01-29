@@ -1,19 +1,5 @@
-resource "aws_ssm_document" "calculate_ebs_performance_metrics" {
-  name          = "AWSSupport-CalculateEBSPerformanceMetrics"
-  document_type = "Automation"
-  content = <<EOF
-{
-  "schemaVersion": "0.3",
-  "description": "Calculates EBS performance metrics.",
-  "parameters": {
-    "resourceId": "*"
-  }
-}
-  EOF
-}
-
-resource "aws_ssm_association" "automation_execution" {
-  name                 = "calculate_ebs_performance_metrics"
+resource "aws_ssm_association" "calculate_ebs_performance_metrics" {
+  name                 = "AWSSupport-CalculateEBSPerformanceMetrics"
   schedule_expression  = "rate(12 hour)"
   document_version     = "$LATEST"
   parameters = {
