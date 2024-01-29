@@ -171,15 +171,6 @@ resource "aws_autoscaling_group" "ec2_scaling_group" {
 # ECS Scaling Policies
 ######################################
 
-# resource "aws_appautoscaling_target" "ecs_service_scaling_target" {
-#   max_capacity       = local.application_data.accounts[local.environment].ec2_max_capacity
-#   min_capacity       = local.application_data.accounts[local.environment].ec2_min_capacity
-#   resource_id        = "service/${aws_ecs_cluster.maat_app_ecs_cluster.id}/${aws_ecs_service.ecs_service.name}"
-#   role_arn           = aws_iam_role.ec2_instance_role.arn
-# #   scalable_dimension = "ecs:service:DesiredCount"
-# #   service_namespace  = "ecs"
-# }
-
 resource "aws_autoscaling_policy" "maat_scaling_up_policy" {
   name               = "${local.application_name}-scaling-up"
   policy_type        = "SimpleScaling"
@@ -207,35 +198,6 @@ resource "aws_security_group" "ecs_security_group" {
   description = "App ECS Security Group"
   vpc_id      = data.aws_vpc.shared.id
 }
-
-# resource "aws_security_group" "alb_security_group" {
-#   name        = "${local.application_name}-alb-security-group"
-#   description = "App ALB Security Group"
-#   vpc_id      = data.aws_vpc.shared.id
-# }
-
-######################################
-# ECS Security Group Rules
-######################################
-
-# resource "aws_security_group_rule" "EcsSecurityGroup1ALBports" {
-#   type                     = "ingress"
-#   from_port                = 32768
-#   to_port                  = 61000
-#   protocol                 = "tcp"
-#   security_group_id        = aws_security_group.ecs_security_group.id
-#   source_security_group_id = 
-# }
-
-# resource "aws_security_group_rule" "EcsSecurityGroupAllowInternalLoadBalancer" {
-#   type                     = "ingress"
-# #   from_port                = 
-# #   to_port                  = 
-#   protocol                 = "tcp"
-#   security_group_id        = aws_security_group.ecs_security_group.id
-#   source_security_group_id = 
-# }
-
 
 #####################################
 # ECS CLOUDWATCH LOG GROUP
