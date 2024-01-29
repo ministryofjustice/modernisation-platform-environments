@@ -115,6 +115,21 @@ locals {
         })
       })
 
+      "pp-onr-db-a" = merge(local.database_onr_a, {
+        config = merge(local.database_onr_a.config, {
+          instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
+        instance = merge(local.database_onr_a.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_onr_a.tags, {
+          instance-scheduling = "skip-scheduling"
+          oracle-sids         = "PPONRBOD PPOASREP PPONRSYS PPONRAUD"
+        })
+      })
+
       "pp-${local.application_name}-bip-a" = merge(local.bip_a, {
         config = merge(local.bip_a.config, {
           instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
