@@ -1,16 +1,16 @@
-variable "setup_reload_pipeline"  {
+variable "setup_reload_pipeline" {
   description = "Enable Reload Pipeline, True or False?"
   type        = bool
   default     = false
 }
 
-variable "reload_pipeline"  {
+variable "reload_pipeline" {
   description = "Name for the Reload Pipeline"
   type        = string
-  default     = ""  
+  default     = ""
 }
 
-variable "pipeline_dms_task_time_out"  {
+variable "pipeline_dms_task_time_out" {
   description = "DMS Task Timeout"
   type        = number
   default     = 43200 # 12 hours
@@ -51,19 +51,19 @@ variable "dms_replication_task_arn" {}
 variable "pipeline_notification_lambda_function" {
   description = "Pipeline Notification Lambda Name"
   type        = string
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_reporting_hub_batch_jobname" {
   description = "Glue Reporting Hub Batch JobName"
   type        = string
-  default     = ""  
+  default     = ""
 }
 
 variable "glue_reporting_hub_cdc_jobname" {
   description = "Glue Reporting Hub CDC JobName"
   type        = string
-  default     = ""  
+  default     = ""
 }
 
 variable "s3_glue_bucket_id" {
@@ -75,13 +75,13 @@ variable "s3_glue_bucket_id" {
 variable "s3_raw_bucket_id" {
   description = "S3, RAW Bucket ID"
   type        = string
-  default     = ""  
+  default     = ""
 }
 
 variable "s3_raw_archive_bucket_id" {
   description = "S3, RAW Archive Bucket ID"
   type        = string
-  default     = ""  
+  default     = ""
 }
 
 variable "s3_structured_bucket_id" {

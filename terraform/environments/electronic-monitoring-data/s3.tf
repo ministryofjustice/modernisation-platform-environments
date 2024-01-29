@@ -40,19 +40,19 @@ data "aws_iam_policy_document" "capita_landing_bucket_policy_document" {
   statement {
     sid = "EnforceTLSv12orHigher"
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["*"]
     }
-    effect = "Deny"
+    effect  = "Deny"
     actions = ["s3:*"]
     resources = [
       aws_s3_bucket.capita_landing_bucket.arn,
       "${aws_s3_bucket.capita_landing_bucket.arn}/*"
     ]
     condition {
-      test = "NumericLessThan"
+      test     = "NumericLessThan"
       variable = "s3:TlsVersion"
-      values = [1.2]
+      values   = [1.2]
     }
   }
 }
