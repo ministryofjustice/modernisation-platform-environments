@@ -26,6 +26,7 @@ locals {
     migration_environment_db_cidr      = ["10.162.44.0/24", "10.162.45.0/24", "10.162.46.0/25"]
     legacy_engineering_vpc_cidr        = "10.161.98.0/25"
     ec2_user_ssh_key                   = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+    homepage_path                      = "/"
   }
 
   ldap_config_dev = {
