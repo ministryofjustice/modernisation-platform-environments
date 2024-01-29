@@ -5,8 +5,8 @@ resource "aws_ssm_association" "calculate_ebs_performance_metrics" {
 
   parameters = {
     AutomationAssumeRole = "arn:aws:iam::612659970365:role/AWS-SSM-AutomationExecutionRole"
-    startTime            = local.ebs_performance_start_time
-    endTime              = local.ebs_performance_end_time
+    StartTime            = local.ebs_performance_start_time
+    EndTime              = local.ebs_performance_end_time
   }
   targets {
     key = "All Instances"
