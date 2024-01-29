@@ -97,7 +97,7 @@ resource "aws_route53_record" "external_cert" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external_cert.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.application_data.accounts[local.environment].environment_name}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
