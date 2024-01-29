@@ -33,7 +33,7 @@ resource "aws_transfer_server" "g4s" {
 
   security_policy_name = "TransferSecurityPolicy-2023-05"
 
-  pre_authentication_login_banner = "Hello there"
+  pre_authentication_login_banner = "\nHello there\n"
 
   workflow_details {
     on_upload {
