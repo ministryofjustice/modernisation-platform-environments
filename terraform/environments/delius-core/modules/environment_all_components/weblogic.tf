@@ -25,11 +25,11 @@ module "weblogic" {
   container_secrets = [
     {
       name      = "JDBC_URL"
-      valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_url.arn
+      valueFrom = aws_ssm_parameter.jdbc_url.arn
     },
     {
       name      = "JDBC_PASSWORD"
-      valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_password.arn
+      valueFrom = aws_ssm_parameter.jdbc_password.arn
     },
     {
       name      = "LDAP_PRINCIPAL"

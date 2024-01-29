@@ -204,13 +204,13 @@ locals {
   ]
 
   gdpr_config_dev = {
-    api_image_tag = try(local.gdpr_config_lower_environments.api_image_tag, "REPLACE")
-    ui_image_tag = try(local.gdpr_config_lower_environments.ui_image_tag, "REPLACE")
+    api_image_tag = "REPLACE"
+    ui_image_tag  = "REPLACE"
   }
 
   merge_config_dev = {
-    api_image_tag = try(local.merge_config_lower_environments.api_image_tag, "REPLACE")
-    ui_image_tag = try(local.merge_config_lower_environments.ui_image_tag, "REPLACE")
+    api_image_tag = "REPLACE"
+    ui_image_tag  = "REPLACE"
   }
 
   weblogic_config_dev = {
@@ -221,8 +221,10 @@ locals {
   }
 
   weblogic_eis_config_dev = {
-    image_tag      = "5.7.6"
-    container_port = 8080
+    image_tag        = "5.7.6"
+    container_port   = 8080
+    container_memory = 2048
+    container_cpu    = 1024
   }
 
   bastion_config_dev = {

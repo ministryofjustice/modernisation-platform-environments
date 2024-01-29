@@ -134,13 +134,17 @@ locals {
   ]
 
   weblogic_config_test = {
-    image_tag      = "5.7.6"
-    container_port = 8080
+    image_tag        = "5.7.6"
+    container_port   = 8080
+    container_memory = 4096
+    container_cpu    = 2048
   }
 
   weblogic_eis_config_test = {
-    image_tag      = "5.7.6"
-    container_port = 8080
+    image_tag        = "5.7.6"
+    container_port   = 8080
+    container_memory = 2048
+    container_cpu    = 1024
   }
 
 

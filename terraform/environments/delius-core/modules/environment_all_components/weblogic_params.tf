@@ -15,7 +15,12 @@ resource "aws_ssm_parameter" "jdbc_url" {
   }
 }
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {
+data "aws_ssm_parameter" "jdbc_url" {
+  name = aws_ssm_parameter.jdbc_url.name
+}
+
+
+resource "aws_ssm_parameter" "jdbc_password" {
   name  = format("/%s-%s/JDBC_PASSWORD", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -27,7 +32,12 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {
   }
 }
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
+data "aws_ssm_parameter" "jdbc_password" {
+  name = aws_ssm_parameter.jdbc_password.name
+}
+
+
+resource "aws_ssm_parameter" "weblogic_admin_username" {
   name  = format("/%s/%s/DEV_USERNAME", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -39,7 +49,11 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
   tags = local.tags
 }
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
+data "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
+  name = aws_ssm_parameter.weblogic_admin_username.name
+}
+
+resource "aws_ssm_parameter" "weblogic_admin_password" {
   name  = format("/%s/%s/DEV_PASSWORD", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -51,20 +65,6 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
   tags = local.tags
 }
 
-
-data "aws_ssm_parameter" "jdbc_url" {
-  name = aws_ssm_parameter.jdbc_url.name
-}
-
-data "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {
-  name = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_password.name
-}
-
-
-data "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
-  name = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.name
-}
-
 data "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
-  name = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.name
+  name = aws_ssm_parameter.weblogic_admin_password.name
 }

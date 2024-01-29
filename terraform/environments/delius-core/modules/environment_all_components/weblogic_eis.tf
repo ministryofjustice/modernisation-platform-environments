@@ -134,11 +134,11 @@ module "weblogic_eis" {
   container_secrets = [
     {
       name      = "JDBC_URL"
-      valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_url.arn
+      valueFrom = aws_ssm_parameter.jdbc_url.arn
     },
     {
       name      = "JDBC_PASSWORD"
-      valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_password.arn
+      valueFrom = aws_ssm_parameter.jdbc_password.arn
     },
     {
       name      = "LDAP_PRINCIPAL"
@@ -202,12 +202,12 @@ resource "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
 }
 
 data "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
-  name = aws_ssm_parameter.weblogic_eis_google_analytics_id
+  name = aws_ssm_parameter.weblogic_eis_google_analytics_id.name
 }
 
 
 resource "aws_ssm_parameter" "merge_secret" {
-  name  = "/${var.env_name}/delius/monitoring/analytics/google_id"
+  name  = "/${var.env_name}/delius/weblogic/ndelius-domain/umt_client_secret"
   type  = "SecureString"
   value = "DEFAULT"
   lifecycle {
@@ -216,7 +216,7 @@ resource "aws_ssm_parameter" "merge_secret" {
 }
 
 data "aws_ssm_parameter" "merge_secret" {
-  name = aws_ssm_parameter.merge_secret
+  name = aws_ssm_parameter.merge_secret.name
 }
 
 resource "aws_ssm_parameter" "usermanagement_secret" {
@@ -229,5 +229,5 @@ resource "aws_ssm_parameter" "usermanagement_secret" {
 }
 
 data "aws_ssm_parameter" "usermanagement_secret" {
-  name = aws_ssm_parameter.usermanagement_secret
+  name = aws_ssm_parameter.usermanagement_secret.name
 }

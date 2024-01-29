@@ -8,5 +8,5 @@ resource "aws_ssm_parameter" "pdfcreation_secret" {
 }
 
 data "aws_ssm_parameter" "pdfcreation_secret" {
-  name = aws_ssm_parameter.pdfcreation_secret
+  name = aws_ssm_parameter.pdfcreation_secret.name
 }
