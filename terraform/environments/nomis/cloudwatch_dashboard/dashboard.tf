@@ -3,9 +3,10 @@ resource "aws_ssm_association" "calculate_ebs_performance_metrics" {
   schedule_expression  = "rate(12 hour)"
   document_version     = "$LATEST"
   parameters = {
-    resourceId = "*"
-    startTime  = local.ebs_performance_start_time
-    endTime    = local.ebs_performance_end_time
+    resourceId           = "*"
+    AutomationAssumeRole = "arn:aws:iam::612659970365:role/AWS-SSM-AutomationExecutionRole"
+    startTime            = local.ebs_performance_start_time
+    endTime              = local.ebs_performance_end_time
   }
   targets {
     key = "ResourceId"
