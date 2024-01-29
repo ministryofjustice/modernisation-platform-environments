@@ -38,7 +38,7 @@ resource "aws_security_group_rule" "ecs_outbound" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  security_group_id        = aws_security_group.maat_api_ecs_security_group.id
+  security_group_id = aws_security_group.maat_api_ecs_security_group.id
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
@@ -56,7 +56,7 @@ resource "aws_security_group_rule" "alb_outbound" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  security_group_id        = aws_security_group.maat_api_alb_sg.id
+  security_group_id = aws_security_group.maat_api_alb_sg.id
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
@@ -74,7 +74,7 @@ resource "aws_security_group_rule" "api_gateway_outbound" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  security_group_id        = aws_security_group.maat_api_gw_sg.id
+  security_group_id = aws_security_group.maat_api_gw_sg.id
   cidr_blocks       = ["0.0.0.0/0"]
 }
 

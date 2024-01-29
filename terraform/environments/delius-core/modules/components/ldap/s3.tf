@@ -103,7 +103,7 @@ module "s3_bucket_app_deployment" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
-  bucket_prefix        = "${var.app_name}-${var.env_name}-deployment-state"
+  bucket_prefix      = "${var.app_name}-${var.env_name}-deployment-state"
   versioning_enabled = true
 
   providers = {

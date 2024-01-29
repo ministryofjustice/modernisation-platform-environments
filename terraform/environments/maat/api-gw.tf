@@ -1,37 +1,37 @@
 # Variables
 locals {
-    api_scope = local.application_data.accounts[local.environment].api_scope
-    api_gateway_fqdn = local.application_data.accounts[local.environment].api_gateway_fqdn
-    api_stage_name = "v1"
-    certificate_arn = local.application_data.accounts[local.environment].certificate_arn
+  api_scope        = local.application_data.accounts[local.environment].api_scope
+  api_gateway_fqdn = local.application_data.accounts[local.environment].api_gateway_fqdn
+  api_stage_name   = "v1"
+  certificate_arn  = local.application_data.accounts[local.environment].certificate_arn
 }
 
 # API Gateway configuration
 resource "aws_apigatewayv2_vpc_link" "maat_api_gateway_vpc_link" {
-  name             = "${local.application_name}_VPC_Link"
+  name               = "${local.application_name}_VPC_Link"
   security_group_ids = [aws_security_group.maat_api_gw_sg.id]
-  subnet_ids        = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  subnet_ids         = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
 }
 
 resource "aws_cloudwatch_log_group" "maat_api_gateway_cloudwatch_log_group" {
-  name = "${local.application_name}-API-Gateway"
+  name              = "${local.application_name}-API-Gateway"
   retention_in_days = 90
 }
 
 resource "aws_apigatewayv2_api" "maat_api_gateway" {
-  name        = "${local.application_name} API Gateway"
-  description = "${local.application_name} API Gateway - HTTP API"
+  name          = "${local.application_name} API Gateway"
+  description   = "${local.application_name} API Gateway - HTTP API"
   protocol_type = "HTTP"
 }
 
 resource "aws_apigatewayv2_integration" "maat_api_integration" {
-  api_id             = aws_apigatewayv2_api.maat_api_gateway.id
-  description        = "${local.application_name} Integration Proxy"
-  integration_type   = "HTTP_PROXY"
-  integration_uri    = aws_lb_listener.maat_api_alb_http_listener.arn
-  integration_method = "ANY"
-  connection_type    = "VPC_LINK"
-  connection_id      = aws_apigatewayv2_vpc_link.maat_api_gateway_vpc_link.id
+  api_id                 = aws_apigatewayv2_api.maat_api_gateway.id
+  description            = "${local.application_name} Integration Proxy"
+  integration_type       = "HTTP_PROXY"
+  integration_uri        = aws_lb_listener.maat_api_alb_http_listener.arn
+  integration_method     = "ANY"
+  connection_type        = "VPC_LINK"
+  connection_id          = aws_apigatewayv2_vpc_link.maat_api_gateway_vpc_link.id
   payload_format_version = "1.0"
 }
 
@@ -82,10 +82,10 @@ resource "aws_apigatewayv2_route" "maat_api_route_dces_service" {
 }
 
 resource "aws_apigatewayv2_authorizer" "maat_api_authorizer" {
-  name              = "${local.application_name}_Authorizer"
-  api_id            = aws_apigatewayv2_api.maat_api_gateway.id
-  authorizer_type   = "JWT"
-  identity_sources   = ["$request.header.Authorization"]
+  name             = "${local.application_name}_Authorizer"
+  api_id           = aws_apigatewayv2_api.maat_api_gateway.id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
 
   jwt_configuration {
     audience = [
@@ -99,15 +99,15 @@ resource "aws_apigatewayv2_authorizer" "maat_api_authorizer" {
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_maatos.id,
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_cvs.id
     ]
-    issuer   = "https://${aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint}"
+    issuer = "https://${aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint}"
   }
 }
 
 resource "aws_apigatewayv2_authorizer" "maat_api_authorizer_for_dces" {
-  name              = "${local.application_name}_DCES_Authorizer"
-  api_id            = aws_apigatewayv2_api.maat_api_gateway.id
-  identity_sources   = ["$request.header.Authorization"]
-  authorizer_type   = "JWT"
+  name             = "${local.application_name}_DCES_Authorizer"
+  api_id           = aws_apigatewayv2_api.maat_api_gateway.id
+  identity_sources = ["$request.header.Authorization"]
+  authorizer_type  = "JWT"
 
 
   jwt_configuration {
@@ -115,41 +115,41 @@ resource "aws_apigatewayv2_authorizer" "maat_api_authorizer_for_dces" {
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_dcrs.id,
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_dirs.id
     ]
-    issuer   = "https://${aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint}"
+    issuer = "https://${aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint}"
   }
 }
 
 resource "aws_apigatewayv2_authorizer" "maat_api_authorizer_for_ats_and_caa" {
-  name              = "${local.application_name}_ATS_And_CAA_Authorizer"
-  api_id            = aws_apigatewayv2_api.maat_api_gateway.id
-  authorizer_type   = "JWT"
-  identity_sources   = ["$request.header.Authorization"]
+  name             = "${local.application_name}_ATS_And_CAA_Authorizer"
+  api_id           = aws_apigatewayv2_api.maat_api_gateway.id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
 
   jwt_configuration {
     audience = [
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_caa.id,
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_ats.id
     ]
-    issuer   = "https://${aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint}"
+    issuer = "https://${aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint}"
   }
 }
 
 resource "aws_apigatewayv2_stage" "maat_api_stage" {
-  name = local.api_stage_name
+  name        = local.api_stage_name
   description = "${local.application_name} ${local.api_stage_name} Stage"
-  api_id     = aws_apigatewayv2_api.maat_api_gateway.id
+  api_id      = aws_apigatewayv2_api.maat_api_gateway.id
   auto_deploy = true
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.maat_api_gateway_cloudwatch_log_group.arn
-    format = "{\"requestId\":\"$context.requestId\",\"extendedRequestId\":\"$context.extendedRequestId\",\"ip\":\"$context.identity.sourceIp\",\"clientId\":\"$context.authorizer.claims.client_id\",\"requestTime\":\"$context.requestTime\",\"routeKey\":\"$context.routeKey\",\"status\":\"$context.status\"}"
+    format          = "{\"requestId\":\"$context.requestId\",\"extendedRequestId\":\"$context.extendedRequestId\",\"ip\":\"$context.identity.sourceIp\",\"clientId\":\"$context.authorizer.claims.client_id\",\"requestTime\":\"$context.requestTime\",\"routeKey\":\"$context.routeKey\",\"status\":\"$context.status\"}"
   }
 }
 
 resource "aws_apigatewayv2_domain_name" "maat_api_external_domain_name" {
   domain_name = "maat-cd-api-gateway.${data.aws_route53_zone.external.name}"
   domain_name_configuration {
-    endpoint_type = "REGIONAL"
+    endpoint_type   = "REGIONAL"
     certificate_arn = aws_acm_certificate.maat_api_acm_certificate.arn
     security_policy = "TLS_1_2"
   }
@@ -169,7 +169,7 @@ resource "aws_acm_certificate" "maat_api_acm_certificate" {
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 
-  count = local.environment == "production" ? 0 : 1
+  count           = local.environment == "production" ? 0 : 1
   allow_overwrite = true
   name            = local.domain_name_main[0]
   records         = local.domain_record_main
@@ -181,7 +181,7 @@ resource "aws_route53_record" "external_validation" {
 resource "aws_route53_record" "external_validation_subdomain" {
   provider = aws.core-vpc
 
-  count = local.environment == "production" ? 0 : 1
+  count           = local.environment == "production" ? 0 : 1
   allow_overwrite = true
   name            = local.domain_name_sub[0]
   records         = local.domain_record_sub

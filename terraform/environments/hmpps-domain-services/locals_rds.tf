@@ -84,6 +84,7 @@ locals {
         enabled = true
         type    = "lb_cookie"
       }
+      target_type = "instance"
     }
     https = {
       port     = 443
@@ -103,6 +104,7 @@ locals {
         enabled = true
         type    = "lb_cookie"
       }
+      target_type = "instance"
     }
   }
 
