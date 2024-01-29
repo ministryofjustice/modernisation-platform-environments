@@ -104,6 +104,7 @@ locals {
       policy_attachments = [
         "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole",
         "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess",
+        "arn:aws:iam::aws:policy/CloudWatchFullAccess",
       ]
     }
 
