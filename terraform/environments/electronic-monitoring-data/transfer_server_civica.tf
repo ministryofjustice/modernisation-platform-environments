@@ -49,7 +49,7 @@ resource "aws_transfer_server" "civica" {
 }
 
 resource "aws_iam_role" "iam_for_transfer_civica" {
-  name_prefix         = "iam_for_transfer_civica_"
+  name_prefix         = "iam-for-transfer-civica-"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }

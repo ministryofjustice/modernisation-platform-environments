@@ -49,7 +49,7 @@ resource "aws_transfer_server" "capita" {
 }
 
 resource "aws_iam_role" "iam_for_transfer_capita" {
-  name_prefix         = "iam_for_transfer_capita_"
+  name_prefix         = "iam-for-transfer-capita-"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }

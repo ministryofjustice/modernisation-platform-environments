@@ -49,7 +49,7 @@ resource "aws_transfer_server" "g4s" {
 }
 
 resource "aws_iam_role" "iam_for_transfer_g4s" {
-  name_prefix         = "iam_for_transfer_g4s_"
+  name_prefix         = "iam-for-transfer-g4s-"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
