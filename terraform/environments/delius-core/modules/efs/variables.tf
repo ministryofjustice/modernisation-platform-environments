@@ -37,15 +37,15 @@ variable "throughput_mode" {
 
 variable "tags" {
   description = "tags to add for all resources"
-  type = map(string)
+  type        = map(string)
   default = {
   }
 }
 
-variable source_security_group_id {
+variable "source_security_group_id" {
   description = "sg of source"
-  type = string
-  default = null
+  type        = string
+  default     = null
 }
 
 variable "vpc_id" {
@@ -59,6 +59,6 @@ variable "subnet_ids" {
 }
 
 variable "vpc_cidr" {
-    description = "vpc cidr"
-    type        = string
+  description = "vpc cidr"
+  type        = string
 }

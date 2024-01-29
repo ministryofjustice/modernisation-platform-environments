@@ -148,6 +148,7 @@ module "data_ingestion_pipeline" {
               "--dpr.file.transfer.destination.bucket" : module.s3_raw_archive_bucket.bucket_id,
               "--dpr.file.transfer.retention.days" : "0",
               "--dpr.file.transfer.delete.copied.files" : "true",
+              "--dpr.allowed.s3.file.extensions" : ".parquet",
               "--dpr.config.s3.bucket" : module.s3_glue_job_bucket.bucket_id
             }
           },

@@ -1,6 +1,7 @@
 locals {
 
   iam_policies_filter = distinct(flatten([
+    var.options.enable_azure_sas_token ? ["SasTokenRotatorPolicy"] : [],
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_hmpps_domain ? ["HmppsDomainSecretsPolicy"] : [],
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
@@ -124,6 +125,32 @@ locals {
     Ec2OracleEnterpriseManagedServerPolicy = {
       description = "Permissions required for Oracle Enterprise Managed Server"
       statements  = local.iam_policy_statements_ec2.OracleEnterpriseManagedServer
+    }
+
+    SasTokenRotatorPolicy = {
+      description = "Allows updating of secrets in SSM"
+      statements = [
+        {
+          sid    = "RotateSecrets"
+          effect = "Allow"
+          actions = [
+            "ssm:PutParameter",
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/azure/*",
+          ]
+        },
+        {
+          sid    = "EncryptSecrets"
+          effect = "Allow"
+          actions = [
+            "kms:Encrypt",
+          ]
+          resources = [
+            var.environment.kms_keys["general"].arn
+          ]
+        },
+      ]
     }
 
     SSMManagedInstanceCoreReducedPolicy = {
