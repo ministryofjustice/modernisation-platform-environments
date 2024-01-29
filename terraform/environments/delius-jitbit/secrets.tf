@@ -56,4 +56,7 @@ resource "aws_secretsmanager_secret" "s3_user_secret_key" {
 resource "aws_secretsmanager_secret_version" "s3_user_secret_key" {
   secret_id     = aws_secretsmanager_secret.s3_user_secret_key.id
   secret_string = aws_iam_access_key.s3_user.secret
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
