@@ -24,8 +24,8 @@ resource "aws_transfer_server" "capita" {
     subnet_ids             = [data.aws_subnet.public_subnets_b.id]
     address_allocation_ids = [aws_eip.capita.id]
     security_group_ids     = [
-      aws_security_group.capita_security_group.id,
-      aws_security_group.test_security_group.id
+      aws_security_group.capita.id,
+      aws_security_group.test.id
     ]
   }
 

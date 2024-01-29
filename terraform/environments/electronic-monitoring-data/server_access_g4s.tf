@@ -71,14 +71,14 @@ resource "aws_iam_role_policy" "g4s_transfer_user_iam_policy" {
 # Set the allowed IP addresses for the supplier.
 #------------------------------------------------------------------------------
 
-resource "aws_security_group" "g4s_security_group" {
+resource "aws_security_group" "g4s" {
   name        = "g4s_inbound_ips"
   description = "Allowed IP addresses from g4s"
   vpc_id      = data.aws_vpc.shared.id
 }
 
 # resource "aws_vpc_security_group_ingress_rule" "g4s_ip_1" {
-#   security_group_id = aws_security_group.g4s_security_group.id
+#   security_group_id = aws_security_group.g4s.id
 
 #   cidr_ipv4   = ""
 #   ip_protocol = "tcp"

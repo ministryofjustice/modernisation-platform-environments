@@ -24,8 +24,8 @@ resource "aws_transfer_server" "civica" {
     subnet_ids             = [data.aws_subnet.public_subnets_b.id]
     address_allocation_ids = [aws_eip.civica.id]
     security_group_ids     = [
-      aws_security_group.civica_security_group.id,
-      aws_security_group.test_security_group.id
+      aws_security_group.civica.id,
+      aws_security_group.test.id
     ]
   }
 

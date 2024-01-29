@@ -71,14 +71,14 @@ resource "aws_iam_role_policy" "civica_transfer_user_iam_policy" {
 # Set the allowed IP addresses for the supplier.
 #------------------------------------------------------------------------------
 
-resource "aws_security_group" "civica_security_group" {
+resource "aws_security_group" "civica" {
   name        = "civica_inbound_ips"
   description = "Allowed IP addresses from Civica"
   vpc_id      = data.aws_vpc.shared.id
 }
 
 # resource "aws_vpc_security_group_ingress_rule" "civica_ip_1" {
-#   security_group_id = aws_security_group.civica_security_group.id
+#   security_group_id = aws_security_group.civica.id
 
 #   cidr_ipv4   = ""
 #   ip_protocol = "tcp"

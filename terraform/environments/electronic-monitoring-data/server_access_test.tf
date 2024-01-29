@@ -22,14 +22,14 @@ resource "aws_transfer_ssh_key" "test_ssh_key_mh" {
 # Set the allowed IP addresses for the supplier.
 #------------------------------------------------------------------------------
 
-resource "aws_security_group" "test_security_group" {
+resource "aws_security_group" "test" {
   name        = "test_inbound_ips"
   description = "Allowed IP addresses for testing"
   vpc_id      = data.aws_vpc.shared.id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "test_fynhy_ip" {
-  security_group_id = aws_security_group.test_security_group.id
+  security_group_id = aws_security_group.test.id
 
   cidr_ipv4   = "46.69.144.146/32"
   ip_protocol = "tcp"
@@ -38,7 +38,7 @@ resource "aws_vpc_security_group_ingress_rule" "test_fynhy_ip" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "test_petty_france_ip" {
-  security_group_id = aws_security_group.test_security_group.id
+  security_group_id = aws_security_group.test.id
 
   cidr_ipv4   = "81.134.202.29/32"
   ip_protocol = "tcp"
