@@ -1,0 +1,1300 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: LAA Application Load Balancer stack
+Parameters:
+  pAppName:
+    Type: String
+    Default: ''
+  pEnvironment:
+    Description: Environment (only development, test, staging, uat and production are allowable values)
+    Type: String
+    Default: ''
+  pCodePipelineArtifactBucket:
+    Description: CodePipeline S3 bucket for artifacts used for deployment
+    Type: String
+  pAppFQDN:
+    Type: String
+    Default: ''
+  pAppEcsCluster:
+    Type: String
+    Default: ''
+  pECSRepositoryURL:
+    Type: String
+    Default: ''
+  pCustomHostedZoneId:
+    Type: String
+    Default: ''
+  pDockerImageTag:
+    Type: String
+    Default: ''
+  pAppAlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+    Default: ''
+  pAppAlbInternalSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+    Default: ''
+  pAppCertificateArn:
+    Type: String
+    Default: ''
+  pCloudfrontAppCertificateArn:
+    Type: String
+    Default: ''
+  pHostedZoneId:
+    Type: String
+    Default: ''
+  pMaatDbMaxConnectionPoolSize:
+    Type: String
+    Default: ''
+  pMaatDbPassword:
+    Type: String
+    Default: ''
+  pMaatDbUrl:
+    Type: String
+    Default: ''
+  pMaatBCEndpointURL:
+    Type: String
+    Default: ''
+  pMaatBCServiceName:
+    Type: String
+    Default: ''
+  pMaatBCClientOrigId:
+    Type: String
+    Default: ''
+  pMaatBCClientUserId:
+    Type: String
+    Default: ''
+  pMlraLocation:
+    Type: String
+    Default: ''
+  pCmaBaseUrl:
+    Type: String
+    Default: ''
+  pCmaClientId:
+    Type: String
+    Default: ''
+  pCmaClientSecret:
+    Type: String
+    Default: ''
+  pCmaAuthScope:
+    Type: String
+    Default: ''
+  pCmaEndpointAuth:
+    Type: String
+    Default: ''
+  pCmaEndpointMeansAssessment:
+    Type: String
+    Default: ''
+  pInternalAppCertificateArn:
+    Type: String
+    Default: ''
+  pEcsServiceDesiredCount:
+    Type: String
+    Default: ''
+  pServiceScalingTargetMaxCapacity:
+    Type: String
+    Default: ''
+  pServiceScalingTargetMinCapacity:
+    Type: String
+    Default: ''
+  pCcpBaseUrl:
+    Type: String
+    Default: ''
+  pCcpClientId:
+    Type: String
+    Default: ''
+  pCcpClientSecret:
+    Type: String
+    Default: ''
+  pCcpAuthScope:
+    Type: String
+    Default: ''
+  pCcpEndpointAuth:
+    Type: String
+    Default: ''
+  pCcpEndpointProceedings:
+    Type: String
+    Default: ''
+  pCaaBaseUrl:
+    Type: String
+    Default: ''
+  pCaaClientId:
+    Type: String
+    Default: ''
+  pCaaClientSecret:
+    Type: String
+    Default: ''
+  pCaaAuthUrl:
+    Type: String
+    Default: ''
+  pCaaAuthScope:
+    Type: String
+    Default: ''
+  pCaaEndpoint:
+    Type: String
+    Default: ''
+  pCccBaseUrl:
+    Type: String
+    Default: ''
+  pCccClientId:
+    Type: String
+    Default: ''
+  pCccClientSecret:
+    Type: String
+    Default: ''
+  pCccAuthUrl:
+    Type: String
+    Default: ''
+  pCccAuthScope:
+    Type: String
+    Default: ''
+  pCccEndpoint:
+    Type: String
+    Default: ''
+  pOrchBaseUrl:
+    Type: String
+    Default: ''
+  pOrchClientId:
+    Type: String
+    Default: ''
+  pOrchClientSecret:
+    Type: String
+    Default: ''
+  pOrchAuthUrl:
+    Type: String
+    Default: ''
+  pOrchAuthScope:
+    Type: String
+    Default: ''
+  pOrchEndpoint:
+    Type: String
+    Default: ''
+  pAppLogLevel:
+    Type: String
+    Default: ''
+  pGoogleAnalytics4TagId:
+    Type: String
+    Default: ''
+
+Resources:
+################################################################################
+#
+# App container setup and ALB
+#
+################################################################################
+
+//   CloudFrontSecret:
+//     Type: 'AWS::SecretsManager::Secret'
+//     Properties:
+//       Name: cloudfront-secret-MAAT
+//       Description: Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront
+//       GenerateSecretString:
+//         PasswordLength: 16
+//         ExcludePunctuation: true
+
+//   EcsService:
+//     Type: AWS::ECS::Service
+//     DependsOn:
+//       - AlbHTTPSListener
+//       - InternalAlbHTTPSListener
+//     Properties:
+//       Cluster: !Ref pAppEcsCluster
+//       DesiredCount: !Ref pEcsServiceDesiredCount
+//       LoadBalancers:
+//         - ContainerName: !Ref pAppName
+//           ContainerPort: 8080
+//           TargetGroupArn: !Ref 'TargetGroup'
+//         - ContainerName: !Ref pAppName
+//           ContainerPort: 8080
+//           TargetGroupArn: !Ref 'InternalLoadBalancerTargetGroup'
+//       Role: !Ref 'EcsServiceRole'
+//       TaskDefinition: !Ref 'TaskDefinition'
+//       PlacementStrategies:
+//         - Type: spread
+//           Field: attribute:ecs.availability-zone
+
+
+//   EcsServiceRole:
+//     Type: AWS::IAM::Role
+//     Properties:
+//       AssumeRolePolicyDocument:
+//         Statement:
+//           - Effect: Allow
+//             Principal:
+//               Service:
+//                 - 'ecs.amazonaws.com'
+//             Action:
+//               - 'sts:AssumeRole'
+//       Path: /
+//       Policies:
+//         - PolicyName: !Sub '${pAppName}-ecs-service'
+//           PolicyDocument:
+//             Statement:
+//               - Effect: Allow
+//                 Action:
+//                   - 'elasticloadbalancing:DeregisterInstancesFromLoadBalancer'
+//                   - 'elasticloadbalancing:DeregisterTargets'
+//                   - 'elasticloadbalancing:Describe*'
+//                   - 'elasticloadbalancing:RegisterInstancesWithLoadBalancer'
+//                   - 'elasticloadbalancing:RegisterTargets'
+//                   - 'ec2:Describe*'
+//                   - 'ec2:AuthorizeSecurityGroupIngress'
+//                 Resource: '*'
+//   ServiceScalingTarget:
+//     Type: AWS::ApplicationAutoScaling::ScalableTarget
+//     Properties:
+//       MaxCapacity: !Ref pServiceScalingTargetMaxCapacity
+//       MinCapacity: !Ref pServiceScalingTargetMinCapacity
+//       ResourceId: !Join ['', [service/, !Ref pAppEcsCluster, /, !GetAtt EcsService.Name]]
+//       RoleARN: !GetAtt AutoscalingRole.Arn
+//       ScalableDimension: ecs:service:DesiredCount
+//       ServiceNamespace: ecs
+//   ScalingUpPolicyService:
+//     Type: AWS::ApplicationAutoScaling::ScalingPolicy
+//     Properties:
+//       PolicyName: !Sub ${EcsService}-ScalingUpPolicy
+//       PolicyType: StepScaling
+//       ScalingTargetId: !Ref ServiceScalingTarget
+//       StepScalingPolicyConfiguration:
+//         AdjustmentType: ChangeInCapacity
+//         Cooldown: 60
+//         StepAdjustments:
+//           - ScalingAdjustment: 1
+//             MetricIntervalLowerBound: 0
+//   ScalingDownPolicyService:
+//     Type: AWS::ApplicationAutoScaling::ScalingPolicy
+//     Properties:
+//       PolicyName: !Sub ${EcsService}-ScalingDownPolicy
+//       PolicyType: StepScaling
+//       ScalingTargetId: !Ref ServiceScalingTarget
+//       StepScalingPolicyConfiguration:
+//         AdjustmentType: ChangeInCapacity
+//         Cooldown: 60
+//         StepAdjustments:
+//         - ScalingAdjustment: -1
+//           MetricIntervalUpperBound: 0
+//   HighCPUServiceAlarm:
+//     Type: AWS::CloudWatch::Alarm
+//     Properties:
+//       AlarmDescription: CPUUtilization exceeding threshold. Triggers scale up
+//       ActionsEnabled: true
+//       Namespace: AWS/ECS
+//       MetricName: CPUUtilization
+//       Unit: Percent
+//       Dimensions:
+//       - Name: ClusterName
+//         Value: !Ref pAppEcsCluster
+//       - Name: ServiceName
+//         Value: !GetAtt EcsService.Name
+//       Statistic: Average
+//       Period: 60
+//       EvaluationPeriods: 3
+//       Threshold: 70
+//       AlarmActions: [!Ref ScalingUpPolicyService]
+//       ComparisonOperator: GreaterThanThreshold
+//   LowCPUServiceAlarm:
+//     Type: AWS::CloudWatch::Alarm
+//     Properties:
+//       AlarmDescription: CPUUtilization lower than threshold. Triggers scale down
+//       ActionsEnabled: true
+//       Namespace: AWS/ECS
+//       MetricName: CPUUtilization
+//       Unit: Percent
+//       Dimensions:
+//       - Name: ClusterName
+//         Value: !Ref pAppEcsCluster
+//       - Name: ServiceName
+//         Value: !GetAtt EcsService.Name
+//       Statistic: Average
+//       Period: 60
+//       EvaluationPeriods: 3
+//       Threshold: 20
+//       AlarmActions: [!Ref ScalingDownPolicyService]
+//       ComparisonOperator: LessThanThreshold
+//   AlbHTTPSListener:
+//     Type: AWS::ElasticLoadBalancingV2::Listener
+//     DependsOn: EcsServiceRole
+//     Properties:
+//       Certificates:
+//         - CertificateArn: !Ref pAppCertificateArn
+//       DefaultActions:
+//         - Type: fixed-response
+//           FixedResponseConfig:
+//             ContentType: text/plain
+//             MessageBody: Access Denied - must access via CloudFront
+//             StatusCode: '403'
+//       LoadBalancerArn: !Ref 'LoadBalancer'
+//       Port: 443
+//       Protocol: HTTPS
+//   EcsAlbHTTPSListenerRule:
+//     Type: AWS::ElasticLoadBalancingV2::ListenerRule
+//     DependsOn: [CloudFrontSecret]
+//     Properties:
+//       Actions:
+//         - Type: forward
+//           TargetGroupArn: !Ref 'TargetGroup'
+//       Conditions:
+//         - Field: http-header
+//           HttpHeaderConfig:
+//             HttpHeaderName: X-Custom-Header-LAA-MAAT
+//             Values:
+//               - '{{resolve:secretsmanager:cloudfront-secret-MAAT}}'
+//       ListenerArn: !Ref 'AlbHTTPSListener'
+//       Priority: 1
+//   TargetGroup:
+//     Type: AWS::ElasticLoadBalancingV2::TargetGroup
+//     DependsOn: LoadBalancer
+//     Properties:
+//       HealthCheckIntervalSeconds: 15
+//       HealthCheckPath: /ccmt-web/
+//       HealthCheckProtocol: HTTP
+//       HealthCheckTimeoutSeconds: 5
+//       HealthyThresholdCount: 2
+//       Name: !Sub '${pAppName}-TargetGroup'
+//       Port: 80
+//       Protocol: HTTP
+//       UnhealthyThresholdCount: 3
+//       VpcId: !ImportValue 'env-VpcId'
+//       TargetGroupAttributes:
+//         - Key: 'stickiness.enabled'
+//           Value: 'true'
+//         - Key: 'stickiness.type'
+//           Value: 'lb_cookie'
+//         - Key: 'stickiness.lb_cookie.duration_seconds'
+//           Value: '10800' # 3 hours in seconds
+//         - Key: 'deregistration_delay.timeout_seconds'
+//           Value: '30'
+//   LoadBalancer:
+//     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+//     Properties:
+//       Name: !Sub '${pAppName}-LoadBalancer'
+//       Scheme: internet-facing
+//       LoadBalancerAttributes:
+//         - Key: idle_timeout.timeout_seconds
+//           Value: '65'
+//       Subnets: [ !ImportValue env-DMZSubnetA, !ImportValue env-DMZSubnetB, !ImportValue env-DMZSubnetC ]
+//       SecurityGroups:
+//         - !Ref pAppAlbSecurityGroup
+
+
+//   InternalAlbHTTPSListener:
+//     Type: AWS::ElasticLoadBalancingV2::Listener
+//     DependsOn: EcsServiceRole
+//     Properties:
+//       Certificates:
+//         - CertificateArn: !Ref pAppCertificateArn
+//       DefaultActions:
+//         - Type: forward
+//           TargetGroupArn: !Ref InternalLoadBalancerTargetGroup
+//       LoadBalancerArn: !Ref 'InternalLoadBalancer'
+//       Port: 443
+//       Protocol: HTTPS
+//   InternalAlbCertificatesList:
+//     Type: AWS::ElasticLoadBalancingV2::ListenerCertificate
+//     Properties:
+//       Certificates:
+//         - CertificateArn: !Ref pInternalAppCertificateArn
+//       ListenerArn: !Ref InternalAlbHTTPSListener
+//   EcsInternalAlbHTTPSListenerRule:
+//     Type: AWS::ElasticLoadBalancingV2::ListenerRule
+//     Properties:
+//       Actions:
+//         - Type: forward
+//           TargetGroupArn: !Ref 'InternalLoadBalancerTargetGroup'
+//       Conditions:
+//         - Field: source-ip
+//           SourceIpConfig:
+//             Values:
+//               - 172.20.0.0/16
+//       ListenerArn: !Ref 'InternalAlbHTTPSListener'
+//       Priority: 1
+
+//   InternalLoadBalancerTargetGroup:
+//     Type: AWS::ElasticLoadBalancingV2::TargetGroup
+//     DependsOn: InternalLoadBalancer
+//     Properties:
+//       HealthCheckIntervalSeconds: 15
+//       HealthCheckPath: /ccmt-web/
+//       HealthCheckProtocol: HTTP
+//       HealthCheckTimeoutSeconds: 5
+//       HealthyThresholdCount: 2
+//       Name: !Sub '${pAppName}Internal-TargetGroup'
+//       Port: 80
+//       Protocol: HTTP
+//       UnhealthyThresholdCount: 3
+//       VpcId: !ImportValue 'env-VpcId'
+//       TargetGroupAttributes:
+//         - Key: 'stickiness.enabled'
+//           Value: 'true'
+//         - Key: 'stickiness.type'
+//           Value: 'lb_cookie'
+//         - Key: 'stickiness.lb_cookie.duration_seconds'
+//           Value: '10800' # 3 hours in seconds
+//         - Key: 'deregistration_delay.timeout_seconds'
+//           Value: '30'
+//   InternalLoadBalancer:
+//     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+//     Properties:
+//       Name: !Sub '${pAppName}-InternalLoadBalancer'
+//       Scheme: internal
+//       LoadBalancerAttributes:
+//         - Key: idle_timeout.timeout_seconds
+//           Value: '65'
+//       Subnets: [ !ImportValue env-AppPrivateSubnetA, !ImportValue env-AppPrivateSubnetB, !ImportValue env-AppPrivateSubnetC ]
+//       SecurityGroups:
+//         - !Ref pAppAlbInternalSecurityGroup
+
+
+//   CloudFrontDistribution:
+//     Type: AWS::CloudFront::Distribution
+//     Properties:
+//       DistributionConfig:
+//         HttpVersion: http2
+//         Origins:
+//           - DomainName: !GetAtt LoadBalancer.DNSName
+//             Id: !Ref 'LoadBalancer'
+//             CustomOriginConfig:
+//               HTTPSPort: 443
+//               OriginProtocolPolicy: https-only
+//               OriginSSLProtocols: [ "TLSv1.2" ]
+//               OriginReadTimeout: 60
+//               OriginKeepaliveTimeout: 60
+//             OriginCustomHeaders:
+//               - HeaderName: X-Custom-Header-LAA-MAAT
+//                 HeaderValue: '{{resolve:secretsmanager:cloudfront-secret-MAAT}}'
+//         Enabled: true
+//         Aliases: [ !Ref pAppFQDN ]
+//         DefaultCacheBehavior:
+//           TargetOriginId: !Ref 'LoadBalancer'
+//           SmoothStreaming: false
+//           AllowedMethods:
+//             - DELETE
+//             - GET
+//             - HEAD
+//             - OPTIONS
+//             - PATCH
+//             - POST
+//             - PUT
+//           CachedMethods:
+//             - HEAD
+//             - GET
+//           ForwardedValues:
+//             QueryString: true
+//             Cookies:
+//               Forward: whitelist
+//               WhitelistedNames:
+//                 - AWSALB
+//                 - JSESSIONID
+//             Headers:
+//               - Authorization
+//               - CloudFront-Forwarded-Proto
+//               - CloudFront-Is-Desktop-Viewer
+//               - CloudFront-Is-Mobile-Viewer
+//               - CloudFront-Is-SmartTV-Viewer
+//               - CloudFront-Is-Tablet-Viewer
+//               - CloudFront-Viewer-Country
+//               - Host
+//               - User-Agent
+//           ViewerProtocolPolicy: https-only
+//         CacheBehaviors:
+//           - TargetOriginId: !Ref 'LoadBalancer'
+//             SmoothStreaming: false
+//             PathPattern: '*.png'
+//             MinTTL: 0
+//             AllowedMethods:
+//               - GET
+//               - HEAD
+//             CachedMethods:
+//               - HEAD
+//               - GET
+//             ForwardedValues:
+//               QueryString: false
+//               Headers:
+//                 - Host
+//                 - User-Agent
+//             ViewerProtocolPolicy: https-only
+//           - TargetOriginId: !Ref 'LoadBalancer'
+//             SmoothStreaming: false
+//             PathPattern: '*.jpg'
+//             MinTTL: 0
+//             AllowedMethods:
+//               - GET
+//               - HEAD
+//             CachedMethods:
+//               - HEAD
+//               - GET
+//             ForwardedValues:
+//               QueryString: false
+//               Headers:
+//                 - Host
+//                 - User-Agent
+//             ViewerProtocolPolicy: https-only
+//           - TargetOriginId: !Ref 'LoadBalancer'
+//             SmoothStreaming: false
+//             PathPattern: '*.gif'
+//             MinTTL: 0
+//             AllowedMethods:
+//               - GET
+//               - HEAD
+//             CachedMethods:
+//               - HEAD
+//               - GET
+//             ForwardedValues:
+//               QueryString: false
+//               Headers:
+//                 - Host
+//                 - User-Agent
+//             ViewerProtocolPolicy: https-only
+//           - TargetOriginId: !Ref 'LoadBalancer'
+//             SmoothStreaming: false
+//             PathPattern: '*.css'
+//             MinTTL: 0
+//             AllowedMethods:
+//               - GET
+//               - HEAD
+//             CachedMethods:
+//               - HEAD
+//               - GET
+//             ForwardedValues:
+//               QueryString: false
+//               Headers:
+//                 - Host
+//                 - User-Agent
+//             ViewerProtocolPolicy: https-only
+//           - TargetOriginId: !Ref 'LoadBalancer'
+//             SmoothStreaming: false
+//             PathPattern: '*.js'
+//             MinTTL: 0
+//             AllowedMethods:
+//               - GET
+//               - HEAD
+//             CachedMethods:
+//               - HEAD
+//               - GET
+//             ForwardedValues:
+//               QueryString: false
+//               Headers:
+//                 - Host
+//                 - User-Agent
+//             ViewerProtocolPolicy: https-only
+//         PriceClass: PriceClass_100
+//         ViewerCertificate:
+//           AcmCertificateArn: !Ref pCloudfrontAppCertificateArn
+//           SslSupportMethod: sni-only
+//           MinimumProtocolVersion: 'TLSv1.2_2018'
+//         Logging:
+//           Bucket: !Sub laa-cloudfront-logging-${pEnvironment}.s3.amazonaws.com
+//           IncludeCookies: false
+//           Prefix: !Ref pAppName
+//         WebACLId: !Ref 'WAFWebACL'
+
+//   WAFManualAllowSet:
+//     Type: AWS::WAF::IPSet
+//     Properties:
+//       Name: !Sub "${pAppName} Manual Allow Set"
+//       IPSetDescriptors:
+//       # Ranges from https://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml
+//       # disc_internet_pipeline, disc_dom1, moj_digital_wifi, petty_france_office365, petty_france_wifi, ark_internet, gateway_proxies
+//       - Type: "IPV4"
+//         Value: "81.134.202.29/32"
+//       - Type: "IPV4"
+//         Value: "157.203.176.138/32"
+//       - Type: "IPV4"
+//         Value: "157.203.176.139/32"
+//       - Type: "IPV4"
+//         Value: "157.203.176.140/32"
+//       - Type: "IPV4"
+//         Value: "157.203.177.190/32"
+//       - Type: "IPV4"
+//         Value: "157.203.177.191/32"
+//       - Type: "IPV4"
+//         Value: "157.203.177.192/32"
+//       - Type: "IPV4"
+//         Value: "62.25.109.0/24"
+//       - Type: "IPV4"
+//         Value: "85.115.52.0/24"
+//       - Type: "IPV4"
+//         Value: "85.115.53.0/24"
+//       - Type: "IPV4"
+//         Value: "85.115.54.0/24"
+//       - Type: "IPV4"
+//         Value: "213.121.161.0/24"
+//       - Type: "IPV4"
+//         Value: "195.59.75.0/24"
+//       - Type: "IPV4"
+//         Value: "194.33.192.0/24"
+//       - Type: "IPV4"
+//         Value: "194.33.193.0/24"
+//       - Type: "IPV4"
+//         Value: "194.33.196.0/24"
+//       - Type: "IPV4"
+//         Value: "194.33.197.0/24"
+//       - Type: "IPV4"
+//         Value: "35.177.125.252/32"
+//       - Type: "IPV4"
+//         Value: "35.177.137.160/32"
+//       # AWS Holborn offices Wired
+//       - Type: "IPV4"
+//         Value: "54.240.197.225/32"
+//       # AWS Holborn offices Wifi
+//       - Type: "IPV4"
+//         Value: "213.121.203.202/32"
+//       # RedCentric access
+//       - Type: "IPV4"
+//         Value: "185.65.103.4/32"
+//       - Type: "IPV4"
+//         Value: "185.65.103.5/32"
+//       # CodeBuild
+//       - Type: "IPV4"
+//         Value: "13.55.255.216/32"
+//       - Type: "IPV4"
+//         Value: "13.55.255.217/32"
+//       - Type: "IPV4"
+//         Value: "13.55.255.218/32"
+//       - Type: "IPV4"
+//         Value: "13.55.255.219/32"
+//       - Type: "IPV4"
+//         Value: "13.55.255.220/32"
+//       - Type: "IPV4"
+//         Value: "13.55.255.221/32"
+//       - Type: "IPV4"
+//         Value: "13.55.255.222/32"
+//       - Type: "IPV4"
+//         Value: "13.55.255.223/32"
+//       - Type: "IPV4"
+//         Value: "13.56.32.200/32"
+//       - Type: "IPV4"
+//         Value: "13.56.32.201/32"
+//       - Type: "IPV4"
+//         Value: "13.56.32.202/32"
+//       - Type: "IPV4"
+//         Value: "13.56.32.203/32"
+//       - Type: "IPV4"
+//         Value: "13.56.32.204/32"
+//       - Type: "IPV4"
+//         Value: "13.56.32.205/32"
+//       - Type: "IPV4"
+//         Value: "13.56.32.206/32"
+//       - Type: "IPV4"
+//         Value: "13.56.32.207/32"
+//       - Type: "IPV4"
+//         Value: "13.112.191.184/32"
+//       - Type: "IPV4"
+//         Value: "13.112.191.185/32"
+//       - Type: "IPV4"
+//         Value: "13.112.191.186/32"
+//       - Type: "IPV4"
+//         Value: "13.112.191.187/32"
+//       - Type: "IPV4"
+//         Value: "13.112.191.188/32"
+//       - Type: "IPV4"
+//         Value: "13.112.191.189/32"
+//       - Type: "IPV4"
+//         Value: "13.112.191.190/32"
+//       - Type: "IPV4"
+//         Value: "13.112.191.191/32"
+//       - Type: "IPV4"
+//         Value: "13.124.145.16/32"
+//       - Type: "IPV4"
+//         Value: "13.124.145.17/32"
+//       - Type: "IPV4"
+//         Value: "13.124.145.18/32"
+//       - Type: "IPV4"
+//         Value: "13.124.145.19/32"
+//       - Type: "IPV4"
+//         Value: "13.124.145.20/32"
+//       - Type: "IPV4"
+//         Value: "13.124.145.21/32"
+//       - Type: "IPV4"
+//         Value: "13.124.145.22/32"
+//       - Type: "IPV4"
+//         Value: "13.124.145.23/32"
+//       - Type: "IPV4"
+//         Value: "13.127.70.136/32"
+//       - Type: "IPV4"
+//         Value: "13.127.70.137/32"
+//       - Type: "IPV4"
+//         Value: "13.127.70.138/32"
+//       - Type: "IPV4"
+//         Value: "13.127.70.139/32"
+//       - Type: "IPV4"
+//         Value: "13.127.70.140/32"
+//       - Type: "IPV4"
+//         Value: "13.127.70.141/32"
+//       - Type: "IPV4"
+//         Value: "13.127.70.142/32"
+//       - Type: "IPV4"
+//         Value: "13.127.70.143/32"
+//       - Type: "IPV4"
+//         Value: "18.231.194.8/32"
+//       - Type: "IPV4"
+//         Value: "18.231.194.9/32"
+//       - Type: "IPV4"
+//         Value: "18.231.194.10/32"
+//       - Type: "IPV4"
+//         Value: "18.231.194.11/32"
+//       - Type: "IPV4"
+//         Value: "18.231.194.12/32"
+//       - Type: "IPV4"
+//         Value: "18.231.194.13/32"
+//       - Type: "IPV4"
+//         Value: "18.231.194.14/32"
+//       - Type: "IPV4"
+//         Value: "18.231.194.15/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.208/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.209/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.210/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.211/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.212/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.213/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.214/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.215/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.216/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.217/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.218/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.219/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.220/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.221/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.222/32"
+//       - Type: "IPV4"
+//         Value: "34.228.4.223/32"
+//       - Type: "IPV4"
+//         Value: "34.250.63.248/32"
+//       - Type: "IPV4"
+//         Value: "34.250.63.249/32"
+//       - Type: "IPV4"
+//         Value: "34.250.63.250/32"
+//       - Type: "IPV4"
+//         Value: "34.250.63.251/32"
+//       - Type: "IPV4"
+//         Value: "34.250.63.252/32"
+//       - Type: "IPV4"
+//         Value: "34.250.63.253/32"
+//       - Type: "IPV4"
+//         Value: "34.250.63.254/32"
+//       - Type: "IPV4"
+//         Value: "34.250.63.255/32"
+//       - Type: "IPV4"
+//         Value: "35.157.127.248/32"
+//       - Type: "IPV4"
+//         Value: "35.157.127.249/32"
+//       - Type: "IPV4"
+//         Value: "35.157.127.250/32"
+//       - Type: "IPV4"
+//         Value: "35.157.127.251/32"
+//       - Type: "IPV4"
+//         Value: "35.157.127.252/32"
+//       - Type: "IPV4"
+//         Value: "35.157.127.253/32"
+//       - Type: "IPV4"
+//         Value: "35.157.127.254/32"
+//       - Type: "IPV4"
+//         Value: "35.157.127.255/32"
+//       - Type: "IPV4"
+//         Value: "35.176.92.32/32"
+//       - Type: "IPV4"
+//         Value: "35.176.92.33/32"
+//       - Type: "IPV4"
+//         Value: "35.176.92.34/32"
+//       - Type: "IPV4"
+//         Value: "35.176.92.35/32"
+//       - Type: "IPV4"
+//         Value: "35.176.92.36/32"
+//       - Type: "IPV4"
+//         Value: "35.176.92.37/32"
+//       - Type: "IPV4"
+//         Value: "35.176.92.38/32"
+//       - Type: "IPV4"
+//         Value: "35.176.92.39/32"
+//       - Type: "IPV4"
+//         Value: "35.182.14.48/32"
+//       - Type: "IPV4"
+//         Value: "35.182.14.49/32"
+//       - Type: "IPV4"
+//         Value: "35.182.14.50/32"
+//       - Type: "IPV4"
+//         Value: "35.182.14.51/32"
+//       - Type: "IPV4"
+//         Value: "35.182.14.52/32"
+//       - Type: "IPV4"
+//         Value: "35.182.14.53/32"
+//       - Type: "IPV4"
+//         Value: "35.182.14.54/32"
+//       - Type: "IPV4"
+//         Value: "35.182.14.55/32"
+//       - Type: "IPV4"
+//         Value: "52.15.247.208/32"
+//       - Type: "IPV4"
+//         Value: "52.15.247.209/32"
+//       - Type: "IPV4"
+//         Value: "52.15.247.210/32"
+//       - Type: "IPV4"
+//         Value: "52.15.247.211/32"
+//       - Type: "IPV4"
+//         Value: "52.15.247.212/32"
+//       - Type: "IPV4"
+//         Value: "52.15.247.213/32"
+//       - Type: "IPV4"
+//         Value: "52.15.247.214/32"
+//       - Type: "IPV4"
+//         Value: "52.15.247.215/32"
+//       - Type: "IPV4"
+//         Value: "52.43.76.88/32"
+//       - Type: "IPV4"
+//         Value: "52.43.76.89/32"
+//       - Type: "IPV4"
+//         Value: "52.43.76.90/32"
+//       - Type: "IPV4"
+//         Value: "52.43.76.91/32"
+//       - Type: "IPV4"
+//         Value: "52.43.76.92/32"
+//       - Type: "IPV4"
+//         Value: "52.43.76.93/32"
+//       - Type: "IPV4"
+//         Value: "52.43.76.94/32"
+//       - Type: "IPV4"
+//         Value: "52.43.76.95/32"
+//       - Type: "IPV4"
+//         Value: "52.47.73.72/32"
+//       - Type: "IPV4"
+//         Value: "52.47.73.73/32"
+//       - Type: "IPV4"
+//         Value: "52.47.73.74/32"
+//       - Type: "IPV4"
+//         Value: "52.47.73.75/32"
+//       - Type: "IPV4"
+//         Value: "52.47.73.76/32"
+//       - Type: "IPV4"
+//         Value: "52.47.73.77/32"
+//       - Type: "IPV4"
+//         Value: "52.47.73.78/32"
+//       - Type: "IPV4"
+//         Value: "52.47.73.79/32"
+//       - Type: "IPV4"
+//         Value: "52.221.221.128/32"
+//       - Type: "IPV4"
+//         Value: "52.221.221.129/32"
+//       - Type: "IPV4"
+//         Value: "52.221.221.130/32"
+//       - Type: "IPV4"
+//         Value: "52.221.221.131/32"
+//       - Type: "IPV4"
+//         Value: "52.221.221.132/32"
+//       - Type: "IPV4"
+//         Value: "52.221.221.133/32"
+//       - Type: "IPV4"
+//         Value: "52.221.221.134/32"
+//       - Type: "IPV4"
+//         Value: "52.221.221.135/32"
+//       - Type: "IPV4"
+//         Value: "177.71.207.16/32"
+//       - Type: "IPV4"
+//         Value: "177.71.207.17/32"
+//       - Type: "IPV4"
+//         Value: "177.71.207.18/32"
+//       - Type: "IPV4"
+//         Value: "177.71.207.19/32"
+//       - Type: "IPV4"
+//         Value: "177.71.207.20/32"
+//       - Type: "IPV4"
+//         Value: "177.71.207.21/32"
+//       - Type: "IPV4"
+//         Value: "177.71.207.22/32"
+//       - Type: "IPV4"
+//         Value: "177.71.207.23/32"
+//       # NAT IPs and SQUID Proxy in Shared Services
+//       - Type: "IPV4"
+//         Value: "18.130.155.248/32"
+//       - Type: "IPV4"
+//         Value: "35.176.148.174/32"
+//       - Type: "IPV4"
+//         Value: "18.130.39.94/32"
+//       - Type: "IPV4"
+//         Value: "35.177.173.197/32"
+//       - Type: "IPV4"
+//         Value: "35.177.145.193/32"
+//       - Type: "IPV4"
+//         Value: "35.176.254.38/32"
+//       - Type: "IPV4"
+//         Value: "52.56.212.11/32"
+//       - Type: "IPV4"
+//         Value: "35.176.127.232/32"
+//       # MoJ Network Changes
+//       - Type: "IPV4"
+//         Value: "51.149.249.0/27"
+//       - Type: "IPV4"
+//         Value: "51.149.249.32/27"
+//       # New MoJ DOM1 IP
+//       - Type: "IPV4"
+//         Value: "51.149.250.0/24"
+//       - Type: "IPV4"
+//         Value: "51.149.249.0/29"
+//       - Type: "IPV4"
+//         Value: "194.33.249.0/29"
+//       - Type: "IPV4"
+//         Value: "51.149.249.32/29"
+//       - Type: "IPV4"
+//         Value: "194.33.248.0/29"
+//       - Type: "IPV4"
+//         Value: "20.49.214.199/32"
+//       - Type: "IPV4"
+//         Value: "20.49.214.228/32"
+//       # HMPPS
+//       - Type: "IPV4"
+//         Value: "20.26.11.71/32"
+//       - Type: "IPV4"
+//         Value: "20.26.11.108/32"
+//       # Pingdom EU Probes
+//       - Type: "IPV4"
+//         Value: "178.162.206.244/32"
+//       - Type: "IPV4"
+//         Value: "159.122.168.9/32"
+//       - Type: "IPV4"
+//         Value: "212.78.83.12/32"
+//       - Type: "IPV4"
+//         Value: "212.78.83.16/32"
+//       - Type: "IPV4"
+//         Value: "196.245.151.42/32"
+//       - Type: "IPV4"
+//         Value: "196.244.191.18/32"
+//       - Type: "IPV4"
+//         Value: "23.92.127.2/32"
+//       - Type: "IPV4"
+//         Value: "169.51.2.18/32"
+//       - Type: "IPV4"
+//         Value: "108.181.70.3/32"
+//       - Type: "IPV4"
+//         Value: "23.106.37.99/32"
+//       - Type: "IPV4"
+//         Value: "85.195.116.134/32"
+//       - Type: "IPV4"
+//         Value: "185.136.156.82/32"
+//       - Type: "IPV4"
+//         Value: "151.106.52.134/32"
+//       - Type: "IPV4"
+//         Value: "46.246.122.10/32"
+//       - Type: "IPV4"
+//         Value: "94.75.211.74/32"
+//       - Type: "IPV4"
+//         Value: "94.75.211.73/32"
+//       - Type: "IPV4"
+//         Value: "82.103.145.126/32"
+//       - Type: "IPV4"
+//         Value: "185.246.208.82/32"
+//       - Type: "IPV4"
+//         Value: "185.152.65.167/32"
+//       - Type: "IPV4"
+//         Value: "185.180.12.65/32"
+//       - Type: "IPV4"
+//         Value: "185.93.3.65/32"
+//       - Type: "IPV4"
+//         Value: "82.103.136.16/32"
+//       - Type: "IPV4"
+//         Value: "185.70.76.23/32"
+//       - Type: "IPV4"
+//         Value: "5.172.196.188/32"
+//       - Type: "IPV4"
+//         Value: "52.57.132.90/32"
+//       - Type: "IPV4"
+//         Value: "52.48.244.35/32"
+//       - Type: "IPV4"
+//         Value: "52.59.147.246/32"
+//       - Type: "IPV4"
+//         Value: "52.59.46.112/32"
+//       - Type: "IPV4"
+//         Value: "52.210.232.124/32"
+//       - Type: "IPV4"
+//         Value: "52.209.186.226/32"
+//       - Type: "IPV4"
+//         Value: "52.209.34.226/32"
+//       - Type: "IPV4"
+//         Value: "82.103.139.165/32"
+//       - Type: "IPV4"
+//         Value: "89.163.242.206/32"
+//       - Type: "IPV4"
+//         Value: "89.163.146.247/32"
+//       - Type: "IPV4"
+//         Value: "185.39.146.214/32"
+//       - Type: "IPV4"
+//         Value: "185.39.146.215/32"
+//       - Type: "IPV4"
+//         Value: "37.252.231.50/32"
+//       - Type: "IPV4"
+//         Value: "94.247.174.83/32"
+//       - Type: "IPV4"
+//         Value: "46.20.45.18/32"
+//       - Type: "IPV4"
+//         Value: "178.255.153.2/32"
+//       - Type: "IPV4"
+//         Value: "178.255.152.2/32"
+//       # Global protect
+//       - Type: "IPV4"
+//         Value: "35.176.93.186/32"
+//       - Type: "IPV4"
+//         Value: "18.130.148.126/32"
+//       - Type: "IPV4"
+//         Value: "35.176.148.126/32"
+//       - Type: "IPV4"
+//         Value: "18.169.147.172/32"
+
+//   WAFManualBlockSet:
+//     Type: AWS::WAF::IPSet
+//     Properties:
+//       Name: !Sub "${pAppName} Manual Block Set"
+
+//   WAFManualAllowRule:
+//     Type: AWS::WAF::Rule
+//     Properties:
+//       Name: !Sub "${pAppName} Manual Allow Rule"
+//       MetricName: !Sub "${pAppName}ManualAllowRule"
+//       Predicates:
+//         - DataId: !Ref 'WAFManualAllowSet'
+//           Negated: false
+//           Type: IPMatch
+//   WAFManualBlockRule:
+//     Type: AWS::WAF::Rule
+//     Properties:
+//       Name: !Sub "${pAppName} Manual Block Rule"
+//       MetricName: !Sub "${pAppName}ManualBlockRule"
+//       Predicates:
+//         - DataId: !Ref 'WAFManualBlockSet'
+//           Negated: false
+//           Type: IPMatch
+
+//   WAFWebACL:
+//     Type: AWS::WAF::WebACL
+//     Properties:
+//       Name: !Sub "${pAppName} Whitelisting Requesters"
+//       DefaultAction:
+//         Type: "BLOCK"
+//       MetricName: !Sub "${pAppName}WhitelistingRequesters"
+//       Rules:
+//         - Action:
+//             Type: ALLOW
+//           Priority: 1
+//           RuleId: !Ref 'WAFManualAllowRule'
+//         - Action:
+//             Type: BLOCK
+//           Priority: 2
+//           RuleId: !Ref 'WAFManualBlockRule'
+
+//   DNSARecordSetGroup:
+//     Type: AWS::Route53::RecordSetGroup
+//     Properties:
+//       HostedZoneId  : !Ref pHostedZoneId
+//       Comment: Domain A record for Cloudfront
+//       RecordSets:
+//       - Name: !Join [ "", [ !Ref pAppFQDN, "." ] ]
+//         Type: A
+//         AliasTarget:
+//           HostedZoneId: "Z2FDTNDATAQYW2"
+//           DNSName: !GetAtt CloudFrontDistribution.DomainName
+
+// #### Internal Load Balancer DNS Record#######
+//   InternalLoadbalancerDNSRecord:
+//     Type: AWS::Route53::RecordSet
+//     Properties:
+//         HostedZoneId: !Ref pCustomHostedZoneId
+//         Comment: Domain CNAME record for MAAT Internal Application Load Balancer
+//         Name: !Join ['.', [meansassesment, !ImportValue dns-AwsHostedZoneDomainName]]
+//         Type: CNAME
+//         TTL: 300
+//         ResourceRecords:
+//         - !GetAtt InternalLoadBalancer.DNSName
+
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Join [ '', [ !Ref pAppName, '-app' ] ]
+      ContainerDefinitions:
+        - Name: xray-daemon
+          Cpu: 32
+          Essential: false
+          Image: !Join [':', [!Ref pECSRepositoryURL, "xray-daemon" ]]
+          Memory: 256
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref 'CloudwatchLogsGroup'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: !Sub '${pAppName}-app'
+          PortMappings:
+            - ContainerPort: 2000
+              Protocol: udp
+        - Name: !Ref pAppName
+          Cpu: 992
+          Essential: true
+          Image: !Join [':', [!Ref pECSRepositoryURL, !Ref pDockerImageTag ]]
+          Memory: 3000
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref 'CloudwatchLogsGroup'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: !Sub '${pAppName}-app'
+          PortMappings:
+            - ContainerPort: 8080
+          Links:
+            - xray-daemon
+          Environment:
+            - Name: APP_DB_URL
+              Value: !Sub "jdbc:oracle:thin:@${pMaatDbUrl}"
+            - Name: APP_DB_USERID
+              Value: TOGDATA
+            - Name: APP_DB_PASSWORD
+              Value: !Ref pMaatDbPassword
+            - Name: APP_DB_POOL_MAX_CONNECTION
+              Value: !Ref pMaatDbMaxConnectionPoolSize
+            - Name: APP_LOG_LEVEL
+              Value: !Ref pAppLogLevel
+            - Name: APP_BC_ENDPOINT
+              Value: !Ref pMaatBCEndpointURL
+            - Name: APP_BC_SERVICE_NAME
+              Value: !Ref pMaatBCServiceName
+            - Name: APP_BC_CLIENT_ORIG_ID
+              Value: !Ref pMaatBCClientOrigId
+            - Name: APP_BC_CLIENT_USER_ID
+              Value: !Ref pMaatBCClientUserId
+            - Name: APP_MLRA_LOCATION
+              Value: !Ref pMlraLocation
+            - Name: APP_CMA_BASE_URL
+              Value: !Ref pCmaBaseUrl
+            - Name: APP_CMA_CLIENT_ID
+              Value: !Ref pCmaClientId
+            - Name: APP_CMA_CLIENT_SECRET
+              Value: !Ref pCmaClientSecret
+            - Name: APP_CMA_OAUTH_SCOPE
+              Value: !Ref pCmaAuthScope
+            - Name: APP_CMA_ENDPOINT_AUTH
+              Value: !Ref pCmaEndpointAuth
+            - Name: APP_CMA_ENDPOINT_CREATE_ASSESSMENT
+              Value: !Ref pCmaEndpointMeansAssessment
+            - Name: APP_TEMP_TRIGGER_GARBAGE
+              Value: 'a random string'
+            - Name: AWS_XRAY_DAEMON_ADDRESS
+              Value: xray-daemon:2000
+            - Name: SENTRY_ENVIRONMENT
+              Value: !Ref pEnvironment
+            - Name: APP_CCP_BASE_URL
+              Value: !Ref pCcpBaseUrl
+            - Name: APP_CCP_CLIENT_ID
+              Value: !Ref pCcpClientId
+            - Name: APP_CCP_CLIENT_SECRET
+              Value: !Ref pCcpClientSecret
+            - Name: APP_CCP_OAUTH_SCOPE
+              Value: !Ref pCcpAuthScope
+            - Name: APP_CCP_ENDPOINT_AUTH
+              Value: !Ref pCcpEndpointAuth
+            - Name: APP_CCP_ENDPOINT_PROCEEDINGS
+              Value: !Ref pCcpEndpointProceedings
+            - Name: APP_CAA_BASE_URL
+              Value: !Ref pCaaBaseUrl
+            - Name: APP_CAA_CLIENT_ID
+              Value: !Ref pCaaClientId
+            - Name: APP_CAA_CLIENT_SECRET
+              Value: !Ref pCaaClientSecret
+            - Name: APP_CAA_OAUTH_URL
+              Value: !Ref pCaaAuthUrl
+            - Name: APP_CAA_OAUTH_SCOPE
+              Value: !Ref pCaaAuthScope
+            - Name: APP_CAA_ENDPOINT
+              Value: !Ref pCaaEndpoint
+            - Name: APP_CCC_BASE_URL
+              Value: !Ref pCccBaseUrl
+            - Name: APP_CCC_CLIENT_ID
+              Value: !Ref pCccClientId
+            - Name: APP_CCC_CLIENT_SECRET
+              Value: !Ref pCccClientSecret
+            - Name: APP_CCC_OAUTH_URL
+              Value: !Ref pCccAuthUrl
+            - Name: APP_CCC_OAUTH_SCOPE
+              Value: !Ref pCccAuthScope
+            - Name: APP_CCC_ENDPOINT
+              Value: !Ref pCccEndpoint
+            - Name: APP_ORCH_BASE_URL
+              Value: !Ref pOrchBaseUrl
+            - Name: APP_ORCH_CLIENT_ID
+              Value: !Ref pOrchClientId
+            - Name: APP_ORCH_CLIENT_SECRET
+              Value: !Ref pOrchClientSecret
+            - Name: APP_ORCH_OAUTH_URL
+              Value: !Ref pOrchAuthUrl
+            - Name: APP_ORCH_OAUTH_SCOPE
+              Value: !Ref pOrchAuthScope
+            - Name: APP_ORCH_ENDPOINT
+              Value: !Ref pOrchEndpoint
+            - Name: APP_GOOGLE_ANALYTICS_4_TAG_ID
+              Value: !Ref pGoogleAnalytics4TagId
+
+  CloudwatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '${pAppName}-ECS'
+      RetentionInDays: 90
+
+//   # Encrypt the Cloudwatch Logs
+//   # Custom resource as cfn doesn't (yet) support associating KMS keys with log groups
+//   CloudwatchLogsGroupKeyAssociation:
+//     Type: AWS::CloudFormation::CustomResource
+//     Properties:
+//       ServiceToken: !ImportValue security-LogGroupLambdaArn
+//       KeyArn: !ImportValue "security-LogGroupKeyArn"
+//       LogGroupName: !Ref CloudwatchLogsGroup
+
+//   AutoscalingRole:
+//     Type: AWS::IAM::Role
+//     Properties:
+//       AssumeRolePolicyDocument:
+//         Statement:
+//           - Effect: Allow
+//             Principal:
+//               Service:
+//                 - 'application-autoscaling.amazonaws.com'
+//             Action:
+//               - 'sts:AssumeRole'
+//       Path: /
+//       Policies:
+//         - PolicyName: service-autoscaling
+//           PolicyDocument:
+//             Statement:
+//               - Effect: Allow
+//                 Action:
+//                   - 'application-autoscaling:*'
+//                   - 'cloudwatch:DescribeAlarms'
+//                   - 'cloudwatch:PutMetricAlarm'
+//                   - 'ecs:DescribeServices'
+//                   - 'ecs:UpdateService'
+//                 Resource: '*'
+
+// Outputs:
+//   EcsService:
+//     Value: !Ref EcsService
+//   LoadBalancerDNSName:
+//     Description: Your ALB DNS URL
+//     Value: !GetAtt LoadBalancer.DNSName
+//   InternalLoadBalancerDNSName:
+//     Description: Your internal ALB DNS URL
+//     Value: !GetAtt InternalLoadBalancer.DNSName
+//   LoadBalancerFullName:
+//     Description: Your ALB Full Name
+//     Value: !GetAtt LoadBalancer.LoadBalancerFullName
+//   TargetGroupFullName:
+//     Description: Your TargetGroup Full Name
+//     Value: TargetGroup.TargetGroupFullName
+//   taskdef:
+//     Value: !Ref 'TaskDefinition'

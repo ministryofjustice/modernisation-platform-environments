@@ -1,0 +1,321 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: LAA infrastructure stack foundation based on UK OFFICIAL infrastructure template
+Parameters:
+  pAppName:
+    Type: String
+    Default: ''
+    Description: Application name with application instance identifier,
+      e.g. "MAAT1" to accommodate multiple instances of the same stack under the same infrastructure
+  pEcsAmiId:
+    Type: AWS::EC2::Image::Id
+    Default: ''
+    Description: AMI image to use
+  pEc2InstanceType:
+    Type: String
+    Default: ''
+    Description: Instance size for EC2 instances hosting ECS
+  pSshKeyName:
+    Type: String
+    Default: ''
+    Description: The EC2 instances SSH key
+  pTransitGatewayCIDR:
+    Type: String
+    Default: ''
+  pAppECSAutoScalingGroupDesiredCapacity:
+    Type: String
+    Default: ''
+  pAppECSAutoScalingGroupMaxSize:
+    Type: String
+    Default: ''
+  pAppECSAutoScalingGroupMinSize:
+    Type: String
+    Default: ''
+
+Resources:
+
+################################################################################
+#
+# Security groups
+#
+################################################################################
+
+  AppEcsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: App ECS Security Group
+      VpcId: !ImportValue "env-VpcId"
+
+  EcsSecurityGroupSSHinbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref AppEcsSecurityGroup
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      CidrIp: 10.0.0.0/8
+
+  EcsSecurityGroup1ALBports:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'AppEcsSecurityGroup'
+      IpProtocol: tcp
+      FromPort: 32768
+      ToPort: 61000
+      SourceSecurityGroupId: !Ref AppAlbSecurityGroup
+
+  EcsSecurityGroupAllowInternalLoadBalancer:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+        GroupId: !Ref 'AppEcsSecurityGroup'
+        IpProtocol: -1
+        SourceSecurityGroupId: !Ref AppAlbInternalSecurityGroup
+
+  ALBSecurityGroupCloudfront:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'AppAlbSecurityGroup'
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      CidrIp: 0.0.0.0/0
+      Description: Allows HTTPS traffic in from Cloudfront (filtered by WAF)
+
+  AppAlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: App ALB Security Group
+      VpcId: !ImportValue "env-VpcId"
+
+  // AppAlbInternalSecurityGroup:
+  //   Type: AWS::EC2::SecurityGroup
+  //   Properties:
+  //     GroupDescription: App internal ALB Security Group
+  //     VpcId: !ImportValue "env-VpcId"
+  // AppAlbInternalSecurityGroupInbound:
+  //   Type: AWS::EC2::SecurityGroupIngress
+  //   Properties:
+  //     GroupId: !Ref AppAlbInternalSecurityGroup
+  //     IpProtocol: tcp
+  //     FromPort: 443
+  //     ToPort: 443
+  //     CidrIp: !Ref pTransitGatewayCIDR
+
+  AppBastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: App Bastion Security Group
+      VpcId: !ImportValue "env-VpcId"
+  BastionSecurityGroupSSHinbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref AppBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      CidrIp: 0.0.0.0/0
+
+
+################################################################################
+#
+# ECS Infastructure
+#
+################################################################################
+
+  
+CloudwatchLogsEC2Group:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '${pAppName}-EC2'
+      RetentionInDays: 90
+
+//   # Encrypt the Cloudwatch Logs
+//   # Custom resource as cfn doesn't (yet) support associating KMS keys with log groups
+//   CloudwatchLogsEC2GroupKeyAssociation:
+//     Type: AWS::CloudFormation::CustomResource
+//     Properties:
+//       ServiceToken: !ImportValue security-LogGroupLambdaArn
+//       KeyArn: !ImportValue "security-LogGroupKeyArn"
+//       LogGroupName: !Ref CloudwatchLogsEC2Group
+
+  AppEc2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ec2.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+      - PolicyName: !Sub "${pAppName}-ecs-service"
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+              - 'ecs:CreateCluster'
+              - 'ecs:DeregisterContainerInstance'
+              - 'ecs:DiscoverPollEndpoint'
+              - 'ecs:Poll'
+              - 'ecs:RegisterContainerInstance'
+              - 'ecs:StartTelemetrySession'
+              - 'ecs:Submit*'
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+              - 'logs:DescribeLogStreams'
+              - 'ecr:*'
+              - 'xray:PutTraceSegments'
+              - 'xray:PutTelemetryRecords'
+              - 'xray:GetSamplingRules'
+              - 'xray:GetSamplingTargets'
+              - 'xray:GetSamplingStatisticSummaries'
+            Resource: '*'
+
+  AppEC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles: [ !Ref AppEc2Role ]
+
+  AppEcsCluster:
+    Type: "AWS::ECS::Cluster"
+    Properties:
+      ClusterName: !Ref pAppName
+
+  AppEc2LaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref pEcsAmiId
+      SecurityGroups: [ !Ref AppEcsSecurityGroup ]
+      InstanceType: !Ref pEc2InstanceType
+      IamInstanceProfile: !Ref AppEC2InstanceProfile
+      KeyName: !Ref pSshKeyName
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          echo ECS_CLUSTER=${AppEcsCluster} >> /etc/ecs/ecs.config
+          yum install -y aws-cfn-bootstrap awslogs
+          cat >/etc/awslogs/awslogs.conf <<-EOF
+          [general]
+          state_file = /var/lib/awslogs/agent-state
+
+          [/var/log/secure]
+          datetime_format = %b %d %H:%M:%S
+          file = /var/log/secure
+          buffer_duration = 5000
+          log_stream_name = secure/{instance_id}
+          initial_position = start_of_file
+          log_group_name = ${pAppName}-EC2
+
+          [/var/log/messages]
+          datetime_format = %b %d %H:%M:%S
+          file = /var/log/messages
+          buffer_duration = 5000
+          log_stream_name = messages/{instance_id}
+          initial_position = start_of_file
+          log_group_name = ${pAppName}-EC2
+          EOF
+          chmod 644 /etc/awslogs/awslogs.conf
+          # Change region
+          sed -i 's/^region = .*/region = eu-west-2/g' /etc/awslogs/awscli.conf
+          chkconfig awslogs on
+          service awslogs restart
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource ECSAutoScalingGroup --region ${AWS::Region}
+
+  AppECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      DesiredCapacity: !Ref pAppECSAutoScalingGroupDesiredCapacity
+      LaunchConfigurationName: !Ref AppEc2LaunchConfig
+      MaxSize: !Ref pAppECSAutoScalingGroupMaxSize
+      MinSize: !Ref pAppECSAutoScalingGroupMinSize
+      VPCZoneIdentifier:
+        - !ImportValue 'env-AppPrivateSubnetA'
+        - !ImportValue 'env-AppPrivateSubnetB'
+        - !ImportValue 'env-AppPrivateSubnetC'
+      MetricsCollection:
+        - Granularity: 1Minute
+      Tags:
+        - Key: Keep
+          Value: 'true'
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: !Sub "${pAppName}-ECS"
+          PropagateAtLaunch: true
+
+  AppEcsClusterScaleUpPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      PolicyType: SimpleScaling
+      AdjustmentType: ChangeInCapacity
+      AutoScalingGroupName: !Ref AppECSAutoScalingGroup
+      Cooldown: '60'
+      ScalingAdjustment: 1
+
+  AppEcsClusterScaleDownPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      PolicyType: SimpleScaling
+      AdjustmentType: ChangeInCapacity
+      AutoScalingGroupName: !Ref AppECSAutoScalingGroup
+      Cooldown: '60'
+      ScalingAdjustment: -1
+
+  AppEcsClusterHighCPUReservationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Average CPU Reservation for the boxes in the ASG is above
+        74% for 1 minutes. Triggers scale up
+      ActionsEnabled: true
+      Namespace: AWS/ECS
+      MetricName: CPUReservation
+      Unit: Percent
+      Dimensions:
+      - Name: ClusterName
+        Value: !Ref AppEcsCluster
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 3
+      Threshold: 74
+      AlarmActions: [!Ref AppEcsClusterScaleUpPolicy]
+      ComparisonOperator: GreaterThanThreshold
+
+  AppEcsClusterLowCPUReservationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Average CPU Reservation for the boxes in the ASG is less
+        than 51% for 3 minutes. Triggers scale down
+      ActionsEnabled: true
+      Namespace: AWS/ECS
+      MetricName: CPUReservation
+      Unit: Percent
+      Dimensions:
+      - Name: ClusterName
+        Value: !Ref AppEcsCluster
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 3
+      Threshold: 51
+      AlarmActions: [!Ref AppEcsClusterScaleDownPolicy]
+      ComparisonOperator: LessThanThreshold
+
+// Outputs:
+//   AppEcsCluster:
+//     Description: The ECS cluster created by the stack
+//     Value: !Ref AppEcsCluster
+
+//   AppAlbSecurityGroup:
+//     Description: Security group used for public load balancers
+//     Value: !Ref AppAlbSecurityGroup
+
+//   AppAlbInternalSecurityGroup:
+//     Description: Security group used for the internal load balancer
+//     Value: !Ref AppAlbInternalSecurityGroup
+
+//   AppECSAutoScalingGroup:
+//     Description: ECS AutoScaling Group name
+//     Value: !Ref AppECSAutoScalingGroup

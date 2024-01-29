@@ -30,7 +30,14 @@
       "pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms",
       "api_scope": "standard",
       "api_gateway_fqdn": "maat-cd-api.dev.legalservices.gov.uk",
-      "certificate_arn": "arn:aws:acm:eu-west-2:411213865113:certificate/0184743f-c424-4d2e-bd87-f2ac439c38ad"
+      "certificate_arn": "arn:aws:acm:eu-west-2:411213865113:certificate/0184743f-c424-4d2e-bd87-f2ac439c38ad",
+      "ami_id": "ami-0631049bf050d0d46",
+      "instance_type": "m5.large",
+      "ec2_asg_desired_capacity": "1",
+      "ec2_asg_min_size": "1",
+      "ec2_asg_max_size": "2",
+      "ec2_cpu_scaling_up_threshold": "74",
+      "ec2_cpu_scaling_down_threshold": "51"
     },
     "test": {
       "example_var": "test-data",
@@ -40,7 +47,12 @@
       "ecs_memory": 2048,
       "ecs_container_cpu": 922,
       "ecs_container_memory": 1792,
-      "pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms"
+      "pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms",
+      "ami_id": "ami-0631049bf050d0d46",
+      "instance_type": "m5.large",
+      "ec2_asg_desired_capacity": "1",
+      "ec2_asg_min_size": "1",
+      "ec2_asg_max_size": "2"
     },
     "preproduction": {
       "example_var": "preproduction-data",
@@ -50,7 +62,12 @@
       "ecs_memory": 3072,
       "ecs_container_cpu": 922,
       "ecs_container_memory": 2816,
-      "pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms"
+      "pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms",
+      "ami_id": "ami-0631049bf050d0d46",
+      "instance_type": "m5.large",
+      "ec2_asg_desired_capacity": "1",
+      "ec2_asg_min_size": "1",
+      "ec2_asg_max_size": "2"
     },
     "production": {
       "example_var": "production-data",
@@ -60,7 +77,12 @@
       "ecs_memory": 3072,
       "ecs_container_cpu": 922,
       "ecs_container_memory": 2816,
-      "pagerduty_integration_key_name": "laa_maat_api_prod_alarms"
+      "pagerduty_integration_key_name": "laa_maat_api_prod_alarms",
+      "ami_id": "ami-0631049bf050d0d46",
+      "instance_type": "m5.large",
+      "ec2_asg_desired_capacity": "1",
+      "ec2_asg_min_size": "1",
+      "ec2_asg_max_size": "2"
     }
   }
 }
