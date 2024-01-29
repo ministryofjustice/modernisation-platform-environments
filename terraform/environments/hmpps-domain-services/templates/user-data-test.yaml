@@ -42,7 +42,9 @@ tasks:
 
           $ssmDocuments = @(
             [PSCustomObject]@{
-              "windows-psreadline-fix" = @{}
+              "windows-domain-join" = @{
+                "newHostname" = "rstestssm2"
+                }
             }
           )
 
@@ -77,3 +79,4 @@ tasks:
               Start-Sleep -Seconds 10
             }
           } while ((Get-Date) -lt $startTime.AddMinutes(10))
+
