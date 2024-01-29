@@ -288,20 +288,20 @@ locals {
         type  = "gp3"
       }
       "/dev/sdc" = { # /u02
-        size  = 1000
+        size  = 500
         label = "app"
         type  = "gp3"
       }
       "/dev/sde" = { # DATA01
         label = "data"
-        size  = 2000
+        size  = 500
         type  = "gp3"
       }
-      "/dev/sdf" = { # DATA02
-        label = "data"
-        size  = 2000
-        type  = "gp3"
-      }
+      # "/dev/sdf" = { # DATA02
+      #   label = "data"
+      #   size  = 2000
+      #   type  = "gp3"
+      # }
       # "/dev/sdg" = {  # DATA03
       # }
       # "/dev/sdh" = {  # DATA04
@@ -311,7 +311,7 @@ locals {
       "/dev/sdj" = { # FLASH01
         label = "flash"
         type  = "gp3"
-        size  = 1000
+        size  = 100
       }
       # "/dev/sdk" = { # FLASH02
       # }
