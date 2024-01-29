@@ -172,7 +172,11 @@ module "weblogic_eis" {
       protocol      = "tcp"
     },
   ]
-  ecs_cluster_arn         = module.ecs.ecs_cluster_arn
+  ecs_cluster_arn = module.ecs.ecs_cluster_arn
+
+  container_memory = var.weblogic_eis_config.container_memory
+  container_cpu    = var.weblogic_eis_config.container_cpu
+
   env_name                = var.env_name
   health_check_path       = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
   ingress_security_groups = []

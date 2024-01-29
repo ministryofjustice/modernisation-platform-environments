@@ -328,3 +328,15 @@ variable "container_image" {
   description = "The container image to use"
   type        = string
 }
+
+variable "container_memory" {
+  description = "The container memory to use"
+  type        = number
+  default     = 1024
+}
+
+variable "container_cpu" {
+  description = "The container cpu to use"
+  type        = number
+  default     = 512
+}
