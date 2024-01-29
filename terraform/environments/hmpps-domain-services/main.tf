@@ -164,9 +164,9 @@ module "fsx" {
 
   common = {
     environment_name = local.environment
-    subnet_ids       = local.subnet_ids
+    subnet_ids       = local.subnet_set
     tags             = local.tags
-    vpc_id           = local.vpc_id
+    vpc_id           = local.vpc_all
     region           = local.region
   }
   fsx    = local.fsx
