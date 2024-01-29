@@ -3,7 +3,7 @@
 # SSM Parameter Store for delius-core-frontend
 ##
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
+resource "aws_ssm_parameter" "jdbc_url" {
   name  = format("/%s-%s/JDBC_URL", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "jdbc:oracle:thin:@//INITIAL_HOSTNAME_OVERRIDEN:INITIAL_PORT_OVERRIDDEN"
@@ -52,8 +52,8 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
 }
 
 
-data "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
-  name = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_url.name
+data "aws_ssm_parameter" "jdbc_url" {
+  name = aws_ssm_parameter.jdbc_url.name
 }
 
 data "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {

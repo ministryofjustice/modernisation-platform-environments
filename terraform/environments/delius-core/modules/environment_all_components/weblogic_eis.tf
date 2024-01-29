@@ -182,7 +182,7 @@ module "weblogic_eis" {
   ingress_security_groups = []
   microservice_lb_arn     = aws_lb.delius_core_frontend.arn
   name                    = "weblogic-eis"
-  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${var.weblogic_eis_config.image_tag}"
+  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-eis-ecr-repo:${var.weblogic_eis_config.image_tag}"
   platform_vars           = var.platform_vars
   tags                    = var.tags
 }
@@ -217,19 +217,6 @@ resource "aws_ssm_parameter" "merge_secret" {
 
 data "aws_ssm_parameter" "merge_secret" {
   name = aws_ssm_parameter.merge_secret
-}
-
-resource "aws_ssm_parameter" "pdfcreation_secret" {
-  name  = "/${var.env_name}/delius/newtech/web/params_secret_key"
-  type  = "SecureString"
-  value = "DEFAULT"
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "pdfcreation_secret" {
-  name = aws_ssm_parameter.pdfcreation_secret
 }
 
 resource "aws_ssm_parameter" "usermanagement_secret" {
