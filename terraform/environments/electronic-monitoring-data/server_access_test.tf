@@ -61,22 +61,9 @@ resource "aws_transfer_user" "test_transfer_user" {
   home_directory = "/${aws_s3_bucket.capita_landing_bucket.id}/"
 }
 
-data "aws_iam_policy_document" "test_assume_role" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["transfer.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
 resource "aws_iam_role" "test_transfer_user_iam_role" {
   name                = "test-transfer-user-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.test_assume_role.json
+  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 

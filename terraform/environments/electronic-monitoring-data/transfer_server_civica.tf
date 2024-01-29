@@ -42,14 +42,20 @@ resource "aws_transfer_server" "civica" {
     }
   }
 
-  logging_role = aws_iam_role.test_transfer_user_iam_role.arn
+  logging_role = aws_iam_role.iam_for_transfer_civica.arn
   structured_log_destinations = [
     "${aws_cloudwatch_log_group.civica.arn}:*"
   ]
 }
 
+resource "aws_iam_role" "iam_for_transfer_civica" {
+  name_prefix         = "iam_for_transfer_civica_"
+  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
+}
+
 resource "aws_cloudwatch_log_group" "civica" {
-  name_prefix = "transfer_test_"
+  name_prefix = "transfer_civica_"
 }
 
 #------------------------------------------------------------------------------
@@ -81,22 +87,9 @@ resource "aws_transfer_workflow" "transfer_civica_to_store" {
   }
 }
 
-data "aws_iam_policy_document" "civica_transfer_workflow_assume_role" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["transfer.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
 resource "aws_iam_role" "civica_transfer_workflow_iam_role" {
   name                = "civica-transfer-workflow-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.civica_transfer_workflow_assume_role.json
+  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
