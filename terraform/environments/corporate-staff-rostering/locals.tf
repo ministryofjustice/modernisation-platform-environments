@@ -12,6 +12,7 @@ locals {
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
+    enable_azure_sas_token                       = true
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
     enable_hmpps_domain                          = true
