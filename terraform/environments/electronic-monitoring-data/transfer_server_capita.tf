@@ -44,11 +44,11 @@ resource "aws_transfer_server" "capita_transfer_server" {
 
   logging_role = aws_iam_role.test_transfer_user_iam_role.arn
   structured_log_destinations = [
-    "${aws_cloudwatch_log_group.transfer.arn}:*"
+    "${aws_cloudwatch_log_group.capita.arn}:*"
   ]
 }
 
-resource "aws_cloudwatch_log_group" "transfer" {
+resource "aws_cloudwatch_log_group" "capita" {
   name_prefix = "transfer_test_"
 }
 
