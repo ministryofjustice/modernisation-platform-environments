@@ -1,4 +1,4 @@
-// OLD to be deleted
+// DEV + PRE-PRODUCTION DNS CONFIGURATION
 
 // ACM Public Certificate
 resource "aws_acm_certificate" "external" {
@@ -41,68 +41,4 @@ resource "aws_route53_record" "external_validation_subdomain" {
   ttl             = 60
   type            = local.domain_type_sub[0]
   zone_id         = data.aws_route53_zone.external.zone_id
-}
-
-
-// NEW - to be kept
-
-
-// DEV + PRE-PRODUCTION DNS CONFIGURATION
-
-// ACM Public Certificate
-resource "aws_acm_certificate" "external_cert" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
-  validation_method = "DNS"
-
-  subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.application_data.accounts[local.environment].environment_name}.modernisation-platform.service.justice.gov.uk"]
-  tags = {
-    Environment = local.environment
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_acm_certificate_validation" "external_cert" {
-  certificate_arn         = aws_acm_certificate.external_cert.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
-}
-
-// Route53 DNS records for certificate validation
-resource "aws_route53_record" "external_cert_validation" {
-  provider = aws.core-network-services
-
-  allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
-  ttl             = 60
-  type            = local.domain_type_main[0]
-  zone_id         = data.aws_route53_zone.network-services.zone_id
-}
-
-resource "aws_route53_record" "external_cert_validation_subdomain" {
-  provider = aws.core-vpc
-
-  allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
-  ttl             = 60
-  type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.external_cert.zone_id
-}
-
-// Route53 DNS record for directing traffic to the service
-resource "aws_route53_record" "external_cert" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external_cert.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.application_data.accounts[local.environment].environment_name}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.chaps_lb.dns_name
-    zone_id                = aws_lb.chaps_lb.zone_id
-    evaluate_target_health = true
-  }
 }

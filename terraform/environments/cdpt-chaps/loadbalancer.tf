@@ -50,12 +50,12 @@ resource "aws_lb_target_group" "chaps_target_group" {
 
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
-  depends_on = [aws_acm_certificate_validation.external_cert]
+  depends_on = [aws_acm_certificate_validation.external]
 
   load_balancer_arn = aws_lb.chaps_lb.arn
   port              = 443
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external_cert.arn
+  certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
     target_group_arn = aws_lb_target_group.chaps_target_group.id

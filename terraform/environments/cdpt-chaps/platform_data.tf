@@ -111,13 +111,6 @@ data "aws_route53_zone" "external" {
   private_zone = false
 }
 
-data "aws_route53_zone" "external_cert" {
-  provider = aws.core-vpc
-
-  name         = "${var.networking[0].business-unit}-${local.application_data.accounts[local.environment].environment_name}.modernisation-platform.service.justice.gov.uk."
-  private_zone = false
-}
-
 data "aws_route53_zone" "inner" {
   provider = aws.core-vpc
 
