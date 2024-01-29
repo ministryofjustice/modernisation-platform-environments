@@ -90,6 +90,22 @@ locals {
       ]
     }
 
+    # allow SSM to call AWS services for EBS Performance Metrics
+    EBSPerformanceMonitoringRole = {
+      assume_role_policy = [{
+        effect = "Allow"
+        actions = ["sts:AssumeRole"]
+        principals = {
+          type = "AWS"
+          identifiers = ["*"]
+        }
+      }]
+      policy_attachments = [
+        "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole",
+        "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess",
+      ]
+    }
+
     SasTokenRotatorRole = {
       assume_role_policy = [{
         effect  = "Allow"
