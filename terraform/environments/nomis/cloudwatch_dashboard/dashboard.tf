@@ -4,7 +4,7 @@ resource "aws_ssm_association" "calculate_ebs_performance_metrics" {
   automation_target_parameter_name = "ResourceId"
 
   parameters = {
-    AutomationAssumeRole = "arn:aws:iam::612659970365:role/AWS-SSM-AutomationExecutionRole"
+    AutomationAssumeRole = "arn:aws:iam::612659970365:role/EBSPerformanceMonitoringRole"
     StartTime            = local.ebs_performance_start_time
     EndTime              = local.ebs_performance_end_time
   }
@@ -290,4 +290,34 @@ locals {
     }
   }
 
+}
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::374269020027:root"
+            },
+            "Action": "sts:AssumeRole"
+        },
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::374269020027:role/AWS-SSM-AutomationAdministrationRole"
+            },
+            "Action": "sts:AssumeRole"
+        },
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ssm.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
 }
