@@ -115,7 +115,7 @@ resource "aws_launch_template" "ec2-launch-template" {
     security_groups             = [aws_security_group.ecs_security_group.id]
   }
 
-  user_data = base64encode(templatefile("maat_ec2_user_data.sh", {
+  user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
     app_name = local.application_name, app_ecs_cluster = aws_ecs_cluster.maat_app_ecs_cluster.name }))
 
   tag_specifications {
