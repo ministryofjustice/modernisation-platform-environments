@@ -292,249 +292,38 @@ resource "aws_cloudwatch_metric_alarm" "low_cpu_service_alarm" {
 # ECS TASK DEFINITION
 ######################################
 
-# resource "aws_ecs_task_definition" "XrayDaemonTaskDefinition" {
-#   family                   = "${local.application_name}-app-daemon"
-#   cpu                      = 32
-#   memory                   = 256
-# #   network_mode             = "awsvpc"
-# #   requires_compatibilities = ["FARGATE"]
-#   execution_role_arn       = aws_iam_role.ec2_instance_role.arn
-#   task_role_arn            = aws_iam_role.ec2_instance_role.arn
-#   container_definitions = jsonencode([
-#     {
-#       name      = "xray-daemon",
-#       cpu       = 32,
-#       essential = false,
-#       image     = "",
-#       memory    = 256,
-#       log_configuration = {
-#         log_driver = "awslogs",
-#         options = {
-#           "awslogs-group"         = aws_cloudwatch_log_group.ecs_cw_log_group.name,
-#           "awslogs-region"        = "${data.aws_region.current.name}",
-#           "awslogs-stream-prefix" = "${local.application_name}-app"
-#         }
-#       },
-#       portMappings = [
-#         {
-#           containerPort = 2000
-#           hostPort      = 2000
-#           protocol      = "udp"
-#         }
-#       ],
-#     }
-#   ])
-# }
+resource "aws_ecs_task_definition" "maat_task_definition" {
+  family                   = "${local.application_name}-task-definition"
+  requires_compatibilities = [
+      "EC2",
+    ]
+  execution_role_arn       = aws_iam_role.ec2_instance_role.arn
+  task_role_arn            = aws_iam_role.ec2_instance_role.arn
 
-# resource "aws_ecs_task_definition" "AppTaskDefinition" {
-#   family                   = "${local.application_name}-app"
-#   cpu                      = 992
-#   memory                   = 3000
+  container_definitions = templatefile("maat_task_definition.json", {
+    ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
+    docker_image_tag            = local.application_data.accounts[local.environment].docker_image_tag
+    region                      = local.application_data.accounts[local.environment].region
+    sentry_env                  = local.environment
+    maat_orch_base_url          = local.application_data.accounts[local.environment].maat_orch_base_url
+    maat_ccp_base_url           = local.application_data.accounts[local.environment].maat_ccp_base_url
+    maat_orch_oauth_url         = local.application_data.accounts[local.environment].maat_orch_oauth_url
+    maat_ccc_oauth_url          = local.application_data.accounts[local.environment].maat_ccc_oauth_url
+    maat_cma_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_cma_endpoint_auth_url
+    maat_ccp_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_ccp_endpoint_auth_url
+    maat_db_url                 = local.application_data.accounts[local.environment].maat_db_url
+    maat_ccc_base_url           = local.application_data.accounts[local.environment].maat_ccc_base_url
+    maat_caa_oauth_url          = local.application_data.accounts[local.environment].maat_caa_oauth_url
+    maat_bc_endpoint_url        = local.application_data.accounts[local.environment].maat_bc_endpoint_url
+    maat_mlra_url               = local.application_data.accounts[local.environment].maat_mlra_url
+    maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
+    maat_cma_url                = local.application_data.accounts[local.environment].maat_cma_url
+  })
 
-#   container_definitions = jsonencode([
-#     {
-#       name      = "${local.application_name}",
-#       cpu       = 992,
-#       essential = true,
-#       image     = "",
-#       memory    = 3000,
-#     #   network_mode             = "awsvpc"
-#     #   requires_compatibilities = ["FARGATE"]
-#       execution_role_arn       = aws_iam_role.ec2_instance_role.arn
-#       task_role_arn            = aws_iam_role.ec2_instance_role.arn
-#       log_configuration = {
-#         log_driver = "awslogs",
-#         options = {
-#           "awslogs-group"         = aws_cloudwatch_log_group.ecs_cw_log_group.name,
-#           "awslogs-region"        = "${data.aws_region.current.name}",
-#           "awslogs-stream-prefix" = "${local.application_name}-app"
-#         }
-#       },
-#       portMappings = [
-#         {
-#           containerPort = 8080
-#           hostPort      = 8080
-#           protocol      = "tcp"
-#         }
-#       ],
-#       environment = [
-#         {
-#           name  = "APP_DB_URL",
-#           value = "jdbc:oracle:thin:@${pMaatDbUrl}"
-#         },
-#         {
-#           name  = "APP_DB_USERID",
-#           value = TOGDATA
-#         },
-#         {
-#           name  = "APP_DB_PASSWORD",
-#           value = APP_DB_POOL_MAX_CONNECTION
-#         },
-#         {
-#           name  = "APP_DB_POOL_MAX_CONNECTION",
-#           value = local.application_data.accountsd[local.environment].pMaatDbMaxConnectionPoolSize
-#         },
-#         {
-#           name  = "APP_LOG_LEVEL",
-#           value = local.application_data.accountsd[local.environment].pAppLogLevel
-#         },
-#         {
-#           name  = "APP_BC_ENDPOINT",
-#           value = local.application_data.accountsd[local.environment].pMaatBCEndpointURL
-#         },
-#         {
-#           name  = "APP_BC_SERVICE_NAME",
-#           value = local.application_data.accountsd[local.environment].pMaatBCServiceName
-#         },
-#         {
-#           name  = "APP_BC_CLIENT_ORIG_ID",
-#           value = local.application_data.accountsd[local.environment].pMaatBCClientOrigId
-#         },
-#         {
-#           name  = "APP_BC_CLIENT_USER_ID",
-#           value = local.application_data.accountsd[local.environment].pMaatBCClientUserId
-#         },
-#         {
-#           name  = "APP_MLRA_LOCATION",
-#           value = local.application_data.accountsd[local.environment].pMlraLocation
-#         },
-#         {
-#           name  = "APP_CMA_BASE_URL",
-#           value = local.application_data.accountsd[local.environment].pCmaBaseUrl
-#         },
-#         {
-#           name  = "APP_CMA_CLIENT_ID",
-#           value = local.application_data.accountsd[local.environment].pCmaClientId
-#         },
-#         {
-#           name  = "APP_CMA_CLIENT_SECRET",
-#           value = local.application_data.accountsd[local.environment].pCmaClientSecret
-#         },
-#         {
-#           name  = "APP_CMA_OAUTH_SCOPE",
-#           value = local.application_data.accountsd[local.environment].pCmaAuthScope
-#         },
-#         {
-#           name  = "APP_CMA_ENDPOINT_AUTH",
-#           value = local.application_data.accountsd[local.environment].pCmaEndpointAuth
-#         },
-#         {
-#           name  = "APP_CMA_ENDPOINT_CREATE_ASSESSMENT",
-#           value = local.application_data.accountsd[local.environment].pCmaEndpointMeansAssessment
-#         },
-#         {
-#           name  = "APP_TEMP_TRIGGER_GARBAGE",
-#           value = 'a random string'
-#         },
-#         {
-#           name  = "AWS_XRAY_DAEMON_ADDRESS",
-#           value = xray-daemon:2000
-#         },
-#         {
-#           name  = "SENTRY_ENVIRONMENT",
-#           value = local.application_data.accountsd[local.environment].pEnvironment
-#         },
-#         {
-#           name  = "APP_CCP_BASE_URL",
-#           value = local.application_data.accountsd[local.environment].pCcpBaseUrl
-#         },
-#         {
-#           name  = "APP_CCP_CLIENT_ID",
-#           value = local.application_data.accountsd[local.environment].pCcpClientId
-#         },
-#         {
-#           name  = "APP_CCP_CLIENT_SECRET",
-#           value = local.application_data.accountsd[local.environment].pCcpClientSecret
-#         },
-#         {
-#           name  = "APP_CCP_OAUTH_SCOPE",
-#           value = local.application_data.accounts[local.environment].pCcpAuthScope
-#         },
-#         {
-#           name  = "APP_CCP_ENDPOINT_AUTH",
-#           value = local.application_data.accounts[local.environment].pCcpEndpointAuth
-#         },
-#         {
-#           name  = "APP_CCP_ENDPOINT_PROCEEDINGS",
-#           value = local.application_data.accounts[local.environment].pCcpEndpointProceedings
-#         },
-#         {
-#           name  = "APP_CAA_BASE_URL",
-#           value = local.application_data.accounts[local.environment].pCaaBaseUrl
-#         },
-#         {
-#           name  = "APP_CAA_CLIENT_ID",
-#           value = local.application_data.accounts[local.environment].pCaaClientId
-#         },
-#         {
-#           name  = "APP_CAA_CLIENT_SECRET",
-#           value = local.application_data.accounts[local.environment].pCaaClientSecret
-#         },
-#         {
-#           name  = "APP_CAA_OAUTH_URL",
-#           value = local.application_data.accounts[local.environment].pCaaAuthUrl
-#         },
-#         {
-#           name  = "APP_CAA_OAUTH_SCOPE",
-#           value = local.application_data.accounts[local.environment].pCaaAuthScope
-#         },
-#         {
-#           name  = "APP_CAA_ENDPOINT",
-#           value = local.application_data.accounts[local.environment].pCaaEndpoint
-#         },
-#         {
-#           name  = "APP_CCC_BASE_URL",
-#           value = local.application_data.accounts[local.environment].pCccBaseUrl
-#         },
-#         {
-#           name  = "APP_CCC_CLIENT_ID",
-#           value = local.application_data.accounts[local.environment].pCccClientId
-#         },
-#         {
-#           name  = "APP_CCC_CLIENT_SECRET",
-#           value = local.application_data.accounts[local.environment].pCccClientSecret
-#         },
-#         {
-#           name  = "APP_CCC_OAUTH_URL",
-#           value = local.application_data.accounts[local.environment].pCccAuthUrl
-#         },
-#         {
-#           name  = "APP_CCC_OAUTH_SCOPE",
-#           value = local.application_data.accounts[local.environment].pCccAuthScope
-#         },
-#         {
-#           name  = "APP_CCC_ENDPOINT",
-#           value = local.application_data.accounts[local.environment].pCccEndpoint
-#         },
-#         {
-#           name  = "APP_ORCH_BASE_URL",
-#           value = local.application_data.accounts[local.environment].pOrchBaseUrl
-#         },
-#         {
-#           name  = "APP_ORCH_CLIENT_ID",
-#           value = local.application_data.accounts[local.environment].pOrchClientId
-#         },
-#         {
-#           name  = "APP_ORCH_CLIENT_SECRET",
-#           value = local.application_data.accounts[local.environment].pOrchClientSecret
-#         },
-#         {
-#           name  = "APP_ORCH_OAUTH_URL",
-#           value = local.application_data.accounts[local.environment].pOrchAuthUrl
-#         },
-#         {
-#           name  = "APP_ORCH_OAUTH_SCOPE",
-#           value = local.application_data.accounts[local.environment].pOrchAuthScope
-#         },
-#         {
-#           name  = "APP_ORCH_ENDPOINT",
-#           value = local.application_data.accounts[local.environment].pOrchEndpoint
-#         },
-#         {
-#           name  = "APP_GOOGLE_ANALYTICS_4_TAG_ID",
-#           value = local.application_data.accounts[local.environment].pGoogleAnalytics4TagId
-#         }
-#       ]
-#     }
-#   ])
-# }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-task-definition"
+    }
+  )
+}
