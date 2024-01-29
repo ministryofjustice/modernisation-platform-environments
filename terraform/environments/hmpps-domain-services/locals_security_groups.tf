@@ -2,9 +2,12 @@ locals {
 
   security_group_cidrs_devtest = {
     azure_vnets = module.ip_addresses.azure_fixngo_cidrs.devtest
+    domain_controllers = module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers
   }
   security_group_cidrs_preprod_prod = {
     azure_vnets = module.ip_addresses.azure_fixngo_cidrs.prod
+    domain_controllers = module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers
+
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
@@ -184,9 +187,9 @@ locals {
       }
     }
   }
-    # need to whittle this down so that the lambda only has access to the DCs for AD access
-    azure_domain = {
-      description = "Security group for Azure domain(s) access from Jumpservers and Azure DCs"
+    # potentially need to whittle this down so that the lambda only has access to the DCs for AD access
+    domain = {
+      description = "Security group for Azure domain(s) access from Azure DCs"
       ingress = {
         all-from-self = {
           description = "Allow all ingress to self"
@@ -239,7 +242,6 @@ locals {
           cidr_blocks = local.security_group_cidrs.domain_controllers
           # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
         }
-
         smb_tcp_domain = {
           description = "445: TCP SMB ingress from Azure DC"
           from_port   = 445
