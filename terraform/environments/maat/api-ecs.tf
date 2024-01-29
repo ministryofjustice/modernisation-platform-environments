@@ -241,7 +241,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_high_cpu_service_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = 70
+  threshold           = local.application_data.accounts[local.environment].ecs_high_cpu_scaling_threshold
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_up_policy.arn]
@@ -261,7 +261,48 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_low_cpu_service_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = 20
+  threshold           = local.application_data.accounts[local.environment].ecs_low_cpu_scaling_threshold
+  unit                = "Percent"
+  comparison_operator = "LessThanThreshold"
+  alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_down_policy.arn]
+
+  dimensions = {
+    ClusterName = aws_ecs_cluster.app_ecs_cluster.name
+    ServiceName = aws_ecs_service.maat_api_ecs_service.name
+  }
+}
+
+## Memory Based Scaling
+resource "aws_cloudwatch_metric_alarm" "maat_api_high_memory_service_alarm" {
+  alarm_name          = "${local.application_name}-api-high-memory-service-alarm"
+  alarm_description   = "MemoryUtlization exceeding threshold. Triggers scale up"
+  actions_enabled     = true
+  namespace           = "AWS/ECS"
+  metric_name         = "MemoryUtilization"
+  statistic           = "Average"
+  period              = 60
+  evaluation_periods  = 3
+  threshold           = local.application_data.accounts[local.environment].ecs_high_memory_scaling_threshold
+  unit                = "Percent"
+  comparison_operator = "GreaterThanThreshold"
+  alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_up_policy.arn]
+
+  dimensions = {
+    ClusterName = aws_ecs_cluster.app_ecs_cluster.name
+    ServiceName = aws_ecs_service.maat_api_ecs_service.name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "maat_api_low_memory_service_alarm" {
+  alarm_name          = "${local.application_name}-api-low-memory-service-alarm"
+  alarm_description   = "MemoryUtilization lower than threshold. Triggers scale down"
+  actions_enabled     = true
+  namespace           = "AWS/ECS"
+  metric_name         = "MemoryUtilization"
+  statistic           = "Average"
+  period              = 60
+  evaluation_periods  = 3
+  threshold           = local.application_data.accounts[local.environment].ecs_low_memory_scaling_threshold
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_down_policy.arn]

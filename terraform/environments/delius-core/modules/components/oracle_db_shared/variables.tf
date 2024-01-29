@@ -28,3 +28,8 @@ variable "public_keys" {
   description = "Public keys to add to the instance"
   type        = map(any)
 }
+
+variable "bastion_sg_id" {
+  description = "Security group id of the bastion"
+  type        = string
+}

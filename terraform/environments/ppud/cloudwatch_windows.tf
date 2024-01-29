@@ -199,9 +199,9 @@ resource "aws_cloudwatch_log_group" "SQL-Server-Logs" {
   retention_in_days = 365
 }
 
-resource "aws_cloudwatch_log_group" "Anti-Virus-Logs" {
+resource "aws_cloudwatch_log_group" "Windows-Defender-Logs" {
   count             = local.is-production == true ? 1 : 0
-  name              = "Anti-Virus-Logs"
+  name              = "Windows-Defender-Logs"
   retention_in_days = 365
 }
 
@@ -298,5 +298,113 @@ resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Failed" {
     dimensions = {
       Instance = "$Instance"
     }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "QuickScan-Started" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "QuickScan-Started"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "Microsoft Defender Antivirus scan has started"
+  metric_transformation {
+    name      = "QuickScan"
+    namespace = "WindowsDefender"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "QuickScan-Finished" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "QuickScan-Finished"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "Microsoft Defender Antivirus scan has finished."
+  metric_transformation {
+    name      = "QuickScan"
+    namespace = "WindowsDefender"
+    value     = "0"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Failed" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareScan-Failed"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "An antimalware scan failed."
+  metric_transformation {
+    name      = "MalwareScan"
+    namespace = "WindowsDefender"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "Malware-Detected" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "Malware-Detected"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The antimalware engine found malware or other potentially unwanted software."
+  metric_transformation {
+    name      = "Malware-Detected"
+    namespace = "WindowsDefender"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareBehavior-Detected" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareBehavior-Detected"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The antimalware platform detected suspicious behavior."
+  metric_transformation {
+    name      = "MalwareBehavior-Detected"
+    namespace = "WindowsDefender"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareState-Detected" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareState-Detected"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The antimalware platform detected malware or other potentially unwanted software."
+  metric_transformation {
+    name      = "MalwareState-Detected"
+    namespace = "WindowsDefender"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareUpdate-Failed" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareUpdate-Failed"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The security intelligence update failed."
+  metric_transformation {
+    name      = "MalwareUpdate-Failed"
+    namespace = "WindowsDefender"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareEngineUpdate-Failed" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareEngineUpdate-Failed"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The antimalware engine update failed."
+  metric_transformation {
+    name      = "MalwareEngineUpdate-Failed"
+    namespace = "WindowsDefender"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareUpdate-OutofDate" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareUpdate-OutofDate"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "The antimalware engine failed to load because the antimalware platform is out of date."
+  metric_transformation {
+    name      = "MalwareUpdate-OutofDate"
+    namespace = "WindowsDefender"
+    value     = "1"
   }
 }

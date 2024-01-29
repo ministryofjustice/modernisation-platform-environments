@@ -158,6 +158,9 @@ locals {
       ## T2
       ##
       "t2-${local.application_name}-db-a" = merge(local.database_a, {
+        instance = merge(local.database_a.instance, {
+          instance_type = "r6i.xlarge"
+        })
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2T2DatabasePolicy",
@@ -236,6 +239,9 @@ locals {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2T1DatabasePolicy",
           ])
+        })
+        instance = merge(local.database_a.instance, {
+          instance_type = "r6i.xlarge"
         })
         ebs_volumes = {
           "/dev/sdb" = { # /u01

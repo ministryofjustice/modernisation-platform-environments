@@ -11,6 +11,8 @@ module "oracle_db_shared" {
   tags               = local.tags
   public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
 
+  bastion_sg_id = module.bastion_linux.bastion_security_group
+
   providers = {
     aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc

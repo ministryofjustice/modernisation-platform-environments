@@ -222,7 +222,7 @@ locals {
 
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
-  # s3 transfer lambda
+  # s3 transfer
   enable_s3_file_transfer_lambda         = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda
   s3_file_transfer_lambda_name           = "${local.project}-s3-file-transfer"
   s3_file_transfer_lambda_handler        = "uk.gov.justice.digital.lambda.S3FileTransferLambda::handleRequest"
@@ -230,9 +230,9 @@ locals {
   s3_file_transfer_lambda_runtime        = "java11"
   s3_file_transfer_lambda_tracing        = "Active"
 
-  scheduled_s3_file_transfer_lambda_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_lambda_retention_days
-  scheduled_s3_file_transfer_lambda_schedule       = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_lambda_schedule
-  enable_s3_file_transfer_lambda_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda_trigger
+  scheduled_s3_file_transfer_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_days
+  scheduled_s3_file_transfer_schedule       = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_schedule
+  enable_s3_file_transfer_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_trigger
 
   s3_file_transfer_lambda_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",

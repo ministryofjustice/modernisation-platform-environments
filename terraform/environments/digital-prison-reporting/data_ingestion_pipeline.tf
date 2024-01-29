@@ -4,7 +4,7 @@ module "step_function_notification_lambda" {
 
   enable_lambda = local.enable_step_function_notification_lambda
   name          = local.step_function_notification_lambda_name
-  s3_bucket     = local.s3_file_transfer_lambda_code_s3_bucket
+  s3_bucket     = local.step_function_notification_lambda_code_s3_bucket
   s3_key        = local.reporting_lambda_code_s3_key
   handler       = local.step_function_notification_lambda_handler
   runtime       = local.step_function_notification_lambda_runtime
@@ -87,7 +87,6 @@ module "data_ingestion_pipeline" {
     module.glue_reporting_hub_batch_job.name,
     module.glue_reporting_hub_cdc_job.name,
     module.glue_hive_table_creation_job.name,
-    module.s3_file_transfer_lambda.lambda_function,
     module.step_function_notification_lambda.lambda_function
   ]
 
@@ -135,34 +134,24 @@ module "data_ingestion_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : "${module.glue_reporting_hub_batch_job.name}"
+            "JobName" : module.glue_reporting_hub_batch_job.name
           },
-          "Next" : "Invoke S3 File Transfer Lambda"
+          "Next" : "Archive Raw Data"
         },
-        "Invoke S3 File Transfer Lambda" : {
+        "Archive Raw Data" : {
           "Type" : "Task",
-          "Resource" : "arn:aws:states:::lambda:invoke.waitForTaskToken",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "Payload" : {
-              "token.$" : "$$.Task.Token",
-              "sourceBucket" : "${module.s3_raw_bucket.bucket_id}",
-              "destinationBucket" : "${module.s3_raw_archive_bucket.bucket_id}"
-            },
-            "FunctionName" : "${module.s3_file_transfer_lambda.lambda_function}"
-          },
-          "Retry" : [
-            {
-              "ErrorEquals" : [
-                "Lambda.ServiceException",
-                "Lambda.AWSLambdaException",
-                "Lambda.SdkClientException",
-                "Lambda.TooManyRequestsException"
-              ],
-              "IntervalSeconds" : 600,
-              "MaxAttempts" : 2,
-              "BackoffRate" : 2
+            "JobName" : module.glue_s3_file_transfer_job.name,
+            "Arguments" : {
+              "--dpr.file.transfer.source.bucket" : module.s3_raw_bucket.bucket_id,
+              "--dpr.file.transfer.destination.bucket" : module.s3_raw_archive_bucket.bucket_id,
+              "--dpr.file.transfer.retention.days" : "0",
+              "--dpr.file.transfer.delete.copied.files" : "true",
+              "--dpr.allowed.s3.file.extensions" : ".parquet",
+              "--dpr.config.s3.bucket" : module.s3_glue_job_bucket.bucket_id
             }
-          ],
+          },
           "Next" : "Create Hive Tables"
         },
         "Create Hive Tables" : {

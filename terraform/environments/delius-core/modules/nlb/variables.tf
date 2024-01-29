@@ -11,13 +11,13 @@ variable "load_balancer_type" {
 }
 
 variable "drop_invalid_header_fields" {
-  type        = bool
-  default     = true
+  type    = bool
+  default = true
 }
 
 variable "enable_deletion_protection" {
-  type        = bool
-  default     = false
+  type    = bool
+  default = false
 }
 
 variable "env_name" {
@@ -26,13 +26,13 @@ variable "env_name" {
 }
 
 variable "target_type" {
-  type        = string
-  default     = "ip"
+  type    = string
+  default = "ip"
 }
 
 variable "deregistration_delay" {
-  type        = string
-  default     = "30"
+  type    = string
+  default = "30"
 }
 
 variable "tags" {
@@ -50,31 +50,31 @@ variable "subnet_ids" {
 }
 
 variable "vpc_cidr" {
-    description = "vpc cidr"
-    type        = string
+  description = "vpc cidr"
+  type        = string
 }
 
 variable "port" {
-    description = "port"
-    type        = number
+  description = "port"
+  type        = number
 }
 
 variable "protocol" {
-    description = "protocol"
-    type        = string
+  description = "protocol"
+  type        = string
 }
 
 variable "mp_application_name" {
-    description = "mp_application_name"
-    type        = string
+  description = "mp_application_name"
+  type        = string
 }
 
 variable "zone_id" {
-    description = "zone_id"
-    type        = string
+  description = "zone_id"
+  type        = string
 }
 
 variable "app_name" {
-    description = "app_name"
-    type        = string
+  description = "app_name"
+  type        = string
 }

@@ -20,9 +20,12 @@ locals {
         })
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
           args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "cb226d7bc7cbce9a252cb4ea79e237f4c074d66d" # 2023-09-27 preprod ansible config
+            branch = "main"
           })
         })
+        # tags = merge(local.oem_ec2_default.tags, {
+        #   oracle-sids = "EMREP PPRCVCAT"
+        # })
       })
     }
 
