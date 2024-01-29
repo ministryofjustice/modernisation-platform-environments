@@ -25,6 +25,8 @@ module "environment_dev" {
   weblogic_config     = local.weblogic_config_dev
   weblogic_eis_config = local.weblogic_eis_config_dev
   bastion_config      = local.bastion_config_dev
+  gdpr_config         = local.gdpr_config_dev
+  merge_config        = local.merge_config_dev
 
   account_info = local.account_info
 

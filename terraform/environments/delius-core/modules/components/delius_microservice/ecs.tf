@@ -1,6 +1,6 @@
 module "container_definition" {
   source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.61.1"
-  container_name           = var.name
+  container_name           = "${var.name}-${var.env_name}"
   container_image          = var.container_image
   container_memory         = var.container_memory
   container_cpu            = var.container_cpu
