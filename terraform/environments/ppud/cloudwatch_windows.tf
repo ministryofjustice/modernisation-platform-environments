@@ -199,9 +199,9 @@ resource "aws_cloudwatch_log_group" "SQL-Server-Logs" {
   retention_in_days = 365
 }
 
-resource "aws_cloudwatch_log_group" "Anti-Virus-Logs" {
+resource "aws_cloudwatch_log_group" "Windows_Defender-Logs" {
   count             = local.is-production == true ? 1 : 0
-  name              = "Anti-Virus-Logs"
+  name              = "Windows-Defender-Logs"
   retention_in_days = 365
 }
 
@@ -298,5 +298,30 @@ resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Failed" {
     dimensions = {
       Instance = "$Instance"
     }
+  }
+}
+
+
+resource "aws_cloudwatch_log_metric_filter" "QuickScan-Started" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "QuickScan-Started"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "Microsoft Defender Antivirus scan has started"
+  metric_transformation {
+    name      = "QuickScan"
+    namespace = "WindowsDefender"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "QuickScan-Finished" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "QuickScan-Finished"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "Microsoft Defender Antivirus scan has finished."
+  metric_transformation {
+    name      = "QuickScan"
+    namespace = "WindowsDefender"
+    value     = "0"
   }
 }
