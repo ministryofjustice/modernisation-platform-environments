@@ -1,6 +1,6 @@
 resource "aws_ssm_association" "calculate_ebs_performance_metrics" {
   name                 = "AWSSupport-CalculateEBSPerformanceMetrics"
-  schedule_expression  = "rate(12 hour)"
+  schedule_expression  = "rate(2 hours)"
   automation_target_parameter_name = "ResourceId"
 
   parameters = {
