@@ -1,7 +1,5 @@
 resource "aws_ssm_association" "calculate_ebs_performance_metrics" {
   name                 = "AWSSupport-CalculateEBSPerformanceMetrics"
-  schedule_expression  = "rate(12 hour)"
-  document_version     = "$LATEST"
   parameters = {
     resourceId           = "*"
     AutomationAssumeRole = "arn:aws:iam::612659970365:role/AWS-SSM-AutomationExecutionRole"
