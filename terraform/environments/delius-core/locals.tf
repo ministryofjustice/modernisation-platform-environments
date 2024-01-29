@@ -18,8 +18,8 @@ locals {
     # account = [env1, env2]
     prod     = []
     pre_prod = []
-    test     = []
-    dev      = ["dev", "test"]
+    test     = ["test"]
+    dev      = ["dev"]
   }
 
   ordered_subnet_ids = [data.aws_subnets.shared-private-a.ids[0], data.aws_subnets.shared-private-b.ids[0], data.aws_subnets.shared-private-c.ids[0]]
