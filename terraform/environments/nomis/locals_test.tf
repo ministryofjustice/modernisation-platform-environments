@@ -4,6 +4,7 @@ locals {
   # baseline presets config
   test_baseline_presets_options = {
     enable_observability_platform_monitoring = true
+    enable_ebs_performance_monitoring = true
     sns_topics = {
       pagerduty_integrations = {
         dso_pagerduty               = "nomis_nonprod_alarms"

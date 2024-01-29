@@ -7,6 +7,7 @@ locals {
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     var.options.enable_observability_platform_monitoring ? ["observability-platform"] : [],
+    var.options.enable_ebs_performance_monitoring ? ["EBSPerformanceMonitoringRole"] : [],
   ]))
 
   iam_roles = {
