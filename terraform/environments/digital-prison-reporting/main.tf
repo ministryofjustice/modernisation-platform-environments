@@ -223,11 +223,11 @@ module "glue_hive_table_creation_job" {
   )
 
   arguments = {
-    "--extra-jars"                = local.glue_jobs_latest_jar_location
-    "--class"                     = "uk.gov.justice.digital.job.HiveTableCreationJob"
-    "--dpr.aws.region"            = local.account_region
-    "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id,
-#    "--dpr.config.key"            = "(Required) config key. Will be specified at point of call in the reload step-functions"
+    "--extra-jars"           = local.glue_jobs_latest_jar_location
+    "--class"                = "uk.gov.justice.digital.job.HiveTableCreationJob"
+    "--dpr.aws.region"       = local.account_region
+    "--dpr.config.s3.bucket" = module.s3_glue_job_bucket.bucket_id,
+    #    "--dpr.config.key"            = "(Required) config key. Will be specified at point of call in the reload step-functions"
     "--dpr.raw.archive.s3.path"   = "s3://${module.s3_raw_archive_bucket.bucket_id}"
     "--dpr.structured.s3.path"    = "s3://${module.s3_structured_bucket.bucket_id}"
     "--dpr.curated.s3.path"       = "s3://${module.s3_curated_bucket.bucket_id}"
@@ -289,11 +289,11 @@ module "glue_s3_file_transfer_job" {
   )
 
   arguments = {
-    "--extra-jars"                            = local.glue_jobs_latest_jar_location
-    "--class"                                 = "uk.gov.justice.digital.job.S3FileTransferJob"
-    "--dpr.aws.region"                        = local.account_region
-    "--dpr.config.s3.bucket"                  = module.s3_glue_job_bucket.bucket_id,
-#    "--dpr.config.key"                        = "(Optional) config key, when provided, the job will only transfer data belonging to config otherwise all data will be transferred"
+    "--extra-jars"           = local.glue_jobs_latest_jar_location
+    "--class"                = "uk.gov.justice.digital.job.S3FileTransferJob"
+    "--dpr.aws.region"       = local.account_region
+    "--dpr.config.s3.bucket" = module.s3_glue_job_bucket.bucket_id,
+    #    "--dpr.config.key"                        = "(Optional) config key, when provided, the job will only transfer data belonging to config otherwise all data will be transferred"
     "--dpr.file.transfer.source.bucket"       = module.s3_raw_bucket.bucket_id
     "--dpr.file.transfer.destination.bucket"  = module.s3_raw_archive_bucket.bucket_id
     "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
@@ -355,16 +355,16 @@ module "glue_switch_prisons_hive_data_location_job" {
   )
 
   arguments = {
-    "--extra-jars"                             = local.glue_jobs_latest_jar_location
-    "--class"                                  = "uk.gov.justice.digital.job.SwitchHiveTableJob"
-    "--dpr.aws.region"                         = local.account_region
-    "--dpr.config.s3.bucket"                   = module.s3_glue_job_bucket.bucket_id,
-#    "--dpr.config.key"                         = "(Required) config key. Will be specified at point of call in the reload step-functions"
-#    "--dpr.prisons.data.switch.target.s3.path" = "(Required) s3 path to point the prisons data to"
-    "--dpr.prisons.database"                   = module.glue_prisons_database.db_name
-    "--dpr.contract.registryName"              = module.s3_schema_registry_bucket.bucket_id
-    "--dpr.schema.cache.max.size"              = local.hive_table_creation_job_schema_cache_max_size
-    "--dpr.log.level"                          = local.refresh_job_log_level
+    "--extra-jars"           = local.glue_jobs_latest_jar_location
+    "--class"                = "uk.gov.justice.digital.job.SwitchHiveTableJob"
+    "--dpr.aws.region"       = local.account_region
+    "--dpr.config.s3.bucket" = module.s3_glue_job_bucket.bucket_id,
+    #    "--dpr.config.key"                         = "(Required) config key. Will be specified at point of call in the reload step-functions"
+    #    "--dpr.prisons.data.switch.target.s3.path" = "(Required) s3 path to point the prisons data to"
+    "--dpr.prisons.database"      = module.glue_prisons_database.db_name
+    "--dpr.contract.registryName" = module.s3_schema_registry_bucket.bucket_id
+    "--dpr.schema.cache.max.size" = local.hive_table_creation_job_schema_cache_max_size
+    "--dpr.log.level"             = local.refresh_job_log_level
   }
 
   depends_on = [
@@ -416,14 +416,14 @@ module "glue_s3_data_deletion_job" {
   )
 
   arguments = {
-    "--extra-jars"                           = local.glue_jobs_latest_jar_location
-    "--class"                                = "uk.gov.justice.digital.job.S3DataDeletionJob"
-    "--dpr.aws.region"                       = local.account_region
-    "--dpr.config.s3.bucket"                 = module.s3_glue_job_bucket.bucket_id,
-#    "--dpr.config.key"                       = "(Required) config key. Will be specified at point of call in the reload step-functions"
-#    "--dpr.file.deletion.buckets"            = "(Required) comma separated set of s3 buckets from which to delete data from"
-    "--dpr.allowed.s3.file.extensions"       = "*"
-    "--dpr.log.level"                        = local.refresh_job_log_level
+    "--extra-jars"           = local.glue_jobs_latest_jar_location
+    "--class"                = "uk.gov.justice.digital.job.S3DataDeletionJob"
+    "--dpr.aws.region"       = local.account_region
+    "--dpr.config.s3.bucket" = module.s3_glue_job_bucket.bucket_id,
+    #    "--dpr.config.key"                       = "(Required) config key. Will be specified at point of call in the reload step-functions"
+    #    "--dpr.file.deletion.buckets"            = "(Required) comma separated set of s3 buckets from which to delete data from"
+    "--dpr.allowed.s3.file.extensions" = "*"
+    "--dpr.log.level"                  = local.refresh_job_log_level
   }
 
   depends_on = [
@@ -471,11 +471,11 @@ module "glue_stop_glue_instance_job" {
   )
 
   arguments = {
-    "--extra-jars"                           = local.glue_jobs_latest_jar_location
-    "--class"                                = "uk.gov.justice.digital.job.StopGlueInstanceJob"
-    "--dpr.aws.region"                       = local.account_region
-#    "--dpr.stop.glue.instance.job.name"      = "(Required) name of the glue job whose running instance is to be stopped"
-    "--dpr.log.level"                        = local.refresh_job_log_level
+    "--extra-jars"     = local.glue_jobs_latest_jar_location
+    "--class"          = "uk.gov.justice.digital.job.StopGlueInstanceJob"
+    "--dpr.aws.region" = local.account_region
+    #    "--dpr.stop.glue.instance.job.name"      = "(Required) name of the glue job whose running instance is to be stopped"
+    "--dpr.log.level" = local.refresh_job_log_level
   }
 }
 
