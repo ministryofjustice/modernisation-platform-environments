@@ -78,6 +78,71 @@ resource "aws_s3_bucket_logging" "capita_bucket_logging" {
 }
 
 #------------------------------------------------------------------------------
+# S3 bucket for landing Civica data
+#
+# Lifecycle management not implemented for this bucket as everything will be
+# moved to a different bucket once landed.
+#------------------------------------------------------------------------------
+
+resource "random_string" "civica_random_string" {
+  length  = 10
+  lower   = true
+  upper   = false
+  numeric = true
+  special = false
+}
+
+resource "aws_s3_bucket" "civica_landing_bucket" {
+  bucket = "civica-${random_string.civica_random_string.result}"
+}
+
+resource "aws_s3_bucket_policy" "civica_landing_bucket_policy" {
+  bucket = aws_s3_bucket.civica_landing_bucket.id
+  policy = data.aws_iam_policy_document.civica_landing_bucket_policy_document.json
+}
+
+data "aws_iam_policy_document" "civica_landing_bucket_policy_document" {
+  statement {
+    sid = "EnforceTLSv12orHigher"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect  = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.civica_landing_bucket.arn,
+      "${aws_s3_bucket.civica_landing_bucket.arn}/*"
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = [1.2]
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "civica_landing_bucket" {
+  bucket = aws_s3_bucket.civica_landing_bucket.id
+  versioning_configuration {
+    status = "Disabled"
+  }
+}
+
+resource "aws_s3_bucket_logging" "civica_bucket_logging" {
+  bucket = aws_s3_bucket.civica_landing_bucket.id
+
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = "log/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
+#------------------------------------------------------------------------------
 # S3 bucket for landed data (internal facing)
 #------------------------------------------------------------------------------
 
