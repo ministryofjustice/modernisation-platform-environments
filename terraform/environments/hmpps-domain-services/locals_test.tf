@@ -67,10 +67,15 @@ locals {
     }
 
     fsx_common_parameters = {
-      subnet_ids = module.environment.subnets["private"].ids
+      environment_name = local.environment      
+      subnet_ids       = module.environment.subnets["private"].ids
+      vpc_id           = local.vpc_all
+      region           = local.region
+      tags             = local.tags
     }
 
     fsx_parameters = {
+      environment_name                   = local.environment
       automatic_backup_retention_days    = 7
       common_name                        = module.environment.environment
       copy_tags_to_backups               = false

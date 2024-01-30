@@ -77,13 +77,6 @@ locals {
   baseline_sns_topics             = {}
   baseline_ssm_parameters         = {}
 
-  fsx_common_parameters = {
-    environment_name = local.environment
-    tags             = local.tags
-    vpc_id           = local.vpc_all
-    region           = local.region
-  }
-  fsx_parameters = {
-    environment_name = local.environment
-  }
+  fsx_common_parameters = {}
+  fsx_parameters        = {}
 }
