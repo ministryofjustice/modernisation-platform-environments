@@ -149,7 +149,7 @@ resource "aws_transfer_server" "this" {
 }
 
 resource "aws_iam_role" "iam_for_transfer" {
-  name_prefix         = "iam-for-transfer-"
+  name_prefix         = "${var.supplier}-iam-for-transfer-"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
@@ -190,7 +190,7 @@ resource "aws_transfer_workflow" "this" {
 }
 
 resource "aws_iam_role" "this_transfer_workflow" {
-  name                = "this-transfer-workflow-iam-role"
+  name                = "${var.supplier}-transfer-workflow-iam-role"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
@@ -250,7 +250,7 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
 }
 
 resource "aws_iam_role_policy" "this_transfer_workflow" {
-  name   = "this-transfer-workflow-iam-policy"
+  name   = "${var.supplier}-transfer-workflow-iam-policy"
   role   = aws_iam_role.this_transfer_workflow.id
   policy = data.aws_iam_policy_document.this_transfer_workflow.json
 }
@@ -273,13 +273,13 @@ resource "aws_transfer_user" "this" {
 }
 
 resource "aws_iam_role" "this_transfer_user" {
-  name                = "this-transfer-user-iam-role"
+  name                = "${var.supplier}-transfer-user-iam-role"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
 resource "aws_iam_role_policy" "this_transfer_user" {
-  name   = "this-transfer-user-iam-policy"
+  name   = "${var.supplier}-transfer-user-iam-policy"
   role   = aws_iam_role.this_transfer_user.id
   policy = data.aws_iam_policy_document.this_transfer_user.json
 }
@@ -320,7 +320,7 @@ resource "aws_transfer_ssh_key" "this" {
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "this" {
-  name        = "inbound-ips"
+  name        = "${var.supplier}-inbound-ips"
   description = "Allowed IP addresses for ${var.supplier}"
   vpc_id      = var.vpc_id
 }
@@ -359,8 +359,8 @@ resource "aws_transfer_ssh_key" "dev_ssh_key" {
 }
 
 resource "aws_security_group" "dev" {
-  name        = "dev-inbound-ips"
-  description = "Allowed developer IP addresses for testing"
+  name        = "${var.supplier}-dev-inbound-ips"
+  description = "Allowed MoJ developer IP addresses for testing ${var.supplier} landing zone"
   vpc_id      = var.vpc_id
 }
 
