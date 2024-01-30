@@ -14,7 +14,7 @@ variable "data_ingestion_pipeline" {
 variable "pipeline_dms_task_time_out" {
   description = "DMS Task Timeout"
   type        = number
-  default     = 43200 # 12 hours
+  default     = 86400 # 24 hours
 }
 
 variable "pipeline_additional_policies" {

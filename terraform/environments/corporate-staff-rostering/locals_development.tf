@@ -18,6 +18,7 @@ locals {
           ami_name          = "base_ol_8_5_*"
           availability_zone = null
         })
+        cloudwatch_metric_alarms = {}
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["database"]
         })

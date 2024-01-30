@@ -13,22 +13,9 @@ resource "aws_transfer_user" "g4s_transfer_user" {
   home_directory = "/${aws_s3_bucket.g4s_landing_bucket.id}/"
 }
 
-data "aws_iam_policy_document" "g4s_assume_role" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["transfer.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
 resource "aws_iam_role" "g4s_transfer_user_iam_role" {
   name                = "g4s-transfer-user-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.g4s_assume_role.json
+  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
