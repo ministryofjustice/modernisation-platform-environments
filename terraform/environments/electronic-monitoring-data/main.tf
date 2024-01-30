@@ -13,10 +13,11 @@ module "capita" {
     "85.115.54.0/24"
   ]
 
-  data_store_bucket = aws_s3_bucket.data_store_bucket
-  log_bucket        = aws_s3_bucket.log_bucket
+  data_store_bucket = aws_s3_bucket.data_store
 
   kms_key_id = data.aws_kms_key.general_shared.arn
+
+  account_id = data.aws_caller_identity.current.account_id
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
@@ -36,10 +37,11 @@ module "civica" {
   supplier_cidr_ipv4s = [
   ]
 
-  data_store_bucket = aws_s3_bucket.data_store_bucket
-  log_bucket        = aws_s3_bucket.log_bucket
+  data_store_bucket = aws_s3_bucket.data_store
 
   kms_key_id = data.aws_kms_key.general_shared.arn
+
+  account_id = data.aws_caller_identity.current.account_id
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
@@ -59,10 +61,11 @@ module "g4s" {
   supplier_cidr_ipv4s = [
   ]
 
-  data_store_bucket = aws_s3_bucket.data_store_bucket
-  log_bucket        = aws_s3_bucket.log_bucket
+  data_store_bucket = aws_s3_bucket.data_store
 
   kms_key_id = data.aws_kms_key.general_shared.arn
+
+  account_id = data.aws_caller_identity.current.account_id
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]

@@ -84,14 +84,25 @@ resource "aws_s3_bucket_versioning" "landing_bucket" {
 resource "aws_s3_bucket_logging" "landing_bucket" {
   bucket = aws_s3_bucket.landing_bucket.id
 
-  target_bucket = var.log_bucket.id
-  target_prefix = "log/${var.supplier}/"
+  target_bucket = module.log_bucket.bucket_id
+  target_prefix = "log/"
 
   target_object_key_format {
     partitioned_prefix {
       partition_date_source = "EventTime"
     }
   }
+}
+
+#------------------------------------------------------------------------------
+# S3 bucket for landing bucket logs
+#------------------------------------------------------------------------------
+
+module "log_bucket" {
+  source = "../s3_log_bucket"
+
+  source_bucket = aws_s3_bucket.landing_bucket
+  account_id    = var.account_id
 }
 
 #------------------------------------------------------------------------------

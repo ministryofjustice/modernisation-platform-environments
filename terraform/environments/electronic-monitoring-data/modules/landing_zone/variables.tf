@@ -22,8 +22,8 @@ variable "data_store_bucket" {
   description = "The bucket landed data is moved to"
 }
 
-variable "log_bucket" {
-  description = "The logging bucket"
+variable "account_id" {
+    description = "The account id"
 }
 
 variable "vpc_id" {
