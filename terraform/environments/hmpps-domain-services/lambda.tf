@@ -22,15 +22,6 @@ module "ad-clean-up-lambda" {
   vpc_subnet_ids         = data.aws_subnets.shared-private
   vpc_security_group_ids = local.security_groups.domain
 
-#   allowed_triggers = {
-
-#     AllowExecutionFromCloudWatch = {
-#       action     = "lambda:InvokeFunction"
-#       principal  = "events.amazonaws.com"
-#       source_arn = aws_cloudwatch_event_rule.instance-state.arn # this will be a data call
-#     }
-#   }
-
   tags = merge(
     local.tags,
     {
@@ -68,6 +59,3 @@ resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
   role       = aws_iam_role.lambda-ad-role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
-
-# TODO IAM policy for cloudwatch event triggers
-# TODO account trust policy
