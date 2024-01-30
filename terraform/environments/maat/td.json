@@ -1,229 +1,229 @@
-${jsonencode({
-// [
-{
-    "name": "xray-daemon",
-    "image": "${ecr_url}:xray-daemon",
-    "cpu": 32,
-    "memory": 256,
-    "portMappings": [
-        {
-            "containerPort": 2000,
-            "hostPort": 0,
-            "protocol": "udp"
+// ${jsonencode({
+[
+    {
+        "name": "xray-daemon",
+        "image": "${ecr_url}:xray-daemon",
+        "cpu": 32,
+        "memory": 256,
+        "portMappings": [
+            {
+                "containerPort": 2000,
+                "hostPort": 0,
+                "protocol": "udp"
+            }
+        ],
+        "essential": false,
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": "MAAT-ECS",
+                "awslogs-region": "${region}",
+                "awslogs-stream-prefix": "MAAT-app"
+            }
         }
-    ],
-    "essential": false,
-    "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-            "awslogs-group": "MAAT-ECS",
-            "awslogs-region": "${region}",
-            "awslogs-stream-prefix": "MAAT-app"
+    },
+    {
+        "name": "MAAT",
+        "image": "${ecr_url}:${docker_image_tag}",
+        "cpu": 992,
+        "memory": 3000,
+        "links": [
+            "xray-daemon"
+        ],
+        "portMappings": [
+            {
+                "containerPort": 8080,
+                "hostPort": 0,
+                "protocol": "tcp"
+            }
+        ],
+        "essential": true,
+        "environment": [
+            {
+                "name": "APP_CMA_OAUTH_SCOPE",
+                "value": "cma/standard"
+            },
+            {
+                "name": "APP_CMA_ENDPOINT_CREATE_ASSESSMENT",
+                "value": "/api/internal/v1/assessment/means"
+            },
+            {
+                "name": "APP_BC_CLIENT_USER_ID",
+                "value": "n3_A6kdEbhF_Wd7"
+            },
+            {
+                "name": "APP_CCC_ENDPOINT",
+                "value": "/api/internal/v1/contribution"
+            },
+            {
+                "name": "APP_ORCH_OAUTH_SCOPE",
+                "value": "orchestration/standard"
+            },
+            {
+                "name": "APP_CCP_CLIENT_SECRET",
+                "value": "1imh0k343mbblve7c8u8c3qafva7858d9502n0mhk036bdpgefb2"
+            },
+            {
+                "name": "APP_ORCH_BASE_URL",
+                "value": "${maat_orch_base_url)"
+            },
+            {
+                "name": "APP_GOOGLE_ANALYTICS_4_TAG_ID",
+                "value": "G-9VVRDTT9VK"
+            },
+            {
+                "name": "APP_CMA_CLIENT_ID",
+                "value": "6fimdvd7nh404sqk6jn74s02l2"
+            },
+            {
+                "name": "APP_BC_SERVICE_NAME",
+                "value": "eP_9_Tk"
+            },
+            {
+                "name": "APP_CCP_OAUTH_SCOPE",
+                "value": "ccp/standard"
+            },
+            {
+                "name": "APP_CCP_BASE_URL",
+                "value": "$(maat_ccp_base_url)"
+            },
+            {
+                "name": "APP_CMA_CLIENT_SECRET",
+                "value": "fcs7n3kke81fp34t8ab2vekot2mbuglihbd6fk8fsvu49eeqfuh"
+            },
+            {
+                "name": "APP_DB_POOL_MAX_CONNECTION",
+                "value": "200"
+            },
+            {
+                "name": "APP_BC_CLIENT_ORIG_ID",
+                "value": "gK_S2_a_DgW6x"
+            },
+            {
+                "name": "APP_DB_PASSWORD",
+                "value": "togae01"
+            },
+            {
+                "name": "APP_CAA_CLIENT_SECRET",
+                "value": "16gg8h19ht7sf8ep62mhmlcpuuu9vu07ris77hslfe30genv672d"
+            },
+            {
+                "name": "APP_TEMP_TRIGGER_GARBAGE",
+                "value": "arandomstring"
+            },
+            {
+                "name": "APP_ORCH_CLIENT_SECRET",
+                "value": "1he43rfakg1860ukppvkr5dfn6uv9r24ru7qraimp8o7datv4id4"
+            },
+            {
+                "name": "APP_ORCH_OAUTH_URL",
+                "value": "$(maat_orch_oauth_url)"
+            },
+            {
+                "name": "APP_CCC_OAUTH_URL",
+                "value": "$(maat_ccc_oauth_url)"
+            },
+            {
+                "name": "APP_CAA_CLIENT_ID",
+                "value": "7jkffg0t145tuml2nl92l3ut7q"
+            },
+            {
+                "name": "APP_LOG_LEVEL",
+                "value": "debug"
+            },
+            {
+                "name": "APP_CMA_ENDPOINT_AUTH",
+                "value": "$(maat_cma_endpoint_auth_url)"
+            },
+            {
+                "name": "APP_CCP_ENDPOINT_AUTH",
+                "value": "$(maat_ccp_endpoint_auth_url)"
+            },
+            {
+                "name": "APP_ORCH_CLIENT_ID",
+                "value": "7ib7rhmcg1ulfgmsggtfaavmtl"
+            },
+            {
+                "name": "APP_CCC_CLIENT_ID",
+                "value": "4nhbjsogo553rq1kpe0n63624b"
+            },
+            {
+                "name": "APP_DB_URL",
+                "value": "$(maat_db_url)"
+            },
+            {
+                "name": "APP_DB_USERID",
+                "value": "TOGDATA"
+            },
+            {
+                "name": "APP_CCC_CLIENT_SECRET",
+                "value": "1fmgtr6jd24v8s6ut3ppqnpj9n7nk7niqn9l3m32a9900dli0e5k"
+            },
+            {
+                "name": "APP_CCC_BASE_URL",
+                "value": "$(maat_ccc_base_url)"
+            },
+            {
+                "name": "APP_CAA_OAUTH_URL",
+                "value": "$(maat_caa_oauth_url)"
+            },
+            {
+                "name": "SENTRY_ENVIRONMENT",
+                "value": "${sentry_env}"
+            },
+            {
+                "name": "APP_ORCH_ENDPOINT",
+                "value": "/api/internal/v1/orchestration"
+            },
+            {
+                "name": "APP_CCC_OAUTH_SCOPE",
+                "value": "ccc/standard"
+            },
+            {
+                "name": "APP_BC_ENDPOINT",
+                "value": "$(maat_bc_endpoint_url)"
+            },
+            {
+                "name": "APP_CCP_CLIENT_ID",
+                "value": "6gs3vf16lerd1e9im6l0o81nr6"
+            },
+            {
+                "name": "APP_CAA_OAUTH_SCOPE",
+                "value": "caa-api-dev/standard"
+            },
+            {
+                "name": "AWS_XRAY_DAEMON_ADDRESS",
+                "value": "xray-daemon:2000"
+            },
+            {
+                "name": "APP_MLRA_LOCATION",
+                "value": "$(maat_mlra_url)"
+            },
+            {
+                "name": "APP_CCP_ENDPOINT_PROCEEDINGS",
+                "value": "/api/internal/v1/proceedings"
+            },
+            {
+                "name": "APP_CAA_BASE_URL",
+                "value": "$(maat_caa_url)"
+            },
+            {
+                "name": "APP_CMA_BASE_URL",
+                "value": "$(maat_cma_base_url)"
+            },
+            {
+                "name": "APP_CAA_ENDPOINT",
+                "value": "/api/internal/v1/crimeapply"
+            }
+        ],
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": "MAAT-ECS",
+                "awslogs-region": "eu-west-2",
+                "awslogs-stream-prefix": "MAAT-app"
+            }
         }
     }
-},
-{
-    "name": "MAAT",
-    "image": "${ecr_url}:${docker_image_tag}",
-    "cpu": 992,
-    "memory": 3000,
-    "links": [
-        "xray-daemon"
-    ],
-    "portMappings": [
-        {
-            "containerPort": 8080,
-            "hostPort": 0,
-            "protocol": "tcp"
-        }
-    ],
-    "essential": true,
-    "environment": [
-        {
-            "name": "APP_CMA_OAUTH_SCOPE",
-            "value": "cma/standard"
-        },
-        {
-            "name": "APP_CMA_ENDPOINT_CREATE_ASSESSMENT",
-            "value": "/api/internal/v1/assessment/means"
-        },
-        {
-            "name": "APP_BC_CLIENT_USER_ID",
-            "value": "n3_A6kdEbhF_Wd7"
-        },
-        {
-            "name": "APP_CCC_ENDPOINT",
-            "value": "/api/internal/v1/contribution"
-        },
-        {
-            "name": "APP_ORCH_OAUTH_SCOPE",
-            "value": "orchestration/standard"
-        },
-        {
-            "name": "APP_CCP_CLIENT_SECRET",
-            "value": "1imh0k343mbblve7c8u8c3qafva7858d9502n0mhk036bdpgefb2"
-        },
-        {
-            "name": "APP_ORCH_BASE_URL",
-            "value": "${maat_orch_base_url)"
-        },
-        {
-            "name": "APP_GOOGLE_ANALYTICS_4_TAG_ID",
-            "value": "G-9VVRDTT9VK"
-        },
-        {
-            "name": "APP_CMA_CLIENT_ID",
-            "value": "6fimdvd7nh404sqk6jn74s02l2"
-        },
-        {
-            "name": "APP_BC_SERVICE_NAME",
-            "value": "eP_9_Tk"
-        },
-        {
-            "name": "APP_CCP_OAUTH_SCOPE",
-            "value": "ccp/standard"
-        },
-        {
-            "name": "APP_CCP_BASE_URL",
-            "value": "$(maat_ccp_base_url)"
-        },
-        {
-            "name": "APP_CMA_CLIENT_SECRET",
-            "value": "fcs7n3kke81fp34t8ab2vekot2mbuglihbd6fk8fsvu49eeqfuh"
-        },
-        {
-            "name": "APP_DB_POOL_MAX_CONNECTION",
-            "value": "200"
-        },
-        {
-            "name": "APP_BC_CLIENT_ORIG_ID",
-            "value": "gK_S2_a_DgW6x"
-        },
-        {
-            "name": "APP_DB_PASSWORD",
-            "value": "togae01"
-        },
-        {
-            "name": "APP_CAA_CLIENT_SECRET",
-            "value": "16gg8h19ht7sf8ep62mhmlcpuuu9vu07ris77hslfe30genv672d"
-        },
-        {
-            "name": "APP_TEMP_TRIGGER_GARBAGE",
-            "value": "arandomstring"
-        },
-        {
-            "name": "APP_ORCH_CLIENT_SECRET",
-            "value": "1he43rfakg1860ukppvkr5dfn6uv9r24ru7qraimp8o7datv4id4"
-        },
-        {
-            "name": "APP_ORCH_OAUTH_URL",
-            "value": "$(maat_orch_oauth_url)"
-        },
-        {
-            "name": "APP_CCC_OAUTH_URL",
-            "value": "$(maat_ccc_oauth_url)"
-        },
-        {
-            "name": "APP_CAA_CLIENT_ID",
-            "value": "7jkffg0t145tuml2nl92l3ut7q"
-        },
-        {
-            "name": "APP_LOG_LEVEL",
-            "value": "debug"
-        },
-        {
-            "name": "APP_CMA_ENDPOINT_AUTH",
-            "value": "$(maat_cma_endpoint_auth_url)"
-        },
-        {
-            "name": "APP_CCP_ENDPOINT_AUTH",
-            "value": "$(maat_ccp_endpoint_auth_url)"
-        },
-        {
-            "name": "APP_ORCH_CLIENT_ID",
-            "value": "7ib7rhmcg1ulfgmsggtfaavmtl"
-        },
-        {
-            "name": "APP_CCC_CLIENT_ID",
-            "value": "4nhbjsogo553rq1kpe0n63624b"
-        },
-        {
-            "name": "APP_DB_URL",
-            "value": "$(maat_db_url)"
-        },
-        {
-            "name": "APP_DB_USERID",
-            "value": "TOGDATA"
-        },
-        {
-            "name": "APP_CCC_CLIENT_SECRET",
-            "value": "1fmgtr6jd24v8s6ut3ppqnpj9n7nk7niqn9l3m32a9900dli0e5k"
-        },
-        {
-            "name": "APP_CCC_BASE_URL",
-            "value": "$(maat_ccc_base_url)"
-        },
-        {
-            "name": "APP_CAA_OAUTH_URL",
-            "value": "$(maat_caa_oauth_url)"
-        },
-        {
-            "name": "SENTRY_ENVIRONMENT",
-            "value": "${sentry_env}"
-        },
-        {
-            "name": "APP_ORCH_ENDPOINT",
-            "value": "/api/internal/v1/orchestration"
-        },
-        {
-            "name": "APP_CCC_OAUTH_SCOPE",
-            "value": "ccc/standard"
-        },
-        {
-            "name": "APP_BC_ENDPOINT",
-            "value": "$(maat_bc_endpoint_url)"
-        },
-        {
-            "name": "APP_CCP_CLIENT_ID",
-            "value": "6gs3vf16lerd1e9im6l0o81nr6"
-        },
-        {
-            "name": "APP_CAA_OAUTH_SCOPE",
-            "value": "caa-api-dev/standard"
-        },
-        {
-            "name": "AWS_XRAY_DAEMON_ADDRESS",
-            "value": "xray-daemon:2000"
-        },
-        {
-            "name": "APP_MLRA_LOCATION",
-            "value": "$(maat_mlra_url)"
-        },
-        {
-            "name": "APP_CCP_ENDPOINT_PROCEEDINGS",
-            "value": "/api/internal/v1/proceedings"
-        },
-        {
-            "name": "APP_CAA_BASE_URL",
-            "value": "$(maat_caa_url)"
-        },
-        {
-            "name": "APP_CMA_BASE_URL",
-            "value": "$(maat_cma_base_url)"
-        },
-        {
-            "name": "APP_CAA_ENDPOINT",
-            "value": "/api/internal/v1/crimeapply"
-        }
-    ],
-    "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-            "awslogs-group": "MAAT-ECS",
-            "awslogs-region": "eu-west-2",
-            "awslogs-stream-prefix": "MAAT-app"
-        }
-    }
-}
-// ]
-})}
+]
+// })}
