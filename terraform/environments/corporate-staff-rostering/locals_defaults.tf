@@ -3,15 +3,18 @@ locals {
   ec2_cloudwatch_metric_alarms = {
     linux = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux
     )
     windows = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
     )
     app = merge(
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows,
       {
         high-memory-usage = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows["high-memory-usage"], {
           threshold           = "75"
