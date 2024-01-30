@@ -260,7 +260,7 @@ resource "aws_ecs_task_definition" "maat_task_definition" {
   execution_role_arn       = aws_iam_role.ec2_instance_role.arn
   task_role_arn            = aws_iam_role.ec2_instance_role.arn
 
-  container_definitions = templatefile("maat_task_definition.json", {
+  container_definitions = templatefile("td.json", {
     docker_image_tag            = local.application_data.accounts[local.environment].docker_image_tag
     region                      = local.application_data.accounts[local.environment].region
     sentry_env                  = local.environment
@@ -277,7 +277,7 @@ resource "aws_ecs_task_definition" "maat_task_definition" {
     maat_mlra_url               = local.application_data.accounts[local.environment].maat_mlra_url
     maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
     maat_cma_url                = local.application_data.accounts[local.environment].maat_cma_url
-    # ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
+    ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
   })
 
   tags = merge(
