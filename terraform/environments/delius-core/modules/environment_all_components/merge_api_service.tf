@@ -7,8 +7,8 @@ module "merge_api_service" {
   env_name = var.env_name
   container_port_mappings = [
     {
-      containerPort = 80
-      hostPort      = 80 # check this
+      containerPort = 8080
+      hostPort      = 8080
       protocol      = "tcp"
     }
   ]
