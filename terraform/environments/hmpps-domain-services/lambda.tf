@@ -19,8 +19,8 @@ module "ad-clean-up-lambda" {
   create_role            = false
   lambda_role            = aws_iam_role.lambda-ad-role.arn
 
-  vpc_subnet_ids         = data.aws_subnets.shared-private
-  vpc_security_group_ids = local.security_groups.domain
+  vpc_subnet_ids         = tolist(data.aws_subnets.shared-private.ids)
+  vpc_security_group_ids = ["domain"]
 
   tags = merge(
     local.tags,
