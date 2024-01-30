@@ -2,14 +2,6 @@ output "security_group" {
   value = aws_security_group.db_ec2
 }
 
-output "instance_profile" {
-  value = aws_iam_instance_profile.db_ec2_instanceprofile
-}
-
-output "iam_role" {
-  value = aws_iam_role.db_ec2_instance_iam_role
-}
-
 output "db_key_pair" {
   value = aws_key_pair.db_ec2_key_pair
 }
@@ -20,4 +12,16 @@ output "db_ssh_key_ssm_parameter" {
 
 output "ssh_keys_bucket_name" {
   value = module.s3_bucket_ssh_keys.bucket.id
+}
+
+output "instance_policies" {
+  value = {
+    "business_unit_kms_key_access"        = aws_iam_policy.business_unit_kms_key_access
+    "core_shared_services_bucket_access"  = aws_iam_policy.core_shared_services_bucket_access
+    "allow_access_to_ssm_parameter_store" = aws_iam_policy.allow_access_to_ssm_parameter_store
+    "ec2_access_for_ansible"              = aws_iam_policy.ec2_access_for_ansible
+    "db_access_to_secrets_manager"        = aws_iam_policy.db_access_to_secrets_manager
+    "oracledb_backup_bucket_access"       = aws_iam_policy.oracledb_backup_bucket_access
+    "db_ssh_keys_s3"                      = aws_iam_policy.db_ssh_keys_s3
+  }
 }
