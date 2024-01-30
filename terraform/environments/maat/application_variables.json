@@ -69,7 +69,9 @@
       "maat_bc_endpoint_url": "https://benefitchecker.dev.legalservices.gov.uk/lsx/lsc-services/benefitChecker",
       "maat_mlra_url": "https://mlra.dev.legalservices.gov.uk",
       "maat_caa_base_url": "https://w2vr5w4fke.execute-api.eu-west-2.amazonaws.com/v1",
-      "maat_cma_base_url": "https://laa-crime-means-assessment-dev.apps.live.cloud-platform.service.justice.gov.uk"
+      "maat_cma_base_url": "https://laa-crime-means-assessment-dev.apps.live.cloud-platform.service.justice.gov.uk",
+      "maat_aws_logs_group": "MAAT-ECS",
+      "maat_aws_stream_prefix": "MAAT-app"
     },
     "test": {
       "example_var": "test-data",

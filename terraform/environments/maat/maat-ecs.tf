@@ -29,7 +29,8 @@ resource "aws_iam_policy" "ec2_instance_role_policy" {
   name = "${local.application_name}-ec2-instance-role-policy"
 
   policy = jsonencode({
-    Statement = [
+   Version = "2012-10-17"
+   Statement = [
       {
         Effect = "Allow"
         Action = [
@@ -277,8 +278,10 @@ resource "aws_ecs_task_definition" "maat_task_definition" {
     maat_bc_endpoint_url        = local.application_data.accounts[local.environment].maat_bc_endpoint_url
     maat_mlra_url               = local.application_data.accounts[local.environment].maat_mlra_url
     maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
-    maat_cma_base_url                = local.application_data.accounts[local.environment].maat_cma_base_url
+    maat_cma_base_url           = local.application_data.accounts[local.environment].maat_cma_base_url
     ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
+    maat_aws_logs_group         = local.application_data.accounts[local.environment].maat_aws_logs_group
+    maat_aws_stream_prefix      = local.application_data.accounts[local.environment].maat_aws_stream_prefix
     }
   )
 

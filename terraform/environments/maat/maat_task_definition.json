@@ -15,9 +15,9 @@
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {
-                "awslogs-group": "MAAT-ECS",
+                "awslogs-group": "${maat_aws_logs_group}",
                 "awslogs-region": "${region}",
-                "awslogs-stream-prefix": "MAAT-app"
+                "awslogs-stream-prefix": "${maat_aws_stream_prefix}"
             }
         }
     },
@@ -40,7 +40,7 @@
         "environment": [
             {
                 "name": "APP_CMA_OAUTH_SCOPE",
-                "value": "cma/standard"
+                "value": ""
             },
             {
                 "name": "APP_CMA_ENDPOINT_CREATE_ASSESSMENT",
@@ -48,19 +48,19 @@
             },
             {
                 "name": "APP_BC_CLIENT_USER_ID",
-                "value": "n3_A6kdEbhF_Wd7"
+                "value": ""
             },
             {
                 "name": "APP_CCC_ENDPOINT",
-                "value": "/api/internal/v1/contribution"
+                "value": ""
             },
             {
                 "name": "APP_ORCH_OAUTH_SCOPE",
-                "value": "orchestration/standard"
+                "value": ""
             },
             {
                 "name": "APP_CCP_CLIENT_SECRET",
-                "value": "1imh0k343mbblve7c8u8c3qafva7858d9502n0mhk036bdpgefb2"
+                "value": ""
             },
             {
                 "name": "APP_ORCH_BASE_URL",
@@ -68,19 +68,19 @@
             },
             {
                 "name": "APP_GOOGLE_ANALYTICS_4_TAG_ID",
-                "value": "G-9VVRDTT9VK"
+                "value": ""
             },
             {
                 "name": "APP_CMA_CLIENT_ID",
-                "value": "6fimdvd7nh404sqk6jn74s02l2"
+                "value": ""
             },
             {
                 "name": "APP_BC_SERVICE_NAME",
-                "value": "eP_9_Tk"
+                "value": ""
             },
             {
                 "name": "APP_CCP_OAUTH_SCOPE",
-                "value": "ccp/standard"
+                "value": ""
             },
             {
                 "name": "APP_CCP_BASE_URL",
@@ -88,7 +88,7 @@
             },
             {
                 "name": "APP_CMA_CLIENT_SECRET",
-                "value": "fcs7n3kke81fp34t8ab2vekot2mbuglihbd6fk8fsvu49eeqfuh"
+                "value": ""
             },
             {
                 "name": "APP_DB_POOL_MAX_CONNECTION",
@@ -96,15 +96,15 @@
             },
             {
                 "name": "APP_BC_CLIENT_ORIG_ID",
-                "value": "gK_S2_a_DgW6x"
+                "value": ""
             },
             {
                 "name": "APP_DB_PASSWORD",
-                "value": "togae01"
+                "value": ""
             },
             {
                 "name": "APP_CAA_CLIENT_SECRET",
-                "value": "16gg8h19ht7sf8ep62mhmlcpuuu9vu07ris77hslfe30genv672d"
+                "value": ""
             },
             {
                 "name": "APP_TEMP_TRIGGER_GARBAGE",
@@ -112,7 +112,7 @@
             },
             {
                 "name": "APP_ORCH_CLIENT_SECRET",
-                "value": "1he43rfakg1860ukppvkr5dfn6uv9r24ru7qraimp8o7datv4id4"
+                "value": ""
             },
             {
                 "name": "APP_ORCH_OAUTH_URL",
@@ -124,7 +124,7 @@
             },
             {
                 "name": "APP_CAA_CLIENT_ID",
-                "value": "7jkffg0t145tuml2nl92l3ut7q"
+                "value": ""
             },
             {
                 "name": "APP_LOG_LEVEL",
@@ -140,11 +140,11 @@
             },
             {
                 "name": "APP_ORCH_CLIENT_ID",
-                "value": "7ib7rhmcg1ulfgmsggtfaavmtl"
+                "value": ""
             },
             {
                 "name": "APP_CCC_CLIENT_ID",
-                "value": "4nhbjsogo553rq1kpe0n63624b"
+                "value": ""
             },
             {
                 "name": "APP_DB_URL",
@@ -152,11 +152,11 @@
             },
             {
                 "name": "APP_DB_USERID",
-                "value": "TOGDATA"
+                "value": ""
             },
             {
                 "name": "APP_CCC_CLIENT_SECRET",
-                "value": "1fmgtr6jd24v8s6ut3ppqnpj9n7nk7niqn9l3m32a9900dli0e5k"
+                "value": ""
             },
             {
                 "name": "APP_CCC_BASE_URL",
@@ -172,11 +172,11 @@
             },
             {
                 "name": "APP_ORCH_ENDPOINT",
-                "value": "/api/internal/v1/orchestration"
+                "value": ""
             },
             {
                 "name": "APP_CCC_OAUTH_SCOPE",
-                "value": "ccc/standard"
+                "value": ""
             },
             {
                 "name": "APP_BC_ENDPOINT",
@@ -184,7 +184,7 @@
             },
             {
                 "name": "APP_CCP_CLIENT_ID",
-                "value": "6gs3vf16lerd1e9im6l0o81nr6"
+                "value": ""
             },
             {
                 "name": "APP_CAA_OAUTH_SCOPE",
@@ -200,7 +200,7 @@
             },
             {
                 "name": "APP_CCP_ENDPOINT_PROCEEDINGS",
-                "value": "/api/internal/v1/proceedings"
+                "value": ""
             },
             {
                 "name": "APP_CAA_BASE_URL",
@@ -212,15 +212,15 @@
             },
             {
                 "name": "APP_CAA_ENDPOINT",
-                "value": "/api/internal/v1/crimeapply"
+                "value": ""
             }
         ],
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {
-                "awslogs-group": "MAAT-ECS",
+                "awslogs-group": "${maat_aws_logs_group}",
                 "awslogs-region": "eu-west-2",
-                "awslogs-stream-prefix": "MAAT-app"
+                "awslogs-stream-prefix": "${maat_aws_stream_prefix}"
             }
         }
     }
