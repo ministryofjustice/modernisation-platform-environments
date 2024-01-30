@@ -64,47 +64,25 @@ resource "aws_security_group" "capita" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "capita_ip_1" {
-  security_group_id = aws_security_group.capita.id
-
-  cidr_ipv4   = "82.203.33.112/28"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
+locals {
+  capita_cidr_ipv4s = [
+    "82.203.33.112/28",
+    "82.203.33.128/28",
+    "85.115.52.0/24",
+    "85.115.53.0/24",
+    "85.115.54.0/24"
+  ]
 }
 
-resource "aws_vpc_security_group_ingress_rule" "capita_ip_2" {
+resource "aws_vpc_security_group_ingress_rule" "capita_ip" {
   security_group_id = aws_security_group.capita.id
+  
+  description = "Allow specific access to IP address via port 2222"
 
-  cidr_ipv4   = "82.203.33.128/28"
   ip_protocol = "tcp"
   from_port   = 2222
   to_port     = 2222
-}
 
-resource "aws_vpc_security_group_ingress_rule" "capita_ip_3" {
-  security_group_id = aws_security_group.capita.id
-
-  cidr_ipv4   = "85.115.52.0/24"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-}
-
-resource "aws_vpc_security_group_ingress_rule" "capita_ip_4" {
-  security_group_id = aws_security_group.capita.id
-
-  cidr_ipv4   = "85.115.53.0/24"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-}
-
-resource "aws_vpc_security_group_ingress_rule" "capita_ip_5" {
-  security_group_id = aws_security_group.capita.id
-
-  cidr_ipv4   = "85.115.54.0/24"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
+  for_each  = { for cidr_ipv4 in local.capita_cidr_ipv4s : cidr_ipv4 => cidr_ipv4 }
+  cidr_ipv4 = each.key
 }

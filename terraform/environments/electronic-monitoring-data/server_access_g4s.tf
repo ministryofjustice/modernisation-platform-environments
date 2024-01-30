@@ -64,11 +64,20 @@ resource "aws_security_group" "g4s" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "g4s_ip_1" {
-#   security_group_id = aws_security_group.g4s.id
+# locals {
+#   g4s_cidr_ipv4s = [
+#   ]
+# }
 
-#   cidr_ipv4   = ""
+# resource "aws_vpc_security_group_ingress_rule" "g4s_ip" {
+#   security_group_id = aws_security_group.g4s.id
+  
+#   description = "Allow specific access to IP address via port 2222"
+
 #   ip_protocol = "tcp"
 #   from_port   = 2222
 #   to_port     = 2222
+
+#   for_each  = { for cidr_ipv4 in local.g4s_cidr_ipv4s : cidr_ipv4 => cidr_ipv4 }
+#   cidr_ipv4 = each.key
 # }

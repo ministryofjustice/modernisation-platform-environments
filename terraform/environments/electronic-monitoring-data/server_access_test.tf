@@ -73,19 +73,20 @@ resource "aws_transfer_ssh_key" "test_g4s_ssh_key" {
 #
 # Set the allowed IP addresses for the supplier.
 #------------------------------------------------------------------------------
-locals {
-  cidr_ipv4s = [
-    # fy nhy
-    "46.69.144.146/32",
-    # Petty France
-    "81.134.202.29/32"
-  ]
-}
 
 resource "aws_security_group" "test" {
   name        = "test_inbound_ips"
   description = "Allowed IP addresses for testing"
   vpc_id      = data.aws_vpc.shared.id
+}
+
+locals {
+  test_cidr_ipv4s = [
+    # fy nhy
+    "46.69.144.146/32",
+    # Petty France
+    "81.134.202.29/32"
+  ]
 }
 
 resource "aws_vpc_security_group_ingress_rule" "test_fynhy_ip" {
@@ -95,6 +96,6 @@ resource "aws_vpc_security_group_ingress_rule" "test_fynhy_ip" {
   from_port   = 2222
   to_port     = 2222
 
-  for_each  = { for cidr_ipv4 in local.cidr_ipv4s : cidr_ipv4 => cidr_ipv4 }
+  for_each  = { for cidr_ipv4 in local.test_cidr_ipv4s : cidr_ipv4 => cidr_ipv4 }
   cidr_ipv4 = each.key
 }
