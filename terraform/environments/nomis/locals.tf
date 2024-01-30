@@ -19,6 +19,7 @@ locals {
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
+    enable_azure_sas_token                       = true
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
     enable_image_builder                         = true
@@ -119,31 +120,6 @@ locals {
         },
       ]
     },
-    SasTokenRotatorPolicy = {
-      description = "Allows updating of secrets in SSM"
-      statements = [
-        {
-          sid    = "RotateSecrets"
-          effect = "Allow"
-          actions = [
-            "ssm:PutParameter",
-          ]
-          resources = [
-            "arn:aws:ssm:*:*:parameter/azure/*",
-          ]
-        },
-        {
-          sid    = "EncryptSecrets"
-          effect = "Allow"
-          actions = [
-            "kms:Encrypt",
-          ]
-          resources = [
-            data.aws_kms_key.general_shared.arn,
-          ]
-        },
-      ]
-    }
   }
   baseline_iam_roles = {
     DBRefresherRole = {
@@ -174,31 +150,6 @@ locals {
         "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
       ]
     },
-    SasTokenRotatorRole = {
-      assume_role_policy = [{
-        effect  = "Allow"
-        actions = ["sts:AssumeRoleWithWebIdentity"]
-        principals = {
-          type        = "Federated"
-          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
-        }
-        conditions = [
-          {
-            test     = "StringEquals"
-            values   = ["sts.amazonaws.com"]
-            variable = "token.actions.githubusercontent.com:aud"
-          },
-          {
-            test     = "StringLike"
-            values   = ["repo:ministryofjustice/dso-modernisation-platform-automation:ref:refs/heads/main"]
-            variable = "token.actions.githubusercontent.com:sub"
-          },
-        ]
-      }]
-      policy_attachments = [
-        "SasTokenRotatorPolicy",
-      ]
-    }
   }
   baseline_iam_service_linked_roles = {}
   baseline_key_pairs                = {}
@@ -226,13 +177,6 @@ locals {
     data-db            = local.security_groups.data_db
   }
 
-  baseline_sns_topics = {}
-
-  baseline_ssm_parameters = {
-    "/azure" = {
-      parameters = {
-        sas_token = { description = "database backup storage account read-only sas token" }
-      }
-    }
-  }
+  baseline_sns_topics     = {}
+  baseline_ssm_parameters = {}
 }

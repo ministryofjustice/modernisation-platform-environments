@@ -4,7 +4,7 @@
 # Assign unique IP for each supplier to connect to.
 #------------------------------------------------------------------------------
 
-resource "aws_eip" "capita" {
+resource "aws_eip" "g4s" {
   domain = "vpc"
 }
 
@@ -14,7 +14,7 @@ resource "aws_eip" "capita" {
 # Configure SFTP server for supplier that only allows supplier specified IPs.
 #------------------------------------------------------------------------------
 
-resource "aws_transfer_server" "capita" {
+resource "aws_transfer_server" "g4s" {
   protocols              = ["SFTP"]
   identity_provider_type = "SERVICE_MANAGED"
 
@@ -22,9 +22,9 @@ resource "aws_transfer_server" "capita" {
   endpoint_details {
     vpc_id                 = data.aws_vpc.shared.id
     subnet_ids             = [data.aws_subnet.public_subnets_b.id]
-    address_allocation_ids = [aws_eip.capita.id]
+    address_allocation_ids = [aws_eip.g4s.id]
     security_group_ids     = [
-      aws_security_group.capita.id,
+      aws_security_group.g4s.id,
       aws_security_group.test.id
     ]
   }
@@ -37,27 +37,26 @@ resource "aws_transfer_server" "capita" {
 
   workflow_details {
     on_upload {
-      workflow_id    = aws_transfer_workflow.transfer_capita_to_store.id
-      execution_role = aws_iam_role.capita_transfer_workflow_iam_role.arn
+      workflow_id    = aws_transfer_workflow.transfer_g4s_to_store.id
+      execution_role = aws_iam_role.g4s_transfer_workflow_iam_role.arn
     }
   }
 
-  logging_role = aws_iam_role.iam_for_transfer_capita.arn
+  logging_role = aws_iam_role.iam_for_transfer_g4s.arn
   structured_log_destinations = [
-    "${aws_cloudwatch_log_group.capita.arn}:*"
+    "${aws_cloudwatch_log_group.g4s.arn}:*"
   ]
 }
 
-resource "aws_iam_role" "iam_for_transfer_capita" {
-  name_prefix         = "iam-for-transfer-capita-"
+resource "aws_iam_role" "iam_for_transfer_g4s" {
+  name_prefix         = "iam-for-transfer-g4s-"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
-resource "aws_cloudwatch_log_group" "capita" {
-  name_prefix = "transfer_capita_"
+resource "aws_cloudwatch_log_group" "g4s" {
+  name_prefix = "transfer_g4s_"
 }
-
 #------------------------------------------------------------------------------
 # AWS transfer workflow
 #
@@ -66,14 +65,14 @@ resource "aws_cloudwatch_log_group" "capita" {
 # 2. delete the file from the landing bucket
 #------------------------------------------------------------------------------
 
-resource "aws_transfer_workflow" "transfer_capita_to_store" {
+resource "aws_transfer_workflow" "transfer_g4s_to_store" {
   steps {
     copy_step_details {
       source_file_location = "$${original.file}"
       destination_file_location {
         s3_file_location {
           bucket = aws_s3_bucket.data_store_bucket.bucket
-          key    = "capita/"
+          key    = "g4s/"
         }
       }
     }
@@ -87,13 +86,13 @@ resource "aws_transfer_workflow" "transfer_capita_to_store" {
   }
 }
 
-resource "aws_iam_role" "capita_transfer_workflow_iam_role" {
-  name                = "capita-transfer-workflow-iam-role"
+resource "aws_iam_role" "g4s_transfer_workflow_iam_role" {
+  name                = "g4s-transfer-workflow-iam-role"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
-data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
+data "aws_iam_policy_document" "g4s_transfer_workflow_iam_policy_document" {
   statement {
     sid    = "AllowCopyReadSource"
     effect = "Allow"
@@ -101,7 +100,7 @@ data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
       "s3:GetObject",
       "s3:GetObjectTagging"
     ]
-    resources = ["${aws_s3_bucket.capita_landing_bucket.arn}/*"]
+    resources = ["${aws_s3_bucket.g4s_landing_bucket.arn}/*"]
   }
   statement {
     sid    = "AllowCopyWriteDestination"
@@ -119,7 +118,7 @@ data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
       "s3:ListBucket"
     ]
     resources = [
-      aws_s3_bucket.capita_landing_bucket.arn,
+      aws_s3_bucket.g4s_landing_bucket.arn,
       aws_s3_bucket.data_store_bucket.arn
     ]
   }
@@ -132,7 +131,7 @@ data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
     ]
     resources = [
       "${aws_s3_bucket.data_store_bucket.arn}/*",
-      "${aws_s3_bucket.capita_landing_bucket.arn}/*",
+      "${aws_s3_bucket.g4s_landing_bucket.arn}/*",
     ]
     # condition {}
   }
@@ -143,12 +142,12 @@ data "aws_iam_policy_document" "capita_transfer_workflow_iam_policy_document" {
       "s3:DeleteObject",
       "s3:DeleteObjectVersion"
     ]
-    resources = ["${aws_s3_bucket.capita_landing_bucket.arn}/*"]
+    resources = ["${aws_s3_bucket.g4s_landing_bucket.arn}/*"]
   }
 }
 
-resource "aws_iam_role_policy" "capita_transfer_workflow_iam_policy" {
-  name   = "capita-transfer-workflow-iam-policy"
-  role   = aws_iam_role.capita_transfer_workflow_iam_role.id
-  policy = data.aws_iam_policy_document.capita_transfer_workflow_iam_policy_document.json
+resource "aws_iam_role_policy" "g4s_transfer_workflow_iam_policy" {
+  name   = "g4s-transfer-workflow-iam-policy"
+  role   = aws_iam_role.g4s_transfer_workflow_iam_role.id
+  policy = data.aws_iam_policy_document.g4s_transfer_workflow_iam_policy_document.json
 }

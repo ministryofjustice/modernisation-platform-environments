@@ -39,7 +39,7 @@
       "alb_5xx_alarm_threshold": 10,
       "alb_target_4xx_alarm_threshold": 10,
       "alb_4xx_alarm_threshold": 10,
-      "ecs_high_cpu_scaling_threshold": 70, 
+      "ecs_high_cpu_scaling_threshold": 70,
       "ecs_low_cpu_scaling_threshold": 20,
       "ecs_high_memory_scaling_threshold": 70,
       "ecs_low_memory_scaling_threshold": 20,

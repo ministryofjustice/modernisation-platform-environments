@@ -396,7 +396,7 @@ locals {
             attachments = [
               { ec2_instance_name = "pd-cafm-w-38-b" },
             ]
-          } 
+          }
         }
         listeners = {
           http = {
