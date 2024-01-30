@@ -8,13 +8,9 @@ data "aws_iam_policy_document" "image_builder_assume_role" {
   }
 }
 
-resource "aws_iam_policy" "image_builder_assume_role" {
-  policy = data.aws_iam_policy_document.image_builder_assume_role.json
-}
-
 resource "aws_iam_role" "EC2ImageBuilderDistributionCrossAccountRole" {
-  name               = "ImageBuilderLaunchTemplateRole"
-  assume_role_policy = aws_iam_policy.image_builder_assume_role.arn
+  name               = "EC2ImageBuilderDistributionCrossAccountRole"
+  assume_role_policy = data.aws_iam_policy_document.image_builder_assume_role.json
 }
 
 resource "aws_iam_policy_attachment" "image_builder_template" {
@@ -44,6 +40,7 @@ data "aws_iam_policy_document" "image_builder_kms" {
 }
 
 resource "aws_iam_policy" "image_builder_kms" {
+  name   = "BusinessUnitKmsCmkPolicy"
   policy = data.aws_iam_policy_document.image_builder_kms.json
 }
 
@@ -73,6 +70,7 @@ data "aws_iam_policy_document" "ImageBuilderLaunchTemplatePolicy" {
 }
 
 resource "aws_iam_policy" "ImageBuilderLaunchTemplatePolicy" {
+  name   = "ImageBuilderLaunchTemplatePolicy"
   policy = data.aws_iam_policy_document.image_builder_kms.json
 }
 
