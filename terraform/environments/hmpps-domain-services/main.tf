@@ -162,12 +162,13 @@ module "baseline" {
 module "fsx" {
   source = "../../modules/fsx"
 
-  common = {
-    environment_name = local.environment
-    subnet_ids       = local.subnet_set
-    tags             = local.tags
-    vpc_id           = local.vpc_all
-    region           = local.region
-  }
-  fsx    = local.fsx
+  common = merge(
+    local.fsx_common_parameters,
+    lookup(llocal.fsx_environment_config, "fsx_common_parameters", {})
+  )
+
+  fsx = merge(
+    local.fsx_parameters,
+    lookup(llocal.fsx_environment_config, "fsx_parameters", {})
+  )
 }

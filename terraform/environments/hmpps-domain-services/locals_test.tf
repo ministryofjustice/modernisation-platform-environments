@@ -240,7 +240,7 @@ locals {
       }
     }
 
-    fsx = {
+    fsx_parameters = {
       automatic_backup_retention_days    = 7
       common_name                        = module.environment.environment
       copy_tags_to_backups               = false
