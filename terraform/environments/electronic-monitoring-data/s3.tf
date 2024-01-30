@@ -7,10 +7,28 @@ resource "aws_s3_bucket" "log_bucket" {
   force_destroy = true
 }
 
-# resource "aws_s3_bucket_acl" "log_bucket_acl" {
-#   bucket = aws_s3_bucket.log_bucket.id
-#   acl    = "log-delivery-write"
-# }
+resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
+  bucket = aws_s3_bucket.log_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "log_bucket" {
+  bucket                  = aws_s3_bucket.log_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_acl" "log_bucket_acl" {
+  bucket = aws_s3_bucket.log_bucket.id
+  acl    = "log-delivery-write"
+}
 
 #------------------------------------------------------------------------------
 # S3 bucket for landing Capita data
@@ -31,7 +49,26 @@ resource "aws_s3_bucket" "capita_landing_bucket" {
   bucket = "capita-${random_string.capita.result}"
 }
 
-resource "aws_s3_bucket_policy" "capita_landing_bucket_policy" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "capita_landing_bucket" {
+  bucket = aws_s3_bucket.capita_landing_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "capita_landing_bucket" {
+  bucket                  = aws_s3_bucket.capita_landing_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+
+resource "aws_s3_bucket_policy" "capita_landing_bucket" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
   policy = data.aws_iam_policy_document.capita_landing_bucket.json
 }
@@ -57,14 +94,14 @@ data "aws_iam_policy_document" "capita_landing_bucket" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "capita" {
+resource "aws_s3_bucket_versioning" "capita_landing_bucket" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
   versioning_configuration {
     status = "Disabled"
   }
 }
 
-resource "aws_s3_bucket_logging" "capita" {
+resource "aws_s3_bucket_logging" "capita_landing_bucket" {
   bucket = aws_s3_bucket.capita_landing_bucket.id
 
   target_bucket = aws_s3_bucket.log_bucket.id
@@ -96,7 +133,25 @@ resource "aws_s3_bucket" "civica_landing_bucket" {
   bucket = "civica-${random_string.civica.result}"
 }
 
-resource "aws_s3_bucket_policy" "civica_landing_bucket_policy" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "civica_landing_bucket" {
+  bucket = aws_s3_bucket.civica_landing_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "civica_landing_bucket" {
+  bucket                  = aws_s3_bucket.civica_landing_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "civica_landing_bucket" {
   bucket = aws_s3_bucket.civica_landing_bucket.id
   policy = data.aws_iam_policy_document.civica_landing_bucket.json
 }
@@ -122,14 +177,14 @@ data "aws_iam_policy_document" "civica_landing_bucket" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "civica" {
+resource "aws_s3_bucket_versioning" "civica_landing_bucket" {
   bucket = aws_s3_bucket.civica_landing_bucket.id
   versioning_configuration {
     status = "Disabled"
   }
 }
 
-resource "aws_s3_bucket_logging" "civica" {
+resource "aws_s3_bucket_logging" "civica_landing_bucket" {
   bucket = aws_s3_bucket.civica_landing_bucket.id
 
   target_bucket = aws_s3_bucket.log_bucket.id
@@ -161,7 +216,25 @@ resource "aws_s3_bucket" "g4s_landing_bucket" {
   bucket = "g4s-${random_string.g4s.result}"
 }
 
-resource "aws_s3_bucket_policy" "g4s_landing_bucket_policy" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "g4s_landing_bucket" {
+  bucket = aws_s3_bucket.g4s_landing_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "g4s_landing_bucket" {
+  bucket                  = aws_s3_bucket.g4s_landing_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "g4s_landing_bucket" {
   bucket = aws_s3_bucket.g4s_landing_bucket.id
   policy = data.aws_iam_policy_document.g4s_landing_bucket.json
 }
@@ -187,14 +260,14 @@ data "aws_iam_policy_document" "g4s_landing_bucket" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "g4s" {
+resource "aws_s3_bucket_versioning" "g4s_landing_bucket" {
   bucket = aws_s3_bucket.g4s_landing_bucket.id
   versioning_configuration {
     status = "Disabled"
   }
 }
 
-resource "aws_s3_bucket_logging" "g4s" {
+resource "aws_s3_bucket_logging" "g4s_landing_bucket" {
   bucket = aws_s3_bucket.g4s_landing_bucket.id
 
   target_bucket = aws_s3_bucket.log_bucket.id
@@ -213,6 +286,24 @@ resource "aws_s3_bucket_logging" "g4s" {
 
 resource "aws_s3_bucket" "data_store_bucket" {
   bucket_prefix = "em-data-store-"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "data_store_bucket" {
+  bucket = aws_s3_bucket.data_store_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "data_store_bucket" {
+  bucket                  = aws_s3_bucket.data_store_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_versioning" "data_store" {
