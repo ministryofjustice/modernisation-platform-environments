@@ -3,7 +3,7 @@ data "aws_iam_policy_document" "image_builder_assume_role" {
     actions = ["sts:AssumeRole"]
     principals {
       type        = "AWS"
-      identifiers = ["core-shared-services-production"]
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"]
     }
   }
 }
