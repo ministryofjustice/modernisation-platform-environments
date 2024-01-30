@@ -186,8 +186,6 @@ locals {
         }
       }
     }
-  }
-    # potentially need to whittle this down so that the lambda only has access to the DCs for AD access
     domain = {
       description = "Security group for Azure domain(s) access from Azure DCs"
       ingress = {
@@ -281,4 +279,5 @@ locals {
         }
       }
     }
+  }
 }
