@@ -66,6 +66,10 @@ locals {
       }
     }
 
+    fsx_common_parameters = {
+      subnet_ids = module.environment.subnets["private"].ids
+    }
+
     fsx_parameters = {
       automatic_backup_retention_days    = 7
       common_name                        = module.environment.environment

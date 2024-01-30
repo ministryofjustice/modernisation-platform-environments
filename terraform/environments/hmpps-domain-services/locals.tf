@@ -79,7 +79,6 @@ locals {
 
   fsx_common_parameters = {
     environment_name = local.environment
-    subnet_ids       = local.subnet_set[0]
     tags             = local.tags
     vpc_id           = local.vpc_all
     region           = local.region
