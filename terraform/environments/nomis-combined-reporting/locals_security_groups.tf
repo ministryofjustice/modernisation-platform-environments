@@ -27,11 +27,21 @@ locals {
   }
 
   security_group_cidrs_preprod_prod = {
+    icmp = flatten([
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
+    ])
+    ssh = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
     https = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
+    ])
+    http7xxx = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
