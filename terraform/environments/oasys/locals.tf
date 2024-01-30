@@ -246,7 +246,7 @@ locals {
 
   database_onr_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name          = "oasys_oracle_db_release_2023-06-26T10-16-03.670Z"
+      ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
       ami_owner         = "self"
       availability_zone = "${local.region}a"
       instance_profile_policies = flatten([
