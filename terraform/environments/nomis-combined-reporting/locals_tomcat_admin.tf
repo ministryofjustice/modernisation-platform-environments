@@ -203,7 +203,7 @@ locals {
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"
-      vpc_security_group_ids = ["private"]
+      vpc_security_group_ids = ["private-web"]
     })
     ebs_volumes = {
       "/dev/sdb" = { type = "gp3", size = 100 }
