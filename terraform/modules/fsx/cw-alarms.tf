@@ -34,6 +34,6 @@ resource "aws_cloudwatch_metric_alarm" "fsx_filesystem_critical" {
   tags                      = var.common.tags
 
   dimensions = {
-    FileSystemId = aws_fsx_windows_file_system.fsx.id
+    FileSystemId = aws_fsx_windows_file_system.this.id
   }
 }
