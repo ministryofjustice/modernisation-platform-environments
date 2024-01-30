@@ -4,8 +4,10 @@ locals {
   # accessed from EC2s. Create a copy as an SSM parameter with just
   # the relevant account ids.
   account_names_for_account_ids_ssm_parameter = distinct(flatten([
+    var.options.enable_ec2_delius_dba_secrets_access ? ["delius-core-${var.environment.environment}"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["hmpps-oem-${var.environment.environment}"] : [],
-    var.options.enable_ec2_oracle_enterprise_manager ? ["hmpps-oem-${var.environment.environment}"] : [],
+    var.options.enable_hmpps_domain && contains(["development", "test"], var.environment.environment) ? ["hmpps-domain-services-test"] : [],
+    var.options.enable_hmpps_domain && contains(["preproduction", "production"], var.environment.environment) ? ["hmpps-domain-services-production"] : [],
   ]))
 
   # add a cloud watch windows SSM param if the file is present
@@ -13,6 +15,7 @@ locals {
 
   ssm_parameters_filter = flatten([
     length(local.account_names_for_account_ids_ssm_parameter) != 0 ? ["account"] : [],
+    var.options.enable_azure_sas_token ? ["/azure"] : [],
     var.options.enable_ec2_user_keypair ? ["ec2-user"] : [],
     var.options.enable_ec2_cloud_watch_agent && fileexists(local.cloud_watch_windows_filename) ? ["cloud-watch-config"] : [],
   ])
@@ -29,6 +32,12 @@ locals {
             key => value if contains(local.account_names_for_account_ids_ssm_parameter, key)
           })
         }
+      }
+    }
+
+    "/azure" = {
+      parameters = {
+        sas_token = { description = "database backup storage account read-only sas token" }
       }
     }
 

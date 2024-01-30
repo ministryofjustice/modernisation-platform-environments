@@ -63,7 +63,7 @@ locals {
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
-  baseline_security_groups = {
+  security_groups = {
     public = {
       description = "Security group for public subnet"
       ingress = {
@@ -84,12 +84,11 @@ locals {
       }
       egress = {
         all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
@@ -113,12 +112,11 @@ locals {
       }
       egress = {
         all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
@@ -135,12 +133,11 @@ locals {
       }
       egress = {
         all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
@@ -162,30 +159,27 @@ locals {
           security_groups = ["management_server"]
         }
         http8555 = { # from oasys
-          description     = "Allow http8555 ingress"
-          from_port       = 8555
-          to_port         = 8555
-          protocol        = "tcp"
-          security_groups = []
-          cidr_blocks     = local.security_group_cidrs.http8555
+          description = "Allow http8555 ingress"
+          from_port   = 8555
+          to_port     = 8555
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.http8555
         }
-        tcp7474 = {
-          description     = "Allow tcp7474 ingress"
-          from_port       = 7474
-          to_port         = 7474
+        tcp-ems = {
+          description     = "Allow all ems ingress"
+          from_port       = 0
+          to_port         = 65535
           protocol        = "tcp"
           security_groups = ["ndh_ems"]
-          cidr_blocks     = []
         }
       }
       egress = {
         all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
@@ -207,38 +201,34 @@ locals {
           security_groups = ["management_server"]
         }
         tcp7222 = { # from nomis (XTAG)
-          description     = "Allow port 7222 ingress"
-          from_port       = 7222
-          to_port         = 7222
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.tcp7222
-          security_groups = []
+          description = "Allow port 7222 ingress"
+          from_port   = 7222
+          to_port     = 7222
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.tcp7222
         }
         tcp7224 = {
-          description     = "Allow port 7224 ingress"
-          from_port       = 7224
-          to_port         = 7224
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.tcp7222
-          security_groups = []
+          description = "Allow port 7224 ingress"
+          from_port   = 7224
+          to_port     = 7224
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.tcp7222
         }
-        tcp7474 = {
-          description     = "Allow tcp7474 ingress"
-          from_port       = 7474
-          to_port         = 7474
+        tcp-app = {
+          description     = "Allow all app ingress"
+          from_port       = 0
+          to_port         = 65535
           protocol        = "tcp"
           security_groups = ["ndh_app"]
-          cidr_blocks     = []
         }
       }
       egress = {
         all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
@@ -263,12 +253,11 @@ locals {
       }
       egress = {
         all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }

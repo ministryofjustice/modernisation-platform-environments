@@ -170,6 +170,26 @@ resource "aws_instance" "s609693lo6vw106" {
   }
 }
 
+resource "aws_instance" "s609693lo6vw111" {
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-005cac270289ea0de"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Dev-Box-VW106[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw111"
+    patch_group = "dev_win_patch"
+  }
+}
+
 resource "aws_instance" "s609693lo6vw107" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-04682227c9aa18702"

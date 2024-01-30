@@ -136,19 +136,17 @@
     "SupportLobs": true,
     "LobChunkSize": 64,
     "TaskRecoveryTableEnabled": false,
-    "ParallelLoadThreads": 8,
     "LobMaxSize": 32,
     "BatchApplyEnabled": false,
     "FullLobMode": false,
     "LimitedSizeLobMode": true,
-    "LoadMaxFileSize": 0,
-    "ParallelLoadBufferSize": 1000
+    "LoadMaxFileSize": 0
   },
   "BeforeImageSettings": null,
   "ControlTablesSettings": {
     "historyTimeslotInMinutes": 5,
     "HistoryTimeslotInMinutes": 5,
-    "StatusTableEnabled": false,
+    "StatusTableEnabled": true,
     "SuspendedTablesTableEnabled": false,
     "HistoryTableEnabled": false,
     "ControlSchema": "",

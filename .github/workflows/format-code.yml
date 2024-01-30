@@ -7,8 +7,7 @@ on:
     - cron: 45 4 * * 1
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 concurrency:
   group: '${{ github.ref }}-${{ github.workflow }}'
@@ -17,6 +16,9 @@ concurrency:
 jobs:
   build:
     name: MegaLinter
+    permissions:
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -38,7 +40,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter/flavors/terraform@5364b811bbe86576d832227be174ebc2aa0f5f49 #v7.6.0
+        uses: oxsecurity/megalinter/flavors/terraform@688bc7466d7ab4faa83d614c2e6f9acf42b674dc #v7.8.0
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/#shared-variables

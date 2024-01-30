@@ -20,7 +20,7 @@ resource "aws_ssm_patch_baseline" "linux_os_baseline" {
   operating_system = "AMAZON_LINUX_2"
 
   approval_rule {
-    approve_after_days  = 6
+    approve_after_days  = 5
     enable_non_security = false
 
     patch_filter {

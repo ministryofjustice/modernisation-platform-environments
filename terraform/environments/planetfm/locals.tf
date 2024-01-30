@@ -14,6 +14,7 @@ locals {
     enable_application_environment_wildcard_cert = false
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
+    enable_hmpps_domain                          = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
@@ -55,13 +56,14 @@ locals {
   }
 
   baseline_security_groups = {
-    migration_cutover = local.security_groups.migration_cutover
-    loadbalancer      = local.security_groups.loadbalancer
-    web               = local.security_groups.web
-    app               = local.security_groups.app
-    database          = local.security_groups.database
-    domain            = local.security_groups.domain
-    jumpserver        = local.security_groups.jumpserver
+    migration_cutover         = local.security_groups.migration_cutover
+    loadbalancer              = local.security_groups.loadbalancer
+    web                       = local.security_groups.web
+    app                       = local.security_groups.app
+    database                  = local.security_groups.database
+    domain                    = local.security_groups.domain
+    jumpserver                = local.security_groups.jumpserver
+    remotedesktop_sessionhost = local.security_groups.remotedesktop_sessionhost
   }
 
   baseline_sns_topics     = {}

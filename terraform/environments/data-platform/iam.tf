@@ -103,12 +103,42 @@ data "aws_iam_policy_document" "create_write_lambda_logs" {
   }
 }
 
+data "aws_iam_policy_document" "athena_query_access" {
+  statement {
+    sid = "AthenaQueryAccess"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+    ]
+    resources = [
+      aws_athena_workgroup.data_product_athena_workgroup.arn
+    ]
+  }
+
+  statement {
+    sid    = "s3GetListPutAthenaQueryResults"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${module.s3_athena_query_results_bucket.bucket.arn}",
+      "${module.s3_athena_query_results_bucket.bucket.arn}/*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
   source_policy_documents = [
     data.aws_iam_policy_document.log_to_bucket.json,
     data.aws_iam_policy_document.read_metadata.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
-    data.aws_iam_policy_document.manage_glue_databases.json
+    data.aws_iam_policy_document.manage_glue_databases.json,
+    data.aws_iam_policy_document.athena_query_access.json,
   ]
 
   statement {
@@ -125,19 +155,6 @@ data "aws_iam_policy_document" "athena_load_lambda_function_policy" {
       "${module.data_s3_bucket.bucket.arn}/fail/*",
       "${module.data_s3_bucket.bucket.arn}/curated/*",
       "${module.data_s3_bucket.bucket.arn}",
-      "${module.s3_athena_query_results_bucket.bucket.arn}",
-      "${module.s3_athena_query_results_bucket.bucket.arn}/*"
-    ]
-  }
-
-  statement {
-    sid = "AthenaQueryAccess"
-    actions = [
-      "athena:StartQueryExecution",
-      "athena:GetQueryExecution"
-    ]
-    resources = [
-      aws_athena_workgroup.data_product_athena_workgroup.arn
     ]
   }
 }
@@ -568,6 +585,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
     data.aws_iam_policy_document.log_to_bucket.json,
     data.aws_iam_policy_document.read_metadata.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
+    data.aws_iam_policy_document.athena_query_access.json,
   ]
   statement {
     sid    = "s3Access"
@@ -579,20 +597,6 @@ data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
     resources = [
       "${module.data_s3_bucket.bucket.arn}/curated/*",
       "${module.data_s3_bucket.bucket.arn}"
-    ]
-  }
-  statement {
-    sid    = "s3AthenaAccess"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:PutObject",
-      "s3:GetBucketLocation"
-    ]
-    resources = [
-      "${module.s3_athena_query_results_bucket.bucket.arn}",
-      "${module.s3_athena_query_results_bucket.bucket.arn}/*"
     ]
   }
   statement {
@@ -609,17 +613,6 @@ data "aws_iam_policy_document" "iam_policy_document_for_preview_data" {
       "*"
     ]
   }
-  statement {
-    sid = "AthenaQueryAccess"
-    actions = [
-      "athena:StartQueryExecution",
-      "athena:GetQueryExecution",
-      "athena:GetQueryResults",
-    ]
-    resources = [
-      aws_athena_workgroup.data_product_athena_workgroup.arn
-    ]
-  }
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_product_lambda" {
@@ -628,14 +621,17 @@ data "aws_iam_policy_document" "iam_policy_document_for_delete_table_for_data_pr
     data.aws_iam_policy_document.read_metadata.json,
     data.aws_iam_policy_document.write_metadata.json,
     data.aws_iam_policy_document.create_write_lambda_logs.json,
-    data.aws_iam_policy_document.manage_glue_databases.json
+    data.aws_iam_policy_document.manage_glue_databases.json,
+    data.aws_iam_policy_document.athena_query_access.json,
   ]
 
   statement {
-    sid    = "s3ListDeleteRawFailCurated"
+    sid    = "s3ListGetDeletePutRawFailCurated"
     effect = "Allow"
     actions = [
+      "s3:PutObject",
       "s3:ListBucket",
+      "s3:GetObject",
       "s3:DeleteObject"
     ]
     resources = [

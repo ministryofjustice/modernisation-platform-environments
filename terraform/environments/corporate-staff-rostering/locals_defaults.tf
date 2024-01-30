@@ -3,11 +3,27 @@ locals {
   ec2_cloudwatch_metric_alarms = {
     linux = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux
     )
     windows = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+    )
+    app = merge(
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows,
+      {
+        high-memory-usage = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows["high-memory-usage"], {
+          threshold           = "75"
+          period              = "60" # seconds
+          evaluation_periods  = "20"
+          datapoints_to_alarm = "20"
+          alarm_description   = "Triggers if the average memory utilization is 75% or above for 20 minutes. Set below the default of 95% to allow enough time to establish an RDP session to fix the issue."
+        })
+      }
     )
   }
 
@@ -32,6 +48,7 @@ locals {
       disable_api_stop       = false
       vpc_security_group_ids = ["database"]
     })
+    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.linux
     ebs_volumes = {
       "/dev/sdb" = { label = "app" }   # /u01
       "/dev/sdc" = { label = "app" }   # /u02
@@ -62,12 +79,14 @@ locals {
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["domain", "app", "jumpserver"]
     })
+    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.app
   })
 
   defaults_web_ec2 = merge(local.defaults_ec2, {
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["domain", "web", "jumpserver"]
     })
+    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.windows
   })
 
 }

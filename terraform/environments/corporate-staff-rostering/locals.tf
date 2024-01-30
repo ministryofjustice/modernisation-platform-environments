@@ -12,8 +12,10 @@ locals {
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
+    enable_azure_sas_token                       = true
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
+    enable_hmpps_domain                          = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
@@ -39,21 +41,9 @@ locals {
       retention_in_days = 30
     }
   }
-  baseline_cloudwatch_log_metric_filters = {
-    iwfm-scheduler-service-started = {
-      pattern        = "%iWFM Scheduler.+service started%"
-      log_group_name = "cwagent-windows-application"
-
-      metric_transformation = {
-        name         = "iWFMSchedulerServiceStarted"
-        namespace    = "CSR"
-        value        = 1
-        defaultValue = 0
-      }
-    }
-  }
-  baseline_ec2_autoscaling_groups = {}
-  baseline_ec2_instances          = {}
+  baseline_cloudwatch_log_metric_filters = {}
+  baseline_ec2_autoscaling_groups        = {}
+  baseline_ec2_instances                 = {}
   baseline_iam_policies = {
     CSRWebServerPolicy = {
       description = "Policy allowing access to instances via the Serial Console"

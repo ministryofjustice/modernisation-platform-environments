@@ -19,7 +19,8 @@ locals {
     }
     cloudwatch_metric_alarms = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
     )
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
   }
@@ -35,7 +36,7 @@ locals {
 
   defaults_app_ec2 = merge(local.defaults_ec2, {
     instance = merge(local.defaults_ec2.instance, {
-      vpc_security_group_ids = ["domain", "app", "jumpserver"]
+      vpc_security_group_ids = ["domain", "app", "jumpserver", "remotedesktop_sessionhost"]
     })
     tags = merge(local.defaults_ec2.tags, {
       component = "app"
@@ -44,7 +45,7 @@ locals {
 
   defaults_web_ec2 = merge(local.defaults_ec2, {
     instance = merge(local.defaults_ec2.instance, {
-      vpc_security_group_ids = ["domain", "web", "jumpserver"]
+      vpc_security_group_ids = ["domain", "web", "jumpserver", "remotedesktop_sessionhost"]
     })
     tags = merge(local.defaults_ec2.tags, {
       component = "web"

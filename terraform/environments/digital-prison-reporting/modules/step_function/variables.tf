@@ -21,7 +21,7 @@ variable "step_function_name" {
 
 variable "dms_task_time_out" {
   description = "(Optional) The duration after which the DMS load step is deemed to have failed."
-  default     = 18000 # 5 hours
+  default     = 86400 # 24 hours
   type        = number
 }
 
@@ -33,4 +33,10 @@ variable "additional_policies" {
   description = "(Optional) The list of Policies used for this Step Function."
   type        = list(any)
   default     = []
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Key-value map of resource tags."
 }

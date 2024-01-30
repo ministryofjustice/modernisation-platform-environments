@@ -1,5 +1,12 @@
 # environment specific settings
 locals {
+
+  # baseline presets config
+  test_baseline_presets_options = {
+    enable_observability_platform_monitoring = true
+  }
+
+  # baseline config
   test_config = {
 
     ec2_common = {
@@ -7,28 +14,10 @@ locals {
       patch_day                 = "TUE"
     }
 
-    baseline_s3_buckets = {
-    }
+    baseline_s3_buckets     = {}
+    baseline_ssm_parameters = {}
 
-    baseline_ssm_parameters = {
-      "/oracle/database/T1OASYS"  = local.database_ssm_parameters
-      "/oracle/database/T1OASREP" = local.database_ssm_parameters
-      "/oracle/database/T1AZBIPI" = local.database_ssm_parameters
-      "/oracle/database/T1MISTRN" = local.database_ssm_parameters
-      "/oracle/database/T1ONRSYS" = local.database_ssm_parameters
-      "/oracle/database/T1ONRAUD" = local.database_ssm_parameters
-      "/oracle/database/T1ONRBDS" = local.database_ssm_parameters
-
-      "/oracle/database/T2OASYS"  = local.database_ssm_parameters
-      "/oracle/database/T2OASREP" = local.database_ssm_parameters
-      "/oracle/database/T2AZBIPI" = local.database_ssm_parameters
-      "/oracle/database/T2MISTRN" = local.database_ssm_parameters
-      "/oracle/database/T2ONRSYS" = local.database_ssm_parameters
-      "/oracle/database/T2ONRAUD" = local.database_ssm_parameters
-      "/oracle/database/T2ONRBDS" = local.database_ssm_parameters
-    }
     baseline_secretsmanager_secrets = {
-      # NEW
       "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_oasys_db
       "/oracle/database/T1OASREP" = local.secretsmanager_secrets_db
       "/oracle/database/T1AZBIPI" = local.secretsmanager_secrets_bip_db
@@ -49,41 +38,37 @@ locals {
 
       "/oracle/bip/t1" = local.secretsmanager_secrets_bip
       "/oracle/bip/t2" = local.secretsmanager_secrets_bip
-
-      # OLD AND WILL BE REPLACED
-
-      "/database/t1/T1OASYS" = {
-        secrets = {
-          apex_listenerpassword    = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-          apex_public_userpassword = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-          apex_rest_publicpassword = {} # move to /oracle/database/T1OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-        }
-      }
-      "/database/t2/T2OASYS" = {
-        secrets = {
-          apex_listenerpassword    = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-          apex_public_userpassword = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-          apex_rest_publicpassword = {} # move to /oracle/database/T2OASYS/apex-passwords {listener: ___ , (find the name of public user): ___ , rest_public: ___}
-        }
-      }
-      "/database/t2-oasys-db-a/T2BIPINF" = {
-        secrets = {
-          systempassword = {} # -> /oracle/database/T2BIPINF/bip-passwords { sys: ___ }
-        }
-      }
-      "/weblogic/test-oasys-bip-b" = {
-        secrets = {
-          admin_password     = {} # -> /oracle/bip/t2/passwords { weblogic: admin_pass }
-          admin_username     = {} # just have in ansible defaults , username is always weblogic
-          biplatformpassword = {} # ->  /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
-          db_username        = {} # put in ansible defaults
-          mdspassword        = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
-          syspassword        = {} # -> /oracle/database/T2AZBIPI/bip-passwords { biplatform: ___ , mdspassword : ___ , sys: ___ }
-        }
-      }
     }
 
     baseline_iam_policies = {
+      Ec2T2WebPolicy = {
+        description = "Permissions required for T2 Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2OASYS/apex-passwords*",
+            ]
+          }
+        ]
+      }
+      Ec2T1WebPolicy = {
+        description = "Permissions required for T1 Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1OASYS/apex-passwords*",
+            ]
+          }
+        ]
+      }
       Ec2T2BipPolicy = {
         description = "Permissions required for T2 Bip EC2s"
         statements = [
@@ -173,25 +158,46 @@ locals {
       ## T2
       ##
       "t2-${local.application_name}-db-a" = merge(local.database_a, {
+        instance = merge(local.database_a.instance, {
+          instance_type = "r6i.xlarge"
+        })
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2T2DatabasePolicy",
           ])
         })
-        tags = merge(local.database_a.tags, {
-          description                             = "t2 ${local.application_name} database"
-          "${local.application_name}-environment" = "t2"
-          bip-db-name                             = "T2BIPINF"
-          instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
-        })
-      })
-      "t2-${local.application_name}-db-a-3" = merge(local.database_a, {
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "oracle_psu_patching"
-          })
-        })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdf" = { # DATA02
+            label = "data"
+            size  = 50
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 50
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
         tags = merge(local.database_a.tags, {
           description                             = "t2 ${local.application_name} database"
           "${local.application_name}-environment" = "t2"
@@ -217,11 +223,11 @@ locals {
         #   })
         # })
         tags = merge(local.bip_a.tags, {
-          oasys-environment   = "t2"
-          bip-db-name         = "T2BIPINF"
-          bip-db-hostname     = "t2-oasys-db-a"
-          oasys-db-name       = "T2OASYS"
-          oasys-db-hostname   = "t2-oasys-db-a"
+          oasys-environment = "t2"
+          bip-db-name       = "T2BIPINF"
+          bip-db-hostname   = "t2-oasys-db-a"
+          oasys-db-name     = "T2OASYS"
+          oasys-db-hostname = "t2-oasys-db-a"
         })
       })
 
@@ -234,6 +240,41 @@ locals {
             "Ec2T1DatabasePolicy",
           ])
         })
+        instance = merge(local.database_a.instance, {
+          instance_type = "r6i.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdf" = { # DATA02
+            label = "data"
+            size  = 50
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 50
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
         tags = merge(local.database_a.tags, {
           description                             = "t1 ${local.application_name} database"
           "${local.application_name}-environment" = "t1"
@@ -259,11 +300,11 @@ locals {
         #   })
         # })
         tags = merge(local.bip_b.tags, {
-          oasys-environment   = "t1"
-          bip-db-name         = "T1BIPINF"
-          bip-db-hostname     = "t1-oasys-db-a"
-          oasys-db-name       = "T1OASYS"
-          oasys-db-hostname   = "t1-oasys-db-a"
+          oasys-environment = "t1"
+          bip-db-name       = "T1BIPINF"
+          bip-db-hostname   = "t1-oasys-db-a"
+          oasys-db-name     = "T1OASYS"
+          oasys-db-hostname = "t1-oasys-db-a"
         })
       })
 
@@ -302,6 +343,9 @@ locals {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2T2WebPolicy",
+          ])
         })
         tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
@@ -315,17 +359,21 @@ locals {
       #     ami_name                  = "oasys_webserver_release_*"
       #     ssm_parameters_prefix     = "ec2-web-t2/"
       #     iam_resource_names_prefix = "ec2-web-t2"
+      #     instance_profile_policies = concat(local.webserver_b.config.instance_profile_policies, [
+      #       "Ec2T2WebPolicy",
+      #     ])
       #   })
       #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "oasys/web-index-html-updation"
+      #       branch = "ords_parameter_file_update"
       #     })
       #   })
-      #   autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
+      #   #autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
       #   tags = merge(local.webserver_a.tags, {
       #     description                             = "t2 ${local.application_name} web"
       #     "${local.application_name}-environment" = "t2"
       #     oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+      #     oracle-db-sid                           = "T2OASYS" # for each env using azure DB will need to be OASPROD
       #   })
       # })
 
@@ -337,6 +385,9 @@ locals {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t1/"
           iam_resource_names_prefix = "ec2-web-t1"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2T1WebPolicy",
+          ])
         })
         tags = merge(local.webserver_a.tags, {
           description                             = "t1 ${local.application_name} web"
@@ -345,6 +396,28 @@ locals {
           oracle-db-sid                           = "T1OASYS" # for each env using azure DB will need to be OASPROD
         })
       })
+
+      # "t1-${local.application_name}-web-b" = merge(local.webserver_b, {
+      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #     ami_name                  = "oasys_webserver_release_*"
+      #     ssm_parameters_prefix     = "ec2-web-t1/"
+      #     iam_resource_names_prefix = "ec2-web-t1"
+      #     instance_profile_policies = concat(local.webserver_b.config.instance_profile_policies, [
+      #       "Ec2T1WebPolicy",
+      #     ])
+      #   })
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "ords_parameter_file_update"
+      #     })
+      #   })
+      #   tags = merge(local.webserver_b.tags, {
+      #     description                             = "t1 ${local.application_name} web"
+      #     "${local.application_name}-environment" = "t1"
+      #     oracle-db-hostname                      = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
+      #     oracle-db-sid                           = "T1OASYS" # for each env using azure DB will need to be OASPROD
+      #   })
+      # })
 
       ##
       ## test
@@ -357,9 +430,6 @@ locals {
       #     oracle-db-name       = "T2BIPINF"
       #   })
       # })
-
-
-
     }
 
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
@@ -588,6 +658,7 @@ locals {
       }
     }
 
+
     # The following zones can be found on azure:
     # az.justice.gov.uk
     # oasys.service.justice.gov.uk
@@ -597,8 +668,8 @@ locals {
       #
       # "${local.application_name}.service.justice.gov.uk" = {
       #   lb_alias_records = [
-      # { name = "t2", type = "A", lbs_map_key = "public" }, # t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
-      # { name = "db.t2", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+      # { name = "t2",    type = "A", lbs_map_key = "public" }, #    t2.oasys.service.justice.gov.uk 
+      # { name = "db.t2", type = "A", lbs_map_key = "public" }, # db.t2.oasys.service.justice.gov.uk
       #   ]
       # }
       # "t1.${local.application_name}.service.justice.gov.uk" = {

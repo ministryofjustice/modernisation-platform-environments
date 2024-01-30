@@ -69,6 +69,8 @@ locals {
   reporting_hub_batch_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_batch_job_num_workers
   reporting_hub_batch_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_batch_job_log_level
 
+  reporting_hub_batch_job_schema_cache_max_size = local.application_data.accounts[local.environment].reporting_hub_batch_job_schema_cache_max_size
+
   reporting_hub_batch_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_attempts
   reporting_hub_batch_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_min_wait_millis
   reporting_hub_batch_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_wait_millis
@@ -77,6 +79,8 @@ locals {
   reporting_hub_cdc_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_cdc_job_worker_type
   reporting_hub_cdc_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_cdc_job_num_workers
   reporting_hub_cdc_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_cdc_job_log_level
+
+  reporting_hub_cdc_job_schema_cache_max_size = local.application_data.accounts[local.environment].reporting_hub_cdc_job_schema_cache_max_size
 
   reporting_hub_cdc_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_max_attempts
   reporting_hub_cdc_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_min_wait_millis
@@ -139,6 +143,9 @@ locals {
   retention_domain_job_num_workers = local.application_data.accounts[local.environment].retention_domain_job_num_workers
   retention_domain_job_log_level   = local.application_data.accounts[local.environment].retention_domain_job_log_level
   retention_domain_job_schedule    = local.application_data.accounts[local.environment].retention_domain_job_schedule
+
+  # Hive Table Creation Job
+  hive_table_creation_job_schema_cache_max_size = local.application_data.accounts[local.environment].hive_table_creation_job_schema_cache_max_size
 
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
@@ -215,7 +222,7 @@ locals {
 
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
-  # s3 transfer lambda
+  # s3 transfer
   enable_s3_file_transfer_lambda         = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda
   s3_file_transfer_lambda_name           = "${local.project}-s3-file-transfer"
   s3_file_transfer_lambda_handler        = "uk.gov.justice.digital.lambda.S3FileTransferLambda::handleRequest"
@@ -223,9 +230,9 @@ locals {
   s3_file_transfer_lambda_runtime        = "java11"
   s3_file_transfer_lambda_tracing        = "Active"
 
-  scheduled_s3_file_transfer_lambda_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_lambda_retention_days
-  scheduled_s3_file_transfer_lambda_schedule       = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_lambda_schedule
-  enable_s3_file_transfer_lambda_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda_trigger
+  scheduled_s3_file_transfer_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_days
+  scheduled_s3_file_transfer_schedule       = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_schedule
+  enable_s3_file_transfer_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_trigger
 
   s3_file_transfer_lambda_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",

@@ -1,3 +1,7 @@
+data "aws_prometheus_workspaces" "observability_platform" {
+  alias_prefix = "observability-platform"
+}
+
 data "aws_iam_policy_document" "aps" {
   statement {
     sid    = "AllowRemoteWrite"
@@ -8,7 +12,7 @@ data "aws_iam_policy_document" "aps" {
       "aps:GetLabels",
       "aps:GetMetricMetadata"
     ]
-    resources = [var.prometheus_workspace_arn]
+    resources = [one(data.aws_prometheus_workspaces.observability_platform.arns)]
   }
 }
 

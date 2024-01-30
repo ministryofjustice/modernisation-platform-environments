@@ -41,3 +41,60 @@ data "aws_iam_policy_document" "datahub" {
     resources = formatlist("arn:aws:iam::%s:role/${local.environment_configuration.datahub_role}", local.environment_configuration.datahub_target_accounts)
   }
 }
+
+data "aws_availability_zones" "available" {}
+
+data "aws_iam_roles" "eks_sso_access_role" {
+  name_regex  = "AWSReservedSSO_${local.environment_configuration.eks_sso_access_role}_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+##################################################
+# Data Platform Apps and Tools Route 53
+##################################################
+
+data "aws_route53_zone" "apps_tools" {
+  name         = local.environment_configuration.route53_zone
+  private_zone = false
+}
+
+##################################################
+# Data Platform Apps and Tools Airflow S3
+##################################################
+
+data "aws_s3_bucket" "airflow" {
+  bucket = local.environment_configuration.airflow_s3_bucket
+}
+
+##################################################
+# Data Platform Apps and Tools IAM
+##################################################
+
+
+
+##################################################
+# Data Platform Apps and Tools Open Metadata
+##################################################
+
+data "aws_secretsmanager_secret_version" "openmetadata_entra_id_client_id" {
+  secret_id = "openmetadata/entra-id/client-id"
+}
+
+data "aws_secretsmanager_secret_version" "openmetadata_entra_id_tenant_id" {
+  secret_id = "openmetadata/entra-id/tenant-id"
+}
+
+##################################################
+# Data Platform Apps and Tools JML
+##################################################
+
+data "aws_secretsmanager_secret_version" "govuk_notify_api_key" {
+  count = terraform.workspace == "data-platform-apps-and-tools-production" ? 1 : 0
+
+  secret_id = aws_secretsmanager_secret.govuk_notify_api_key[0].id
+}
+
+data "aws_secretsmanager_secret_version" "jml_email" {
+  count = terraform.workspace == "data-platform-apps-and-tools-production" ? 1 : 0
+
+  secret_id = aws_secretsmanager_secret.jml_email[0].id
+}

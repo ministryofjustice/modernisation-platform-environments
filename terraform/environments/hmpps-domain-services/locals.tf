@@ -2,23 +2,29 @@ locals {
   business_unit = var.networking[0].business-unit
   region        = "eu-west-2"
 
+  environment_baseline_presets_options = {
+    development   = local.development_baseline_presets_options
+    test          = local.test_baseline_presets_options
+    preproduction = local.preproduction_baseline_presets_options
+    production    = local.production_baseline_presets_options
+  }
   environment_configs = {
     development   = local.development_config
     test          = local.test_config
     preproduction = local.preproduction_config
     production    = local.production_config
   }
-  baseline_environment_config = local.environment_configs[local.environment]
+  baseline_environment_presets_options = local.environment_baseline_presets_options[local.environment]
+  baseline_environment_config          = local.environment_configs[local.environment]
 
   baseline_presets_options = {
-    enable_application_environment_wildcard_cert = true
+    enable_application_environment_wildcard_cert = false
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
+    enable_hmpps_domain                          = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
-    enable_oracle_secure_web                     = false
-    enable_ec2_put_parameter                     = false
     enable_ec2_user_keypair                      = true
     enable_shared_s3                             = false # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = false # adds db backup buckets
@@ -67,22 +73,7 @@ locals {
   }
 
   baseline_secretsmanager_secrets = {}
-
-  baseline_security_groups = {
-    private-dc    = local.security_groups.private_dc
-    load-balancer = local.security_groups.load-balancer
-  }
-
-  baseline_sns_topics     = {}
-  baseline_ssm_parameters = {}
-
-  fsx_environment_config = {
-    common = {
-      environment_name = local.environment
-      subnet_ids       = local.subnet_set
-      tags             = local.tags
-      vpc_id           = local.vpc_all
-      region           = local.region
-    }
-  }
+  baseline_security_groups        = local.security_groups
+  baseline_sns_topics             = {}
+  baseline_ssm_parameters         = {}
 }

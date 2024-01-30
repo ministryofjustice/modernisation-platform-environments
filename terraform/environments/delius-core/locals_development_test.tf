@@ -6,6 +6,7 @@ locals {
   account_config_test = {
     shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
     private_subnet_ids            = data.aws_subnets.shared-private.ids
+    ordered_private_subnet_ids    = local.ordered_subnet_ids
     public_subnet_ids             = data.aws_subnets.shared-public.ids
     data_subnet_ids               = data.aws_subnets.shared-data.ids
     data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
@@ -14,7 +15,6 @@ locals {
     route53_external_zone         = data.aws_route53_zone.external
     general_shared_kms_key_arn    = data.aws_kms_key.general_shared.arn
     shared_vpc_id                 = data.aws_vpc.shared.id
-    bastion                       = module.bastion_linux
     kms_keys = {
       ebs_shared     = data.aws_kms_key.ebs_shared.arn
       general_shared = data.aws_kms_key.general_shared.arn
@@ -30,14 +30,15 @@ locals {
   }
 
   ldap_config_test = {
-    name                         = try(local.ldap_config_lower_environments.name, "ldap")
-    migration_source_account_id  = local.ldap_config_lower_environments.migration_source_account_id
-    migration_lambda_role        = local.ldap_config_lower_environments.migration_lambda_role
-    efs_throughput_mode          = local.ldap_config_lower_environments.efs_throughput_mode
-    efs_provisioned_throughput   = local.ldap_config_lower_environments.efs_provisioned_throughput
-    efs_backup_schedule          = "cron(0 19 * * ? *)",
-    efs_backup_retention_period  = "30"
-    efs_datasync_destination_arn = null
+    name                        = try(local.ldap_config_lower_environments.name, "ldap")
+    encrypted                   = true
+    migration_source_account_id = local.ldap_config_lower_environments.migration_source_account_id
+    migration_lambda_role       = local.ldap_config_lower_environments.migration_lambda_role
+    efs_throughput_mode         = local.ldap_config_lower_environments.efs_throughput_mode
+    efs_provisioned_throughput  = local.ldap_config_lower_environments.efs_provisioned_throughput
+    efs_backup_schedule         = "cron(0 19 * * ? *)",
+    efs_backup_retention_period = "30"
+    port                        = 389
   }
 
   db_config_test = [{
@@ -144,6 +145,14 @@ locals {
     db_image_tag                  = "5.7.4"
     db_port                       = 1521
     db_name                       = "MODNDA"
+  }
+
+
+  bastion_config_test = {
+    business_unit           = local.vpc_name
+    subnet_set              = local.subnet_set
+    environment             = local.environment
+    extra_user_data_content = "yum install -y openldap-clients"
   }
 
   delius_db_container_config_test = {
