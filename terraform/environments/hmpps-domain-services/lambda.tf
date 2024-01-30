@@ -58,14 +58,14 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
 }
 
 resource "aws_iam_role" "lambda-ad-role" {
-  name = "LambdaFunctionADCleanUp"
+  name = "LambdaFunctionADObjectCleanUp"
   tags = local.tags
 
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
-  role       = aws_iam_role.lambda-vpc-role.name
+  role       = aws_iam_role.lambda-ad-role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
