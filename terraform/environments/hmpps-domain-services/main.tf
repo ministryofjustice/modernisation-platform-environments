@@ -160,7 +160,7 @@ module "baseline" {
 }
 
 module "fsx" {
-  source = "./modules/fsx"
+  source = "../../modules/fsx"
 
   common = {
     environment_name = local.environment
