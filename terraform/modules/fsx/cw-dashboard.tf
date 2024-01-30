@@ -3,7 +3,7 @@ data "template_file" "fsx_dashboard" {
   template = file("${path.module}/files/fsx_dashboard.json")
   vars = {
     region       = var.common.region
-    filesystemid = aws_fsx_windows_file_system.fsx.id
+    filesystemid = aws_fsx_windows_file_system.this.id
   }
 }
 
