@@ -22,6 +22,8 @@ tasks:
 
           Write-Host "instance: $instance"
 
+          New-Item -Type File -Path "C:\Temp\instanceinfo.txt" -Force 
+
           Add-Content -Path "C:\Temp\instanceinfo.txt" -Value $instance
 
       - frequency: once
@@ -31,6 +33,11 @@ tasks:
           # Install AWS PowerShell module if not already installed
           if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
             Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
+          }
+
+          # Create a file to track the status of the user data script
+          if (-Not (Test-Path -Path "C:\Temp\user_data_status.txt")) {
+            New-Item -Type File -Path "C:\Temp\user_data_status.txt" -Force
           }
 
           Function Get-SSMAgentStatus {
@@ -52,6 +59,10 @@ tasks:
             $Parameters = $SSMDocumentObject.$DocumentName
 
             $instanceId = Get-EC2InstanceMetadata -Category InstanceId
+
+            Add-Content -Path "C:\Temp\user_data_status.txt" -Value "Executing SSM Document $DocumentName with parameters $Parameters. $(Get-Date)"
+
+            Add-Content -Path "C:\Temp\user_data_status.txt" -Value "Executing on instance $instanceId. $(Get-Date)"
 
             $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $DocumentName -Parameter $Parameters -Force
             Write-Host "Executed SSM command with Command ID: $($commandId.CommandId)"
@@ -81,7 +92,7 @@ tasks:
           #     # Param2 = "Value2"
           #   }
           # }            
-          #) 
+          #)
 
           # Main loop to wait for SSM Agent to be running & run multiple ssm docs with parameters
           do {
