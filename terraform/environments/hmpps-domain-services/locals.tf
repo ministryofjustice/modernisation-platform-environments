@@ -84,5 +84,7 @@ locals {
     vpc_id           = local.vpc_all
     region           = local.region
   }
-  fsx_parameters = {}
+  fsx_parameters = {
+    environment_name = local.environment
+  }
 }
