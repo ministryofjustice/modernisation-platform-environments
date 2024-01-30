@@ -280,7 +280,7 @@ resource "aws_ecs_task_definition" "maat_task_definition" {
     maat_cma_url                = local.application_data.accounts[local.environment].maat_cma_url
     ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
     }
-  ))  
+  )
 
   tags = merge(
     local.tags,
