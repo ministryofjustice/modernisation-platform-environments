@@ -1,14 +1,8 @@
 ---
 schemaVersion: "2.2"
-description: "SSM Document for joining Windows EC2 instances to the hmpp noms domain. Moving Computers to a different OU must be done manually on the relevant domain controller."
-parameters:
-  newHostname:
-    type: "String"
-    description: "By default uses the Name tag. Otherwise set to keep-existing or the desired hostname 15 chars or less"
-    default: "tag:Name"
-    maxChars: 15
+description: "SSM Document for removing Windows EC2 instances from hmpp noms domain."
 mainSteps:
-  - name: WindowsDomainJoin
+  - name: WindowsDomainLeave
     action: aws:runPowerShellScript
     precondition:
       StringEquals:
@@ -18,7 +12,6 @@ mainSteps:
       runCommand:
         - |
           $ErrorActionPreference = "Stop" # all errors will terminate the script
-          $newHostname = "{{newHostname}}"
 
           # Lookup domain configuration based on environment-name tag
           $token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
@@ -45,13 +38,13 @@ mainSteps:
           # Check if already domain joined
           If ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) {
             $existingDomain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
-            if ($existingDomain -Eq $domainNameFQDN) {
-              Write-Output "Joined to domain $domainNameFQDN"
-              Exit 0
-            } Else {
+            if ($existingDomain -Ne $domainNameFQDN) {
               Write-Error "Joined to a different domain $existingDomain. Expected $domainNameFQDN"
               Exit 1
             }
+          } Else {
+            Write-Output "Unjoined from domain"
+            Exit 0
           }
 
           # Install powershell features if missing
@@ -83,19 +76,7 @@ mainSteps:
           $domainJoinPasswordSecureString = ConvertTo-SecureString $secretValue.$domainJoinUsername -AsPlainText -Force
           $credentials = New-Object System.Management.Automation.PSCredential ("$domainNameNetbios\$domainJoinUsername", $domainJoinPasswordSecureString)
 
-          #Rename host
-          If ($newHostname -Eq "tag:Name") {
-            $newHostname = ($tags.Tags | Where-Object  {$_.Key -eq "Name"}).Value
-          } ElseIf ($newHostname -Eq "keep-existing") {
-            $newHostname = $env:COMPUTERNAME
-          }
-          If ($newHostname -Ne $env:COMPUTERNAME) {
-            Write-Host "INFO: Renaming EC2 instance to $newHostname and then rebooting"
-            Rename-Computer -NewName $newHostname -Force
-            Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot
-          }
-
-          # Join the domain
-          Write-Host "INFO: Joining $env:COMPUTERNAME to $domainNameFQDN domain and rebooting"
-          Add-Computer -DomainName $domainNameFQDN -Credential $credentials -Verbose -Force
+          # Leave the domain
+          Write-Host "INFO: Removing $env:COMPUTERNAME from $domainNameFQDN domain and rebooting"
+          Remove-Computer -Credential $credentials -Verbose -Force
           Exit 3010 # Exit code 3010 means reboot required, ssm document will continue after reboot
