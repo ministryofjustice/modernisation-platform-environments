@@ -204,7 +204,7 @@
             },
             {
                 "name": "APP_CAA_BASE_URL",
-                "value": "${maat_caa_url}"
+                "value": "${maat_caa_base_url}"
             },
             {
                 "name": "APP_CMA_BASE_URL",
