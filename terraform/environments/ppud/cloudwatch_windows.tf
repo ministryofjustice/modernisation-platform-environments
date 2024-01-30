@@ -311,7 +311,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Started" {
   metric_transformation {
     name      = "MalwareScan-Started"
     namespace = "WindowsDefender"
-    value     = "0"
+    value     = "1"
   }
 }
 
@@ -323,7 +323,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Finished" {
   metric_transformation {
     name      = "MalwareScan-Finished"
     namespace = "WindowsDefender"
-    value     = "0"
+    value     = "1"
   }
 }
 
@@ -335,7 +335,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Stopped" {
   metric_transformation {
     name      = "MalwareScan-Stopped"
     namespace = "WindowsDefender"
-    value     = "0"
+    value     = "1"
   }
 }
 
@@ -347,7 +347,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Failed" {
   metric_transformation {
     name      = "MalwareScan-Failed"
     namespace = "WindowsDefender"
-    value     = "0"
+    value     = "1"
   }
 }
 
@@ -359,7 +359,7 @@ resource "aws_cloudwatch_log_metric_filter" "Malware-Detected" {
   metric_transformation {
     name      = "Malware-Detected"
     namespace = "WindowsDefender"
-    value     = "0"
+    value     = "1"
   }
 }
 
@@ -371,7 +371,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareBehavior-Detected" {
   metric_transformation {
     name      = "MalwareBehavior-Detected"
     namespace = "WindowsDefender"
-    value     = "0"
+    value     = "1"
   }
 }
 
@@ -383,7 +383,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareState-Detected" {
   metric_transformation {
     name      = "MalwareState-Detected"
     namespace = "WindowsDefender"
-    value     = "0"
+    value     = "1"
   }
 }
 
@@ -395,7 +395,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareSignatureUpdate-Failed" {
   metric_transformation {
     name      = "MalwareSignatureUpdate-Failed"
     namespace = "WindowsDefender"
-    value     = "0"
+    value     = "1"
   }
 }
 
@@ -407,7 +407,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineUpdate-Failed" {
   metric_transformation {
     name      = "MalwareEngineUpdate-Failed"
     namespace = "WindowsDefender"
-    value     = "0"
+    value     = "1"
   }
 }
 
@@ -419,6 +419,6 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineUpdate-OutofDate" {
   metric_transformation {
     name      = "MalwareEngineUpdate-OutofDate"
     namespace = "WindowsDefender"
-    value     = "0"
+    value     = "1"
   }
 }
