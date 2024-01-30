@@ -9,7 +9,7 @@ resource "aws_fsx_windows_file_system" "this" {
   security_group_ids                = [aws_security_group.fsx.id]
   deployment_type                   = var.fsx.deployment_type
   #fsx_admin_password                = var.fsx.fsx_admin_password # FSx admin password
-  kms_key_id                        = var.common.kms_key_id 
+  #kms_key_id                        = var.common.kms_key_id 
 
   tags = merge(
     var.common.tags,
