@@ -9,6 +9,25 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
+          # Get EC2 Instance facts
+          if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
+            Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
+          }
+
+          $instanceId = Get-EC2InstanceMetadata -Category InstanceId
+
+          Write-Host "instanceId: $instanceId"
+
+          $instance = (Get-EC2Instance -InstanceId $instanceId).Instance
+
+          Write-Host "instance: $instance"
+
+          Add-Content -Path "C:\Temp\instanceinfo.txt" -Value $instance
+
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
           # Install AWS PowerShell module if not already installed
           if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
             Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
