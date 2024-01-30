@@ -18,14 +18,25 @@ tasks:
 
           Write-Host "instanceId: $instanceId"
 
-          $instance = (Get-EC2Instance -InstanceId $instanceId).Instance
+          $instance = Get-EC2Instance -InstanceId $instanceId | Select-Object -ExpandProperty Instances
 
           Write-Host "instance: $instance"
 
           New-Item -Type File -Path "C:\Temp\instanceinfo.txt" -Force 
 
-          Add-Content -Path "C:\Temp\instanceinfo.txt" -Value $instance
+          $instanceJson = $instance | ConvertTo-Json -Depth 10
 
+          Add-Content -Path "C:\Temp\instanceinfo.txt" -Value $instanceJson
+
+          $TagName = ( $instance.Tag | Where-Object { $_.Key -eq "Name"} ).Value
+
+          Add-Content -Path "C:\Temp\instanceinfo.txt" -Value "TagName: $TagName"
+      - frequency: always
+        type: powershell
+        runAs: admin
+        content: |-
+          # Are previously available values available?
+          Add-Content -Path "C:\Temp\instanceinfo.txt" -Value "TagName_two: $TagName"
       - frequency: once
         type: powershell
         runAs: admin
@@ -60,7 +71,7 @@ tasks:
 
             $instanceId = Get-EC2InstanceMetadata -Category InstanceId
 
-            Add-Content -Path "C:\Temp\user_data_status.txt" -Value "Executing SSM Document $DocumentName with parameters $Parameters. $(Get-Date)"
+            Add-Content -Path "C:\Temp\user_data_status.txt" -Value "Executing SSM Document $DocumentName with newHostname $Parameters.newHostname $(Get-Date)"
 
             Add-Content -Path "C:\Temp\user_data_status.txt" -Value "Executing on instance $instanceId. $(Get-Date)"
 
