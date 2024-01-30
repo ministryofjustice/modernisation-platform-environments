@@ -32,10 +32,10 @@ resource "aws_instance" "db_ec2" {
   }
 
   dynamic "ephemeral_block_device" {
-    for_each = { for k, v in var.ebs_volumes.ebs_non_root_volumes : k => v if v.no_device == true }
+    for_each = var.ebs_volumes.ebs_non_root_volumes
     content {
       device_name = ephemeral_block_device.key
-      no_device   = true
+      no_device   = ephemeral_block_device.value.no_device
     }
   }
   tags = merge(var.tags,
