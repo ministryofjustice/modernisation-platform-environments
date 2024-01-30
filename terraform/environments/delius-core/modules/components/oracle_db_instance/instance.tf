@@ -31,13 +31,14 @@ resource "aws_instance" "db_ec2" {
     tags        = var.tags
   }
 
-  dynamic "ephemeral_block_device" {
-    for_each = var.ebs_volumes.ebs_non_root_volumes
-    content {
-      device_name = ephemeral_block_device.key
-      no_device   = ephemeral_block_device.value.no_device
-    }
-  }
+  # dynamic "ephemeral_block_device" {
+  #   for_each = var.ebs_volumes.ebs_non_root_volumes
+  #   content {
+  #     device_name = ephemeral_block_device.key
+  #     no_device   = ephemeral_block_device.value.no_device
+  #   }
+  # }
+
   tags = merge(var.tags,
     { Name = lower(format("%s-delius-db-%s", var.env_name, local.instance_name_index)) },
     { server-type = "delius_core_db" },
