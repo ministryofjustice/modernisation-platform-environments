@@ -72,7 +72,8 @@
       "maat_cma_base_url": "https://laa-crime-means-assessment-dev.apps.live.cloud-platform.service.justice.gov.uk",
       "maat_aws_logs_group": "MAAT-ECS",
       "maat_aws_stream_prefix": "MAAT-app",
-      "SSM_managed_core_policy_arn": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      "SSM_managed_core_policy_arn": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+      "ext_lb_enable_deletion_protection": "false"
     },
     "test": {
       "example_var": "test-data",
@@ -102,7 +103,8 @@
       "ecs_memory": 3072,
       "ecs_container_cpu": 922,
       "ecs_container_memory": 2816,
-      "pagerduty_integration_key_name": "laa_maat_api_prod_alarms"
+      "pagerduty_integration_key_name": "laa_maat_api_prod_alarms",
+      "ext_lb_enable_deletion_protection": "true"
     }
   }
 }
