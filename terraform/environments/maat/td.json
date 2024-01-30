@@ -169,7 +169,7 @@
             },
             {
                 "name": "SENTRY_ENVIRONMENT",
-                "value": "${sentry_env}"
+                "value": "development"
             },
             {
                 "name": "APP_ORCH_ENDPOINT",

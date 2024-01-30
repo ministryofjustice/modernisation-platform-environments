@@ -263,7 +263,7 @@ resource "aws_ecs_task_definition" "maat_task_definition" {
   container_definitions = templatefile("td.json", {
     docker_image_tag            = local.application_data.accounts[local.environment].docker_image_tag
     region                      = local.application_data.accounts[local.environment].region
-    sentry_env                  = local.environment
+    # sentry_env                  = local.environment
     maat_orch_base_url          = local.application_data.accounts[local.environment].maat_orch_base_url
     maat_ccp_base_url           = local.application_data.accounts[local.environment].maat_ccp_base_url
     maat_orch_oauth_url         = local.application_data.accounts[local.environment].maat_orch_oauth_url
