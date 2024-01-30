@@ -46,11 +46,11 @@ data "aws_iam_policy_document" "civica_transfer_user" {
 # Set the public ssh key for the supplier user profile to access SFTP server.
 #------------------------------------------------------------------------------
 
-# resource "aws_transfer_ssh_key" "civica_ssh_key" {
-#   server_id = aws_transfer_server.civica.id
-#   user_name = aws_transfer_user.civica.user_name
-#   body      = ""
-# }
+resource "aws_transfer_ssh_key" "civica_ssh_key" {
+  server_id = aws_transfer_server.civica.id
+  user_name = aws_transfer_user.civica.user_name
+  body      = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBCJBwZM5nMigS31soM45PITAHCmyhQpdDAkdX1liqnIZSd8A+zn3XQyVRy5E2a39gfsng5hAQetDFJKn+SaayATCQAzN0cJWlcrvtv314UsRV+PxO236sWVf+RwguUDZRQ=="
+}
 
 #------------------------------------------------------------------------------
 # AWS security group 
@@ -64,11 +64,11 @@ resource "aws_security_group" "civica" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "civica_ip_1" {
-#   security_group_id = aws_security_group.civica.id
+resource "aws_vpc_security_group_ingress_rule" "civica_ip_1" {
+  security_group_id = aws_security_group.civica.id
 
-#   cidr_ipv4   = ""
-#   ip_protocol = "tcp"
-#   from_port   = 2222
-#   to_port     = 2222
-# }
+  cidr_ipv4   = "20.0.26.153"
+  ip_protocol = "tcp"
+  from_port   = 2222
+  to_port     = 2222
+}
