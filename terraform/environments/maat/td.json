@@ -4,7 +4,6 @@
         "image": "${ecr_url}:xray-daemon",
         "cpu": 32,
         "memory": 256,
-        "links": [],
         "portMappings": [
             {
                 "containerPort": 2000,
@@ -169,7 +168,7 @@
             },
             {
                 "name": "SENTRY_ENVIRONMENT",
-                "value": "development"
+                "value": "${sentry_env}"
             },
             {
                 "name": "APP_ORCH_ENDPOINT",
