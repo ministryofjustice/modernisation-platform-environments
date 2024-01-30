@@ -20,9 +20,8 @@ module "ad-clean-up-lambda" {
   lambda_role            = aws_iam_role.lambda-ad-role.arn
 
   vpc_subnet_ids         = data.aws_subnets.shared-private
-  vpc_security_group_ids = locals.security_groups.domain
+  vpc_security_group_ids = local.security_groups.domain
 
-# need to think about this - the trigger will be cloudwatch events from multiple accounts
 #   allowed_triggers = {
 
 #     AllowExecutionFromCloudWatch = {
@@ -58,7 +57,7 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
   }
 }
 
-resource "aws_iam_role" "lambda-ad-cleanup" {
+resource "aws_iam_role" "lambda-ad-role" {
   name = "LambdaFunctionADCleanUp"
   tags = local.tags
 
