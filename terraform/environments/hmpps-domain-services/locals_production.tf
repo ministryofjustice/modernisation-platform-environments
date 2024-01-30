@@ -79,7 +79,7 @@ locals {
       })
       pd-rds-1-b = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
-          availability_zone = "eu-west-2a"
+          availability_zone = "eu-west-2b"
         })
         tags = merge(local.rds_ec2_instance.tags, {
           description = "Remote Desktop Services for hmpp.noms.root domain"
