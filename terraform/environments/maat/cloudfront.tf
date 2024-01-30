@@ -157,8 +157,8 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 resource "aws_cloudfront_distribution" "external" {
   http_version = "http2"
   origin {
-    domain_name = aws_lb.loadbalancer.dns_name # TODO update with the actual LB
-    origin_id   = aws_lb.loadbalancer.id # TODO update with the actual LB
+    domain_name = aws_lb.external.dns_name
+    origin_id   = aws_lb.external.id
     custom_origin_config {
       http_port                = 80 # This port was not defined in CloudFormation, but should not be used anyways, only required by Terraform
       https_port               = 443
@@ -175,7 +175,7 @@ resource "aws_cloudfront_distribution" "external" {
   enabled = "true"
   aliases = [local.cloudfront_alias]
   default_cache_behavior {
-    target_origin_id = aws_lb.loadbalancer.id # TODO update with the actual LB
+    target_origin_id = aws_lb.external.id
     smooth_streaming = lookup(local.cloudfront_default_cache_behavior, "smooth_streaming", null)
     allowed_methods  = lookup(local.cloudfront_default_cache_behavior, "allowed_methods", null)
     cached_methods   = lookup(local.cloudfront_default_cache_behavior, "cached_methods", null)
@@ -193,7 +193,7 @@ resource "aws_cloudfront_distribution" "external" {
   dynamic "ordered_cache_behavior" {
     for_each = local.cloudfront_ordered_cache_behavior
     content {
-      target_origin_id = aws_lb.loadbalancer.id # TODO update with the actual LB
+      target_origin_id = aws_lb.external.id
       smooth_streaming = lookup(ordered_cache_behavior.value, "smooth_streaming", null)
       path_pattern     = lookup(ordered_cache_behavior.value, "path_pattern", null)
       min_ttl          = lookup(ordered_cache_behavior.value, "min_ttl", null)
