@@ -168,11 +168,11 @@ module "fsx" {
 
   common = merge(
     local.fsx_common_parameters,
-    lookup(llocal.fsx_environment_config, "fsx_common_parameters", {})
+    lookup(local.baseline_environment_config, "fsx_common_parameters", {})
   )
 
   fsx = merge(
     local.fsx_parameters,
-    lookup(llocal.fsx_environment_config, "fsx_parameters", {})
+    lookup(local.baseline_environment_config, "fsx_parameters", {})
   )
 }
