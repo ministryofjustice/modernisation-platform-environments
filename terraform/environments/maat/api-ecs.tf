@@ -16,7 +16,7 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
   name                              = "${local.application_name}-api-ecs-service"
   cluster                           = aws_ecs_cluster.app_ecs_cluster.id
   launch_type                       = "FARGATE"
-  desired_count                     = local.application_data.accounts[local.environment].ecs_service_desired_count
+  desired_count                     = local.application_data.accounts[local.environment].maat_api_ecs_service_desired_count
   task_definition                   = aws_ecs_task_definition.TaskDefinition.arn
   health_check_grace_period_seconds = 120
 
@@ -49,8 +49,8 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
 ######################################
 resource "aws_ecs_task_definition" "TaskDefinition" {
   family                   = "${local.application_name}-api-task-definition"
-  cpu                      = local.application_data.accounts[local.environment].ecs_cpu
-  memory                   = local.application_data.accounts[local.environment].ecs_memory
+  cpu                      = local.application_data.accounts[local.environment].maat_api_ecs_cpu
+  memory                   = local.application_data.accounts[local.environment].maat_api_ecs_memory
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.maat_api_ecs_taks_execution_role.arn
@@ -59,10 +59,10 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
   container_definitions = jsonencode([
     {
       name      = "${local.application_name}-cd-api",
-      cpu       = local.application_data.accounts[local.environment].ecs_container_cpu,
+      cpu       = local.application_data.accounts[local.environment].maat_api_ecs_container_cpu,
       essential = true,
-      image     = local.application_data.accounts[local.environment].ecs_image,
-      memory    = local.application_data.accounts[local.environment].ecs_container_memory,
+      image     = local.application_data.accounts[local.environment].maat_api_ecs_image,
+      memory    = local.application_data.accounts[local.environment].maat_api_ecs_container_memory,
       logConfiguration = {
         logDriver = "awslogs",
         options = {
@@ -103,75 +103,75 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
       environment = [
         {
           name  = "DATASOURCE_URL",
-          value = local.application_data.accounts[local.environment].ecs_env_DatasourceUrl
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_DatasourceUrl
         },
         {
           name  = "CLOUD_PLATFORM_QUEUE_REGION",
-          value = local.application_data.accounts[local.environment].ecs_env_CloudPlatformQueueRegion
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_CloudPlatformQueueRegion
         },
         {
           name  = "CREATE_LINK_QUEUE",
-          value = local.application_data.accounts[local.environment].ecs_env_CreateLinkQueue
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_CreateLinkQueue
         },
         {
           name  = "UNLINK_QUEUE",
-          value = local.application_data.accounts[local.environment].ecs_env_UnlinkQueue
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_UnlinkQueue
         },
         {
           name  = "HEARING_RESULTED_QUEUE",
-          value = local.application_data.accounts[local.environment].ecs_env_HearingsResultedQueue
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_HearingsResultedQueue
         },
         {
           name  = "CDA_OAUTH_URL",
-          value = local.application_data.accounts[local.environment].ecs_env_CdaOauthUrl
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_CdaOauthUrl
         },
         {
           name  = "CDA_BASE_URL",
-          value = local.application_data.accounts[local.environment].ecs_env_CdaBaseUrl
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_CdaBaseUrl
         },
         {
           name  = "SENTRY_ENV",
-          value = local.application_data.accounts[local.environment].ecs_env_Environment
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_Environment
         },
         {
           name  = "POST_MVP_ENABLED",
-          value = local.application_data.accounts[local.environment].ecs_env_PostMvpEnabled
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_PostMvpEnabled
         },
         {
           name  = "PROSECUTION_CONCLUDED_LISTENER_ENABLED",
-          value = local.application_data.accounts[local.environment].ecs_env_ProsecutionConcludedListenerEnabled
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_ProsecutionConcludedListenerEnabled
         },
         {
           name  = "PROSECUTION_CONCLUDED_SCHEDULE_ENABLED",
-          value = local.application_data.accounts[local.environment].ecs_env_ProsecutionConcludedScheduleEnabled
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_ProsecutionConcludedScheduleEnabled
         },
         {
           name  = "CREATE_LINK_CP_STATUS_JOB_QUEUE",
-          value = local.application_data.accounts[local.environment].ecs_env_CreateLinkCpStatusJobQueue
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_CreateLinkCpStatusJobQueue
         },
         {
           name  = "LAA_PROSECUTION_CONCLUDED_QUEUE",
-          value = local.application_data.accounts[local.environment].ecs_env_LaaProsecutionConcludedQueue
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_LaaProsecutionConcludedQueue
         },
         {
           name  = "AWS_DEFAULT_REGION",
-          value = local.application_data.accounts[local.environment].ecs_env_AwsDefaultRegion
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_AwsDefaultRegion
         },
         {
           name  = "CLOUDWATCH_STEP",
-          value = local.application_data.accounts[local.environment].ecs_env_CloudwatchStep
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_CloudwatchStep
         },
         {
           name  = "CLOUDWATCH_BATCH_SIZE",
-          value = local.application_data.accounts[local.environment].ecs_env_CloudwatchBatchSize
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_CloudwatchBatchSize
         },
         {
           name  = "ENABLE_CLOUDWATCH_METRICS",
-          value = local.application_data.accounts[local.environment].ecs_env_EnableCloudwatchMetrics
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_EnableCloudwatchMetrics
         },
         {
           name  = "TOGDATA_DATASOURCE_USERNAME",
-          value = local.application_data.accounts[local.environment].ecs_env_TogDataUsername
+          value = local.application_data.accounts[local.environment].maat_api_ecs_env_TogDataUsername
         }
       ]
     }
@@ -183,8 +183,8 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
 # ECS Scaling
 ######################################
 resource "aws_appautoscaling_target" "ecs_service_scaling_target" {
-  max_capacity       = local.application_data.accounts[local.environment].ecs_service_max_count
-  min_capacity       = local.application_data.accounts[local.environment].ecs_service_min_count
+  max_capacity       = local.application_data.accounts[local.environment].maat_api_ecs_service_max_count
+  min_capacity       = local.application_data.accounts[local.environment].maat_api_ecs_service_min_count
   resource_id        = "service/${aws_ecs_cluster.app_ecs_cluster.name}/${aws_ecs_service.maat_api_ecs_service.name}"
   role_arn           = aws_iam_role.maat_api_ecs_autoscaling_role.arn
   scalable_dimension = "ecs:service:DesiredCount"
@@ -241,7 +241,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_high_cpu_service_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = local.application_data.accounts[local.environment].ecs_high_cpu_scaling_threshold
+  threshold           = local.application_data.accounts[local.environment].maat_api_ecs_high_cpu_scaling_threshold
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_up_policy.arn]
@@ -261,7 +261,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_low_cpu_service_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = local.application_data.accounts[local.environment].ecs_low_cpu_scaling_threshold
+  threshold           = local.application_data.accounts[local.environment].maat_api_ecs_low_cpu_scaling_threshold
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_down_policy.arn]
@@ -282,7 +282,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_high_memory_service_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = local.application_data.accounts[local.environment].ecs_high_memory_scaling_threshold
+  threshold           = local.application_data.accounts[local.environment].maat_api_ecs_high_memory_scaling_threshold
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_up_policy.arn]
@@ -302,7 +302,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_low_memory_service_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = local.application_data.accounts[local.environment].ecs_low_memory_scaling_threshold
+  threshold           = local.application_data.accounts[local.environment].maat_api_ecs_low_memory_scaling_threshold
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_down_policy.arn]
