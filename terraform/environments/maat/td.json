@@ -13,29 +13,14 @@
             }
         ],
         "essential": false,
-        "entryPoint": [],
-        "command": [],
-        "environment": [],
-        "environmentFiles": [],
-        "mountPoints": [],
-        "volumesFrom": [],
-        "secrets": [],
-        "dnsServers": [],
-        "dnsSearchDomains": [],
-        "extraHosts": [],
-        "dockerSecurityOptions": [],
-        "dockerLabels": {},
-        "ulimits": [],
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {
                 "awslogs-group": "MAAT-ECS",
                 "awslogs-region": "${region}",
                 "awslogs-stream-prefix": "MAAT-app"
-            },
-            "secretOptions": []
-        },
-        "systemControls": []
+            }
+        }
     },
     {
         "name": "MAAT",
@@ -53,8 +38,6 @@
             }
         ],
         "essential": true,
-        "entryPoint": [],
-        "command": [],
         "environment": [
             {
                 "name": "APP_CMA_OAUTH_SCOPE",
@@ -233,91 +216,13 @@
                 "value": "/api/internal/v1/crimeapply"
             }
         ],
-        "environmentFiles": [],
-        "mountPoints": [],
-        "volumesFrom": [],
-        "secrets": [],
-        "dnsServers": [],
-        "dnsSearchDomains": [],
-        "extraHosts": [],
-        "dockerSecurityOptions": [],
-        "dockerLabels": {},
-        "ulimits": [],
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {
                 "awslogs-group": "MAAT-ECS",
                 "awslogs-region": "eu-west-2",
                 "awslogs-stream-prefix": "MAAT-app"
-            },
-            "secretOptions": []
-        },
-        "systemControls": []
-    }
-],
-"family": "MAAT-app",
-"revision": 378,
-"volumes": [],
-"status": "ACTIVE",
-"requiresAttributes": [
-    {
-        "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-    },
-    {
-        "name": "com.amazonaws.ecs.capability.ecr-auth"
-    },
-    {
-        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-    },
-    {
-        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
-    },
-    {
-        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-    }
-],
-"placementConstraints": [],
-"compatibilities": [
-    "EXTERNAL",
-    "EC2"
-],
-"registeredAt": "2024-01-26T16:45:43.990Z",
-"registeredBy": "arn:aws:sts::411213865113:assumed-role/cloudformationdeployer-role/AWSCloudFormation",
-"tags": [
-    {
-        "key": "owner",
-        "value": "laa-crime-apps@digital.justice.gov.uk"
-    },
-    {
-        "key": "component",
-        "value": "app-server"
-    },
-    {
-        "key": "environment-name",
-        "value": "development"
-    },
-    {
-        "key": "source-code",
-        "value": "https://github.com/ministryofjustice/laa-maat-application"
-    },
-    {
-        "key": "application",
-        "value": "Means Assessment Administration Tool - MAAT"
-    },
-    {
-        "key": "is-production",
-        "value": "false"
-    },
-    {
-        "key": "runbook",
-        "value": "https://dsdmoj.atlassian.net/wiki/spaces/LM/pages/760545284/Runbooks"
-    },
-    {
-        "key": "business-unit",
-        "value": "LAA"
-    },
-    {
-        "key": "infrastructure-support",
-        "value": "laa-role-sre@digital.justice.gov.uk"
+            }
+        }
     }
 ]
