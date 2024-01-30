@@ -65,6 +65,21 @@ locals {
         ]
       }
     }
+
+    fsx_common_parameters = {
+      subnet_ids = module.environment.subnets["private"].ids
+    }
+
+    fsx_parameters = {
+      automatic_backup_retention_days    = 7
+      common_name                        = module.environment.environment
+      copy_tags_to_backups               = false
+      daily_automatic_backup_start_time  = "03:00"
+      deployment_type                    = "MULTI_AZ_1" 
+      filesystem_name                    = "${module.environment.business_unit}-${module.environment.environment}"
+      storage_capacity                   = 32 # GiB // these values can be changed
+      throughput_capacity                = 8 # MB/s // these values can be changed
+    }
   }
 }
 
