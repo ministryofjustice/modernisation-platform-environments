@@ -64,11 +64,11 @@ resource "aws_security_group" "civica" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "civica_ip_1" {
-  security_group_id = aws_security_group.civica.id
+# resource "aws_vpc_security_group_ingress_rule" "civica_ip_1" {
+#   security_group_id = aws_security_group.civica.id
 
-  cidr_ipv4   = "20.0.26.153"
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-}
+#   cidr_ipv4   = "20.0.26.153"
+#   ip_protocol = "tcp"
+#   from_port   = 2222
+#   to_port     = 2222
+# }
