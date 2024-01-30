@@ -70,5 +70,5 @@ resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
-# need the IAM policy for cloudwatch event triggers
-# need the account trust policy
+# TODO IAM policy for cloudwatch event triggers
+# TODO account trust policy

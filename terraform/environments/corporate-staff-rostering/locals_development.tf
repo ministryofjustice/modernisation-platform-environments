@@ -75,22 +75,22 @@ locals {
   }
 }
 
-resource "aws_cloudwatch_event_rule" "instance-state" {
-  name        = "InstanceState"
-  description = "Trigger AdCleanUp Lambda function in domain services account"
+# resource "aws_cloudwatch_event_rule" "instance-state" {
+#   name        = "InstanceState"
+#   description = "Trigger AdCleanUp Lambda function in domain services account"
 
-  event_pattern = jsonencode({
-    source      = ["aws.ec2"],
-    detail-type = ["EC2 Instance State-change Notification"],
-    detail = {
-      state = ["stopped"] # "terminated" eventually, "stopped" during testing
-    }
-  })
+#   event_pattern = jsonencode({
+#     source      = ["aws.ec2"],
+#     detail-type = ["EC2 Instance State-change Notification"],
+#     detail = {
+#       state = ["stopped"] # "terminated" eventually, "stopped" during testing
+#     }
+#   })
 
-  tags = merge(local.tags,
-    { Name = "instance-state-${local.environment}" }
-  )
-}
+#   tags = merge(local.tags,
+#     { Name = "instance-state-${local.environment}" }
+#   )
+# }
 
 # resource "aws_cloud_watch_event_target" "lambda" {
 #   rule = aws_cloudwatch_event_rule.instance-state.InstanceState
