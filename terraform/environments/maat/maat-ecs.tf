@@ -271,7 +271,7 @@ resource "aws_ecs_task_definition" "maat_task_definition" {
     maat_ccp_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_ccp_endpoint_auth_url
     maat_db_url                 = local.application_data.accounts[local.environment].maat_db_url
     maat_ccc_base_url           = local.application_data.accounts[local.environment].maat_ccc_base_url
-    maat_caa_oauth_url          = $local.application_data.accounts[local.environment].maat_caa_oauth_url
+    maat_caa_oauth_url          = local.application_data.accounts[local.environment].maat_caa_oauth_url
     maat_bc_endpoint_url        = local.application_data.accounts[local.environment].maat_bc_endpoint_url
     maat_mlra_url               = local.application_data.accounts[local.environment].maat_mlra_url
     maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
