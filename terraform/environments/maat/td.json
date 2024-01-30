@@ -1,3 +1,4 @@
+${jsonencode({
 [
     {
         "name": "xray-daemon",
@@ -225,3 +226,4 @@
         }
     }
 ]
+})}
