@@ -76,4 +76,14 @@ locals {
   baseline_security_groups        = local.security_groups
   baseline_sns_topics             = {}
   baseline_ssm_parameters         = {}
+
+  fsx_environment_config = {
+    common = {
+      environment_name = local.environment
+      subnet_ids       = local.subnet_set
+      tags             = local.tags
+      vpc_id           = local.vpc_all
+      region           = local.region
+    }
+  }
 }
