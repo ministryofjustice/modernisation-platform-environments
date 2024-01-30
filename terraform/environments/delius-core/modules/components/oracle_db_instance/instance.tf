@@ -82,8 +82,8 @@ module "instance" {
   ami_name                      = data.aws_ami.oracle_db.name
   ami_owner                     = var.db_ami.owner
   instance                      = local.instance_config
-  ebs_volumes_copy_all_from_ami = true
   ebs_kms_key_id                = var.account_config.kms_keys.general_shared
+  ebs_volumes_copy_all_from_ami = true
   ebs_volume_config             = var.ebs_volume_config
   ebs_volumes                   = var.ebs_volumes
   ebs_volume_tags               = var.tags

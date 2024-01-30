@@ -14,6 +14,7 @@ module "oracle_db_shared" {
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
   providers = {
+    aws                       = aws
     aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
@@ -84,6 +85,7 @@ module "oracle_db_primary" {
   instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
 
   providers = {
+    aws                       = aws
     aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
@@ -99,6 +101,7 @@ module "oracle_db_standby" {
     name_regex = "^delius_core_ol_8_5_oracle_db_19c_"
     owner      = var.platform_vars.environment_management.account_ids["core-shared-services-production"]
   }
+
   db_type        = "standby"
   count          = 2
   db_count_index = count.index + 1
@@ -154,6 +157,7 @@ module "oracle_db_standby" {
   instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
 
   providers = {
+    aws                       = aws
     aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
