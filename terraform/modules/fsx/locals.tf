@@ -1,7 +1,7 @@
 locals {
   common = {
     environment_name = var.environment_name
-    subnet_ids       = tolist([local.private_subnet_ids[0], local.private_subnet_ids[1]])
+    subnet_ids       = var.subnet_ids
     tags             = var.tags
     vpc_id           = var.vpc_id
     region           = var.region
@@ -16,5 +16,4 @@ locals {
     storage_capacity                   = var.storage_capacity
     throughput_capacity                = var.throughput_capacity
   }
-  private_subnet_ids = var.private_subnet_ids
 }
