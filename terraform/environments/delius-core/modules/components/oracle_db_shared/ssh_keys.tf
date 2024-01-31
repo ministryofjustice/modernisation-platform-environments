@@ -112,7 +112,7 @@ resource "aws_iam_policy" "db_ssh_keys_s3" {
   policy = data.aws_iam_policy_document.db_ssh_keys_s3_policy_document.json
 }
 
-resource "aws_iam_role_policy_attachment" "db_ssh_keys_s3" {
-  policy_arn = aws_iam_policy.db_ssh_keys_s3.arn
-  role       = aws_iam_role.db_ec2_instance_iam_role.name
-}
+#resource "aws_iam_role_policy_attachment" "db_ssh_keys_s3" {
+#  policy_arn = aws_iam_policy.db_ssh_keys_s3.arn
+#  role       = aws_iam_role.db_ec2_instance_iam_role.name
+#}
