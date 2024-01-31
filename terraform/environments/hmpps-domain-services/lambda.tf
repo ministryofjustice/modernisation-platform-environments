@@ -6,7 +6,9 @@ locals {
 
 module "ad-clean-up-lambda" {
   source                 = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function" # ref for V3.1
-  
+  count                  = local.environment == "test" ? 1 : 0 # temporary whilst on-going work
+
+
   application_name       = local.lambda_ad_object_cleanup.function_name
   function_name          = local.lambda_ad_object_cleanup.function_name
   description            = "Lambda to remove corresponding computer object from Active Directory upon server termination"
@@ -20,7 +22,7 @@ module "ad-clean-up-lambda" {
   lambda_role            = aws_iam_role.lambda-ad-role.arn
 
   vpc_subnet_ids         = tolist(data.aws_subnets.shared-private.ids)
-  vpc_security_group_ids = ["domain"]
+  vpc_security_group_ids = [module.baseline.security_groups["domain"].id]
 
   tags = merge(
     local.tags,
@@ -31,9 +33,10 @@ module "ad-clean-up-lambda" {
 }
 
 data "archive_file" "ad-cleanup-lambda" {
-  type        = "zip"
-  source_dir = "lambda/ad-clean-up"
-  output_path = "lambda/ad-cleanup/ad-cleanup-lambda-payload.zip"
+  count            = local.environment == "test" ? 1 : 0 # temporary whilst on-going work
+  type             = "zip"
+  source_dir       = "lambda/ad-clean-up"
+  output_path      = "lambda/ad-cleanup/ad-cleanup-lambda-payload-test.zip"
 }
 
 data "aws_iam_policy_document" "lambda_assume_role_policy" {
@@ -49,13 +52,15 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
 }
 
 resource "aws_iam_role" "lambda-ad-role" {
-  name = "LambdaFunctionADObjectCleanUp"
-  tags = local.tags
+  count = local.environment == "test" ? 1 : 0 # temporary whilst on-going work  
+  name  = "LambdaFunctionADObjectCleanUp"
+  tags  = local.tags
 
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
+  count      = local.environment == "test" ? 1 : 0 # temporary whilst on-going work
   role       = aws_iam_role.lambda-ad-role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
