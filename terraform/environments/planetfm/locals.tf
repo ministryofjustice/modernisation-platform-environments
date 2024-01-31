@@ -36,11 +36,22 @@ locals {
     }
   }
 
-  baseline_acm_certificates         = {}
-  baseline_cloudwatch_log_groups    = {}
-  baseline_ec2_autoscaling_groups   = {}
-  baseline_ec2_instances            = {}
-  baseline_iam_policies             = {}
+  baseline_acm_certificates       = {}
+  baseline_cloudwatch_log_groups  = {}
+  baseline_ec2_autoscaling_groups = {}
+  baseline_ec2_instances          = {}
+  baseline_iam_policies = {
+    SSMPolicy = {
+      description = "Policy to allow ssm actions"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "ssm:SendCommand"
+        ]
+        resources = ["*"]
+      }]
+    }
+  }
   baseline_iam_roles                = {}
   baseline_iam_service_linked_roles = {}
   baseline_key_pairs                = {}
