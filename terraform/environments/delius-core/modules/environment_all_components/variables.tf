@@ -109,7 +109,7 @@ variable "gdpr_config" {
   })
   default = {
     api_image_tag = "default_image_tag"
-    ui_image_tag = "default_image_tag"
+    ui_image_tag  = "default_image_tag"
   }
 }
 
@@ -120,7 +120,7 @@ variable "merge_config" {
   })
   default = {
     api_image_tag = "default_image_tag"
-    ui_image_tag = "default_image_tag"
+    ui_image_tag  = "default_image_tag"
   }
 }
 
