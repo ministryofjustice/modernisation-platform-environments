@@ -44,13 +44,8 @@ module "oracle_db_primary" {
   ebs_volumes = {
     "/dev/sdb" = { label = "app", size = 200 } # /u01
     "/dev/sdc" = { label = "app", size = 100 } # /u02
-    "/dev/sde" = { label = "data" }            # DATA01
-    "/dev/sdf" = { label = "data" }            # DATA02
-    "/dev/sdg" = { label = "data" }            # DATA03
-    "/dev/sdh" = { label = "data" }            # DATA04
-    "/dev/sdi" = { label = "data" }            # DATA05
-    "/dev/sdj" = { label = "flash" }           # FLASH01
-    "/dev/sdk" = { label = "flash" }           # FLASH02
+    "/dev/sde" = { label = "data" }            # DATA
+    "/dev/sdf" = { label = "flash" }           # FLASH
     "/dev/sds" = { label = "swap" }
   }
   ebs_volume_config = {
@@ -72,7 +67,6 @@ module "oracle_db_primary" {
       total_size = 500
     }
   }
-
   env_name           = var.env_name
   environment_config = var.environment_config
   subnet_id          = var.account_config.ordered_private_subnet_ids[count.index % 3]
@@ -122,25 +116,29 @@ module "oracle_db_standby" {
   ec2_key_pair_name = module.oracle_db_shared.db_key_pair.key_name
 
   ebs_volumes = {
-    "/dev/sdb" = { label = "app" }   # /u01
-    "/dev/sdc" = { label = "app" }   # /u02
-    "/dev/sde" = { label = "data" }  # DATA01
-    "/dev/sdf" = { label = "data" }  # DATA02
-    "/dev/sdg" = { label = "data" }  # DATA03
-    "/dev/sdh" = { label = "data" }  # DATA04
-    "/dev/sdi" = { label = "data" }  # DATA05
-    "/dev/sdj" = { label = "flash" } # FLASH01
-    "/dev/sdk" = { label = "flash" } # FLASH02
+    "/dev/sdb" = { label = "app", size = 200 } # /u01
+    "/dev/sdc" = { label = "app", size = 100 } # /u02
+    "/dev/sde" = { label = "data" }            # DATA
+    "/dev/sdf" = { label = "flash" }           # FLASH
     "/dev/sds" = { label = "swap" }
   }
   ebs_volume_config = {
+    app = {
+      iops       = 3000
+      throughput = 125
+      type       = "gp3"
+    }
     data = {
       iops       = 3000
       throughput = 125
+      type       = "gp3"
+      total_size = 500
     }
     flash = {
       iops       = 3000
       throughput = 125
+      type       = "gp3"
+      total_size = 500
     }
   }
 
