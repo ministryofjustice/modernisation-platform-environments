@@ -63,6 +63,11 @@ resource "aws_iam_role_policy_attachment" "ec2_instance_role_policy_attachment" 
   policy_arn = aws_iam_policy.ec2_instance_role_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "SSM_managed_core_policy_attachment" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = local.application_data.accounts[local.environment].SSM_managed_core_policy_arn
+}
+
 ######################################
 # ECS Instance Profile
 ######################################
