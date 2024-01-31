@@ -47,6 +47,8 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
+          # NOTE: EC2 Instance calling SSM documents MUST have ssm:SendCommand permissions for [*] resources
+
           # Install AWS PowerShell module if not already installed
           if (-Not (Get-Module -ListAvailable -Name "AWSPowerShell")) {
             Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
