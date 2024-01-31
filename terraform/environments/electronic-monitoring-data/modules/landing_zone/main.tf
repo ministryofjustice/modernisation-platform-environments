@@ -103,6 +103,51 @@ module "log_bucket" {
 
   source_bucket = aws_s3_bucket.landing_bucket
   account_id    = var.account_id
+
+#------------------------------------------------------------------------------
+# AWS KMS for encrypting cloudwatch logs
+#------------------------------------------------------------------------------
+
+resource "aws_kms_key" "this" {
+  description             = "${var.supplier} server cloudwatch log encryption key"
+  key_usage               = "ENCRYPT_DECRYPT"
+  deletion_window_in_days = 30
+
+}
+}
+
+resource "aws_kms_key_policy" "this" {
+  key_id = aws_kms_key.this.id
+  policy = jsonencode({
+    Id = "${var.supplier}-cloudwatch"
+    Statement = [
+      {
+        Action = "kms:*"
+        Effect = "Allow"
+        Principal = {
+          AWS = "*"
+        }
+        Resource = "*"
+        Sid      = "Enable IAM User Permissions"
+      },
+      {
+        Action = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.eu-west-2.amazonaws.com"
+        }
+        Resource = "*"
+        Sid      = "Enable log service Permissions"
+      }
+    ]
+    Version = "2012-10-17"
+  })
 }
 
 #------------------------------------------------------------------------------
@@ -168,7 +213,7 @@ resource "aws_iam_role" "iam_for_transfer" {
 resource "aws_cloudwatch_log_group" "this" {
   name_prefix       = "transfer_${var.supplier}"
   retention_in_days = 365
-  kms_key_id        = var.kms_key_id
+  kms_key_id        = aws_kms_key.this.id
 }
 
 #------------------------------------------------------------------------------
