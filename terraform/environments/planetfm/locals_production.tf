@@ -211,7 +211,6 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
         }
         cloudwatch_metric_alarms = {} # no alarms as this is an RDS test instance
         tags = {
