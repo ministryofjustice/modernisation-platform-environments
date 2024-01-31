@@ -218,7 +218,7 @@ locals {
           description       = "RDS Test Instance"
           app-config-status = "pending"
           os-type           = "Windows"
-          ami               = "base_windows_server_2012_r2_release_2024-01-29*"
+          ami               = "base_windows_server_2012_r2_release_2024-01-29"
           component         = "app"
         }
         route53_records = {
