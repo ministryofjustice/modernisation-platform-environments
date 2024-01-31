@@ -95,6 +95,8 @@ module "instance" {
   iam_resource_names_prefix = "instance"
   instance_profile_policies = var.instance_profile_policies
 
+  user_data_raw = base64encode(var.user_data)
+
   business_unit     = var.account_info.business_unit
   application_name  = var.account_info.application_name
   environment       = var.account_info.mp_environment

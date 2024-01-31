@@ -42,25 +42,34 @@ module "oracle_db_primary" {
   user_data_replace_on_change = var.account_info.mp_environment == "development" ? true : false
 
   ebs_volumes = {
-    "/dev/sdb" = { label = "app" }   # /u01
-    "/dev/sdc" = { label = "app" }   # /u02
-    "/dev/sde" = { label = "data" }  # DATA01
-    "/dev/sdf" = { label = "data" }  # DATA02
-    "/dev/sdg" = { label = "data" }  # DATA03
-    "/dev/sdh" = { label = "data" }  # DATA04
-    "/dev/sdi" = { label = "data" }  # DATA05
-    "/dev/sdj" = { label = "flash" } # FLASH01
-    "/dev/sdk" = { label = "flash" } # FLASH02
+    "/dev/sdb" = { label = "app", size = 200 } # /u01
+    "/dev/sdc" = { label = "app", size = 100 } # /u02
+    "/dev/sde" = { label = "data" }            # DATA01
+    "/dev/sdf" = { label = "data" }            # DATA02
+    "/dev/sdg" = { label = "data" }            # DATA03
+    "/dev/sdh" = { label = "data" }            # DATA04
+    "/dev/sdi" = { label = "data" }            # DATA05
+    "/dev/sdj" = { label = "flash" }           # FLASH01
+    "/dev/sdk" = { label = "flash" }           # FLASH02
     "/dev/sds" = { label = "swap" }
   }
   ebs_volume_config = {
+    app = {
+      iops       = 3000
+      throughput = 125
+      type       = "gp3"
+    }
     data = {
       iops       = 3000
       throughput = 125
+      type       = "gp3"
+      total_size = 500
     }
     flash = {
       iops       = 3000
       throughput = 125
+      type       = "gp3"
+      total_size = 500
     }
   }
 
