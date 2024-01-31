@@ -29,7 +29,10 @@ module "jml_extract_lambda" {
         "cloudwatch:GenerateQuery",
         "logs:DescribeLogStreams",
         "logs:DescribeLogGroups",
-        "logs:GetLogEvents"
+        "logs:GetLogEvents",
+        "logs:StartQuery",
+        "logs:StopQuery",
+        "logs:GetQueryExecution"
       ]
       resources = [
         "${module.auth0_log_streams["alpha-analytics-moj"].cloudwatch_log_group_arn}"
