@@ -28,7 +28,7 @@ module "oracle_db_primary" {
   account_info   = var.account_info
   db_ami = {
     name_regex = "^delius_core_ol_8_5_oracle_db_19c_"
-    owner      = var.platform_vars.environment_management.account_ids["core-shared-services-production"]
+    owner      = "self"
   }
   db_type           = "primary"
   count             = 1
@@ -99,7 +99,7 @@ module "oracle_db_standby" {
 
   db_ami = {
     name_regex = "^delius_core_ol_8_5_oracle_db_19c_"
-    owner      = var.platform_vars.environment_management.account_ids["core-shared-services-production"]
+    owner      = "self"
   }
 
   db_type        = "standby"
