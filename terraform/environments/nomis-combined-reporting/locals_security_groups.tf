@@ -159,7 +159,7 @@ locals {
           from_port       = 3690
           to_port         = 3690
           protocol        = "tcp"
-          security_groups = ["data"]
+          security_groups = []
           cidr_blocks     = local.security_group_cidrs.http7xxx
         }
       }
