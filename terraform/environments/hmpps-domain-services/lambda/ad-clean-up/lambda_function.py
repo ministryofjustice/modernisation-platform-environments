@@ -7,8 +7,21 @@ def check_ad_for_object(object):
     
     # create a secrets manager client
     secrets_manager_client = boto3.client('secretsmanager')
-    # extract the secret value
-    secret_name = '/activedirectory/devtest/aws-lambda/passwords'
+
+    test_domain = 'azure.noms.root'
+    prod_domain = 'azure.hmpp.root'
+    
+    # extract the secret value from hmpps-domain-services-test / hmpps-domain-services-prod
+    test_secret = '/microsoft/AD/azure.noms.root/shared-passwords'  # this acould be variablised 
+    prod_secret = '/microsoft/AD/azure.hmpp.root/shared-passwords'
+
+    # password logic to be added DSOS-2545
+
+    response = secrets_manager_client.get_secret_value(SecretId=secret_name)
+    secret_data = response['SecretString']
+
+    # extract the secret value from hmpps-domain-services-prod
+
     response = secrets_manager_client.get_secret_value(SecretId=secret_name)
     secret_data = response['SecretString']
 
@@ -17,9 +30,14 @@ def check_ad_for_object(object):
     ad_password = secret_json['aws-lambda']
     
     # dev test domain controller connection details
-    server = Server('MGMCW0002.azure.noms.root:389', get_info=ALL)
-    username = r'azure\aws-lambda'
-    password = ad_password
+    test_server = Server('MGMCW0002.{test_domain}:389', get_info=ALL)
+    test_username = r'azure\aws-lambda'
+    test_password = ad_password
+
+    # preprod and prod domain controller connection details
+    prod_server = Server('MGMCW0002.{prod_domain}:389', get_info=ALL)
+    prod_username = r'azure\aws-lambda'
+    prod_password = ad_password
     
     with Connection(server, user=username, password=password, auto_bind=True) as conn:
         search_base = 'ou=Managed-Windows-Servers,ou=Computers,dc=azure,dc=noms,dc=root'
@@ -53,13 +71,15 @@ def lambda_handler(event, context):
         response = ec2.describe_instances(InstanceIds=[instance_id])
         
         tags = response['Reservations'][0]['Instances'][0]['Tags']
-        resource_key = 'server-name'
-        resource_name = get_tag_value(tags, resource_key)
+        resource_name = 'server-name'
+        resource_environment = 'environment'
+        hostname = get_tag_value(tags, resource_name)
+        environment = get_tag_value(tags, resource_environment)
         
-        if resource_name is not None:
-            check_ad_for_object(resource_name)
+        if hostname is not None:
+            check_ad_for_object(hostname)
         else:
-            print(f"The tag '{resource_key}' was not found for the instance.")
+            print(f"The tag '{resource_name}' was not found for the instance.")
     
     # 200 http response lambda run successful
     return {
