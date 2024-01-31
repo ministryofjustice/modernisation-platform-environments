@@ -24,6 +24,8 @@ module "environment_test" {
   ldap_config                = local.ldap_config_test
   db_config                  = local.db_config_test
   weblogic_config            = local.weblogic_config_test
+  merge_config               = local.merge_config_test
+  gdpr_config                = local.gdpr_config_test
   delius_db_container_config = local.delius_db_container_config_test
   bastion_config             = local.bastion_config_test
 
