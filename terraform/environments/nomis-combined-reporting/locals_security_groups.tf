@@ -162,6 +162,22 @@ locals {
           security_groups = []
           cidr_blocks     = local.security_group_cidrs.http7xxx
         }
+        http9704 = {
+          description     = "Allow http8005 ingress"
+          from_port       = 8005
+          to_port         = 8005
+          protocol        = "tcp"
+          security_groups = []
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+        }
+        http9704 = {
+          description     = "Allow http8443 ingress"
+          from_port       = 8443
+          to_port         = 8443
+          protocol        = "tcp"
+          security_groups = []
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+        }
       }
       egress = {
         all = {
