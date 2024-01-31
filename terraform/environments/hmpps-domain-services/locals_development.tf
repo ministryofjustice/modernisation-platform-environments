@@ -31,7 +31,7 @@ locals {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "base_windows_server_2012_r2_release*"
-          availability_zone             = null
+          availability_zone             = ["eu-west-2a", "eu-west-2b"] # match load balancer config
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
@@ -56,7 +56,7 @@ locals {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
-          availability_zone             = null
+          availability_zone             = ["eu-west-2a", "eu-west-2b"] # match load balancer config
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
@@ -80,7 +80,7 @@ locals {
       dev-rhel85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "base_rhel_8_5*"
-          availability_zone = null
+          availability_zone = ["eu-west-2a", "eu-west-2b"] # match load balancer config
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]

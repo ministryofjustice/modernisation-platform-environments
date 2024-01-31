@@ -29,7 +29,7 @@ locals {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "base_windows_server_2012_r2_release*"
-          availability_zone             = null
+          availability_zone             = ["eu-west-2a", "eu-west-2b"] # match load balancer config
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
@@ -40,7 +40,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 2
+          desired_capacity = 0
           max_size         = 2
         })
         tags = {
