@@ -101,6 +101,10 @@ module "instance" {
   region            = "eu-west-2"
   availability_zone = var.availability_zone
   subnet_id         = var.subnet_id
-  tags              = var.tags
+  tags = merge(var.tags,
+    { Name = lower(format("%s-delius-db-%s", var.env_name, local.instance_name_index)) },
+    { server-type = "delius_core_db" },
+    { database = local.database_tag }
+  )
   #  cloudwatch_metric_alarms = {}
 }
