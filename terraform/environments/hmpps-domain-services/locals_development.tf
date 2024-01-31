@@ -1,7 +1,13 @@
 locals {
 
   # baseline presets config
-  development_baseline_presets_options = {}
+  development_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        hmpps_domain_pagerduty = "hmpps_domain_services_nonprod_alarms"
+      }
+    }
+  }
 
   # baseline config
   development_config = {
