@@ -1,4 +1,4 @@
-# nomis-production environment settings
+# csr-production environment settings
 locals {
 
   # baseline config

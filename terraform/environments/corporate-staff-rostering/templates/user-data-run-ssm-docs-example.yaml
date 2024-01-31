@@ -26,7 +26,7 @@ tasks:
           Function Invoke-SSMDocument {
             param(
               [Parameter(Mandatory = $true)]
-              [PSCustomObject]]$SSMDocumentObject
+              [PSCustomObject]$SSMDocumentObject
             )
 
             $DocumentName = $SSMDocumentObject.PSObject.Properties.Name
@@ -34,7 +34,7 @@ tasks:
 
             $instanceId = Get-EC2InstanceMetadata -Category InstanceId
 
-            $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $DocumentName -Parameters $Parameters -Force
+            $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $DocumentName -Parameter $Parameters -Force
             Write-Host "Executed SSM command with Command ID: $($commandId.CommandId)"
           }
 
@@ -53,7 +53,9 @@ tasks:
           # },
           # [PSCustomObject]@{
           #   "another-ssm-doc" = @{
-          #     # Add your parameters here. Example:
+          #     # Add your parameters here as a hashtable.
+          #     # Quoting depends on the values, special characters etc.
+          #     # Example:
           #     # Param1 = "Value1"
           #     # Param2 = "Value2"
           #   }
@@ -67,7 +69,7 @@ tasks:
 
               foreach ($ssmDocument in $ssmDocuments) {
                 Add-Content -Path "C:\Temp\user_data_status.txt" - Value "SSM Document $ssmDocument run has started. $(Get-Date)"
-                Invoke-SSMDocument -DocumentName "$ssmDocument
+                Invoke-SSMDocument -SSMDocumentObject $ssmDocument
               }
               break
             } else {
@@ -75,4 +77,3 @@ tasks:
               Start-Sleep -Seconds 10
             }
           } while ((Get-Date) -lt $startTime.AddMinutes(10))
-

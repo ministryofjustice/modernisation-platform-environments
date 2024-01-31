@@ -1,4 +1,4 @@
-# nomis-preproduction environment settings
+# csr-preproduction environment settings
 locals {
 
   # baseline config
