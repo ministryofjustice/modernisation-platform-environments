@@ -227,7 +227,7 @@ resource "aws_iam_role" "iam_for_transfer" {
 resource "aws_cloudwatch_log_group" "this" {
   name_prefix       = "transfer_${var.supplier}"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.this.id
+  # kms_key_id        = aws_kms_key.this.id
 }
 
 #------------------------------------------------------------------------------
