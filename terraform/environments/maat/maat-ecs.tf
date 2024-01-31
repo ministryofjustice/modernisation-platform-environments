@@ -90,44 +90,44 @@ resource "aws_ecs_cluster" "maat_app_ecs_cluster" {
 # ECS launch config/template
 ######################################
 
-resource "aws_launch_template" "ec2-launch-template" {
-  name_prefix            = "${local.application_name}-ec2-launch-template"
-  image_id               = local.application_data.accounts[local.environment].ami_id
-  instance_type          = local.application_data.accounts[local.environment].instance_type
+# resource "aws_launch_template" "ec2-launch-template" {
+#   name_prefix            = "${local.application_name}-ec2-launch-template"
+#   image_id               = local.application_data.accounts[local.environment].ami_id
+#   instance_type          = local.application_data.accounts[local.environment].instance_type
 
-  monitoring {
-    enabled = true
-  }
+#   monitoring {
+#     enabled = true
+#   }
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.ec2_instance_profile.name
-  }
+#   iam_instance_profile {
+#     name = aws_iam_instance_profile.ec2_instance_profile.name
+#   }
 
-  network_interfaces {
-    security_groups             = [aws_security_group.ecs_security_group.id]
-  }
+#   network_interfaces {
+#     security_groups             = [aws_security_group.ecs_security_group.id]
+#   }
 
-  user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
-    app_name = local.application_name, app_ecs_cluster = aws_ecs_cluster.maat_app_ecs_cluster.name }))
+#   user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
+#     app_name = local.application_name, app_ecs_cluster = aws_ecs_cluster.maat_app_ecs_cluster.name }))
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = merge(tomap({
-      "Name" = "${local.application_name}-ecs-cluster"
-    }), local.tags)
-  }
+#   tag_specifications {
+#     resource_type = "instance"
+#     tags = merge(tomap({
+#       "Name" = "${local.application_name}-ecs-cluster"
+#     }), local.tags)
+#   }
 
-  tag_specifications {
-    resource_type = "volume"
-    tags = merge(tomap({
-      "Name" = "${local.application_name}-ecs-cluster"
-    }), local.tags)
-  }
+#   tag_specifications {
+#     resource_type = "volume"
+#     tags = merge(tomap({
+#       "Name" = "${local.application_name}-ecs-cluster"
+#     }), local.tags)
+#   }
 
-  tags = merge(tomap({
-    "Name" = "${local.application_name}-ecs-cluster-template"
-  }), local.tags)
-}
+#   tags = merge(tomap({
+#     "Name" = "${local.application_name}-ecs-cluster-template"
+#   }), local.tags)
+# }
 
 ######################################
 # ECS Scaling Group
@@ -163,22 +163,22 @@ resource "aws_autoscaling_group" "ec2_scaling_group" {
 # ECS Scaling Policies
 ######################################
 
-resource "aws_autoscaling_policy" "maat_scaling_up_policy" {
-  name               = "${local.application_name}-scaling-up"
-  policy_type        = "SimpleScaling"
-  adjustment_type         = "ChangeInCapacity"
-  autoscaling_group_name = aws_autoscaling_group.ec2_scaling_group.name
-  cooldown                = 60
-  scaling_adjustment          = 1
-}
+# resource "aws_autoscaling_policy" "maat_scaling_up_policy" {
+#   name               = "${local.application_name}-scaling-up"
+#   policy_type        = "SimpleScaling"
+#   adjustment_type         = "ChangeInCapacity"
+#   autoscaling_group_name = aws_autoscaling_group.ec2_scaling_group.name
+#   cooldown                = 60
+#   scaling_adjustment          = 1
+# }
 
-resource "aws_autoscaling_policy" "maat_scaling_down_policy" {
-  name               = "${local.application_name}-scaling-down"
-  policy_type        = "SimpleScaling"
-  adjustment_type         = "ChangeInCapacity"
-  autoscaling_group_name = aws_autoscaling_group.ec2_scaling_group.name
-  cooldown                = 60
-  scaling_adjustment          = -1
+# resource "aws_autoscaling_policy" "maat_scaling_down_policy" {
+#   name               = "${local.application_name}-scaling-down"
+#   policy_type        = "SimpleScaling"
+#   adjustment_type         = "ChangeInCapacity"
+#   autoscaling_group_name = aws_autoscaling_group.ec2_scaling_group.name
+#   cooldown                = 60
+#   scaling_adjustment          = -1
 }
 
 ######################################
@@ -204,43 +204,43 @@ resource "aws_cloudwatch_log_group" "ecs_cw_log_group" {
 # CloudWatch Alarms for CPU
 ######################################
 
-resource "aws_cloudwatch_metric_alarm" "high_cpu_service_alarm" {
-  alarm_name          = "${local.application_name}-high-cpu-service-alarm"
-  alarm_description   = "Average CPU Reservation for the boxes in the ASG is above 74% for 1 minutes. Triggers scale up"
-  actions_enabled     = true
-  namespace           = "AWS/ECS"
-  metric_name         = "CPUReservation"
-  statistic           = "Average"
-  period              = 60
-  evaluation_periods  = 3
-  threshold           = local.application_data.accounts[local.environment].ec2_cpu_scaling_up_threshold
-  unit                = "Percent"
-  comparison_operator = "GreaterThanThreshold"
-  alarm_actions       = [aws_autoscaling_policy.maat_scaling_up_policy.arn]
+# resource "aws_cloudwatch_metric_alarm" "high_cpu_service_alarm" {
+#   alarm_name          = "${local.application_name}-high-cpu-service-alarm"
+#   alarm_description   = "Average CPU Reservation for the boxes in the ASG is above 74% for 1 minutes. Triggers scale up"
+#   actions_enabled     = true
+#   namespace           = "AWS/ECS"
+#   metric_name         = "CPUReservation"
+#   statistic           = "Average"
+#   period              = 60
+#   evaluation_periods  = 3
+#   threshold           = local.application_data.accounts[local.environment].ec2_cpu_scaling_up_threshold
+#   unit                = "Percent"
+#   comparison_operator = "GreaterThanThreshold"
+#   alarm_actions       = [aws_autoscaling_policy.maat_scaling_up_policy.arn]
 
-  dimensions = {
-    ClusterName = aws_ecs_cluster.maat_app_ecs_cluster.name
-  }
-}
+#   dimensions = {
+#     ClusterName = aws_ecs_cluster.maat_app_ecs_cluster.name
+#   }
+# }
 
-resource "aws_cloudwatch_metric_alarm" "low_cpu_service_alarm" {
-  alarm_name          = "${local.application_name}-low-cpu-service-alarm"
-  alarm_description   = "Average CPU Reservation for the boxes in the ASG is less than 51% for 3 minutes. Triggers scale down"
-  actions_enabled     = true
-  namespace           = "AWS/ECS"
-  metric_name         = "CPUReservation"
-  statistic           = "Average"
-  period              = 60
-  evaluation_periods  = 3
-  threshold           = local.application_data.accounts[local.environment].ec2_cpu_scaling_down_threshold
-  unit                = "Percent"
-  comparison_operator = "LessThanThreshold"
-  alarm_actions       = [aws_autoscaling_policy.maat_scaling_down_policy.arn]
+# resource "aws_cloudwatch_metric_alarm" "low_cpu_service_alarm" {
+#   alarm_name          = "${local.application_name}-low-cpu-service-alarm"
+#   alarm_description   = "Average CPU Reservation for the boxes in the ASG is less than 51% for 3 minutes. Triggers scale down"
+#   actions_enabled     = true
+#   namespace           = "AWS/ECS"
+#   metric_name         = "CPUReservation"
+#   statistic           = "Average"
+#   period              = 60
+#   evaluation_periods  = 3
+#   threshold           = local.application_data.accounts[local.environment].ec2_cpu_scaling_down_threshold
+#   unit                = "Percent"
+#   comparison_operator = "LessThanThreshold"
+#   alarm_actions       = [aws_autoscaling_policy.maat_scaling_down_policy.arn]
 
-  dimensions = {
-    ClusterName = aws_ecs_cluster.maat_app_ecs_cluster.name
-  }
-}
+#   dimensions = {
+#     ClusterName = aws_ecs_cluster.maat_app_ecs_cluster.name
+#   }
+# }
 
 ######################################
 # ECS TASK DEFINITION
