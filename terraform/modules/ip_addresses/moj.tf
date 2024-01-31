@@ -3,9 +3,14 @@ locals {
   moj_cidr = {
 
     # for MoJ Digital Staff devices
-    moj_digital_studio_office                 = "217.33.148.210/32"
-    moj_digital_service_desk_vpn              = "81.134.202.29/32" # aka nurved, moj dsd
-    moj_aws_digital_macos_globalprotect_alpha = "35.176.93.186/32"
+    moj_digital_studio_office = "217.33.148.210/32"
+    # moj_digital_service_desk_vpn            = "81.134.202.29/32" # aka nurved, moj dsd - decommissioned
+    moj_aws_digital_macos_globalprotect_alpha = [
+      "18.169.147.172/32",
+      "35.176.93.186/32",
+      "18.130.148.126/32",
+      "35.176.148.126/32"
+    ]
 
     # for MOJ Official devices
     mojo_aws_globalprotect_vpc = "10.184.0.0/16"
@@ -36,9 +41,8 @@ locals {
 
   moj_cidrs = {
 
-    trusted_moj_digital_staff_public = [
+    trusted_moj_digital_staff_public = flatten([
       local.moj_cidr.moj_digital_studio_office,
-      local.moj_cidr.moj_digital_service_desk_vpn,
       local.moj_cidr.moj_aws_digital_macos_globalprotect_alpha,
       local.moj_cidr.mojo_aws_preprod_byoip_cidr,
       local.moj_cidr.mojo_aws_prod_byoip_cidr,
@@ -46,7 +50,7 @@ locals {
       local.moj_cidr.mojo_arkc_internet_egress_vodafone,
       local.moj_cidr.mojo_arkf_internet_egress_exponential_e,
       local.moj_cidr.mojo_arkf_internet_egress_vodafone,
-    ]
+    ])
 
     trusted_moj_enduser_internal = [
       local.moj_cidr.mojo_aws_globalprotect_vpc,

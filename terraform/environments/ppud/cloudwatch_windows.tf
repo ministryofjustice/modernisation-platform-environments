@@ -303,137 +303,34 @@ resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Failed" {
 
 # Windows Defender Event Metrics
 
-resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Started" {
+resource "aws_cloudwatch_log_metric_filter" "MalwareScanStarted" {
   count          = local.is-production == true ? 1 : 0
-  name           = "MalwareScan-Started"
+  name           = "MalwareScanStarted"
   log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "Microsoft Defender Antivirus scan has started."
+  pattern        = "[date, time, Instance, MalwareScanStarted, status=1000]"
   metric_transformation {
-    name      = "MalwareScan-Started"
+    name      = "MalwareScanStarted"
     namespace = "WindowsDefender"
     value     = "1"
-        dimensions = {
+    dimensions = {
       Instance = "$Instance"
+      MalwareScanStarted = "$MalwareScanStarted"
     }
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Finished" {
+resource "aws_cloudwatch_log_metric_filter" "MalwareScanFinished" {
   count          = local.is-production == true ? 1 : 0
-  name           = "MalwareScan-Finished"
+  name           = "MalwareScanFinished"
   log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "Microsoft Defender Antivirus scan has finished."
+  pattern        = "[date, time, Instance, MalwareScanFinished, status=1001]"
   metric_transformation {
-    name      = "MalwareScan-Finished"
+    name      = "MalwareScanFinished"
     namespace = "WindowsDefender"
     value     = "1"
-        dimensions = {
+    dimensions = {
       Instance = "$Instance"
-    }
-  }
-}
-
-resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Stopped" {
-  count          = local.is-production == true ? 1 : 0
-  name           = "MalwareScan-Stopped"
-  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "Microsoft Defender Antivirus scan has been stopped before completion."
-  metric_transformation {
-    name      = "MalwareScan-Stopped"
-    namespace = "WindowsDefender"
-    value     = "1"
-        dimensions = {
-      Instance = "$Instance"
-    }
-  }
-}
-
-resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Failed" {
-  count          = local.is-production == true ? 1 : 0
-  name           = "MalwareScan-Failed"
-  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "Microsoft Defender Antivirus scan has failed."
-  metric_transformation {
-    name      = "MalwareScan-Failed"
-    namespace = "WindowsDefender"
-    value     = "1"
-        dimensions = {
-      Instance = "$Instance"
-    }
-  }
-}
-
-resource "aws_cloudwatch_log_metric_filter" "MalwareBehavior-Detected" {
-  count          = local.is-production == true ? 1 : 0
-  name           = "MalwareBehavior-Detected"
-  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "Microsoft Defender Antivirus detected a suspicious behavior."
-  metric_transformation {
-    name      = "MalwareBehavior-Detected"
-    namespace = "WindowsDefender"
-    value     = "1"
-        dimensions = {
-      Instance = "$Instance"
-    }
-  }
-}
-
-resource "aws_cloudwatch_log_metric_filter" "MalwareState-Detected" {
-  count          = local.is-production == true ? 1 : 0
-  name           = "MalwareState-Detected"
-  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "Microsoft Defender Antivirus has detected malware or other potentially unwanted software."
-  metric_transformation {
-    name      = "MalwareState-Detected"
-    namespace = "WindowsDefender"
-    value     = "1"
-        dimensions = {
-      Instance = "$Instance"
-    }
-  }
-}
-
-resource "aws_cloudwatch_log_metric_filter" "MalwareSignatureUpdate-Failed" {
-  count          = local.is-production == true ? 1 : 0
-  name           = "MalwareSignatureUpdate-Failed"
-  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "Microsoft Defender Antivirus has encountered an error trying to update security intelligence."
-  metric_transformation {
-    name      = "MalwareSignatureUpdate-Failed"
-    namespace = "WindowsDefender"
-    value     = "1"
-        dimensions = {
-      Instance = "$Instance"
-    }
-  }
-}
-
-resource "aws_cloudwatch_log_metric_filter" "MalwareEngineUpdate-Failed" {
-  count          = local.is-production == true ? 1 : 0
-  name           = "MalwareEngineUpdate-Failed"
-  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "Microsoft Defender Antivirus has encountered an error trying to update the engine."
-  metric_transformation {
-    name      = "MalwareEngineUpdate-Failed"
-    namespace = "WindowsDefender"
-    value     = "1"
-        dimensions = {
-      Instance = "$Instance"
-    }
-  }
-}
-
-resource "aws_cloudwatch_log_metric_filter" "MalwareEngineUpdate-OutofDate" {
-  count          = local.is-production == true ? 1 : 0
-  name           = "MalwareEngineUpdate-OutofDate"
-  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "Microsoft Defender Antivirus could not load antimalware engine because current platform version is not supported."
-  metric_transformation {
-    name      = "MalwareEngineUpdate-OutofDate"
-    namespace = "WindowsDefender"
-    value     = "1"
-        dimensions = {
-      Instance = "$Instance"
+      MalwareScanFinished = "$MalwareScanFinished"
     }
   }
 }

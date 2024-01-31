@@ -1,7 +1,13 @@
 locals {
 
   # baseline presets config
-  development_baseline_presets_options = {}
+  development_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        hmpps_domain_services_pagerduty = "hmpps_domain_services_nonprod_alarms"
+      }
+    }
+  }
 
   # baseline config
   development_config = {
@@ -59,6 +65,7 @@ locals {
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy"])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]

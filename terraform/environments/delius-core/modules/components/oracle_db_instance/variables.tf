@@ -26,6 +26,11 @@ variable "subnet_id" {
   type        = string
 }
 
+variable "availability_zone" {
+  description = "Availability zone to launch the instance in"
+  type        = string
+}
+
 variable "monitoring" {
   description = "Enable/disable detailed monitoring"
   type        = bool
@@ -39,6 +44,11 @@ variable "user_data" {
 
 variable "account_config" {
   description = "Account config to pass to the instance"
+  type        = any
+}
+
+variable "account_info" {
+  description = "Account info to pass to the instance"
   type        = any
 }
 
@@ -58,7 +68,7 @@ variable "db_ami" {
   description = "AMI to use for the database instance"
   type = object({
     name_regex = string
-    owners     = list(string)
+    owner      = string
   })
 
 }
@@ -69,23 +79,29 @@ variable "tags" {
 }
 
 variable "ebs_volumes" {
-  description = "EBS volumes to attach to the instance"
-  type = object({
-    kms_key_id = string
-    tags       = map(string)
-    iops       = number
-    throughput = number
-    root_volume = object({
-      volume_type = string
-      volume_size = number
-    })
-    ebs_non_root_volumes = map(object({
-      volume_type = optional(string)
-      volume_size = optional(string)
-      no_device   = optional(bool)
-    }))
-  })
+  description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key.  label is used as part of the Name tag"
+  type = map(object({
+    label       = optional(string)
+    snapshot_id = optional(string)
+    iops        = optional(number)
+    throughput  = optional(number)
+    size        = optional(number)
+    type        = optional(string)
+    kms_key_id  = optional(string)
+  }))
 }
+
+variable "ebs_volume_config" {
+  description = "EC2 volume configurations, where key is a label, e.g. flash, which is assigned to the disk in ebs_volumes.  All disks with same label have the same configuration.  If not specified, use values from the AMI.  If total_size specified, the volume size is this divided by the number of drives with the given label"
+  type = map(object({
+    iops       = optional(number)
+    throughput = optional(number)
+    total_size = optional(number)
+    type       = optional(string)
+    kms_key_id = optional(string)
+  }))
+}
+
 
 variable "environment_config" {
   type = object({
@@ -107,11 +123,6 @@ variable "standby_dbs_required" {
   default     = 0
 }
 
-variable "instance_profile" {
-  description = "The instance profile to attach"
-  type        = any
-}
-
 variable "security_group_ids" {
   description = "A list of security group IDs to attach"
   type        = list(string)
@@ -126,4 +137,9 @@ variable "user_data_replace_on_change" {
   description = "Whether to replace the instances when the user data changes"
   type        = bool
   default     = false
+}
+
+variable "instance_profile_policies" {
+  description = "A list of IAM policy ARNs to attach to the instance profile"
+  type        = list(string)
 }

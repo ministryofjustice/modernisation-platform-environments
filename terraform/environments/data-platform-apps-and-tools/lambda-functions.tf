@@ -11,6 +11,8 @@ module "jml_extract_lambda" {
   function_name = "data_platform_jml_extract"
   description   = "Generates a JML report and sends it to JMLv4"
   package_type  = "Image"
+  memory_size   = 512
+  timeout       = 120
   image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-jml-extract-lambda-ecr-repo:1.0.3"
 
   environment_variables = {
@@ -32,10 +34,11 @@ module "jml_extract_lambda" {
         "logs:GetLogEvents",
         "logs:StartQuery",
         "logs:StopQuery",
-        "logs:GetQueryExecution"
+        "logs:GetQueryExecution",
+        "logs:GetQueryResults"
       ]
       resources = [
-        "${module.auth0_log_streams["alpha-analytics-moj"].cloudwatch_log_group_arn}"
+        "${module.auth0_log_streams["alpha-analytics-moj"].cloudwatch_log_group_arn}:*"
       ]
     }
     "secretsmanager" = {
