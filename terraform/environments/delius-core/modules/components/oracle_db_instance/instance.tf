@@ -92,7 +92,7 @@ module "instance" {
     create_internal_record = false
     create_external_record = false
   }
-  iam_resource_names_prefix = lower(format("%s-delius-db-%s", var.env_name, local.instance_name_index))
+  iam_resource_names_prefix = "instance"
   instance_profile_policies = var.instance_profile_policies
 
   business_unit     = var.account_info.business_unit

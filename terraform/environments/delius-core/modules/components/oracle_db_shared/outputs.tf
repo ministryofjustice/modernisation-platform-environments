@@ -23,5 +23,6 @@ output "instance_policies" {
     "db_access_to_secrets_manager"        = aws_iam_policy.db_access_to_secrets_manager
     "oracledb_backup_bucket_access"       = aws_iam_policy.oracledb_backup_bucket_access
     "db_ssh_keys_s3"                      = aws_iam_policy.db_ssh_keys_s3
+    "instance_ssm"                        = aws_iam_policy.instance_ssm
   }
 }

@@ -53,9 +53,6 @@ resource "aws_iam_policy" "business_unit_kms_key_access" {
   name   = format("%s-delius-db-business_unit_kms_key_access_policy", var.env_name)
   path   = "/"
   policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
-  tags = merge(var.tags,
-    { Name = format("%s-delius-db-business_unit_kms_key_access_policy", var.env_name) }
-  )
 }
 
 data "aws_iam_policy_document" "core_shared_services_bucket_access" {
@@ -76,9 +73,6 @@ resource "aws_iam_policy" "core_shared_services_bucket_access" {
   name   = format("%s-delius-db-core_shared_services_bucket_access_policy", var.env_name)
   path   = "/"
   policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
-  tags = merge(var.tags,
-    { Name = format("%s-delius-db-core_shared_services_bucket_access_policy", var.env_name) }
-  )
 }
 
 data "aws_iam_policy_document" "ec2_access_for_ansible" {
@@ -108,9 +102,6 @@ resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
   name   = format("%s-delius-db-allow_access_to_ssm_parameter_store", var.env_name)
   path   = "/"
   policy = data.aws_iam_policy_document.allow_access_to_ssm_parameter_store.json
-  tags = merge(var.tags,
-    { Name = format("%s-delius-db-ec2_access_for_ansible", var.env_name) }
-  )
 }
 #
 #resource "aws_iam_role_policy_attachment" "allow_access_to_ssm_parameter_store" {
@@ -122,9 +113,6 @@ resource "aws_iam_policy" "ec2_access_for_ansible" {
   name   = format("%s-delius-db-ec2_access_for_ansible", var.env_name)
   path   = "/"
   policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
-  tags = merge(var.tags,
-    { Name = format("%s-delius-db-ec2_access_for_ansible", var.env_name) }
-  )
 }
 
 #resource "aws_iam_role_policy" "business_unit_kms_key_access" {
@@ -173,12 +161,66 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
 resource "aws_iam_policy" "db_access_to_secrets_manager" {
   name   = "${var.env_name}-delius-db-allow-access-secrets-manager"
   policy = data.aws_iam_policy_document.db_access_to_secrets_manager.json
-  tags = merge(var.tags,
-    { Name = "${var.env_name}-delius-db-ec2-access" }
-  )
 }
 
 #resource "aws_iam_role_policy_attachment" "db_access_to_secrets_manager" {
 #  role       = aws_iam_role.db_ec2_instance_iam_role.name
 #  policy_arn = aws_iam_policy.db_access_to_secrets_manager.arn
 #}
+
+
+data "aws_iam_policy_document" "instance_ssm" {
+  statement {
+    sid    = "SSMManagedSSM"
+    effect = "Allow"
+    actions = [
+      "ssm:DescribeAssociation",
+      "ssm:GetDeployablePatchSnapshotForInstance",
+      "ssm:GetDocument",
+      "ssm:DescribeDocument",
+      "ssm:GetManifest",
+      "ssm:ListAssociations",
+      "ssm:ListInstanceAssociations",
+      "ssm:PutInventory",
+      "ssm:PutComplianceItems",
+      "ssm:PutConfigurePackageResult",
+      "ssm:UpdateAssociationStatus",
+      "ssm:UpdateInstanceAssociationStatus",
+      "ssm:UpdateInstanceInformation",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    sid    = "SSMManagedSSMMessages"
+    effect = "Allow"
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "SSMManagedEC2Messages"
+    effect = "Allow"
+    actions = [
+      "ec2messages:AcknowledgeMessage",
+      "ec2messages:DeleteMessage",
+      "ec2messages:FailMessage",
+      "ec2messages:GetEndpoint",
+      "ec2messages:GetMessages",
+      "ec2messages:SendReply"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "instance_ssm" {
+  name   = "${var.env_name}-delius-db-allow-access-ssm"
+  policy = data.aws_iam_policy_document.instance_ssm.json
+}
