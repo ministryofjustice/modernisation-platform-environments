@@ -1,7 +1,13 @@
 locals {
 
   # baseline presets config
-  preproduction_baseline_presets_options = {}
+  preproduction_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        hmpps_domain_services_pagerduty = "hmpps_domain_services_prod_alarms"
+      }
+    }
+  }
 
   # baseline config
   preproduction_config = {
