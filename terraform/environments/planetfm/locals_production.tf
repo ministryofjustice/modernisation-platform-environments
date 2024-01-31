@@ -198,6 +198,34 @@ locals {
           create_external_record = true
         }
       })
+      pd-cafm-a-16-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name                  = "base_windows_server_2012_r2_release_2024-01-29*"
+          ami_owner                 = "374269020027"
+          availability_zone         = "${local.region}b"
+          user_data_raw             = base64encode(file("./templates/user-data.yaml"))
+          instance_profile_policies = concat(local.defaults_app_ec2.config.instance_profile_policies, ["SSMPolicy"])
+        })
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "t3.large"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+        }
+        cloudwatch_metric_alarms = {} # no alarms as this is an RDS test instance
+        tags = {
+          description       = "RDS Test Instance"
+          app-config-status = "pending"
+          os-type           = "Windows"
+          ami               = "base_windows_server_2012_r2_release_2024-01-29*"
+          component         = "app"
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
 
       # web servers
       pd-cafm-w-5-a = merge(local.defaults_web_ec2, {
