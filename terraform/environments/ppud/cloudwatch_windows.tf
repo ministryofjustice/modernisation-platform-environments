@@ -303,34 +303,34 @@ resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Failed" {
 
 # Windows Defender Event Metrics
 
-resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Started" {
+resource "aws_cloudwatch_log_metric_filter" "MalwareScanStarted" {
   count          = local.is-production == true ? 1 : 0
-  name           = "MalwareScan-Started"
+  name           = "MalwareScanStarted"
   log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "[date, time, Instance, MalwareScan-Started, status=1000]"
+  pattern        = "[date, time, Instance, MalwareScanStarted, status=1000]"
   metric_transformation {
-    name      = "MalwareScan-Started"
+    name      = "MalwareScanStarted"
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
       Instance = "$Instance"
-      MalwareScan-Started = "$MalwareScan-Started"
+      MalwareScanStarted = "$MalwareScanStarted"
     }
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Finished" {
+resource "aws_cloudwatch_log_metric_filter" "MalwareScanFinished" {
   count          = local.is-production == true ? 1 : 0
-  name           = "MalwareScan-Finished"
+  name           = "MalwareScanFinished"
   log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
-  pattern        = "[date, time, Instance, MalwareScan-Finished, status=1001]"
+  pattern        = "[date, time, Instance, MalwareScanFinished, status=1001]"
   metric_transformation {
-    name      = "MalwareScan-Finished"
+    name      = "MalwareScanFinished"
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
       Instance = "$Instance"
-      MalwareScan-Finished = "$MalwareScan-Finished"
+      MalwareScanFinished = "$MalwareScanFinished"
     }
   }
 }
