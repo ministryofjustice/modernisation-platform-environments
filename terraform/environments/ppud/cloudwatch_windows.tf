@@ -312,6 +312,9 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Started" {
     name      = "MalwareScan-Started"
     namespace = "WindowsDefender"
     value     = "1"
+        dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
@@ -324,6 +327,9 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Finished" {
     name      = "MalwareScan-Finished"
     namespace = "WindowsDefender"
     value     = "1"
+        dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
@@ -336,6 +342,9 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Stopped" {
     name      = "MalwareScan-Stopped"
     namespace = "WindowsDefender"
     value     = "1"
+        dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
@@ -348,6 +357,9 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScan-Failed" {
     name      = "MalwareScan-Failed"
     namespace = "WindowsDefender"
     value     = "1"
+        dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
@@ -360,6 +372,9 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareBehavior-Detected" {
     name      = "MalwareBehavior-Detected"
     namespace = "WindowsDefender"
     value     = "1"
+        dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
@@ -372,6 +387,9 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareState-Detected" {
     name      = "MalwareState-Detected"
     namespace = "WindowsDefender"
     value     = "1"
+        dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
@@ -384,6 +402,9 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareSignatureUpdate-Failed" {
     name      = "MalwareSignatureUpdate-Failed"
     namespace = "WindowsDefender"
     value     = "1"
+        dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
@@ -396,6 +417,9 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineUpdate-Failed" {
     name      = "MalwareEngineUpdate-Failed"
     namespace = "WindowsDefender"
     value     = "1"
+        dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
 
@@ -408,5 +432,8 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineUpdate-OutofDate" {
     name      = "MalwareEngineUpdate-OutofDate"
     namespace = "WindowsDefender"
     value     = "1"
+        dimensions = {
+      Instance = "$Instance"
+    }
   }
 }
