@@ -14,29 +14,35 @@ tasks:
             Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
           }
 
+          # Example code for getting EC2 Instance facts
+
           $instanceId = Get-EC2InstanceMetadata -Category InstanceId
 
-          Write-Host "instanceId: $instanceId"
+          Write-Debug "instanceId: $instanceId"
 
+          # Get the EC2 instance details
           $instance = Get-EC2Instance -InstanceId $instanceId | Select-Object -ExpandProperty Instances
 
-          Write-Host "instance: $instance"
-
-          New-Item -Type File -Path "C:\Temp\instanceinfo.txt" -Force 
-
-          $instanceJson = $instance | ConvertTo-Json -Depth 10
-
-          Add-Content -Path "C:\Temp\instanceinfo.txt" -Value $instanceJson
-
+          # Get the EC2 instance tag value for the tag 'Name'
           $TagName = ( $instance.Tag | Where-Object { $_.Key -eq "Name"} ).Value
 
-          Add-Content -Path "C:\Temp\instanceinfo.txt" -Value "TagName: $TagName"
-      - frequency: always
-        type: powershell
-        runAs: admin
-        content: |-
-          # Are previously available values available?
-          Add-Content -Path "C:\Temp\instanceinfo.txt" -Value "TagName_two: $TagName"
+          Write-Debug "instance: $instance"
+
+          # Write the EC2 instance details to a file as Json
+          New-Item -Type File -Path "C:\Temp\instanceinfo.txt" -Force 
+          $instanceJson = $instance | ConvertTo-Json -Depth 10
+          Add-Content -Path "C:\Temp\instanceinfo.txt" -Value $instanceJson
+      
+          # Write the EC2 instance tag value for the tag 'Name' to a file
+          Add-Content -Path "C:\Temp\instanceinfo.txt" -Value "Tag = Name: $TagName"
+
+          # NOTE: Values from one code block like the one above are NOT available in subsequent blocks
+          # This means that if you wanted to supply a new hostname in an instance tag via terraform you
+          # would need to execute the $instanceId EC2InstanceMetadata and EC2Instance lookups in the block 
+          # where the value is needed
+          #
+          # When calling SSM documents it's likely better if the ssm-document does all the lookups for parameter values
+          # See windows-domain-join.yaml as a good example of this.
       - frequency: once
         type: powershell
         runAs: admin
@@ -46,9 +52,11 @@ tasks:
             Install-Package -Name "AWSPowerShell" -Force -SkipPublisherCheck
           }
 
+          $logFile = "C:\Temp\user_data_status.txt"
+
           # Create a file to track the status of the user data script
-          if (-Not (Test-Path -Path "C:\Temp\user_data_status.txt")) {
-            New-Item -Type File -Path "C:\Temp\user_data_status.txt" -Force
+          if (-Not (Test-Path -Path $logFile)) {
+            New-Item -Type File -Path $logFile -Force
           }
 
           Function Get-SSMAgentStatus {
@@ -71,20 +79,18 @@ tasks:
 
             $instanceId = Get-EC2InstanceMetadata -Category InstanceId
 
-            Add-Content -Path "C:\Temp\user_data_status.txt" -Value "Executing SSM Document $DocumentName with newHostname $Parameters.newHostname $(Get-Date)"
+            Add-Content -Path $logFile -Value "Executing SSM Document $DocumentName with newHostname $Parameters.newHostname $(Get-Date)"
 
-            Add-Content -Path "C:\Temp\user_data_status.txt" -Value "Executing on instance $instanceId. $(Get-Date)"
+            Add-Content -Path $logFile -Value "Executing on instance $instanceId. $(Get-Date)"
 
             $commandId = Send-SSMCommand -InstanceId $instanceId -DocumentName $DocumentName -Parameter $Parameters -Force
-            Write-Host "Executed SSM command with Command ID: $($commandId.CommandId)"
+            Add-Content -Path $logFile -Value "Executed SSM command with Command ID: $($commandId.CommandId) $(Get-Date)"
           }
-
-          $startTime = Get-Date
 
           $ssmDocuments = @(
             [PSCustomObject]@{
               "windows-domain-join" = @{
-                "newHostname" = "rstestssm2"
+                "newHostname" = "tag:Name" # default value when calling windows-domain-join
                 }
             }
           )
@@ -105,18 +111,20 @@ tasks:
           # }            
           #)
 
+          $startTime = Get-Date
+
           # Main loop to wait for SSM Agent to be running & run multiple ssm docs with parameters
           do {
             if (Get-SSMAgentStatus) {
-              Add-Content -Path "C:\Temp\user_data_status.txt" -Value "SSM Agent is running, executing SSM command. $(Get-Date)"
+              Add-Content -Path $logFile -Value "SSM Agent is running, executing SSM command. $(Get-Date)"
 
               foreach ($ssmDocument in $ssmDocuments) {
-                Add-Content -Path "C:\Temp\user_data_status.txt" - Value "SSM Document $ssmDocument run has started. $(Get-Date)"
+                Add-Content -Path $logFile -Value "SSM Document $ssmDocument run has started. $(Get-Date)"
                 Invoke-SSMDocument -SSMDocumentObject $ssmDocument
               }
               break
             } else {
-              Add-Content -Path "C:\Temp\user_data_status.txt" -Value "SSM Agent is not running yet. $(Get-Date) Waiting..."
+              Add-Content -Path $logFile -Value "SSM Agent is not running yet. $(Get-Date) Waiting..."
               Start-Sleep -Seconds 10
             }
           } while ((Get-Date) -lt $startTime.AddMinutes(10))
