@@ -105,8 +105,8 @@ resource "aws_route53_record" "external_prod" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.dacp_lb.dns_name
-    zone_id                = aws_lb.dacp_lb.zone_id
+    name                   = aws_lb.chaps_lb.dns_name
+    zone_id                = aws_lb.chaps_lb.zone_id
     evaluate_target_health = true
   }
 }
