@@ -12,6 +12,7 @@ module "jml_extract_lambda" {
   description   = "Generates a JML report and sends it to JMLv4"
   package_type  = "Image"
   memory_size   = 512
+  timeout       = 120
   image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/data-platform-jml-extract-lambda-ecr-repo:1.0.3"
 
   environment_variables = {
