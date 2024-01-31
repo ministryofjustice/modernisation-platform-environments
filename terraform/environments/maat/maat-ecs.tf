@@ -84,11 +84,6 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 
 resource "aws_ecs_cluster" "maat_app_ecs_cluster" {
   name = "${local.application_name}-ecs-cluster"
-
-#    setting {
-#     # name  = "containerInsights"
-#     # value = "enabled"
-#   }
 }
 
 ######################################
@@ -99,20 +94,16 @@ resource "aws_launch_template" "ec2-launch-template" {
   name_prefix            = "${local.application_name}-ec2-launch-template"
   image_id               = local.application_data.accounts[local.environment].ami_id
   instance_type          = local.application_data.accounts[local.environment].instance_type
-#   ebs_optimized          = true
-#   update_default_version = true
 
-# Need to check whether good to have
-#   monitoring {
-#     enabled = true
-#   }
+  monitoring {
+    enabled = true
+  }
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_instance_profile.name
   }
 
   network_interfaces {
-    # associate_public_ip_address = false
     security_groups             = [aws_security_group.ecs_security_group.id]
   }
 
@@ -182,7 +173,7 @@ resource "aws_autoscaling_policy" "maat_scaling_up_policy" {
 }
 
 resource "aws_autoscaling_policy" "maat_scaling_down_policy" {
-  name               = "${local.application_name}-scaling-up"
+  name               = "${local.application_name}-scaling-down"
   policy_type        = "SimpleScaling"
   adjustment_type         = "ChangeInCapacity"
   autoscaling_group_name = aws_autoscaling_group.ec2_scaling_group.name
