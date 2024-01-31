@@ -28,6 +28,10 @@ resource "random_string" "this" {
 
 resource "aws_s3_bucket" "landing_bucket" {
   bucket = "${var.supplier}-${random_string.this.result}"
+
+  tags = {
+    supplier = var.supplier
+  }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "landing_bucket" {
@@ -103,6 +107,10 @@ module "log_bucket" {
 
   source_bucket = aws_s3_bucket.landing_bucket
   account_id    = var.account_id
+  tags          = {
+    supplier = var.supplier
+  }
+}
 
 #------------------------------------------------------------------------------
 # AWS KMS for encrypting cloudwatch logs
@@ -113,7 +121,9 @@ resource "aws_kms_key" "this" {
   key_usage               = "ENCRYPT_DECRYPT"
   deletion_window_in_days = 30
 
-}
+  tags = {
+    supplier = var.supplier
+  }
 }
 
 resource "aws_kms_key_policy" "this" {
@@ -158,6 +168,10 @@ resource "aws_kms_key_policy" "this" {
 
 resource "aws_eip" "this" {
   domain = "vpc"
+
+  tags = {
+    supplier = var.supplier
+  }
 }
 
 #------------------------------------------------------------------------------
@@ -184,7 +198,7 @@ resource "aws_transfer_server" "this" {
   domain = "S3"
 
   tags = {
-    Name = var.supplier
+    supplier = var.supplier
   }
 
   security_policy_name = "TransferSecurityPolicy-2023-05"
@@ -220,11 +234,25 @@ resource "aws_cloudwatch_log_group" "this" {
 # AWS transfer workflow
 #
 # For files that arrive in the landing bucket:
-# 1. copy the file to the internal data store bucket
-# 2. delete the file from the landing bucket
+# 1. tag the file with the supplier who sent it
+# 2. copy the file to the internal data store bucket
+# 3. delete the file from the landing bucket
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_workflow" "this" {
+  description = "Move data from ${var.supplier} landing zone to data store"
+
+  steps {
+    tag_step_details {
+      name                 = "example"
+      source_file_location = "$${original.file}"
+      tags {
+        key   = "supplier"
+        value = var.supplier
+      }
+    }
+    type = "TAG"
+  }
   steps {
     copy_step_details {
       source_file_location = "$${original.file}"
@@ -242,6 +270,10 @@ resource "aws_transfer_workflow" "this" {
       source_file_location = "$${original.file}"
     }
     type = "DELETE"
+  }
+
+  tags = {
+    supplier = var.supplier
   }
 }
 
@@ -326,6 +358,10 @@ resource "aws_transfer_user" "this" {
   role      = aws_iam_role.this_transfer_user.arn
 
   home_directory = "/${aws_s3_bucket.landing_bucket.id}/"
+
+  tags = {
+    supplier = var.supplier
+  }
 }
 
 resource "aws_iam_role" "this_transfer_user" {
@@ -379,6 +415,10 @@ resource "aws_security_group" "this" {
   name        = "${var.supplier}-inbound-ips"
   description = "Allowed IP addresses for ${var.supplier}"
   vpc_id      = var.vpc_id
+
+  tags = {
+    supplier = var.supplier
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "this" {
@@ -404,6 +444,10 @@ resource "aws_transfer_user" "dev" {
   role      = aws_iam_role.this_transfer_user.arn
 
   home_directory = "/${aws_s3_bucket.landing_bucket.id}/"
+
+  tags = {
+    supplier = var.supplier
+  }
 }
 
 resource "aws_transfer_ssh_key" "dev_ssh_key" {
@@ -418,6 +462,10 @@ resource "aws_security_group" "dev" {
   name        = "${var.supplier}-dev-inbound-ips"
   description = "Allowed MoJ developer IP addresses for testing ${var.supplier} landing zone"
   vpc_id      = var.vpc_id
+
+  tags = {
+    supplier = var.supplier
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "dev" {

@@ -1,8 +1,10 @@
 
 resource "aws_s3_bucket" "this" {
-  bucket = "logs-${var.source_bucket.id}"
+  bucket = "${var.source_bucket.id}-logs"
 
   force_destroy = true
+
+  tags = var.tags
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
