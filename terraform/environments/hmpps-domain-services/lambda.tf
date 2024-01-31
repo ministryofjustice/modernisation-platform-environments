@@ -60,6 +60,6 @@ resource "aws_iam_role" "lambda-ad-role" {
 
 resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
   count      = local.environment == "test" ? 1 : 0 # temporary whilst on-going work
-  role       = aws_iam_role.lambda-ad-role.name
+  role       = aws_iam_role.lambda-ad-role[count.index].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
