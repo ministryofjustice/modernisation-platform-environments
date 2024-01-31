@@ -81,3 +81,17 @@ resource "aws_ssm_document" "network-testing-tools" {
     },
   )
 }
+
+resource "aws_ssm_document" "windows-domain-leave" {
+  name            = "windows-domain-leave"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/windows-domain-leave.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "network-testing-tools"
+    },
+  )
+}

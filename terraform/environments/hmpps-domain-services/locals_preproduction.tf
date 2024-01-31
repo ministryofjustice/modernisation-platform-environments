@@ -1,7 +1,13 @@
 locals {
 
   # baseline presets config
-  preproduction_baseline_presets_options = {}
+  preproduction_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        hmpps_domain_services_pagerduty = "hmpps_domain_services_prod_alarms"
+      }
+    }
+  }
 
   # baseline config
   preproduction_config = {
@@ -40,7 +46,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 2
+          desired_capacity = 0
           max_size         = 2
         })
         tags = {

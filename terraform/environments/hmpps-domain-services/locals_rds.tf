@@ -30,10 +30,7 @@ locals {
       internal_lb                      = false
       load_balancer_type               = "application"
       security_groups                  = ["public-lb"]
-      subnets = [
-        module.environment.subnet["public"]["eu-west-2a"].id,
-        module.environment.subnet["public"]["eu-west-2b"].id,
-      ]
+      subnets                          = module.environment.subnets["public"].ids
     }
   }
 

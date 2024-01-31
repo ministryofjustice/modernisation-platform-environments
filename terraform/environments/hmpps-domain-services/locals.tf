@@ -29,14 +29,15 @@ locals {
     enable_shared_s3                             = false # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = false # adds db backup buckets
     enable_oracle_secure_web                     = false # allows db to list all buckets
-    cloudwatch_metric_alarms                     = {}
+    cloudwatch_metric_alarms_default_actions = ["hmpps_domain_services_pagerduty"]
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    sns_topics               = {}
+
+    # sns_topics are defined in locals_${environment}.tf
   }
 
   baseline_acm_certificates              = {}
@@ -74,6 +75,7 @@ locals {
 
   baseline_secretsmanager_secrets = {}
   baseline_security_groups        = local.security_groups
-  baseline_sns_topics             = {}
   baseline_ssm_parameters         = {}
+
+  baseline_sns_topics = {}
 }
