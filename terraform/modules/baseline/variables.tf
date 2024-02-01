@@ -248,7 +248,6 @@ variable "ec2_autoscaling_groups" {
     lb_target_groups = optional(map(object({
       port                 = optional(number)
       protocol             = optional(string)
-      target_type          = string
       deregistration_delay = optional(number)
       health_check = optional(object({
         enabled             = optional(bool)

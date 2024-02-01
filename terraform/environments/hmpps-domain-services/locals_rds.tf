@@ -74,6 +74,7 @@ locals {
         matcher             = "200-399"
         path                = "/"
         port                = 80
+        protocol            = "HTTP"
         timeout             = 5
         unhealthy_threshold = 2
       }
