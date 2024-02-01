@@ -1,18 +1,22 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
 
-  developer_cidr_ipv4s = [
+  developer_cidr_ipv6s = [
     # Pen tester
     "2001:8b0:13dc::/48",
+    "2a05:d01c:e83:b500::/64",
+    "2a05:d01c:e83:b500:f25:37ec:29e9:4b6e",
+    "2603:1020:700:2::e2"
+  ]
+
+  developer_cidr_ipv4s = [
+    # Pen tester
     "90.155.48.192/26",
     "81.2.127.144/28",
     "81.187.169.170",
     "88.97.60.11",
-    "2a05:d01c:e83:b500::/64",
     "13.42.192.167",
-    "2a05:d01c:e83:b500:f25:37ec:29e9:4b6e",
     "51.104.217.191",
-    "2603:1020:700:2::e2",
     # fy nhy
     "46.69.144.146/32",
     # Petty France

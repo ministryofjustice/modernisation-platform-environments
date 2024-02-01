@@ -14,8 +14,15 @@ variable "supplier_shh_key" {
 }
 
 variable "supplier_cidr_ipv4s" {
-  description = "The allowed IP addresses for the supplier that can access the SFTP server"
+  description = "The allowed IPv4 addresses for the supplier that can access the SFTP server"
   type        = list(string)
+  default     = []
+}
+
+variable "supplier_cidr_ipv6s" {
+  description = "The allowed IPv6 addresses for the supplier that can access the SFTP server"
+  type        = list(string)
+  default     = []
 }
 
 variable "data_store_bucket" {
@@ -50,6 +57,13 @@ variable "dev_ssh_keys" {
 }
 
 variable "dev_cidr_ipv4s" {
-  description = "The allowed IP addresses for developers that can access the SFTP server"
+  description = "The allowed IPv4 addresses for developers that can access the SFTP server"
   type        = list(string)
+  default     = []
+}
+
+variable "dev_cidr_ipv6s" {
+  description = "The allowed IPv6 addresses for developers that can access the SFTP server"
+  type        = list(string)
+  default     = []
 }
