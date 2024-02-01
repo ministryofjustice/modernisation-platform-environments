@@ -7,8 +7,8 @@ module "gdpr_api_service" {
   env_name = var.env_name
   container_port_mappings = [
     {
-      containerPort = 80
-      hostPort      = 80 # check this
+      containerPort = 8080
+      hostPort      = 8080
       protocol      = "tcp"
     }
   ]
@@ -34,6 +34,8 @@ module "gdpr_api_service" {
   tags = var.tags
   microservice_lb_arn = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
+  alb_listener_rule_priority = 5
+  alb_listener_rule_paths = ["/gdpr/api", "/gdpr/api/*"]
   platform_vars = var.platform_vars
   container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-gdpr-api-ecr-repo:${var.gdpr_config.api_image_tag}"
   account_config = var.account_config
