@@ -416,7 +416,6 @@ resource "aws_security_group_rule" "external_lb_ingress_2" {
     "18.169.147.172/32",
     "18.130.148.126/32",
     "35.176.148.126/32"
-
   ]
 }
 
