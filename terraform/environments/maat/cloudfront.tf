@@ -86,8 +86,14 @@ resource "random_password" "cloudfront" {
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
-  name        = "cloudfront-secret-${local.application_name}" # ${formatdate("DDMMMYYYYhhmm", timestamp())}
+  name        = "cloudfront-secret-${upper(local.application_name)}" # ${formatdate("DDMMMYYYYhhmm", timestamp())}
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
+  tags = merge(
+    local.tags,
+    {
+      Name = "cloudfront-secret-${upper(local.application_name)}"
+    }
+  )
 }
 
 resource "aws_secretsmanager_secret_version" "cloudfront" {

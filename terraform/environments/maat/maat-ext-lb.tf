@@ -2,7 +2,7 @@ locals {
     existing_bucket_name = ""
     account_number = local.environment_management.account_ids[terraform.workspace]
     external_lb_idle_timeout = 65
-    ext_lb_listener_protocol = "HTTP"
+    ext_lb_listener_protocol = "HTTP" # TODO Switch to HTTPS once the certs are configured
     ext_lb_ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01"
     ext_listener_custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
 }
@@ -146,15 +146,16 @@ resource "aws_lb" "external" {
   )
 }
 
-
-#######################################################################
-# To be completed
-#######################################################################
-
 resource "aws_security_group" "external_lb" {
   name        = "${local.application_name}-external-lb-security-group"
   description = "App External ALB Security Group"
   vpc_id      = data.aws_vpc.shared.id
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-external-lb-security-group"
+    }
+  )
 }
 
 resource "aws_security_group_rule" "external_lb_ingress" {
