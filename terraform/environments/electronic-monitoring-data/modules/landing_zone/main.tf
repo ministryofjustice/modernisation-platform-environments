@@ -421,15 +421,26 @@ resource "aws_security_group" "this" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "this" {
+resource "aws_vpc_security_group_ingress_rule" "this_ipv4" {
   security_group_id = aws_security_group.this.id
-  description       = "Allow specific access to IP address via port 2222"
+  description       = "Allow specific access to IPv4 address via port 2222"
   ip_protocol       = "tcp"
   from_port         = 2222
   to_port           = 2222
 
   for_each  = { for cidr_ipv4 in var.supplier_cidr_ipv4s : cidr_ipv4 => cidr_ipv4 }
   cidr_ipv4 = each.key
+}
+
+resource "aws_vpc_security_group_ingress_rule" "this_ipv6" {
+  security_group_id = aws_security_group.this.id
+  description       = "Allow specific access to IPv6 address via port 2222"
+  ip_protocol       = "tcp"
+  from_port         = 2222
+  to_port           = 2222
+
+  for_each  = { for cidr_ipv6 in var.supplier_cidr_ipv6s : cidr_ipv6 => cidr_ipv6 }
+  cidr_ipv6 = each.key
 }
 
 #------------------------------------------------------------------------------
@@ -468,7 +479,7 @@ resource "aws_security_group" "dev" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "dev" {
+resource "aws_vpc_security_group_ingress_rule" "dev_ipv4" {
   security_group_id = aws_security_group.dev.id
 
   ip_protocol = "tcp"
@@ -477,4 +488,15 @@ resource "aws_vpc_security_group_ingress_rule" "dev" {
 
   for_each  = { for cidr_ipv4 in var.dev_cidr_ipv4s : cidr_ipv4 => cidr_ipv4 }
   cidr_ipv4 = each.key
+}
+
+resource "aws_vpc_security_group_ingress_rule" "dev_ipv6" {
+  security_group_id = aws_security_group.dev.id
+
+  ip_protocol = "tcp"
+  from_port   = 2222
+  to_port     = 2222
+
+  for_each  = { for cidr_ipv6 in var.dev_cidr_ipv6s : cidr_ipv6 => cidr_ipv6 }
+  cidr_ipv6 = each.key
 }

@@ -12,6 +12,7 @@ module "capita" {
     "85.115.53.0/24",
     "85.115.54.0/24"
   ]
+  supplier_cidr_ipv6s = []
 
   data_store_bucket = aws_s3_bucket.data_store
 
@@ -25,6 +26,7 @@ module "capita" {
   give_dev_access = true
   dev_ssh_keys    = local.developer_ssh_keys
   dev_cidr_ipv4s  = local.developer_cidr_ipv4s
+  dev_cidr_ipv6s  = local.developer_cidr_ipv6s
 }
 
 module "civica" {
@@ -34,8 +36,8 @@ module "civica" {
 
   give_access         = false
   supplier_shh_key    = null
-  supplier_cidr_ipv4s = [
-  ]
+  supplier_cidr_ipv4s = []
+  supplier_cidr_ipv6s = []
 
   data_store_bucket = aws_s3_bucket.data_store
 
@@ -49,6 +51,7 @@ module "civica" {
   give_dev_access = true
   dev_ssh_keys    = local.developer_ssh_keys
   dev_cidr_ipv4s  = local.developer_cidr_ipv4s
+  dev_cidr_ipv6s  = local.developer_cidr_ipv6s
 }
 
 module "g4s" {
@@ -58,8 +61,8 @@ module "g4s" {
 
   give_access         = false
   supplier_shh_key    = null
-  supplier_cidr_ipv4s = [
-  ]
+  supplier_cidr_ipv4s = []
+  supplier_cidr_ipv6s = []
 
   data_store_bucket = aws_s3_bucket.data_store
 
@@ -73,4 +76,5 @@ module "g4s" {
   give_dev_access = true
   dev_ssh_keys    = local.developer_ssh_keys
   dev_cidr_ipv4s  = local.developer_cidr_ipv4s
+  dev_cidr_ipv6s  = local.developer_cidr_ipv6s
 }
