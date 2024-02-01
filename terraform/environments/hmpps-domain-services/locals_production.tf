@@ -87,6 +87,9 @@ locals {
         config = merge(local.rds_ec2_instance.config, {
           availability_zone = "eu-west-2b"
         })
+        instance = merge(local.rds_ec2_instance.instance, {
+          instance_type = "t3.large"
+        })
         tags = merge(local.rds_ec2_instance.tags, {
           description = "Remote Desktop Services for hmpp.noms.root domain"
         })
