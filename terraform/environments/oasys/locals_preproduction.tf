@@ -115,25 +115,25 @@ locals {
         })
       })
 
-      # "pp-onr-db-a" = merge(local.database_onr_a, {
-      #   config = merge(local.database_onr_a.config, {
-      #     instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
-      #       "Ec2PreprodDatabasePolicy",
-      #     ])
-      #   })
-      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "oracle_11g_oasys_patchset_addition"
-      #     })
-      #   })
-      #   instance = merge(local.database_onr_a.instance, {
-      #     instance_type = "r6i.2xlarge"
-      #   })
-      #   tags = merge(local.database_onr_a.tags, {
-      #     instance-scheduling = "skip-scheduling"
-      #     oracle-sids         = "PPONRBOD PPOASREP PPONRSYS PPONRAUD"
-      #   })
-      # })
+      "pp-onr-db-a" = merge(local.database_onr_a, {
+        config = merge(local.database_onr_a.config, {
+          instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
+        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+            branch = "oracle_11g_oasys_patchset_addition"
+          })
+        })
+        instance = merge(local.database_onr_a.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_onr_a.tags, {
+          instance-scheduling = "skip-scheduling"
+          oracle-sids         = "PPONRBOD PPOASREP PPONRSYS PPONRAUD"
+        })
+      })
 
       "pp-${local.application_name}-bip-a" = merge(local.bip_a, {
         config = merge(local.bip_a.config, {
