@@ -43,13 +43,11 @@ module "weblogic" {
       valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_eis_user_context.arn
     }
   ]
-  container_port_mappings = [
+  container_port_config = [
     {
-      containerPort = var.weblogic_config.frontend_container_port
-      hostPort      = var.weblogic_config.frontend_container_port
+      containerPort = 8080
       protocol      = "tcp"
-    },
-  ]
+  }]
   ecs_cluster_arn         = module.ecs.ecs_cluster_arn
   env_name                = var.env_name
   health_check_path       = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
