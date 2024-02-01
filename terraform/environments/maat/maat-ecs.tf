@@ -195,6 +195,24 @@ resource "aws_security_group" "ecs_security_group" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
+resource "aws_security_group_rule" "alb_ingress" {
+  type                     = "ingress"
+  from_port                = 32768
+  to_port                  = 61000
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.ecs_security_group.id
+  source_security_group_id = aws_security_group.external_lb.id
+}
+
+resource "aws_security_group_rule" "outbound" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.ecs_security_group.id
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
 #####################################
 # ECS CLOUDWATCH LOG GROUP
 #####################################
