@@ -191,10 +191,12 @@ variable "ecs_cluster_arn" {
   type        = string
 }
 
-variable "task_def_container_port" {
-  description = "The port on which the container is exposing the application"
-  type        = number
-  default     = 8080
+variable "container_port_config" {
+  description = "The port configuration for the container. First in list is used for Load Balancer Configuration"
+  type = list(object({
+    containerPort = number
+    protocol      = string
+  }))
 }
 
 variable "target_group_protocol" {
@@ -284,15 +286,6 @@ variable "container_secrets" {
   type = list(object({
     name      = string
     valueFrom = string
-  }))
-}
-
-variable "container_port_mappings" {
-  description = "Port mappings to pass to the container"
-  type = list(object({
-    containerPort = number
-    hostPort      = number
-    protocol      = string
   }))
 }
 

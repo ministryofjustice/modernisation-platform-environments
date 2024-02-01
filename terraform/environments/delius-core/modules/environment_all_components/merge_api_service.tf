@@ -5,10 +5,9 @@ module "merge_api_service" {
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
-  container_port_mappings = [
+  container_port_config = [
     {
       containerPort = 8080
-      hostPort      = 8080
       protocol      = "tcp"
     }
   ]
@@ -27,14 +26,17 @@ module "merge_api_service" {
       valueFrom = aws_ssm_parameter.delius_core_merge_api_client_secret.arn
     }
   ]
-  ingress_security_groups = []
-  tags                    = var.tags
-  microservice_lb_arn     = aws_lb.delius_core_frontend.arn
-  platform_vars           = var.platform_vars
-  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-merge-api-ecr-repo:${var.merge_config.api_image_tag}"
-  account_config          = var.account_config
-  health_check_path       = "/merge/api/actuator/health"
-  account_info            = var.account_info
+  ingress_security_groups            = []
+  tags                               = var.tags
+  microservice_lb_arn                = aws_lb.delius_core_frontend.arn
+  microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
+  alb_listener_rule_priority         = 7
+  alb_listener_rule_paths            = ["/merge/api", "/merge/api/*"]
+  platform_vars                      = var.platform_vars
+  container_image                    = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-merge-api-ecr-repo:${var.merge_config.api_image_tag}"
+  account_config                     = var.account_config
+  health_check_path                  = "/merge/api/actuator/health"
+  account_info                       = var.account_info
   container_environment_vars = [
     {
       name  = "SERVER_SERVLET_CONTEXT_PATH"
@@ -113,5 +115,4 @@ module "merge_api_service" {
     #      value = "classpath:/db"
     #    }
   ]
-
 }

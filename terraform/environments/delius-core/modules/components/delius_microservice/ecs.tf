@@ -8,7 +8,7 @@ module "container_definition" {
   readonly_root_filesystem = false
   environment              = var.container_environment_vars
   secrets                  = var.container_secrets
-  port_mappings            = var.container_port_mappings
+  port_mappings            = var.container_port_config
   log_configuration = {
     logDriver = "awslogs"
     options = {
@@ -52,7 +52,7 @@ module "ecs_service" {
     {
       target_group_arn = aws_lb_target_group.this.arn
       container_name   = var.name
-      container_port   = var.task_def_container_port
+      container_port   = var.container_port_config[0].containerPort
     }
   ]
 
