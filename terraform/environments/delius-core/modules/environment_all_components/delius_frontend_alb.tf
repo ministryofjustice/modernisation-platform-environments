@@ -69,7 +69,7 @@ resource "aws_lb" "delius_core_frontend" {
 }
 
 
-resource "aws_lb_listener" "listener" {
+resource "aws_lb_listener" "listener_https" {
   load_balancer_arn = aws_lb.delius_core_frontend.id
   port              = 443
   protocol          = "HTTPS"
@@ -77,8 +77,11 @@ resource "aws_lb_listener" "listener" {
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
-    target_group_arn = module.weblogic.target_group_arn
-    type             = "forward"
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "404"
+    }
   }
 }
 
@@ -94,6 +97,7 @@ resource "aws_lb_listener" "listener_http" {
       port        = "443"
       protocol    = "HTTPS"
       status_code = "HTTP_301"
+      path        = var.environment_config.homepage_path
     }
   }
 }
@@ -124,54 +128,58 @@ resource "aws_lb_listener" "listener_http" {
 #  }
 #}
 
-resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
-
-  zone_id = var.account_config.route53_external_zone.zone_id
-  name    = local.frontend_url
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.delius_core_frontend.dns_name
-    zone_id                = aws_lb.delius_core_frontend.zone_id
-    evaluate_target_health = true
+# Listener rules
+resource "aws_lb_listener_rule" "homepage_listener_rule" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
   }
-}
-
-resource "aws_route53_record" "external_validation" {
-  provider = aws.core-network-services
-
-  allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
-  ttl             = 60
-  type            = local.domain_type_main[0]
-  zone_id         = var.account_config.route53_network_services_zone.zone_id
-}
-
-resource "aws_route53_record" "external_validation_subdomain" {
-  provider = aws.core-vpc
-
-  allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
-  ttl             = 60
-  type            = local.domain_type_sub[0]
-  zone_id         = var.account_config.route53_external_zone.zone_id
-}
-
-resource "aws_acm_certificate" "external" {
-  domain_name               = "modernisation-platform.service.justice.gov.uk"
-  validation_method         = "DNS"
-  subject_alternative_names = [local.frontend_url]
-  tags                      = local.tags
-
-  lifecycle {
-    create_before_destroy = true
+  action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_302"
+      path        = var.environment_config.homepage_path
+    }
   }
+  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }
 
-resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  condition {
+    path_pattern {
+      values = [
+        "/NDelius*",
+        "/jspellhtml/*"
+      ]
+    }
+  }
+  action {
+    type             = "forward"
+    target_group_arn = module.weblogic.target_group_arn
+  }
+  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
+}
+
+resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 1 # must be before ndelius_allowed_paths_rule
+  condition {
+    path_pattern {
+      values = [
+        "/NDelius*/delius/a4j/g/3_3_3.Final*DATA*", # mitigates CVE-2018-12533
+      ]
+    }
+  }
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "404"
+    }
+  }
 }

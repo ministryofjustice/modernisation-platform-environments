@@ -213,6 +213,12 @@ variable "microservice_lb_arn" {
   type        = string
 }
 
+variable "microservice_lb_https_listener_arn" {
+  description = "The ARN of the load balancer HTTPS listener to use for the target group"
+  type        = string
+  default     = null
+}
+
 variable "create_rds" {
   description = "Whether to create an RDS instance"
   type        = bool
@@ -316,6 +322,18 @@ variable "alb_stickiness_type" {
   description = "Type of stickiness for the alb target group"
   type        = string
   default     = "lb_cookie"
+}
+
+variable "alb_listener_rule_priority" {
+  description = "Priority of the alb listener"
+  type        = number
+  default     = null
+}
+
+variable "alb_listener_rule_paths" {
+  description = "Paths to use for the alb listener rule"
+  type        = list(string)
+  default     = null
 }
 
 variable "cloudwatch_error_pattern" {
