@@ -96,7 +96,7 @@
     "production": {
       "example_var": "production-data",
       "maat_api_mlra_vpc_cidr": "10.27.64.0/21",
-      "maat_api_ecs_service_count": 2,<
+      "maat_api_ecs_service_count": 2,
       "maat_api_ecs_cpu": 1024,
       "maat_api_ecs_memory": 3072,
       "maat_api_ecs_container_cpu": 922,
