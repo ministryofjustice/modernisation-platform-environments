@@ -181,7 +181,7 @@ resource "aws_lb_listener" "external" {
   port              = 443
   protocol        = local.ext_lb_listener_protocol
   ssl_policy      = local.ext_lb_listener_protocol == "HTTPS" ? local.ext_lb_ssl_policy : null
-  certificate_arn = local.ext_lb_listener_protocol == "HTTPS" ? null : null # For HTTPS, this needs the ARN of the certificate from Mod Platform - aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
+  certificate_arn = local.ext_lb_listener_protocol == "HTTPS" ? null : null # TODO For HTTPS, this needs the ARN of the certificate from Mod Platform - aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
 
   default_action {
     type = "fixed-response"

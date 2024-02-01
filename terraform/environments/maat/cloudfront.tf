@@ -226,7 +226,8 @@ resource "aws_cloudfront_distribution" "external" {
     bucket          = aws_s3_bucket.cloudfront.bucket_domain_name
     prefix          = local.application_name
   }
-#   web_acl_id = aws_waf_web_acl.waf_acl.id # TODO update with the actual WAF
+  
+  web_acl_id = aws_waf_web_acl.waf_acl.id
 
   # This is a required block in Terraform. Here we are having no geo restrictions.
   restrictions { 
