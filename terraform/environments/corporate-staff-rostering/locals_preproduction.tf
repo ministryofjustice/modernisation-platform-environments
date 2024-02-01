@@ -704,6 +704,12 @@ locals {
         }
 
         listeners = {
+          alarm_target_group_names = [
+            "pp-csr-w-12-7770",
+            "pp-csr-w-12-7771",
+            "pp-csr-w-12-7780",
+            "pp-csr-w-12-7781",
+          ]
           http = {
             port     = 80
             protocol = "TCP"
