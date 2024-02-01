@@ -19,7 +19,7 @@ module "environment_test" {
   app_name      = local.application_name
   platform_vars = local.platform_vars
 
-  account_config      = local.account_config_test
+  account_config      = local.account_config
   environment_config  = local.environment_config_test
   ldap_config         = local.ldap_config_test
   db_config           = local.db_config_test

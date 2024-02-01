@@ -3,25 +3,6 @@
 # Sample data
 # tags demonstrate inheritance due to merges in the module
 locals {
-  account_config_test = {
-    shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
-    private_subnet_ids            = data.aws_subnets.shared-private.ids
-    ordered_private_subnet_ids    = local.ordered_subnet_ids
-    public_subnet_ids             = data.aws_subnets.shared-public.ids
-    data_subnet_ids               = data.aws_subnets.shared-data.ids
-    data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
-    route53_inner_zone_info       = data.aws_route53_zone.inner
-    route53_network_services_zone = data.aws_route53_zone.network-services
-    route53_external_zone         = data.aws_route53_zone.external
-    general_shared_kms_key_arn    = data.aws_kms_key.general_shared.arn
-    shared_vpc_id                 = data.aws_vpc.shared.id
-    kms_keys = {
-      ebs_shared     = data.aws_kms_key.ebs_shared.arn
-      general_shared = data.aws_kms_key.general_shared.arn
-      rds_shared     = data.aws_kms_key.rds_shared.arn
-    }
-  }
-
   environment_config_test = {
     migration_environment_private_cidr = ["10.162.32.0/22", "10.162.36.0/22", "10.162.40.0/22"]
     migration_environment_db_cidr      = ["10.162.44.0/24", "10.162.45.0/24", "10.162.46.0/25"]
