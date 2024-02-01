@@ -30,19 +30,19 @@ locals {
     }
 
     baseline_ec2_instances = {
-      # test-oem-a = merge(local.oem_ec2_default, {
-      #   config = merge(local.oem_ec2_default.config, {
-      #     availability_zone = "eu-west-2a"
-      #   })
-      #   user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
-      #     args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-      #       branch = "45027fb7482eb7fb601c9493513bb73658780dda" # 2023-08-11
-      #     })
-      #   })
-      #   tags = merge(local.oem_ec2_default.tags, {
-      #     oracle-sids = "EMREP TRCVCAT"
-      #   })
-      # })
+      test-oem-a = merge(local.oem_ec2_default, {
+        config = merge(local.oem_ec2_default.config, {
+          availability_zone = "eu-west-2a"
+        })
+        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
+          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.oem_ec2_default.tags, {
+          # oracle-sids = "EMREP TRCVCAT"
+        })
+      })
     }
 
     baseline_s3_buckets = {
