@@ -36,6 +36,9 @@ resource "aws_security_group" "load_balancer_security_group" {
     cidr_blocks = [
       "81.134.202.29/32",  # MoJ Digital VPN
       "35.176.93.186/32",  # Global Protect VPN
+      "18.169.147.172/32", # Global Protect VPN 
+      "18.130.148.126/32", # Global Protect VPN
+      "35.176.148.126/32", # Global Protect VPN
       "51.149.250.0/24",   # mojo_aws_prod_byoip_cidr
       "51.149.249.0/29",   # ARK Corsham Internet Egress Exponential-E
       "10.184.0.0/16",     # Global Protect AWS VPC
