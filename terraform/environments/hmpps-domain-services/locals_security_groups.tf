@@ -1,11 +1,11 @@
 locals {
 
   security_group_cidrs_devtest = {
-    azure_vnets = module.ip_addresses.azure_fixngo_cidrs.devtest
+    azure_vnets        = module.ip_addresses.azure_fixngo_cidrs.devtest
     domain_controllers = module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers
   }
   security_group_cidrs_preprod_prod = {
-    azure_vnets = module.ip_addresses.azure_fixngo_cidrs.prod
+    azure_vnets        = module.ip_addresses.azure_fixngo_cidrs.prod
     domain_controllers = module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers
 
   }
