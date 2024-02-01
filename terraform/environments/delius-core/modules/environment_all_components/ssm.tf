@@ -198,6 +198,10 @@ resource "aws_ssm_parameter" "delius_core_merge_api_client_secret" {
   tags = local.tags
 }
 
+data "aws_ssm_parameter" "delius_core_merge_api_client_secret" {
+  name = aws_ssm_parameter.delius_core_merge_api_client_secret.name
+}
+
 resource "aws_ssm_parameter" "delius_core_weblogic_ndelius_domain_umt_client_secret" {
   name  = format("/%s-%s/weblogic/ndelius-domain/umt_client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"

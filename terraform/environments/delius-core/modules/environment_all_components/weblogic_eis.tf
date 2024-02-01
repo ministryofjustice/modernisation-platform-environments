@@ -150,7 +150,7 @@ module "weblogic_eis" {
     },
     {
       name      = "MERGE_SECRET"
-      valueFrom = data.aws_ssm_parameter.merge_secret.arn
+      valueFrom = data.aws_ssm_parameter.delius_core_merge_api_client_secret.arn
     },
     {
       name      = "PDFCREATION_SECRET"
@@ -165,12 +165,11 @@ module "weblogic_eis" {
     #      valueFrom = aws_sns_topic.delius_core_topic.arn
     #    }
   ]
-  container_port_mappings = [
+  container_port_config = [
     {
-      containerPort = var.weblogic_eis_config.container_port
-      hostPort      = var.weblogic_eis_config.container_port
+      containerPort = 8080
       protocol      = "tcp"
-    },
+    }
   ]
 
   name     = "weblogic-eis"
@@ -212,18 +211,6 @@ data "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
 }
 
 
-resource "aws_ssm_parameter" "merge_secret" {
-  name  = "/${var.env_name}/delius/weblogic/ndelius-domain/umt_client_secret"
-  type  = "SecureString"
-  value = "DEFAULT"
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "merge_secret" {
-  name = aws_ssm_parameter.merge_secret.name
-}
 
 resource "aws_ssm_parameter" "usermanagement_secret" {
   name  = "/${var.env_name}/delius/umt/umt/delius_secret"

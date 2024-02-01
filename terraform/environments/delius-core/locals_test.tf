@@ -148,11 +148,6 @@ locals {
     container_cpu    = 1024
   }
 
-  gdpr_config_test = {
-    api_image_tag = "REPLACE"
-    ui_image_tag  = "REPLACE"
-  }
-
   merge_config_test = {
     api_image_tag = "REPLACE"
     ui_image_tag  = "REPLACE"
@@ -162,12 +157,6 @@ locals {
     api_image_tag = "REPLACE"
     ui_image_tag  = "REPLACE"
   }
-
-  merge_config_test = {
-    api_image_tag = "REPLACE"
-    ui_image_tag  = "REPLACE"
-  }
-
 
   bastion_config_test = {
     business_unit           = local.vpc_name
