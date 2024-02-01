@@ -10,7 +10,6 @@ locals {
   weblogic_target_group_http_7001 = {
     port                 = 7001
     protocol             = "HTTP"
-    target_type          = "instance"
     deregistration_delay = 30
     health_check = {
       enabled             = true
@@ -19,6 +18,7 @@ locals {
       matcher             = "200-399"
       path                = "/"
       port                = 7001
+      protocol            = "HTTP"
       timeout             = 5
       unhealthy_threshold = 2
     }
@@ -31,7 +31,6 @@ locals {
   weblogic_target_group_http_7777 = {
     port                 = 7777
     protocol             = "HTTP"
-    target_type          = "instance"
     deregistration_delay = 30
     health_check = {
       enabled             = true
@@ -40,6 +39,7 @@ locals {
       matcher             = "200-399"
       path                = "/keepalive.htm"
       port                = 7777
+      protocol            = "HTTP"
       timeout             = 5
       unhealthy_threshold = 2
     }
