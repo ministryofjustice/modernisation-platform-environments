@@ -153,7 +153,7 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   condition {
     path_pattern {
       values = [
-        "/sNDeliu*",
+        "/NDelius*",
         "/jspellhtml/*"
       ]
     }
