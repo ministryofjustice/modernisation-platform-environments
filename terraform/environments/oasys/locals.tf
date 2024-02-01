@@ -100,7 +100,6 @@ locals {
   target_group_http_8080 = {
     port                 = 8080
     protocol             = "HTTP"
-    target_type          = "instance"
     deregistration_delay = 30
     health_check = {
       enabled             = true
@@ -109,6 +108,7 @@ locals {
       matcher             = "200-399"
       path                = "/"
       port                = 8080
+      protocol            = "HTTP"
       timeout             = 5
       unhealthy_threshold = 5
     }

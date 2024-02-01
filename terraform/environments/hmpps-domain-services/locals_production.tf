@@ -83,9 +83,14 @@ locals {
           description = "Remote Desktop Gateway for hmpp.noms.root domain"
         })
       })
-      pd-rds-1-b = merge(local.rds_ec2_instance, {
+      pd-rds-1-a = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
-          availability_zone = "eu-west-2b"
+          availability_zone         = "eu-west-2a"
+          user_data_raw             = base64encode(file("./templates/user-data-domain-join.yaml"))
+          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy"])
+        })
+        instance = merge(local.rds_ec2_instance.instance, {
+          instance_type = "t3.large"
         })
         tags = merge(local.rds_ec2_instance.tags, {
           description = "Remote Desktop Services for hmpp.noms.root domain"
@@ -104,7 +109,7 @@ locals {
           })
           pd-rds-1-https = merge(local.rds_target_groups.https, {
             attachments = [
-              { ec2_instance_name = "pd-rds-1-b" },
+              { ec2_instance_name = "pd-rds-1-a" },
             ]
           })
         }
