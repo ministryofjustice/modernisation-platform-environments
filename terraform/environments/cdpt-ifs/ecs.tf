@@ -362,8 +362,3 @@ resource "aws_iam_role" "ec2_instance_role" {
 }
 EOF
 }
-
-  resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "${local.application_name}-ec2-instance-profile"
-  role = aws_iam_role.ec2_instance_role.name
-}
