@@ -114,7 +114,7 @@ locals {
     },
     {
       name           = "standbydb1"
-      ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_"
+      ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16:06:00.575Z"
       user_data_raw = base64encode(
         templatefile(
           "${path.module}/templates/userdata.sh.tftpl",
