@@ -112,6 +112,7 @@ locals {
                   host_header = {
                     values = [
                       "rdweb1.hmpps-domain.service.justice.gov.uk",
+                      "cafmtx.planetfm.service.justice.gov.uk",
                     ]
                   }
                 }]

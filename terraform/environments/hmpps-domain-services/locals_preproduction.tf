@@ -94,6 +94,7 @@ locals {
                   host_header = {
                     values = [
                       "rdweb1.preproduction.hmpps-domain.service.justice.gov.uk",
+                      "cafmtx.pp.planetfm.service.justice.gov.uk",
                     ]
                   }
                 }]
