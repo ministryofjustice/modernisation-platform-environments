@@ -36,42 +36,10 @@ locals {
           "*.preproduction.hmpps-domain.service.justice.gov.uk",
           "*.pp.planetfm.service.justice.gov.uk",
         ]
-        external_validation_records_created = false
-        # cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for hmpps domain load balancer"
-        }
-      }
-    }
-
-    baseline_ec2_autoscaling_groups = {
-
-      pp-rds-2012 = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "base_windows_server_2012_r2_release*"
-          availability_zone             = null
-          ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["rds-ec2s"]
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-        }
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 2
-          max_size         = 2
-        })
-        lb_target_groups = {
-          http  = local.rds_target_groups.http
-          https = local.rds_target_groups.https
-        }
-        tags = {
-          description = "Windows Server 2012 for testing"
-          os-type     = "Windows"
-          component   = "test"
         }
       }
     }
@@ -85,14 +53,14 @@ locals {
           description = "Remote Desktop Gateway for hmpp.noms.root domain"
         })
       })
-      pp-rds-1-b = merge(local.rds_ec2_instance, {
-        config = merge(local.rds_ec2_instance.config, {
-          availability_zone = "eu-west-2a"
-        })
-        tags = merge(local.rds_ec2_instance.tags, {
-          description = "Remote Desktop Services for hmpp.noms.root domain"
-        })
-      })
+      # pp-rds-1-a = merge(local.rds_ec2_instance, {
+      #   config = merge(local.rds_ec2_instance.config, {
+      #     availability_zone = "eu-west-2a"
+      #   })
+      #   tags = merge(local.rds_ec2_instance.tags, {
+      #     description = "Remote Desktop Services for hmpp.noms.root domain"
+      #   })
+      # })
     }
 
     baseline_lbs = {
@@ -105,13 +73,14 @@ locals {
           })
           pp-rds-1-https = merge(local.rds_target_groups.https, {
             attachments = [
-              { ec2_instance_name = "pp-rds-1-b" },
+              # { ec2_instance_name = "pp-rds-1-a" },
             ]
           })
         }
         listeners = {
           http = local.rds_lb_listeners.http
           https = merge(local.rds_lb_listeners.https, {
+            certificate_names_or_arns = ["remote_desktop_and_planetfm_wildcard_cert"]
             rules = {
               pp-rdgw-1-http = {
                 priority = 100
@@ -141,34 +110,6 @@ locals {
                   }
                 }]
               }
-              pp-rdgw-2-http = {
-                priority = 300
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "pp-rds-2012-http"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdgateway2.preproduction.hmpps-domain.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              pd-rds-2-https = {
-                priority = 400
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "pp-rds-2012-https"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdweb2.preproduction.hmpps-domain.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
             }
           })
         }
@@ -180,8 +121,6 @@ locals {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
-          { name = "rdgateway2", type = "A", lbs_map_key = "public" },
-          { name = "rdweb2", type = "A", lbs_map_key = "public" },
         ]
       }
     }

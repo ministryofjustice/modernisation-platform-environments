@@ -28,46 +28,23 @@ module "oracle_db_primary" {
   account_config = var.account_config
   account_info   = var.account_info
   db_ami = {
-    name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
-    owner      = var.env_name == "dev" ? "self" : var.platform_vars.environment_management.account_ids["core-shared-services-production"]
+    name_regex = var.db_config.ami_name_regex
+    owner      = "self"
   }
   db_type           = "primary"
   count             = 1
   db_count_index    = count.index + 1
-  ec2_instance_type = "r6i.xlarge"
+  ec2_instance_type = var.db_config.instance_type
 
   security_group_ids = [module.oracle_db_shared.security_group.id]
 
   ec2_key_pair_name = module.oracle_db_shared.db_key_pair.key_name
 
-  user_data_replace_on_change = var.account_info.mp_environment == "development" ? true : false
+  user_data_replace_on_change = false
 
-  ebs_volumes = {
-    "/dev/sdb" = { label = "app", size = 200 } # /u01
-    "/dev/sdc" = { label = "app", size = 100 } # /u02
-    "/dev/sde" = { label = "data" }            # DATA
-    "/dev/sdf" = { label = "flash" }           # FLASH
-    "/dev/sds" = { label = "swap" }
-  }
-  ebs_volume_config = {
-    app = {
-      iops       = 3000
-      throughput = 125
-      type       = "gp3"
-    }
-    data = {
-      iops       = 3000
-      throughput = 125
-      type       = "gp3"
-      total_size = 500
-    }
-    flash = {
-      iops       = 3000
-      throughput = 125
-      type       = "gp3"
-      total_size = 500
-    }
-  }
+  ebs_volumes       = var.db_config.ebs_volumes
+  ebs_volume_config = var.db_config.ebs_volume_config
+
   env_name           = var.env_name
   environment_config = var.environment_config
   subnet_id          = var.account_config.ordered_private_subnet_ids[count.index % 3]
@@ -76,12 +53,7 @@ module "oracle_db_primary" {
   tags = local.tags
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
-    {
-      branch               = "main"
-      ansible_repo         = "modernisation-platform-configuration-management"
-      ansible_repo_basedir = "ansible"
-      ansible_args         = "oracle_19c_install"
-    }
+    var.db_config.ansible_user_data_config
   )
 
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
@@ -102,46 +74,24 @@ module "oracle_db_standby" {
   account_info   = var.account_info
 
   db_ami = {
-    name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
-    owner      = var.env_name == "dev" ? "self" : var.platform_vars.environment_management.account_ids["core-shared-services-production"]
+    name_regex = var.db_config.ami_name_regex
+    owner      = "self"
   }
 
   db_type        = "standby"
   count          = 2
   db_count_index = count.index + 1
 
-  ec2_instance_type = "r6i.xlarge"
+  ec2_instance_type = var.db_config.instance_type
 
   security_group_ids = [module.oracle_db_shared.security_group.id]
 
   ec2_key_pair_name = module.oracle_db_shared.db_key_pair.key_name
 
-  ebs_volumes = {
-    "/dev/sdb" = { label = "app", size = 200 } # /u01
-    "/dev/sdc" = { label = "app", size = 100 } # /u02
-    "/dev/sde" = { label = "data" }            # DATA
-    "/dev/sdf" = { label = "flash" }           # FLASH
-    "/dev/sds" = { label = "swap" }
-  }
-  ebs_volume_config = {
-    app = {
-      iops       = 3000
-      throughput = 125
-      type       = "gp3"
-    }
-    data = {
-      iops       = 3000
-      throughput = 125
-      type       = "gp3"
-      total_size = 500
-    }
-    flash = {
-      iops       = 3000
-      throughput = 125
-      type       = "gp3"
-      total_size = 500
-    }
-  }
+  user_data_replace_on_change = false
+
+  ebs_volumes       = var.db_config.ebs_volumes
+  ebs_volume_config = var.db_config.ebs_volume_config
 
   env_name           = var.env_name
   environment_config = var.environment_config
@@ -151,12 +101,7 @@ module "oracle_db_standby" {
   user_data = base64encode(
     templatefile(
       "${path.module}/templates/userdata.sh.tftpl",
-      {
-        branch               = "main"
-        ansible_repo         = "modernisation-platform-configuration-management"
-        ansible_repo_basedir = "ansible"
-        ansible_args         = "oracle_19c_install"
-      }
+      var.db_config.ansible_user_data_config
     )
   )
 
