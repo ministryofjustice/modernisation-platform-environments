@@ -25,6 +25,11 @@ locals {
       rds_shared     = data.aws_kms_key.rds_shared.arn
     }
     dns_suffix = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    environment_management        = local.environment_management
+    business_unit                 = local.vpc_name
+    application_name              = local.application_name
+    environment                   = local.environment
+    subnet_set                    = local.subnet_set
   }
 
   platform_vars = {

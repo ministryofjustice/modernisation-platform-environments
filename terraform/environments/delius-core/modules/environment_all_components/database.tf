@@ -18,6 +18,7 @@ module "oracle_db_shared" {
     aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
+    aws.modernisation-platform = aws.modernisation-platform
   }
 
 }
