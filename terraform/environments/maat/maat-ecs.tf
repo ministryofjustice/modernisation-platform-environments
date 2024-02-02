@@ -12,6 +12,7 @@ resource "aws_iam_role" "ec2_instance_role" {
   )
   assume_role_policy = <<EOF
 {
+    "Version": "2008-10-17",
     "Statement": [
         {
             "Action": "sts:AssumeRole",
@@ -193,6 +194,24 @@ resource "aws_security_group" "ecs_security_group" {
   name        = "${local.application_name}-ecs-security-group"
   description = "App ECS Security Group"
   vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_security_group_rule" "alb_ingress" {
+  type                     = "ingress"
+  from_port                = 32768
+  to_port                  = 61000
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.ecs_security_group.id
+  source_security_group_id = aws_security_group.external_lb.id
+}
+
+resource "aws_security_group_rule" "outbound" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.ecs_security_group.id
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 #####################################
