@@ -160,7 +160,6 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   }
 }
 
-# TODO Commenting out CloudFront code as certificate is not validated yet
 # resource "aws_cloudfront_distribution" "external" {
 #   http_version = "http2"
 #   origin {
@@ -250,6 +249,32 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 
 # }
 
+# resource "aws_route53_record" "cloudfront-non-prod" {
+#   count    = local.environment != "production" ? 1 : 0
+#   provider = aws.core-vpc
+#   zone_id  = data.aws_route53_zone.external.zone_id
+#   name     = "${local.application_url_prefix}.${data.aws_route53_zone.external.name}"
+#   type     = "A"
+#   alias {
+#     name                   = aws_cloudfront_distribution.external.domain_name
+#     zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
+#     evaluate_target_health = true
+#   }
+# }
+
+# resource "aws_route53_record" "cloudfront-prod" {
+#   count    = local.environment == "production" ? 1 : 0
+#   provider = aws.core-network-services
+#   zone_id  = data.aws_route53_zone.production-network-services.zone_id
+#   name     = "TBC" # TODO Production URL to be confirmed
+#   type     = "A"
+#   alias {
+#     name                   = aws_cloudfront_distribution.external.domain_name
+#     zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
+#     evaluate_target_health = true
+#   }
+# }
+
 resource "aws_acm_certificate" "cloudfront" {
   domain_name               = local.application_data.accounts[local.environment].domain_name
   validation_method         = "DNS"
@@ -260,4 +285,33 @@ resource "aws_acm_certificate" "cloudfront" {
   lifecycle {
     prevent_destroy = false
   }
+}
+
+resource "aws_route53_record" "cloudfront_external_validation" {
+  provider = aws.core-network-services
+
+  count           = local.environment == "production" ? 0 : 1
+  allow_overwrite = true
+  name            = local.cloudfront_domain_name_main[0]
+  records         = local.cloudfront_domain_record_main
+  ttl             = 60
+  type            = local.cloudfront_domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+}
+
+resource "aws_route53_record" "cloudfront_external_validation_subdomain" {
+  provider = aws.core-vpc
+
+  count           = local.environment == "production" ? 0 : 1
+  allow_overwrite = true
+  name            = local.cloudfront_domain_name_sub[0]
+  records         = local.cloudfront_domain_record_sub
+  ttl             = 60
+  type            = local.cloudfront_domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+resource "aws_acm_certificate_validation" "cloudfront" {
+  certificate_arn         = aws_acm_certificate.cloudfront.arn
+  validation_record_fqdns = [local.cloudfront_domain_name_main[0], local.cloudfront_domain_name_sub[0]]
 }
