@@ -95,3 +95,27 @@ EOF
   )
 }
 
+resource "aws_iam_role_policy" "app_execution" {
+  name = "execution-${var.networking[0].application}"
+  role = aws_iam_role.app_execution.id
+
+  policy = <<-EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+           "Action": [
+              "ecr:*",
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents",
+              "logs:DescribeLogStreams",
+              "secretsmanager:GetSecretValue"
+           ],
+           "Resource": "*",
+           "Effect": "Allow"
+      }
+    ]
+  }
+  EOF
+}
