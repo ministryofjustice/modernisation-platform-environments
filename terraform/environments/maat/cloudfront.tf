@@ -312,6 +312,7 @@ resource "aws_route53_record" "cloudfront_external_validation_subdomain" {
 }
 
 resource "aws_acm_certificate_validation" "cloudfront" {
+  provider        = aws.us-east-1
   certificate_arn         = aws_acm_certificate.cloudfront.arn
   validation_record_fqdns = [local.cloudfront_domain_name_main[0], local.cloudfront_domain_name_sub[0]]
 }
