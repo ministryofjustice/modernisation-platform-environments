@@ -34,9 +34,11 @@ module "civica" {
 
   supplier = "civica"
 
-  give_access         = false
-  supplier_shh_key    = null
-  supplier_cidr_ipv4s = []
+  give_access         = true
+  supplier_shh_key    = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBCJBwZM5nMigS31soM45PITAHCmyhQpdDAkdX1liqnIZSd8A+zn3XQyVRy5E2a39gfsng5hAQetDFJKn+SaayATCQAzN0cJWlcrvtv314UsRV+PxO236sWVf+RwguUDZRQ=="
+  supplier_cidr_ipv4s = [
+    "20.0.26.153/32"
+  ]
   supplier_cidr_ipv6s = []
 
   data_store_bucket = aws_s3_bucket.data_store
