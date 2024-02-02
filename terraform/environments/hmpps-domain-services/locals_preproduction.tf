@@ -80,7 +80,7 @@ locals {
         listeners = {
           http = local.rds_lb_listeners.http
           https = merge(local.rds_lb_listeners.https, {
-            certificate_names_or_arns = ["remote_desktop_and_planetfm_wildcard_cert"]
+            certificate_names_or_arns = ["remote_desktop_wildcard_and_planetfm_cert"]
             rules = {
               pp-rdgw-1-http = {
                 priority = 100
