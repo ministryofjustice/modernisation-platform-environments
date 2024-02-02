@@ -238,9 +238,130 @@ resource "aws_iam_role_policy" "app_execution" {
   EOF
 }
 
+# EC2 launch template - settings to use for new EC2s added to the group
+# Note - when updating this you will need to manually terminate the EC2s
+# so that the autoscaling group creates new ones using the new launch template
+
+resource "aws_launch_template" "ec2-launch-template" {
+  name_prefix   = "${local.application_name}-ec2-launch-template"
+  image_id      = local.application_data.accounts[local.environment].ami_image_id
+  instance_type = local.application_data.accounts[local.environment].instance_type
+  key_name      = "${local.application_name}-ec2"
+  ebs_optimized = true
+
+  monitoring {
+    enabled = true
+  }
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "optional"
+  }
+
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_instance_profile.name
   }
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups             = [aws_security_group.cluster_ec2.id]#, aws_security_group.db.id]
+  }
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_size           = 30
+      volume_type           = "gp2"
+      iops                  = 0
+    }
+  }
+
+  user_data = local.user_data
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(tomap({
+      "Name" = "${local.application_name}-ecs-cluster"
+    }), local.tags)
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags = merge(tomap({
+      "Name" = "${local.application_name}-ecs-cluster"
+    }), local.tags)
+  }
+
+  tags = merge(tomap({
+    "Name" = "${local.application_name}-ecs-cluster-template"
+  }), local.tags)
+}
+
+resource "aws_security_group" "cluster_ec2" {
+  name        = "${local.application_name}-cluster-ec2-security-group"
+  description = "controls access to the cluster ec2 instance"
+  vpc_id      = data.aws_vpc.shared.id
+
+#ingress {
+#  description     = "allow access on HTTP from load balancer"
+#  from_port       = 80
+#  to_port         = 80
+#  protocol        = "tcp"
+#  cidr_blocks     = ["0.0.0.0/0"]
+#  security_groups = [aws_security_group.chaps_lb_sc.id]
+#}
+
+# ingress {
+#   description     = "Allow RDP ingress"
+#   from_port       = 3389
+#   to_port         = 3389
+#   protocol        = "tcp"
+#   security_groups = [module.bastion_linux.bastion_security_group]
+# }
+
+#  egress {
+#    description     = "Cluster EC2 loadbalancer egress rule"
+#    from_port       = 0
+#    to_port         = 0
+#    protocol        = "-1"
+#    cidr_blocks     = ["0.0.0.0/0"]
+#    security_groups = []
+#  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-cluster-ec2-security-group"
+    }
+  )
+}
+
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "${local.application_name}-ec2-instance-profile"
+  role = aws_iam_role.ec2_instance_role.name
+}
+
+resource "aws_iam_role" "ec2_instance_role" {
+  name = "${local.application_name}-ec2-instance-role"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
 
   resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${local.application_name}-ec2-instance-profile"
