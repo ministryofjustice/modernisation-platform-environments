@@ -95,6 +95,56 @@ EOF
   )
 }
 
+resource "aws_iam_role_policy" "app_task" {
+  name = "task-${var.networking[0].application}"
+  role = aws_iam_role.app_task.id
+
+  policy = <<-EOF
+  {
+   "Version": "2012-10-17",
+   "Statement": [
+     {
+       "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "ecr:*",
+          "iam:*",
+          "ec2:*"
+        ],
+       "Resource": "*"
+     }
+   ]
+  }
+  EOF
+}
+
+resource "aws_iam_role" "app_execution" {
+  name = "execution-${var.networking[0].application}"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "execution-${var.networking[0].application}"
+    },
+  )
+}
 resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
