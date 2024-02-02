@@ -191,10 +191,12 @@ variable "ecs_cluster_arn" {
   type        = string
 }
 
-variable "task_def_container_port" {
-  description = "The port on which the container is exposing the application"
-  type        = number
-  default     = 8080
+variable "container_port_config" {
+  description = "The port configuration for the container. First in list is used for Load Balancer Configuration"
+  type = list(object({
+    containerPort = number
+    protocol      = string
+  }))
 }
 
 variable "target_group_protocol" {
@@ -287,15 +289,6 @@ variable "container_secrets" {
   }))
 }
 
-variable "container_port_mappings" {
-  description = "Port mappings to pass to the container"
-  type = list(object({
-    containerPort = number
-    hostPort      = number
-    protocol      = string
-  }))
-}
-
 variable "alb_security_group_id" {
   description = "The security group ID of the ALB"
   type        = string
@@ -345,4 +338,16 @@ variable "cloudwatch_error_pattern" {
 variable "container_image" {
   description = "The container image to use"
   type        = string
+}
+
+variable "container_memory" {
+  description = "The container memory to use"
+  type        = number
+  default     = 1024
+}
+
+variable "container_cpu" {
+  description = "The container cpu to use"
+  type        = number
+  default     = 512
 }
