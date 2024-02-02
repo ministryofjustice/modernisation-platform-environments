@@ -1,7 +1,9 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "environment_name": "development",
+       "container_port": 80,
+       "client_id": "838aa730-5f66-46df-9ff7-07eea29035ba"
     },
     "test": {
       "example_var": "test-data"
