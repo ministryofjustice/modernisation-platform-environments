@@ -5,10 +5,9 @@ module "community_api" {
   certificate_arn       = aws_acm_certificate.external.arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
-  container_port_mappings = [
+  container_port_config = [
     {
       containerPort = var.community_api.container_port
-      hostPort      = var.community_api.host_port
       protocol      = var.community_api.protocol
     }
   ]
@@ -26,17 +25,14 @@ module "community_api" {
     #   name      = "SPRING_LDAP_PASSWORD"
     #   valueFrom = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/ldap_admin_password"
     # },
-    {
-      name      = "DELIUS_USERNAME"
-      valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.name
-    #  value = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/casenotes_user"
-    },
-    {
-      name      = "DELIUS_PASSWORD"
-      valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.name
-    #  value = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/casenotes_password"
-    }
-    # ,
+    # {
+    #   name      = "DELIUS_USERNAME"
+    #   valueFrom = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/casenotes_user"
+    # },
+    # {
+    #   name      = "DELIUS_PASSWORD"
+    #   valueFrom = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/casenotes_password"
+    # },
     # {
     #   name      = "SENTRY_DSN"
     #   valueFrom = "/${var.environment_name}/${var.project_name}/probation-integration/community-api/sentry-dsn"
