@@ -507,6 +507,8 @@ locals {
         records = [
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1128.awsdns-13.org", "ns-2027.awsdns-61.co.uk", "ns-854.awsdns-42.net", "ns-90.awsdns-11.com"] },
           { name = "pp", type = "NS", ttl = "86400", records = ["ns-1407.awsdns-47.org", "ns-1645.awsdns-13.co.uk", "ns-63.awsdns-07.com", "ns-730.awsdns-27.net"] },
+          { name = "_a6a2b9e651b91ed3f1e906b4f1c3c317", type = "CNAME", ttl = 86400, records = ["_c4257165635a7b495df6c4fbd986c09f.mhbtsbpdnt.acm-validations.aws"] },
+          { name = "cafmtx", type = "CNAME", ttl = 3600, records = ["rdweb1.hmpps-domain.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "cafmtx", type = "A", lbs_map_key = "private" },
