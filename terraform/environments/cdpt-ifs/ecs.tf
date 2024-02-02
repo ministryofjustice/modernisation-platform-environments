@@ -237,3 +237,12 @@ resource "aws_iam_role_policy" "app_execution" {
   }
   EOF
 }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_instance_profile.name
+  }
+
+  resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "${local.application_name}-ec2-instance-profile"
+  role = aws_iam_role.ec2_instance_role.name
+}
