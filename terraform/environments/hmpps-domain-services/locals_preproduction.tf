@@ -61,7 +61,7 @@ locals {
           })
           pp-rds-1-https = merge(local.rds_target_groups.https, {
             attachments = [
-              # { ec2_instance_name = "pp-rds-1-a" },
+              { ec2_instance_name = "pp-rds-1-a" },
             ]
           })
         }
@@ -94,6 +94,7 @@ locals {
                   host_header = {
                     values = [
                       "rdweb1.preproduction.hmpps-domain.service.justice.gov.uk",
+                      "cafmtx.pp.planetfm.service.justice.gov.uk",
                     ]
                   }
                 }]

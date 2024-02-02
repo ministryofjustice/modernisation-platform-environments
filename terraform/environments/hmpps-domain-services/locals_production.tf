@@ -79,7 +79,7 @@ locals {
           })
           pd-rds-1-https = merge(local.rds_target_groups.https, {
             attachments = [
-              # { ec2_instance_name = "pd-rds-1-a" },
+              { ec2_instance_name = "pd-rds-1-a" },
             ]
           })
         }
@@ -112,6 +112,7 @@ locals {
                   host_header = {
                     values = [
                       "rdweb1.hmpps-domain.service.justice.gov.uk",
+                      "cafmtx.planetfm.service.justice.gov.uk",
                     ]
                   }
                 }]
