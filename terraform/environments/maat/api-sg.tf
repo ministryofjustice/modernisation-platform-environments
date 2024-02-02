@@ -66,7 +66,7 @@ resource "aws_security_group_rule" "AppAlbSecurityGroupModPlatformIngress" {
   to_port           = 80
   protocol          = "tcp"
   security_group_id = aws_security_group.maat_api_alb_sg.id
-  cidr_blocks       = [local.application_data.accounts[local.environment].mlra_vpc_cidr]
+  cidr_blocks       = [local.application_data.accounts[local.environment].maat_api_mlra_vpc_cidr]
 }
 
 resource "aws_security_group_rule" "api_gateway_outbound" {

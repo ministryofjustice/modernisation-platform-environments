@@ -6,12 +6,6 @@ variable "app_name" {
   type = string
 }
 
-variable "internal" {
-  description = "whether the LB is internal or not. Defaults to `true`"
-  type        = bool
-  default     = true
-}
-
 # Account level info
 variable "account_info" {
   type = object({
@@ -25,43 +19,7 @@ variable "account_info" {
 }
 
 variable "account_config" {
-  type = object({
-    shared_vpc_cidr               = string
-    shared_vpc_id                 = string
-    private_subnet_ids            = list(string)
-    ordered_private_subnet_ids    = list(string)
-    public_subnet_ids             = list(string)
-    data_subnet_ids               = list(string)
-    data_subnet_a_id              = string
-    route53_inner_zone_info       = any
-    route53_network_services_zone = any
-    route53_external_zone         = any
-    kms_keys = object({
-      ebs_shared     = any
-      general_shared = any
-      rds_shared     = any
-    })
-    general_shared_kms_key_arn = optional(string)
-  })
-  default = {
-    shared_vpc_cidr                = "default_shared_vpc_cidr"
-    shared_vpc_id                  = "default_shared_vpc_id"
-    private_subnet_ids             = ["default_private_subnet_ids"]
-    ordered_private_subnet_ids     = []
-    public_subnet_ids              = ["default_public_subnet_ids"]
-    data_subnet_ids                = ["default_data_subnet_ids"]
-    data_subnet_a_id               = "default_data_subnet_id"
-    route53_inner_zone_info        = {}
-    route53_network_services_zone  = {}
-    route53_external_zone          = {}
-    migration_environment_vpc_cidr = "default_migration_environment_vpc_cidr"
-    general_shared_kms_key_arn     = "default_general_shared_kms_key_arn"
-    kms_keys = {
-      ebs_shared     = {}
-      general_shared = {}
-      rds_shared     = {}
-    }
-  }
+  type = any
 }
 
 variable "environment_config" {
@@ -162,24 +120,11 @@ variable "merge_config" {
 }
 
 variable "weblogic_config" {
-  type = object({
-    name                          = string
-    frontend_service_name         = string
-    frontend_fully_qualified_name = string
-    frontend_image_tag            = string
-    frontend_container_port       = number
-    frontend_url_suffix           = string
-    db_name                       = string
-  })
-  default = {
-    name                          = "default_name"
-    frontend_service_name         = "default_frontend_service_name"
-    frontend_fully_qualified_name = "default_frontend_fully_qualified_name"
-    frontend_image_tag            = "default_frontend_image_tag"
-    frontend_container_port       = 8080
-    frontend_url_suffix           = "default_frontend_url_suffix"
-    db_name                       = "default_db_name"
-  }
+  type = any
+}
+
+variable "weblogic_eis_config" {
+  type = any
 }
 
 variable "tags" {
@@ -192,23 +137,6 @@ variable "platform_vars" {
   })
 }
 
-variable "delius_db_container_config" {
-  type = object({
-    image_tag            = string
-    image_name           = string
-    fully_qualified_name = string
-    port                 = number
-    name                 = string
-  })
-  default = {
-    image_tag            = "5.7.4"
-    image_name           = "delius-core-testing-db"
-    fully_qualified_name = "testing-db"
-    port                 = 1521
-    name                 = "MODNDA"
-  }
-
-}
 
 variable "bastion_config" {
   type = any

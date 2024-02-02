@@ -3,24 +3,6 @@
 # Sample data
 # tags demonstrate inheritance due to merges in the module
 locals {
-  account_config_dev = {
-    shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
-    private_subnet_ids            = data.aws_subnets.shared-private.ids
-    public_subnet_ids             = data.aws_subnets.shared-public.ids
-    ordered_private_subnet_ids    = local.ordered_subnet_ids
-    data_subnet_ids               = data.aws_subnets.shared-data.ids
-    data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
-    route53_inner_zone_info       = data.aws_route53_zone.inner
-    route53_network_services_zone = data.aws_route53_zone.network-services
-    route53_external_zone         = data.aws_route53_zone.external
-    shared_vpc_id                 = data.aws_vpc.shared.id
-    kms_keys = {
-      ebs_shared     = data.aws_kms_key.ebs_shared.arn
-      general_shared = data.aws_kms_key.general_shared.arn
-      rds_shared     = data.aws_kms_key.rds_shared.arn
-    }
-  }
-
   environment_config_dev = {
     migration_environment_private_cidr = ["10.162.32.0/22", "10.162.36.0/22", "10.162.40.0/22"]
     migration_environment_db_cidr      = ["10.162.44.0/24", "10.162.45.0/24", "10.162.46.0/25"]
@@ -233,17 +215,17 @@ locals {
   }
 
   weblogic_config_dev = {
-    name                          = "weblogic"
-    frontend_service_name         = "weblogic"
-    frontend_fully_qualified_name = "${local.application_name}-dev-${local.frontend_service_name}"
-    frontend_image_tag            = "5.7.6"
-    frontend_container_port       = 8080
-    frontend_url_suffix           = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-    db_service_name               = "testing-db"
-    db_fully_qualified_name       = "${local.application_name}-${local.db_service_name}"
-    db_image_tag                  = "5.7.4"
-    db_port                       = 1521
-    db_name                       = "MODNDA"
+    image_tag        = "5.7.6"
+    container_port   = 8080
+    container_memory = 4096
+    container_cpu    = 2048
+  }
+
+  weblogic_eis_config_dev = {
+    image_tag        = "5.7.6"
+    container_port   = 8080
+    container_memory = 2048
+    container_cpu    = 1024
   }
 
   bastion_config_dev = {
@@ -251,13 +233,5 @@ locals {
     subnet_set              = local.subnet_set
     environment             = local.environment
     extra_user_data_content = "yum install -y openldap-clients"
-  }
-
-  delius_db_container_config_dev = {
-    image_tag            = "5.7.4"
-    image_name           = "delius-core-testing-db"
-    fully_qualified_name = "testing-db"
-    port                 = 1521
-    name                 = "MODNDA"
   }
 }
