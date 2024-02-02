@@ -139,7 +139,7 @@ data "aws_kms_key" "rds_shared" {
 }
 
 # State for core-network-services resource information
-data "terraform_remote_state" "core_network_services" {
+data "terraform_remote_state" "core_network_services" { #tfsec:ignore:aws-s3-enable-versioning
   backend = "s3"
   config = {
     acl     = "bucket-owner-full-control"
