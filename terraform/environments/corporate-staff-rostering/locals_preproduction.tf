@@ -704,6 +704,9 @@ locals {
         }
 
         listeners = {
+          alarm_target_group_names = [
+            "pp-csr-w-12-7781" # this alarm will deliberately fail, will be removed later
+          ]
           http = {
             port     = 80
             protocol = "TCP"
@@ -1208,6 +1211,13 @@ locals {
         }
 
         listeners = {
+          # we only want alarms on the training servers in pre-production 
+          alarm_target_group_names = [ 
+            "pp-csr-w-34-7770", 
+            "pp-csr-w-34-7771",
+            "pp-csr-w-34-7780",
+            "pp-csr-w-34-7781",
+          ]
           http = {
             port     = 80
             protocol = "TCP"

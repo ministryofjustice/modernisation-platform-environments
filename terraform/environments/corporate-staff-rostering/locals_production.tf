@@ -608,6 +608,12 @@ locals {
         }
 
         listeners = {
+          alarm_target_group_names = [
+            "pd-csr-w-12-7770",
+            "pd-csr-w-12-7771",
+            "pd-csr-w-12-7780",
+            "pd-csr-w-12-7781",
+          ]
           http = {
             port     = 80
             protocol = "TCP"
@@ -776,6 +782,12 @@ locals {
         }
 
         listeners = {
+          alarm_target_group_names = [
+            "pd-csr-w-34-7770",
+            "pd-csr-w-34-7771",
+            "pd-csr-w-34-7780",
+            "pd-csr-w-34-7781",
+          ]
           http = {
             port     = 80
             protocol = "TCP"
@@ -944,6 +956,12 @@ locals {
         }
 
         listeners = {
+          alarm_target_group_names = [
+            "pd-csr-w-56-7770",
+            "pd-csr-w-56-7771",
+            "pd-csr-w-56-7780",
+            "pd-csr-w-56-7781",
+          ]
           http = {
             port     = 80
             protocol = "TCP"
