@@ -27,7 +27,7 @@ module "oracle_db_primary" {
   account_config = var.account_config
   account_info   = var.account_info
   db_ami = {
-    name_regex = "^delius_core_ol_8_5_oracle_db_19c_"
+    name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
     owner      = var.env_name == "dev" ? "self" : var.platform_vars.environment_management.account_ids["core-shared-services-production"]
   }
   db_type           = "primary"
@@ -101,7 +101,7 @@ module "oracle_db_standby" {
   account_info   = var.account_info
 
   db_ami = {
-    name_regex = "^delius_core_ol_8_5_oracle_db_19c_"
+    name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
     owner      = var.env_name == "dev" ? "self" : var.platform_vars.environment_management.account_ids["core-shared-services-production"]
   }
 
