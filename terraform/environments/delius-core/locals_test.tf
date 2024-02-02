@@ -134,11 +134,6 @@ locals {
     ui_image_tag  = "REPLACE"
   }
 
-  merge_config_test = {
-    api_image_tag = "REPLACE"
-    ui_image_tag  = "REPLACE"
-  }
-
   bastion_config_test = {
     business_unit           = local.vpc_name
     subnet_set              = local.subnet_set
