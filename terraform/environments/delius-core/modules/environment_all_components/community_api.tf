@@ -44,6 +44,8 @@ module "community_api" {
   ]
   ingress_security_groups = []
   tags                    = var.tags
+  # TODO - This LB is a placeholder marked no 13 on the architecture diagram: https://dsdmoj.atlassian.net/wiki/spaces/DAM/pages/3773105057/High-Level+Architecture
+  # Two LBs (public and secure) are needed as show on the architecture diagram. There is an architectural discussion to be had if we could get away with just one LB instead
   microservice_lb_arn     = aws_lb.delius_core_frontend.arn
   # microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
   platform_vars     = var.platform_vars
@@ -54,30 +56,36 @@ module "community_api" {
   container_environment_vars = [
     {
       name  = "SPRING_PROFILES_ACTIVE"
+      # The value below is from the legacy
       value = "oracle"
     },
     {
       name  = "SPRING_DATASOURCE_USERNAME"
+      # The value below is from the legacy
       value = "delius_pool"
     },
     {
       name  = "SPRING_DATASOURCE_URL"
       value = aws_ssm_parameter.delius_core_community_api_env_var_jdbc_url.arn
+      # The value below is from the legacy
       # value = data.terraform_remote_state.database.outputs.jdbc_failover_url
     },
     {
       name  = "DELIUS_LDAP_USERS_BASE"
       value = aws_ssm_parameter.delius_core_ldap_principal.arn
+      # The value below is from the legacy
       # value = data.terraform_remote_state.ldap.outputs.ldap_base_users
     },
     {
       name  = "SPRING_LDAP_USERNAME"
       value = aws_secretsmanager_secret.delius_core_ldap_credential.arn
+      # The value below is from the legacy
       # value = data.terraform_remote_state.ldap.outputs.ldap_bind_user
     },
     {
       name  = "SPRING_LDAP_URLS"
       value = "ldap://${module.ldap.nlb_dns_name}:${local.ldap_port}"
+      # The value below is from the legacy
       # value = "${data.terraform_remote_state.ldap.outputs.ldap_protocol}://${data.terraform_remote_state.ldap.outputs.private_fqdn_ldap_elb}:${data.terraform_remote_state.ldap.outputs.ldap_port}"
     },
     # {
