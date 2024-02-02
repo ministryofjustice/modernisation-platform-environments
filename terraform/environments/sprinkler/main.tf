@@ -863,6 +863,19 @@ resource "aws_key_pair" "key_pair" {
   public_key = tls_private_key.tls_key_pair.public_key_openssh
   depends_on = [tls_private_key.tls_key_pair]
 }
+data "template_file" "cymulate_data_1" {
+  template = file("user_data/linux_cymulate_user_data_private.sh")
+  vars = {
+   cymulate_agent_linkingkey = var.cymulate_agent_linkingkey_1
+  }
+}
+data "template_file" "cymulate_data_2" {
+  template = file("user_data/linux_cymulate_user_data_private.sh")
+  vars = {
+   cymulate_agent_linkingkey = var.cymulate_agent_linkingkey_2
+  }
+}
+
 # Create a private EC2 instance (bastion host)
 resource "aws_instance" "cymulate-test" {
   ami                    = "ami-0a398a6b09d71fecc" # Replace this with a suitable AMI ID
@@ -871,10 +884,27 @@ resource "aws_instance" "cymulate-test" {
   key_name               = aws_key_pair.key_pair.key_name
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
-  user_data              = file("user_data/linux_cymulate_user_data_private.sh")
+  # user_data              = file("user_data/linux_cymulate_user_data_private.sh")
+  user_data              = data.template_file.cymulate_data_1.rendered
 
     tags = {
-    Name = "cymulate-test"
+    Name = "cymulate-test",
+    instance_scheduling = "skip-scheduling"
+  }
+}
+# Create a private EC2 instance (bastion host)
+resource "aws_instance" "cymulate-test-2nd" {
+  ami                    = "ami-0a398a6b09d71fecc" # Replace this with a suitable AMI ID
+  instance_type          = "t2.micro"
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  key_name               = aws_key_pair.key_pair.key_name
+  vpc_security_group_ids = [aws_security_group.bastion_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  # user_data              = file("user_data/linux_cymulate_user_data_private.sh")
+  user_data              = data.template_file.cymulate_data_2.rendered
+    tags = {
+    Name = "cymulate-test-2nd",
+    instance_scheduling = "skip-scheduling"
   }
 }
 
