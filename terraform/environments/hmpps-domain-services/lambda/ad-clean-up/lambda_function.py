@@ -7,16 +7,9 @@ def check_ad_for_object(object):
     
     # create a secrets manager client
     secrets_manager_client = boto3.client('secretsmanager')
-
-    test_domain = 'azure.noms.root'
-    prod_domain = 'azure.hmpp.root'
     
     # extract the secret value from hmpps-domain-services-test / hmpps-domain-services-prod
-    test_secret = '/microsoft/AD/azure.noms.root/shared-passwords'  # this acould be variablised 
-    prod_secret = '/microsoft/AD/azure.hmpp.root/shared-passwords'
-
-    # password logic to be added DSOS-2545
-
+    secret_name = '/microsoft/AD/{domain}/shared-passwords'
     response = secrets_manager_client.get_secret_value(SecretId=secret_name)
     secret_data = response['SecretString']
 
@@ -55,16 +48,28 @@ def check_ad_for_object(object):
         else:
             print(f"The object {object} is not found in Active Directory - no further action taken.")
 
-# function to iterate through instance tags 
+# function to iterate through instance tags for hostname
 def get_tag_value(tags, key):
     for tag in tags:
         if tag['Key'] == key:
             return tag['Value']
     return None
 
+# function to iterate through instance tags for environment value
+def get_environment_value(instance_id):
+
+def environment_value(tag):
+    environment = tag.split('-')
+    print(environment[-1])
+
 # function to search active directory if an instance is stopped, final iteration will be state terminated                       
 def lambda_handler(event, context):
-    if event['detail']['state'] == 'stopped':
+
+    if environment_tag == 'preproduction' or 'production':
+        domain = 
+
+
+    if event['detail']['state'] == 'stopped': # to be updated to terminated
         instance_id = event['detail']['instance-id']
         
         ec2 = boto3.client('ec2')
@@ -84,5 +89,5 @@ def lambda_handler(event, context):
     # 200 http response lambda run successful
     return {
         'statusCode': 200,
-        'body': 'Active Directory search complete. Check logs for results'
+        'body': 'Active Directory clean up complete. Computer object {resource_name} has been removed.'
     }
