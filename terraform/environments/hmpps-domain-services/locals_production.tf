@@ -33,6 +33,23 @@ locals {
           description = "wildcard cert for hmpps domain load balancer"
         }
       }
+      remote_desktop_wildcard_and_planetfm_cert = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          "*.${module.environment.domains.public.application_environment}",
+          "*.hmpps-domain.service.justice.gov.uk",
+          "hmpps-az-gw1.justice.gov.uk",
+          "*.hmpps-az-gw1.justice.gov.uk",
+          "*.planetfm.service.justice.gov.uk",
+        ]
+        external_validation_records_created = false
+        # cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        tags = {
+          description = "wildcard cert for hmpps domain load balancer"
+        }
+      }
     }
     baseline_ec2_autoscaling_groups = {
 
