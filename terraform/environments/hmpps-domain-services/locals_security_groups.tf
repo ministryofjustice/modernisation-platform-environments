@@ -3,11 +3,18 @@ locals {
   security_group_cidrs_devtest = {
     azure_vnets        = module.ip_addresses.azure_fixngo_cidrs.devtest
     domain_controllers = module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers
+    rd_session_hosts = flatten([
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+    ])
   }
   security_group_cidrs_preprod_prod = {
     azure_vnets        = module.ip_addresses.azure_fixngo_cidrs.prod
     domain_controllers = module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers
-
+    rd_session_hosts = flatten([
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+    ])
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
@@ -52,12 +59,33 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient_internal
         }
+        rpc_udp_rd_sessionhost = {
+          description = "135: UDP MS-RPC ingress from remote desktop session hosts"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        rpc_tcp_rd_sessionhost = {
+          description = "135: TCP MS-RPC ingress from remote desktop session hosts"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
         https-from-euc = {
           description = "Allow direct https access for testing"
           from_port   = 443
           to_port     = 443
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient_internal
+        }
+        rpc_dynamic_tcp_rd_sessionhost = {
+          description = "49152-65535: TCP Dynamic Port ingress from remote desktop session hosts"
+          from_port   = 49152
+          to_port     = 65535
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
         all-from-azure-vnets-vnet = {
           description = "Allow all from azure vnets"
@@ -251,13 +279,6 @@ locals {
           description = "445: UDP SMB ingress from Azure DC"
           from_port   = 445
           to_port     = 445
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-        }
-        rpc_dynamic_udp_domain = {
-          description = "49152-65535: UDP Dynamic Port range"
-          from_port   = 49152
-          to_port     = 65535
           protocol    = "UDP"
           cidr_blocks = local.security_group_cidrs.domain_controllers
         }
