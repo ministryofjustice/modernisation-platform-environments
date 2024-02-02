@@ -68,3 +68,30 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   }
 }
 
+resource "aws_iam_role" "app_task" {
+  name = "task-${var.networking[0].application}"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "task-${var.networking[0].application}"
+    },
+  )
+}
+
