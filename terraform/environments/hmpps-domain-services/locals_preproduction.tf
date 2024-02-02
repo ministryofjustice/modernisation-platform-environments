@@ -61,7 +61,7 @@ locals {
           })
           pp-rds-1-https = merge(local.rds_target_groups.https, {
             attachments = [
-              # { ec2_instance_name = "pp-rds-1-a" },
+              { ec2_instance_name = "pp-rds-1-a" },
             ]
           })
         }
