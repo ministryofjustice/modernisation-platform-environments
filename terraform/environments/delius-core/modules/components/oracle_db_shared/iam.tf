@@ -187,6 +187,7 @@ data "aws_iam_policy_document" "instance_ssm" {
       "ssm:UpdateAssociationStatus",
       "ssm:UpdateInstanceAssociationStatus",
       "ssm:UpdateInstanceInformation",
+      "ssm:GetParameter*"
     ]
     resources = [
       "*"
