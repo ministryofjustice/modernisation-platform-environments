@@ -1,4 +1,3 @@
-# nomis-preproduction environment settings
 locals {
 
   # baseline config
@@ -67,49 +66,6 @@ locals {
       })
 
       # web servers
-      pp-cafm-w-2-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-cafm-w-2-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          disable_api_termination = false
-          disable_api_stop        = false
-          instance_type           = "t3.large"
-          vpc_security_group_ids  = concat(local.defaults_web_ec2.instance.vpc_security_group_ids, ["cafm_app_fixngo"])
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-        }
-        tags = merge(local.defaults_web_ec2.tags, {
-          description       = "Migrated server PPFWW0002 Web Access Server / RDS Gateway Server"
-          ami               = "pp-cafm-w-2-b"
-          app-config-status = "pending"
-        })
-      })
-
-      pp-cafm-w-3-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-cafm-w-2-b"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          disable_api_termination = false
-          disable_api_stop        = false
-          instance_type           = "t3.large"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-        }
-        tags = merge(local.defaults_web_ec2.tags, {
-          description       = "Migrated server PPFWW0003 Web Access Server / RDS Gateway Server"
-          ami               = "pp-cafm-w-2-b"
-          app-config-status = "pending"
-        })
-      })
-
       pp-cafm-w-4-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-cafm-w-4-b"
@@ -231,7 +187,7 @@ locals {
       "pp.planetfm.service.justice.gov.uk" = {
         records = [
           { name = "_658adffab7a58a4d5a86804a2b6eb2f7", type = "CNAME", ttl = 86400, records = ["_c649cb794d2fa2e1ac4d3f6fb4e1c8a7.mhbtsbpdnt.acm-validations.aws"] },
-          # { name = "cafmtx", type = "CNAME", ttl = 3600, records = ["rdweb1.preproduction.hmpps-domain.service.justice.gov.uk"] },
+          { name = "cafmtx", type = "CNAME", ttl = 3600, records = ["rdweb1.preproduction.hmpps-domain.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "cafmwebx", type = "A", lbs_map_key = "private" },
