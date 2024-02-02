@@ -23,186 +23,41 @@ locals {
     port                        = 389
   }
 
-  db_config_dev = [{
-    name           = "primarydb"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_"
-    user_data_raw = base64encode(
-      templatefile(
-        "${path.module}/templates/userdata.sh.tftpl",
-        {
-          branch               = local.db_config.user_data_param.branch
-          ansible_repo         = local.db_config.user_data_param.ansible_repo
-          ansible_repo_basedir = local.db_config.user_data_param.ansible_repo_basedir
-          ansible_args         = local.db_config.user_data_param.ansible_args
-        }
-      )
-    )
-
-    instance = {
-      instance_type           = "r6i.xlarge"
-      monitoring              = false
-      vpc_security_group_ids  = []
-      disable_api_termination = true
-    }
-
+  db_config_dev = {
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
     ebs_volumes = {
-      kms_key_id = data.aws_kms_key.ebs_shared.arn
-      tags       = local.tags
-      iops       = 3000
-      throughput = 125
-      root_volume = {
-        volume_type = "gp3"
-        volume_size = 30
-      }
-      ebs_non_root_volumes = {
-        "/dev/sdb" = {
-          # /u01 oracle app disk
-          volume_type = "gp3"
-          volume_size = 200
-          no_device   = false
-        }
-        "/dev/sdc" = {
-          # /u02 oracle app disk
-          volume_type = "gp3"
-          volume_size = 100
-          no_device   = false
-        }
-        "/dev/sds" = {
-          # swap disk
-          volume_type = "gp3"
-          volume_size = 4
-          no_device   = false
-        }
-        "/dev/sde" = {
-          # oracle asm disk DATA01
-          volume_type = "gp3"
-          volume_size = 500
-          no_device   = false
-        }
-        "/dev/sdf" = {
-          # oracle asm disk DATA02
-          no_device = true
-        }
-        "/dev/sdg" = {
-          # oracle asm disk DATA03
-          no_device = true
-        }
-        "/dev/sdh" = {
-          # oracle asm disk DATA04
-          no_device = true
-        }
-        "/dev/sdi" = {
-          # oracle asm disk DATA05
-          no_device = true
-        }
-        "/dev/sdj" = {
-          # oracle asm disk FLASH01
-          volume_type = "gp3"
-          volume_size = 500
-          no_device   = false
-        }
-        "/dev/sdk" = {
-          # oracle asm disk FLASH02
-          no_device = true
-        }
-      }
+      "/dev/sdb" = { label = "app", size = 200 } # /u01
+      "/dev/sdc" = { label = "app", size = 100 } # /u02
+      "/dev/sde" = { label = "data" }            # DATA
+      "/dev/sdf" = { label = "flash" }           # FLASH
+      "/dev/sds" = { label = "swap" }
     }
-    route53_records = {
-      create_internal_record = true
-      create_external_record = false
-    }
-    },
-    {
-      name           = "standbydb1"
-      ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_"
-      user_data_raw = base64encode(
-        templatefile(
-          "${path.module}/templates/userdata.sh.tftpl",
-          {
-            branch               = local.db_config.user_data_param.branch
-            ansible_repo         = local.db_config.user_data_param.ansible_repo
-            ansible_repo_basedir = local.db_config.user_data_param.ansible_repo_basedir
-            ansible_args         = local.db_config.user_data_param.ansible_args
-          }
-        )
-      )
-
-      instance = {
-        instance_type           = "r6i.xlarge"
-        monitoring              = false
-        vpc_security_group_ids  = []
-        disable_api_termination = true
-      }
-
-      ebs_volumes = {
-        kms_key_id = data.aws_kms_key.ebs_shared.arn
-        tags       = local.tags
+    ebs_volume_config = {
+      app = {
         iops       = 3000
         throughput = 125
-        root_volume = {
-          volume_type = "gp3"
-          volume_size = 30
-          no_device   = false
-        }
-        ebs_non_root_volumes = {
-          "/dev/sdb" = {
-            # /u01 oracle app disk
-            volume_type = "gp3"
-            volume_size = 200
-            no_device   = false
-          }
-          "/dev/sdc" = {
-            # /u02 oracle app disk
-            volume_type = "gp3"
-            volume_size = 100
-            no_device   = false
-          }
-          "/dev/sds" = {
-            # swap disk
-            volume_type = "gp3"
-            volume_size = 4
-            no_device   = false
-          }
-          "/dev/sde" = {
-            # oracle asm disk DATA01
-            volume_type = "gp3"
-            volume_size = 500
-            no_device   = false
-          }
-          "/dev/sdf" = {
-            # oracle asm disk DATA02
-            no_device = true
-          }
-          "/dev/sdg" = {
-            # oracle asm disk DATA03
-            no_device = true
-          }
-          "/dev/sdh" = {
-            # oracle asm disk DATA04
-            no_device = true
-          }
-          "/dev/sdi" = {
-            # oracle asm disk DATA05
-            no_device = true
-          }
-          "/dev/sdj" = {
-            # oracle asm disk FLASH01
-            volume_type = "gp3"
-            volume_size = 500
-            no_device   = false
-          }
-          "/dev/sdk" = {
-            # oracle asm disk FLASH02
-            no_device = true
-          }
-        }
+        type       = "gp3"
       }
-      route53_records = {
-        create_internal_record = true
-        create_external_record = false
+      data = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+        total_size = 500
+      }
+      flash = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+        total_size = 500
       }
     }
-  ]
+    ansible_user_data_config = {
+      branch               = "main"
+      ansible_repo         = "modernisation-platform-configuration-management"
+      ansible_repo_basedir = "ansible"
+      ansible_args         = "oracle_19c_install"
+    }
+  }
 
   gdpr_config_dev = {
     api_image_tag = "REPLACE"
