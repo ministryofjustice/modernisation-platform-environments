@@ -4,14 +4,6 @@ resource "aws_security_group" "pra_lb_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow access on HTTPS for the MOJ VPN"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
-  }
-
-  ingress {
     description = "allow access on HTTPS for the Dom1 Cisco VPN"
     from_port   = 443
     to_port     = 443
@@ -47,7 +39,10 @@ resource "aws_security_group" "pra_lb_sc" {
       "89.32.121.144/32",
       "194.33.192.0/25",
       "194.33.193.0/25",
-      "194.33.197.0/25"
+      "194.33.197.0/25",
+      "18.169.147.172/32",
+      "18.130.148.126/32",
+      "35.176.148.126/32"
     ]
   }
 
