@@ -31,7 +31,7 @@
       "maat_api_ecs_env_TogDataUsername": "togdata",
       "maat_api_ecs_cpu_alarm_threshold": 75,
       "maat_api_ecs_memory_alarm_threshold": 75,
-      "maat_api_ecs_high_cpu_scaling_threshold": 70, 
+      "maat_api_ecs_high_cpu_scaling_threshold": 70,
       "maat_api_ecs_low_cpu_scaling_threshold": 20,
       "maat_api_ecs_high_memory_scaling_threshold": 70,
       "maat_api_ecs_low_memory_scaling_threshold": 20,

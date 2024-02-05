@@ -5,7 +5,7 @@ variable "supplier" {
 
 variable "give_access" {
   description = "When true, access is given to supplier"
-  type        = bool  
+  type        = bool
 }
 
 variable "supplier_shh_key" {
@@ -30,16 +30,16 @@ variable "data_store_bucket" {
 }
 
 variable "account_id" {
-    description = "The account id"
+  description = "The account id"
 }
 
 variable "vpc_id" {
-    description = "The vpc used for the SFTP server"
+  description = "The vpc used for the SFTP server"
 }
 
 variable "subnet_ids" {
-    description = "The subnet ids used for the SFTP server"
-    type        = list(string)
+  description = "The subnet ids used for the SFTP server"
+  type        = list(string)
 }
 
 variable "kms_key_id" {
@@ -48,7 +48,7 @@ variable "kms_key_id" {
 
 variable "give_dev_access" {
   description = "When true, developer access is given to sftp server"
-  type        = bool  
+  type        = bool
 }
 
 variable "dev_ssh_keys" {

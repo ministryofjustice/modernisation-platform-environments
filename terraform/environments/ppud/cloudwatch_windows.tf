@@ -313,7 +313,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScanStarted" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance           = "$Instance"
       MalwareScanStarted = "$MalwareScanStarted"
     }
   }
@@ -329,7 +329,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScanFinished" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance            = "$Instance"
       MalwareScanFinished = "$MalwareScanFinished"
     }
   }

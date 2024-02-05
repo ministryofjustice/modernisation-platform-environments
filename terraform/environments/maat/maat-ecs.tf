@@ -30,28 +30,28 @@ resource "aws_iam_policy" "ec2_instance_role_policy" {
   name = "${local.application_name}-ec2-instance-role-policy"
 
   policy = jsonencode({
-   Version = "2012-10-17"
-   Statement = [
+    Version = "2012-10-17"
+    Statement = [
       {
         Effect = "Allow"
         Action = [
-            "ecs:CreateCluster",
-            "ecs:DeregisterContainerInstance",
-            "ecs:DiscoverPollEndpoint",
-            "ecs:Poll",
-            "ecs:RegisterContainerInstance",
-            "ecs:StartTelemetrySession",
-            "ecs:Submit*",
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents",
-            "logs:DescribeLogStreams",
-            "ecr:*",
-            "xray:PutTraceSegments",
-            "xray:PutTelemetryRecords",
-            "xray:GetSamplingRules",
-            "xray:GetSamplingTargets",
-            "xray:GetSamplingStatisticSummaries"
+          "ecs:CreateCluster",
+          "ecs:DeregisterContainerInstance",
+          "ecs:DiscoverPollEndpoint",
+          "ecs:Poll",
+          "ecs:RegisterContainerInstance",
+          "ecs:StartTelemetrySession",
+          "ecs:Submit*",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams",
+          "ecr:*",
+          "xray:PutTraceSegments",
+          "xray:PutTelemetryRecords",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:GetSamplingStatisticSummaries"
         ]
         Resource = "*"
       },
@@ -97,9 +97,9 @@ resource "aws_ecs_cluster" "maat_app_ecs_cluster" {
 ######################################
 
 resource "aws_launch_template" "ec2-launch-template" {
-  name_prefix            = "${local.application_name}-ec2-launch-template"
-  image_id               = local.application_data.accounts[local.environment].ami_id
-  instance_type          = local.application_data.accounts[local.environment].instance_type
+  name_prefix   = "${local.application_name}-ec2-launch-template"
+  image_id      = local.application_data.accounts[local.environment].ami_id
+  instance_type = local.application_data.accounts[local.environment].instance_type
 
   monitoring {
     enabled = true
@@ -110,11 +110,11 @@ resource "aws_launch_template" "ec2-launch-template" {
   }
 
   network_interfaces {
-    security_groups             = [aws_security_group.ecs_security_group.id]
+    security_groups = [aws_security_group.ecs_security_group.id]
   }
 
   user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
-    app_name = local.application_name, app_ecs_cluster = aws_ecs_cluster.maat_app_ecs_cluster.name }))
+  app_name = local.application_name, app_ecs_cluster = aws_ecs_cluster.maat_app_ecs_cluster.name }))
 
   tag_specifications {
     resource_type = "instance"
@@ -140,12 +140,12 @@ resource "aws_launch_template" "ec2-launch-template" {
 ######################################
 
 resource "aws_autoscaling_group" "ec2_scaling_group" {
-  vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
-  name                  = "${local.application_name}-ECS"
-  desired_capacity      = local.application_data.accounts[local.environment].ec2_asg_desired_capacity
-  max_size              = local.application_data.accounts[local.environment].ec2_asg_max_size
-  min_size              = local.application_data.accounts[local.environment].ec2_asg_min_size
-  metrics_granularity   = "1Minute"
+  vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
+  name                = "${local.application_name}-ECS"
+  desired_capacity    = local.application_data.accounts[local.environment].ec2_asg_desired_capacity
+  max_size            = local.application_data.accounts[local.environment].ec2_asg_max_size
+  min_size            = local.application_data.accounts[local.environment].ec2_asg_min_size
+  metrics_granularity = "1Minute"
 
 
   launch_template {
@@ -169,21 +169,21 @@ resource "aws_autoscaling_group" "ec2_scaling_group" {
 ######################################
 
 resource "aws_autoscaling_policy" "maat_scaling_up_policy" {
-  name               = "${local.application_name}-scaling-up"
-  policy_type        = "SimpleScaling"
-  adjustment_type         = "ChangeInCapacity"
+  name                   = "${local.application_name}-scaling-up"
+  policy_type            = "SimpleScaling"
+  adjustment_type        = "ChangeInCapacity"
   autoscaling_group_name = aws_autoscaling_group.ec2_scaling_group.name
-  cooldown                = 60
-  scaling_adjustment          = 1
+  cooldown               = 60
+  scaling_adjustment     = 1
 }
 
 resource "aws_autoscaling_policy" "maat_scaling_down_policy" {
-  name               = "${local.application_name}-scaling-down"
-  policy_type        = "SimpleScaling"
-  adjustment_type         = "ChangeInCapacity"
+  name                   = "${local.application_name}-scaling-down"
+  policy_type            = "SimpleScaling"
+  adjustment_type        = "ChangeInCapacity"
   autoscaling_group_name = aws_autoscaling_group.ec2_scaling_group.name
-  cooldown                = 60
-  scaling_adjustment          = -1
+  cooldown               = 60
+  scaling_adjustment     = -1
 }
 
 ######################################
@@ -274,28 +274,28 @@ resource "aws_ecs_task_definition" "maat_task_definition" {
   requires_compatibilities = ["EC2"]
   execution_role_arn       = aws_iam_role.ec2_instance_role.arn
   task_role_arn            = aws_iam_role.ec2_instance_role.arn
-  
-  container_definitions = templatefile("maat-task-definition.json", 
+
+  container_definitions = templatefile("maat-task-definition.json",
     {
-    docker_image_tag            = local.application_data.accounts[local.environment].docker_image_tag
-    region                      = local.application_data.accounts[local.environment].region
-    sentry_env                  = local.environment
-    maat_orch_base_url          = local.application_data.accounts[local.environment].maat_orch_base_url
-    maat_ccp_base_url           = local.application_data.accounts[local.environment].maat_ccp_base_url
-    maat_orch_oauth_url         = local.application_data.accounts[local.environment].maat_orch_oauth_url
-    maat_ccc_oauth_url          = local.application_data.accounts[local.environment].maat_ccc_oauth_url
-    maat_cma_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_cma_endpoint_auth_url
-    maat_ccp_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_ccp_endpoint_auth_url
-    maat_db_url                 = local.application_data.accounts[local.environment].maat_db_url
-    maat_ccc_base_url           = local.application_data.accounts[local.environment].maat_ccc_base_url
-    maat_caa_oauth_url          = local.application_data.accounts[local.environment].maat_caa_oauth_url
-    maat_bc_endpoint_url        = local.application_data.accounts[local.environment].maat_bc_endpoint_url
-    maat_mlra_url               = local.application_data.accounts[local.environment].maat_mlra_url
-    maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
-    maat_cma_base_url           = local.application_data.accounts[local.environment].maat_cma_base_url
-    ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
-    maat_aws_logs_group         = local.application_data.accounts[local.environment].maat_aws_logs_group
-    maat_aws_stream_prefix      = local.application_data.accounts[local.environment].maat_aws_stream_prefix
+      docker_image_tag           = local.application_data.accounts[local.environment].docker_image_tag
+      region                     = local.application_data.accounts[local.environment].region
+      sentry_env                 = local.environment
+      maat_orch_base_url         = local.application_data.accounts[local.environment].maat_orch_base_url
+      maat_ccp_base_url          = local.application_data.accounts[local.environment].maat_ccp_base_url
+      maat_orch_oauth_url        = local.application_data.accounts[local.environment].maat_orch_oauth_url
+      maat_ccc_oauth_url         = local.application_data.accounts[local.environment].maat_ccc_oauth_url
+      maat_cma_endpoint_auth_url = local.application_data.accounts[local.environment].maat_cma_endpoint_auth_url
+      maat_ccp_endpoint_auth_url = local.application_data.accounts[local.environment].maat_ccp_endpoint_auth_url
+      maat_db_url                = local.application_data.accounts[local.environment].maat_db_url
+      maat_ccc_base_url          = local.application_data.accounts[local.environment].maat_ccc_base_url
+      maat_caa_oauth_url         = local.application_data.accounts[local.environment].maat_caa_oauth_url
+      maat_bc_endpoint_url       = local.application_data.accounts[local.environment].maat_bc_endpoint_url
+      maat_mlra_url              = local.application_data.accounts[local.environment].maat_mlra_url
+      maat_caa_base_url          = local.application_data.accounts[local.environment].maat_caa_base_url
+      maat_cma_base_url          = local.application_data.accounts[local.environment].maat_cma_base_url
+      ecr_url                    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
+      maat_aws_logs_group        = local.application_data.accounts[local.environment].maat_aws_logs_group
+      maat_aws_stream_prefix     = local.application_data.accounts[local.environment].maat_aws_stream_prefix
     }
   )
 

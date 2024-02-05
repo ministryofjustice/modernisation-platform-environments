@@ -107,7 +107,7 @@ module "log_bucket" {
 
   source_bucket = aws_s3_bucket.landing_bucket
   account_id    = var.account_id
-  tags          = {
+  tags = {
     supplier = var.supplier
   }
 }
@@ -189,7 +189,7 @@ resource "aws_transfer_server" "this" {
     vpc_id                 = var.vpc_id
     subnet_ids             = var.subnet_ids
     address_allocation_ids = [aws_eip.this.id]
-    security_group_ids     = [
+    security_group_ids = [
       aws_security_group.this.id,
       aws_security_group.dev.id
     ]
@@ -465,8 +465,8 @@ resource "aws_transfer_ssh_key" "dev_ssh_key" {
   server_id = aws_transfer_server.this.id
   user_name = aws_transfer_user.dev[0].user_name
 
-  for_each  = { for ssh_key in var.dev_ssh_keys : ssh_key => ssh_key }
-  body      = each.key
+  for_each = { for ssh_key in var.dev_ssh_keys : ssh_key => ssh_key }
+  body     = each.key
 }
 
 resource "aws_security_group" "dev" {

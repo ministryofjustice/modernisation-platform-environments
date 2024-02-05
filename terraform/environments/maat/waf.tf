@@ -1,5 +1,5 @@
 locals {
-    ip_set_list   = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))) : ip]
+  ip_set_list = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))) : ip]
 }
 
 resource "aws_waf_ipset" "allow" {
@@ -7,7 +7,7 @@ resource "aws_waf_ipset" "allow" {
 
   # Ranges from https://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml
   # disc_internet_pipeline, disc_dom1, moj_digital_wifi, petty_france_office365, petty_france_wifi, ark_internet, gateway_proxies
-  
+
   # TODO Note that there are CodeBuild IP Addresses here, which may not be required if CodeBuild is no longer needed for the testing
 
   dynamic "ip_set_descriptors" {

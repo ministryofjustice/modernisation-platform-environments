@@ -223,7 +223,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
 ## UAT
 
 data "aws_iam_policy_document" "sns_topic_policy_uat_ec2cw" {
-  count = local.is-preproduction == true ? 1 : 0
+  count     = local.is-preproduction == true ? 1 : 0
   policy_id = "SnsUATTopicId"
   statement {
     sid = "statement1"

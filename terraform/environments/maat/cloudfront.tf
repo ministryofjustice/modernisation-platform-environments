@@ -1,79 +1,79 @@
 locals {
-    application_url_prefix = "meansassessment"
-    lower_env_url = "${local.application_url_prefix}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
-    custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
-    cloudfront_alias = local.environment == "production" ? local.application_data.accounts[local.environment].domain_name : local.lower_env_url
+  application_url_prefix = "meansassessment"
+  lower_env_url          = "${local.application_url_prefix}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
+  custom_header          = "X-Custom-Header-LAA-${upper(local.application_name)}"
+  cloudfront_alias       = local.environment == "production" ? local.application_data.accounts[local.environment].domain_name : local.lower_env_url
 
 
-    cloudfront_default_cache_behavior = {
-        smooth_streaming                           = false
-        allowed_methods                            = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-        cached_methods                             = ["HEAD", "GET"]
-        forwarded_values_query_string              = true
-        forwarded_values_headers                   = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
-        forwarded_values_cookies_forward           = "whitelist"
-        forwarded_values_cookies_whitelisted_names = ["AWSALB", "JSESSIONID"]
-        viewer_protocol_policy                     = "https-only"
+  cloudfront_default_cache_behavior = {
+    smooth_streaming                           = false
+    allowed_methods                            = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods                             = ["HEAD", "GET"]
+    forwarded_values_query_string              = true
+    forwarded_values_headers                   = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
+    forwarded_values_cookies_forward           = "whitelist"
+    forwarded_values_cookies_whitelisted_names = ["AWSALB", "JSESSIONID"]
+    viewer_protocol_policy                     = "https-only"
+  }
+
+  # Other cache behaviors are processed in the order in which they're listed in the CloudFront console or, if you're using the CloudFront API, the order in which they're listed in the DistributionConfig element for the distribution.
+  cloudfront_ordered_cache_behavior = {
+    "cache_behavior_0" = {
+      smooth_streaming                 = false
+      path_pattern                     = "*.png"
+      min_ttl                          = 0
+      allowed_methods                  = ["GET", "HEAD"]
+      cached_methods                   = ["HEAD", "GET"]
+      forwarded_values_query_string    = false
+      forwarded_values_headers         = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy           = "https-only"
+    },
+    "cache_behavior_1" = {
+      smooth_streaming                 = false
+      path_pattern                     = "*.jpg"
+      min_ttl                          = 0
+      allowed_methods                  = ["GET", "HEAD"]
+      cached_methods                   = ["HEAD", "GET"]
+      forwarded_values_query_string    = false
+      forwarded_values_headers         = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy           = "https-only"
+    },
+    "cache_behavior_2" = {
+      smooth_streaming                 = false
+      path_pattern                     = "*.gif"
+      min_ttl                          = 0
+      allowed_methods                  = ["GET", "HEAD"]
+      cached_methods                   = ["HEAD", "GET"]
+      forwarded_values_query_string    = false
+      forwarded_values_headers         = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy           = "https-only"
+    },
+    "cache_behavior_3" = {
+      smooth_streaming                 = false
+      path_pattern                     = "*.css"
+      min_ttl                          = 0
+      allowed_methods                  = ["GET", "HEAD"]
+      cached_methods                   = ["HEAD", "GET"]
+      forwarded_values_query_string    = false
+      forwarded_values_headers         = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy           = "https-only"
+    },
+    "cache_behavior_4" = {
+      smooth_streaming                 = false
+      path_pattern                     = "*.js"
+      min_ttl                          = 0
+      allowed_methods                  = ["GET", "HEAD"]
+      cached_methods                   = ["HEAD", "GET"]
+      forwarded_values_query_string    = false
+      forwarded_values_headers         = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy           = "https-only"
     }
-
-    # Other cache behaviors are processed in the order in which they're listed in the CloudFront console or, if you're using the CloudFront API, the order in which they're listed in the DistributionConfig element for the distribution.
-    cloudfront_ordered_cache_behavior = {
-        "cache_behavior_0" = {
-            smooth_streaming                 = false
-            path_pattern                     = "*.png"
-            min_ttl                          = 0
-            allowed_methods                  = ["GET", "HEAD"]
-            cached_methods                   = ["HEAD", "GET"]
-            forwarded_values_query_string    = false
-            forwarded_values_headers         = ["Host", "User-Agent"]
-            forwarded_values_cookies_forward = "none"
-            viewer_protocol_policy           = "https-only"
-        },
-        "cache_behavior_1" = {
-            smooth_streaming                 = false
-            path_pattern                     = "*.jpg"
-            min_ttl                          = 0
-            allowed_methods                  = ["GET", "HEAD"]
-            cached_methods                   = ["HEAD", "GET"]
-            forwarded_values_query_string    = false
-            forwarded_values_headers         = ["Host", "User-Agent"]
-            forwarded_values_cookies_forward = "none"
-            viewer_protocol_policy           = "https-only"
-        },
-        "cache_behavior_2" = {
-            smooth_streaming                 = false
-            path_pattern                     = "*.gif"
-            min_ttl                          = 0
-            allowed_methods                  = ["GET", "HEAD"]
-            cached_methods                   = ["HEAD", "GET"]
-            forwarded_values_query_string    = false
-            forwarded_values_headers         = ["Host", "User-Agent"]
-            forwarded_values_cookies_forward = "none"
-            viewer_protocol_policy           = "https-only"
-        },
-        "cache_behavior_3" = {
-            smooth_streaming                 = false
-            path_pattern                     = "*.css"
-            min_ttl                          = 0
-            allowed_methods                  = ["GET", "HEAD"]
-            cached_methods                   = ["HEAD", "GET"]
-            forwarded_values_query_string    = false
-            forwarded_values_headers         = ["Host", "User-Agent"]
-            forwarded_values_cookies_forward = "none"
-            viewer_protocol_policy           = "https-only"
-        },
-        "cache_behavior_4" = {
-            smooth_streaming                 = false
-            path_pattern                     = "*.js"
-            min_ttl                          = 0
-            allowed_methods                  = ["GET", "HEAD"]
-            cached_methods                   = ["HEAD", "GET"]
-            forwarded_values_query_string    = false
-            forwarded_values_headers         = ["Host", "User-Agent"]
-            forwarded_values_cookies_forward = "none"
-            viewer_protocol_policy           = "https-only"
-        }
-    }
+  }
 }
 
 # data "aws_ec2_managed_prefix_list" "cloudfront" {
@@ -112,7 +112,7 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
 }
 
 # Mirroring laa-cloudfront-logging-development in laa-dev
-resource "aws_s3_bucket" "cloudfront" { 
+resource "aws_s3_bucket" "cloudfront" {
   bucket = "laa-${local.application_name}-cloudfront-logging-${local.environment}"
   # force_destroy = true # Enable to recreate bucket deleting everything inside
   tags = merge(
@@ -233,7 +233,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 #     bucket          = aws_s3_bucket.cloudfront.bucket_domain_name
 #     prefix          = local.application_name
 #   }
-  
+
 #   web_acl_id = aws_waf_web_acl.waf_acl.id
 
 #   # This is a required block in Terraform. Here we are having no geo restrictions.

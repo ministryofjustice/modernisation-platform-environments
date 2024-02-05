@@ -218,7 +218,7 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 
 # Add a local to get the keys
 locals {
-  pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  pagerduty_integration_keys              = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   maat_api_pagerduty_integration_key_name = local.application_data.accounts[local.environment].maat_api_pagerduty_integration_key_name
 }
 
