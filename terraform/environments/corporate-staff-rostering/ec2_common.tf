@@ -1,4 +1,11 @@
 locals {
+  # this local is used in locals.tf
+  ssm_doc_cloudwatch_log_groups = {
+    for key, value in local.ssm_docs :
+    "/aws/ssm/${try(value.name, key)}" => {
+      retention_in_days = 30
+    }
+  }
   ssm_docs = {
     windows-domain-join = {
       content = file("./ssm-documents/windows-domain-join.yaml")
