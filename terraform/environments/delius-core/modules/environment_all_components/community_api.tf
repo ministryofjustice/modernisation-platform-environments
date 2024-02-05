@@ -48,7 +48,6 @@ module "community_api" {
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
   # Please check with the app team what the rule path should be here.
   alb_listener_rule_paths    = ["/secure", "/secure/*"]
-  alb_listener_rule_priority = 60
   platform_vars              = var.platform_vars
   container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-community-api-ecr-repo:${var.community_api.image_tag}"
   account_config             = var.account_config
