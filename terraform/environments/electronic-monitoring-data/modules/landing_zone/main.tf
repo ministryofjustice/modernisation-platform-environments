@@ -189,7 +189,7 @@ resource "aws_transfer_server" "this" {
     vpc_id                 = var.vpc_id
     subnet_ids             = var.subnet_ids
     address_allocation_ids = [aws_eip.this.id]
-    security_group_ids     = local.landing_zone_users_security_groups
+    security_group_ids     = local.landing_zone_security_group_ids
   }
 
   domain = "S3"
@@ -346,8 +346,8 @@ resource "aws_iam_role_policy" "this_transfer_workflow" {
 # Create user profiles that has put access to only this landing zone bucket.
 #------------------------------------------------------------------------------
 
-module "landing_zone_user_instance" {
-  source = "./landing_zone_users"
+module "landing_zone_users" {
+  source = "./landing_zone_user"
 
   for_each = { for idx, item in var.user_accounts : idx => item }
 
@@ -364,7 +364,7 @@ module "landing_zone_user_instance" {
 #------------------------------------------------------------------------------
 
 module "landing_zone_security_groups" {
-  source = "./security_groups"
+  source = "./server_security_group"
 
   for_each = { for idx, item in var.user_accounts : idx => item }
 
@@ -375,7 +375,7 @@ module "landing_zone_security_groups" {
 }
 
 locals {
-  landing_zone_users_security_groups = flatten([
+  landing_zone_security_group_ids = flatten([
     for module_instance in values(module.landing_zone_security_groups) : 
       module_instance.security_group_id
   ])
