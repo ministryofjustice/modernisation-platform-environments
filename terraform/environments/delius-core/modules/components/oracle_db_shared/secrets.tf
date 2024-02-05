@@ -1,7 +1,26 @@
 resource "aws_secretsmanager_secret" "delius_core_dba_passwords" {
-  name        = join("-", [lookup(var.tags, "environment-name", null), lookup(var.tags, "delius-environment", null), replace(lookup(var.tags, "application", null), "-core", ""), "dba-passwords"])
+  name        = local.dba_secret_name
   description = "DBA Users Credentials"
+  kms_key_id  = var.account_config.kms_keys.general_shared
   tags        = var.tags
+}
+
+data "aws_iam_policy_document" "delius_core_dba_passwords" {
+  statement {
+    sid    = "OemAWSAccountToReadTheSecret"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.oem_account_id}:role/EC2OracleEnterpriseManagementSecretsRole"]
+    }
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_secretsmanager_secret_policy" "delius_core_dba_passwords" {
+  secret_arn = aws_secretsmanager_secret.delius_core_dba_passwords.arn
+  policy     = data.aws_iam_policy_document.delius_core_dba_passwords.json
 }
 
 resource "aws_secretsmanager_secret_version" "delius_core_dba_passwords" {
@@ -15,8 +34,9 @@ resource "aws_secretsmanager_secret_version" "delius_core_dba_passwords" {
 }
 
 resource "aws_secretsmanager_secret" "delius_core_application_passwords" {
-  name        = join("-", [lookup(var.tags, "environment-name", null), lookup(var.tags, "delius-environment", null), replace(lookup(var.tags, "application", null), "-core", ""), "application-passwords"])
+  name        = local.application_secret_name
   description = "Application Users Credentials"
+  kms_key_id  = var.account_config.kms_keys.general_shared
   tags        = var.tags
 }
 

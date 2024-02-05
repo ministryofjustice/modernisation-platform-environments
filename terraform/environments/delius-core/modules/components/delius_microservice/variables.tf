@@ -191,10 +191,12 @@ variable "ecs_cluster_arn" {
   type        = string
 }
 
-variable "task_def_container_port" {
-  description = "The port on which the container is exposing the application"
-  type        = number
-  default     = 8080
+variable "container_port_config" {
+  description = "The port configuration for the container. First in list is used for Load Balancer Configuration"
+  type = list(object({
+    containerPort = number
+    protocol      = string
+  }))
 }
 
 variable "target_group_protocol" {
@@ -211,6 +213,12 @@ variable "certificate_arn" {
 variable "microservice_lb_arn" {
   description = "The ARN of the load balancer to use for the target group"
   type        = string
+}
+
+variable "microservice_lb_https_listener_arn" {
+  description = "The ARN of the load balancer HTTPS listener to use for the target group"
+  type        = string
+  default     = null
 }
 
 variable "create_rds" {
@@ -281,15 +289,6 @@ variable "container_secrets" {
   }))
 }
 
-variable "container_port_mappings" {
-  description = "Port mappings to pass to the container"
-  type = list(object({
-    containerPort = number
-    hostPort      = number
-    protocol      = string
-  }))
-}
-
 variable "alb_security_group_id" {
   description = "The security group ID of the ALB"
   type        = string
@@ -318,6 +317,18 @@ variable "alb_stickiness_type" {
   default     = "lb_cookie"
 }
 
+variable "alb_listener_rule_priority" {
+  description = "Priority of the alb listener"
+  type        = number
+  default     = null
+}
+
+variable "alb_listener_rule_paths" {
+  description = "Paths to use for the alb listener rule"
+  type        = list(string)
+  default     = null
+}
+
 variable "cloudwatch_error_pattern" {
   description = "The cloudwatch error pattern to use for the alarm"
   type        = string
@@ -327,4 +338,16 @@ variable "cloudwatch_error_pattern" {
 variable "container_image" {
   description = "The container image to use"
   type        = string
+}
+
+variable "container_memory" {
+  description = "The container memory to use"
+  type        = number
+  default     = 1024
+}
+
+variable "container_cpu" {
+  description = "The container cpu to use"
+  type        = number
+  default     = 512
 }

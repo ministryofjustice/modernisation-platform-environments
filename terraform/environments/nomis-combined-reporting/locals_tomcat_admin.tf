@@ -9,7 +9,6 @@ locals {
   tomcat_admin_target_group_http_7777 = {
     port                 = 7777
     protocol             = "HTTP"
-    target_type          = "instance"
     deregistration_delay = 30
     health_check = {
       enabled             = true
@@ -18,6 +17,7 @@ locals {
       matcher             = "200-399"
       path                = "/"
       port                = 7777
+      protocol            = "HTTP"
       timeout             = 5
       unhealthy_threshold = 5
     }
@@ -30,7 +30,6 @@ locals {
   tomcat_admin_target_group_http_7010 = {
     port                 = 7010
     protocol             = "HTTP"
-    target_type          = "instance"
     deregistration_delay = 30
     health_check = {
       enabled             = true
@@ -39,6 +38,7 @@ locals {
       matcher             = "200-399"
       path                = "/"
       port                = 7010
+      protocol            = "HTTP"
       timeout             = 5
       unhealthy_threshold = 5
     }
@@ -51,7 +51,6 @@ locals {
   tomcat_admin_target_group_http_8443 = {
     port                 = 8443
     protocol             = "HTTP"
-    target_type          = "instance"
     deregistration_delay = 30
     health_check = {
       enabled             = true
@@ -60,6 +59,7 @@ locals {
       matcher             = "200-399"
       path                = "/"
       port                = 8443
+      protocol            = "HTTP"
       timeout             = 5
       unhealthy_threshold = 5
     }
@@ -72,7 +72,6 @@ locals {
   tomcat_admin_target_group_http_8005 = {
     port                 = 8005
     protocol             = "HTTP"
-    target_type          = "instance"
     deregistration_delay = 30
     health_check = {
       enabled             = true
@@ -81,6 +80,7 @@ locals {
       matcher             = "200-399"
       path                = "/"
       port                = 8005
+      protocol            = "HTTP"
       timeout             = 5
       unhealthy_threshold = 5
     }

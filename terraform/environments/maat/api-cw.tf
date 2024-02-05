@@ -2,7 +2,7 @@
 # ECS CLOUDWATCH GROUP
 ######################################
 resource "aws_cloudwatch_log_group" "maat_api_ecs_cw_group" {
-  name              = "${local.application_name}-ECS"
+  name              = "${local.application_name}-api-ECS"
   retention_in_days = 90
   kms_key_id        = aws_kms_key.cloudwatch_logs_key.arn
 }
@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
   statistic          = "Average"
   period             = 60
   evaluation_periods = 5
-  threshold          = local.application_data.accounts[local.environment].ecs_cpu_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].maat_api_ecs_cpu_alarm_threshold
   treat_missing_data = "breaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_threshold" {
   statistic          = "Average"
   period             = 60
   evaluation_periods = 5
-  threshold          = local.application_data.accounts[local.environment].ecs_memory_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].maat_api_ecs_memory_alarm_threshold
   treat_missing_data = "breaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -56,7 +56,7 @@ resource "aws_cloudwatch_metric_alarm" "target_response_time" {
   extended_statistic = "p99"
   period             = 60
   evaluation_periods = 5
-  threshold          = local.application_data.accounts[local.environment].alb_target_response_time_threshold
+  threshold          = local.application_data.accounts[local.environment].maat_api_alb_target_response_time_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -74,7 +74,7 @@ resource "aws_cloudwatch_metric_alarm" "target_response_time_maximum" {
   statistic          = "Maximum"
   period             = 60
   evaluation_periods = 1
-  threshold          = local.application_data.accounts[local.environment].alb_target_response_time_threshold_maximum
+  threshold          = local.application_data.accounts[local.environment].maat_api_alb_target_response_time_threshold_maximum
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -92,7 +92,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_hosts" {
   statistic          = "Average"
   period             = 60
   evaluation_periods = 5
-  threshold          = local.application_data.accounts[local.environment].alb_unhealthy_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].maat_api_alb_unhealthy_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -111,7 +111,7 @@ resource "aws_cloudwatch_metric_alarm" "rejected_connection_count" {
   statistic          = "Sum"
   period             = 60
   evaluation_periods = 5
-  threshold          = local.application_data.accounts[local.environment].alb_rejected_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].maat_api_alb_rejected_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -129,7 +129,7 @@ resource "aws_cloudwatch_metric_alarm" "http_5xx_error" {
   statistic          = "Sum"
   period             = 60
   evaluation_periods = 5
-  threshold          = local.application_data.accounts[local.environment].alb_target_5xx_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].maat_api_alb_target_5xx_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -147,7 +147,7 @@ resource "aws_cloudwatch_metric_alarm" "application_elb_5xx_error" {
   statistic          = "Sum"
   period             = 60
   evaluation_periods = 5
-  threshold          = local.application_data.accounts[local.environment].alb_5xx_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].maat_api_alb_5xx_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -165,7 +165,7 @@ resource "aws_cloudwatch_metric_alarm" "http4xxError" {
   statistic          = "Sum"
   period             = 60
   evaluation_periods = 5
-  threshold          = local.application_data.accounts[local.environment].alb_target_4xx_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].maat_api_alb_target_4xx_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -183,7 +183,7 @@ resource "aws_cloudwatch_metric_alarm" "application_elb_4xx_error" {
   statistic          = "Sum"
   period             = 60
   evaluation_periods = 5
-  threshold          = local.application_data.accounts[local.environment].alb_4xx_alarm_threshold
+  threshold          = local.application_data.accounts[local.environment].maat_api_alb_4xx_alarm_threshold
   treat_missing_data = "notBreaching"
   alarm_actions      = [aws_sns_topic.maat_api_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
@@ -201,7 +201,7 @@ resource "aws_sns_topic" "maat_api_alerting_topic" {
 resource "aws_sns_topic_subscription" "pagerduty_subscription" {
   topic_arn = aws_sns_topic.maat_api_alerting_topic.arn
   protocol  = "https"
-  endpoint  = "https://events.pagerduty.com/integration/${local.pagerduty_integration_keys[local.pagerduty_integration_key_name]}/enqueue"
+  endpoint  = "https://events.pagerduty.com/integration/${local.pagerduty_integration_keys[local.maat_api_pagerduty_integration_key_name]}/enqueue"
 }
 
 # Pager duty integration
@@ -219,7 +219,7 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 # Add a local to get the keys
 locals {
   pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
+  maat_api_pagerduty_integration_key_name = local.application_data.accounts[local.environment].maat_api_pagerduty_integration_key_name
 }
 
 # link the sns topic to the service

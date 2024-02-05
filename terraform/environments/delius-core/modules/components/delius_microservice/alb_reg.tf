@@ -24,3 +24,19 @@ resource "aws_lb_target_group" "this" {
     timeout             = "5"
   }
 }
+
+resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
+  count        = var.alb_listener_rule_paths != null ? 1 : 0
+  listener_arn = var.microservice_lb_https_listener_arn
+  priority     = var.alb_listener_rule_priority
+  condition {
+    path_pattern {
+      values = var.alb_listener_rule_paths
+    }
+  }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+}
+

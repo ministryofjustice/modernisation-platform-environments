@@ -2,13 +2,13 @@ module "container_definition" {
   source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.61.1"
   container_name           = var.name
   container_image          = var.container_image
-  container_memory         = 4096
-  container_cpu            = 1024
+  container_memory         = var.container_memory
+  container_cpu            = var.container_cpu
   essential                = true
   readonly_root_filesystem = false
   environment              = var.container_environment_vars
   secrets                  = var.container_secrets
-  port_mappings            = var.container_port_mappings
+  port_mappings            = var.container_port_config
   log_configuration = {
     logDriver = "awslogs"
     options = {
@@ -52,7 +52,7 @@ module "ecs_service" {
     {
       target_group_arn = aws_lb_target_group.this.arn
       container_name   = var.name
-      container_port   = var.task_def_container_port
+      container_port   = var.container_port_config[0].containerPort
     }
   ]
 

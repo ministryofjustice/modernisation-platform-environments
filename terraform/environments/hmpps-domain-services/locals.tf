@@ -29,7 +29,7 @@ locals {
     enable_shared_s3                             = false # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = false # adds db backup buckets
     enable_oracle_secure_web                     = false # allows db to list all buckets
-    cloudwatch_metric_alarms_default_actions = ["hmpps_domain_services_pagerduty"]
+    cloudwatch_metric_alarms_default_actions     = ["hmpps_domain_services_pagerduty"]
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }

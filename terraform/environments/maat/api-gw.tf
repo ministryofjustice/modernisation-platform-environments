@@ -1,9 +1,7 @@
 # Variables
 locals {
-  api_scope        = local.application_data.accounts[local.environment].api_scope
-  api_gateway_fqdn = local.application_data.accounts[local.environment].api_gateway_fqdn
-  api_stage_name   = "v1"
-  certificate_arn  = local.application_data.accounts[local.environment].certificate_arn
+    maat_api_api_scope = local.application_data.accounts[local.environment].maat_api_api_scope
+    api_stage_name = "v1"
 }
 
 # API Gateway configuration
@@ -39,7 +37,7 @@ resource "aws_apigatewayv2_route" "maat_api_route1" {
   api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /link/validate"
   authorization_type   = "JWT"
-  authorization_scopes = ["${local.application_name}/${local.api_scope}"]
+  authorization_scopes = ["${local.application_name}/${local.maat_api_api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer.id
   target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
   depends_on           = [aws_apigatewayv2_integration.maat_api_integration]
@@ -49,7 +47,7 @@ resource "aws_apigatewayv2_route" "maat_api_route_crime_means_assessment" {
   api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /api/internal/v1/{proxy+}"
   authorization_type   = "JWT"
-  authorization_scopes = ["${local.application_name}/${local.api_scope}"]
+  authorization_scopes = ["${local.application_name}/${local.maat_api_api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer.id
   target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
@@ -58,7 +56,7 @@ resource "aws_apigatewayv2_route" "maat_api_route_crown_court_proceeding" {
   api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /api/internal/v1/crowncourtproceeding"
   authorization_type   = "JWT"
-  authorization_scopes = ["${local.application_name}/${local.api_scope}"]
+  authorization_scopes = ["${local.application_name}/${local.maat_api_api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer.id
   target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
@@ -67,7 +65,7 @@ resource "aws_apigatewayv2_route" "maat_api_route_eform_staging" {
   api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /api/eform/{proxy+}"
   authorization_type   = "JWT"
-  authorization_scopes = ["${local.application_name}/${local.api_scope}"]
+  authorization_scopes = ["${local.application_name}/${local.maat_api_api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer_for_ats_and_caa.id
   target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
@@ -76,7 +74,7 @@ resource "aws_apigatewayv2_route" "maat_api_route_dces_service" {
   api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /api/internal/v1/debt-collection-enforcement/{proxy+}"
   authorization_type   = "JWT"
-  authorization_scopes = ["${local.application_name}/${local.api_scope}"]
+  authorization_scopes = ["${local.application_name}/${local.maat_api_api_scope}"]
   authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer_for_dces.id
   target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
@@ -171,10 +169,10 @@ resource "aws_route53_record" "external_validation" {
 
   count           = local.environment == "production" ? 0 : 1
   allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
+  name            = local.maat_api_domain_name_main[0]
+  records         = local.maat_api_domain_record_main
   ttl             = 60
-  type            = local.domain_type_main[0]
+  type            = local.maat_api_domain_type_main[0]
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
@@ -183,16 +181,16 @@ resource "aws_route53_record" "external_validation_subdomain" {
 
   count           = local.environment == "production" ? 0 : 1
   allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
+  name            = local.maat_api_domain_name_sub[0]
+  records         = local.maat_api_domain_record_sub
   ttl             = 60
-  type            = local.domain_type_sub[0]
+  type            = local.maat_api_domain_type_sub[0]
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 resource "aws_acm_certificate_validation" "maat_api_acm_certificate_validation" {
   certificate_arn         = aws_acm_certificate.maat_api_acm_certificate.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = [local.maat_api_domain_name_main[0], local.maat_api_domain_name_sub[0]]
 }
 
 resource "aws_apigatewayv2_api_mapping" "maat_api_mapping" {

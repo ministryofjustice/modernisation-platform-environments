@@ -704,6 +704,7 @@ locals {
         }
 
         listeners = {
+
           http = {
             port     = 80
             protocol = "TCP"
@@ -721,6 +722,7 @@ locals {
             }
           }
           http-7771 = {
+
             port     = 7771
             protocol = "TCP"
             default_action = {
@@ -737,8 +739,8 @@ locals {
             }
           }
           http-7781 = {
-            port     = 7781
-            protocol = "TCP"
+            port                     = 7781
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-12-7781"
@@ -1217,36 +1219,44 @@ locals {
             }
           }
           http-7770 = {
-            port     = 7770
-            protocol = "TCP"
+            alarm_target_group_names = ["pp-csr-w-34-7770"]
+            port                     = 7770
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7770"
             }
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7771 = {
-            port     = 7771
-            protocol = "TCP"
+            alarm_target_group_names = ["pp-csr-w-34-7771"]
+            port                     = 7771
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7771"
             }
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7780 = {
-            port     = 7780
-            protocol = "TCP"
+            alarm_target_group_names = ["pp-csr-w-34-7780"]
+            port                     = 7780
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7780"
             }
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7781 = {
-            port     = 7781
-            protocol = "TCP"
+            alarm_target_group_names = ["pp-csr-w-34-7781"]
+            port                     = 7781
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7781"
             }
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
         }
       }
