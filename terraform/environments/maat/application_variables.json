@@ -71,7 +71,10 @@
       "maat_cma_base_url": "https://laa-crime-means-assessment-dev.apps.live.cloud-platform.service.justice.gov.uk",
       "maat_aws_logs_group": "MAAT-ECS",
       "maat_aws_stream_prefix": "MAAT-app",
-      "SSM_managed_core_policy_arn": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      "SSM_managed_core_policy_arn": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+      "app_service_scaling_target_max": "2",
+      "app_service_scaling_target_min": "1",
+      "maat_ecs_service_desired_count": "1"
     },
     "test": {
       "example_var": "test-data",
