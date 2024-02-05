@@ -4,11 +4,19 @@ resource "aws_security_group" "wardship_lb_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow access on HTTPS for the MOJ VPN"
+    description = "allow access on HTTPS for the Dom1 Cisco VPN"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
+    cidr_blocks = ["194.33.192.1/32"]
+  }
+
+  ingress {
+    description = "allow access on HTTPS for the Global Protect VPN"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["35.176.93.186/32"]
   }
 
   // Allow all User IPs
@@ -30,7 +38,10 @@ resource "aws_security_group" "wardship_lb_sc" {
       "194.33.192.0/25",
       "157.203.176.0/25",
       "201.33.21.5/32",
-      "54.94.206.111/32"
+      "54.94.206.111/32",
+      "18.169.147.172/32",
+      "18.130.148.126/32",
+      "35.176.148.126/32"
     ]
   }
 

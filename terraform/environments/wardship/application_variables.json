@@ -1,7 +1,6 @@
 {
   "accounts": {
     "development": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "wardship_db_dev",
       "identifier": "wardship-db-dev",
       "db_username": "dbadmin",
@@ -23,7 +22,6 @@
       "tactical_products_db_secrets_arn": "tspb4H"
     },
     "preproduction": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "wardship_db_pre_prod",
       "identifier": "wardship-db-pre-prod",
       "db_username": "dbadmin",
@@ -45,7 +43,6 @@
       "tactical_products_db_secrets_arn": "kVCGj1"
     },
     "production": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "wardship_db_prod",
       "identifier": "wardship-db-prod",
       "db_username": "dbadmin",
