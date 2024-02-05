@@ -46,7 +46,8 @@ module "community_api" {
   # Two LBs (public and secure) are needed as show on the architecture diagram. There is an architectural discussion to be had if we could get away with just one LB instead
   microservice_lb_arn     = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
-  alb_listener_rule_paths = ["/community-api"]
+  # Please check with the app team what the rule path should be here.
+  alb_listener_rule_paths = ["/secure", "/secure/*"]
   platform_vars     = var.platform_vars
   container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-community-api-ecr-repo:${var.community_api.image_tag}"
   account_config    = var.account_config
