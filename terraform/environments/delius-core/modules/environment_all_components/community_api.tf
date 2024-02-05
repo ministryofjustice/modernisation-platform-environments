@@ -17,10 +17,12 @@ module "community_api" {
     #   name      = "APPINSIGHTS_INSTRUMENTATIONKEY"
     #   valueFrom = "/${var.environment_name}/${var.project_name}/newtech/offenderapi/appinsights_key"
     # },
-    # {
-    #   name      = "SPRING_DATASOURCE_PASSWORD"
-    #   valueFrom = "/${var.environment_name}/${var.project_name}/delius-database/db/delius_pool_password"
-    # },
+    {
+      name     = "SPRING_DATASOURCE_PASSWORD"
+      valueFrom = aws_ssm_parameter.jdbc_password.arn
+      # valueFrom = "/${var.environment_name}/${var.project_name}/delius-database/db/delius_pool_password"
+    }
+    # ,
     # {
     #   name      = "SPRING_LDAP_PASSWORD"
     #   valueFrom = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/ldap_admin_password"
@@ -62,7 +64,7 @@ module "community_api" {
     },
     {
       name  = "SPRING_DATASOURCE_URL"
-      value = aws_ssm_parameter.delius_core_community_api_env_var_jdbc_url.arn
+      value = aws_ssm_parameter.jdbc_url.arn
       # The value below is from the legacy
       # value = data.terraform_remote_state.database.outputs.jdbc_failover_url
     },
