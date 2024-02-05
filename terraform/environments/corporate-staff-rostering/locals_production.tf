@@ -618,44 +618,44 @@ locals {
             }
           }
           http-7770 = {
-            alarm_target_group_names = [ "pd-csr-w-12-7770" ]
-            port     = 7770
-            protocol = "TCP"
+            alarm_target_group_names = ["pd-csr-w-12-7770"]
+            port                     = 7770
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-12-7770"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7771 = {
-            alarm_target_group_names = [ "pd-csr-w-12-7771" ]
-            port     = 7771
-            protocol = "TCP"
+            alarm_target_group_names = ["pd-csr-w-12-7771"]
+            port                     = 7771
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-12-7771"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7780 = {
-            alarm_target_group_names = [ "pd-csr-w-12-7780" ]
-            port     = 7780
-            protocol = "TCP"
+            alarm_target_group_names = ["pd-csr-w-12-7780"]
+            port                     = 7780
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-12-7780"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7781 = {
-            alarm_target_group_names = [ "pd-csr-w-12-7781" ]
-            port     = 7781
-            protocol = "TCP"
+            alarm_target_group_names = ["pd-csr-w-12-7781"]
+            port                     = 7781
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-12-7781"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
         }
       }
@@ -794,44 +794,44 @@ locals {
             }
           }
           http-7770 = {
-            alarm_target_group_names = [ "pd-csr-w-34-7770" ]
-            port     = 7770
-            protocol = "TCP"
+            alarm_target_group_names = ["pd-csr-w-34-7770"]
+            port                     = 7770
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-34-7770"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7771 = {
-            alarm_target_group_names = [ "pd-csr-w-34-7771" ]
-            port     = 7771
-            protocol = "TCP"
+            alarm_target_group_names = ["pd-csr-w-34-7771"]
+            port                     = 7771
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-34-7771"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7780 = {
-            alarm_target_group_names = [ "pd-csr-w-34-7780" ]
-            port     = 7780
-            protocol = "TCP"
+            alarm_target_group_names = ["pd-csr-w-34-7780"]
+            port                     = 7780
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-34-7780"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7781 = {
-            alarm_target_group_names = [ "pd-csr-w-34-7781" ]
-            port     = 7781
-            protocol = "TCP"
+            alarm_target_group_names = ["pd-csr-w-34-7781"]
+            port                     = 7781
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-34-7781"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
         }
       }
@@ -971,43 +971,43 @@ locals {
           }
           http-7770 = {
             alarm_target_group_names = ["pd-csr-w-56-7770"]
-            port     = 7770
-            protocol = "TCP"
+            port                     = 7770
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-56-7770"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7771 = {
             alarm_target_group_names = ["pd-csr-w-56-7771"]
-            port     = 7771
-            protocol = "TCP"
+            port                     = 7771
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-56-7771"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7780 = {
             alarm_target_group_names = ["pd-csr-w-56-7780"]
-            port     = 7780
-            protocol = "TCP"
+            port                     = 7780
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-56-7780"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7781 = {
             alarm_target_group_names = ["pd-csr-w-56-7781"]
-            port     = 7781
-            protocol = "TCP"
+            port                     = 7781
+            protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pd-csr-w-56-7781"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
         }
       }
