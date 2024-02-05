@@ -1,30 +1,69 @@
-#! /bin/bash
-sudo amazon-linux-extras instal -y epel
-sudo yum update -y
-sudo yum install -y ansible
+#!/bin/bash
 
+# Install EPEL repository and Ansible
+amazon-linux-extras install -y epel
+sleep 20
+yum update -y
+sleep 20
+yum install -y ansible
+
+# Create the configuration file /opt/cfg.json
+cat << EOF > /opt/cfg.json
+{
+    "AppProxyInfo": { 
+        "Address": "",
+        "Port": 0,
+        "Username": "",
+        "Password": "",
+        "Domain": "",
+        "UseProxy": false
+    },
+    "BrowsingProxyInfo": { 
+        "Address": "<Browsing Proxy Address>",
+        "Port": 0,
+        "Username": "",
+        "Password": "",
+        "Domain": "",
+        "UseProxy": false
+    },
+    "HttpsInfo": {
+        "LinkingKey": "${cymulate_agent_linkingkey}"
+    },
+    "SmtpInfo": {
+        "UserName": "",
+        "Password": "",
+        "Domain": "",
+        "IP": "", 
+        "Type": 0, 
+        "Version": 2 
+    }
+}
+EOF
+
+# Create the Ansible playbook /opt/cymulate.yml
 cat << EOF > /opt/cymulate.yml
 ---
-- hosts: all
+- hosts: localhost
   become: true
   vars:
     cymulate_agent_linkingkey: "${cymulate_agent_linkingkey}"
   tasks:
-    - name: Update apt cache
-      apt:
-        update_cache: yes
+    - name: Update yum packages
+      yum:
+        name: "*"
+        state: latest
 
     - name: Install required packages
-      apt:
+      yum:
         name: "{{ item }}"
         state: present
       loop:
         - libgdiplus
+        - libicu
         - cups
-        - zlib1g-dev
-        - libssl-dev
-        - build-essential
-        - make
+        - gcc
+        - zlib-devel
+        - openssl-devel
         - python3-pip
         - curl
         - unzip
@@ -36,39 +75,25 @@ cat << EOF > /opt/cymulate.yml
         chmod +x ./kubectl
         mv ./kubectl /usr/local/bin/kubectl
 
-    - name: Download Cymulate Agent
-      get_url:
-        url: "https://app.cymulate.com/agent/download?arch=64&os=linux&type=zip&isService=false"
-        dest: "/tmp/CymulateAgentInstaller.zip"
+    - name: Download Cymulate Agent & unzip packages
+      shell: |
+        mkdir /opt/cymulate_install
+        curl -o /opt/cymulate_install/CymulateAgentInstaller.zip "https://app.cymulate.com/api/agent/download?arch=64&os=linux&type=zip&isService=false&isInstaller=false&isExecutor=false"
+        cd /opt/cymulate_install
+        unzip /opt/cymulate_install/CymulateAgentInstaller.zip
 
-    - name: Unzip Cymulate Agent Installer
-      command: "unzip /tmp/CymulateAgentInstaller.zip"
-      args:
-        chdir: "/tmp"
+    - name: Set Permissions and Install agent without waiting as it takes a long time
+      shell: |
+        cd /opt/cymulate_install
+        chmod +x install.sh
+        sudo ./install.sh -configfile /opt/cfg.json
+      poll: 0
+      background: yes
 
-    - name: Move to Cymulate Agent Installer directory
-      command: "mv /tmp/CymulateAgentInstaller /opt"
-      args:
-        creates: "/opt"
-
-    - name: Change directory to Cymulate Agent Installer
-      command: "cd /opt/CymulateAgentInstaller"
-
-    - name: Set execute permissions for install.sh
-      command: "chmod +x install.sh"
-      args:
-        chdir: "/opt/CymulateAgentInstaller"
-
-    - name: Copy cfg.json to the target machine
-      copy:
-        src: "cfg.json"
-        dest: "/path/on/target/machine/cfg.json"
-
-    - name: Run Cymulate Agent Installer
-      command: "sudo ./install.sh -configfile cfg.json"
-      args:
-        chdir: "/opt/CymulateAgentInstaller"
+    - name: Cymulate setup now completed
+      debug:
+        msg: "Cymulate setup now completed"
 EOF
 
+# Run the Ansible playbook
 ansible-playbook /opt/cymulate.yml
-
