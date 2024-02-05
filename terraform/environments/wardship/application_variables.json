@@ -1,14 +1,13 @@
 {
   "accounts": {
     "development": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "wardship_db_dev",
       "identifier": "wardship-db-dev",
       "db_username": "dbadmin",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
-      "engine_version": "14.7",
+      "engine_version": "14.10",
       "instance_class": "db.t3.micro",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
@@ -23,14 +22,13 @@
       "tactical_products_db_secrets_arn": "tspb4H"
     },
     "preproduction": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "wardship_db_pre_prod",
       "identifier": "wardship-db-pre-prod",
       "db_username": "dbadmin",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
-      "engine_version": "14.7",
+      "engine_version": "14.10",
       "instance_class": "db.t3.micro",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
@@ -45,14 +43,13 @@
       "tactical_products_db_secrets_arn": "kVCGj1"
     },
     "production": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "wardship_db_prod",
       "identifier": "wardship-db-prod",
       "db_username": "dbadmin",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
-      "engine_version": "14.7",
+      "engine_version": "14.10",
       "instance_class": "db.t3.micro",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
