@@ -746,7 +746,6 @@ locals {
               type              = "forward"
               target_group_name = "pp-csr-w-12-7781"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
           }
         }
       }
@@ -1228,7 +1227,7 @@ locals {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7770"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7771 = {
             alarm_target_group_names = ["pp-csr-w-34-7771"]
@@ -1238,7 +1237,7 @@ locals {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7771"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7780 = {
             alarm_target_group_names = ["pp-csr-w-34-7780"]
@@ -1248,7 +1247,7 @@ locals {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7780"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
           http-7781 = {
             alarm_target_group_names = ["pp-csr-w-34-7781"]
@@ -1258,7 +1257,7 @@ locals {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7781"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].lb
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
         }
       }

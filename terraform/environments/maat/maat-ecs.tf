@@ -215,12 +215,113 @@ resource "aws_security_group_rule" "outbound" {
 }
 
 #####################################
+# KMS KEYS
+#####################################
+
+resource "aws_kms_key" "maat_cloudwatch_logs_key_ecs" {
+  description = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ecs-key"
+    }
+  )
+}
+resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ecs" {
+  key_id = aws_kms_key.maat_cloudwatch_logs_key_ecs.id
+  policy = jsonencode({
+    Id = "key-default-1"
+    Statement = [
+      {
+        Action = "kms:*"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.env_account_id}:root"
+        }
+
+        Resource = "*"
+        Sid      = "Enable IAM User Permissions"
+      },
+      {
+        Action = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.eu-west-2.amazonaws.com"
+        }
+        Resource = "*"
+        Sid      = "Enable log service Permissions"
+      }
+    ]
+    Version = "2012-10-17"
+  })
+}
+
+resource "aws_kms_key" "maat_cloudwatch_logs_key_ec2" {
+  description = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-key"
+    }
+  )
+}
+resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ec2" {
+  key_id = aws_kms_key.maat_cloudwatch_logs_key_ec2.id
+  policy = jsonencode({
+    Id = "key-default-1"
+    Statement = [
+      {
+        Action = "kms:*"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.env_account_id}:root"
+        }
+
+        Resource = "*"
+        Sid      = "Enable IAM User Permissions"
+      },
+      {
+        Action = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.eu-west-2.amazonaws.com"
+        }
+        Resource = "*"
+        Sid      = "Enable log service Permissions"
+      }
+    ]
+    Version = "2012-10-17"
+  })
+}
+
+
+#####################################
 # ECS CLOUDWATCH LOG GROUP
 #####################################
 
 resource "aws_cloudwatch_log_group" "ecs_cw_log_group" {
   name              = "${local.application_name}-ECS"
   retention_in_days = 90
+  kms_key_id = aws_kms_key.maat_cloudwatch_logs_key_ecs.arn
+  
+}
+
+resource "aws_cloudwatch_log_group" "ec2_cw_log_group" {
+  name              = "${local.application_name}-EC2"
+  retention_in_days = 90
+  kms_key_id = aws_kms_key.maat_cloudwatch_logs_key_ec2.arn
 }
 
 ######################################

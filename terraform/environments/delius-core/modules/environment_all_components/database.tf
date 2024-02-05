@@ -7,6 +7,8 @@ module "oracle_db_shared" {
   source             = "../components/oracle_db_shared"
   account_config     = var.account_config
   environment_config = var.environment_config
+  account_info       = var.account_info
+  platform_vars      = var.platform_vars
   env_name           = var.env_name
   tags               = local.tags
   public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
@@ -14,10 +16,10 @@ module "oracle_db_shared" {
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws                        = aws
+    aws.bucket-replication     = aws
+    aws.core-vpc               = aws.core-vpc
+    aws.core-network-services  = aws.core-network-services
   }
 
 }

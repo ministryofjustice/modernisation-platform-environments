@@ -126,9 +126,6 @@ locals {
             branch = "oracle_11g_oasys_patchset_addition"
           })
         })
-        instance = merge(local.database_onr_a.instance, {
-          instance_type = "r6i.2xlarge"
-        })
         tags = merge(local.database_onr_a.tags, {
           instance-scheduling = "skip-scheduling"
           oracle-sids         = "PPONRBOD PPOASREP PPONRSYS PPONRAUD"

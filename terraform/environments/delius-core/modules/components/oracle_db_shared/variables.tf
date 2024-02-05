@@ -23,6 +23,15 @@ variable "account_config" {
   type        = any
 }
 
+variable "account_info" {
+  description = "Account info to pass to the instance"
+  type        = any
+}
+
+variable "platform_vars" {
+  description = "Platform vars to pass to the instance"
+  type        = any
+}
 
 variable "public_keys" {
   description = "Public keys to add to the instance"

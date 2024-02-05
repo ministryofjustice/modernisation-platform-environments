@@ -104,3 +104,22 @@ variable "environments_in_account" {
   type    = list(string)
   default = []
 }
+
+variable "community_api" {
+  type = object({
+    name           = string
+    image_tag      = string
+    container_port = number
+    host_port      = number
+    protocol       = string
+    db_name        = string
+  })
+  default = {
+    name           = "community-api"
+    image_tag      = "default_image_tag"
+    container_port = 8080
+    host_port      = 8080
+    protocol       = "tcp"
+    db_name        = "default_db_name"
+  }
+}
