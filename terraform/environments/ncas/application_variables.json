@@ -1,7 +1,6 @@
 {
   "accounts": {
     "development": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "ncas_db_dev",
       "identifier": "ncas-db-dev",
       "db_username": "dbadmin",
@@ -22,7 +21,6 @@
       "tactical_products_db_secrets_arn": "8NFchF"
     },
     "preproduction": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "ncas_db_pre_prod",
       "identifier": "ncas-db-pre-prod",
       "db_username": "dbadmin",
@@ -43,7 +41,6 @@
       "tactical_products_db_secrets_arn": "0De931"
     },
     "production": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "ncas_db_prod",
       "identifier": "ncas-db-prod",
       "db_username": "dbadmin",
