@@ -104,3 +104,12 @@ variable "environments_in_account" {
   type    = list(string)
   default = []
 }
+
+variable "pwm_config" {
+  type = object({
+    image_tag = string
+  })
+  default = {
+    image_tag = "default_image_tag"
+  }
+}

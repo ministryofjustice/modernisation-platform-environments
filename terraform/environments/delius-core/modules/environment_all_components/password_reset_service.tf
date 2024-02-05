@@ -9,18 +9,18 @@ module "password_reset_service" {
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
-  container_port_mappings = [
+  container_port_config = [
     {
       containerPort = 8080
-      hostPort      = 8080
       protocol      = "tcp"
     }
   ]
+
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
   container_secrets = [
     {
       name      = "SECURITY_KEY"
-      valueFrom = aws_ssm_parameter.delius_core_pwm_security_key.arn
+      valueFrom = "REPLACE"
       #   "/${var.environment_name}/${var.project_name}/pwm/pwm/security_key"
     },
     {
@@ -38,11 +38,10 @@ module "password_reset_service" {
   tags                    = var.tags
   microservice_lb_arn     = aws_lb.delius_core_frontend.arn
   platform_vars           = var.platform_vars
-  #   container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management-ecr-repo:${var.pwm_config.api_image_tag}"
-  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management-ecr-repo:1.9.1"
-  account_config    = var.account_config
-  health_check_path = "/gdpr/api/actuator/health"
-  account_info      = var.account_info
+  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management-ecr-repo:${var.pwm_config.image_tag}"
+  account_config          = var.account_config
+  health_check_path       = "/gdpr/api/actuator/health"
+  account_info            = var.account_info
 
   container_environment_vars = [
     {
@@ -51,13 +50,13 @@ module "password_reset_service" {
         region    = var.account_info["region"]
         ldap_url  = "ldap://${module.ldap.nlb_dns_name}:${local.ldap_port}"
         ldap_user = aws_ssm_parameter.delius_core_ldap_principal.arn
-        user_base = data.aws_ssm_parameter.delius_core_frontend_env_var_user_context.arn
+        user_base = "REPLACE"
         # site_url  = "https://${aws_route53_record.public_dns.fqdn}"
-        site_url = "https://moj-ldap.com"
+        site_url = "REPLACE"
         # email_smtp_address = "smtp.${data.terraform_remote_state.vpc.outputs.private_zone_name}"
-        email_smtp_address = "smtp.moj.com"
+        email_smtp_address = "REPLACE"
         # email_from_address = "no-reply@${data.terraform_remote_state.vpc.outputs.public_zone_name}"
-        email_from_address = "no-reply@moj.com"
+        email_from_address = "REPLACE"
       }))
     }
   ]
