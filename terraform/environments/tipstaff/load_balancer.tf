@@ -4,14 +4,22 @@ resource "aws_security_group" "tipstaff_lb_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow access on HTTPS for the MOJ VPN"
+    description = "allow access on HTTPS for the Dom1 Cisco VPN"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
+    cidr_blocks = ["194.33.192.1/32"]
   }
 
-  // Allow all IP addresses that had load balancer access in the Tactical Products environment
+  ingress {
+    description = "allow access on HTTPS for the Global Protect VPN"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["35.176.93.186/32"]
+  }
+
+  // Allow user IP addresses
   ingress {
     from_port = 443
     to_port   = 443
@@ -41,7 +49,10 @@ resource "aws_security_group" "tipstaff_lb_sc" {
       "185.191.249.100/32",
       "54.94.206.111/32",
       "194.33.193.0/25",
-      "178.248.34.42/32"
+      "178.248.34.42/32",
+      "18.169.147.172/32",
+      "18.130.148.126/32",
+      "35.176.148.126/32"
     ]
   }
 

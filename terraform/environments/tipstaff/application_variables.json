@@ -1,7 +1,6 @@
 {
   "accounts": {
     "development": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "tipstaff_db_dev",
       "identifier": "tipstaff-db-dev",
       "db_username": "dbadmin",
@@ -26,7 +25,6 @@
       "example_var": "test-data"
     },
     "preproduction": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "tipstaff_db_pre_prod",
       "identifier": "tipstaff-db-pre-prod",
       "db_username": "dbadmin",
@@ -48,7 +46,6 @@
       "tactical_products_db_secrets_arn": "vhUrZe"
     },
     "production": {
-      "moj_ip": "81.134.202.29/32",
       "db_name": "tipstaff_db_prod",
       "identifier": "tipstaff-db-prod",
       "db_username": "dbadmin",
