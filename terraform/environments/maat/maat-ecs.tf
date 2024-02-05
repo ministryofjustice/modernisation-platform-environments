@@ -220,6 +220,12 @@ resource "aws_security_group_rule" "outbound" {
 
 resource "aws_kms_key" "maat_cloudwatch_logs_key_ecs" {
   description = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ecs-key"
+    }
+  )
 }
 resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ecs" {
   key_id = aws_kms_key.maat_cloudwatch_logs_key_ecs.id
@@ -258,6 +264,12 @@ resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ecs" {
 
 resource "aws_kms_key" "maat_cloudwatch_logs_key_ec2" {
   description = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-key"
+    }
+  )
 }
 resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ec2" {
   key_id = aws_kms_key.maat_cloudwatch_logs_key_ec2.id
