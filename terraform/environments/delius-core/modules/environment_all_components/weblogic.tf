@@ -7,7 +7,7 @@ module "weblogic" {
   container_environment_vars = [
     {
       name  = "LDAP_PORT"
-      value = local.ldap_port
+      value = var.ldap_config.port
     },
     {
       name  = "LDAP_HOST"
