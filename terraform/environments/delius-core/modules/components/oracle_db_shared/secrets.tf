@@ -1,6 +1,7 @@
 resource "aws_secretsmanager_secret" "delius_core_dba_passwords" {
   name        = join("-", [lookup(var.tags, "environment-name", null), lookup(var.tags, "delius-environment", null), replace(lookup(var.tags, "application", null), "-core", ""), "dba-passwords"])
   description = "DBA Users Credentials"
+  kms_key_id  = var.account_config.kms_keys.general_shared
   tags        = var.tags
 }
 
@@ -16,6 +17,7 @@ resource "aws_secretsmanager_secret_version" "delius_core_dba_passwords" {
 
 resource "aws_secretsmanager_secret" "delius_core_application_passwords" {
   name        = join("-", [lookup(var.tags, "environment-name", null), lookup(var.tags, "delius-environment", null), replace(lookup(var.tags, "application", null), "-core", ""), "application-passwords"])
+  kms_key_id  = var.account_config.kms_keys.general_shared
   description = "Application Users Credentials"
   tags        = var.tags
 }

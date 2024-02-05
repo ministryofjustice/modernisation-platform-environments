@@ -1,4 +1,3 @@
-# nomis-preproduction environment settings
 locals {
 
   # baseline config
@@ -66,47 +65,7 @@ locals {
         })
       })
 
-
       # web servers
-      pp-cafm-w-2-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-cafm-w-2-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type          = "t3.large"
-          vpc_security_group_ids = concat(local.defaults_web_ec2.instance.vpc_security_group_ids, ["cafm_app_fixngo"])
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-        }
-        tags = merge(local.defaults_web_ec2.tags, {
-          description       = "Migrated server PPFWW0002 Web Access Server / RDS Gateway Server"
-          ami               = "pp-cafm-w-2-b"
-          app-config-status = "pending"
-        })
-      })
-
-      pp-cafm-w-3-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-cafm-w-2-b"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "t3.large"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-        }
-        tags = merge(local.defaults_web_ec2.tags, {
-          description       = "Migrated server PPFWW0003 Web Access Server / RDS Gateway Server"
-          ami               = "pp-cafm-w-2-b"
-          app-config-status = "pending"
-        })
-      })
-
       pp-cafm-w-4-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-cafm-w-4-b"
@@ -154,28 +113,6 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          web-23-80 = {
-            port     = 80
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              path                = "/RDWeb"
-              healthy_threshold   = 3
-              unhealthy_threshold = 5
-              timeout             = 5
-              interval            = 30
-              matcher             = "200-399"
-              port                = 80
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pp-cafm-w-2-b" },
-              { ec2_instance_name = "pp-cafm-w-3-a" },
-            ]
-          }
           web-45-80 = {
             port     = 80
             protocol = "HTTP"
@@ -226,21 +163,6 @@ locals {
               }
             }
             rules = {
-              web-23-80 = {
-                priority = 2380
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-23-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmtx.pp.planetfm.service.justice.gov.uk",
-                      "pp-cafmtx.az.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
               web-45-80 = {
                 priority = 4580
                 actions = [{
@@ -264,13 +186,10 @@ locals {
     baseline_route53_zones = {
       "pp.planetfm.service.justice.gov.uk" = {
         records = [
-          # set to PPFDW0030 PP SQL server for planetfm, not applied as not used previously in testing
-          # { name = "ppplanet", type = "A", ttl = "300", records = ["10.40.50.132"] },
-          # { name = "ppplanet-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
-          # { name = "ppplanet-b", type = "CNAME", ttl = "300", records = ["pp-cafm-db-a.planetfm.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "_658adffab7a58a4d5a86804a2b6eb2f7", type = "CNAME", ttl = 86400, records = ["_c649cb794d2fa2e1ac4d3f6fb4e1c8a7.mhbtsbpdnt.acm-validations.aws"] },
+          { name = "cafmtx", type = "CNAME", ttl = 3600, records = ["rdweb1.preproduction.hmpps-domain.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "cafmtx", type = "A", lbs_map_key = "private" },
           { name = "cafmwebx", type = "A", lbs_map_key = "private" },
         ]
       }

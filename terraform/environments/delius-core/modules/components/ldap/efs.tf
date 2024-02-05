@@ -5,7 +5,7 @@ module "efs" {
   env_name       = var.env_name
   creation_token = "${var.env_name}-ldap"
 
-  kms_key_arn                     = var.account_config.general_shared_kms_key_arn
+  kms_key_arn                     = var.account_config.kms_keys.general_shared
   throughput_mode                 = var.ldap_config.efs_throughput_mode
   provisioned_throughput_in_mibps = var.ldap_config.efs_provisioned_throughput
   tags                            = var.tags
