@@ -49,19 +49,3 @@ resource "aws_secretsmanager_secret_version" "delius_core_application_passwords"
     ]
   }
 }
-
-module "environment" {
-  source = "../../../../../modules/environment"
-
-  providers = {
-    aws.modernisation-platform = aws.modernisation-platform
-    aws.core-network-services  = aws.core-network-services
-    aws.core-vpc               = aws.core-vpc
-  }
-
-  environment_management = var.account_config.environment_management
-  business_unit          = var.account_config.business_unit
-  application_name       = var.account_config.application_name
-  environment            = var.account_config.environment
-  subnet_set             = var.account_config.subnet_set
-}
