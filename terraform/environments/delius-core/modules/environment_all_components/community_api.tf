@@ -17,10 +17,12 @@ module "community_api" {
     #   name      = "APPINSIGHTS_INSTRUMENTATIONKEY"
     #   valueFrom = "/${var.environment_name}/${var.project_name}/newtech/offenderapi/appinsights_key"
     # },
-    # {
-    #   name      = "SPRING_DATASOURCE_PASSWORD"
-    #   valueFrom = "/${var.environment_name}/${var.project_name}/delius-database/db/delius_pool_password"
-    # },
+    {
+      name     = "SPRING_DATASOURCE_PASSWORD"
+      valueFrom = aws_ssm_parameter.jdbc_password.arn
+      # valueFrom = "/${var.environment_name}/${var.project_name}/delius-database/db/delius_pool_password"
+    }
+    # ,
     # {
     #   name      = "SPRING_LDAP_PASSWORD"
     #   valueFrom = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/ldap_admin_password"
@@ -43,7 +45,9 @@ module "community_api" {
   # TODO - This LB is a placeholder marked no 13 on the architecture diagram: https://dsdmoj.atlassian.net/wiki/spaces/DAM/pages/3773105057/High-Level+Architecture
   # Two LBs (public and secure) are needed as show on the architecture diagram. There is an architectural discussion to be had if we could get away with just one LB instead
   microservice_lb_arn     = aws_lb.delius_core_frontend.arn
-  # microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
+  microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
+  # Please check with the app team what the rule path should be here.
+  alb_listener_rule_paths = ["/secure", "/secure/*"]
   platform_vars     = var.platform_vars
   container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-community-api-ecr-repo:${var.community_api.image_tag}"
   account_config    = var.account_config
@@ -62,7 +66,7 @@ module "community_api" {
     },
     {
       name  = "SPRING_DATASOURCE_URL"
-      value = aws_ssm_parameter.delius_core_community_api_env_var_jdbc_url.arn
+      value = aws_ssm_parameter.jdbc_url.arn
       # The value below is from the legacy
       # value = data.terraform_remote_state.database.outputs.jdbc_failover_url
     },
