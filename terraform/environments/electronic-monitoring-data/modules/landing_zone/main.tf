@@ -370,7 +370,7 @@ module "landing_zone_security_groups" {
 
   cidr_ipv4s = each.value.cidr_ipv4s
   cidr_ipv6s = each.value.cidr_ipv6s
-  suppler    = var.supplier
+  supplier   = var.supplier
   user_name  = each.value.name
   vpc_id     = var.vpc_id
 }
