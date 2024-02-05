@@ -5,13 +5,12 @@ variable "supplier" {
 
 variable "user_accounts"{
   description = "The names of the user accounts to create"
-  type        = list(any)
-  # type        = list(map(object({
-  #   name       = string
-  #   ssh_keys   = list(string)
-  #   cidr_ipv4s = list(string)
-  #   cidr_ipv6s = list(string)
-  # })))
+  type        = list(object({
+    name       = string
+    ssh_keys   = list(string)
+    cidr_ipv4s = list(string)
+    cidr_ipv6s = list(string)
+  }))
   default     = []
 }
 
