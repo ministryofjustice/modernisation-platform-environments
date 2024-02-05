@@ -1,11 +1,7 @@
-locals {
-  app_name = "password-reset"
-}
-
 module "password_reset_service" {
   source = "../components/delius_microservice"
 
-  name                  = local.app_name
+  name                  = "password-reset"
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
