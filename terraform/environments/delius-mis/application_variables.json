@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "legacy_counterpart_cidr": "10.162.32.0/20"
     },
     "test": {
       "example_var": "test-data"
