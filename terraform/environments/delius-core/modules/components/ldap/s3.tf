@@ -16,6 +16,7 @@ module "s3_bucket_migration" {
       "s3:GetBucketLocation",
       "s3:ListBucket",
       "s3:ListBucketMultipartUploads",
+      "s3:CreateMultipartUpload",
       "s3:AbortMultipartUpload",
       "s3:DeleteObject",
       "s3:GetObject",
