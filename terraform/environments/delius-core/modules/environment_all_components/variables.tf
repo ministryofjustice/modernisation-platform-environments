@@ -85,6 +85,11 @@ variable "weblogic_eis_config" {
   type = any
 }
 
+variable "user_management_config" {
+  type = any
+}
+
+
 variable "tags" {
   type = any
 }

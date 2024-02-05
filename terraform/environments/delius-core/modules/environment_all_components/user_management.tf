@@ -10,7 +10,7 @@ module "user_management" {
   ]
   container_port_config = [
     {
-      containerPort = 8080
+      containerPort = var.user_management_config.container_port
       protocol      = "tcp"
     }
   ]
@@ -19,8 +19,8 @@ module "user_management" {
   env_name = var.env_name
 
   ecs_cluster_arn  = module.ecs.ecs_cluster_arn
-  container_memory = var.weblogic_eis_config.container_memory
-  container_cpu    = var.weblogic_eis_config.container_cpu
+  container_memory = var.user_management_config.container_memory
+  container_cpu    = var.user_management_config.container_cpu
 
   health_check_path                 = "/umt"
   health_check_grace_period_seconds = 600
@@ -33,7 +33,7 @@ module "user_management" {
   alb_listener_rule_priority         = 10
   alb_listener_rule_paths            = ["/umt"]
 
-  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-eis-ecr-repo:${var.user_management.image_tag}"
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-eis-ecr-repo:${var.user_management_config.image_tag}"
 
   platform_vars = var.platform_vars
   tags          = var.tags
