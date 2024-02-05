@@ -5,8 +5,8 @@
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "this" {
-  name        = "${var.user_name}-inbound-ips"
-  description = "Allowed IP addresses for ${var.user_name}"
+  name        = "${var.supplier}-${var.user_name}-inbound-ips"
+  description = "Allowed IP addresses for ${var.user_name} on ${var.supplier} server"
   vpc_id      = var.vpc_id
 
   tags = {

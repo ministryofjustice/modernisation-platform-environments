@@ -368,10 +368,11 @@ module "landing_zone_security_groups" {
 
   for_each = { for idx, item in var.user_accounts : idx => item }
 
-  cidr_ipv4s      = each.value.cidr_ipv4s
-  cidr_ipv6s      = each.value.cidr_ipv6s
-  user_name       = each.value.name
-  vpc_id          = var.vpc_id
+  cidr_ipv4s = each.value.cidr_ipv4s
+  cidr_ipv6s = each.value.cidr_ipv6s
+  suppler    = var.supplier
+  user_name  = each.value.name
+  vpc_id     = var.vpc_id
 }
 
 locals {

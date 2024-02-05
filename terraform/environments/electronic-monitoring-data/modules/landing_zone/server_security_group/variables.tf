@@ -10,6 +10,11 @@ variable "cidr_ipv6s" {
   default     = []
 }
 
+variable "supplier" {
+  description = "The name of the supplier the SFTP server is for"
+  type        = string
+}
+
 variable "user_name" {
   description = "The user name for the SFTP server account"
   type        = string
