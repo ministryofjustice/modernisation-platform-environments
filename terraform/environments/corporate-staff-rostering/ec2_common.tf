@@ -1,32 +1,3 @@
-moved {
-  from = aws_ssm_document.windows_domain_join
-  to   = aws_ssm_document.ssm_documents["windows-domain-join"]
-}
-moved {
-  from = aws_ssm_document.cloud_watch_agent
-  to   = aws_ssm_document.ssm_documents["windows-cloudwatch-agent-config"]
-}
-moved {
-  from = aws_ssm_document.ami_build_command
-  to   = aws_ssm_document.ssm_documents["ami-build-command"]
-}
-moved {
-  from = aws_ssm_document.ami_build_automation
-  to   = aws_ssm_document.ssm_documents["ami-build-automation"]
-}
-moved {
-  from = aws_ssm_document.leave_windows_domain
-  to   = aws_ssm_document.ssm_documents["leave-windows-domain"]
-}
-moved {
-  from = aws_ssm_document.remove_local_users_windows
-  to   = aws_ssm_document.ssm_documents["remove-local-users-windows"]
-}
-moved {
-  from = aws_ssm_document.network-testing-tools
-  to   = aws_ssm_document.ssm_documents["network-testing-tools"]
-}
-
 locals {
   ssm_docs = {
     windows-domain-join = {
