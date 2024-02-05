@@ -6,7 +6,6 @@ variable "data_store_bucket" {
   description = "The bucket landed data is moved to"
 }
 
-
 variable "subnet_ids" {
     description = "The subnet ids used for the SFTP server"
     type        = list(string)
@@ -27,7 +26,6 @@ variable "user_accounts"{
   }))
   default     = []
 }
-
 
 variable "vpc_id" {
     description = "The vpc used for the SFTP server"
