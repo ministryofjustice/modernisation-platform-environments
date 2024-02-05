@@ -739,14 +739,12 @@ locals {
             }
           }
           http-7781 = {
-            alarm_target_group_names = ["pp-csr-w-12-7781"] # this alarm will deliberately fail, will be removed later
             port                     = 7781
             protocol                 = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-12-7781"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
           }
         }
       }
