@@ -293,7 +293,7 @@ locals {
       }
       "/dev/sde" = { # DATA01
         label = "data"
-        size  = 500
+        size  = 2000
         type  = "gp3"
       }
       # "/dev/sdf" = { # DATA02
@@ -310,7 +310,7 @@ locals {
       "/dev/sdj" = { # FLASH01
         label = "flash"
         type  = "gp3"
-        size  = 100
+        size  = 300
       }
       # "/dev/sdk" = { # FLASH02
       # }
