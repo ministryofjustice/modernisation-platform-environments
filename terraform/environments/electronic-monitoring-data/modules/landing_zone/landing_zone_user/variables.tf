@@ -7,6 +7,11 @@ variable "ssh_keys" {
   type        = list(string)
 }
 
+variable "supplier" {
+  description = "The name of the supplier the SFTP server is for"
+  type        = string
+}
+
 variable "transfer_server" {
   description = "The SFTP server"
 }

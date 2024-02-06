@@ -353,6 +353,7 @@ module "landing_zone_users" {
 
   landing_bucket  = aws_s3_bucket.landing_bucket
   ssh_keys        = each.value.ssh_keys
+  supplier        = var.supplier
   transfer_server = aws_transfer_server.this
   user_name       = each.value.name
 }

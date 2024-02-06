@@ -30,7 +30,7 @@ resource "aws_transfer_user" "this" {
 }
 
 resource "aws_iam_role" "this_transfer_user" {
-  name                = "${var.user_name}-transfer-user-iam-role"
+  name                = "${var.supplier}-${var.user_name}-transfer-user-iam-role"
   assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
