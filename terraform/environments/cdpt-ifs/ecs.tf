@@ -408,3 +408,33 @@ resource "aws_ecs_cluster_capacity_providers" "cdpt-ifs" {
 
   capacity_providers = [aws_ecs_capacity_provider.ifs.name]
 }
+
+resource "aws_autoscaling_group" "cluster-scaling-group" {
+  vpc_zone_identifier       = sort(data.aws_subnets.shared-private.ids)
+  name                      = "${local.application_name}-cluster-scaling-group"
+  desired_capacity          = local.application_data.accounts[local.environment].ec2_desired_capacity
+  max_size                  = local.application_data.accounts[local.environment].ec2_max_size
+  min_size                  = local.application_data.accounts[local.environment].ec2_min_size
+  health_check_grace_period = 60
+
+  launch_template {
+    id      = aws_launch_template.ec2-launch-template.id
+    version = "$Latest"
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "${local.application_name}-cluster-scaling-group"
+    propagate_at_launch = true
+  }
+
+  dynamic "tag" {
+    for_each = local.tags
+
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
+}
