@@ -81,3 +81,17 @@ resource "aws_ssm_document" "rds_app" {
     },
   )
 }
+
+resource "aws_ssm_document" "winrm" {
+  name            = "winrm"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/winrm.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      os-type = "Windows"
+    },
+  )
+}

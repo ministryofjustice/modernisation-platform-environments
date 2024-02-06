@@ -1,0 +1,24 @@
+---
+schemaVersion: "2.2"
+description: "SSM Document for enabling WinRM over HTTPS"
+mainSteps:
+  - name: EnableWinRmHttps
+    action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
+    inputs:
+      runCommand:
+        - |
+          $hostName = $env:COMPUTERNAME
+          $hostIP=(Get-NetAdapter| Get-NetIPAddress).IPv4Address|Out-String
+          $srvCert = New-SelfSignedCertificate -DnsName $hostName,$hostIP -CertStoreLocation Cert:\LocalMachine\My
+          New-Item -Path WSMan:\localhost\Listener\ -Transport HTTPS -Address * -CertificateThumbPrint $srvCert.Thumbprint -Force
+          
+          New-NetFirewallRule -Displayname 'WinRM - Powershell remoting HTTPS-In' -Name 'WinRM - Powershell remoting HTTPS-In' -Profile Any -LocalPort 5986 -Protocol TCP
+          Restart-Service WinRM
+          
+          Export-Certificate -Cert $srvCert -FilePath c:\SSL_PS_Remoting.cer
+          Import-Certificate -FilePath c:\SSL_PS_Remoting.cer -CertStoreLocation Cert:\LocalMachine\root\
+          del c:\SSL_PS_Remoting.cer
