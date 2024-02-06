@@ -275,7 +275,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ec2_high_cpu_alarm" {
   alarm_actions       = [aws_autoscaling_policy.maat_ec2_scaling_up_policy.arn]
 
   dimensions = {
-    ClusterName = aws_ecs_cluster.maat_app_ecs_cluster.name
+    ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
   }
 }
 
@@ -304,14 +304,14 @@ resource "aws_cloudwatch_metric_alarm" "maat_ec2_low_cpu_alarm" {
 # 
 #####################################
 
-##### ECS IAM Role -----
+##### ECS Service Role -----
 
-resource "aws_iam_role" "maat_ecs_role" {
-  name = "${local.application_name}-ecs-role"
+resource "aws_iam_role" "maat_ecs_service_role" {
+  name = "${local.application_name}-ecs-service-role"
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-ecs-role"
+      Name = "${local.application_name}-ecs-service-role"
     }
   )
   assume_role_policy = <<EOF
@@ -329,8 +329,8 @@ resource "aws_iam_role" "maat_ecs_role" {
 EOF
 }
 
-resource "aws_iam_policy" "maat_ecs_role_policy" {
-  name = "${local.application_name}-ecs-role-policy"
+resource "aws_iam_policy" "maat_ecs_service_role_policy" {
+  name = "${local.application_name}-ecs-service-role-policy"
 
   policy = jsonencode({
    Version = "2012-10-17"
@@ -352,9 +352,59 @@ resource "aws_iam_policy" "maat_ecs_role_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "maat_ecs_role_policy_attachment" {
-  role       = aws_iam_role.maat_ecs_role.name
-  policy_arn = aws_iam_policy.maat_ecs_role_policy.arn
+resource "aws_iam_role_policy_attachment" "maat_ecs_service_role_policy_attachment" {
+  role       = aws_iam_role.maat_ecs_service_role.name
+  policy_arn = aws_iam_policy.maat_ecs_service_role_policy.arn
+}
+
+##### ECS Autoscaling Role -----
+
+resource "aws_iam_role" "maat_ecs_autoscaling_role" {
+  name = "${local.application_name}-ecs-autoscaling-role"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ecs-autoscaling-role"
+    }
+  )
+  assume_role_policy = <<EOF
+{
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {},
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "maat_ecs_autoscaling_role_policy" {
+  name = "${local.application_name}-ecs-autoscaling-role-policy"
+
+  policy = jsonencode({
+   Version = "2012-10-17"
+   Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+            "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+            "application-autoscaling:*",
+            "cloudwatch:DescribeAlarms",
+            "cloudwatch:PutMetricAlarm",
+            "ecs:DescribeServices",
+            "ecs:UpdateService"
+        ]
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "maat_ecs_autoscaling_role_policy_attachment" {
+  role       = aws_iam_role.maat_ecs_autoscaling_role.name
+  policy_arn = aws_iam_policy.maat_ecs_autoscaling_role_policy.arn
 }
 
 #### ECS TASK DEFINITION -------
@@ -403,7 +453,7 @@ resource "aws_appautoscaling_target" "maat_ecs_scaling_target" {
   max_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_max
   min_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_min
   resource_id        = "service/${aws_ecs_cluster.app_ecs_cluster.name}/${aws_ecs_service.maat_api_ecs_service.name}"
-  role_arn           = aws_iam_role.x.arn
+  role_arn           = aws_iam_role.maat_ecs_autoscaling_role.arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
@@ -512,7 +562,7 @@ resource "aws_ecs_service" "maat_ecs_service" {
 #   launch_type                       = "FARGATE"
   desired_count                     = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
   task_definition                   = aws_ecs_task_definition.maat_ecs_task_definition.arn
-  iam_role                          = aws_iam_role.maat_ecs_role.arn
+  iam_role                          = aws_iam_role.maat_ecs_service_role.arn
 #   health_check_grace_period_seconds = 120
 
   ordered_placement_strategy {
