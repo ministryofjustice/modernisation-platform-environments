@@ -24,7 +24,7 @@ locals {
   }
 
   db_config_dev = {
-    instance_type           = "r6i.xlarge"
+    instance_type  = "r6i.xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
@@ -82,6 +82,13 @@ locals {
     container_port   = 8080
     container_memory = 2048
     container_cpu    = 1024
+  }
+
+  user_management_config_dev = {
+    image_tag        = "5.7.6"
+    container_port   = 8080
+    container_memory = 4096
+    container_cpu    = 2048
   }
 
   bastion_config_dev = {
