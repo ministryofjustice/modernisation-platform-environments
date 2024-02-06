@@ -449,56 +449,56 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
   )
 }
 
-# #### ECS Scaling target ------
+#### ECS Scaling target ------
 
-# resource "aws_appautoscaling_target" "maat_ecs_scaling_target" {
-#   max_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_max
-#   min_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_min
-#   resource_id        = "service/${aws_ecs_cluster.app_ecs_cluster.name}/${aws_ecs_service.maat_api_ecs_service.name}"
-#   role_arn           = aws_iam_role.maat_ecs_autoscaling_role.arn
-#   scalable_dimension = "ecs:service:DesiredCount"
-#   service_namespace  = "ecs"
-# }
+resource "aws_appautoscaling_target" "maat_ecs_scaling_target" {
+  max_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_max
+  min_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_min
+  resource_id        = "service/${aws_ecs_cluster.app_ecs_cluster.name}/${aws_ecs_service.maat_api_ecs_service.name}"
+  role_arn           = aws_iam_role.maat_ecs_autoscaling_role.arn
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
 
-# #### ECS Scaling Policies -------
+#### ECS Scaling Policies -------
 
-# resource "aws_appautoscaling_policy" "maat_ecs_scaling_up_policy" {
-#   name               = "${local.application_name}-ecs-scaling-up"
-#   policy_type        = "StepScaling"
-#   resource_id        = aws_appautoscaling_target.maat_ecs_scaling_target.resource_id
-#   scalable_dimension = aws_appautoscaling_target.maat_ecs_scaling_target.scalable_dimension
-#   service_namespace  = aws_appautoscaling_target.maat_ecs_scaling_target.service_namespace
+resource "aws_appautoscaling_policy" "maat_ecs_scaling_up_policy" {
+  name               = "${local.application_name}-ecs-scaling-up"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.maat_ecs_scaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.maat_ecs_scaling_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.maat_ecs_scaling_target.service_namespace
 
-#   step_scaling_policy_configuration {
-#     adjustment_type         = "ChangeInCapacity"
-#     cooldown                = 60
-#     metric_aggregation_type = "Average"
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Average"
 
-#     step_adjustment {
-#       scaling_adjustment          = 1
-#       metric_interval_lower_bound = 0
-#     }
-#   }
-# }
+    step_adjustment {
+      scaling_adjustment          = 1
+      metric_interval_lower_bound = 0
+    }
+  }
+}
 
-# resource "aws_appautoscaling_policy" "maat_ecs_scaling_down_policy" {
-#   name               = "${local.application_name}-ecs-scaling-down"
-#   policy_type        = "StepScaling"
-#   resource_id        = aws_appautoscaling_target.maat_ecs_scaling_target.resource_id
-#   scalable_dimension = aws_appautoscaling_target.maat_ecs_scaling_target.scalable_dimension
-#   service_namespace  = aws_appautoscaling_target.maat_ecs_scaling_target.service_namespace
+resource "aws_appautoscaling_policy" "maat_ecs_scaling_down_policy" {
+  name               = "${local.application_name}-ecs-scaling-down"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.maat_ecs_scaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.maat_ecs_scaling_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.maat_ecs_scaling_target.service_namespace
 
-#   step_scaling_policy_configuration {
-#     adjustment_type         = "ChangeInCapacity"
-#     cooldown                = 60
-#     metric_aggregation_type = "Average"
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Average"
 
-#     step_adjustment {
-#       scaling_adjustment          = -1
-#       metric_interval_lower_bound = 0
-#     }
-#   }
-# }
+    step_adjustment {
+      scaling_adjustment          = -1
+      metric_interval_lower_bound = 0
+    }
+  }
+}
 
 #### ECS CLOUDWATCH LOG GROUP & Key ------
 
@@ -597,44 +597,44 @@ resource "aws_ecs_service" "maat_ecs_service" {
   )
 }
 
-# ##### ECS CloudWatch Alarms -------
+##### ECS CloudWatch Alarms -------
 
-# resource "aws_cloudwatch_metric_alarm" "maat_ecs_high_cpu_alarm" {
-#   alarm_name          = "${local.application_name}-ecs-high-cpu-alarm"
-#   alarm_description   = "CPUUtilization exceeding threshold. Triggers scale up"
-#   actions_enabled     = true
-#   namespace           = "AWS/ECS"
-#   metric_name         = "CPUUtilization"
-#   statistic           = "Average"
-#   period              = 60
-#   evaluation_periods  = 3
-#   threshold           = 70
-#   unit                = "Percent"
-#   comparison_operator = "GreaterThanThreshold"
-#   alarm_actions       = [aws_appautoscaling_policy.maat_ecs_scaling_up_policy.arn]
+resource "aws_cloudwatch_metric_alarm" "maat_ecs_high_cpu_alarm" {
+  alarm_name          = "${local.application_name}-ecs-high-cpu-alarm"
+  alarm_description   = "CPUUtilization exceeding threshold. Triggers scale up"
+  actions_enabled     = true
+  namespace           = "AWS/ECS"
+  metric_name         = "CPUUtilization"
+  statistic           = "Average"
+  period              = 60
+  evaluation_periods  = 3
+  threshold           = 70
+  unit                = "Percent"
+  comparison_operator = "GreaterThanThreshold"
+  alarm_actions       = [aws_appautoscaling_policy.maat_ecs_scaling_up_policy.arn]
 
-#   dimensions = {
-#     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
-#     ServiceName = aws_ecs_service.maat_ecs_service.name
-#   }
-# }
+  dimensions = {
+    ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
+    ServiceName = aws_ecs_service.maat_ecs_service.name
+  }
+}
 
-# resource "aws_cloudwatch_metric_alarm" "maat_ecs_low_cpu_alarm" {
-#   alarm_name          = "${local.application_name}-ecs-low-cpu-alarm"
-#   alarm_description   = "CPUUtilization lower than threshold. Triggers scale down"
-#   actions_enabled     = true
-#   namespace           = "AWS/ECS"
-#   metric_name         = "CPUUtilization"
-#   statistic           = "Average"
-#   period              = 60
-#   evaluation_periods  = 3
-#   threshold           = 20
-#   unit                = "Percent"
-#   comparison_operator = "LessThanThreshold"
-#   alarm_actions       = [aws_appautoscaling_policy.maat_ecs_scaling_down_policy.arn]
+resource "aws_cloudwatch_metric_alarm" "maat_ecs_low_cpu_alarm" {
+  alarm_name          = "${local.application_name}-ecs-low-cpu-alarm"
+  alarm_description   = "CPUUtilization lower than threshold. Triggers scale down"
+  actions_enabled     = true
+  namespace           = "AWS/ECS"
+  metric_name         = "CPUUtilization"
+  statistic           = "Average"
+  period              = 60
+  evaluation_periods  = 3
+  threshold           = 20
+  unit                = "Percent"
+  comparison_operator = "LessThanThreshold"
+  alarm_actions       = [aws_appautoscaling_policy.maat_ecs_scaling_down_policy.arn]
 
-#   dimensions = {
-#     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
-#     ServiceName = aws_ecs_service.maat_ecs_service.name
-#   }
-# }
+  dimensions = {
+    ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
+    ServiceName = aws_ecs_service.maat_ecs_service.name
+  }
+}
