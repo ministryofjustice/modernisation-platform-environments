@@ -519,6 +519,11 @@ resource "aws_instance" "ad_fixngo" {
     }
   }
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
   root_block_device {
     encrypted = true
     ##CSS kms_key_id  = module.kms["hmpps"].kms_key_id [OUTPUT DOESN'T EXIST]
