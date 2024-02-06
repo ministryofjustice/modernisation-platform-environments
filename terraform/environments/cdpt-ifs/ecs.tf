@@ -439,6 +439,11 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   }
 }
 
+resource "aws_key_pair" "ec2-user" {
+  key_name   = "${local.application_name}-ec2"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwVil3c3Nh/F6S1IzMFUMhykwj1SwQEXVvNghpUW5Ncm82ibJqtVccgCFW96HoHO7Bv8jt5O+TrfENlNI6yywASKEiJRDNUpBBK/UCqXQrYJ0KTvJ7FHegQjrxBOM/Lo3o3IniB2lNTe8hijBMrdaeKivWjB2YKTJxLFdUdLFjBop5uH0gL5Or6+P5/CyKmkIftn3Wazyq4Oe3mYQhB9Gr45/T8/UZCPnWWZ/p7AB3hH5jVO3BqHsB0t3YqJrbCV3Uo85xM62BBBV0AcWXNADY2f4A+6zcUX6j6BIfgAmYP3EQCZBxFq0BgxurF7xIh7CIjl4iIMQJ0sz3uoyLdh9f alistair.curtis@MJ004521"
+  tags       = local.tags
+  }
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
