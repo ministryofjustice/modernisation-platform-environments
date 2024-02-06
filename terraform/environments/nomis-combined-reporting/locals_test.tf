@@ -193,7 +193,7 @@ locals {
           desired_capacity = 0
         })
         cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-        config = merge(local.bip_cms_ec2_default_default.config, {
+        config = merge(local.bip_cms_ec2_default.config, {
           instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
             "Ec2T1ReportingPolicy",
           ])
