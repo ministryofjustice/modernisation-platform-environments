@@ -52,15 +52,6 @@ resource "aws_apigatewayv2_route" "maat_api_route_crime_means_assessment" {
   target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
 }
 
-resource "aws_apigatewayv2_route" "maat_api_route_crown_court_proceeding" {
-  api_id               = aws_apigatewayv2_api.maat_api_gateway.id
-  route_key            = "ANY /api/internal/v1/crowncourtproceeding"
-  authorization_type   = "JWT"
-  authorization_scopes = ["${local.application_name}/${local.maat_api_api_scope}"]
-  authorizer_id        = aws_apigatewayv2_authorizer.maat_api_authorizer.id
-  target               = "integrations/${aws_apigatewayv2_integration.maat_api_integration.id}"
-}
-
 resource "aws_apigatewayv2_route" "maat_api_route_eform_staging" {
   api_id               = aws_apigatewayv2_api.maat_api_gateway.id
   route_key            = "ANY /api/eform/{proxy+}"

@@ -2,27 +2,11 @@ locals {
   test_config = {
 
     baseline_secretsmanager_secrets = {
-      "/ndh/t1"   = local.ndh_secretsmanager_secrets
-      "/ndh/t2"   = local.ndh_secretsmanager_secrets
-      "/ndh/test" = local.ndh_secretsmanager_secrets
+      "/ndh/t1" = local.ndh_secretsmanager_secrets
+      "/ndh/t2" = local.ndh_secretsmanager_secrets
     }
 
     baseline_iam_policies = {
-      Ec2TestPolicy = {
-        description = "Permissions required for Test EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ndh/test/*",
-            ]
-          }
-        ]
-      }
-
       Ec2t1Policy = {
         description = "Permissions required for t1 EC2s"
         statements = [
@@ -58,30 +42,6 @@ locals {
 
       test-management-server-2022 = merge(local.management_server_2022, {
         tags = merge(local.management_server_2022.tags, {
-          nomis-data-hub-environment = "test"
-        })
-      })
-
-      test-ndh-app-a = merge(local.ndh_app_a, {
-        config = merge(local.ndh_app_a.config, {
-          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
-            "Ec2TestPolicy",
-          ])
-        })
-        tags = merge(local.ndh_app_a.tags, {
-          os-type                    = "Linux"
-          nomis-data-hub-environment = "test"
-        })
-      })
-
-      test-ndh-ems-a = merge(local.ndh_ems_a, {
-        config = merge(local.ndh_ems_a.config, {
-          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
-            "Ec2TestPolicy",
-          ])
-        })
-        tags = merge(local.ndh_ems_a.tags, {
-          os-type                    = "Linux"
           nomis-data-hub-environment = "test"
         })
       })
@@ -155,11 +115,11 @@ locals {
           #{ name = "t1-app", type = "A", ttl = 300, records = ["10.101.3.196"] }, #azure
           { name = "t1-app", type = "A", ttl = 300, records = ["10.26.8.54"] }, #aws
           #{ name = "t1-ems", type = "A", ttl = 300, records = ["10.101.3.197"] }, #azure
-          { name = "t1-ems", type = "A", ttl = 300, records = ["10.26.8.49"] },    #aws
-          { name = "t2-app", type = "A", ttl = 300, records = ["10.101.33.196"] }, #azure
-          #{ name = "t2-app", type = "A", ttl = 300, records = ["10.26.8.218"] }, #aws
-          { name = "t2-ems", type = "A", ttl = 300, records = ["10.101.33.197"] }, #azure
-          #{ name = "t2-ems", type = "A", ttl = 300, records = ["10.26.8.121"] }, #aws
+          { name = "t1-ems", type = "A", ttl = 300, records = ["10.26.8.49"] }, #aws
+          #{ name = "t2-app", type = "A", ttl = 300, records = ["10.101.33.196"] }, #azure
+          { name = "t2-app", type = "A", ttl = 300, records = ["10.26.8.218"] }, #aws
+          #{ name = "t2-ems", type = "A", ttl = 300, records = ["10.101.33.197"] }, #azure
+          { name = "t2-ems", type = "A", ttl = 300, records = ["10.26.8.121"] }, #aws
         ]
       }
     }
