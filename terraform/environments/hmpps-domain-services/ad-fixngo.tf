@@ -4,8 +4,8 @@
 # For each domain, Spins up a pair of DC EC2s and a RD Licensing EC2 for use
 # by all dev/test and preprod/prod environments using this domain.
 
-# aws ec2 describe-network-interfaces --filters "Name=subnet-id,Values=subnet-0586cffe06d59a339" --query 'NetworkInterfaces[*].PrivateIpAddress' --profile core-vpc-test | jq .[] -r | sort -g
-# aws ec2 describe-network-interfaces --filters "Name=subnet-id,Values=subnet-0586cffe06d59a339" --query 'NetworkInterfaces[*].PrivateIpAddress' --profile core-vpc-test | jq .[] -r | sort -g
+# aws ec2 describe-network-interfaces --filters "Name=subnet-id,Values=subnet-0586cffe06d59a339" --query 'NetworkInterfaces[*].PrivateIpAddress' --profile core-vpc-test | jq .[] -r | sort -g
+# aws ec2 describe-network-interfaces --filters "Name=subnet-id,Values=subnet-0586cffe06d59a339" --query 'NetworkInterfaces[*].PrivateIpAddress' --profile core-vpc-test | jq .[] -r | sort -g
 
 module "ad_fixngo_ip_addresses" {
   source = "github.com/ministryofjustice/modernisation-platform-environments//terraform/modules/ip_addresses"
@@ -33,32 +33,32 @@ locals {
       #   private_ip              = null
       #   az_index                = 0 # zone a
       #   vpc_name                = "live_data"
-      #   vpc_security_group_name = "ad_hmpp_dc_sg"
+      #   vpc_security_group_name = "ad_hmpp_dc_sg"
       #   tags = {
       #     description = "domain controller for FixNGo azure.hmpp.root domain"
-      #   }
-      # }
+      #   }
+      # }
       # ad-hmpp-dc-b = {
       #   ami_name                = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
       #   instance_type           = "t3.large"
       #   private_ip              = "TODO"
-      #   az_index                = 1 # zone b
+      #   az_index                = 1 # zone b
       #   vpc_name                = "live_data"
-      #   vpc_security_group_name = "ad_hmpp_dc_sg"
+      #   vpc_security_group_name = "ad_hmpp_dc_sg"
       #   tags = {
-      #     description = "domain controller for FixNGo azure.hmpp.root domain"
+      #     description = "domain controller for FixNGo azure.hmpp.root domain"
       #   }
-      # }
-      # ad-hmpp-rdlic = {
-      #   ami_name                = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-      #   instance_type           = "t3.medium"
+      # }
+      # ad-hmpp-rdlic = {
+      #   ami_name                = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+      #   instance_type           = "t3.medium"
       #   private_ip              = null
       #   az_index                = 2 # zone c
       #   vpc_name                = "live_data"
       #   vpc_security_group_name = "ad_hmpp_rdlic_sg"
       #   tags = {
       #     description = "remote desktop licensing server for FixNGo azure.hmpp.root domain"
-      #   }
+      #   }
       # }
 
       ad-azure-dc-a = {
@@ -93,6 +93,44 @@ locals {
         tags = {
           description = "remote desktop licensing server for FixNGo azure.noms.root domain"
         }
+      }
+    }
+
+    ec2_iam_policies = {
+      ad-fixngo-ec2 = {
+        description = "Policy used by AD FixNGo EC2 instance roles"
+        path        = "/"
+        statements = [
+          {
+            sid    = "BusinessUnitKmsCmk"
+            effect = "Allow"
+            actions = [
+              "kms:Encrypt",
+              "kms:Decrypt",
+              "kms:ReEncrypt*",
+              "kms:GenerateDataKey*",
+              "kms:DescribeKey",
+              "kms:CreateGrant",
+              "kms:ListGrants",
+              "kms:RevokeGrant"
+            ]
+            resources = [
+              ##CSS update
+              module.environment.kms_keys["ebs"].arn,
+              module.environment.kms_keys["general"].arn
+            ]
+          },
+          {
+            sid    = "Ec2SelfProvision"
+            effect = "Allow"
+            actions = [
+              "ec2:DescribeVolumes",
+              "ec2:DescribeTags",
+              "ec2:DescribeInstances",
+            ]
+            resources = ["*"]
+          },
+        ]
       }
     }
 
@@ -457,6 +495,34 @@ data "aws_ami" "ad_fixngo" {
   }
 }
 
+data "aws_iam_policy_document" "ad_fixngo" {
+  for_each = local.ad_fixngo.ec2_iam_policies
+
+  dynamic "statement" {
+    for_each = each.value.statements
+
+    content {
+      sid       = statement.value.sid
+      effect    = statement.value.effect
+      actions   = statement.value.actions
+      resources = statement.value.resources
+    }
+  }
+}
+
+resource "aws_iam_policy" "ad_fixngo" {
+  for_each = local.ad_fixngo.ec2_iam_policies
+
+  name        = each.key
+  path        = each.value.path
+  description = each.value.description
+  policy      = data.aws_iam_policy_document.ad_fixngo[each.key].json
+
+  tags = merge(local.tags, local.ad_fixngo.tags, {
+    Name = each.key
+  })
+}
+
 resource "aws_iam_role" "ad_fixngo" {
   for_each = local.ad_fixngo.aws_instances
 
@@ -479,7 +545,10 @@ resource "aws_iam_role" "ad_fixngo" {
     }
   )
 
-  # managed_policy_arns = each.value.instance_profile_policies
+  managed_policy_arns = flatten([
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    [for key, value in aws_iam_policy.ad_fixngo : value.arn]
+  ])
 
   tags = merge(local.tags, local.ad_fixngo.tags, each.value.tags, {
     Name = "ec2-role-${each.key}"
