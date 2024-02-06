@@ -454,7 +454,7 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
 resource "aws_appautoscaling_target" "maat_ecs_scaling_target" {
   max_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_max
   min_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_min
-  resource_id        = "service/${aws_ecs_cluster.app_ecs_cluster.name}/${aws_ecs_service.maat_api_ecs_service.name}"
+  resource_id        = "service/${aws_ecs_cluster.maat_ecs_cluster.name}/${aws_ecs_service.maat_ecs_service.name}"
   role_arn           = aws_iam_role.maat_ecs_autoscaling_role.arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
@@ -561,10 +561,12 @@ resource "aws_ecs_service" "maat_ecs_service" {
 
   name                              = "${local.application_name}-ecs-service"
   cluster                           = aws_ecs_cluster.maat_ecs_cluster.id
-#   launch_type                       = "FARGATE"
+#   launch_type                       = ""
   desired_count                     = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
   task_definition                   = aws_ecs_task_definition.maat_ecs_task_definition.arn
+ #### UNCOMMENT THE IAM ROLE ASSOCIATION ONCE THE LB DETAILS ARE ADDED ########### 
   # iam_role                          = aws_iam_role.maat_ecs_service_role.arn
+ ################################################################################
 #   health_check_grace_period_seconds = 120
 
   ordered_placement_strategy {
@@ -578,15 +580,15 @@ resource "aws_ecs_service" "maat_ecs_service" {
 #       data.aws_subnets.shared-private.ids[1],
 #       data.aws_subnets.shared-private.ids[2],
 #     ]
-#     security_groups  = [aws_security_group.maat_ec2_security_group.id]
+#     security_groups  = [aws_security_group.foo.id]
 #     assign_public_ip = false
 #   }
 
 #   ######## ADD LB DETAILS HERE
 #   load_balancer {
-#     container_name   = "${local.application_name}-cd-api"
+#     container_name   = "${local.application_name}-foo"
 #     container_port   = 8090
-#     target_group_arn = aws_lb_target_group.maat_api_ecs_target_group.arn
+#     target_group_arn = aws_lb_target_group.foo.arn
 #   }
 
   tags = merge(
