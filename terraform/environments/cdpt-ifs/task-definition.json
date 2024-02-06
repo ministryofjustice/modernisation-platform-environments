@@ -1,0 +1,77 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:eu-west-2:224131490563:task-definition/ifsFamily:1",
+    "containerDefinitions": [
+        {
+            "name": "cdpt-ifs-container",
+            "image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/cdpt-ifs-ecr-repo:development",
+            "cpu": 1024,
+            "memory": 1024,
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "CLIENT_ID",
+                    "value": "838aa730-5f66-46df-9ff7-07eea29035ba"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "cdpt-ifs-ecs",
+                    "awslogs-region": "eu-west-2",
+                    "awslogs-stream-prefix": "cdpt-ifs"
+                }
+            }
+        }
+    ],
+    "family": "ifsFamily",
+    "taskRoleArn": "arn:aws:iam::224131490563:role/task-cdpt-ifs",
+    "executionRoleArn": "arn:aws:iam::224131490563:role/execution-cdpt-ifs",
+    "networkMode": "awsvpc",
+    "revision": 1,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2"
+    ],
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "registeredAt": "2024-02-02T11:54:52.757000+00:00",
+    "registeredBy": "arn:aws:sts::224131490563:assumed-role/MemberInfrastructureAccess/aws-go-sdk-1706874890119872393"
+}

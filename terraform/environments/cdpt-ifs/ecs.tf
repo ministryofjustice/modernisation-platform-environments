@@ -342,3 +342,69 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${local.application_name}-ec2-instance-profile"
   role = aws_iam_role.ec2_instance_role.name
 }
+
+resource "aws_ecs_service" "ecs_service" {
+  depends_on = [
+    aws_lb_listener.https_listener
+  ]
+
+  name                              = var.networking[0].application
+  cluster                           = aws_ecs_cluster.ecs_cluster.id
+  task_definition                   = aws_ecs_task_definition.ifs_task_definition.arn
+  desired_count                     = local.application_data.accounts[local.environment].app_count
+  health_check_grace_period_seconds = 60
+
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.ifs.name
+    weight            = 1
+  }
+
+  ordered_placement_strategy {
+    field = "attribute:ecs.availability-zone"
+    type  = "spread"
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.ifs_target_group.arn
+    container_name   = "${local.application_name}-container"
+    container_port   = local.application_data.accounts[local.environment].container_port
+  }
+
+  network_configuration {
+    subnets         = data.aws_subnets.shared-private.ids
+    security_groups = [aws_security_group.ecs_service.id]
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}"
+    }
+  )
+}
+
+resource "aws_ecs_capacity_provider" "ifs" {
+  name = "${local.application_name}-ecs-capacity-provider"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+
+    managed_scaling {
+      status          = "ENABLED"
+      target_capacity = 100
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ecs-capacity-provider"
+    }
+  )
+}
+
+resource "aws_ecs_cluster_capacity_providers" "cdpt-ifs" {
+  cluster_name = aws_ecs_cluster.ecs_cluster.name
+
+  capacity_providers = [aws_ecs_capacity_provider.ifs.name]
+}
