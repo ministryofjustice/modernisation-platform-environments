@@ -1,8 +1,12 @@
-######################################
-# ECS Role
-######################################
+#####################################
+#
+# EC2 RESOURCES (from infra stack)
+# 
+#####################################
 
-resource "aws_iam_role" "ec2_instance_role" {
+##### EC2 IAM Role ---------
+
+resource "aws_iam_role" "maat_ec2_instance_role" {
   name = "${local.application_name}-ec2-instance-role"
   tags = merge(
     local.tags,
@@ -12,7 +16,6 @@ resource "aws_iam_role" "ec2_instance_role" {
   )
   assume_role_policy = <<EOF
 {
-    "Version": "2008-10-17",
     "Statement": [
         {
             "Action": "sts:AssumeRole",
@@ -26,7 +29,7 @@ resource "aws_iam_role" "ec2_instance_role" {
 EOF
 }
 
-resource "aws_iam_policy" "ec2_instance_role_policy" {
+resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
   name = "${local.application_name}-ec2-instance-role-policy"
 
   policy = jsonencode({
@@ -59,23 +62,21 @@ resource "aws_iam_policy" "ec2_instance_role_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ec2_instance_role_policy_attachment" {
-  role       = aws_iam_role.ec2_instance_role.name
-  policy_arn = aws_iam_policy.ec2_instance_role_policy.arn
+resource "aws_iam_role_policy_attachment" "maat_ec2_instance_role_policy_attachment" {
+  role       = aws_iam_role.maat_ec2_instance_role.name
+  policy_arn = aws_iam_policy.maat_ec2_instance_role_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "SSM_managed_core_policy_attachment" {
-  role       = aws_iam_role.ec2_instance_role.name
+resource "aws_iam_role_policy_attachment" "SSM_ec2_role_policy_attachment" {
+  role       = aws_iam_role.maat_ec2_instance_role.name
   policy_arn = local.application_data.accounts[local.environment].SSM_managed_core_policy_arn
 }
 
-######################################
-# ECS Instance Profile
-######################################
+##### EC2 Instance Profile ------
 
-resource "aws_iam_instance_profile" "ec2_instance_profile" {
+resource "aws_iam_instance_profile" "maat_ec2_instance_profile" {
   name = "${local.application_name}-ec2-instance-profile"
-  role = aws_iam_role.ec2_instance_role.name
+  role = aws_iam_role.maat_ec2_instance_role.name
   tags = merge(
     local.tags,
     {
@@ -84,19 +85,15 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   )
 }
 
-######################################
-# ECS Cluster 
-######################################
+#### ECS Cluster -----
 
-resource "aws_ecs_cluster" "maat_app_ecs_cluster" {
+resource "aws_ecs_cluster" "maat_ecs_cluster" {
   name = "${local.application_name}-ecs-cluster"
 }
 
-######################################
-# ECS launch config/template
-######################################
+##### EC2 launch config/template -----
 
-resource "aws_launch_template" "ec2-launch-template" {
+resource "aws_launch_template" "maat_ec2_launch_template" {
   name_prefix            = "${local.application_name}-ec2-launch-template"
   image_id               = local.application_data.accounts[local.environment].ami_id
   instance_type          = local.application_data.accounts[local.environment].instance_type
@@ -106,15 +103,15 @@ resource "aws_launch_template" "ec2-launch-template" {
   }
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.ec2_instance_profile.name
+    name = aws_iam_instance_profile.maat_ec2_instance_profile.name
   }
 
   network_interfaces {
-    security_groups             = [aws_security_group.ecs_security_group.id]
+    security_groups             = [aws_security_group.maat_ecs_security_group.id]
   }
 
   user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
-    app_name = local.application_name, app_ecs_cluster = aws_ecs_cluster.maat_app_ecs_cluster.name }))
+    app_name = local.application_name, app_ecs_cluster = aws_ecs_cluster.maat_ecs_cluster.name }))
 
   tag_specifications {
     resource_type = "instance"
@@ -135,13 +132,11 @@ resource "aws_launch_template" "ec2-launch-template" {
   }), local.tags)
 }
 
-######################################
-# ECS Scaling Group
-######################################
+#### EC2 Scaling Group  -----
 
-resource "aws_autoscaling_group" "ec2_scaling_group" {
+resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
-  name                  = "${local.application_name}-ECS"
+  name                  = "${local.application_name}-EC2-asg"
   desired_capacity      = local.application_data.accounts[local.environment].ec2_asg_desired_capacity
   max_size              = local.application_data.accounts[local.environment].ec2_asg_max_size
   min_size              = local.application_data.accounts[local.environment].ec2_asg_min_size
@@ -149,7 +144,7 @@ resource "aws_autoscaling_group" "ec2_scaling_group" {
 
 
   launch_template {
-    id      = aws_launch_template.ec2-launch-template.id
+    id      = aws_launch_template.maat_ec2_launch_template.id
     version = "$Latest"
   }
 
@@ -164,33 +159,55 @@ resource "aws_autoscaling_group" "ec2_scaling_group" {
   }
 }
 
-######################################
-# ECS Scaling Policies
-######################################
+#### EC2 Scaling Policies 
 
-resource "aws_autoscaling_policy" "maat_scaling_up_policy" {
-  name               = "${local.application_name}-scaling-up"
+resource "aws_autoscaling_policy" "maat_ec2_scaling_up_policy" {
+  name               = "${local.application_name}-ec2-scaling-up"
   policy_type        = "SimpleScaling"
   adjustment_type         = "ChangeInCapacity"
-  autoscaling_group_name = aws_autoscaling_group.ec2_scaling_group.name
+  autoscaling_group_name = aws_autoscaling_group.maat_ec2_scaling_group.name
   cooldown                = 60
   scaling_adjustment          = 1
 }
 
-resource "aws_autoscaling_policy" "maat_scaling_down_policy" {
-  name               = "${local.application_name}-scaling-down"
+resource "aws_autoscaling_policy" "maat_ec2_scaling_down_policy" {
+  name               = "${local.application_name}-ec2-scaling-down"
   policy_type        = "SimpleScaling"
   adjustment_type         = "ChangeInCapacity"
-  autoscaling_group_name = aws_autoscaling_group.ec2_scaling_group.name
+  autoscaling_group_name = aws_autoscaling_group.maat_ec2_scaling_group.name
   cooldown                = 60
   scaling_adjustment          = -1
 }
 
-#####################################
-# KMS KEYS
-#####################################
+#### ECS Security Groups -----
 
-resource "aws_kms_key" "maat_cloudwatch_logs_key_ec2" {
+resource "aws_security_group" "maat_ecs_security_group" {
+  name        = "${local.application_name}-ecs-security-group"
+  description = "App ECS Security Group"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_security_group_rule" "alb_ingress" {
+  type                     = "ingress"
+  from_port                = 32768
+  to_port                  = 61000
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.maat_ecs_security_group.id
+  source_security_group_id = aws_security_group.external_lb.id
+}
+
+resource "aws_security_group_rule" "outbound" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.maat_ecs_security_group.id
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+#### EC2 CLOUDWATCH LOG GROUP & Key ------
+
+resource "aws_kms_key" "maat_ec2_cloudwatch_log_key" {
   description = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
   tags = merge(
     local.tags,
@@ -199,8 +216,9 @@ resource "aws_kms_key" "maat_cloudwatch_logs_key_ec2" {
     }
   )
 }
+
 resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ec2" {
-  key_id = aws_kms_key.maat_cloudwatch_logs_key_ec2.id
+  key_id = aws_kms_key.maat_ec2_cloudwatch_log_key.id
   policy = jsonencode({
     Id = "key-default-1"
     Statement = [
@@ -234,23 +252,16 @@ resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ec2" {
   })
 }
 
-
-#####################################
-# ECS CLOUDWATCH LOG GROUP
-#####################################
-
-resource "aws_cloudwatch_log_group" "ec2_cw_log_group" {
-  name              = "${local.application_name}-EC2"
+resource "aws_cloudwatch_log_group" "ec2_cloudwatch_log_group" {
+  name              = "${local.application_name}-ec2-log-group"
   retention_in_days = 90
-  kms_key_id = aws_kms_key.maat_cloudwatch_logs_key_ec2.arn
+  kms_key_id = aws_kms_key.maat_ec2_cloudwatch_log_key.arn
 }
 
-######################################
-# CloudWatch Alarms for CPU
-######################################
+##### EC2 CloudWatch Alarms
 
-resource "aws_cloudwatch_metric_alarm" "high_cpu_service_alarm" {
-  alarm_name          = "${local.application_name}-high-cpu-service-alarm"
+resource "aws_cloudwatch_metric_alarm" "maat_ec2_high_cpu_alarm" {
+  alarm_name          = "${local.application_name}-ec2-high-cpu-alarm"
   alarm_description   = "Average CPU Reservation for the boxes in the ASG is above 74% for 1 minutes. Triggers scale up"
   actions_enabled     = true
   namespace           = "AWS/ECS"
@@ -261,15 +272,15 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu_service_alarm" {
   threshold           = local.application_data.accounts[local.environment].ec2_cpu_scaling_up_threshold
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
-  alarm_actions       = [aws_autoscaling_policy.maat_scaling_up_policy.arn]
+  alarm_actions       = [aws_autoscaling_policy.maat_ec2_scaling_up_policy.arn]
 
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_app_ecs_cluster.name
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "low_cpu_service_alarm" {
-  alarm_name          = "${local.application_name}-low-cpu-service-alarm"
+resource "aws_cloudwatch_metric_alarm" "maat_ec2_low_cpu_alarm" {
+  alarm_name          = "${local.application_name}-ec2-low-cpu-alarm"
   alarm_description   = "Average CPU Reservation for the boxes in the ASG is less than 51% for 3 minutes. Triggers scale down"
   actions_enabled     = true
   namespace           = "AWS/ECS"
@@ -280,62 +291,20 @@ resource "aws_cloudwatch_metric_alarm" "low_cpu_service_alarm" {
   threshold           = local.application_data.accounts[local.environment].ec2_cpu_scaling_down_threshold
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
-  alarm_actions       = [aws_autoscaling_policy.maat_scaling_down_policy.arn]
+  alarm_actions       = [aws_autoscaling_policy.maat_ec2_scaling_down_policy.arn]
 
   dimensions = {
-    ClusterName = aws_ecs_cluster.maat_app_ecs_cluster.name
+    ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
   }
 }
 
-# #####################################
-# ECS TASK DEFINITION
-# #####################################
-
-resource "aws_ecs_task_definition" "maat_task_definition" {
-  family                   = "${local.application_name}-task-definition"
-  requires_compatibilities = ["EC2"]
-  execution_role_arn       = aws_iam_role.ec2_instance_role.arn
-  task_role_arn            = aws_iam_role.ec2_instance_role.arn
-  
-  container_definitions = templatefile("maat-task-definition.json", 
-    {
-    docker_image_tag            = local.application_data.accounts[local.environment].docker_image_tag
-    region                      = local.application_data.accounts[local.environment].region
-    sentry_env                  = local.environment
-    maat_orch_base_url          = local.application_data.accounts[local.environment].maat_orch_base_url
-    maat_ccp_base_url           = local.application_data.accounts[local.environment].maat_ccp_base_url
-    maat_orch_oauth_url         = local.application_data.accounts[local.environment].maat_orch_oauth_url
-    maat_ccc_oauth_url          = local.application_data.accounts[local.environment].maat_ccc_oauth_url
-    maat_cma_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_cma_endpoint_auth_url
-    maat_ccp_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_ccp_endpoint_auth_url
-    maat_db_url                 = local.application_data.accounts[local.environment].maat_db_url
-    maat_ccc_base_url           = local.application_data.accounts[local.environment].maat_ccc_base_url
-    maat_caa_oauth_url          = local.application_data.accounts[local.environment].maat_caa_oauth_url
-    maat_bc_endpoint_url        = local.application_data.accounts[local.environment].maat_bc_endpoint_url
-    maat_mlra_url               = local.application_data.accounts[local.environment].maat_mlra_url
-    maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
-    maat_cma_base_url           = local.application_data.accounts[local.environment].maat_cma_base_url
-    ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
-    maat_aws_logs_group         = local.application_data.accounts[local.environment].maat_aws_logs_group
-    maat_aws_stream_prefix      = local.application_data.accounts[local.environment].maat_aws_stream_prefix
-    }
-  )
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-task-definition"
-    }
-  )
-}
-
 #####################################
 # 
-# ECS RESOURCES 
+# ECS RESOURCES (from app stack)
 # 
 #####################################
 
-##### ECS IAM Role
+##### ECS IAM Role -----
 
 resource "aws_iam_role" "maat_ecs_role" {
   name = "${local.application_name}-ecs-role"
@@ -388,12 +357,47 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_role_policy_attachment" {
   policy_arn = aws_iam_policy.maat_ecs_role_policy.arn
 }
 
-#### ECS Cluster 
+#### ECS TASK DEFINITION -------
 
-resource "aws_ecs_cluster" "maat_ecs_cluster" {
-  name = "${local.application_name}-ecs-cluster"
+resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
+  family                   = "${local.application_name}-ecs-task-definition"
+  requires_compatibilities = ["EC2"]
+  execution_role_arn       = aws_iam_role.maat_ec2_instance_role.arn
+  task_role_arn            = aws_iam_role.maat_ec2_instance_role.arn
+  
+  container_definitions = templatefile("maat-task-definition.json", 
+    {
+    docker_image_tag            = local.application_data.accounts[local.environment].docker_image_tag
+    region                      = local.application_data.accounts[local.environment].region
+    sentry_env                  = local.environment
+    maat_orch_base_url          = local.application_data.accounts[local.environment].maat_orch_base_url
+    maat_ccp_base_url           = local.application_data.accounts[local.environment].maat_ccp_base_url
+    maat_orch_oauth_url         = local.application_data.accounts[local.environment].maat_orch_oauth_url
+    maat_ccc_oauth_url          = local.application_data.accounts[local.environment].maat_ccc_oauth_url
+    maat_cma_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_cma_endpoint_auth_url
+    maat_ccp_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_ccp_endpoint_auth_url
+    maat_db_url                 = local.application_data.accounts[local.environment].maat_db_url
+    maat_ccc_base_url           = local.application_data.accounts[local.environment].maat_ccc_base_url
+    maat_caa_oauth_url          = local.application_data.accounts[local.environment].maat_caa_oauth_url
+    maat_bc_endpoint_url        = local.application_data.accounts[local.environment].maat_bc_endpoint_url
+    maat_mlra_url               = local.application_data.accounts[local.environment].maat_mlra_url
+    maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
+    maat_cma_base_url           = local.application_data.accounts[local.environment].maat_cma_base_url
+    ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
+    maat_aws_logs_group         = local.application_data.accounts[local.environment].maat_aws_logs_group
+    maat_aws_stream_prefix      = local.application_data.accounts[local.environment].maat_aws_stream_prefix
+    }
+  )
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-task-definition"
+    }
+  )
 }
-#### ECS Scaling target
+
+#### ECS Scaling target ------
 
 resource "aws_appautoscaling_target" "maat_ecs_scaling_target" {
   max_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_max
@@ -404,7 +408,7 @@ resource "aws_appautoscaling_target" "maat_ecs_scaling_target" {
   service_namespace  = "ecs"
 }
 
-#### ECS Scaling Policies 
+#### ECS Scaling Policies -------
 
 resource "aws_appautoscaling_policy" "maat_ecs_scaling_up_policy" {
   name               = "${local.application_name}-ecs-scaling-up"
@@ -444,7 +448,7 @@ resource "aws_appautoscaling_policy" "maat_ecs_scaling_down_policy" {
   }
 }
 
-#### ECS CLOUDWATCH LOG GROUP
+#### ECS CLOUDWATCH LOG GROUP & Key ------
 
 resource "aws_kms_key" "maat_ecs_cloudwatch_log_key" {
   description = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
@@ -497,7 +501,7 @@ resource "aws_cloudwatch_log_group" "maat_ecs_cloudwatch_log_group" {
   kms_key_id        = aws_kms_key.maat_ecs_cloudwatch_log_key.arn
 }
 
-#### ECS Service
+#### ECS Service ------
 
 resource "aws_ecs_service" "maat_ecs_service" {
 # Add LB names
@@ -541,10 +545,10 @@ resource "aws_ecs_service" "maat_ecs_service" {
   )
 }
 
-##### ECS CloudWatch Alarms
+##### ECS CloudWatch Alarms -------
 
-resource "aws_cloudwatch_metric_alarm" "high_cpu_utilisation_alarm" {
-  alarm_name          = "${local.application_name}-high-cpu-utilisation-alarm"
+resource "aws_cloudwatch_metric_alarm" "maat_ecs_high_cpu_alarm" {
+  alarm_name          = "${local.application_name}-ecs-high-cpu-alarm"
   alarm_description   = "CPUUtilization exceeding threshold. Triggers scale up"
   actions_enabled     = true
   namespace           = "AWS/ECS"
@@ -563,8 +567,8 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu_utilisation_alarm" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "low_cpu_utilisation_alarm" {
-  alarm_name          = "${local.application_name}-low-cpu-utilisation-alarm"
+resource "aws_cloudwatch_metric_alarm" "maat_ecs_low_cpu_alarm" {
+  alarm_name          = "${local.application_name}-ecs-low-cpu-alarm"
   alarm_description   = "CPUUtilization lower than threshold. Triggers scale down"
   actions_enabled     = true
   namespace           = "AWS/ECS"
@@ -581,30 +585,4 @@ resource "aws_cloudwatch_metric_alarm" "low_cpu_utilisation_alarm" {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
     ServiceName = aws_ecs_service.maat_ecs_service.name
   }
-}
-
-#### ECS Security Groups
-
-resource "aws_security_group" "maat_ecs_security_group" {
-  name        = "${local.application_name}-ecs-security-group"
-  description = "App ECS Security Group"
-  vpc_id      = data.aws_vpc.shared.id
-}
-
-resource "aws_security_group_rule" "alb_ingress" {
-  type                     = "ingress"
-  from_port                = 32768
-  to_port                  = 61000
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.maat_ecs_security_group.id
-  source_security_group_id = aws_security_group.external_lb.id
-}
-
-resource "aws_security_group_rule" "outbound" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  security_group_id = aws_security_group.maat_ecs_security_group.id
-  cidr_blocks       = ["0.0.0.0/0"]
 }
