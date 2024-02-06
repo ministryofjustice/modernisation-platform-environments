@@ -1,6 +1,7 @@
 ---
 schemaVersion: "2.2"
 description: "SSM Document for configuring an RDS gateway"
+# TODO: Remove parameters
 parameters:
   domainUsername:
     type: "String"
@@ -21,11 +22,13 @@ mainSteps:
     inputs:
       runCommand:
         - |
+        # TODO: Get secrets elsewhere
           $username = "{{domainUsername}}@AZURE.NOMS.ROOT"
           $password =  ConvertTo-SecureString "{{domainPassword}}" -AsPlainText -Force
           $credential = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
-
+        # TODO: Logic to handle different DCs
           Invoke-Command -ComputerName {{rdsGatewayHostname}}.azure.noms.root  -credential $credential -scriptblock {
+              # TODO: Logic to handle different user groups
               $GroupName="Domain Users@azure.noms.root"
               $ManagedComputers="RDG_RDCBComputers"
               $CAPPath="RDS:\GatewayServer\CAP"
@@ -42,6 +45,7 @@ mainSteps:
               Invoke-CimMethod -MethodName SetSslBridging -Arguments @{SslBridging=[uint32]1} -InputObject $config
 
               # Managed Computer Groups
+              # TODO: What computers to manage?
               $MCGComputers=@($env:COMPUTERNAME,"MGMRW0008")
               $MCGs=@(@{Name="RDG_RDCBComputers";Desc="All RDCB Computers in the deployment";Computers=$MCGComputers})
 
