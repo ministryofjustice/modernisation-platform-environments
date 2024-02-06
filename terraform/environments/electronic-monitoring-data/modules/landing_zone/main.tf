@@ -38,6 +38,7 @@ resource "aws_s3_object" "this" {
   bucket             = aws_s3_bucket.landing_bucket.id
   key                = "someobject"
   checksum_algorithm = "SHA256"
+  source = "*"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "landing_bucket" {
