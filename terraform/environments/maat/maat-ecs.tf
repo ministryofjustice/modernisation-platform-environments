@@ -500,7 +500,7 @@ resource "aws_appautoscaling_policy" "maat_ecs_scaling_down_policy" {
   }
 }
 
-#### ECS CLOUDWATCH LOG GROUP & Key ------
+#### ECS CLOUDWATCH LOG GROUP & KEY ------
 
 resource "aws_kms_key" "maat_ecs_cloudwatch_log_key" {
   description = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
@@ -590,6 +590,11 @@ resource "aws_ecs_service" "maat_ecs_service" {
 #     container_port   = 8090
 #     target_group_arn = aws_lb_target_group.foo.arn
 #   }
+
+  ordered_placement_strategy {
+    field = "attribute:ecs.availability-zone"
+    type  = "spread"
+  }
 
   tags = merge(
     local.tags,
