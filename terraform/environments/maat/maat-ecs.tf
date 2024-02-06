@@ -609,7 +609,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ecs_high_cpu_alarm" {
   threshold           = 70
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
-  alarm_actions       = [aws_autoscaling_policy.maat_ecs_scaling_up_policy.arn]
+  alarm_actions       = [aws_appautoscaling_policy.maat_ecs_scaling_up_policy.arn]
 
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
@@ -629,7 +629,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ecs_low_cpu_alarm" {
   threshold           = 20
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
-  alarm_actions       = [aws_autoscaling_policy.maat_ecs_scaling_down_policy.arn]
+  alarm_actions       = [aws_appautoscaling_policy.maat_ecs_scaling_down_policy.arn]
 
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
