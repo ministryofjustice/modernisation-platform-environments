@@ -43,3 +43,25 @@ resource "aws_iam_user_policy_attachment" "mgn_attach_policy_app_migrationfull_a
   user       = aws_iam_user.mgn_user.name
   policy_arn = "arn:aws:iam::aws:policy/AWSApplicationMigrationFullAccess"
 }
+
+# AD clean up lambda IAM resources
+
+resource "aws_iam_role" "lambda-ad-role" {
+  count = local.environment == "development" ? 1 : 0 # temporary
+  name  = "LambdaFunctionADObjectCleanUp"
+  tags  = local.tags
+
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
+  count      = local.environment == "development" ? 1 : 0 # temporary
+  role       = aws_iam_role.lambda-ad-role[count.index].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_secrets_manager" {
+  count      = local.environment == "development" ? 1 : 0 # temporary
+  role       = aws_iam_role.lambda-ad-role[count.index].name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerRead"
+}

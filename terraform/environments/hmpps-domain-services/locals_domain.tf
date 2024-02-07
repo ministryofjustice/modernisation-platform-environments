@@ -7,9 +7,9 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-development}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/EC2HmppsDomainSecretsRole",
-      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-development}:role/AmazonSSMRoleForInstancesQuickSetup",
       "arn:aws:iam::${module.environment.account_ids.planetfm-development}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.planetfm-test}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-development}:role/LambdaFunctionADObjectCleanUp", # development only whilst testing
     ]
     preproduction = []
     production = [
