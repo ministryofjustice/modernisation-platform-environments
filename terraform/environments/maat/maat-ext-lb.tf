@@ -2,7 +2,7 @@ locals {
     existing_bucket_name = ""
     account_number = local.environment_management.account_ids[terraform.workspace]
     external_lb_idle_timeout = 65
-    ext_lb_listener_protocol = "HTTP" # TODO Switch to HTTPS once the certs are configured
+    ext_lb_listener_protocol = "HTTPS" # TODO Switch to HTTPS once the certs are configured
     ext_lb_ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01"
     ext_listener_custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
     int_lb_url_nonprod = "${local.application_url_prefix}-lb.${data.aws_route53_zone.external.name}" # TODO This URL to access Internal ALB needs to be confirmed
@@ -183,7 +183,7 @@ resource "aws_lb_listener" "external" {
   port              = 443
   protocol        = local.ext_lb_listener_protocol
   ssl_policy      = local.ext_lb_listener_protocol == "HTTPS" ? local.ext_lb_ssl_policy : null
-  certificate_arn = local.ext_lb_listener_protocol == "HTTPS" ? null : null # TODO For HTTPS, this needs the ARN of the certificate from Mod Platform - aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
+  certificate_arn = local.ext_lb_listener_protocol == "HTTPS" ? aws_acm_certificate_validation.load_balancers.certificate_arn : null
 
   default_action {
     type = "fixed-response"
