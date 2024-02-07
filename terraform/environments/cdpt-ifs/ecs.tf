@@ -310,16 +310,16 @@ ingress {
   to_port         = 80
   protocol        = "tcp"
   cidr_blocks     = ["0.0.0.0/0"]
-  security_groups = [aws_security_group.chaps_lb_sc.id]
+  security_groups = [aws_security_group.ifs_lb_sc.id]
  }
 
- ingress {
-   description     = "Allow RDP ingress"
-   from_port       = 3389
-   to_port         = 3389
-   protocol        = "tcp"
-   security_groups = [module.bastion_linux.bastion_security_group]
- }
+# ingress {
+#   description     = "Allow RDP ingress"
+#   from_port       = 3389
+#   to_port         = 3389
+#   protocol        = "tcp"
+#   security_groups = [module.bastion_linux.bastion_security_group]
+# }
 
   egress {
     description     = "Cluster EC2 loadbalancer egress rule"
