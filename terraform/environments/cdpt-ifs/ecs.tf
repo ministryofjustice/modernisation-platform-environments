@@ -460,3 +460,56 @@ resource "aws_security_group" "ecs_service" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+# AWS EventBridge rule
+resource "aws_cloudwatch_event_rule" "ecs_events" {
+  name        = "ecs-events"
+  description = "Capture all ECS events"
+
+  event_pattern = jsonencode({
+    "source" : ["aws.ecs"],
+    "detail" : {
+      "clusterArn" : [aws_ecs_cluster.ecs_cluster.arn]
+    }
+  })
+}
+
+# AWS EventBridge target
+resource "aws_cloudwatch_event_target" "logs" {
+  depends_on = [aws_cloudwatch_log_group.deployment_logs]
+  rule       = aws_cloudwatch_event_rule.ecs_events.name
+  target_id  = "send-to-cloudwatch"
+  arn        = aws_cloudwatch_log_group.deployment_logs.arn
+}
+
+resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
+  policy_document = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "TrustEventsToStoreLogEvent",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : ["events.amazonaws.com", "delivery.logs.amazonaws.com"]
+        },
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/*:*"
+      }
+    ]
+  })
+  policy_name = "TrustEventsToStoreLogEvents"
+}
+
+# Set up CloudWatch group and log stream and retain logs for 30 days
+resource "aws_cloudwatch_log_group" "cloudwatch_group" {
+  name              = "${local.application_name}-ecs"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
+  name           = "${local.application_name}-log-stream"
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+}
