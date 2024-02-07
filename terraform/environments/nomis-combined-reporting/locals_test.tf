@@ -113,30 +113,30 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-tomcat-admin-1 = merge(local.tomcat_admin_ec2_default, {
-        cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
-        config = merge(local.tomcat_admin_ec2_default.config, {
-          instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
-          ])
-        })
-        tags = merge(local.tomcat_admin_ec2_default.tags, {
-          description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
-          nomis-combined-reporting-environment = "t1"
-        })
-      })
-      t1-ncr-bip-cms-1 = merge(local.bip_cms_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-        config = merge(local.bip_cms_ec2_default.config, {
-          instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
-          ])
-        })
-        tags = merge(local.bip_cms_ec2_default.tags, {
-          description                          = "For testing SAP BI Platform CMS installation and configurations"
-          nomis-combined-reporting-environment = "t1"
-        })
-      })
+      # t1-ncr-tomcat-admin = merge(local.tomcat_admin_ec2_default, {
+      #   cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
+      #   config = merge(local.tomcat_admin_ec2_default.config, {
+      #     instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
+      #       "Ec2T1ReportingPolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.tomcat_admin_ec2_default.tags, {
+      #     description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
+      #     nomis-combined-reporting-environment = "t1"
+      #   })
+      # })
+      # t1-ncr-bip-cms = merge(local.bip_cms_ec2_default, {
+      #   cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
+      #   config = merge(local.bip_cms_ec2_default.config, {
+      #     instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
+      #       "Ec2T1ReportingPolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.bip_cms_ec2_default.tags, {
+      #     description                          = "For testing SAP BI Platform CMS installation and configurations"
+      #     nomis-combined-reporting-environment = "t1"
+      #   })
+      # })
     }
 
     baseline_ec2_autoscaling_groups = {
