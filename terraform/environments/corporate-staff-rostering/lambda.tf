@@ -6,7 +6,7 @@ locals {
 
 module "ad-clean-up-lambda" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function" # ref for V3.1
-  count  = local.environment == "development" ? 1 : 0 # temporary                                            # temporary whilst on-going work
+  count  = local.environment == "test" ? 1 : 0 # temporary                                            # temporary whilst on-going work
 
 
   application_name = local.lambda_ad_object_cleanup.function_name
