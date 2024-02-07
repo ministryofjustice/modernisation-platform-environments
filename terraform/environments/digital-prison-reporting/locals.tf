@@ -223,42 +223,17 @@ locals {
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
   # s3 transfer
-  enable_s3_file_transfer_lambda         = local.application_data.accounts[local.environment].enable_s3_file_transfer_lambda
-  s3_file_transfer_lambda_name           = "${local.project}-s3-file-transfer"
-  s3_file_transfer_lambda_handler        = "uk.gov.justice.digital.lambda.S3FileTransferLambda::handleRequest"
-  s3_file_transfer_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  s3_file_transfer_lambda_runtime        = "java11"
-  s3_file_transfer_lambda_tracing        = "Active"
-
   scheduled_s3_file_transfer_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_days
   scheduled_s3_file_transfer_schedule       = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_schedule
   enable_s3_file_transfer_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_trigger
 
-  s3_file_transfer_lambda_policies = [
-    "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
-    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
-    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
-    "arn:aws:iam::${local.account_id}:policy/${local.all_state_machine_policy}"
-  ]
-
   # step function notification lambda
-  enable_step_function_notification_lambda         = local.application_data.accounts[local.environment].enable_step_function_notification_lambda
-  step_function_notification_lambda_name           = "${local.project}-step-function-notification"
-  step_function_notification_lambda_handler        = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
-  step_function_notification_lambda_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  step_function_notification_lambda_runtime        = "java11"
-  step_function_notification_lambda_tracing        = "Active"
-
+  step_function_notification_lambda_handler  = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
   step_function_notification_lambda_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.all_state_machine_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.dynamo_db_access_policy}"
   ]
-
-  # Data Ingestion Pipeline Step Function
-  enable_data_ingestion_step_function = local.application_data.accounts[local.environment].enable_data_ingestion_step_function
-  data_ingestion_step_function_name   = "${local.project}-data-ingestion-step-function-${local.environment}"
-  dms_task_time_out                   = local.application_data.accounts[local.environment].dms_task_time_out
 
   # Datamart
   create_scheduled_action_iam_role = local.application_data.accounts[local.environment].setup_scheduled_action_iam_role
