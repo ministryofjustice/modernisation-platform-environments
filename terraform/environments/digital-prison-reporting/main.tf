@@ -308,7 +308,7 @@ module "glue_s3_file_transfer_job" {
 }
 
 resource "aws_glue_trigger" "glue_s3_file_transfer_job_trigger" {
-  count    = enable_s3_file_transfer_trigger ? 1 : 0
+  count    = local.enable_s3_file_transfer_trigger ? 1 : 0
   name     = "${module.glue_s3_file_transfer_job.name}-trigger"
   schedule = local.scheduled_s3_file_transfer_schedule
   type     = "SCHEDULED"
