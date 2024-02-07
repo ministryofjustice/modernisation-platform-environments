@@ -318,5 +318,5 @@ resource "aws_route53_record" "load_balancers_external_validation_subdomain_2" {
 
 resource "aws_acm_certificate_validation" "load_balancers" {
   certificate_arn         = aws_acm_certificate.load_balancers.arn
-  validation_record_fqdns = [local.lbs_domain_name_main[0], local.lbs_domain_name_sub[0]]
+  validation_record_fqdns = [local.lbs_domain_name_main[0], local.lbs_domain_name_sub[0], local.lbs_domain_name_sub[1]]
 }
