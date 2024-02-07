@@ -183,7 +183,6 @@ resource "aws_lb_listener" "external" {
   load_balancer_arn = aws_lb.external.arn
   port              = 443
   protocol        = local.ext_lb_listener_protocol
-  ssl_policy      = null
   # ssl_policy      = local.ext_lb_listener_protocol == "HTTPS" ? local.ext_lb_ssl_policy : null
   certificate_arn = local.ext_lb_listener_protocol == "HTTPS" ? aws_acm_certificate_validation.load_balancers.certificate_arn : null
 
