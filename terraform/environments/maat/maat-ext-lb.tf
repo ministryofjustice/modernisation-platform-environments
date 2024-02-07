@@ -272,7 +272,7 @@ resource "aws_lb_target_group" "external" {
 resource "aws_acm_certificate" "load_balancers" {
   domain_name               = local.application_data.accounts[local.environment].cloudfront_domain_name
   validation_method         = "DNS"
-  subject_alternative_names = local.environment == "production" ? null : [local.lower_env_cloudfront_url]
+  subject_alternative_names = local.environment == "production" ? null : [local.int_lb_url]
   # subject_alternative_names = local.environment == "production" ? [local.int_lb_url] : [local.int_lb_url, local.lower_env_cloudfront_url]
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
