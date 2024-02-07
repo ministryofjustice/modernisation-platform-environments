@@ -45,7 +45,7 @@
       "maat_api_alb_4xx_alarm_threshold": 10,
       "maat_api_pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms",
       "maat_api_api_scope": "standard",
-      "domain_name": "modernisation-platform.service.justice.gov.uk",
+      "cloudfront_domain_name": "modernisation-platform.service.justice.gov.uk",
       "ext_lb_enable_deletion_protection": "false",
       "ami_id": "ami-0631049bf050d0d46",
       "instance_type": "m5.large",
@@ -81,7 +81,8 @@
       "maat_api_ecs_memory": 2048,
       "maat_api_ecs_container_cpu": 922,
       "maat_api_ecs_container_memory": 1792,
-      "maat_api_pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms"
+      "maat_api_pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms",
+      "cloudfront_domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "preproduction": {
       "example_var": "preproduction-data",
@@ -91,7 +92,8 @@
       "maat_api_ecs_memory": 3072,
       "maat_api_ecs_container_cpu": 922,
       "maat_api_ecs_container_memory": 2816,
-      "maat_api_pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms"
+      "maat_api_pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms",
+      "cloudfront_domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "production": {
       "example_var": "production-data",
@@ -102,7 +104,8 @@
       "maat_api_ecs_container_cpu": 922,
       "maat_api_ecs_container_memory": 2816,
       "maat_api_pagerduty_integration_key_name": "laa_maat_api_prod_alarms",
-      "ext_lb_enable_deletion_protection": "true"
+      "ext_lb_enable_deletion_protection": "true",
+      "cloudfront_domain_name": "meansassessment.service.justice.gov.uk"
     }
   }
 }

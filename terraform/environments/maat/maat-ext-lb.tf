@@ -2,10 +2,11 @@ locals {
     existing_bucket_name = ""
     account_number = local.environment_management.account_ids[terraform.workspace]
     external_lb_idle_timeout = 65
-    ext_lb_listener_protocol = "HTTPS" # TODO Switch to HTTPS once the certs are configured
+    ext_lb_listener_protocol = "HTTPS"
     ext_lb_ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01"
     ext_listener_custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
-    int_lb_url_nonprod = "${local.application_url_prefix}-lb.${data.aws_route53_zone.external.name}" # TODO This URL to access Internal ALB needs to be confirmed
+    # TODO This URL to access Internal ALB needs to be confirmed, and may need another hosted zone for production
+    int_lb_url = local.environment == "production" ? "${local.application_url_prefix}-lb.${data.aws_route53_zone.production-network-services.name}" : "${local.application_url_prefix}-lb.${data.aws_route53_zone.external.name}"
 }
 
 # Terraform module which creates S3 Bucket resources for Load Balancer Access Logs on AWS.
@@ -252,7 +253,7 @@ resource "aws_lb_target_group" "external" {
 #   count    = local.environment != "production" ? 1 : 0
 #   provider = aws.core-vpc
 #   zone_id  = data.aws_route53_zone.external.zone_id
-#   name     = local.int_lb_url_nonprod
+#   name     = local.int_lb_url
 #   type     = "CNAME"
 #   ttl      = 300
 #   records = [aws_lb.internal.dns_name] # TODO link to the actual internal LB
@@ -269,9 +270,9 @@ resource "aws_lb_target_group" "external" {
 # }
 
 resource "aws_acm_certificate" "load_balancers" {
-  domain_name               = local.application_data.accounts[local.environment].domain_name
+  domain_name               = local.application_data.accounts[local.environment].cloudfront_domain_name
   validation_method         = "DNS"
-  subject_alternative_names = local.environment == "production" ? null : [local.int_lb_url_nonprod]
+  subject_alternative_names = local.environment == "production" ? [local.int_lb_url] : [local.int_lb_url, local.lower_env_cloudfront_url]
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {

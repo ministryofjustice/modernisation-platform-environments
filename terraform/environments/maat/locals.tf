@@ -19,8 +19,7 @@ locals {
   maat_api_domain_type_sub    = [for k, v in local.maat_api_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
   # For CloudFront validation for MAAT
-  cloudfront_prod_domain = local.environment == "production" ? "meansassessment.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
-
+  
   cloudfront_domain_types = { for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value
