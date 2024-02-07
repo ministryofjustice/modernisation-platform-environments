@@ -35,7 +35,7 @@ module "ad-clean-up-lambda" {
 data "archive_file" "ad-cleanup-lambda" {
   type             = "zip"
   source_dir       = "lambda/ad-clean-up"
-  output_path      = "lambda/ad-clean-up/ad-cleanup-lambda-payload-test.zip"
+  output_path      = "lambda/ad-clean-up/ad-clean-up-lambda-payload-test.zip"
 }
 
 data "aws_iam_policy_document" "lambda_assume_role_policy" {
