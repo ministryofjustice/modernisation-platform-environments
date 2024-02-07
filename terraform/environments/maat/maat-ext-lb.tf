@@ -298,7 +298,7 @@ resource "aws_route53_record" "load_balancers_external_validation_subdomain_1" {
   count           = local.environment == "production" ? 0 : 1
   allow_overwrite = true
   name            = local.lbs_domain_name_sub[0]
-  records         = local.lbs_domain_record_sub
+  records         = [local.lbs_domain_record_sub[0]]
   ttl             = 60
   type            = local.lbs_domain_type_sub[0]
   zone_id         = data.aws_route53_zone.external.zone_id
@@ -310,7 +310,7 @@ resource "aws_route53_record" "load_balancers_external_validation_subdomain_2" {
   count           = local.environment == "production" ? 0 : 1
   allow_overwrite = true
   name            = local.lbs_domain_name_sub[1]
-  records         = local.lbs_domain_record_sub
+  records         = [local.lbs_domain_record_sub[1]]
   ttl             = 60
   type            = local.lbs_domain_type_sub[1]
   zone_id         = data.aws_route53_zone.external.zone_id
