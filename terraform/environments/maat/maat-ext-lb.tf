@@ -178,72 +178,72 @@ resource "aws_security_group_rule" "external_lb_egress" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-# resource "aws_lb_listener" "external" {
+resource "aws_lb_listener" "external" {
 
-#   load_balancer_arn = aws_lb.external.arn
-#   port              = 443
-#   protocol        = local.ext_lb_listener_protocol
-#   ssl_policy      = local.ext_lb_listener_protocol == "HTTPS" ? local.ext_lb_ssl_policy : null
-#   certificate_arn = local.ext_lb_listener_protocol == "HTTPS" ? aws_acm_certificate_validation.load_balancers.certificate_arn : null
+  load_balancer_arn = aws_lb.external.arn
+  port              = 443
+  protocol        = local.ext_lb_listener_protocol
+  ssl_policy      = local.ext_lb_listener_protocol == "HTTPS" ? local.ext_lb_ssl_policy : null
+  certificate_arn = local.ext_lb_listener_protocol == "HTTPS" ? aws_acm_certificate_validation.load_balancers.certificate_arn : null
 
-#   default_action {
-#     type = "fixed-response"
-#     fixed_response {
-#       content_type = "text/plain"
-#       message_body = "Access Denied - must access via CloudFront"
-#       status_code  = 403
-#     }
-#   }
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access Denied - must access via CloudFront"
+      status_code  = 403
+    }
+  }
 
-#   tags = local.tags
+  tags = local.tags
 
-# }
+}
 
-# resource "aws_lb_listener_rule" "external" {
-#   listener_arn = aws_lb_listener.external.arn
-#   priority     = 1
+resource "aws_lb_listener_rule" "external" {
+  listener_arn = aws_lb_listener.external.arn
+  priority     = 1
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.external.arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.external.arn
+  }
 
-#   condition {
-#     http_header {
-#       http_header_name = local.ext_listener_custom_header
-#       values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
-#     }
-#   }
-# }
+  condition {
+    http_header {
+      http_header_name = local.ext_listener_custom_header
+      values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
+    }
+  }
+}
 
-# resource "aws_lb_target_group" "external" {
-#   name                 = "${local.application_name}-external-target-group"
-#   port                 = 80
-#   protocol             = "HTTP"
-#   vpc_id               = data.aws_vpc.shared.id
-#   deregistration_delay = 30
-#   health_check {
-#     interval            = 15
-#     path                = "/ccmt-web/"
-#     protocol            = "HTTP"
-#     timeout             = 5
-#     healthy_threshold   = 2
-#     unhealthy_threshold = 3
-#   }
-#   stickiness {
-#     enabled         = true
-#     type            = "lb_cookie"
-#     cookie_duration = 10800 # 3 hours in seconds
-#   }
+resource "aws_lb_target_group" "external" {
+  name                 = "${local.application_name}-external-target-group"
+  port                 = 80
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  deregistration_delay = 30
+  health_check {
+    interval            = 15
+    path                = "/ccmt-web/"
+    protocol            = "HTTP"
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+  stickiness {
+    enabled         = true
+    type            = "lb_cookie"
+    cookie_duration = 10800 # 3 hours in seconds
+  }
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name}-external-target-group"
-#     },
-#   )
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-external-target-group"
+    },
+  )
 
-# }
+}
 
 #######################################################
 # Certification and Route53 for LBs
@@ -272,8 +272,7 @@ resource "aws_security_group_rule" "external_lb_egress" {
 resource "aws_acm_certificate" "load_balancers" {
   domain_name               = local.application_data.accounts[local.environment].cloudfront_domain_name
   validation_method         = "DNS"
-  subject_alternative_names = local.environment == "production" ? null : [local.int_lb_url]
-  # subject_alternative_names = local.environment == "production" ? [local.int_lb_url] : [local.int_lb_url, local.lower_env_cloudfront_url]
+  subject_alternative_names = local.environment == "production" ? [local.int_lb_url] : [local.int_lb_url, local.lower_env_cloudfront_url]
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
