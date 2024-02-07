@@ -304,31 +304,31 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
-#ingress {
-#  description     = "allow access on HTTP from load balancer"
-#  from_port       = 80
-#  to_port         = 80
-#  protocol        = "tcp"
-#  cidr_blocks     = ["0.0.0.0/0"]
-#  security_groups = [aws_security_group.chaps_lb_sc.id]
-#}
+ingress {
+  description     = "allow access on HTTP from load balancer"
+  from_port       = 80
+  to_port         = 80
+  protocol        = "tcp"
+  cidr_blocks     = ["0.0.0.0/0"]
+  security_groups = [aws_security_group.chaps_lb_sc.id]
+ }
 
-# ingress {
-#   description     = "Allow RDP ingress"
-#   from_port       = 3389
-#   to_port         = 3389
-#   protocol        = "tcp"
-#   security_groups = [module.bastion_linux.bastion_security_group]
-# }
+ ingress {
+   description     = "Allow RDP ingress"
+   from_port       = 3389
+   to_port         = 3389
+   protocol        = "tcp"
+   security_groups = [module.bastion_linux.bastion_security_group]
+ }
 
-#  egress {
-#    description     = "Cluster EC2 loadbalancer egress rule"
-#    from_port       = 0
-#    to_port         = 0
-#    protocol        = "-1"
-#    cidr_blocks     = ["0.0.0.0/0"]
-#    security_groups = []
-#  }
+  egress {
+    description     = "Cluster EC2 loadbalancer egress rule"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+    security_groups = []
+  }
 
   tags = merge(
     local.tags,
@@ -344,16 +344,12 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_ecs_service" "ecs_service" {
-  depends_on = [
-    aws_lb_listener.https_listener
-  ]
-
+  depends_on = [aws_lb_listener.https_listener]
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.ifs_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
-
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.ifs.name
     weight            = 1
