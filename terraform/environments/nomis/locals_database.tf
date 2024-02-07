@@ -49,7 +49,8 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2_instance_cwagent_collectd_connectivity_test,
     )
     db_connected = merge(
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_high_priority_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_connected,
+      # DBAs have slack integration via OEM for this so don't include pagerduty integration
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
     )
     db_backup = merge(
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup,

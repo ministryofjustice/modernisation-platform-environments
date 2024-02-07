@@ -222,7 +222,8 @@ locals {
         statistic           = "Maximum"
         threshold           = "1"
         alarm_description   = "Triggers if an oracle database defined in oracle-sids tag is disconnected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698"
-        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        # Slack integration is via Oracle Enterprise Management rather than cloudwatch
+        # alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
     ec2_instance_cwagent_collectd_oracle_db_backup = {
