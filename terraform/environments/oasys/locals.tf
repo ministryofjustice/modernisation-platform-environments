@@ -137,7 +137,7 @@ locals {
       }
       instance_type = "r6i.4xlarge"
     })
-    database_ec2_cloudwatch_metric_alarms = {
+    cloudwatch_metric_alarms = merge(
       # standard
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2,
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux,
@@ -164,7 +164,7 @@ locals {
       
       # db_backup
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup,
-    }
+    )
     autoscaling_schedules = {}
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
