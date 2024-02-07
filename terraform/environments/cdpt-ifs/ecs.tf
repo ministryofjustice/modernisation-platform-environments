@@ -46,6 +46,11 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
 EOF
 }
 
+resource "aws_cloudwatch_log_group" "deployment_logs" {
+  name              = "/aws/events/deploymentLogs"
+  retention_in_days = "7"
+}
+
 resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.ec2_instance_policy.arn
