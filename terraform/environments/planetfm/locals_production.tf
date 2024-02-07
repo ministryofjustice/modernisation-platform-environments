@@ -149,131 +149,8 @@ locals {
           create_external_record = true
         }
       })
-      pd-cafm-a-14-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pd-cafm-a-14-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "t3.xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 200 }
-        }
-        tags = {
-          description       = "RDS Session Host and CAFM App Server copy of PDFAW0014"
-          app-config-status = "pending"
-          os-type           = "Windows"
-          ami               = "pd-cafm-a-14-b"
-          component         = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-      pd-cafm-a-15-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pd-cafm-a-15-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "t3.large"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-        }
-        tags = {
-          description       = "RDS Session Broker / RDS Licence Server. Copy of PDFAW0015"
-          app-config-status = "pending"
-          os-type           = "Windows"
-          ami               = "pd-cafm-a-15-a"
-          component         = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-      pd-cafm-a-16-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name                  = "base_windows_server_2012_r2_release_2024-01-29*"
-          ami_owner                 = "374269020027"
-          availability_zone         = "${local.region}b"
-          user_data_raw             = base64encode(file("./templates/user-data.yaml"))
-          instance_profile_policies = concat(local.defaults_app_ec2.config.instance_profile_policies, ["SSMPolicy"])
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "t3.large"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-        }
-        cloudwatch_metric_alarms = {} # no alarms as this is an RDS test instance
-        tags = {
-          description       = "RDS Test Instance"
-          app-config-status = "pending"
-          os-type           = "Windows"
-          ami               = "base_windows_server_2012_r2_release_2024-01-29"
-          component         = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
 
       # web servers
-      pd-cafm-w-5-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pd-cafm-w-5-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "t3.large"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-        }
-        tags = {
-          description       = "CAFM Web Portal Server. Copy of PDFWW0005"
-          app-config-status = "pending"
-          os-type           = "Windows"
-          ami               = "pd-cafm-w-5-a"
-          component         = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-      pd-cafm-w-6-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pd-cafm-w-6-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "t3.large"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-        }
-        tags = {
-          description       = "CAFM Web Portal Server copy of PDFWW0006"
-          app-config-status = "pending"
-          os-type           = "Windows"
-          ami               = "pd-cafm-w-6-b"
-          component         = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
       pd-cafm-w-36-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-cafm-w-36-b"
@@ -358,28 +235,7 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          web-56-80 = {
-            port     = 80
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              path                = "/"
-              healthy_threshold   = 3
-              unhealthy_threshold = 5
-              timeout             = 5
-              interval            = 30
-              matcher             = "200-399"
-              port                = 80
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "pd-cafm-w-5-a" },
-              { ec2_instance_name = "pd-cafm-w-6-b" },
-            ]
-          }
+
           web-3637-80 = {
             port     = 80
             protocol = "HTTP"
@@ -451,21 +307,6 @@ locals {
               }
             }
             rules = {
-              web-56-80 = {
-                priority = 5680
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-56-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmwebx.planetfm.service.justice.gov.uk",
-                      "cafmwebx.az.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
               web-3637-80 = {
                 priority = 3637
                 actions = [{
@@ -510,7 +351,6 @@ locals {
           { name = "cafmtx", type = "CNAME", ttl = 3600, records = ["rdweb1.hmpps-domain.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "cafmwebx", type = "A", lbs_map_key = "private" },
           { name = "cafmwebx2", type = "A", lbs_map_key = "private" },
           { name = "cafmtrainweb", type = "A", lbs_map_key = "private" },
         ]
