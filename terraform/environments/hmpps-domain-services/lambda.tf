@@ -6,7 +6,7 @@ locals {
 
 module "ad-clean-up-lambda" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function" # ref for V3.1
-  count  = local.environment == "test" ? 1 : 0                                             # temporary whilst on-going work
+  count  = local.environment == "development" ? 1 : 0                                             # temporary whilst on-going work
 
 
   application_name = local.lambda_ad_object_cleanup.function_name
@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
 }
 
 resource "aws_iam_role" "lambda-ad-role" {
-  count = local.environment == "test" ? 1 : 0 # temporary whilst on-going work  
+  count = local.environment == "development" ? 1 : 0 # temporary whilst on-going work  
   name  = "LambdaFunctionADObjectCleanUp"
   tags  = local.tags
 
@@ -59,13 +59,13 @@ resource "aws_iam_role" "lambda-ad-role" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
-  count      = local.environment == "test" ? 1 : 0 # temporary whilst on-going work
+  count      = local.environment == "development" ? 1 : 0 # temporary whilst on-going work
   role       = aws_iam_role.lambda-ad-role[count.index].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_secrets_manager" {
-  count      = local.environment == "test" ? 1 : 0 # temporary whilst on-going work
+  count      = local.environment == "development" ? 1 : 0 # temporary whilst on-going work
   role       = aws_iam_role.lambda-ad-role[count.index].name
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerRead"
 }
