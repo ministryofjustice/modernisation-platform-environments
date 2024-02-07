@@ -82,11 +82,11 @@ resource "aws_ssm_document" "rds_app" {
   )
 }
 
-resource "aws_ssm_document" "winrm" {
-  name            = "winrm"
+resource "aws_ssm_document" "winrm_https" {
+  name            = "winrm_https"
   document_type   = "Command"
   document_format = "YAML"
-  content         = file("./ssm-documents/winrm.yaml")
+  content         = file("./ssm-documents/winrm_https.yaml")
 
   tags = merge(
     local.tags,

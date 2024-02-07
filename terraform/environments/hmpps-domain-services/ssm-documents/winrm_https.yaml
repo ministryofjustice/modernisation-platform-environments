@@ -2,7 +2,7 @@
 schemaVersion: "2.2"
 description: "SSM Document for enabling WinRM over HTTPS"
 mainSteps:
-  - name: EnableWinRmHttps
+  - name: EnableWinRMHTTPS
     action: aws:runPowerShellScript
     precondition:
       StringEquals:
