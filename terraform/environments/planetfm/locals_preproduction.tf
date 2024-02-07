@@ -11,6 +11,10 @@ locals {
         })
         instance = merge(local.defaults_database_ec2.instance, {
           instance_type = "r6i.xlarge"
+          # set these to false and apply before instance can be deleted
+          disable_api_termination = true 
+          disable_api_stop        = true
+          monitoring              = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -36,6 +40,10 @@ locals {
         })
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "t3.large"
+          # set these to false and apply before instance can be deleted
+          disable_api_termination = true 
+          disable_api_stop        = true
+          monitoring              = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -54,6 +62,10 @@ locals {
         })
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "t3.large"
+          # set these to false and apply before instance can be deleted
+          disable_api_termination = true 
+          disable_api_stop        = true
+          monitoring              = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -73,6 +85,10 @@ locals {
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "t3.large"
+          # set these to false and apply before instance can be deleted
+          disable_api_termination = true 
+          disable_api_stop        = true
+          monitoring              = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -91,6 +107,10 @@ locals {
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "t3.large"
+          # set these to false and apply before instance can be deleted
+          disable_api_termination = true 
+          disable_api_stop        = true
+          monitoring              = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
