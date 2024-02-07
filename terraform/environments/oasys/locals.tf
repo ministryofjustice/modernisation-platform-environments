@@ -156,7 +156,7 @@ locals {
           threshold           = "40"
           alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 8 hours allowing for DB refreshes.  See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
         })
-      }
+      },
 
       # db_connected
       # DBAs have slack integration via OEM for this so don't include pagerduty integration
