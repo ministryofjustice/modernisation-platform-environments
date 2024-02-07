@@ -448,7 +448,6 @@ locals {
 
   public_key_data = jsondecode(file("./files/bastion_linux.json"))
 
-  baseline_cloudwatch_log_groups         = {}
   baseline_cloudwatch_metric_alarms      = {}
   baseline_cloudwatch_log_metric_filters = {}
   baseline_cloudwatch_log_groups         = {}
