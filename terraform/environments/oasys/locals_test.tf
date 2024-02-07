@@ -6,8 +6,8 @@ locals {
     sns_topics = {
       pagerduty_integrations = {
         dso_pagerduty               = "oasys_nonprod_alarms"
-        # dba_pagerduty               = "hmpps_shef_dba_non_prod"
-        # dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
+        dba_pagerduty               = "hmpps_shef_dba_non_prod"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
       }
     }
   }
