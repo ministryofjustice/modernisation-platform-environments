@@ -292,7 +292,7 @@ resource "aws_route53_record" "load_balancers_external_validation" {
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
-resource "aws_route53_record" "load_balancers_external_validation_subdomain" {
+resource "aws_route53_record" "load_balancers_external_validation_subdomain_1" {
   provider = aws.core-vpc
 
   count           = local.environment == "production" ? 0 : 1
@@ -301,6 +301,18 @@ resource "aws_route53_record" "load_balancers_external_validation_subdomain" {
   records         = local.lbs_domain_record_sub
   ttl             = 60
   type            = local.lbs_domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+resource "aws_route53_record" "load_balancers_external_validation_subdomain_2" {
+  provider = aws.core-vpc
+
+  count           = local.environment == "production" ? 0 : 1
+  allow_overwrite = true
+  name            = local.lbs_domain_name_sub[1]
+  records         = local.lbs_domain_record_sub
+  ttl             = 60
+  type            = local.lbs_domain_type_sub[1]
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
