@@ -2,7 +2,7 @@ locals {
     existing_bucket_name = ""
     account_number = local.environment_management.account_ids[terraform.workspace]
     external_lb_idle_timeout = 65
-    ext_lb_listener_protocol = "HTTPS"
+    ext_lb_listener_protocol = "HTTP"
     ext_lb_ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01"
     ext_listener_custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
     # TODO This URL to access Internal ALB needs to be confirmed, and may need another hosted zone for production
