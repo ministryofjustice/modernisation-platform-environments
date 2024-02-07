@@ -6,9 +6,6 @@ locals {
       ebs_volumes_copy_all_from_ami = false
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      disable_api_termination = true
-      disable_api_stop        = true
-      monitoring              = true
       tags = {
         backup-plan         = "daily-and-weekly"
         instance-scheduling = "skip-scheduling"
