@@ -1,8 +1,10 @@
 locals {
     application_url_prefix = "meansassessment"
-    lower_env_url = "${local.application_url_prefix}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
+    lower_env_cloudfront_url = "${local.application_url_prefix}.${data.aws_route53_zone.external.name}"
     custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
-    cloudfront_alias = local.environment == "production" ? local.application_data.accounts[local.environment].domain_name : local.lower_env_url
+
+    # TODO Note that the application variable's domain_name will be the actual CloudFront alias for production
+    cloudfront_alias = local.environment == "production" ? local.application_data.accounts[local.environment].cloudfront_domain_name : local.lower_env_cloudfront_url
 
 
     cloudfront_default_cache_behavior = {
@@ -266,7 +268,7 @@ resource "aws_route53_record" "cloudfront-prod" {
   count    = local.environment == "production" ? 1 : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.production-network-services.zone_id
-  name     = local.cloudfront_prod_domain # TODO Production URL to be confirmed
+  name     = local.application_data.accounts[local.environment].cloudfront_domain_name # TODO Production URL to be confirmed
   type     = "A"
   alias {
     name                   = aws_cloudfront_distribution.external.domain_name
@@ -276,10 +278,10 @@ resource "aws_route53_record" "cloudfront-prod" {
 }
 
 resource "aws_acm_certificate" "cloudfront" {
-  domain_name               = local.application_data.accounts[local.environment].domain_name
+  domain_name               = local.application_data.accounts[local.environment].cloudfront_domain_name
   validation_method         = "DNS"
   provider                  = aws.us-east-1
-  subject_alternative_names = local.environment == "production" ? null : [local.lower_env_url]
+  subject_alternative_names = local.environment == "production" ? null : [local.lower_env_cloudfront_url]
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
