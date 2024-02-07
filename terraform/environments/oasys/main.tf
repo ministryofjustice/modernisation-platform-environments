@@ -25,7 +25,7 @@ module "baseline_presets" {
 
   options = {
     cloudwatch_log_groups                        = null
-    cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
+    # cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
     enable_application_environment_wildcard_cert = true
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
@@ -64,7 +64,6 @@ module "baseline" {
     module.baseline_presets.acm_certificates,
     lookup(local.environment_config, "baseline_acm_certificates", {})
   )
-
   # backups = {
   #   "everything" = {
   #     plans = merge(
