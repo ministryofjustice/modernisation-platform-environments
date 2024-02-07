@@ -38,14 +38,3 @@ data "archive_file" "ad-cleanup-lambda" {
   output_path      = "lambda/ad-clean-up/ad-clean-up-lambda-payload-test.zip"
 }
 
-data "aws_iam_policy_document" "lambda_assume_role_policy" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}

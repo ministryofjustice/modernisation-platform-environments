@@ -46,6 +46,18 @@ resource "aws_iam_user_policy_attachment" "mgn_attach_policy_app_migrationfull_a
 
 # AD clean up lambda IAM resources
 
+data "aws_iam_policy_document" "lambda_assume_role_policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
 resource "aws_iam_role" "lambda-ad-role" {
   count = local.environment == "development" ? 1 : 0 # temporary
   name  = "LambdaFunctionADObjectCleanUp"
