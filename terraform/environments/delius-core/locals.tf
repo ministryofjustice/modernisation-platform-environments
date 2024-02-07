@@ -10,8 +10,6 @@ locals {
   frontend_image_tag      = "5.7.6"
   frontend_container_port = 8080
 
-  ldap_port = 389
-
   delius_environments_per_account = {
     # account = [env1, env2]
     prod     = []

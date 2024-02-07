@@ -150,6 +150,7 @@ resource "aws_lb_listener_rule" "homepage_listener_rule" {
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 2
   condition {
     path_pattern {
       values = [

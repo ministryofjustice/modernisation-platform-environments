@@ -7,7 +7,7 @@ module "weblogic" {
   container_environment_vars = [
     {
       name  = "LDAP_PORT"
-      value = local.ldap_port
+      value = var.ldap_config.port
     },
     {
       name  = "LDAP_HOST"
@@ -47,10 +47,10 @@ module "weblogic" {
   ecs_cluster_arn         = module.ecs.ecs_cluster_arn
   env_name                = var.env_name
   health_check_path       = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
-  ingress_security_groups = []
   microservice_lb_arn     = aws_lb.delius_core_frontend.arn
   name                    = "weblogic"
   container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${var.weblogic_config.image_tag}"
   platform_vars           = var.platform_vars
   tags                    = var.tags
+  ingress_security_groups = []
 }
