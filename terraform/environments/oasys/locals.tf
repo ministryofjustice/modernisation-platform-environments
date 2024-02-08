@@ -37,6 +37,24 @@ locals {
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
 
+  baseline_presets_options = {
+    cloudwatch_log_groups                        = null
+    # cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
+    enable_application_environment_wildcard_cert = true
+    enable_backup_plan_daily_and_weekly          = true
+    enable_business_unit_kms_cmks                = true
+    enable_image_builder                         = true
+    enable_ec2_cloud_watch_agent                 = true
+    enable_ec2_self_provision                    = true
+    enable_ec2_user_keypair                      = true
+    enable_ec2_oracle_enterprise_managed_server  = true
+    enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
+    db_backup_s3                                 = true # adds db backup buckets
+    iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+    s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+    iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy", "Ec2OracleEnterpriseManagerPolicy"]
+  }
+
   ######
   ### env independent webserver vars
   ######

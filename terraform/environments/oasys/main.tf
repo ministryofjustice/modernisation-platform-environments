@@ -23,24 +23,10 @@ module "baseline_presets" {
   environment  = module.environment
   ip_addresses = module.ip_addresses
 
-  options = {
-    cloudwatch_log_groups                        = null
-    # cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
-    enable_application_environment_wildcard_cert = true
-    enable_backup_plan_daily_and_weekly          = true
-    enable_business_unit_kms_cmks                = true
-    enable_image_builder                         = true
-    enable_ec2_cloud_watch_agent                 = true
-    enable_ec2_self_provision                    = true
-    enable_ec2_user_keypair                      = true
-    enable_ec2_oracle_enterprise_managed_server  = true
-    enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
-    enable_observability_platform_monitoring     = lookup(local.baseline_environment_presets_options, "enable_observability_platform_monitoring", false)
-    db_backup_s3                                 = true # adds db backup buckets
-    iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-    s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy", "Ec2OracleEnterpriseManagerPolicy"]
-  }
+  options = merge(
+    local.baseline_presets_options,
+    local.baseline_environment_presets_options,
+  )
 }
 
 module "baseline" {
