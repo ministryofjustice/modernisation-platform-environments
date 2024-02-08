@@ -7,7 +7,7 @@ module "weblogic_eis" {
   container_environment_vars = [
     {
       name  = "LDAP_PORT"
-      value = local.ldap_port
+      value = var.ldap_config.port
     },
     {
       name  = "LDAP_HOST"
@@ -187,7 +187,6 @@ module "weblogic_eis" {
 
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
-  alb_listener_rule_priority         = 10
   alb_listener_rule_paths            = ["/eis"]
 
   container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-eis-ecr-repo:${var.weblogic_eis_config.image_tag}"

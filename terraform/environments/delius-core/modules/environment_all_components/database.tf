@@ -16,10 +16,10 @@ module "oracle_db_shared" {
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
   providers = {
-    aws                        = aws
-    aws.bucket-replication     = aws
-    aws.core-vpc               = aws.core-vpc
-    aws.core-network-services  = aws.core-network-services
+    aws                       = aws
+    aws.bucket-replication    = aws
+    aws.core-vpc              = aws.core-vpc
+    aws.core-network-services = aws.core-network-services
   }
 
 }
@@ -99,11 +99,9 @@ module "oracle_db_standby" {
   subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_primary)) % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_primary)) % 3, "a")}"
   tags               = local.tags
-  user_data = base64encode(
-    templatefile(
-      "${path.module}/templates/userdata.sh.tftpl",
-      var.db_config.ansible_user_data_config
-    )
+  user_data = templatefile(
+    "${path.module}/templates/userdata.sh.tftpl",
+    var.db_config.ansible_user_data_config
   )
 
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name

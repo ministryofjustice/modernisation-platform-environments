@@ -25,10 +25,10 @@ resource "aws_lb_target_group" "this" {
   }
 }
 
-resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
+resource "aws_lb_listener_rule" "this" {
   count        = var.alb_listener_rule_paths != null ? 1 : 0
   listener_arn = var.microservice_lb_https_listener_arn
-  priority     = var.alb_listener_rule_priority
+  priority     = var.alb_listener_rule_priority != null ? var.alb_listener_rule_priority : null
   condition {
     path_pattern {
       values = var.alb_listener_rule_paths

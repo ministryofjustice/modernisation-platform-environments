@@ -1,11 +1,7 @@
-locals {
-  app_name = "password-reset"
-}
-
 module "password_reset_service" {
   source = "../components/delius_microservice"
 
-  name                  = local.app_name
+  name                  = "password-reset"
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
@@ -52,7 +48,7 @@ module "password_reset_service" {
       name = "CONFIG_XML_BASE64"
       value = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
         region    = var.account_info["region"]
-        ldap_url  = "ldap://${module.ldap.nlb_dns_name}:${local.ldap_port}"
+        ldap_url  = "ldap://${module.ldap.nlb_dns_name}:${var.ldap_config.port}"
         ldap_user = aws_ssm_parameter.delius_core_ldap_principal.arn
         user_base = "REPLACE"
         # site_url  = "https://${aws_route53_record.public_dns.fqdn}"

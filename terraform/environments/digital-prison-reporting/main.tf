@@ -308,6 +308,7 @@ module "glue_s3_file_transfer_job" {
 }
 
 resource "aws_glue_trigger" "glue_s3_file_transfer_job_trigger" {
+  count    = local.enable_s3_file_transfer_trigger ? 1 : 0
   name     = "${module.glue_s3_file_transfer_job.name}-trigger"
   schedule = local.scheduled_s3_file_transfer_schedule
   type     = "SCHEDULED"
@@ -1015,48 +1016,6 @@ module "datamart" {
       Resource_Type = "Redshift Cluster"
     }
   )
-}
-
-# Lambda for moving files from the raw bucket to the raw archive bucket
-module "s3_file_transfer_lambda" {
-  source = "./modules/lambdas/generic"
-
-  enable_lambda = local.enable_s3_file_transfer_lambda
-  name          = local.s3_file_transfer_lambda_name
-  s3_bucket     = local.s3_file_transfer_lambda_code_s3_bucket
-  s3_key        = local.reporting_lambda_code_s3_key
-  handler       = local.s3_file_transfer_lambda_handler
-  runtime       = local.s3_file_transfer_lambda_runtime
-  policies      = local.s3_file_transfer_lambda_policies
-  tracing       = local.s3_file_transfer_lambda_tracing
-  timeout       = 900 # Max timeout of 15 minutes
-
-  vpc_settings = {
-    subnet_ids = [
-      data.aws_subnet.data_subnets_a.id,
-      data.aws_subnet.data_subnets_b.id,
-      data.aws_subnet.data_subnets_c.id
-    ]
-
-    security_group_ids = [
-      aws_security_group.lambda_generic[0].id
-    ]
-  }
-
-  tags = merge(
-    local.all_tags,
-    {
-      Resource_Group = "ingestion-pipeline"
-      Jira           = "DPR2-209"
-      Resource_Type  = "Lambda"
-      Name           = local.s3_file_transfer_lambda_name
-    }
-  )
-
-  depends_on = [
-    aws_iam_policy.s3_all_object_actions_policy,
-    aws_iam_policy.kms_read_access_policy
-  ]
 }
 
 # DMS Nomis Data Collector
