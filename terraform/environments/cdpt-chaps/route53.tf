@@ -101,7 +101,7 @@ resource "aws_route53_record" "external_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "correspondence-handling-and-processing.service.justice.gov.uk"
+  name     = "development.correspondence-handling-and-processing.service.justice.gov.uk"
   type     = "A"
 
   alias {
