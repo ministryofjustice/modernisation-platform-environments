@@ -7,7 +7,7 @@ resource "aws_ssm_parameter" "data_source_username" {
   value = "replace in console"
   lifecycle {
     ignore_changes = [
-      "value",
+      value,
     ]
   }
 }
@@ -18,7 +18,7 @@ resource "aws_ssm_parameter" "data_source_password" {
   value = "replace in console"
   lifecycle {
     ignore_changes = [
-      "value",
+      value,
     ]
   }
 }
@@ -29,7 +29,7 @@ resource "aws_ssm_parameter" "cda_client_id" {
   value = "replace in console"
   lifecycle {
     ignore_changes = [
-      "value",
+      value,
     ]
   }
 }
@@ -40,7 +40,7 @@ resource "aws_ssm_parameter" "cda_client_secret" {
   value = "replace in console"
   lifecycle {
     ignore_changes = [
-      "value",
+      value,
     ]
   }
 }
@@ -51,7 +51,7 @@ resource "aws_ssm_parameter" "togdata_datasource_password" {
   value = "replace in console"
   lifecycle {
     ignore_changes = [
-      "value",
+      value,
     ]
   }
 }

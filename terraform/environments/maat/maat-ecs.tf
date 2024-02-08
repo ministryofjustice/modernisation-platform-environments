@@ -205,6 +205,15 @@ resource "aws_security_group_rule" "outbound" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "maat_sg_rule_int_lb_to_ecs" {
+  security_group_id       = aws_security_group.maat_ecs_security_group.id
+  type                    = "ingress"
+  from_port               = 0
+  to_port                 = 0
+  protocol               = "-1"
+  source_security_group_id = aws_security_group.maat_int_lb_sg.id
+}
+
 #### EC2 CLOUDWATCH LOG GROUP & Key ------
 
 resource "aws_kms_key" "maat_ec2_cloudwatch_log_key" {
