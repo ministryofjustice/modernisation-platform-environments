@@ -1,7 +1,15 @@
 # environment specific settings
 locals {
 
-  preproduction_baseline_presets_options = {}
+  preproduction_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "oasys_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
+      }
+    }
+  }
 
   preproduction_config = {
     ec2_common = {
