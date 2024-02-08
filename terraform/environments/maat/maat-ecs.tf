@@ -435,7 +435,7 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
     maat_mlra_url               = local.application_data.accounts[local.environment].maat_mlra_url
     maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
     maat_cma_base_url           = local.application_data.accounts[local.environment].maat_cma_base_url
-    ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
+    ecr_url                     = "${local.environment_management.account_ids["core-shared-services-development"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
     maat_aws_logs_group         = local.application_data.accounts[local.environment].maat_aws_logs_group
     maat_aws_stream_prefix      = local.application_data.accounts[local.environment].maat_aws_stream_prefix
     }
@@ -573,7 +573,7 @@ resource "aws_ecs_service" "maat_ecs_service" {
   }
 
   load_balancer {
-    container_name   = local.application_name
+    container_name   = "MAAT"
     container_port   = 8080
     target_group_arn = aws_lb_target_group.external.arn
   }
