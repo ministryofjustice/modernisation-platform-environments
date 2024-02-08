@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
       identifiers = ["lambda.amazonaws.com"]
     }
   }
-}q
+}
 
 resource "aws_iam_role" "lambda-ad-role" {
   count = local.environment == "test" ? 1 : 0 # temporary
