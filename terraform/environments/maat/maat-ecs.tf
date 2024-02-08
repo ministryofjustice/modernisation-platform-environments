@@ -556,17 +556,17 @@ resource "aws_cloudwatch_log_group" "maat_ecs_cloudwatch_log_group" {
 #### ECS Service ------
 
 resource "aws_ecs_service" "maat_ecs_service" {
-# Add LB names
-#   depends_on = [aws_lb_listener.maat_alb_http_listener, aws_lb_listener.maat_internal_alb_https_listener]
-
   name                              = "${local.application_name}-ecs-service"
   cluster                           = aws_ecs_cluster.maat_ecs_cluster.id
 #   launch_type                       = ""
   desired_count                     = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
   task_definition                   = aws_ecs_task_definition.maat_ecs_task_definition.arn
- #### UNCOMMENT THE IAM ROLE ASSOCIATION ONCE THE LB DETAILS ARE ADDED ########### 
-  # iam_role                          = aws_iam_role.maat_ecs_service_role.arn
- ################################################################################
+  iam_role                          = aws_iam_role.maat_ecs_service_role.arn
+  depends_on                        = [
+                                      aws_lb_listener.external 
+                                      # aws_lb_listener.maat_internal_alb_https_listener
+                                      ]
+
 #   health_check_grace_period_seconds = 120
 
   ordered_placement_strategy {
@@ -574,22 +574,17 @@ resource "aws_ecs_service" "maat_ecs_service" {
     type  = "spread"
   }
 
-#   network_configuration {
-#     subnets = [
-#       data.aws_subnets.shared-private.ids[0],
-#       data.aws_subnets.shared-private.ids[1],
-#       data.aws_subnets.shared-private.ids[2],
-#     ]
-#     security_groups  = [aws_security_group.foo.id]
-#     assign_public_ip = false
-#   }
+  load_balancer {
+    container_name   = local.application_name
+    container_port   = 8080
+    target_group_arn = aws_lb_target_group.external.arn
+  }
 
-#   ######## ADD LB DETAILS HERE
-#   load_balancer {
-#     container_name   = "${local.application_name}-foo"
-#     container_port   = 8090
-#     target_group_arn = aws_lb_target_group.foo.arn
-#   }
+  #   load_balancer {
+  #   container_name   = local.application_name
+  #   container_port   = 8080
+  #   target_group_arn = aws_lb_target_group.foo.arn
+  # }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
