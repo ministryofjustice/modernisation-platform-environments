@@ -253,7 +253,7 @@ resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ec2" {
 }
 
 resource "aws_cloudwatch_log_group" "ec2_cloudwatch_log_group" {
-  name              = "${local.application_name}-ec2"
+  name              = local.application_data.accounts[local.environment].maat_ec2_log_group
   retention_in_days = 90
   kms_key_id = aws_kms_key.maat_ec2_cloudwatch_log_key.arn
 }
@@ -436,7 +436,7 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
     maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
     maat_cma_base_url           = local.application_data.accounts[local.environment].maat_cma_base_url
     ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
-    maat_aws_logs_group         = local.application_data.accounts[local.environment].maat_aws_logs_group
+    maat_ecs_log_group         = local.application_data.accounts[local.environment].maat_ecs_log_group
     maat_aws_stream_prefix      = local.application_data.accounts[local.environment].maat_aws_stream_prefix
     }
   )
@@ -548,7 +548,7 @@ resource "aws_kms_key_policy" "maat_ecs_cloudwatch_log_key_policy" {
 }
 
 resource "aws_cloudwatch_log_group" "maat_ecs_cloudwatch_log_group" {
-  name              = "${local.application_name}-ecs"
+  name              = local.application_data.accounts[local.environment].maat_ecs_log_group
   retention_in_days = 90
   kms_key_id        = aws_kms_key.maat_ecs_cloudwatch_log_key.arn
 }
@@ -572,13 +572,13 @@ resource "aws_ecs_service" "maat_ecs_service" {
   }
 
   load_balancer {
-    container_name   = "MAAT"
+    container_name   = upper(local.application_name)
     container_port   = 8080
     target_group_arn = aws_lb_target_group.external.arn
   }
 
   #   load_balancer {
-  #   container_name   = local.application_name
+  #   container_name   = upper(local.application_name)
   #   container_port   = 8080
   #   target_group_arn = aws_lb_target_group.foo.arn
   # }
