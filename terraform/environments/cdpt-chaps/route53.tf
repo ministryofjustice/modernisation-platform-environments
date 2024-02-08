@@ -99,8 +99,8 @@ resource "aws_route53_record" "external_validation_prod" {
 # This will build on the core-vpc development account under platforms-development.modernisation-platform.service.justice.gov.uk, and route traffic back to example LB
 resource "aws_route53_record" "external_prod" {
   count    = local.is-production ? 1 : 0
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.application_zone.zone_id
   name     = "development.correspondence-handling-and-processing.service.justice.gov.uk"
   type     = "A"
 
@@ -110,4 +110,3 @@ resource "aws_route53_record" "external_prod" {
     evaluate_target_health = true
   }
 }
-
