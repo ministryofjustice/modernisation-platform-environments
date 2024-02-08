@@ -101,7 +101,7 @@ resource "aws_route53_record" "external_prod" {
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application_zone.zone_id
-  name    = "correspondence-handling-and-processing.service.justice.gov.uk"
+  name    = "${local.environment}.correspondence-handling-and-processing.service.justice.gov.uk"
   type    = "A"
 
   alias {
