@@ -111,7 +111,7 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
   }
 
   user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
-    app_name = local.application_name, app_ecs_cluster = aws_ecs_cluster.maat_ecs_cluster.name }))
+    maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group, app_ecs_cluster = aws_ecs_cluster.maat_ecs_cluster.name }))
 
   tag_specifications {
     resource_type = "instance"
