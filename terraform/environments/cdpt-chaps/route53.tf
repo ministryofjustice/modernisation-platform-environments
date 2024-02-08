@@ -101,7 +101,7 @@ resource "aws_route53_record" "external_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.application_zone.zone_id
-  name     = "development.correspondence-handling-and-processing.service.justice.gov.uk"
+  name     = "production.correspondence-handling-and-processing.service.justice.gov.uk"
   type     = "A"
 
   alias {
