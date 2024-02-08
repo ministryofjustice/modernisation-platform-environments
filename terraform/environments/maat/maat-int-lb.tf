@@ -59,7 +59,7 @@ resource "aws_lb" "maat_internal_lb" {
 ######################################
 
 resource "aws_lb_target_group" "maat_internal_lb_target_group" {
-  name                  = "${local.application_name}-InternalLoadBalancer-TargetGroup"
+  name                  = "${local.application_name}-Int-LB-TG"
   port                  = 80
   protocol              = "HTTP"
   vpc_id                = data.aws_vpc.shared.id
