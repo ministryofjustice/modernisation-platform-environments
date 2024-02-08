@@ -39,4 +39,3 @@ resource "aws_lb_listener_rule" "this" {
     target_group_arn = aws_lb_target_group.this.arn
   }
 }
-
