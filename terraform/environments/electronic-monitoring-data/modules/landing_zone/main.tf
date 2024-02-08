@@ -118,6 +118,7 @@ module "log_bucket" {
 
 resource "aws_kms_key" "this" {
   description             = "${var.supplier} server cloudwatch log encryption key"
+  enable_key_rotation     = true
   key_usage               = "ENCRYPT_DECRYPT"
   deletion_window_in_days = 30
 
