@@ -373,7 +373,7 @@ resource "aws_iam_role" "maat_ecs_autoscaling_role" {
         {
             "Action": "sts:AssumeRole",
              "Principal": {
-               "Service": "ec2.amazonaws.com"
+               "Service": "application-autoscaling.amazonaws.com"
             },
             "Effect": "Allow"
         }
