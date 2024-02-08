@@ -45,19 +45,19 @@ resource "aws_route53_record" "external_validation_subdomain" {
 }
 
 // Route53 DNS record for directing traffic to the service
-//resource "aws_route53_record" "external" {
-//  provider = aws.core-vpc
-//
-//  zone_id = data.aws_route53_zone.external.zone_id
-//  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-//  type    = "A"
-//
-//  alias {
-//    name                   = aws_lb.chaps_lb.dns_name
-//    zone_id                = aws_lb.chaps_lb.zone_id
-//    evaluate_target_health = true
-//  }
-//}
+resource "aws_route53_record" "external" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.chaps_lb.dns_name
+    zone_id                = aws_lb.chaps_lb.zone_id
+    evaluate_target_health = true
+  }
+}
 
 
 // PRODUCTION DNS CONFIGURATION
@@ -97,10 +97,11 @@ resource "aws_route53_record" "external_validation_prod" {
 }
 
 # This will build on the core-vpc development account under platforms-development.modernisation-platform.service.justice.gov.uk, and route traffic back to example LB
-resource "aws_route53_record" "external" {
+resource "aws_route53_record" "external_prod" {
+  count    = local.is-production ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${local.environment}.correspondence-handling-and-processing.service.justice.gov.uk"
+  name     = "correspondence-handling-and-processing.service.justice.gov.uk"
   type     = "A"
 
   alias {
@@ -110,19 +111,3 @@ resource "aws_route53_record" "external" {
   }
 }
 
-
-// Route53 DNS record for directing traffic to the service
-//resource "aws_route53_record" "external_prod" {
-//  count    = local.is-production ? 1 : 0
-//  provider = aws.core-network-services
-//
-//  zone_id = data.aws_route53_zone.application_zone.zone_id
-//  name    = "${local.environment}.correspondence-handling-and-processing.service.justice.gov.uk"
-//  type    = "A"
-//
-//  alias {
-//    name                   = aws_lb.chaps_lb.dns_name
-//    zone_id                = aws_lb.chaps_lb.zone_id
-//    evaluate_target_health = true
-//  }
-//}
