@@ -320,7 +320,7 @@ resource "aws_iam_role" "maat_ecs_service_role" {
         {
             "Action": "sts:AssumeRole",
             "Principal": {
-               "Service": "ec2.amazonaws.com"
+               "Service": "ecs.amazonaws.com"
             },
             "Effect": "Allow"
         }
@@ -566,8 +566,6 @@ resource "aws_ecs_service" "maat_ecs_service" {
                                       aws_lb_listener.external 
                                       # aws_lb_listener.maat_internal_alb_https_listener
                                       ]
-
-#   health_check_grace_period_seconds = 120
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
