@@ -72,18 +72,6 @@ resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
-data "aws_iam_policy_document" "lambda_assume_role_policy" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}
-
 resource "aws_iam_role_policy_attachment" "lambda_secrets_manager" {
   count      = local.environment == "test" ? 1 : 0 # temporary
   role       = aws_iam_role.lambda-ad-role[count.index].name
