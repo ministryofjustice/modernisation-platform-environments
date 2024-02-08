@@ -39,11 +39,11 @@ resource "aws_lb" "maat_internal_lb" {
 
   enable_deletion_protection = true
 
-  access_logs {
-    bucket  = local.existing_bucket_name != "" ? local.existing_bucket_name : module.lb-s3-access-logs[0].bucket.id
-    prefix  = "${local.application_name}-InternalLoadBalancer"
-    enabled = true
-  }
+#   access_logs {
+#     bucket  = local.existing_bucket_name != "" ? local.existing_bucket_name : module.lb-s3-access-logs[0].bucket.id
+#     prefix  = "${local.application_name}-InternalLoadBalancer"
+#     enabled = true
+#   }
     
   tags = merge(
     local.tags,
