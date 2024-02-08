@@ -310,20 +310,20 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
-      # {
-      #   cpu-utilization-high = {
-      #     comparison_operator = "GreaterThanOrEqualToThreshold"
-      #     evaluation_periods  = "120"
-      #     datapoints_to_alarm = "120"
-      #     metric_name         = "CPUUtilization"
-      #     namespace           = "AWS/EC2"
-      #     period              = "60"
-      #     statistic           = "Maximum"
-      #     threshold           = "95"
-      #     alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on an oasys-db instance"
-      #     alarm_actions       = ["dso_pagerduty"]
-      #   }
-      # }
+      {
+        cpu-utilization-high = {
+          comparison_operator = "GreaterThanOrEqualToThreshold"
+          evaluation_periods  = "120"
+          datapoints_to_alarm = "120"
+          metric_name         = "CPUUtilization"
+          namespace           = "AWS/EC2"
+          period              = "60"
+          statistic           = "Maximum"
+          threshold           = "95"
+          alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on an oasys-db instance"
+          alarm_actions       = ["dso_pagerduty"]
+        }
+      }
     )
     autoscaling_schedules = {}
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
