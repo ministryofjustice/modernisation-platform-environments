@@ -257,7 +257,7 @@ resource "aws_transfer_workflow" "this" {
       destination_file_location {
         s3_file_location {
           bucket = var.data_store_bucket.bucket
-          key    = "${var.supplier}/$${Transfer:username}/"
+          key    = "${var.supplier}/$${transfer:UserName}/$${transfer:UploadDate}/"
         }
       }
     }
