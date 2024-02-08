@@ -241,7 +241,7 @@ resource "aws_transfer_workflow" "this" {
 
   steps {
     tag_step_details {
-      name                 = "example"
+      name                 = "tag-with-supplier"
       source_file_location = "$${original.file}"
       tags {
         key   = "supplier"
@@ -252,11 +252,12 @@ resource "aws_transfer_workflow" "this" {
   }
   steps {
     copy_step_details {
+      name                 = "copy-file-to-data-store"
       source_file_location = "$${original.file}"
       destination_file_location {
         s3_file_location {
           bucket = var.data_store_bucket.bucket
-          key    = "${var.supplier}/"
+          key    = "${var.supplier}/$${Transfer:username}/"
         }
       }
     }
@@ -264,6 +265,7 @@ resource "aws_transfer_workflow" "this" {
   }
   steps {
     delete_step_details {
+      name                 = "delete-file-from-landing-zone"
       source_file_location = "$${original.file}"
     }
     type = "DELETE"
