@@ -20,6 +20,7 @@ resource "aws_acm_certificate_validation" "external" {
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
+
 // Route53 DNS records for certificate validation
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
@@ -94,6 +95,21 @@ resource "aws_route53_record" "external_validation_prod" {
   zone_id         = data.aws_route53_zone.application_zone.zone_id
   ttl             = 60
 }
+
+# This will build on the core-vpc development account under platforms-development.modernisation-platform.service.justice.gov.uk, and route traffic back to example LB
+resource "aws_route53_record" "external_prod" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external_prod.zone_id
+  name     = "${local.environment}.correspondence-handling-and-processing.service.justice.gov.uk"
+  type     = "A"
+
+  alias {
+    name                   = aws_lb.chaps_lb.dns_name
+    zone_id                = aws_lb.chaps_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
 
 // Route53 DNS record for directing traffic to the service
 //resource "aws_route53_record" "external_prod" {
