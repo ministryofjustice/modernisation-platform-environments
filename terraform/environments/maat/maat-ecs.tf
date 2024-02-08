@@ -253,7 +253,7 @@ resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ec2" {
 }
 
 resource "aws_cloudwatch_log_group" "ec2_cloudwatch_log_group" {
-  name              = "${local.application_name}-ec2-log-group"
+  name              = "${local.application_name}-ec2"
   retention_in_days = 90
   kms_key_id = aws_kms_key.maat_ec2_cloudwatch_log_key.arn
 }
@@ -548,7 +548,7 @@ resource "aws_kms_key_policy" "maat_ecs_cloudwatch_log_key_policy" {
 }
 
 resource "aws_cloudwatch_log_group" "maat_ecs_cloudwatch_log_group" {
-  name              = "${local.application_name}-ecs-log-group"
+  name              = "${local.application_name}-ecs"
   retention_in_days = 90
   kms_key_id        = aws_kms_key.maat_ecs_cloudwatch_log_key.arn
 }
@@ -558,7 +558,6 @@ resource "aws_cloudwatch_log_group" "maat_ecs_cloudwatch_log_group" {
 resource "aws_ecs_service" "maat_ecs_service" {
   name                              = "${local.application_name}-ecs-service"
   cluster                           = aws_ecs_cluster.maat_ecs_cluster.id
-#   launch_type                       = ""
   desired_count                     = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
   task_definition                   = aws_ecs_task_definition.maat_ecs_task_definition.arn
   iam_role                          = aws_iam_role.maat_ecs_service_role.arn
