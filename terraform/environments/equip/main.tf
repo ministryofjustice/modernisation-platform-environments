@@ -766,7 +766,7 @@ locals {
 }
 
 
-module "PowerBI server" {
+module "PowerBI_server" {
   source = "./ec2-instance-module"
 
 
