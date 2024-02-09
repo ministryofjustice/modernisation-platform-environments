@@ -13,7 +13,7 @@ locals {
         instance = merge(local.defaults_database_ec2.instance, {
           instance_type = "r6i.4xlarge"
           # set these to false and apply before instance can be deleted
-          disable_api_termination = true 
+          disable_api_termination = true
           disable_api_stop        = true
           monitoring              = true
         })
@@ -42,7 +42,7 @@ locals {
         instance = merge(local.defaults_database_ec2.instance, {
           instance_type = "r6i.4xlarge"
           # set these to false and apply before instance can be deleted
-          disable_api_termination = true 
+          disable_api_termination = true
           disable_api_stop        = true
           monitoring              = true
         })
@@ -73,7 +73,7 @@ locals {
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "t3.xlarge"
           # set these to false and apply before instance can be deleted
-          disable_api_termination = true 
+          disable_api_termination = true
           disable_api_stop        = true
           monitoring              = true
         })
@@ -101,7 +101,7 @@ locals {
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "t3.xlarge"
           # set these to false and apply before instance can be deleted
-          disable_api_termination = true 
+          disable_api_termination = true
           disable_api_stop        = true
           monitoring              = true
         })
@@ -129,7 +129,7 @@ locals {
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "t3.xlarge"
           # set these to false and apply before instance can be deleted
-          disable_api_termination = true 
+          disable_api_termination = true
           disable_api_stop        = true
           monitoring              = true
         })
@@ -157,7 +157,7 @@ locals {
         instance = merge(local.defaults_app_ec2.instance, {
           instance_type = "t3.xlarge"
           # set these to false and apply before instance can be deleted
-          disable_api_termination = true 
+          disable_api_termination = true
           disable_api_stop        = true
           monitoring              = true
         })
@@ -187,7 +187,7 @@ locals {
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "t3.xlarge"
           # set these to false and apply before instance can be deleted
-          disable_api_termination = true 
+          disable_api_termination = true
           disable_api_stop        = true
           monitoring              = true
         })
@@ -215,7 +215,7 @@ locals {
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "t3.xlarge"
           # set these to false and apply before instance can be deleted
-          disable_api_termination = true 
+          disable_api_termination = true
           disable_api_stop        = true
           monitoring              = true
         })
@@ -243,7 +243,7 @@ locals {
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "t3.large"
           # set these to false and apply before instance can be deleted
-          disable_api_termination = true 
+          disable_api_termination = true
           disable_api_stop        = true
           monitoring              = true
         })
