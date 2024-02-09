@@ -70,10 +70,18 @@ variable "merge_config" {
   type = object({
     api_image_tag = string
     ui_image_tag  = string
+    create_rds         = bool
+    rds_engine         = string
+    rds_engine_version = string
+    rds_instance_class = string
   })
   default = {
     api_image_tag = "default_image_tag"
     ui_image_tag  = "default_image_tag"
+    create_rds         = null
+    rds_engine         = null
+    rds_engine_version = null
+    rds_instance_class = null
   }
 }
 

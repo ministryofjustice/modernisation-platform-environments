@@ -26,7 +26,11 @@ module "merge_api_service" {
     }
   ]
   ingress_security_groups            = []
+<<<<<<< HEAD
   bastion_sg_id                      = module.bastion_linux.bastion_security_group
+=======
+  bastion_security_group             = [module.bastion_linux.bastion_security_group]
+>>>>>>> e8f7f9493 (initial config for RDS added to merge microservice)
   tags                               = var.tags
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
@@ -36,10 +40,11 @@ module "merge_api_service" {
   account_config                     = var.account_config
   health_check_path                  = "/merge/api/actuator/health"
   account_info                       = var.account_info
-  create_rds                         = true
-  rds_engine                         = "Postgres"
-  rds_engine_version                 = "15.5"
-  rds_instance_class                 = "db.t3.small"
+  create_rds                         = var.merge_config.create_rds
+  rds_engine                         = var.merge_config.rds_engine
+  rds_engine_version                 = var.merge_config.rds_engine_version
+  rds_instance_class                 = var.merge_config.rds_instance_class
+  rds_port = 1521
   container_environment_vars = [
     {
       name  = "SERVER_SERVLET_CONTEXT_PATH"

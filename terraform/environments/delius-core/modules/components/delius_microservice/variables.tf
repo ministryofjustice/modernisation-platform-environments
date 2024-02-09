@@ -162,6 +162,12 @@ variable "ingress_security_groups" {
   type        = list(string)
 }
 
+variable "bastion_security_group" {
+  description = "security group for bastion server"
+  type        = list(string)
+  default     = null
+}
+
 variable "tags" {
   description = "Tags to apply to the instance"
   type        = map(string)
@@ -351,8 +357,11 @@ variable "container_cpu" {
   type        = number
   default     = 512
 }
+<<<<<<< HEAD
 
 variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string
 }
+=======
+>>>>>>> e8f7f9493 (initial config for RDS added to merge microservice)
