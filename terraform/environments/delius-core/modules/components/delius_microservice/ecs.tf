@@ -27,7 +27,7 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
+  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=a319c417fe7d499acc7893cf19db6fd566e30822"
   container_definition_json = module.container_definition.json_map_encoded_list
   ecs_cluster_arn           = var.ecs_cluster_arn
   name                      = var.name
@@ -65,4 +65,5 @@ module "ecs_service" {
   ignore_changes_task_definition = true
   redeploy_on_apply              = false
   force_new_deployment           = false
+
 }
