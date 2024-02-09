@@ -45,7 +45,7 @@
       "maat_api_alb_4xx_alarm_threshold": 10,
       "maat_api_pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms",
       "maat_api_api_scope": "standard",
-      "domain_name": "modernisation-platform.service.justice.gov.uk",
+      "cloudfront_domain_name": "modernisation-platform.service.justice.gov.uk",
       "ext_lb_enable_deletion_protection": "false",
       "ami_id": "ami-0631049bf050d0d46",
       "instance_type": "m5.large",
@@ -54,7 +54,7 @@
       "ec2_asg_max_size": "2",
       "ec2_cpu_scaling_up_threshold": "74",
       "ec2_cpu_scaling_down_threshold": "51",
-      "docker_image_tag": "19af94e9",
+      "docker_image_tag": "development",
       "region": "eu-west-2",
       "maat_orch_base_url": "https://laa-maat-orchestration-dev.apps.live.cloud-platform.service.justice.gov.uk",
       "maat_ccp_base_url": "https://laa-crown-court-proceeding-dev.apps.live.cloud-platform.service.justice.gov.uk",
@@ -69,9 +69,13 @@
       "maat_mlra_url": "https://mlra.dev.legalservices.gov.uk",
       "maat_caa_base_url": "https://w2vr5w4fke.execute-api.eu-west-2.amazonaws.com/v1",
       "maat_cma_base_url": "https://laa-crime-means-assessment-dev.apps.live.cloud-platform.service.justice.gov.uk",
-      "maat_aws_logs_group": "MAAT-ECS",
+      "maat_ecs_log_group": "MAAT-ECS",
+      "maat_ec2_log_group": "MAAT-EC2",
       "maat_aws_stream_prefix": "MAAT-app",
-      "SSM_managed_core_policy_arn": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      "SSM_managed_core_policy_arn": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+      "maat_ecs_scaling_target_max": "2",
+      "maat_ecs_scaling_target_min": "1",
+      "maat_ecs_service_desired_count": "1"
     },
     "test": {
       "example_var": "test-data",
@@ -81,7 +85,8 @@
       "maat_api_ecs_memory": 2048,
       "maat_api_ecs_container_cpu": 922,
       "maat_api_ecs_container_memory": 1792,
-      "maat_api_pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms"
+      "maat_api_pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms",
+      "cloudfront_domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "preproduction": {
       "example_var": "preproduction-data",
@@ -91,7 +96,8 @@
       "maat_api_ecs_memory": 3072,
       "maat_api_ecs_container_cpu": 922,
       "maat_api_ecs_container_memory": 2816,
-      "maat_api_pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms"
+      "maat_api_pagerduty_integration_key_name": "laa_maat_api_nonprod_alarms",
+      "cloudfront_domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "production": {
       "example_var": "production-data",
@@ -102,7 +108,8 @@
       "maat_api_ecs_container_cpu": 922,
       "maat_api_ecs_container_memory": 2816,
       "maat_api_pagerduty_integration_key_name": "laa_maat_api_prod_alarms",
-      "ext_lb_enable_deletion_protection": "true"
+      "ext_lb_enable_deletion_protection": "true",
+      "cloudfront_domain_name": "meansassessment.service.justice.gov.uk"
     }
   }
 }

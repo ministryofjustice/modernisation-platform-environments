@@ -118,6 +118,7 @@ module "log_bucket" {
 
 resource "aws_kms_key" "this" {
   description             = "${var.supplier} server cloudwatch log encryption key"
+  enable_key_rotation     = true
   key_usage               = "ENCRYPT_DECRYPT"
   deletion_window_in_days = 30
 
@@ -189,10 +190,7 @@ resource "aws_transfer_server" "this" {
     vpc_id                 = var.vpc_id
     subnet_ids             = var.subnet_ids
     address_allocation_ids = [aws_eip.this.id]
-    security_group_ids     = [
-      aws_security_group.this.id,
-      aws_security_group.dev.id
-    ]
+    security_group_ids     = local.landing_zone_security_group_ids
   }
 
   domain = "S3"
@@ -244,7 +242,7 @@ resource "aws_transfer_workflow" "this" {
 
   steps {
     tag_step_details {
-      name                 = "example"
+      name                 = "tag-with-supplier"
       source_file_location = "$${original.file}"
       tags {
         key   = "supplier"
@@ -255,11 +253,12 @@ resource "aws_transfer_workflow" "this" {
   }
   steps {
     copy_step_details {
+      name                 = "copy-file-to-data-store"
       source_file_location = "$${original.file}"
       destination_file_location {
         s3_file_location {
           bucket = var.data_store_bucket.bucket
-          key    = "${var.supplier}/"
+          key    = "${var.supplier}/$${transfer:UserName}/$${transfer:UploadDate}/"
         }
       }
     }
@@ -267,6 +266,7 @@ resource "aws_transfer_workflow" "this" {
   }
   steps {
     delete_step_details {
+      name                 = "delete-file-from-landing-zone"
       source_file_location = "$${original.file}"
     }
     type = "DELETE"
@@ -346,157 +346,42 @@ resource "aws_iam_role_policy" "this_transfer_workflow" {
 #------------------------------------------------------------------------------
 # AWS transfer user
 #
-# Create supplier user profile that has put access to only their landing zone
-# bucket.
+# Create user profiles that has put access to only this landing zone bucket.
 #------------------------------------------------------------------------------
 
-resource "aws_transfer_user" "this" {
-  count = var.give_access ? 1 : 0
+module "landing_zone_users" {
+  source = "./landing_zone_user"
 
-  server_id = aws_transfer_server.this.id
-  user_name = var.supplier
-  role      = aws_iam_role.this_transfer_user.arn
+  for_each = { for idx, item in var.user_accounts : idx => item }
 
-  home_directory = "/${aws_s3_bucket.landing_bucket.id}/"
-
-  tags = {
-    supplier = var.supplier
-  }
-}
-
-resource "aws_iam_role" "this_transfer_user" {
-  name                = "${var.supplier}-transfer-user-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
-}
-
-resource "aws_iam_role_policy" "this_transfer_user" {
-  name   = "${var.supplier}-transfer-user-iam-policy"
-  role   = aws_iam_role.this_transfer_user.id
-  policy = data.aws_iam_policy_document.this_transfer_user.json
-}
-
-data "aws_iam_policy_document" "this_transfer_user" {
-  statement {
-    sid       = "AllowListAccessToLandingS3"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.landing_bucket.arn]
-  }
-  statement {
-    sid       = "AllowPutAccessToLandingS3"
-    effect    = "Allow"
-    actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.landing_bucket.arn}/*"]
-  }
-}
-
-#------------------------------------------------------------------------------
-# AWS transfer ssh key
-#
-# Set the public ssh key for the supplier user profile to access SFTP server.
-#------------------------------------------------------------------------------
-
-resource "aws_transfer_ssh_key" "this" {
-  count = var.give_access ? 1 : 0
-
-  server_id = aws_transfer_server.this.id
-  user_name = aws_transfer_user.this[0].user_name
-  body      = var.supplier_shh_key
+  landing_bucket  = aws_s3_bucket.landing_bucket
+  ssh_keys        = each.value.ssh_keys
+  supplier        = var.supplier
+  transfer_server = aws_transfer_server.this
+  user_name       = each.value.name
 }
 
 #------------------------------------------------------------------------------
 # AWS security group 
 #
-# Set the allowed IP addresses for the supplier.
+# Set the allowed IP addresses for the this SFTP server.
 #------------------------------------------------------------------------------
 
-resource "aws_security_group" "this" {
-  name        = "${var.supplier}-inbound-ips"
-  description = "Allowed IP addresses for ${var.supplier}"
-  vpc_id      = var.vpc_id
+module "landing_zone_security_groups" {
+  source = "./server_security_group"
 
-  tags = {
-    supplier = var.supplier
-  }
+  for_each = { for idx, item in var.user_accounts : idx => item }
+
+  cidr_ipv4s = each.value.cidr_ipv4s
+  cidr_ipv6s = each.value.cidr_ipv6s
+  supplier   = var.supplier
+  user_name  = each.value.name
+  vpc_id     = var.vpc_id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "this_ipv4" {
-  security_group_id = aws_security_group.this.id
-  description       = "Allow specific access to IPv4 address via port 2222"
-  ip_protocol       = "tcp"
-  from_port         = 2222
-  to_port           = 2222
-
-  for_each  = { for cidr_ipv4 in var.supplier_cidr_ipv4s : cidr_ipv4 => cidr_ipv4 }
-  cidr_ipv4 = each.key
-}
-
-resource "aws_vpc_security_group_ingress_rule" "this_ipv6" {
-  security_group_id = aws_security_group.this.id
-  description       = "Allow specific access to IPv6 address via port 2222"
-  ip_protocol       = "tcp"
-  from_port         = 2222
-  to_port           = 2222
-
-  for_each  = { for cidr_ipv6 in var.supplier_cidr_ipv6s : cidr_ipv6 => cidr_ipv6 }
-  cidr_ipv6 = each.key
-}
-
-#------------------------------------------------------------------------------
-# Create dev account for testing
-#------------------------------------------------------------------------------
-
-resource "aws_transfer_user" "dev" {
-  count = var.give_dev_access ? 1 : 0
-
-  server_id = aws_transfer_server.this.id
-  user_name = "dev"
-  role      = aws_iam_role.this_transfer_user.arn
-
-  home_directory = "/${aws_s3_bucket.landing_bucket.id}/"
-
-  tags = {
-    supplier = var.supplier
-  }
-}
-
-resource "aws_transfer_ssh_key" "dev_ssh_key" {
-  server_id = aws_transfer_server.this.id
-  user_name = aws_transfer_user.dev[0].user_name
-
-  for_each  = { for ssh_key in var.dev_ssh_keys : ssh_key => ssh_key }
-  body      = each.key
-}
-
-resource "aws_security_group" "dev" {
-  name        = "${var.supplier}-dev-inbound-ips"
-  description = "Allowed MoJ developer IP addresses for testing ${var.supplier} landing zone"
-  vpc_id      = var.vpc_id
-
-  tags = {
-    supplier = var.supplier
-  }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "dev_ipv4" {
-  security_group_id = aws_security_group.dev.id
-
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-
-  for_each  = { for cidr_ipv4 in var.dev_cidr_ipv4s : cidr_ipv4 => cidr_ipv4 }
-  cidr_ipv4 = each.key
-}
-
-resource "aws_vpc_security_group_ingress_rule" "dev_ipv6" {
-  security_group_id = aws_security_group.dev.id
-
-  ip_protocol = "tcp"
-  from_port   = 2222
-  to_port     = 2222
-
-  for_each  = { for cidr_ipv6 in var.dev_cidr_ipv6s : cidr_ipv6 => cidr_ipv6 }
-  cidr_ipv6 = each.key
+locals {
+  landing_zone_security_group_ids = flatten([
+    for module_instance in values(module.landing_zone_security_groups) : 
+      module_instance.security_group_id
+  ])
 }

@@ -77,6 +77,10 @@
       {
         "name": "SENTRY_ENVIRONMENT",
         "value": "${sentry_env}"
+      },
+      {
+        "name": "APP_GOOGLE_ANALYTICS_4_TAG_ID",
+        "value": ""
       }
     ],
     "secrets": [

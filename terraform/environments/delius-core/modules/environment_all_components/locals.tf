@@ -1,6 +1,4 @@
 locals {
-  ldap_port = 389
-
   tags = merge(
     var.tags,
     {

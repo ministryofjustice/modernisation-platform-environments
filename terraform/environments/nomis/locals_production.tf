@@ -110,6 +110,7 @@ locals {
     baseline_secretsmanager_secrets = {
       "/oracle/weblogic/prod"     = local.weblogic_secretsmanager_secrets
       "/oracle/database/PCNOM"    = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/PCNOMHA"  = local.database_secretsmanager_secrets
       "/oracle/database/PNDH"     = local.database_secretsmanager_secrets
       "/oracle/database/PTRDAT"   = local.database_secretsmanager_secrets
       "/oracle/database/PCNMAUD"  = local.database_secretsmanager_secrets

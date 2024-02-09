@@ -7,6 +7,8 @@ module "oracle_db_shared" {
   source             = "../components/oracle_db_shared"
   account_config     = var.account_config
   environment_config = var.environment_config
+  account_info       = var.account_info
+  platform_vars      = var.platform_vars
   env_name           = var.env_name
   tags               = local.tags
   public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
@@ -97,11 +99,9 @@ module "oracle_db_standby" {
   subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_primary)) % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_primary)) % 3, "a")}"
   tags               = local.tags
-  user_data = base64encode(
-    templatefile(
-      "${path.module}/templates/userdata.sh.tftpl",
-      var.db_config.ansible_user_data_config
-    )
+  user_data = templatefile(
+    "${path.module}/templates/userdata.sh.tftpl",
+    var.db_config.ansible_user_data_config
   )
 
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name

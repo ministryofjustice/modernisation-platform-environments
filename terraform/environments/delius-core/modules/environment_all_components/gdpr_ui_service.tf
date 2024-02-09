@@ -17,7 +17,6 @@ module "gdpr_ui_service" {
   tags                               = var.tags
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
-  alb_listener_rule_priority         = 6
   alb_listener_rule_paths            = ["/gdpr/ui", "/gdpr/ui/*"]
   platform_vars                      = var.platform_vars
   container_image                    = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-gdpr-ui-ecr-repo:${var.gdpr_config.ui_image_tag}"

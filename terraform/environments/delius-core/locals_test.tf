@@ -86,6 +86,14 @@ locals {
     ui_image_tag  = "REPLACE"
   }
 
+  user_management_config_test = {
+    image_tag        = "5.7.6"
+    container_port   = 8080
+    container_memory = 4096
+    container_cpu    = 2048
+  }
+
+
 
   bastion_config_test = {
     business_unit           = local.vpc_name

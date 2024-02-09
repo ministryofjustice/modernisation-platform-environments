@@ -36,8 +36,8 @@ module "ecs_service" {
   launch_type  = "FARGATE"
   network_mode = "awsvpc"
 
-  task_cpu    = "1024"
-  task_memory = "4096"
+  task_cpu    = var.container_cpu
+  task_memory = var.container_memory
 
   service_role_arn   = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.service_role.name}"
   task_role_arn      = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_role.name}"

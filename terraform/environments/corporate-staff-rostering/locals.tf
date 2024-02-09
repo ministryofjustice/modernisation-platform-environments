@@ -36,14 +36,14 @@ locals {
   }
 
   baseline_acm_certificates = {}
-  baseline_cloudwatch_log_groups = {
-    cwagent-windows-application = {
-      retention_in_days = 30
+  baseline_cloudwatch_log_groups = merge(
+    local.ssm_doc_cloudwatch_log_groups,
+    {
+      cwagent-windows-application = {
+        retention_in_days = 30
+      }
     }
-    "/aws/ssm/windows-cloudwatch-agent-config" = {
-      retention_in_days = 30
-    }
-  }
+  )
   baseline_cloudwatch_log_metric_filters = {}
   baseline_ec2_autoscaling_groups        = {}
   baseline_ec2_instances                 = {}

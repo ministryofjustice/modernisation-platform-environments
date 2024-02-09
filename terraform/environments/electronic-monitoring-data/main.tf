@@ -3,30 +3,17 @@ module "capita" {
 
   supplier = "capita"
 
-  give_access         = true
-  supplier_shh_key    = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIhggGYKbOk6BH7fpEs6JGRnMyLRK/9/tAMQOVYOZtehKTRcM5vGsJFRGjjm2wEan3/uYOuto0NoVkbRfIi0AIG6EWrp1gvHNQlUTtxQVp7rFeOnZAjVEE9xVUEgHhMNLw=="
-  supplier_cidr_ipv4s = [
-    "82.203.33.112/28",
-    "82.203.33.128/28",
-    "85.115.52.0/24",
-    "85.115.53.0/24",
-    "85.115.54.0/24"
+  user_accounts = [
+    local.sftp_account_capita,
+    local.sftp_account_dev,
   ]
-  supplier_cidr_ipv6s = []
 
   data_store_bucket = aws_s3_bucket.data_store
-
-  kms_key_id = data.aws_kms_key.general_shared.arn
 
   account_id = data.aws_caller_identity.current.account_id
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
-
-  give_dev_access = true
-  dev_ssh_keys    = local.developer_ssh_keys
-  dev_cidr_ipv4s  = local.developer_cidr_ipv4s
-  dev_cidr_ipv6s  = local.developer_cidr_ipv6s
 }
 
 module "civica" {
@@ -34,26 +21,17 @@ module "civica" {
 
   supplier = "civica"
 
-  give_access         = true
-  supplier_shh_key    = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBCJBwZM5nMigS31soM45PITAHCmyhQpdDAkdX1liqnIZSd8A+zn3XQyVRy5E2a39gfsng5hAQetDFJKn+SaayATCQAzN0cJWlcrvtv314UsRV+PxO236sWVf+RwguUDZRQ=="
-  supplier_cidr_ipv4s = [
-    "20.0.26.153/32"
+  user_accounts = [
+    local.sftp_account_civica,
+    local.sftp_account_dev,
   ]
-  supplier_cidr_ipv6s = []
 
   data_store_bucket = aws_s3_bucket.data_store
-
-  kms_key_id = data.aws_kms_key.general_shared.arn
 
   account_id = data.aws_caller_identity.current.account_id
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
-
-  give_dev_access = true
-  dev_ssh_keys    = local.developer_ssh_keys
-  dev_cidr_ipv4s  = local.developer_cidr_ipv4s
-  dev_cidr_ipv6s  = local.developer_cidr_ipv6s
 }
 
 module "g4s" {
@@ -61,22 +39,15 @@ module "g4s" {
 
   supplier = "g4s"
 
-  give_access         = false
-  supplier_shh_key    = null
-  supplier_cidr_ipv4s = []
-  supplier_cidr_ipv6s = []
+  user_accounts = [
+    local.sftp_account_g4s_test,
+    local.sftp_account_dev,
+  ]
 
   data_store_bucket = aws_s3_bucket.data_store
-
-  kms_key_id = data.aws_kms_key.general_shared.arn
 
   account_id = data.aws_caller_identity.current.account_id
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
-
-  give_dev_access = true
-  dev_ssh_keys    = local.developer_ssh_keys
-  dev_cidr_ipv4s  = local.developer_cidr_ipv4s
-  dev_cidr_ipv6s  = local.developer_cidr_ipv6s
 }

@@ -11,7 +11,7 @@ file = /var/log/secure
 buffer_duration = 5000
 log_stream_name = secure/{instance_id}
 initial_position = start_of_file
-log_group_name = ${app_name}-EC2
+log_group_name = ${maat_ec2_log_group}
 
 [/var/log/messages]
 datetime_format = %b %d %H:%M:%S
@@ -19,7 +19,7 @@ file = /var/log/messages
 buffer_duration = 5000
 log_stream_name = messages/{instance_id}
 initial_position = start_of_file
-log_group_name = ${app_name}-EC2
+log_group_name = ${maat_ec2_log_group}
 EOF
 chmod 644 /etc/awslogs/awslogs.conf
 # Change region

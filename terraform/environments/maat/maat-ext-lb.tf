@@ -2,9 +2,11 @@ locals {
     existing_bucket_name = ""
     account_number = local.environment_management.account_ids[terraform.workspace]
     external_lb_idle_timeout = 65
-    ext_lb_listener_protocol = "HTTP" # TODO Switch to HTTPS once the certs are configured
+    ext_lb_listener_protocol = "HTTPS"
     ext_lb_ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01"
     ext_listener_custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
+    # TODO This URL to access Internal ALB needs to be confirmed, and may need another hosted zone for production
+    int_lb_url = local.environment == "production" ? "${local.application_url_prefix}-lb.${data.aws_route53_zone.production-network-services.name}" : "${local.application_url_prefix}-lb.${data.aws_route53_zone.external.name}"
 }
 
 # Terraform module which creates S3 Bucket resources for Load Balancer Access Logs on AWS.
@@ -182,7 +184,7 @@ resource "aws_lb_listener" "external" {
   port              = 443
   protocol        = local.ext_lb_listener_protocol
   ssl_policy      = local.ext_lb_listener_protocol == "HTTPS" ? local.ext_lb_ssl_policy : null
-  certificate_arn = local.ext_lb_listener_protocol == "HTTPS" ? null : null # TODO For HTTPS, this needs the ARN of the certificate from Mod Platform - aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn
+  certificate_arn = local.ext_lb_listener_protocol == "HTTPS" ? aws_acm_certificate_validation.load_balancers.certificate_arn : null
 
   default_action {
     type = "fixed-response"
@@ -241,4 +243,80 @@ resource "aws_lb_target_group" "external" {
     },
   )
 
+}
+
+#######################################################
+# Certification and Route53 for LBs
+#######################################################
+
+# resource "aws_route53_record" "internal_lb_non_prod" {
+#   count    = local.environment != "production" ? 1 : 0
+#   provider = aws.core-vpc
+#   zone_id  = data.aws_route53_zone.external.zone_id
+#   name     = local.int_lb_url
+#   type     = "CNAME"
+#   ttl      = 300
+#   records = [aws_lb.internal.dns_name] # TODO link to the actual internal LB
+# }
+
+# resource "aws_route53_record" "internal_lb_prod" {
+#   count    = local.environment == "production" ? 1 : 0
+#   provider = aws.core-network-services
+#   zone_id  = data.aws_route53_zone.production-network-services.zone_id # TODO The zone may change as this currently points to the same one that hosted the CloudFront record
+#   name     = "tbc" # TODO Production URL to be confirmed
+#   type     = "CNAME"
+#   ttl      = 300
+#   records = [aws_lb.internal.dns_name] # TODO link to the actual internal LB
+# }
+
+resource "aws_acm_certificate" "load_balancers" {
+  domain_name               = local.application_data.accounts[local.environment].cloudfront_domain_name
+  validation_method         = "DNS"
+  subject_alternative_names = local.environment == "production" ? [local.int_lb_url] : [local.int_lb_url, local.lower_env_cloudfront_url]
+  tags                      = local.tags
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+resource "aws_route53_record" "load_balancers_external_validation" {
+  provider = aws.core-network-services
+
+  count           = local.environment == "production" ? 0 : 1
+  allow_overwrite = true
+  name            = local.lbs_domain_name_main[0]
+  records         = local.lbs_domain_record_main
+  ttl             = 60
+  type            = local.lbs_domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+}
+
+resource "aws_route53_record" "load_balancers_external_validation_subdomain_1" {
+  provider = aws.core-vpc
+
+  count           = local.environment == "production" ? 0 : 1
+  allow_overwrite = true
+  name            = local.lbs_domain_name_sub[0]
+  records         = [local.lbs_domain_record_sub[0]]
+  ttl             = 60
+  type            = local.lbs_domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+resource "aws_route53_record" "load_balancers_external_validation_subdomain_2" {
+  provider = aws.core-vpc
+
+  count           = local.environment == "production" ? 0 : 1
+  allow_overwrite = true
+  name            = local.lbs_domain_name_sub[1]
+  records         = [local.lbs_domain_record_sub[1]]
+  ttl             = 60
+  type            = local.lbs_domain_type_sub[1]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+resource "aws_acm_certificate_validation" "load_balancers" {
+  certificate_arn         = aws_acm_certificate.load_balancers.arn
+  validation_record_fqdns = [local.lbs_domain_name_main[0], local.lbs_domain_name_sub[0], local.lbs_domain_name_sub[1]]
 }

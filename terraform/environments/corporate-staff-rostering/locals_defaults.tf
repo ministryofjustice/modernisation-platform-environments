@@ -1,10 +1,11 @@
 locals {
 
   ec2_cloudwatch_metric_alarms = {
-    linux = merge(
+    database = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup
     )
     windows = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
@@ -48,7 +49,7 @@ locals {
       disable_api_stop       = false
       vpc_security_group_ids = ["database"]
     })
-    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.linux
+    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.database
     ebs_volumes = {
       "/dev/sdb" = { label = "app" }   # /u01
       "/dev/sdc" = { label = "app" }   # /u02

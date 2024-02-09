@@ -222,7 +222,8 @@ locals {
         statistic           = "Maximum"
         threshold           = "1"
         alarm_description   = "Triggers if an oracle database defined in oracle-sids tag is disconnected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698"
-        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        # Slack integration is via Oracle Enterprise Management rather than cloudwatch
+        # alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
     ec2_instance_cwagent_collectd_oracle_db_backup = {
@@ -293,6 +294,20 @@ locals {
         statistic           = "Average"
         threshold           = "1"
         alarm_description   = "Triggers if the number of unhealthy hosts in the target table group is at least one for 3 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340278"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+    network_lb = {
+      unhealthy-network-load-balancer-host = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "UnHealthyHostCount"
+        namespace           = "AWS/NetworkELB"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "Triggers if the number of unhealthy network loadbalancer hosts in the target table group is at least one for 3 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340278"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }

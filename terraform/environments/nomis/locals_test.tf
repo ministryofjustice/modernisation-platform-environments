@@ -457,7 +457,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 500 }
+          data  = { total_size = 700 }
           flash = { total_size = 50 }
         })
         tags = merge(local.database_ec2.tags, {
@@ -561,7 +561,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 2000 }
+          data  = { total_size = 2500 }
           flash = { total_size = 500 }
         })
         tags = merge(local.database_ec2.tags, {

@@ -1,7 +1,15 @@
 # environment specific settings
 locals {
 
-  preproduction_baseline_presets_options = {}
+  preproduction_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "oasys_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
+      }
+    }
+  }
 
   preproduction_config = {
     ec2_common = {
@@ -125,9 +133,6 @@ locals {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
             branch = "oracle_11g_oasys_patchset_addition"
           })
-        })
-        instance = merge(local.database_onr_a.instance, {
-          instance_type = "r6i.2xlarge"
         })
         tags = merge(local.database_onr_a.tags, {
           instance-scheduling = "skip-scheduling"
@@ -347,7 +352,8 @@ locals {
       # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-preproduction.modernisation-platform.service.justice.gov.uk
         records = [
-          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] }, # uncomment when db in aws is set up
+          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.pp.onr", type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         # lb_alias_records = [
         #   { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },     # pp.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk
@@ -365,6 +371,7 @@ locals {
         records = [
           # { name = "db.pp.${local.application_name}", type = "A", ttl = "300", records = ["10.40.40.133"] }, # for azure 
           { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
+          { name = "db.pp.onr", type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
         ]
         lb_alias_records = [
           # { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },
