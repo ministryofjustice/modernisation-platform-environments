@@ -9,7 +9,9 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.planetfm-development}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.planetfm-test}:role/EC2HmppsDomainSecretsRole",
-      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-development}:role/LambdaFunctionADObjectCleanUp", # to be added after lambda deployed in CSR
+      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/LambdaFunctionADObjectCleanUp", # testing
+      "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-development}:role/LambdaFunctionADObjectCleanUp", # testing
+
     ]
     preproduction = []
     production = [
