@@ -12,6 +12,10 @@ locals {
   # baseline config
   development_config = {
 
+    baseline_secretsmanager_secrets = {
+      "/microsoft/AD/azure.noms.root" = local.domain_secretsmanager_secrets
+    }
+
     baseline_acm_certificates = {
       remote_desktop_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
