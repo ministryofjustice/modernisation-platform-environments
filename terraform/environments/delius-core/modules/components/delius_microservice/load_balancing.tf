@@ -50,18 +50,14 @@ resource "aws_lb" "delius_microservices" {
   security_groups            = [aws_security_group.delius_microservices_service_nlb.id]
   subnets                    = var.account_config.private_subnet_ids
   enable_deletion_protection = false
-  tags = merge({
-    Name = "delius-microservices-service-alb"
-  }, var.tags)
+  tags                       = var.tags
 }
 
 resource "aws_security_group" "delius_microservices_service_nlb" {
-  name        = "delius-microservices-service-alb"
+  name        = "${var.name}-service-alb"
   description = "Security group for delius microservices service load balancer"
   vpc_id      = var.account_info.vpc_id
-  tags = merge({
-    Name = "delius-microservices-service-nlb"
-  }, var.tags)
+  tags        = var.tags
   lifecycle {
     create_before_destroy = true
   }
