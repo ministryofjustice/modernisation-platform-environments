@@ -249,26 +249,6 @@ resource "aws_lb_target_group" "external" {
 # Certification and Route53 for LBs
 #######################################################
 
-# resource "aws_route53_record" "internal_lb_non_prod" {
-#   count    = local.environment != "production" ? 1 : 0
-#   provider = aws.core-vpc
-#   zone_id  = data.aws_route53_zone.external.zone_id
-#   name     = local.int_lb_url
-#   type     = "CNAME"
-#   ttl      = 300
-#   records = [aws_lb.internal.dns_name] # TODO link to the actual internal LB
-# }
-
-# resource "aws_route53_record" "internal_lb_prod" {
-#   count    = local.environment == "production" ? 1 : 0
-#   provider = aws.core-network-services
-#   zone_id  = data.aws_route53_zone.production-network-services.zone_id # TODO The zone may change as this currently points to the same one that hosted the CloudFront record
-#   name     = "tbc" # TODO Production URL to be confirmed
-#   type     = "CNAME"
-#   ttl      = 300
-#   records = [aws_lb.internal.dns_name] # TODO link to the actual internal LB
-# }
-
 resource "aws_acm_certificate" "load_balancers" {
   domain_name               = local.application_data.accounts[local.environment].cloudfront_domain_name
   validation_method         = "DNS"
