@@ -5,7 +5,7 @@
       "container_port": 80,
       "client_id": "838aa730-5f66-46df-9ff7-07eea29035ba",
       "ami_image_id": "ami-06cdd5b44c17085ed",
-      "instance_type": "t3.micro",
+      "instance_type": "t3.medium",
       "app_count": 1,
       "ec2_desired_capacity": 1,
       "ec2_max_size": 2,
