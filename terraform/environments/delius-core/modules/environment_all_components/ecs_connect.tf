@@ -24,3 +24,24 @@ resource "aws_vpc_security_group_ingress_rule" "from_bastion" {
   ip_protocol                  = "-1"
   security_group_id            = aws_security_group.delius_microservices_nlb.id
 }
+
+locals {
+  unique_container_ports = distinct([for _, v in var.delius_microservice_configs : v.container_port])
+}
+
+resource "aws_lb_listener" "delius_microservices_listener" {
+  for_each = {
+    for port in local.unique_container_ports : port => var.delius_microservice_configs
+  }
+  load_balancer_arn = aws_lb.delius_microservices.arn
+  port              = each.key
+  protocol          = "TCP"
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Delius microservices listener"
+      status_code  = "200"
+    }
+  }
+}

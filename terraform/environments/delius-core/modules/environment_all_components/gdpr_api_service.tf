@@ -149,4 +149,9 @@ module "gdpr_api_service" {
       value = "classpath:/db"
     }
   ]
+
+  providers = {
+    aws          = aws
+    aws.core-vpc = aws.core-vpc
+  }
 }

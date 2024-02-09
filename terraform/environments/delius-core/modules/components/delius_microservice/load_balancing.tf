@@ -25,7 +25,7 @@ resource "aws_lb_target_group" "this" {
   }
 }
 
-resource "aws_lb_listener_rule" "this" {
+resource "aws_lb_listener_rule" "alb" {
   count        = var.alb_listener_rule_paths != null ? 1 : 0
   listener_arn = var.microservice_lb_https_listener_arn
   priority     = var.alb_listener_rule_priority != null ? var.alb_listener_rule_priority : null
@@ -38,4 +38,27 @@ resource "aws_lb_listener_rule" "this" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
   }
+}
+
+resource "aws_lb_listener_rule" "nlb" {
+  count        = var.ecs_connectivity_nlb != "" ? 1 : 0
+  listener_arn = var.ecs_connectivity_nlb
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+  condition {
+    host_header {
+      values = aws_route53_record.nlb_target_group.name
+    }
+  }
+}
+
+resource "aws_route53_record" "nlb_target_group" {
+  provider = aws.core-vpc
+  zone_id  = var.account_config.route53_inner_zone_info.zone_id
+  name     = "${var.name}.service.${var.env_name}.${var.account_config.dns_suffix}"
+  type     = "CNAME"
+  ttl      = 60
+  records  = []
 }

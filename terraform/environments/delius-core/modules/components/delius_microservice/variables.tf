@@ -352,6 +352,12 @@ variable "container_cpu" {
   default     = 512
 }
 
+variable "ecs_connectivity_nlb" {
+  description = "The NLB ARN to use for the ECS connectivity"
+  type        = string
+  default     = ""
+}
+
 variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string

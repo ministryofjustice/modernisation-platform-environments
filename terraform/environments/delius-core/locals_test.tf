@@ -61,54 +61,76 @@ locals {
     }
   }
 
+  delius_microservices_configs_test = {
+    gdpr_ui = {
+      image_tag      = "REPLACE"
+      container_port = 80
+    }
 
-  weblogic_config_test = {
-    image_tag        = "5.7.6"
-    container_port   = 8080
-    container_memory = 4096
-    container_cpu    = 2048
+    gdpr_api = {
+      image_tag             = "REPLACE"
+      container_port        = 8080
+      create_rds            = true
+      rds_engine            = "postgres"
+      rds_engine_version    = "15"
+      rds_instance_class    = "db.t3.small"
+      rds_allocated_storage = 20
+      rds_username          = "dbadmin"
+      rds_port              = 5432
+      rds_license_model     = "postgresql-license"
+    }
+
+    merge_ui = {
+      image_tag      = "REPLACE"
+      container_port = 80
+    }
+
+    merge_api = {
+      image_tag             = "REPLACE"
+      container_port        = 8080
+      create_rds            = true
+      rds_engine            = "postgres"
+      rds_engine_version    = "15"
+      rds_instance_class    = "db.t3.small"
+      rds_allocated_storage = 20
+      rds_username          = "dbadmin"
+      rds_port              = 5432
+      rds_license_model     = "postgresql-license"
+    }
+
+    weblogic = {
+      image_tag        = "5.7.6"
+      container_port   = 8080
+      container_memory = 4096
+      container_cpu    = 2048
+    }
+
+    weblogic_eis = {
+      image_tag        = "5.7.6"
+      container_port   = 8080
+      container_memory = 2048
+      container_cpu    = 1024
+    }
+
+    user_management = {
+      image_tag        = "5.7.6"
+      container_port   = 8080
+      container_memory = 4096
+      container_cpu    = 1024
+    }
+
+    user_management_config_test = {
+      image_tag        = "5.7.6"
+      container_port   = 8080
+      container_memory = 4096
+      container_cpu    = 2048
+    }
+
+    pwm = {
+      image_tag      = "5.7.6"
+      container_port = 8080
+    }
   }
-
-  weblogic_eis_config_test = {
-    image_tag        = "5.7.6"
-    container_port   = 8080
-    container_memory = 2048
-    container_cpu    = 1024
-  }
-
-  merge_config_test = {
-    api_image_tag         = "REPLACE"
-    ui_image_tag          = "REPLACE"
-    create_rds            = true
-    rds_engine            = "postgres"
-    rds_engine_version    = "15"
-    rds_instance_class    = "db.t3.small"
-    rds_allocated_storage = 20
-    rds_username          = "dbadmin"
-    rds_port              = 5432
-    rds_license_model     = "postgresql-license"
-  }
-
-  gdpr_config_test = {
-    api_image_tag         = "REPLACE"
-    ui_image_tag          = "REPLACE"
-    create_rds            = true
-    rds_engine            = "postgres"
-    rds_engine_version    = "15"
-    rds_instance_class    = "db.t3.small"
-    rds_allocated_storage = 20
-    rds_username          = "dbadmin"
-    rds_port              = 5432
-    rds_license_model     = "postgresql-license"
-  }
-
-  user_management_config_test = {
-    image_tag        = "5.7.6"
-    container_port   = 8080
-    container_memory = 4096
-    container_cpu    = 2048
-  }
-
 
 
   bastion_config_test = {

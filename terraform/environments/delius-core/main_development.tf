@@ -18,20 +18,18 @@ module "environment_dev" {
   app_name      = local.application_name
   platform_vars = local.platform_vars
 
-  account_config         = local.account_config
-  environment_config     = local.environment_config_dev
-  ldap_config            = local.ldap_config_dev
-  db_config              = local.db_config_dev
-  weblogic_config        = local.weblogic_config_dev
-  weblogic_eis_config    = local.weblogic_eis_config_dev
-  bastion_config         = local.bastion_config_dev
-  gdpr_config            = local.gdpr_config_dev
-  merge_config           = local.merge_config_dev
-  user_management_config = local.user_management_config_dev
+  account_config = local.account_config
+  account_info   = local.account_info
 
-  account_info = local.account_info
-
+  environment_config      = local.environment_config_dev
   environments_in_account = local.delius_environments_per_account.dev
+
+  bastion_config = local.bastion_config_dev
+
+  ldap_config = local.ldap_config_dev
+  db_config   = local.db_config_dev
+
+  delius_microservice_configs = local.delius_microservices_configs_dev
 
   tags = local.tags
 }

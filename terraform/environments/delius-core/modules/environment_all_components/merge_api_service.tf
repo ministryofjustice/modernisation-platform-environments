@@ -6,7 +6,7 @@ module "merge_api_service" {
   env_name              = var.env_name
   container_port_config = [
     {
-      containerPort = 8080
+      containerPort = var.delius_microservice_configs.merge_api.container_port
       protocol      = "tcp"
     }
   ]
@@ -32,7 +32,7 @@ module "merge_api_service" {
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
   alb_listener_rule_paths            = ["/merge/api", "/merge/api/*"]
   platform_vars                      = var.platform_vars
-  container_image                    = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-merge-api-ecr-repo:${var.merge_config.api_image_tag}"
+  container_image                    = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-merge-api-ecr-repo:${var.delius_microservice_configs.merge_api.image_tag}"
   account_config                     = var.account_config
   health_check_path                  = "/merge/api/actuator/health"
   account_info                       = var.account_info
@@ -122,4 +122,9 @@ module "merge_api_service" {
     #      value = "classpath:/db"
     #    }
   ]
+
+  providers = {
+    aws          = aws
+    aws.core-vpc = aws.core-vpc
+  }
 }
