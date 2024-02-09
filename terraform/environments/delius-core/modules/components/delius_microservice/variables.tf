@@ -352,13 +352,13 @@ variable "container_cpu" {
   default     = 512
 }
 
-variable "ecs_connectivity_nlb" {
-  description = "The NLB ARN to use for the ECS connectivity"
-  type        = string
-  default     = ""
+variable "ecs_connectivity_services_alb" {
+  description = "The NLB to use for the ECS connectivity"
+  type        = any
+  default     = null
 }
 
-variable "ecs_connectivity_listeners" {
+variable "ecs_connectivity_services_alb_listeners" {
   description = "The listeners to use for the ECS connectivity"
   type        = any
   default     = null

@@ -19,8 +19,8 @@ module "merge_ui_service" {
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
-  ecs_connectivity_nlb       = aws_lb.delius_microservices
-  ecs_connectivity_listeners = aws_lb_listener.delius_microservices_listeners
+  ecs_connectivity_services_alb           = aws_lb.delius_microservices
+  ecs_connectivity_services_alb_listeners = aws_lb_listener.delius_microservices_listeners
 
   alb_listener_rule_paths    = ["/merge/ui", "/merge/ui/*"]
   platform_vars              = var.platform_vars
