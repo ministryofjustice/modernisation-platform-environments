@@ -1,5 +1,3 @@
-# Terraform module which creates S3 Bucket resources for Load Balancer Access Logs on AWS.
-
 module "artifacts-s3" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
