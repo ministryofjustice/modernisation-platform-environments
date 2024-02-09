@@ -67,5 +67,5 @@ resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
 resource "aws_iam_role_policy_attachment" "lambda_secrets_manager" {
   count      = local.environment == "development" ? 1 : 0 # temporary
   role       = aws_iam_role.lambda-ad-role[count.index].name
-  policy_arn = "rn:aws:iam::aws:policy/SecretsManagerReadWrite"
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
