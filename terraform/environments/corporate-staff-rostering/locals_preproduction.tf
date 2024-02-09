@@ -739,8 +739,8 @@ locals {
             }
           }
           http-7781 = {
-            port                     = 7781
-            protocol                 = "TCP"
+            port     = 7781
+            protocol = "TCP"
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-12-7781"
