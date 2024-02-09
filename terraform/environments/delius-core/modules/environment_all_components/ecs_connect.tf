@@ -11,12 +11,15 @@ resource "aws_lb" "delius_microservices" {
 }
 
 resource "aws_security_group" "delius_microservices_service_alb" {
-  name        = "delius-microservices-nlb"
-  description = "Security group for delius microservices network load balancer"
+  name        = "delius-microservices-alb"
+  description = "Security group for delius microservices service load balancer"
   vpc_id      = var.account_info.vpc_id
   tags = merge({
     Name = "delius-microservices-services-alb"
   }, var.tags)
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "from_bastion" {
