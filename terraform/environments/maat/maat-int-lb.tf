@@ -116,3 +116,27 @@ resource "aws_lb_listener_rule" "maat_internal_lb_https_listener_rule" {
   }
 }
 
+#######################################
+# Internal Load Balancer Reoute 53
+######################################
+
+resource "aws_route53_record" "internal_lb_non_prod" {
+  count    = local.environment != "production" ? 1 : 0
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = local.int_lb_url
+  type     = "CNAME"
+  ttl      = 300
+  records = [aws_lb.maat_internal_lb.dns_name]
+}
+
+resource "aws_route53_record" "internal_lb_prod" {
+  count    = local.environment == "production" ? 1 : 0
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.production-network-services.zone_id # TODO The zone may change as this currently points to the same one that hosted the CloudFront record
+  name     = "tbc" # TODO Production URL to be confirmed
+  type     = "CNAME"
+  ttl      = 300
+  records = [aws_lb.maat_internal_lb.dns_name]
+}
+
