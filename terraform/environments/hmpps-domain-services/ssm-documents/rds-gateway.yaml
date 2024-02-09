@@ -1,17 +1,6 @@
 ---
 schemaVersion: "2.2"
 description: "SSM Document for configuring an RDS gateway"
-# TODO: Remove parameters
-parameters:
-  domainUsername:
-    type: "String"
-    description: "Username with domain join permissions"
-  domainPassword:
-    type: "String"
-    description: "Password for the domain join user (NOTE: Do not use a password containing quotes)"
-  rdsGatewayHostname:
-    type: "String"
-    description: "Hostname of the gateway for the RDS deployment"
 mainSteps:
   - name: ConfigureRDSGateway
     action: aws:runPowerShellScript
@@ -22,14 +11,64 @@ mainSteps:
     inputs:
       runCommand:
         - |
-        # TODO: Get secrets elsewhere
-          $username = "{{domainUsername}}@AZURE.NOMS.ROOT"
-          $password =  ConvertTo-SecureString "{{domainPassword}}" -AsPlainText -Force
-          $credential = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
-        # TODO: Logic to handle different DCs
-          Invoke-Command -ComputerName {{rdsGatewayHostname}}.azure.noms.root  -credential $credential -scriptblock {
+          $ErrorActionPreference = "Stop" 
+          $rdsGatewayHostname = "$env:computername"
+
+          # Lookup domain configuration based on environment-name tag
+          $token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
+          $instanceId = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -Uri http://169.254.169.254/latest/meta-data/instance-id
+          $tagsRaw = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId"
+          $tags = "$tagsRaw" | ConvertFrom-Json
+          $environmentNameTag = ($tags.Tags | Where-Object  {$_.Key -eq "environment-name"}).Value
+          $environment = $environmentNameTag.Split("-")[-1]
+          $domainJoinUsername = "svc_join_domain"
+          If ($environment -Eq "development" -Or $environment -Eq "test") {
+              $secretAccountName = "hmpps-domain-services-test"
+              $domainNameFQDN = "azure.noms.root"
+              $domainNameNetbios = "AZURE"
+          } ElseIf ($environment -Eq "preproduction" -Or $environment -Eq "production") {
+              $secretAccountName = "hmpps-domain-services-production"
+              $domainNameFQDN = "azure.hmpp.root"
+              $domainNameNetbios = "HMPP"
+          } Else {
+              Write-Error "Unexpected environment_name tag $$environmentNameTag.tags.Value"
+              Exit 1
+          }
+
+          # Lookup domain join secrets
+          $accountIdsRaw = aws ssm get-parameter --name account_ids --with-decryption --query Parameter.Value --output text
+          $accountIds = "$accountIdsRaw" | ConvertFrom-Json
+          $secretAccountId = $accountIds.$secretAccountName
+          $secretName = "/microsoft/AD/$domainNameFQDN/shared-passwords"
+          $secretArn = "arn:aws:secretsmanager:eu-west-2:${secretAccountId}:secret:${secretName}"
+          $accountId = aws sts get-caller-identity --query Account --output text
+          $roleArn = "arn:aws:iam::${accountId}:role/EC2HmppsDomainSecretsRole"
+          $session = "ssm-deploy-rds-gateway"
+          $credsRaw = aws sts assume-role --role-arn "${roleArn}" --role-session-name "${session}"
+          $creds = "$credsRaw" | ConvertFrom-Json
+          $env:AWS_ACCESS_KEY_ID = $creds.Credentials.AccessKeyId
+          $env:AWS_SECRET_ACCESS_KEY = $creds.Credentials.SecretAccessKey
+          $env:AWS_SESSION_TOKEN = $creds.Credentials.SessionToken
+          $secretValueRaw = aws secretsmanager get-secret-value --secret-id "${secretArn}" --query SecretString --output text
+          $secretValue = "$secretValueRaw" | ConvertFrom-Json
+          $env:AWS_ACCESS_KEY_ID = ""
+          $env:AWS_SECRET_ACCESS_KEY = ""
+          $env:AWS_SESSION_TOKEN = ""
+          $domainJoinPassword = $secretValue.$domainJoinUsername
+          $domainJoinPasswordSecureString = ConvertTo-SecureString $secretValue.$domainJoinUsername -AsPlainText -Force
+         # $credentials = New-Object System.Management.Automation.PSCredential ("$domainNameNetbios\$domainJoinUsername", $domainJoinPasswordSecureString)
+
+
+          #  $username = "$domainJoinUsername@AZURE.NOMS.ROOT"
+          #  $password =  ConvertTo-SecureString "pass" -AsPlainText -Force
+          $credential = New-Object System.Management.Automation.PSCredential($domainJoinUsername@$domainNameFQDN, $domainJoinPasswordSecureString)
+          # TODO: Logic to handle different DCs
+
+
+          Invoke-Command -ComputerName "$rdsGatewayHostname.$domainNameFQDN" -ArgumentList  $domainNameFQDN -credential $credential -scriptblock {
               # TODO: Logic to handle different user groups
-              $GroupName="Domain Users@azure.noms.root"
+              $domainNameFQDN = $args[0]
+              $GroupName="Domain Users@$domainNameFQDN"
               $ManagedComputers="RDG_RDCBComputers"
               $CAPPath="RDS:\GatewayServer\CAP"
               $RAPPath="RDS:\GatewayServer\RAP"
@@ -39,6 +78,8 @@ mainSteps:
               Import-Module RemoteDesktopServices
               Add-WindowsFeature -Name RDS-Gateway -IncludeManagementTools
 
+
+
               # Set Transport and SSL Bridging
               $config = Get-CimInstance -ClassName Win32_TSGatewayServerSettings -Namespace root\cimv2\terminalservices
               Invoke-CimMethod -MethodName EnableTransport -Arguments @{TransportType=[uint16]2;enable=$false} -InputObject $config
@@ -46,7 +87,7 @@ mainSteps:
 
               # Managed Computer Groups
               # TODO: What computers to manage?
-              $MCGComputers=@($env:COMPUTERNAME,"MGMRW0008")
+              $MCGComputers=@($env:COMPUTERNAME)
               $MCGs=@(@{Name="RDG_RDCBComputers";Desc="All RDCB Computers in the deployment";Computers=$MCGComputers})
 
               # Connection Authorization Policies (CAP)
