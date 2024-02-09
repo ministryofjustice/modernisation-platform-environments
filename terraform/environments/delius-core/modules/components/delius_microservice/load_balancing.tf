@@ -41,25 +41,25 @@ resource "aws_lb_listener_rule" "alb" {
 }
 
 resource "aws_lb_listener_rule" "nlb" {
-  count        = var.ecs_connectivity_nlb != "" ? 1 : 0
-  listener_arn =
+  for_each     = var.ecs_connectivity_nlb == null ? toset([]) : toset([for _, v in var.container_port_config : tostring(v.containerPort)])
+  listener_arn = var.ecs_connectivity_listeners[each.value].arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
   }
   condition {
     host_header {
-      values = aws_route53_record.nlb_target_group.name
+      values = [aws_route53_record.nlb_target_group[0].name]
     }
   }
 }
 
 resource "aws_route53_record" "nlb_target_group" {
+  count    = var.ecs_connectivity_nlb == null ? 0 : 1
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone_info.zone_id
   name     = "${var.name}.service.${var.env_name}.${var.account_config.dns_suffix}"
   type     = "CNAME"
-  ttl      = 60
   alias {
     evaluate_target_health = false
     name                   = var.ecs_connectivity_nlb.name

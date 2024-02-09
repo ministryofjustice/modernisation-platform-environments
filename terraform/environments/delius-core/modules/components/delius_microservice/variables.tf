@@ -360,7 +360,8 @@ variable "ecs_connectivity_nlb" {
 
 variable "ecs_connectivity_listeners" {
   description = "The listeners to use for the ECS connectivity"
-  type        = list(any)
+  type        = any
+  default     = null
 }
 
 variable "bastion_sg_id" {
