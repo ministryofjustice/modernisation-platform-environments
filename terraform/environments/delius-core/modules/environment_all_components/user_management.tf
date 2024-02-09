@@ -33,9 +33,6 @@ module "user_management" {
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
   alb_listener_rule_paths            = ["/umt"]
 
-  ecs_connectivity_services_alb           = aws_lb.delius_microservices
-  ecs_connectivity_services_alb_listeners = aws_lb_listener.delius_microservices_listeners
-
   container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-user-management-ecr-repo:${var.delius_microservice_configs.user_management.image_tag}"
 
   platform_vars = var.platform_vars

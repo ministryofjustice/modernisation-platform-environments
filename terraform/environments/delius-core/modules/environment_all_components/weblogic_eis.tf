@@ -189,9 +189,6 @@ module "weblogic_eis" {
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
   alb_listener_rule_paths            = ["/eis"]
 
-  ecs_connectivity_services_alb           = aws_lb.delius_microservices
-  ecs_connectivity_services_alb_listeners = aws_lb_listener.delius_microservices_listeners
-
   container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-eis-ecr-repo:${var.delius_microservice_configs.weblogic_eis.image_tag}"
 
   bastion_sg_id = module.bastion_linux.bastion_security_group

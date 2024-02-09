@@ -52,7 +52,6 @@ module "gdpr_api_service" {
 
   ecs_connectivity_services_alb           = aws_lb.delius_microservices
   ecs_connectivity_services_alb_listeners = aws_lb_listener.delius_microservices_listeners
-
   container_environment_vars = [
     {
       name  = "SERVER_SERVLET_CONTEXT_PATH"
