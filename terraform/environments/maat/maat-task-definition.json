@@ -15,7 +15,7 @@
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {
-                "awslogs-group": "${maat_aws_logs_group}",
+                "awslogs-group": "${maat_ecs_log_group}",
                 "awslogs-region": "${region}",
                 "awslogs-stream-prefix": "${maat_aws_stream_prefix}"
             }
@@ -218,7 +218,7 @@
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {
-                "awslogs-group": "${maat_aws_logs_group}",
+                "awslogs-group": "${maat_ecs_log_group}",
                 "awslogs-region": "eu-west-2",
                 "awslogs-stream-prefix": "${maat_aws_stream_prefix}"
             }

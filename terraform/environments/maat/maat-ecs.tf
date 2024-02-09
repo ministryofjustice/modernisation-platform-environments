@@ -111,7 +111,7 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
   }
 
   user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
-    app_name = local.application_name, app_ecs_cluster = aws_ecs_cluster.maat_ecs_cluster.name }))
+    maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group, app_ecs_cluster = aws_ecs_cluster.maat_ecs_cluster.name }))
 
   tag_specifications {
     resource_type = "instance"
@@ -205,6 +205,15 @@ resource "aws_security_group_rule" "outbound" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "maat_sg_rule_int_lb_to_ecs" {
+  security_group_id       = aws_security_group.maat_ecs_security_group.id
+  type                    = "ingress"
+  from_port               = 0
+  to_port                 = 0
+  protocol               = "-1"
+  source_security_group_id = aws_security_group.maat_int_lb_sg.id
+}
+
 #### EC2 CLOUDWATCH LOG GROUP & Key ------
 
 resource "aws_kms_key" "maat_ec2_cloudwatch_log_key" {
@@ -253,7 +262,7 @@ resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ec2" {
 }
 
 resource "aws_cloudwatch_log_group" "ec2_cloudwatch_log_group" {
-  name              = "${local.application_name}-ec2-log-group"
+  name              = local.application_data.accounts[local.environment].maat_ec2_log_group
   retention_in_days = 90
   kms_key_id = aws_kms_key.maat_ec2_cloudwatch_log_key.arn
 }
@@ -320,7 +329,7 @@ resource "aws_iam_role" "maat_ecs_service_role" {
         {
             "Action": "sts:AssumeRole",
             "Principal": {
-               "Service": "ec2.amazonaws.com"
+               "Service": "ecs.amazonaws.com"
             },
             "Effect": "Allow"
         }
@@ -373,7 +382,7 @@ resource "aws_iam_role" "maat_ecs_autoscaling_role" {
         {
             "Action": "sts:AssumeRole",
              "Principal": {
-               "Service": "ec2.amazonaws.com"
+               "Service": "application-autoscaling.amazonaws.com"
             },
             "Effect": "Allow"
         }
@@ -414,8 +423,8 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_autoscaling_role_policy_atta
 resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
   family                   = "${local.application_name}-ecs-task-definition"
   requires_compatibilities = ["EC2"]
-  execution_role_arn       = aws_iam_role.maat_ec2_instance_role.arn
-  task_role_arn            = aws_iam_role.maat_ec2_instance_role.arn
+  # execution_role_arn       = aws_iam_role.maat_ec2_instance_role.arn
+  # task_role_arn            = aws_iam_role.maat_ec2_instance_role.arn
   
   container_definitions = templatefile("maat-task-definition.json", 
     {
@@ -435,8 +444,8 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
     maat_mlra_url               = local.application_data.accounts[local.environment].maat_mlra_url
     maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
     maat_cma_base_url           = local.application_data.accounts[local.environment].maat_cma_base_url
-    ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat"
-    maat_aws_logs_group         = local.application_data.accounts[local.environment].maat_aws_logs_group
+    ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
+    maat_ecs_log_group         = local.application_data.accounts[local.environment].maat_ecs_log_group
     maat_aws_stream_prefix      = local.application_data.accounts[local.environment].maat_aws_stream_prefix
     }
   )
@@ -548,7 +557,7 @@ resource "aws_kms_key_policy" "maat_ecs_cloudwatch_log_key_policy" {
 }
 
 resource "aws_cloudwatch_log_group" "maat_ecs_cloudwatch_log_group" {
-  name              = "${local.application_name}-ecs-log-group"
+  name              = local.application_data.accounts[local.environment].maat_ecs_log_group
   retention_in_days = 90
   kms_key_id        = aws_kms_key.maat_ecs_cloudwatch_log_key.arn
 }
@@ -556,40 +565,32 @@ resource "aws_cloudwatch_log_group" "maat_ecs_cloudwatch_log_group" {
 #### ECS Service ------
 
 resource "aws_ecs_service" "maat_ecs_service" {
-# Add LB names
-#   depends_on = [aws_lb_listener.maat_alb_http_listener, aws_lb_listener.maat_internal_alb_https_listener]
-
   name                              = "${local.application_name}-ecs-service"
   cluster                           = aws_ecs_cluster.maat_ecs_cluster.id
-#   launch_type                       = ""
   desired_count                     = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
   task_definition                   = aws_ecs_task_definition.maat_ecs_task_definition.arn
- #### UNCOMMENT THE IAM ROLE ASSOCIATION ONCE THE LB DETAILS ARE ADDED ########### 
-  # iam_role                          = aws_iam_role.maat_ecs_service_role.arn
- ################################################################################
-#   health_check_grace_period_seconds = 120
+  iam_role                          = aws_iam_role.maat_ecs_service_role.arn
+  depends_on                        = [
+                                      aws_lb_listener.external 
+                                      # aws_lb_listener.maat_internal_alb_https_listener
+                                      ]
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
   }
 
-#   network_configuration {
-#     subnets = [
-#       data.aws_subnets.shared-private.ids[0],
-#       data.aws_subnets.shared-private.ids[1],
-#       data.aws_subnets.shared-private.ids[2],
-#     ]
-#     security_groups  = [aws_security_group.foo.id]
-#     assign_public_ip = false
-#   }
+  load_balancer {
+    container_name   = upper(local.application_name)
+    container_port   = 8080
+    target_group_arn = aws_lb_target_group.external.arn
+  }
 
-#   ######## ADD LB DETAILS HERE
-#   load_balancer {
-#     container_name   = "${local.application_name}-foo"
-#     container_port   = 8090
-#     target_group_arn = aws_lb_target_group.foo.arn
-#   }
+  #   load_balancer {
+  #   container_name   = upper(local.application_name)
+  #   container_port   = 8080
+  #   target_group_arn = aws_lb_target_group.foo.arn
+  # }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
