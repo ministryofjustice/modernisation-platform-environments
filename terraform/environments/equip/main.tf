@@ -725,3 +725,71 @@ module "win2022_STD_multiple" {
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
   )
 }
+
+
+locals {
+  win2019_STD_powerBI_instances = {
+    COR-A-GW01 = {
+      instance_type          = "t3a.xlarge"
+      subnet_id              = data.aws_subnet.private_subnets_a.id
+      vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id]
+      root_block_device = [
+        {
+          encrypted   = true
+          volume_type = "gp3"
+          volume_size = 90
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-GWP01-root-block" }
+          )
+        }
+      ]
+      ebs_block_device = [
+        {
+          device_name = "/dev/sdg"
+          volume_type = "gp3"
+          volume_size = 20
+          encrypted   = true
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-GW01-ebs-block-1" }
+          )
+        }
+        
+      ]
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-GW01"
+        Role = "Nimbus PowerBI Services" }
+      )
+    }
+  }
+}
+
+
+module "PowerBI server" {
+  source = "./ec2-instance-module"
+
+
+  for_each = local.win2019_STD_powerBI_instances
+
+  name                   = "${local.name}-${each.key}"
+  ami                    = "ami-0df480245c4679e0b"
+  instance_type          = each.value.instance_type
+  vpc_security_group_ids = each.value.vpc_security_group_ids
+  subnet_id              = each.value.subnet_id
+  monitoring             = true
+  ebs_optimized          = true
+  key_name               = aws_key_pair.windowskey.key_name
+  user_data              = data.template_file.windows-userdata.rendered
+  iam_instance_profile   = aws_iam_instance_profile.instance-profile-moj.name
+
+  enable_volume_tags = false
+  root_block_device  = lookup(each.value, "root_block_device", [])
+  ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+
+  tags = merge(each.value.tags, local.tags, {
+    Environment = "development"
+    terraform_managed = "true" },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
+  )
+}
