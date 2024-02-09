@@ -62,7 +62,7 @@ resource "aws_route53_record" "services_alb_target_group" {
   type     = "CNAME"
   alias {
     evaluate_target_health = false
-    name                   = var.ecs_connectivity_nlb.dns_name
-    zone_id                = var.ecs_connectivity_nlb.zone_id
+    name                   = var.ecs_connectivity_services_alb.dns_name
+    zone_id                = var.ecs_connectivity_services_alb.zone_id
   }
 }
