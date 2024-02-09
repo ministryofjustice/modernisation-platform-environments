@@ -29,7 +29,7 @@ locals {
   unique_container_ports = distinct([for _, v in var.delius_microservice_configs : v.container_port])
 }
 
-resource "aws_lb_listener" "delius_microservices_listener" {
+resource "aws_lb_listener" "delius_microservices_listeners" {
   for_each = {
     for port in local.unique_container_ports : port => var.delius_microservice_configs
   }

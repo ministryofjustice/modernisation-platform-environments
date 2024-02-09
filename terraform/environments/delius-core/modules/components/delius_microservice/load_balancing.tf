@@ -42,7 +42,7 @@ resource "aws_lb_listener_rule" "alb" {
 
 resource "aws_lb_listener_rule" "nlb" {
   count        = var.ecs_connectivity_nlb != "" ? 1 : 0
-  listener_arn = var.ecs_connectivity_nlb
+  listener_arn =
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
@@ -60,5 +60,9 @@ resource "aws_route53_record" "nlb_target_group" {
   name     = "${var.name}.service.${var.env_name}.${var.account_config.dns_suffix}"
   type     = "CNAME"
   ttl      = 60
-  records  = []
+  alias {
+    evaluate_target_health = false
+    name                   = var.ecs_connectivity_nlb.name
+    zone_id                = var.ecs_connectivity_nlb.zone_id
+  }
 }

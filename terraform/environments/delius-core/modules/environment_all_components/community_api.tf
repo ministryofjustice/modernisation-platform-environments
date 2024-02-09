@@ -47,6 +47,10 @@ module "community_api" {
   # Two LBs (public and secure) are needed as show on the architecture diagram. There is an architectural discussion to be had if we could get away with just one LB instead
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
+
+  ecs_connectivity_nlb       = aws_lb.delius_microservices
+  ecs_connectivity_listeners = aws_lb_listener.delius_microservices_listeners
+
   # Please check with the app team what the rule path should be here.
   alb_listener_rule_paths = ["/secure", "/secure/*"]
   platform_vars           = var.platform_vars

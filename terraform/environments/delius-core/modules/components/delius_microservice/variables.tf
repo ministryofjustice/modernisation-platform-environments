@@ -358,6 +358,11 @@ variable "ecs_connectivity_nlb" {
   default     = ""
 }
 
+variable "ecs_connectivity_listeners" {
+  description = "The listeners to use for the ECS connectivity"
+  type        = list(any)
+}
+
 variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string

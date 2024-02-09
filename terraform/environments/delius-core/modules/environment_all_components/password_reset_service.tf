@@ -36,6 +36,10 @@ module "password_reset_service" {
   tags                               = var.tags
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
+
+  ecs_connectivity_nlb       = aws_lb.delius_microservices
+  ecs_connectivity_listeners = aws_lb_listener.delius_microservices_listeners
+
   #TODO - check the path based routing based on shared ALB or dedicated
   alb_listener_rule_paths = ["/password-reset"]
   platform_vars           = var.platform_vars

@@ -18,13 +18,17 @@ module "merge_ui_service" {
   tags                               = var.tags
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
-  alb_listener_rule_paths            = ["/merge/ui", "/merge/ui/*"]
-  platform_vars                      = var.platform_vars
-  container_image                    = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-merge-ui-ecr-repo:${var.delius_microservice_configs.merge_ui.image_tag}"
-  account_config                     = var.account_config
-  health_check_path                  = "/merge/ui/"
-  account_info                       = var.account_info
-  container_environment_vars         = []
+
+  ecs_connectivity_nlb       = aws_lb.delius_microservices
+  ecs_connectivity_listeners = aws_lb_listener.delius_microservices_listeners
+
+  alb_listener_rule_paths    = ["/merge/ui", "/merge/ui/*"]
+  platform_vars              = var.platform_vars
+  container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-merge-ui-ecr-repo:${var.delius_microservice_configs.merge_ui.image_tag}"
+  account_config             = var.account_config
+  health_check_path          = "/merge/ui/"
+  account_info               = var.account_info
+  container_environment_vars = []
 
   providers = {
     aws          = aws
