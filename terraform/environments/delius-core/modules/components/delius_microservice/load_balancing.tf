@@ -1,6 +1,6 @@
-resource "aws_lb_target_group" "this" {
+## ALB target group and listener rule
+resource "aws_lb_target_group" "frontend" {
   # checkov:skip=CKV_AWS_261
-
   name                 = "${var.env_name}-${var.name}"
   port                 = var.ecs_service_port
   protocol             = var.target_group_protocol
@@ -36,21 +36,63 @@ resource "aws_lb_listener_rule" "alb" {
   }
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
+    target_group_arn = aws_lb_target_group.frontend.arn
   }
 }
 
-resource "aws_lb_listener_rule" "services_alb" {
-  for_each     = var.ecs_connectivity_services_alb == null ? toset([]) : toset([for _, v in var.container_port_config : tostring(v.containerPort)])
-  listener_arn = var.ecs_connectivity_services_alb_listeners[each.value].arn
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
+
+# NLB for service interconnectivity
+
+resource "aws_lb" "delius_microservices" {
+  name                       = "delius-microservices"
+  internal                   = true
+  load_balancer_type         = "network"
+  security_groups            = [aws_security_group.delius_microservices_service_nlb.id]
+  subnets                    = var.account_config.private_subnet_ids
+  enable_deletion_protection = false
+  tags = merge({
+    Name = "delius-microservices-service-alb"
+  }, var.tags)
+}
+
+resource "aws_security_group" "delius_microservices_service_nlb" {
+  name        = "delius-microservices-service-alb"
+  description = "Security group for delius microservices service load balancer"
+  vpc_id      = var.account_info.vpc_id
+  tags = merge({
+    Name = "delius-microservices-service-nlb"
+  }, var.tags)
+  lifecycle {
+    create_before_destroy = true
   }
-  condition {
-    host_header {
-      values = [aws_route53_record.services_alb_target_group[0].name]
-    }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "from_vpc" {
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
+  ip_protocol       = "-1"
+  security_group_id = aws_security_group.delius_microservices_service_nlb.id
+}
+
+resource "aws_lb_target_group" "service" {
+  for_each = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
+
+  name     = "${var.name}-service-at-${each.value}"
+  port     = each.value
+  protocol = "TCP"
+  vpc_id   = var.account_info.vpc_id
+  tags     = var.tags
+}
+
+resource "aws_lb_listener" "delius_microservices_listeners" {
+  for_each = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
+
+  load_balancer_arn = aws_lb.delius_microservices.arn
+  port              = each.value
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.service[each.value].arn
   }
 }
 
@@ -62,7 +104,7 @@ resource "aws_route53_record" "services_alb_target_group" {
   type     = "CNAME"
   alias {
     evaluate_target_health = false
-    name                   = var.ecs_connectivity_services_alb.dns_name
-    zone_id                = var.ecs_connectivity_services_alb.zone_id
+    name                   = aws_lb.delius_microservices.dns_name
+    zone_id                = aws_lb.delius_microservices.zone_id
   }
 }

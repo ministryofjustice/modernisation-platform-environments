@@ -50,7 +50,7 @@ module "ecs_service" {
 
   ecs_load_balancers = [
     {
-      target_group_arn = aws_lb_target_group.this.arn
+      target_group_arn = aws_lb_target_group.frontend.arn
       container_name   = var.name
       container_port   = var.container_port_config[0].containerPort
     }
