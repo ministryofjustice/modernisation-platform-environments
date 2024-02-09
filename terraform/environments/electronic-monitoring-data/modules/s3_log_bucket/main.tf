@@ -7,6 +7,13 @@ resource "aws_s3_bucket" "this" {
   tags = var.tags
 }
 
+resource "aws_s3_bucket_versioning" "this" {
+  bucket = aws_s3_bucket.this.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
   bucket = aws_s3_bucket.this.id
 
@@ -31,6 +38,25 @@ resource "aws_s3_bucket_policy" "this" {
 }
 
 data "aws_iam_policy_document" "this" {
+  statement {
+    sid = "EnforceTLSv12orHigher"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect  = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.this.arn,
+      "${aws_s3_bucket.this.arn}/*"
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = [1.2]
+    }
+  }
+
   statement {
     sid    = "S3ServerAccessLogsPolicy"
     effect = "Allow"
