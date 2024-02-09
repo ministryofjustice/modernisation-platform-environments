@@ -44,7 +44,7 @@ resource "aws_lb_listener_rule" "alb" {
 # NLB for service interconnectivity
 
 resource "aws_lb" "delius_microservices" {
-  name                       = "delius-microservices"
+  name                       = "${var.name}-service-nlb"
   internal                   = true
   load_balancer_type         = "network"
   security_groups            = [aws_security_group.delius_microservices_service_nlb.id]
