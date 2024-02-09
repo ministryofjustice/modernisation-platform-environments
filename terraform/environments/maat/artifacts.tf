@@ -8,7 +8,6 @@ module "artifacts-s3" {
   }
 
   bucket_prefix       = "${local.application_name}-build-artifacts"
-  bucket_policy       = [data.aws_iam_policy_document.arfitacts.json]
   replication_enabled = false
   versioning_enabled  = true
   force_destroy       = true
@@ -34,22 +33,5 @@ module "artifacts-s3" {
   ]
 
   tags = local.tags
-}
-
-data "aws_iam_policy_document" "arfitacts" {
-  # statement {
-  #   effect = "Allow"
-  #   actions = [
-  #     "s3:PutObject"
-  #   ]
-  #   resources = [
-  #     "${module.artifacts-s3.bucket.arn}/*"
-  #   ]
-  #   principals {
-  #     type        = "AWS"
-  #     identifiers = ["arn:aws:iam::${local.env_account_id}:role/modernisation-platform-oidc-cicd"]
-  #   }
-  # }
-
 }
 
