@@ -23,6 +23,10 @@ resource "aws_lb_target_group" "frontend" {
     matcher             = "200-499"
     timeout             = "5"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener_rule" "alb" {
