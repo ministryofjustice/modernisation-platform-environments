@@ -3,7 +3,7 @@
     "development": {
       "environment_name": "development",
       "container_port": 80,
-      "client_id": "838aa730-5f66-46df-9ff7-07eea29035ba",
+      "client_id": "7ee6af8d-ea3c-4349-8765-644f2a1edf3b",
       "ami_image_id": "ami-06cdd5b44c17085ed",
       "instance_type": "t3.medium",
       "app_count": 1,
