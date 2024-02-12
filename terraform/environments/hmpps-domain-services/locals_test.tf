@@ -58,6 +58,7 @@ locals {
           description = "Windows Server 2012 for connecting to Azure domain"
           os-type     = "Windows"
           component   = "test"
+          server-type = "HmppsDomainServicesTest"
         }
       }
 
@@ -84,6 +85,7 @@ locals {
           description = "Windows Server 2022 for connecting to Azure domain"
           os-type     = "Windows"
           component   = "test"
+          server-type = "HmppsDomainServicesTest"
         }
       }
     }
