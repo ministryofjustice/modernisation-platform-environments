@@ -21,9 +21,9 @@ module "replay_pipeline" {
               "--dpr.stop.glue.instance.job.name" : var.glue_reporting_hub_cdc_jobname
             }
           },
-          "Next" : "Empty Temp Reload Bucket Data"
+          "Next" : "Prepare Temp Reload Bucket Data"
         },
-        "Empty Temp Reload Bucket Data" : {
+        "Prepare Temp Reload Bucket Data" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
