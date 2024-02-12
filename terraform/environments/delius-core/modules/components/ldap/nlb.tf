@@ -12,6 +12,8 @@ module "nlb" {
   internal            = true
   tags                = var.tags
   port                = 389
+  secure_port         = 636
+  certificate_arn     = aws_acm_certificate.external.arn
   protocol            = "TCP"
   subnet_ids          = var.account_config.private_subnet_ids
   vpc_cidr            = var.account_config.shared_vpc_cidr

@@ -27,6 +27,26 @@ resource "aws_lb_listener" "ldap" {
   )
 }
 
+resource "aws_lb_listener" "ldaps" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = var.secure_port
+  protocol          = "TLS"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+
+  certificate_arn = var.certificate_arn
+
+  tags = merge(
+    var.tags,
+    {
+      Name = var.app_name
+    }
+  )
+}
+
 resource "aws_lb_target_group" "this" {
   name     = "${var.app_name}-${var.env_name}"
   port     = var.port
@@ -47,7 +67,7 @@ resource "aws_lb_target_group" "this" {
 resource "aws_route53_record" "ldap_dns_internal" {
   provider = aws.core-vpc
   zone_id  = var.zone_id
-  name     = "${var.env_name}.${var.env_name}.${var.mp_application_name}"
+  name     = "${var.app_name}.${var.env_name}.${var.mp_application_name}"
   type     = "A"
 
   alias {
