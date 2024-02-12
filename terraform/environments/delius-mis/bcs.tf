@@ -57,7 +57,7 @@ module "bcs_instance" {
   ami_owner                     = "self"
   instance                      = local.bcs_instance_config
   ebs_kms_key_id                = data.aws_kms_key.ebs_shared.id
-  ebs_volumes_copy_all_from_ami = true
+  ebs_volumes_copy_all_from_ami = false # probably need to look into integrating the volumes into the AMI
   ebs_volume_config             = local.bcs_instance_ebs_volumes_config
   ebs_volumes                   = local.bcs_instance_ebs_volumes
   ebs_volume_tags               = local.tags
