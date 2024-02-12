@@ -7,17 +7,15 @@ locals {
 
   bcs_instance_count = 3
 
-  bcs_instance_ebs_volumes_config = {
-    "/dev/xvdf" = { label = "data", size = 300 }
-
+  bcs_instance_ebs_volumes = {
+    "/dev/xvdf" = { label = "data", size = 100 }
   }
 
-  bcs_instance_ebs_volumes = {
+  bcs_instance_ebs_volumes_config = {
     data = {
       iops       = 1000
       throughput = 125
       type       = "gp3"
-      total_size = 500
     }
   }
 
@@ -55,7 +53,7 @@ module "bcs_instance" {
 
   name = "${local.application_name}-bcs-${count.index + 1}"
 
-  ami_name                      = "delius_mis_windows_server_patch_2024-02-07T11:03:13.202Z"
+  ami_name                      = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
   ami_owner                     = "self"
   instance                      = local.bcs_instance_config
   ebs_kms_key_id                = data.aws_kms_key.ebs_shared.id
