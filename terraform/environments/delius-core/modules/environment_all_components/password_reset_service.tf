@@ -26,7 +26,7 @@ module "password_reset_service" {
     },
     {
       name      = "LDAP_PASSWORD"
-      valueFrom = module.ldap.delius_core_ldap_credential_arn
+      valueFrom = module.ldap.delius_core_ldap_bind_password_arn
       #value = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/ldap_admin_password"
     }
   ]
