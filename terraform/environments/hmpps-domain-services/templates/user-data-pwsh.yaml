@@ -9,6 +9,7 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
+          $ErrorActionPreference = "Stop"
           if (-not (Get-Command "git" -ErrorAction SilentlyContinue)) {
             choco install git.install -y   
           }
@@ -16,8 +17,9 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
+          $ErrorActionPreference = "Stop"
           Set-Location -Path ([System.IO.Path]::GetTempPath())
-          $GitBranch = "main"
-          $Script = "ModPlatformAD/Join-ModPlatformAD.ps1"
+          $GitBranch = "DSOS-2601/powershell-fixes-for-win2012"
+          $Script = "Invoke-UserDataScript.ps1"
           Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
           . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch
