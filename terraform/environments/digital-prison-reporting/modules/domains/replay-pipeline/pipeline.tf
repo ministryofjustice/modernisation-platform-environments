@@ -89,22 +89,6 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Archive Raw Data"
-        },
-        "Archive Raw Data" : {
-          "Type" : "Task",
-          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-          "Parameters" : {
-            "JobName" : var.glue_s3_file_transfer_job,
-            "Arguments" : {
-              "--dpr.file.transfer.source.bucket" : var.s3_raw_bucket_id,
-              "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
-              "--dpr.file.transfer.retention.days" : "0",
-              "--dpr.file.transfer.delete.copied.files" : "true",
-              "--dpr.allowed.s3.file.extensions" : ".parquet",
-              "--dpr.config.key" : var.domain
-            }
-          },
           "Next" : "Switch Hive Tables for Prisons to Curated"
         },
         "Switch Hive Tables for Prisons to Curated" : {
