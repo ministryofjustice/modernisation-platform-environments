@@ -1,5 +1,5 @@
 resource "aws_security_group" "bcs" {
-  name_prefix = "bcs-"
+  name_prefix = "bcs"
   vpc_id      = data.aws_vpc.shared.id
 }
 
@@ -44,7 +44,7 @@ locals {
 
 }
 
-module "instance" {
+module "bcs_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
 
   count = local.bcs_instance_count
@@ -55,7 +55,7 @@ module "instance" {
 
   name = "${local.application_name}-bcs-${count.index + 1}"
 
-  ami_name                      = "delius-core-db"
+  ami_name                      = "delius_mis_windows_server_patch_2024-02-07T11:03:13.202Z"
   ami_owner                     = "self"
   instance                      = local.bcs_instance_config
   ebs_kms_key_id                = data.aws_kms_key.ebs_shared.id
@@ -67,14 +67,14 @@ module "instance" {
     create_internal_record = false
     create_external_record = false
   }
-  iam_resource_names_prefix = "instance-bcs${count.index + 1}-"
+  iam_resource_names_prefix = "instance-bcs${count.index + 1}"
   instance_profile_policies = local.bcs_instance_profile_policies
 
   user_data_raw = base64encode("")
 
   business_unit     = var.networking[0].business-unit
   application_name  = local.application_name
-  environment       = terraform.workspace
+  environment       = local.environment
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
   subnet_id         = data.aws_subnets.shared-private.ids[0]
