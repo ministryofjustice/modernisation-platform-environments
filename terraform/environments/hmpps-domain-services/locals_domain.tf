@@ -11,6 +11,7 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.planetfm-test}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/LambdaFunctionADObjectCleanUp", # testing
       # "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-development}:role/LambdaFunctionADObjectCleanUp", # to be added after hmpps dev apply
+      "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-development}:role/ec2-instance-role-dev-win-2022", # testing
 
     ]
     preproduction = []
