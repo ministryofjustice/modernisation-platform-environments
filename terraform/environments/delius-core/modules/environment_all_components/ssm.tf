@@ -184,7 +184,7 @@ resource "aws_ssm_parameter" "delius_core_gdpr_api_client_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_pwm_config_password" {
-  name  = format("/%s-%s/pwm_pwm_config_password", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/pwm_config_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
