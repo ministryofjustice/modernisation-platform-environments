@@ -43,6 +43,7 @@ locals {
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy"])
+          user_data_raw                 = base64encode(file("./templates/user-data-pwsh.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]
@@ -54,7 +55,6 @@ locals {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        user_data_raw = base64encode(file("./templates/user-data-pwsh.yaml"))
         tags = {
           description = "Windows Server 2012 for connecting to Azure domain"
           os-type     = "Windows"
@@ -70,6 +70,7 @@ locals {
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy"])
+          user_data_raw                 = base64encode(file("./templates/user-data-pwsh.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]
