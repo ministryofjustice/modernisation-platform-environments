@@ -96,7 +96,7 @@ data "aws_iam_policy_document" "ecs_task_exec" {
 }
 
 resource "aws_iam_role" "task_exec" {
-  name               = "${var.env_name}-${var.service_name}-task-exec"
+  name               = "${var.env_name}-${var.service_name}-ecs-task-exec"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_exec.json
   tags               = var.tags
 }
