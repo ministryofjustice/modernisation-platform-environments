@@ -142,11 +142,11 @@ module "weblogic_eis" {
     },
     {
       name      = "LDAP_PRINCIPAL"
-      valueFrom = aws_ssm_parameter.delius_core_ldap_principal.arn
+      valueFrom = module.ldap.delius_core_ldap_principal_arn
     },
     {
       name      = "LDAP_CREDENTIAL"
-      valueFrom = aws_secretsmanager_secret.delius_core_ldap_credential.arn
+      valueFrom = module.ldap.delius_core_ldap_credential_arn
     },
     {
       name      = "MERGE_SECRET"
