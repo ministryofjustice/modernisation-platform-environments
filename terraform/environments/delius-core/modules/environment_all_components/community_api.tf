@@ -72,13 +72,13 @@ module "community_api" {
     },
     {
       name  = "DELIUS_LDAP_USERS_BASE"
-      value = aws_ssm_parameter.delius_core_ldap_principal.arn
+      value = module.ldap.delius_core_ldap_principal_arn
       # The value below is from the legacy
       # value = data.terraform_remote_state.ldap.outputs.ldap_base_users
     },
     {
       name  = "SPRING_LDAP_USERNAME"
-      value = aws_secretsmanager_secret.delius_core_ldap_credential.arn
+      value = module.ldap.delius_core_ldap_principal_arn
       # The value below is from the legacy
       # value = data.terraform_remote_state.ldap.outputs.ldap_bind_user
     },
