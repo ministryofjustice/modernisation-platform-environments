@@ -8,11 +8,17 @@ locals {
   bcs_instance_count = 3
 
   bcs_instance_ebs_volumes = {
+    "/dev/sda1" = { label = "root", size = 30 }
     "/dev/xvdf" = { label = "data", size = 100 }
   }
 
   bcs_instance_ebs_volumes_config = {
     data = {
+      iops       = 1000
+      throughput = 125
+      type       = "gp3"
+    }
+    root = {
       iops       = 1000
       throughput = 125
       type       = "gp3"
