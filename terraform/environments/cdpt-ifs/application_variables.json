@@ -16,6 +16,7 @@
       "db_name": "ifs-dev",
       "env_name": "DEVELOPMENT",
       "db_instance_identifier": "db-ifs-dev",
+      "s3_bucket_name": "ifs-dev-bucket",
       "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:cdpt-dev-staging-2024-jan-24"
     },
     "preproduction": {
