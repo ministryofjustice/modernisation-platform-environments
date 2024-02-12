@@ -1,7 +1,7 @@
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
-  zone_id = var.account_config.route53_outer_zone_id.zone_id
+  zone_id = var.account_config.route53_external_zone.zone_id
   name    = "${var.app_name}.${var.account_config.dns_suffix}"
   type    = "CNAME"
   ttl     = "60"
