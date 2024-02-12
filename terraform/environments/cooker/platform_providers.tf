@@ -56,3 +56,12 @@ provider "aws" {
     role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureBedrockEuCentral"
   }
 }
+
+# Provider for reading resources from root account IdentityStore
+provider "aws" {
+  region = "eu-west-2"
+  alias  = "sso-readonly"
+  assume_role {
+    role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
+  }
+}
