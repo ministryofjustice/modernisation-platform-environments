@@ -1,12 +1,12 @@
 locals {
-    existing_bucket_name = ""
-    account_number = local.environment_management.account_ids[terraform.workspace]
-    external_lb_idle_timeout = 65
-    ext_lb_listener_protocol = "HTTPS"
-    ext_lb_ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01"
-    ext_listener_custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
-    # TODO This URL to access Internal ALB needs to be confirmed, and may need another hosted zone for production
-    int_lb_url = local.environment == "production" ? "${local.application_url_prefix}-lb.${data.aws_route53_zone.production-network-services.name}" : "${local.application_url_prefix}-lb.${data.aws_route53_zone.external.name}"
+  existing_bucket_name       = ""
+  account_number             = local.environment_management.account_ids[terraform.workspace]
+  external_lb_idle_timeout   = 65
+  ext_lb_listener_protocol   = "HTTPS"
+  ext_lb_ssl_policy          = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ext_listener_custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
+  # TODO This URL to access Internal ALB needs to be confirmed, and may need another hosted zone for production
+  int_lb_url = local.environment == "production" ? "${local.application_url_prefix}-lb.${data.aws_route53_zone.production-network-services.name}" : "${local.application_url_prefix}-lb.${data.aws_route53_zone.external.name}"
 }
 
 # Terraform module which creates S3 Bucket resources for Load Balancer Access Logs on AWS.
@@ -182,9 +182,9 @@ resource "aws_lb_listener" "external" {
 
   load_balancer_arn = aws_lb.external.arn
   port              = 443
-  protocol        = local.ext_lb_listener_protocol
-  ssl_policy      = local.ext_lb_listener_protocol == "HTTPS" ? local.ext_lb_ssl_policy : null
-  certificate_arn = local.ext_lb_listener_protocol == "HTTPS" ? aws_acm_certificate_validation.load_balancers.certificate_arn : null
+  protocol          = local.ext_lb_listener_protocol
+  ssl_policy        = local.ext_lb_listener_protocol == "HTTPS" ? local.ext_lb_ssl_policy : null
+  certificate_arn   = local.ext_lb_listener_protocol == "HTTPS" ? aws_acm_certificate_validation.load_balancers.certificate_arn : null
 
   default_action {
     type = "fixed-response"

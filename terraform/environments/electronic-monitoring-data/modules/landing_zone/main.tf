@@ -107,7 +107,7 @@ module "log_bucket" {
 
   source_bucket = aws_s3_bucket.landing_bucket
   account_id    = var.account_id
-  tags          = {
+  tags = {
     supplier = var.supplier
   }
 }
@@ -381,7 +381,7 @@ module "landing_zone_security_groups" {
 
 locals {
   landing_zone_security_group_ids = flatten([
-    for module_instance in values(module.landing_zone_security_groups) : 
-      module_instance.security_group_id
+    for module_instance in values(module.landing_zone_security_groups) :
+    module_instance.security_group_id
   ])
 }

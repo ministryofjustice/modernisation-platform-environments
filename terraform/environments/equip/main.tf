@@ -755,7 +755,7 @@ locals {
             { Name = "${local.name}-COR-A-GW01-ebs-block-1" }
           )
         }
-        
+
       ]
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-GW01"

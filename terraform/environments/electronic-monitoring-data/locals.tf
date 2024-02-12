@@ -2,7 +2,7 @@
 locals {
   sftp_account_capita = {
     name = "capita"
-    ssh_keys   = [
+    ssh_keys = [
       "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBFc140uxPfjq1ilaOxcLYbnyIau2vURzKWFHLsxra+5Vf1nSZypOZ/g9eavBxcf2tkxBjgTx06BeRh3j+QhA8rnV9vKtyh9ZXIe5SNcrGlsGLKMyn+eB05Dt2m58oyMwWA==",
     ]
     cidr_ipv4s = [
@@ -17,7 +17,7 @@ locals {
 
   sftp_account_civica = {
     name = "civica"
-    ssh_keys   = [
+    ssh_keys = [
       "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBCJBwZM5nMigS31soM45PITAHCmyhQpdDAkdX1liqnIZSd8A+zn3XQyVRy5E2a39gfsng5hAQetDFJKn+SaayATCQAzN0cJWlcrvtv314UsRV+PxO236sWVf+RwguUDZRQ==",
     ]
     cidr_ipv4s = [
@@ -28,7 +28,7 @@ locals {
 
   sftp_account_g4s_test = {
     name = "g4s_test"
-    ssh_keys   = [
+    ssh_keys = [
       "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBK85G9UwgU1KKgsYXfTWDsT4MqGSmjku1XGpH1EqmSuXLk5lmwFsgoLqqsROq2oEw2Yrr3uLyNVY2Dl6Pfm+dkdljfbPtqku+AkRSkhDo4K7bIwhWPh7HImcalxhde6BUA== ecdsa-key-20240208",
     ]
     cidr_ipv4s = [
@@ -39,7 +39,7 @@ locals {
 
   sftp_account_dev = {
     name = "dev"
-    ssh_keys   = [
+    ssh_keys = [
       # Matt Price
       "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBA3BsCFaNiGxbmJffRi9q/W3aLmZWgqE6QkeFJD5O6F4nDdjsV1R0ZMUvTSoi3tKqoAE+1RYYj2Ra/F1buHov9e+sFPrlMl0wql6uMsBA1ndiIiKuq+NLY1NOxEvqm2J9Q==",
       # Matt Heery
