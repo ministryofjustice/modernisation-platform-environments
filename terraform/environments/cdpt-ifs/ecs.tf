@@ -269,7 +269,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [aws_security_group.cluster_ec2.id]#, aws_security_group.db.id]
+    security_groups             = [aws_security_group.cluster_ec2.id], aws_security_group.db.id]
   }
 
   block_device_mappings {
@@ -318,13 +318,13 @@ ingress {
   security_groups = [aws_security_group.ifs_lb_sc.id]
  }
 
-# ingress {
-#   description     = "Allow RDP ingress"
-#   from_port       = 3389
-#   to_port         = 3389
-#   protocol        = "tcp"
-#   security_groups = [module.bastion_linux.bastion_security_group]
-# }
+ ingress {
+   description     = "Allow RDP ingress"
+   from_port       = 3389
+   to_port         = 3389
+   protocol        = "tcp"
+   security_groups = [module.bastion_linux.bastion_security_group]
+ }
 
   egress {
     description     = "Cluster EC2 loadbalancer egress rule"
