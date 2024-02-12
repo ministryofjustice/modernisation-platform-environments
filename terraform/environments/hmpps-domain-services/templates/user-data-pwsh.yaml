@@ -9,6 +9,7 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
+          # Install git
           $ErrorActionPreference = "Stop"
           if (-not (Get-Command "git" -ErrorAction SilentlyContinue)) {
             choco install git.install -y   
@@ -17,6 +18,25 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
+          # Wait for SSM otherwise aws CLI might not work properly
+          $ErrorActionPreference = "Stop"
+          $N = 12
+          1..$N | foreach {
+            $AmazonSSMAgent = Get-Service -Name "AmazonSSMAgent" -ErrorAction SilentlyContinue
+            if (-not $AmazonSSMAgent) {
+              Start-Service -Name "AmazonSSMAgent" -Force
+            } elseif ($AmazonSSMAgent.Status -ne "Running") {
+              Write-Output "[$_/$N] Waiting for AmazonSSMAgent status: $AmazonSSMAgentStatus"
+              Start-Sleep -Seconds 10
+            } else {
+              break
+            }
+          }
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          # Run appropriate UserData powershell from modernisation-platform-configuration-management repo
           $ErrorActionPreference = "Stop"
           Set-Location -Path ([System.IO.Path]::GetTempPath())
           $GitBranch = "DSOS-2601/powershell-fixes-for-win2012"
