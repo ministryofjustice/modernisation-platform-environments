@@ -269,7 +269,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [aws_security_group.cluster_ec2.id], aws_security_group.db.id]
+    security_groups             = [aws_security_group.cluster_ec2.id, aws_security_group.db.id]
   }
 
   block_device_mappings {
