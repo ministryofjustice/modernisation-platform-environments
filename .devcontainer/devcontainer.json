@@ -1,17 +1,8 @@
 {
   "name": "modernisation-platform-environments",
-  "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu",
+  "image": "ghcr.io/ministryofjustice/devcontainer-base:latest",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "configureZshAsDefaultShell": true,
-    },
-    "./features/src/base": {},
-    "./features/src/aws": {},
-    "./features/src/static-analysis": {},
-    "./features/src/terraform": {},
-  },
-  "overrideFeatureInstallOrder": [
-    "ghcr.io/devcontainers/features/common-utils",
-    "./features/src/base",
-  ],
+    "ghcr.io/ministryofjustice/devcontainer-feature/aws:0": {},
+    "ghcr.io/ministryofjustice/devcontainer-feature/terraform:0": {}
+  }
 }
