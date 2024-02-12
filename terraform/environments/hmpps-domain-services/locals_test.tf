@@ -42,7 +42,6 @@ locals {
           ami_name                      = "base_windows_server_2012_r2_release*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/user-data-pwsh.yaml"))
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy"])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
@@ -55,6 +54,7 @@ locals {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        user_data_raw = base64encode(file("./templates/user-data-pwsh.yaml"))
         tags = {
           description = "Windows Server 2012 for connecting to Azure domain"
           os-type     = "Windows"
@@ -69,7 +69,6 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/user-data-pwsh.yaml"))
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy"])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
@@ -82,6 +81,7 @@ locals {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        user_data_raw = base64encode(file("./templates/user-data-pwsh.yaml"))
         tags = {
           description = "Windows Server 2022 for connecting to Azure domain"
           os-type     = "Windows"
