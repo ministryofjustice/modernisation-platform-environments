@@ -81,7 +81,7 @@ locals {
           disable_api_stop        = false
           tags = {
             backup-plan         = "daily-and-weekly"
-            instance-scheduling = "skip-scheduling"
+            instance-scheduling = "default"
           }
         })
         ebs_volumes = {
