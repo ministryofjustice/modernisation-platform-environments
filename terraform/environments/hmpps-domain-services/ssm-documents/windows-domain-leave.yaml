@@ -12,7 +12,6 @@ mainSteps:
       runCommand:
         - |
           $ErrorActionPreference = "Stop" # all errors will terminate the script
-          $NewHostname = "{{newHostname}}"
 
           Set-Location -Path ([System.IO.Path]::GetTempPath())
           $GitBranch = "DSOS-2601/powershell-fixes-for-win2012"
