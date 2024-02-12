@@ -21,6 +21,18 @@ module "replay_pipeline" {
               "--dpr.stop.glue.instance.job.name" : var.glue_reporting_hub_cdc_jobname
             }
           },
+          "Next" : "Empty Temp Reload Bucket Data"
+        },
+        "Empty Temp Reload Bucket Data" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_s3_data_deletion_job,
+            "Arguments" : {
+              "--dpr.file.deletion.buckets" : var.s3_temp_reload_bucket_id,
+              "--dpr.config.key" : var.domain
+            }
+          },
           "Next" : "Copy Data to Temp-Reload Bucket"
         },
         "Copy Data to Temp-Reload Bucket" : {
