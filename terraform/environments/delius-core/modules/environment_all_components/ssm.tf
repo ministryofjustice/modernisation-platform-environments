@@ -156,6 +156,19 @@ resource "aws_ssm_parameter" "test_user_password" {
   tags = local.tags
 }
 
+resource "aws_ssm_parameter" "performance_test_user_password" {
+  name  = format("/%s-%s/performance_test_user_password", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+
+  tags = local.tags
+}
+
 resource "aws_ssm_parameter" "delius_core_gdpr_api_client_secret" {
   name  = format("/%s-%s/gdpr_api_client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
