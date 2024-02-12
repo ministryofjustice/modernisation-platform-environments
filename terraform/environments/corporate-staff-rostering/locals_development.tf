@@ -70,6 +70,31 @@ locals {
     }
 
     baseline_ec2_instances = {
+      dv-csr-w-1-a-kw = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "PPCWW00001"
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
+          disable_api_termination = false
+          disable_api_stop        = false
+          tags = {
+            backup-plan         = "daily-and-weekly"
+            instance-scheduling = "default"
+          }
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 129 }
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+      })
     }
     baseline_route53_zones = {
     }
