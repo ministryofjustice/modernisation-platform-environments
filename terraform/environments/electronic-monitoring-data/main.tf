@@ -40,7 +40,7 @@ module "g4s" {
   supplier = "g4s"
 
   user_accounts = [
-    local.sftp_account_g4s,
+    local.sftp_account_g4s_test,
     local.sftp_account_dev,
   ]
 

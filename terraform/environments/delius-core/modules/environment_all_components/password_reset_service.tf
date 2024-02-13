@@ -26,7 +26,7 @@ module "password_reset_service" {
     },
     {
       name      = "LDAP_PASSWORD"
-      valueFrom = aws_ssm_parameter.ldap_admin_password.arn
+      valueFrom = module.ldap.delius_core_ldap_credential_arn
       #value = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/ldap_admin_password"
     }
   ]
@@ -49,7 +49,7 @@ module "password_reset_service" {
       value = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
         region    = var.account_info["region"]
         ldap_url  = "ldap://${module.ldap.nlb_dns_name}:${var.ldap_config.port}"
-        ldap_user = aws_ssm_parameter.delius_core_ldap_principal.arn
+        ldap_user = module.ldap.delius_core_ldap_principal_arn
         user_base = "REPLACE"
         # site_url  = "https://${aws_route53_record.public_dns.fqdn}"
         site_url = "REPLACE"

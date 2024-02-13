@@ -33,10 +33,11 @@ module "weblogic" {
     },
     {
       name      = "LDAP_PRINCIPAL"
-      valueFrom = aws_ssm_parameter.delius_core_ldap_principal.arn
+      valueFrom = module.ldap.delius_core_ldap_principal_arn
     },
-    { name      = "LDAP_CREDENTIAL"
-      valueFrom = aws_secretsmanager_secret.delius_core_ldap_credential.arn
+    { 
+      name      = "LDAP_CREDENTIAL"
+      valueFrom = module.ldap.delius_core_ldap_credential_arn
     }
   ]
   container_port_config = [

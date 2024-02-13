@@ -490,7 +490,7 @@ locals {
       }
     }
     database = {
-      # FIXME: note - this is currently INCOMPLETE
+      # FIXME: note - this may still need Winrm and Winrm https ports adding
       description = "Security group for WINDOWS SQL database servers"
       ingress = {
         all-from-self = {
@@ -500,6 +500,13 @@ locals {
           protocol        = -1
           self            = true
           security_groups = ["web", "app"]
+        }
+        http_enduser_db = {
+          description = "80: HTTP ingress for end-users"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
         netbios_udp_enduser = {
           description = "137-139: UDP NetBIOS ingress from enduserclient"
@@ -513,6 +520,13 @@ locals {
           from_port   = 445
           to_port     = 445
           protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        smb_udp_445_enduser = {
+          description = "445: UDP SMB ingress from enduserclient"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "UDP"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
         rdp_tcp_db = {
@@ -548,14 +562,28 @@ locals {
           from_port   = 7071
           to_port     = 7071
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient # NOTE: this may need to change at some point
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
         cafm_licensing_db = {
           description = "7073: All CAFM licensing inbound"
           from_port   = 7073
           to_port     = 7073
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient # NOTE: this may need to change at some point
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        rpc_dynamic_udp_db = {
+          description = "49152-65535: UDP Dynamic Port range"
+          from_port   = 49152
+          to_port     = 65535
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        rpc_dynamic_tcp_db = {
+          description = "49152-65535: TCP Dynamic Port range"
+          from_port   = 49152
+          to_port     = 65535
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
       }
       egress = {

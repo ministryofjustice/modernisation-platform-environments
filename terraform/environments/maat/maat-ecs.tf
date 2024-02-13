@@ -16,6 +16,7 @@ resource "aws_iam_role" "maat_ec2_instance_role" {
   )
   assume_role_policy = <<EOF
 {
+    "Version": "2008-10-17",
     "Statement": [
         {
             "Action": "sts:AssumeRole",
@@ -325,6 +326,7 @@ resource "aws_iam_role" "maat_ecs_service_role" {
   )
   assume_role_policy = <<EOF
 {
+    "Version": "2008-10-17",
     "Statement": [
         {
             "Action": "sts:AssumeRole",
@@ -378,6 +380,7 @@ resource "aws_iam_role" "maat_ecs_autoscaling_role" {
   )
   assume_role_policy = <<EOF
 {
+    "Version": "2008-10-17",
     "Statement": [
         {
             "Action": "sts:AssumeRole",
