@@ -36,43 +36,6 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
-          # Wait for SSM Agent
-          $ErrorActionPreference = "Stop"
-          $N = 12
-          1..$N | foreach {
-            $AmazonSSMAgent = Get-Service -Name "AmazonSSMAgent" -ErrorAction SilentlyContinue
-            if (-not $AmazonSSMAgent) {
-              Write-Output "[$_/$N] Starting AmazonSSMAgent"
-              Start-Service -Name "AmazonSSMAgent" -Force
-            } elseif ($AmazonSSMAgent.Status -ne "Running") {
-              Write-Output "[$_/$N] Waiting for AmazonSSMAgent status: $AmazonSSMAgentStatus"
-              Start-Sleep -Seconds 10
-            } else {
-              break
-            }
-          }
-          Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
-      - frequency: once
-        type: powershell
-        runAs: admin
-        content: |-
-          # Wait for instance role to be attached. EC2 must have permissions to access tags
-          $N = 12
-          $TestParamName = "environment_management_arn"
-          1..$N | foreach {
-            $TestParam = aws ssm get-parameter --name $TestParamName --with-decryption --query Parameter.Value --region eu-west-2 --output text
-            if ($TestParam) {
-              break
-            } else {
-              Write-Output "[$_/$N] Waiting for instance role: aws ssm get-parameter --name $TestParamName --with-decryption --query Parameter.Value --region eu-west-2 --output text"
-              Start-Sleep -Seconds 10
-            }
-          }
-          Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
-      - frequency: once
-        type: powershell
-        runAs: admin
-        content: |-
           # Run UserData powershell from modernisation-platform-configuration-management repo
           $ErrorActionPreference = "Stop"
           Write-Output "Downloading and running Run-GitScript.ps1"
