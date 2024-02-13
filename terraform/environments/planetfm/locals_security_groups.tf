@@ -501,6 +501,13 @@ locals {
           self            = true
           security_groups = ["web", "app"]
         }
+        http_enduser_db = {
+          description = "80: HTTP ingress for end-users"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
         netbios_udp_enduser = {
           description = "137-139: UDP NetBIOS ingress from enduserclient"
           from_port   = 137
