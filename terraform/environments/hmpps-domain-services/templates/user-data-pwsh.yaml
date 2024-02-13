@@ -36,6 +36,23 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
+          # Wait for instance role to be attached. EC2 must have permissions to access tags
+          $N = 12
+          $TestParamName = "environment_management_arn"
+          1..$N | foreach {
+            $TestParam = aws ssm get-parameter --name $TestParamName --with-decryption --query Parameter.Value --region eu-west-2 --output text
+            if ($TestParam) {
+              break
+            } else {
+              Write-Output "[$_/$N] Waiting for instance role: aws ssm get-parameter --name $TestParamName --with-decryption --query Parameter.Value --region eu-west-2 --output text"
+              Start-Sleep -Seconds 10
+            }
+          }
+          Start-Sleep -Seconds 2 # helps debugging as logs have different timestamps
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
           # Run UserData powershell from modernisation-platform-configuration-management repo
           $ErrorActionPreference = "Stop"
           Write-Output "Downloading and running Run-GitScript.ps1"
