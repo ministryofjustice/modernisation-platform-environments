@@ -22,9 +22,9 @@ module "reload_pipeline" {
               "--dpr.stop.glue.instance.job.name" : var.glue_reporting_hub_cdc_jobname
             }
           },
-          "Next" : "Create Hive Tables"
+          "Next" : "Update Hive Tables"
         },
-        "Create Hive Tables" : {
+        "Update Hive Tables" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
