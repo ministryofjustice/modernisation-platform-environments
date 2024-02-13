@@ -428,7 +428,8 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
   
   container_definitions = templatefile("maat-task-definition.json", 
     {
-    docker_image_tag            = local.application_data.accounts[local.environment].docker_image_tag
+    maat_docker_image_tag       = local.application_data.accounts[local.environment].maat_docker_image_tag
+    xray_docker_image_tag       = local.application_data.accounts[local.environment].xray_docker_image_tag
     region                      = local.application_data.accounts[local.environment].region
     sentry_env                  = local.environment
     maat_orch_base_url          = local.application_data.accounts[local.environment].maat_orch_base_url
