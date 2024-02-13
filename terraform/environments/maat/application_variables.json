@@ -75,7 +75,18 @@
       "SSM_managed_core_policy_arn": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
       "maat_ecs_scaling_target_max": "2",
       "maat_ecs_scaling_target_min": "1",
-      "maat_ecs_service_desired_count": "1"
+      "maat_ecs_service_desired_count": "1",
+      "ECSCPUAlarmThreshold":"",
+      "EcsMemoryOverThreshold":"",
+      "ASGStatusFailureAlarmThreshold":"",
+      "ALBTargetResponseTimeThreshold":"",
+      "ALBTargetResponseTimeThresholdMaximum":"",
+      "ALBUnhealthyAlarmThreshold":"",
+      "ALBRejectedAlarmThreshold":"",
+      "ALBTarget5xxAlarmThreshold":"",
+      "ALB5xxAlarmThreshold":"",
+      "ALBTarget4xxAlarmThreshold":"",
+      "ALB4xxAlarmThreshold":""
     },
     "test": {
       "example_var": "test-data",
