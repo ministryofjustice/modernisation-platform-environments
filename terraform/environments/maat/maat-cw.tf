@@ -85,8 +85,8 @@ resource "aws_cloudwatch_metric_alarm" "maat_EcsCPUNotRunning" {
 
 #######   StatusCheckFailure CLOUDWATCH ALARM
 
-resource "aws_cloudwatch_metric_alarm" "maat_status-check-failure-alarm" {
-  alarm_name         = "${local.application_name}-elb-4xx-error-alarm"
+resource "aws_cloudwatch_metric_alarm" "maat_StatusCheckFailure" {
+  alarm_name         = "${local.application_name}-status-check-failure-alarm"
   alarm_description  = "If a status check failure occurs on an instance, please investigate. http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html."
   namespace          = "AWS/EC2"
   metric_name        = "StatusCheckFailed"
@@ -104,7 +104,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_status-check-failure-alarm" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-elb-4xx-error-alarm"
+      Name = "${local.application_name}-status-check-failure-alarm"
     },
   )
 }
@@ -416,7 +416,7 @@ resource "aws_cloudwatch_dashboard" "maat_cloudwatch_dashboard" {
           "title" : "ECS Memory",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.maat_ecsmemoryoverthreshold.arn}"
+              "${aws_cloudwatch_metric_alarm.maat_EcsMemoryOverThreshold.arn}"
             ]
           },
           "view": "timeSeries",
