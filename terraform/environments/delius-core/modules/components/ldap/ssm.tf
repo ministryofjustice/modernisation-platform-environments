@@ -47,11 +47,11 @@ resource "aws_ssm_parameter" "delius_core_ldap_seed_uri" {
 }
 
 ####################
-# LDAP CREDENTIAL
+# LDAP BIND PASSWORD
 ####################
 
-resource "aws_ssm_parameter" "delius_core_ldap_credential" {
-  name  = format("/%s-%s/LDAP_CREDENTIAL", var.account_info.application_name, var.env_name)
+resource "aws_ssm_parameter" "delius_core_ldap_bind_password" {
+  name  = format("/%s-%s/LDAP_BIND_PASSWORD", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {

@@ -59,6 +59,12 @@ variable "port" {
   type        = number
 }
 
+variable "secure_port" {
+  description = "secure_port"
+  type        = number
+}
+
+
 variable "protocol" {
   description = "protocol"
   type        = string
@@ -76,5 +82,10 @@ variable "zone_id" {
 
 variable "app_name" {
   description = "app_name"
+  type        = string
+}
+
+variable "certificate_arn" {
+  description = "certificate_arn"
   type        = string
 }
