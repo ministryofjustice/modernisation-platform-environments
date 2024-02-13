@@ -30,10 +30,6 @@ data "aws_iam_policy_document" "this" {
   statement {
     sid = "S3ReadWrite"
     effect  = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
     actions = [
       "s3:PutObjectTagging",
       "s3:GetObject",
