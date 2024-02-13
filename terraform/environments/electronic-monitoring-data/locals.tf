@@ -16,7 +16,7 @@ locals {
   capita_cidr_ipv6s = []
 
   sftp_account_capita_test = {
-    name       = "capita_test"
+    name       = "test"
     ssh_keys   = local.capita_ssh_keys
     cidr_ipv4s = local.capita_cidr_ipv4s
     cidr_ipv6s = local.capita_cidr_ipv6s
@@ -55,7 +55,7 @@ locals {
   civica_cidr_ipv6s = []
 
   sftp_account_civica_test = {
-    name       = "civica_test"
+    name       = "test"
     ssh_keys   = local.civica_ssh_keys
     cidr_ipv4s = local.civica_cidr_ipv4s
     cidr_ipv6s = local.civica_cidr_ipv6s
@@ -80,7 +80,7 @@ locals {
   g4s_cidr_ipv6s = []
   
   sftp_account_g4s_test = {
-    name       = "g4s_test"
+    name       = "test"
     ssh_keys   = local.g4s_ssh_keys
     cidr_ipv4s = local.g4s_cidr_ipv4s
     cidr_ipv6s = local.g4s_cidr_ipv6s
@@ -153,7 +153,7 @@ locals {
   # DEVELOPERS
   #----------------------------------------------------------------------------
   sftp_account_dev = {
-    name = "dev"
+    name = "dev_access"
     ssh_keys   = [
       # Matt Price
       "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBA3BsCFaNiGxbmJffRi9q/W3aLmZWgqE6QkeFJD5O6F4nDdjsV1R0ZMUvTSoi3tKqoAE+1RYYj2Ra/F1buHov9e+sFPrlMl0wql6uMsBA1ndiIiKuq+NLY1NOxEvqm2J9Q==",
