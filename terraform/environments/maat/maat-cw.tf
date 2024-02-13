@@ -4,7 +4,7 @@
 # 
 #####################################
 
-resource "aws_cloudwatch_metric_alarm" "EscCPUoverThreshold" {
+resource "aws_cloudwatch_metric_alarm" "maat_EscCPUoverThreshold" {
   alarm_name         = "${local.application_name}-ECS-CPU-high-threshold-alarm"
   alarm_description  = "If the CPU exceeds the predefined threshold, this alarm will trigger. Please investigate"
   namespace          = "AWS/ECS"
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "EscCPUoverThreshold" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "EcsMemoryOverThreshold" {
+resource "aws_cloudwatch_metric_alarm" "maat_EcsMemoryOverThreshold" {
   alarm_name         = "${local.application_name}-ECS-Memory-high-threshold-alarm"
   alarm_description  = "If the memory util exceeds the predefined threshold, this alarm will trigger. Please investigate."
   namespace          = "AWS/ECS"
@@ -52,7 +52,7 @@ resource "aws_cloudwatch_metric_alarm" "EcsMemoryOverThreshold" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "EcsCPUNotRunning" {
+resource "aws_cloudwatch_metric_alarm" "maat_EcsCPUNotRunning" {
   alarm_name         = "${local.application_name}-ECS-CPU-not-running-alarm"
   alarm_description  = "If the the number of CPU processes drops to 0, this alarm will trigger. Please investigate."
   namespace          = "AWS/ECS"
@@ -85,7 +85,7 @@ resource "aws_cloudwatch_metric_alarm" "EcsCPUNotRunning" {
 
 #######   StatusCheckFailure CLOUDWATCH ALARM
 
-resource "aws_cloudwatch_metric_alarm" "status-check-failure-alarm" {
+resource "aws_cloudwatch_metric_alarm" "maat_status-check-failure-alarm" {
   alarm_name         = "${local.application_name}-elb-4xx-error-alarm"
   alarm_description  = "If a status check failure occurs on an instance, please investigate. http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html."
   namespace          = "AWS/EC2"
@@ -98,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "status-check-failure-alarm" {
   threshold          = local.application_data.accounts[local.environment].ASGStatusFailureAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
-    AutoScalingGroupName = 
+    AutoScalingGroupName = aws_autoscaling_group.maat_ec2_scaling_group.name
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -115,7 +115,7 @@ resource "aws_cloudwatch_metric_alarm" "status-check-failure-alarm" {
 # 
 #####################################
 
-resource "aws_cloudwatch_metric_alarm" "TargetResponseTime" {
+resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTime" {
   alarm_name         = "${local.application_name}-alb-target-response-time-alarm"
   alarm_description  = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received."
   namespace          = "AWS/ApplicationELB"
@@ -128,7 +128,7 @@ resource "aws_cloudwatch_metric_alarm" "TargetResponseTime" {
   threshold          = local.application_data.accounts[local.environment].ALBTargetResponseTimeThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
-    LoadBalancer = 
+    LoadBalancer = aws_lb.external.name
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -139,7 +139,7 @@ resource "aws_cloudwatch_metric_alarm" "TargetResponseTime" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "TargetResponseTimeMaximum" {
+resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTimeMaximum" {
   alarm_name         = "${local.application_name}-alb-target-response-time-alarm-maximum"
   alarm_description  = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received. Triggered if response is longer than 60s."
   namespace          = "AWS/ApplicationELB"
@@ -152,7 +152,7 @@ resource "aws_cloudwatch_metric_alarm" "TargetResponseTimeMaximum" {
   threshold          = local.application_data.accounts[local.environment].ALBTargetResponseTimeThresholdMaximum
   treat_missing_data = "notBreaching"
   dimensions = {
-    LoadBalancer = 
+    LoadBalancer = aws_lb.external.name
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -163,7 +163,7 @@ resource "aws_cloudwatch_metric_alarm" "TargetResponseTimeMaximum" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "UnHealthyHosts" {
+resource "aws_cloudwatch_metric_alarm" "maat_UnHealthyHosts" {
   alarm_name         = "${local.application_name}-unhealthy-hosts-alarm"
   alarm_description  = "The unhealthy hosts alarm triggers if your load balancer recognises there is an unhealthy host and has been there for over 15 minutes."
   namespace          = "AWS/ApplicationELB"
@@ -176,8 +176,8 @@ resource "aws_cloudwatch_metric_alarm" "UnHealthyHosts" {
   threshold          = local.application_data.accounts[local.environment].ALBUnhealthyAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
-    LoadBalancer = 
-    TargetGroup =
+    LoadBalancer = aws_lb.external.name
+    TargetGroup = aws_lb_target_group.external.arn
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -188,7 +188,7 @@ resource "aws_cloudwatch_metric_alarm" "UnHealthyHosts" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "RejectedConnectionCount" {
+resource "aws_cloudwatch_metric_alarm" "maat_RejectedConnectionCount" {
   alarm_name         = "${local.application_name}-RejectevdConnectionCount-alarm"
   alarm_description  = "There is no surge queue on ALB's. Alert triggers in ALB rejects too many requests, usually due to backend being busy."
   namespace          = "AWS/ApplicationELB"
@@ -201,7 +201,7 @@ resource "aws_cloudwatch_metric_alarm" "RejectedConnectionCount" {
   threshold          = local.application_data.accounts[local.environment].ALBRejectedAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
-    LoadBalancer = 
+    LoadBalancer = aws_lb.external.name
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -212,7 +212,7 @@ resource "aws_cloudwatch_metric_alarm" "RejectedConnectionCount" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "http5xxError" {
+resource "aws_cloudwatch_metric_alarm" "maat_http5xxError" {
   alarm_name         = "${local.application_name}-http-5xx-error-alarm"
   alarm_description  = "This alarm will trigger if we receive 4 5XX http alerts in a 5 minute period."
   namespace          = "AWS/ApplicationELB"
@@ -225,7 +225,7 @@ resource "aws_cloudwatch_metric_alarm" "http5xxError" {
   threshold          = local.application_data.accounts[local.environment].ALBTarget5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
-    LoadBalancer = 
+    LoadBalancer = aws_lb.external.name
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -236,7 +236,7 @@ resource "aws_cloudwatch_metric_alarm" "http5xxError" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "ApplicationELB5xxError" {
+resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB5xxError" {
   alarm_name         = "${local.application_name}-elb-5xx-error-alarm"
   alarm_description  = "This alarm will trigger if we receive 4 5XX elb alerts in a 5 minute period."
   namespace          = "AWS/ApplicationELB"
@@ -249,7 +249,7 @@ resource "aws_cloudwatch_metric_alarm" "ApplicationELB5xxError" {
   threshold          = local.application_data.accounts[local.environment].ALB5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
-    LoadBalancer = 
+    LoadBalancer = aws_lb.external.name
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -260,7 +260,7 @@ resource "aws_cloudwatch_metric_alarm" "ApplicationELB5xxError" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "http4xxError" {
+resource "aws_cloudwatch_metric_alarm" "maat_http4xxError" {
   alarm_name         = "${local.application_name}-elb-5xx-error-alarm"
   alarm_description  = "This alarm will trigger if we receive 4 4XX http alerts in a 5 minute period."
   namespace          = "AWS/ApplicationELB"
@@ -273,7 +273,7 @@ resource "aws_cloudwatch_metric_alarm" "http4xxError" {
   threshold          = local.application_data.accounts[local.environment].ALBTarget4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
-    LoadBalancer = 
+    LoadBalancer = aws_lb.external.name
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -284,7 +284,7 @@ resource "aws_cloudwatch_metric_alarm" "http4xxError" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "ApplicationELB4xxError" {
+resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB4xxError" {
   alarm_name         = "${local.application_name}-elb-4xx-error-alarm"
   alarm_description  = "This alarm will trigger if we receive 4 4XX elb alerts in a 5 minute period."
   namespace          = "AWS/ApplicationELB"
@@ -297,7 +297,7 @@ resource "aws_cloudwatch_metric_alarm" "ApplicationELB4xxError" {
   threshold          = local.application_data.accounts[local.environment].ALB4xxAlarmThreshold 
   treat_missing_data = "notBreaching"
   dimensions = {
-    LoadBalancer = 
+    LoadBalancer = aws_lb.external.name
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -317,7 +317,7 @@ resource "aws_cloudwatch_metric_alarm" "ApplicationELB4xxError" {
 
 ####### CLOUDWATCH DASHBOARD
 
-resource "aws_cloudwatch_dashboard" "mlradash" {
+resource "aws_cloudwatch_dashboard" "maat_cloudwatch_dashboard" {
   dashboard_name = "MAAT"
   depends_on = [
     aws_cloudwatch_metric_alarm.ApplicationELB4xxError,
