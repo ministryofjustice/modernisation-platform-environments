@@ -8,7 +8,7 @@ resource "aws_lambda_function" "this" {
 }
 
 resource "aws_iam_role" "this" {
-  name               = "ChecksumLambdaRole"
+  name                = "${var.supplier}-checksum-lambda-iam-role"
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
   assume_role_policy  = data.aws_iam_policy_document.this.json
 }
