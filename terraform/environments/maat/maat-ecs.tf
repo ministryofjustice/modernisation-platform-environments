@@ -576,7 +576,7 @@ resource "aws_ecs_service" "maat_ecs_service" {
   cluster                           = aws_ecs_cluster.maat_ecs_cluster.id
   desired_count                     = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
   task_definition                   = aws_ecs_task_definition.maat_ecs_task_definition.arn
-  # iam_role                          = aws_iam_role.maat_ecs_service_role.arn
+  iam_role                          = aws_iam_role.maat_ecs_service_role.arn
   depends_on                        = [aws_lb_listener.external, aws_lb_listener.maat_internal_lb_https_listener]
 
   ordered_placement_strategy {
@@ -590,11 +590,11 @@ resource "aws_ecs_service" "maat_ecs_service" {
     target_group_arn = aws_lb_target_group.external.arn
   }
 
-    load_balancer {
-    container_name   = upper(local.application_name)
-    container_port   = 8080
-    target_group_arn = aws_lb_target_group.maat_internal_lb_target_group.arn
-  }
+  #   load_balancer {
+  #   container_name   = upper(local.application_name)
+  #   container_port   = 8080
+  #   target_group_arn = aws_lb_target_group.maat_internal_lb_target_group.arn
+  # }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
