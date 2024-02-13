@@ -1,4 +1,4 @@
-data "archive_file" "ad-cleanup-lambda" {
+data "archive_file" "this" {
   type        = "zip"
   source_dir  = "${path.module}/checksum_lambda.py"
   output_path = "${path.module}/checksum_lambda.zip"
