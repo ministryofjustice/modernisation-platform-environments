@@ -1,6 +1,7 @@
 # This is an EC2Launch V2 type user-data script
 # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
 # See C:\ProgramData\Amazon\EC2Launch\log for logs
+# See C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch* for script output
 version: 1.0 # version 1.0 is required as this executes AFTER the SSM Agent is running
 tasks:
   - task: executeScript
@@ -9,16 +10,40 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
-          # Install git
+          # Install git - should be in AMI but install if missing
           $ErrorActionPreference = "Stop"
           if (-not (Get-Command "git" -ErrorAction SilentlyContinue)) {
-            choco install git.install -y   
+            choco install git.install -y
           }
       - frequency: once
         type: powershell
         runAs: admin
         content: |-
-          # Wait for SSM otherwise aws CLI might not work properly
+          # Install awscli - should be in AMI but install if missing
+          $ErrorActionPreference = "Stop"
+          if (-not (Get-Command "aws" -ErrorAction SilentlyContinue)) {
+            choco install awscli -y
+          }
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          # Wait for instance role to be attached. EC2 must have permissions to access tags
+          $N = 12
+          1..$N | foreach {
+            $Tags = aws ec2 describe-tags
+            if ($Tags) {
+              break
+            } else {
+              Write-Output "[$_/$N] Waiting for instance role: aws ec2 describe-tags"
+              Start-Sleep -Seconds 10
+            }
+          }
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          # Start and wait for SSM Agent
           $ErrorActionPreference = "Stop"
           $N = 12
           1..$N | foreach {
