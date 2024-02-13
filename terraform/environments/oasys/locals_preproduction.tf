@@ -229,7 +229,7 @@ locals {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["pp_${local.application_name}_cert_2"]
+            certificate_names_or_arns = ["pp_${local.application_name}_cert"]
             default_action = {
               type = "fixed-response"
               fixed_response = {
@@ -297,7 +297,7 @@ locals {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["pp_${local.application_name}_cert_2"]
+            certificate_names_or_arns = ["pp_${local.application_name}_cert"]
             default_action = {
               type = "fixed-response"
               fixed_response = {
