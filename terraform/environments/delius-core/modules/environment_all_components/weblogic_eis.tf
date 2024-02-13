@@ -191,6 +191,8 @@ module "weblogic_eis" {
 
   container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-eis-ecr-repo:${var.weblogic_eis_config.image_tag}"
 
+  bastion_sg_id = module.bastion_linux.bastion_security_group
+
   platform_vars = var.platform_vars
   tags          = var.tags
 }

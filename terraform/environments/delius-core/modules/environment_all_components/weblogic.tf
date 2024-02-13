@@ -35,7 +35,7 @@ module "weblogic" {
       name      = "LDAP_PRINCIPAL"
       valueFrom = module.ldap.delius_core_ldap_principal_arn
     },
-    { 
+    {
       name      = "LDAP_CREDENTIAL"
       valueFrom = module.ldap.delius_core_ldap_credential_arn
     }
@@ -54,4 +54,5 @@ module "weblogic" {
   platform_vars           = var.platform_vars
   tags                    = var.tags
   ingress_security_groups = []
+  bastion_sg_id           = module.bastion_linux.bastion_security_group
 }
