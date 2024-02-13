@@ -180,10 +180,11 @@ locals {
         # and put the wildcard in the san
         domain_name = "pp.oasys.service.justice.gov.uk"
         subject_alternate_names = [
+          "pp-int.oasys.service.justice.gov.uk",
           "bridge-pp-oasys.az.justice.gov.uk",
           "pp-oasys.az.justice.gov.uk",
           "*.pp-oasys.az.justice.gov.uk",
-          "*.oasys.service.justice.gov.uk",
+          "db.pp.oasys.service.justice.gov.uk",
           "db.pp.onr.oasys.service.justice.gov.uk",
         ]
         external_validation_records_created = false
