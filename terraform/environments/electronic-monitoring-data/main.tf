@@ -4,8 +4,16 @@ module "capita" {
   supplier = "capita"
 
   user_accounts = [
-    local.sftp_account_capita,
+    # Developer access.
     local.sftp_account_dev,
+
+    # Test account for supplier.
+    local.sftp_account_capita_test,
+
+    # Accounts for each system to be migrated.
+    local.sftp_account_capita_alcohol_monitoring,
+    local.sftp_account_capita_blob_storage,
+    local.sftp_account_capita_forms_and_subject_id,
   ]
 
   data_store_bucket = aws_s3_bucket.data_store
@@ -22,8 +30,14 @@ module "civica" {
   supplier = "civica"
 
   user_accounts = [
-    local.sftp_account_civica,
+    # Developer access.
     local.sftp_account_dev,
+
+    # Test account for supplier.
+    local.sftp_account_civica_test,
+
+    # Accounts for each system to be migrated.
+    local.sftp_account_civica_orca,
   ]
 
   data_store_bucket = aws_s3_bucket.data_store
@@ -40,8 +54,22 @@ module "g4s" {
   supplier = "g4s"
 
   user_accounts = [
-    local.sftp_account_g4s_test,
+    # Developer access.
     local.sftp_account_dev,
+
+    # Test account for supplier.
+    local.sftp_account_g4s_test,
+
+    # Accounts for each system to be migrated.
+    local.sftp_account_g4s_atrium,
+    local.sftp_account_g4s_atv,
+    local.sftp_account_g4s_emsys_mvp,
+    local.sftp_account_g4s_emsys_tpims,
+    local.sftp_account_g4s_fep,
+    local.sftp_account_g4s_integrity,
+    local.sftp_account_g4s_subject_history,
+    local.sftp_account_g4s_tasking,
+    local.sftp_account_g4s_telephony,
   ]
 
   data_store_bucket = aws_s3_bucket.data_store
