@@ -45,11 +45,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_EcsMemoryOverThreshold" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${local.application_name}-ECS-Memory-high-threshold-alarm"
     }
-  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_EcsCPUNotRunning" {
@@ -455,12 +454,12 @@ resource "aws_sns_topic" "AlertCrimeAppsSnsTopic" {
 # resource "aws_sns_topic_subscription" "pagerduty_Sev5_subscription" {
 #   topic_arn = aws_sns_topic.Sev5SnsTopic.arn
 #   protocol  = "https"
-#   endpoint  = "https://events.pagerduty.com/integration/${var.pagerduty_integration_key}/enqueue"
+#   endpoint  = "https://events.pagerduty.com/integration/${local.application_data.accounts[local.environment].pagerduty_sev5_integration_key}/enqueue"
 # }
 
 # resource "aws_sns_topic_subscription" "pagerduty_app_subscription" {
 #   topic_arn = aws_sns_topic.AlertCrimeAppsSnsTopic.arn
 #   protocol  = "https"
-#   endpoint  = "https://events.pagerduty.com/integration/${var.pagerduty_integration_key}/enqueue"
+#   endpoint  = "https://events.pagerduty.com/integration/${local.application_data.accounts[local.environment].pagerduty_app_integration_key}/enqueue"
 # }
 

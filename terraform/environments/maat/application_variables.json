@@ -86,7 +86,9 @@
       "ALBTarget5xxAlarmThreshold":"10",
       "ALB5xxAlarmThreshold":"10",
       "ALBTarget4xxAlarmThreshold":"10",
-      "ALB4xxAlarmThreshold":"60"
+      "ALB4xxAlarmThreshold":"60",
+      "pagerduty_sev5_integration_key": "",
+      "pagerduty_app_integration_key": ""
     },
     "test": {
       "example_var": "test-data",
