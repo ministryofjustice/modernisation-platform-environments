@@ -7,7 +7,7 @@
         "portMappings": [
             {
                 "containerPort": 2000,
-                "hostPort": 2000,
+                "hostPort": 0,
                 "protocol": "udp"
             }
         ],
