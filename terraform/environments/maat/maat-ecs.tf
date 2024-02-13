@@ -90,6 +90,12 @@ resource "aws_iam_instance_profile" "maat_ec2_instance_profile" {
 
 resource "aws_ecs_cluster" "maat_ecs_cluster" {
   name = "${local.application_name}-ecs-cluster"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-instance-profile"
+    }
+  )
 }
 
 ##### EC2 launch config/template -----
@@ -425,13 +431,11 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_autoscaling_role_policy_atta
 
 resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
   family                   = "${local.application_name}-ecs-task-definition"
-  requires_compatibilities = ["EC2"]
-  # execution_role_arn       = aws_iam_role.maat_ec2_instance_role.arn
-  # task_role_arn            = aws_iam_role.maat_ec2_instance_role.arn
   
   container_definitions = templatefile("maat-task-definition.json", 
     {
-    docker_image_tag            = local.application_data.accounts[local.environment].docker_image_tag
+    maat_docker_image_tag       = local.application_data.accounts[local.environment].maat_docker_image_tag
+    xray_docker_image_tag       = local.application_data.accounts[local.environment].xray_docker_image_tag
     region                      = local.application_data.accounts[local.environment].region
     sentry_env                  = local.environment
     maat_orch_base_url          = local.application_data.accounts[local.environment].maat_orch_base_url
@@ -572,11 +576,8 @@ resource "aws_ecs_service" "maat_ecs_service" {
   cluster                           = aws_ecs_cluster.maat_ecs_cluster.id
   desired_count                     = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
   task_definition                   = aws_ecs_task_definition.maat_ecs_task_definition.arn
-  iam_role                          = aws_iam_role.maat_ecs_service_role.arn
-  depends_on                        = [
-                                      aws_lb_listener.external 
-                                      # aws_lb_listener.maat_internal_alb_https_listener
-                                      ]
+  # iam_role                          = aws_iam_role.maat_ecs_service_role.arn
+  depends_on                        = [aws_lb_listener.external, aws_lb_listener.maat_internal_lb_https_listener]
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
@@ -589,11 +590,11 @@ resource "aws_ecs_service" "maat_ecs_service" {
     target_group_arn = aws_lb_target_group.external.arn
   }
 
-  #   load_balancer {
-  #   container_name   = upper(local.application_name)
-  #   container_port   = 8080
-  #   target_group_arn = aws_lb_target_group.foo.arn
-  # }
+    load_balancer {
+    container_name   = upper(local.application_name)
+    container_port   = 8080
+    target_group_arn = aws_lb_target_group.maat_internal_lb_target_group.arn
+  }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
