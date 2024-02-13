@@ -10,7 +10,7 @@ resource "aws_security_group" "db" {
     from_port   = var.rds_port
     to_port     = var.rds_port
     security_groups = concat(
-      var.bastion_sg_id,
+      [var.bastion_sg_id],
       var.ingress_security_groups
     )
   }
