@@ -599,9 +599,9 @@ resource "aws_iam_role" "ad_fixngo" {
     }
   )
 
-  managed_policy_arns = [
-    for key_or_arn in each.value.managed_policy_arns : try(aws_iam_policy.ad_fixngo[key_or_arn], key_or_arn)
-  ]
+  managed_policy_arns = []
+  #  for key_or_arn in each.value.managed_policy_arns : try(aws_iam_policy.ad_fixngo[key_or_arn], key_or_arn)
+  # ]
 
   tags = merge(local.tags, local.ad_fixngo.tags, {
     Name = each.key
