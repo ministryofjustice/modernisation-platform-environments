@@ -82,7 +82,7 @@ locals {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        user_data_raw = base64encode(file("./templates/user-data-pwsh.yaml"))
+        user_data_raw         = base64encode(file("./templates/user-data-pwsh.yaml"))
         tags = {
           description = "Windows Server 2022 for connecting to Azure domain"
           os-type     = "Windows"
