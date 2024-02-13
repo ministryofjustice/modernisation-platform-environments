@@ -231,10 +231,11 @@ resource "aws_cloudwatch_log_group" "this" {
 #------------------------------------------------------------------------------
 # AWS transfer workflow
 #
-# For files that arrive in the landing bucket:
-# 1. tag the file with the supplier who sent it
-# 2. copy the file to the internal data store bucket
-# 3. delete the file from the landing bucket
+# For objects that arrive in the landing bucket:
+# 1. tag the object with the supplier who sent it
+# 2. copy the object to the internal data store bucket
+# 3. use lambda function to tag object with its SHA256 checksum in Base64
+# 4. delete the object from the landing bucket
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_workflow" "this" {
@@ -263,6 +264,14 @@ resource "aws_transfer_workflow" "this" {
       }
     }
     type = "COPY"
+  }
+  steps {
+    custom_step_details {
+      name                 = "calculate-file-sha256-checksum"
+      source_file_location = "$${previous.file}"
+      target               = module.this_transfer_workflow_lambda.lambda_function_arn
+    }
+    type = "CUSTOM"
   }
   steps {
     delete_step_details {
@@ -324,7 +333,6 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
       "${var.data_store_bucket.arn}/*",
       "${aws_s3_bucket.landing_bucket.arn}/*",
     ]
-    # condition {}
   }
   statement {
     sid    = "AllowDeleteSource"
@@ -335,12 +343,26 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
     ]
     resources = ["${aws_s3_bucket.landing_bucket.arn}/*"]
   }
+  statement {
+    sid    = "AllowChecksumLambda"
+    effect = "Allow"
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+    resources = [module.this_transfer_workflow_lambda.lambda_function_arn]
+  }
 }
 
 resource "aws_iam_role_policy" "this_transfer_workflow" {
   name   = "${var.supplier}-transfer-workflow-iam-policy"
   role   = aws_iam_role.this_transfer_workflow.id
   policy = data.aws_iam_policy_document.this_transfer_workflow.json
+}
+
+module "this_transfer_workflow_lambda" {
+  source = "./checksum_lambda"
+
+  data_store_bucket = var.data_store_bucket
 }
 
 #------------------------------------------------------------------------------
