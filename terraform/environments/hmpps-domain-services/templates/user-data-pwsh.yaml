@@ -10,32 +10,21 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
-          # Install git - should be in AMI but install if missing
           $ErrorActionPreference = "Stop"
-          if (Get-Command "git" -ErrorAction SilentlyContinue)) {
+          # Install git and awscli - they should be in AMI but install if missing
+          if (Get-Command "git" -ErrorAction SilentlyContinue) {
             Write-Output "git already installed"
           } else {
             Write-Output "choco install git.install -y"
             choco install git.install -y
           }
-      - frequency: once
-        type: powershell
-        runAs: admin
-        content: |-
-          # Install awscli - should be in AMI but install if missing
-          $ErrorActionPreference = "Stop"
           if (Get-Command "aws" -ErrorAction SilentlyContinue) {
             Write-Output "awscli already installed"
           } else {
             Write-Output "choco install awscli -y"
             choco install awscli -y
           }
-      - frequency: once
-        type: powershell
-        runAs: admin
-        content: |-
           # Run UserData powershell from modernisation-platform-configuration-management repo
-          $ErrorActionPreference = "Stop"
           Write-Output "Downloading and running Run-GitScript.ps1"
           Set-Location -Path ([System.IO.Path]::GetTempPath())
           $GitBranch = "DSOS-2601/powershell-fixes-for-win2012"
