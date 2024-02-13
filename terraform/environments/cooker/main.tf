@@ -261,7 +261,7 @@ resource "aws_key_pair" "ec2-user" {
   tags = merge(
     local.tags,
     {
-      Name = "ec2-user"
+      Name = "${local.application_name}-ec2-user"
     },
   )
 }
