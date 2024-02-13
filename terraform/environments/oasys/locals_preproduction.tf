@@ -184,8 +184,6 @@ locals {
           "bridge-pp-oasys.az.justice.gov.uk",
           "pp-oasys.az.justice.gov.uk",
           "*.pp-oasys.az.justice.gov.uk",
-          "db.pp.oasys.service.justice.gov.uk",
-          "db.pp.onr.oasys.service.justice.gov.uk",
         ]
         external_validation_records_created = false
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
