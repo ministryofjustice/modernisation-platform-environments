@@ -1,7 +1,7 @@
 [
     {
         "name": "xray-daemon",
-        "image": "${ecr_url}:xray-daemon",
+        "image": "${ecr_url}:${xray_docker_image_tag}",
         "cpu": 32,
         "memory": 256,
         "portMappings": [
@@ -23,7 +23,7 @@
     },
     {
         "name": "MAAT",
-        "image": "${ecr_url}:${docker_image_tag}",
+        "image": "${ecr_url}:${maat_docker_image_tag}",
         "cpu": 992,
         "memory": 3000,
         "links": [
