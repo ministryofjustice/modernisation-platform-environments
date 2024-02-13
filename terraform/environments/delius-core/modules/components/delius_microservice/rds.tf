@@ -10,7 +10,7 @@ resource "aws_security_group" "db" {
     from_port   = var.rds_port
     to_port     = var.rds_port
     security_groups = concat(
-      var.account_config.bastion.bastion_security_group,
+      [var.bastion_sg_id],
       var.ingress_security_groups
     )
   }
@@ -26,7 +26,7 @@ resource "aws_security_group" "db" {
 resource "aws_db_subnet_group" "this" {
   count      = var.create_rds ? 1 : 0
   name       = "data-tier"
-  subnet_ids = var.account_config.ordered_subnets.*.id
+  subnet_ids = var.account_config.ordered_private_subnet_ids
   tags       = var.tags
 }
 

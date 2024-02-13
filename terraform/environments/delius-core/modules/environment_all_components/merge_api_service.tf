@@ -1,6 +1,5 @@
 module "merge_api_service" {
-  source = "../components/delius_microservice"
-
+  source                = "../components/delius_microservice"
   name                  = "merge-api"
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
@@ -37,6 +36,12 @@ module "merge_api_service" {
   account_config                     = var.account_config
   health_check_path                  = "/merge/api/actuator/health"
   account_info                       = var.account_info
+  create_rds                         = var.merge_config.create_rds
+  rds_engine                         = var.merge_config.rds_engine
+  rds_engine_version                 = var.merge_config.rds_engine_version
+  rds_instance_class                 = var.merge_config.rds_instance_class
+  rds_port                           = 5432
+  snapshot_identifier                = "merge-snapshot"
   container_environment_vars = [
     {
       name  = "SERVER_SERVLET_CONTEXT_PATH"

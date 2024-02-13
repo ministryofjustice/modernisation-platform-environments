@@ -79,6 +79,10 @@ locals {
   merge_config_test = {
     api_image_tag = "REPLACE"
     ui_image_tag  = "REPLACE"
+    create_rds         = false
+    rds_engine         = "postgres"
+    rds_engine_version = "15"
+    rds_instance_class = "db.t3.small"
   }
 
   gdpr_config_test = {

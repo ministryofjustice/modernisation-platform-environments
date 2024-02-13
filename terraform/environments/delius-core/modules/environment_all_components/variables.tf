@@ -67,14 +67,7 @@ variable "gdpr_config" {
 }
 
 variable "merge_config" {
-  type = object({
-    api_image_tag = string
-    ui_image_tag  = string
-  })
-  default = {
-    api_image_tag = "default_image_tag"
-    ui_image_tag  = "default_image_tag"
-  }
+  type = any
 }
 
 variable "weblogic_config" {

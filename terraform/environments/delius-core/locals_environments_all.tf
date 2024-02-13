@@ -13,6 +13,7 @@ locals {
     private_subnet_ids            = data.aws_subnets.shared-private.ids
     public_subnet_ids             = data.aws_subnets.shared-public.ids
     ordered_private_subnet_ids    = local.ordered_subnet_ids
+    ordered_subnets               = [local.ordered_subnet_ids]
     data_subnet_ids               = data.aws_subnets.shared-data.ids
     data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
     route53_inner_zone_info       = data.aws_route53_zone.inner
