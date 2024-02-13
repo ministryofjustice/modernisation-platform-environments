@@ -193,6 +193,22 @@ locals {
           description = "cert for ${local.application_name} ${local.environment} domains"
         }
       }
+      "pp_${local.application_name}_cert_2" = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = "pp.oasys.service.justice.gov.uk"
+        subject_alternate_names = [
+          "pp-int.oasys.service.justice.gov.uk",
+          "bridge-pp-oasys.az.justice.gov.uk",
+          "pp-oasys.az.justice.gov.uk",
+          "*.pp-oasys.az.justice.gov.uk",
+        ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        tags = {
+          description = "cert for ${local.application_name} ${local.environment} domains"
+        }
+      }
     }
 
     # options for LBs https://docs.google.com/presentation/d/1RpXpfNY_hw7FjoMw0sdMAdQOF7kZqLUY6qVVtLNavWI/edit?usp=sharing
