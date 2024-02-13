@@ -22,6 +22,18 @@ module "reload_pipeline" {
               "--dpr.stop.glue.instance.job.name" : var.glue_reporting_hub_cdc_jobname
             }
           },
+          "Next" : "Create Hive Tables"
+        },
+        "Create Hive Tables" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_hive_table_creation_jobname,
+            "Arguments" : {
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            }
+          },
           "Next" : "Prepare Temp Reload Bucket Data"
         },
         "Prepare Temp Reload Bucket Data" : {
