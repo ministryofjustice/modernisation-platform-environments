@@ -1,10 +1,16 @@
+data "archive_file" "ad-cleanup-lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/checksum_lambda.py"
+  output_path = "${path.module}/checksum_lambda.zip"
+}
+
 resource "aws_lambda_function" "this" {
-  filename         = "${path.module}/checksum_lambda.py"
-  function_name    = "ChecksumLambda"
-  role             = aws_iam_role.this.arn
-  handler          = "checksum_lambda.handler"
-  runtime          = "python3.9"
-  timeout          = 900
+  filename      = "${path.module}/checksum_lambda.zip"
+  function_name = "ChecksumLambda"
+  role          = aws_iam_role.this.arn
+  handler       = "checksum_lambda.handler"
+  runtime       = "python3.9"
+  timeout       = 900
 }
 
 data "aws_iam_policy_document" "lambda_assume_role" {
