@@ -26,11 +26,7 @@ module "merge_api_service" {
     }
   ]
   ingress_security_groups            = []
-<<<<<<< HEAD
   bastion_sg_id                      = module.bastion_linux.bastion_security_group
-=======
-  bastion_security_group             = [module.bastion_linux.bastion_security_group]
->>>>>>> e8f7f9493 (initial config for RDS added to merge microservice)
   tags                               = var.tags
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
@@ -44,7 +40,7 @@ module "merge_api_service" {
   rds_engine                         = var.merge_config.rds_engine
   rds_engine_version                 = var.merge_config.rds_engine_version
   rds_instance_class                 = var.merge_config.rds_instance_class
-  rds_port = 1521
+  rds_port                           = 1521
   snapshot_identifier                = "merge-snapshot"
   container_environment_vars = [
     {
