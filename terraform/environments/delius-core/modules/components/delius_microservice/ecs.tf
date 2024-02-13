@@ -20,7 +20,7 @@ module "container_definition" {
 }
 
 module "ecs_policies" {
-  source       = "../../ecs_policies"
+  source       = "../../helpers/ecs_policies"
   env_name     = var.env_name
   service_name = var.name
   tags         = var.tags
