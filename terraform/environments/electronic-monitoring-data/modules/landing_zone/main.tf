@@ -233,9 +233,10 @@ resource "aws_cloudwatch_log_group" "this" {
 #
 # For objects that arrive in the landing bucket:
 # 1. tag the object with the supplier who sent it
-# 2. copy the object to the internal data store bucket
-# 3. use lambda function to tag object with its SHA256 checksum in Base64
-# 4. delete the object from the landing bucket
+# 2. tag the object denoting its virus scan status
+# 3. copy the object to the internal data store bucket
+# 4. use lambda function to tag object with its SHA256 checksum in Base64
+# 5. delete the object from the landing bucket
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_workflow" "this" {
@@ -248,6 +249,17 @@ resource "aws_transfer_workflow" "this" {
       tags {
         key   = "supplier"
         value = var.supplier
+      }
+    }
+    type = "TAG"
+  }
+  steps {
+    tag_step_details {
+      name                 = "tag-with-quarantine-status"
+      source_file_location = "$${original.file}"
+      tags {
+        key   = "virus scan status"
+        value = "not been scanned"
       }
     }
     type = "TAG"
