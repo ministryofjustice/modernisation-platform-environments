@@ -1,0 +1,44 @@
+---
+name: Dependabot Configuration Generator
+
+on:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  dependabot-configuration-generator:
+    name: Generate Dependabot Configuration
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Generate Dependabot Configuration
+        id: dependabot-configuration-generator
+        shell: bash
+        run: |
+          bash scripts/generate-dependabot-file.sh
+
+      - name: Detect Changes
+        id: detect_changes
+        shell: bash
+        run: |
+          if git diff --exit-code .github/dependabot.yml; then
+            echo "No changes detected in .github/dependabot.yml"
+          else
+            echo "Changes detected in .github/dependabot.yml"
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git checkout -b dependabot-configuration-generator-$(date +%s)
+            git add .github/dependabot.yml
+            git commit -m "update .github/dependabot.yml"
+            git push origin dependabot-configuration-generator-$(date +%s)
+            gh pr create --title "Update .github/dependabot.yml" --body "This PR updates the .github/dependabot.yml file." --base main --head dependabot-configuration-generator-$(date +%s)
+          fi
