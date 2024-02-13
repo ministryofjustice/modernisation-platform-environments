@@ -1,8 +1,8 @@
 # azure.noms.root and azure.hmpp.root AD DS infra migrated from Azure FixNGo
-# See https://github.com/ministryofjustice/modernisation-platform/issues/5970
-#
-# For each domain, Spins up a pair of DC EC2s and a RD Licensing EC2 for use
-# by all dev/test and preprod/prod environments using this domain.
+# For more details, please see: 
+# - https://github.com/ministryofjustice/modernisation-platform/issues/5970
+# - https://dsdmoj.atlassian.net/wiki/x/3oCKGAE
+# Managed by DSO team
 
 # aws ec2 describe-network-interfaces --filters "Name=subnet-id,Values=subnet-0586cffe06d59a339" --query 'NetworkInterfaces[*].PrivateIpAddress' --profile core-vpc-test | jq .[] -r | sort -g
 # aws ec2 describe-network-interfaces --filters "Name=subnet-id,Values=subnet-0586cffe06d59a339" --query 'NetworkInterfaces[*].PrivateIpAddress' --profile core-vpc-test | jq .[] -r | sort -g
@@ -28,76 +28,98 @@ locals {
       # a/b/c suffix = availability zone
 
       # ad-hmpp-dc-a = {
-      #   ami_name                = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-      #   instance_type           = "t3.large"
-      #   private_ip              = null
-      #   az_index                = 0 # zone a
-      #   vpc_name                = "live_data"
-      #   vpc_security_group_name = "ad_hmpp_dc_sg"
+      #   ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+      #   az_index                  = 0 # zone a
+      #   iam_instance_profile_role = "ad-fixngo-ec2-live-role"
+      #   instance_type             = "t3.large"
+      #   private_ip                = null
+      #   vpc_name                  = "live_data"
+      #   vpc_security_group_name   = "ad_hmpp_dc_sg"
       #   tags = {
       #     description = "domain controller for FixNGo azure.hmpp.root domain"
       #   }
       # }
       # ad-hmpp-dc-b = {
-      #   ami_name                = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-      #   instance_type           = "t3.large"
-      #   private_ip              = "TODO"
-      #   az_index                = 1 # zone b
-      #   vpc_name                = "live_data"
-      #   vpc_security_group_name = "ad_hmpp_dc_sg"
+      #   ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+      #   az_index                  = 1 # zone b
+      #   iam_instance_profile_role = "ad-fixngo-ec2-live-role"
+      #   instance_type             = "t3.large"
+      #   private_ip                = "TODO"
+      #   vpc_name                  = "live_data"
+      #   vpc_security_group_name   = "ad_hmpp_dc_sg"
       #   tags = {
       #     description = "domain controller for FixNGo azure.hmpp.root domain"
       #   }
       # }
       # ad-hmpp-rdlic = {
-      #   ami_name                = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-      #   instance_type           = "t3.medium"
-      #   private_ip              = null
-      #   az_index                = 2 # zone c
-      #   vpc_name                = "live_data"
-      #   vpc_security_group_name = "ad_hmpp_rdlic_sg"
+      #   ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+      #   az_index                  = 2 # zone c
+      #   iam_instance_profile_role = "ad-fixngo-ec2-live-role"
+      #   instance_type             = "t3.medium"
+      #   private_ip                = null
+      #   vpc_name                  = "live_data"
+      #   vpc_security_group_name   = "ad_hmpp_rdlic_sg"
       #   tags = {
       #     description = "remote desktop licensing server for FixNGo azure.hmpp.root domain"
       #   }
       # }
 
-      ad-azure-dc-a = {
-        ami_name                = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-        instance_type           = "t3.large"
-        private_ip              = "10.26.8.20"
-        az_index                = 0 # zone a
-        vpc_name                = "non_live_data"
-        vpc_security_group_name = "ad_azure_dc_sg"
-        tags = {
-          description = "domain controller for FixNGo azure.noms.root domain"
-        }
-      }
-      ad-azure-dc-b = {
-        ami_name                = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-        instance_type           = "t3.large"
-        private_ip              = "10.26.9.20"
-        az_index                = 1 # zone b
-        vpc_name                = "non_live_data"
-        vpc_security_group_name = "ad_azure_dc_sg"
-        tags = {
-          description = "domain controller for FixNGo azure.noms.root domain"
-        }
-      }
-      ad-azure-rdlic = {
-        ami_name                = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-        instance_type           = "t3.medium"
-        private_ip              = null
-        az_index                = 2 # zone c
-        vpc_name                = "non_live_data"
-        vpc_security_group_name = "ad_azure_rdlic_sg"
-        tags = {
-          description = "remote desktop licensing server for FixNGo azure.noms.root domain"
-        }
-      }
+      # ad-azure-dc-a = {
+      #   ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+      #   az_index                  = 0 # zone a
+      #   iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
+      #   instance_type             = "t3.large"
+      #   private_ip                = "10.26.8.20"
+      #   vpc_name                  = "non_live_data"
+      #   vpc_security_group_name   = "ad_azure_dc_sg"
+      #   tags = {
+      #     description = "domain controller for FixNGo azure.noms.root domain"
+      #   }
+      # }
+      # ad-azure-dc-b = {
+      #   ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+      #   az_index                  = 1 # zone b
+      #   iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
+      #   instance_type             = "t3.large"
+      #   private_ip                = "10.26.9.20"
+      #   vpc_name                  = "non_live_data"
+      #   vpc_security_group_name   = "ad_azure_dc_sg"
+      #   tags = {
+      #     description = "domain controller for FixNGo azure.noms.root domain"
+      #   }
+      # }
+      # ad-azure-rdlic = {
+      #   az_index                  = 2 # zone c
+      #   ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+      #   iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
+      #   instance_type             = "t3.medium"
+      #   private_ip                = null
+      #   vpc_name                  = "non_live_data"
+      #   vpc_security_group_name   = "ad_azure_rdlic_sg"
+      #   tags = {
+      #     description = "remote desktop licensing server for FixNGo azure.noms.root domain"
+      #   }
+      # }
     }
 
+    ec2_iam_roles = {
+      ad-fixngo-ec2-nonlive-role = {
+        managed_policy_arns = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "ad-fixngo-ec2-policy",
+          "ad-fixngo-devtest-secrets-policy",
+        ]
+      }
+      ad-fixngo-ec2-live-role = {
+        managed_policy_arns = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "ad-fixngo-ec2-policy",
+          "ad-fixngo-live-secrets-policy",
+        ]
+      }
+    }
     ec2_iam_policies = {
-      ad-fixngo-ec2 = {
+      ad-fixngo-ec2-policy = {
         description = "Policy used by AD FixNGo EC2 instance roles"
         path        = "/"
         statements = [
@@ -129,6 +151,38 @@ locals {
               "ec2:DescribeInstances",
             ]
             resources = ["*"]
+          },
+        ]
+      }
+      ad-fixngo-nonlive-secrets-policy = {
+        description = "Policy used by AD FixNGo EC2 instance roles to access azure.noms.root secrets"
+        path        = "/"
+        statements = [
+          {
+            sid    = "HmppsDomainSecretsDevTest"
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:${module.environment.account_ids.hmpps-domain-services-test}:secret:/microsoft/AD/*/shared-*",
+            ]
+          },
+        ]
+      }
+      ad-fixngo-live-secrets-policy = {
+        description = "Policy used by AD FixNGo EC2 instance roles to access azure.hmpp.root secrets"
+        path        = "/"
+        statements = [
+          {
+            sid    = "HmppsDomainSecretsProd"
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:${module.environment.account_ids.hmpps-domain-services-production}:secret:/microsoft/AD/*/shared-*",
+            ]
           },
         ]
       }
@@ -524,9 +578,9 @@ resource "aws_iam_policy" "ad_fixngo" {
 }
 
 resource "aws_iam_role" "ad_fixngo" {
-  for_each = local.ad_fixngo.aws_instances
+  for_each = local.ad_fixngo.ec2_iam_roles
 
-  name                 = "ec2-role-${each.key}"
+  name                 = each.key
   path                 = "/"
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
@@ -545,13 +599,12 @@ resource "aws_iam_role" "ad_fixngo" {
     }
   )
 
-  managed_policy_arns = flatten([
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-    [for key, value in aws_iam_policy.ad_fixngo : value.arn]
-  ])
+  managed_policy_arns = [
+    for key_or_arn in each.value.managed_policy_arns : try(aws_iam_policy.ad_fixngo[key_or_arn], key_or_arn)
+  ]
 
-  tags = merge(local.tags, local.ad_fixngo.tags, each.value.tags, {
-    Name = "ec2-role-${each.key}"
+  tags = merge(local.tags, local.ad_fixngo.tags, {
+    Name = each.key
   })
 }
 
@@ -559,7 +612,7 @@ resource "aws_iam_instance_profile" "ad_fixngo" {
   for_each = local.ad_fixngo.aws_instances
 
   name = "ec2-profile-${each.key}"
-  role = aws_iam_role.ad_fixngo[each.key].name
+  role = each.value.iam_instance_profile_role
   path = "/"
 }
 
