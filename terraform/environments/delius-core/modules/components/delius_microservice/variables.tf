@@ -351,3 +351,8 @@ variable "container_cpu" {
   type        = number
   default     = 512
 }
+
+variable "bastion_sg_id" {
+  description = "Security group id of the bastion"
+  type        = string
+}

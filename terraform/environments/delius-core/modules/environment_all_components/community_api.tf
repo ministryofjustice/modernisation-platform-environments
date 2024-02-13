@@ -41,6 +41,7 @@ module "community_api" {
     # }
   ]
   ingress_security_groups = []
+  bastion_sg_id           = module.bastion_linux.bastion_security_group
   tags                    = var.tags
   # TODO - This LB is a placeholder marked no 13 on the architecture diagram: https://dsdmoj.atlassian.net/wiki/spaces/DAM/pages/3773105057/High-Level+Architecture
   # Two LBs (public and secure) are needed as show on the architecture diagram. There is an architectural discussion to be had if we could get away with just one LB instead

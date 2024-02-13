@@ -27,7 +27,7 @@ locals {
       "10.0.0.0/8",
     ])
   }
-  security_group_cidrs_preprod_prod = {
+  security_group_cidrs_preprod = {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
     ])
@@ -42,6 +42,36 @@ locals {
     ])
     oracle_db = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      "10.40.40.64/26", # pp oasys app
+      module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
+    ])
+    oracle_oem_agent = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
+    http7xxx = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+    ])
+  }
+  security_group_cidrs_prod = {
+    icmp = flatten([
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
+    ])
+    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
+    https_internal = flatten([
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+    ])
+    https_external = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
+    ])
+    oracle_db = flatten([
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      "10.40.6.64/26", # prod oasys app
+      module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -54,8 +84,8 @@ locals {
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
     test          = local.security_group_cidrs_devtest
-    preproduction = local.security_group_cidrs_preprod_prod
-    production    = local.security_group_cidrs_preprod_prod
+    preproduction = local.security_group_cidrs_preprod
+    production    = local.security_group_cidrs_prod
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 

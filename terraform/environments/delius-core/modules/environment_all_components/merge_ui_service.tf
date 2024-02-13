@@ -14,6 +14,7 @@ module "merge_ui_service" {
   ecs_cluster_arn                    = module.ecs.ecs_cluster_arn
   container_secrets                  = []
   ingress_security_groups            = []
+  bastion_sg_id                      = module.bastion_linux.bastion_security_group
   tags                               = var.tags
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
