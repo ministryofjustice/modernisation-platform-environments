@@ -18,7 +18,7 @@ tasks:
             Write-Output "choco install git.install -y"
             choco install git.install -y
           }
-          Start-Sleep -Seconds 2 # helps debugging as logs have different timestamps
+          Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
       - frequency: once
         type: powershell
         runAs: admin
@@ -31,7 +31,27 @@ tasks:
             Write-Output "choco install awscli -y"
             choco install awscli -y
           }
-          Start-Sleep -Seconds 2 # helps debugging as logs have different timestamps
+          Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          # Wait for SSM Agent
+          $ErrorActionPreference = "Stop"
+          $N = 12
+          1..$N | foreach {
+            $AmazonSSMAgent = Get-Service -Name "AmazonSSMAgent" -ErrorAction SilentlyContinue
+            if (-not $AmazonSSMAgent) {
+              Write-Output "[$_/$N] Starting AmazonSSMAgent"
+              Start-Service -Name "AmazonSSMAgent" -Force
+            } elseif ($AmazonSSMAgent.Status -ne "Running") {
+              Write-Output "[$_/$N] Waiting for AmazonSSMAgent status: $AmazonSSMAgentStatus"
+              Start-Sleep -Seconds 10
+            } else {
+              break
+            }
+          }
+          Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
       - frequency: once
         type: powershell
         runAs: admin
@@ -48,7 +68,7 @@ tasks:
               Start-Sleep -Seconds 10
             }
           }
-          Start-Sleep -Seconds 2 # helps debugging as logs have different timestamps
+          Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
       - frequency: once
         type: powershell
         runAs: admin
