@@ -1,740 +1,346 @@
-variable "region" {
-  type        = string
-  description = ""
-  default     = "eu-west-2"
-}
-# data "aws_iam_policy_document" "assume_policy_document" {
-#   statement {
-#     actions = [
-#       "sts:AssumeRole"
-#     ]
-#     principals {
-#       type        = "Service"
-#       identifiers = ["ec2.amazonaws.com"]
-#     }
-#   }
-# }
-
-# resource "aws_iam_role" "bastion_host_role" {
-#   name               = "bastion_linux_ec2_role"
-#   path               = "/"
-#   assume_role_policy = data.aws_iam_policy_document.assume_policy_document.json
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "bastion_linux_ec2_role"
-#     },
-#   )
-
-# }
-
-# resource "aws_iam_role_policy_attachment" "bastion_host_ssm" {
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-#   role       = aws_iam_role.bastion_host_role.name
-# }
-
-# data "aws_iam_policy_document" "bastion_ssm_s3_policy_document" {
-
-#   statement {
-#     effect = "Allow"
-#     actions = [
-#       "s3:GetObject"
-#     ]
-#     resources = [
-#       "arn:aws:s3:::aws-ssm-${var.region}/*",
-#       "arn:aws:s3:::aws-windows-downloads-${var.region}/*",
-#       "arn:aws:s3:::amazon-ssm-${var.region}/*",
-#       "arn:aws:s3:::amazon-ssm-packages-${var.region}/*",
-#       "arn:aws:s3:::${var.region}-birdwatcher-prod/*",
-#       "arn:aws:s3:::aws-ssm-distributor-file-${var.region}/*",
-#       "arn:aws:s3:::aws-ssm-document-attachments-${var.region}/*",
-#       "arn:aws:s3:::patch-baseline-snapshot-${var.region}/*"
-#     ]
-#   }
-# }
-# resource "aws_iam_policy" "bastion_ssm_s3_policy" {
-#   name   = "bastion_ssm_s3"
-#   policy = data.aws_iam_policy_document.bastion_ssm_s3_policy_document.json
-# }
-
-# resource "aws_iam_role_policy_attachment" "bastion_host_ssm_s3" {
-#   policy_arn = aws_iam_policy.bastion_ssm_s3_policy.arn
-#   role       = aws_iam_role.bastion_host_role.name
-# }
-
-# resource "aws_iam_instance_profile" "bastion_host_profile" {
-#   role = aws_iam_role.bastion_host_role.name
-#   path = "/"
-# }
+###########################################################################################
+#------------------------Comment out file if not required----------------------------------
+###########################################################################################
 
 
-#------------------------------------------------------------------------------
-# Application - ECS Fargate
-#------------------------------------------------------------------------------
+locals {
 
-resource "aws_security_group" "app" {
+  app_name = "ec2-test-instance"
+  business_unit       = var.networking[0].business-unit
+  region              = "eu-west-2"
 
-  name        = "app-${var.networking[0].application}"
-  description = "Allow traffic from load balancer(s)"
-  vpc_id      = data.aws_vpc.shared.id
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "app-${var.networking[0].application}"
-    },
-  )
-}
-
-resource "aws_security_group_rule" "app_egress_1" {
-
-  security_group_id = aws_security_group.app.id
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = -1
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
-resource "aws_security_group_rule" "app_ingress_1" {
-
-  security_group_id        = aws_security_group.app.id
-  type                     = "ingress"
-  from_port                = 3000
-  to_port                  = 3000
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.external_lb.id
-}
-
-resource "aws_security_group_rule" "app_ingress_2" {
-
-  security_group_id        = aws_security_group.app.id
-  type                     = "ingress"
-  from_port                = 3000
-  to_port                  = 3000
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.inner_lb.id
-}
-
-resource "aws_ecs_cluster" "app" {
-
-  name = var.networking[0].application
-
-  tags = merge(
-    local.tags,
-    {
-      Name = var.networking[0].application
-    },
-  )
-}
-
-resource "aws_ecs_service" "app" {
-  depends_on = [
-    aws_lb_target_group.external,
-    aws_lb_target_group.inner,
-    aws_lb_listener.external,
-    aws_lb_listener.inner
-  ]
-
-  name = var.networking[0].application
-  deployment_controller {
-    type = "ECS"
-  }
-  cluster                           = aws_ecs_cluster.app.id
-  task_definition                   = aws_ecs_task_definition.app.arn
-  launch_type                       = local.application_data.accounts[local.environment].ecs_type
-  enable_execute_command            = true
-  desired_count                     = "1"
-  health_check_grace_period_seconds = "120"
-  network_configuration {
-    subnets          = data.aws_subnets.shared-private.ids
-    security_groups  = [aws_security_group.app.id]
-    assign_public_ip = false
+  autoscaling_schedules_default = {
+    "scale_up" = {
+      recurrence = "0 7 * * Mon-Fri"
+    }
+    "scale_down" = {
+      desired_capacity = 0
+      recurrence       = "0 19 * * Mon-Fri"
+    }    
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.external.arn
-    container_name   = var.networking[0].application
-    container_port   = 3000
-  }
-  load_balancer {
-    target_group_arn = aws_lb_target_group.inner.arn
-    container_name   = var.networking[0].application
-    container_port   = 3000
+  instance = {
+    disable_api_termination      = false
+    instance_type                = "t3a.small"
+    key_name                     = try(aws_key_pair.ec2-user.key_name)
+    monitoring                   = false
+    metadata_options_http_tokens = "required"
+    vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = var.networking[0].application
-    },
-  )
-}
+  ec2_test = {
+    tags = {
+      component = "test"
+    }
 
-resource "aws_ecs_task_definition" "app" {
-
-  network_mode             = "awsvpc"
-  requires_compatibilities = [local.application_data.accounts[local.environment].ecs_type]
-  execution_role_arn       = aws_iam_role.app_execution.arn
-  task_role_arn            = aws_iam_role.app_task.arn
-  family                   = var.networking[0].application
-  cpu                      = 256
-  memory                   = 1024
-  container_definitions    = <<TASK_DEFINITION
-  [
-    {
-      "name": "${var.networking[0].application}",
-      "image": "${local.environment_management.account_ids[terraform.workspace]}.dkr.ecr.eu-west-2.amazonaws.com/testlab:latest",
-      "cpu": 256,
-      "memory": 1024,
-      "essential": true,
-      "portMappings": [
-        {
-          "containerPort": 3000
-        }
-      ],
-      "LogConfiguration": {
-        "LogDriver": "awslogs",
-        "Options": {
-          "awslogs-group": "${var.networking[0].application}",
-          "awslogs-region": "eu-west-2",
-          "awslogs-stream-prefix": "${var.networking[0].application}"
-        }
-      },
-      "environment" : [
-        {
-          "name" : "DB_HOST",
-          "value" : "${aws_db_instance.app.address}"
-        },
-        {
-          "name" : "DB_SCHEMA",
-          "value": "${var.networking[0].application}"
-        },
-        {
-          "name" : "DB_USER",
-          "value" : "dbmain"
-        },
-        {
-          "name" : "DB_PORT",
-          "value" : "5432"
-        }
-      ],
-      "secrets": [
-        {
-          "name": "DB_PASSWORD",
-          "valueFrom": "${aws_secretsmanager_secret_version.master_password.arn}"
-        }
+    user_data_cloud_init = {
+      args = {
+        lifecycle_hook_name  = "ready-hook"
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        ansible_args         = "--tags ec2provision"
+      }
+      scripts = [
+        "install-ssm-agent.sh.tftpl",
+        "ansible-ec2provision.sh.tftpl",
+        "post-ec2provision.sh.tftpl"
       ]
     }
-  ]
-  TASK_DEFINITION
 
-  tags = merge(
-    local.tags,
-    {
-      Name = var.networking[0].application
-    },
-  )
-}
-
-resource "aws_iam_role" "app_execution" {
-  name = "execution-${var.networking[0].application}"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
+    route53_records = {
+      create_internal_record = true
+      create_external_record = false
     }
-  ]
-}
-EOF
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "execution-${var.networking[0].application}"
-    },
-  )
-}
+    # user can manually increase the desired capacity to 1 via CLI/console
+    # to create an instance
+    autoscaling_group = {
+      desired_capacity = 0
+      max_size         = 2
+      min_size         = 0
+    }
 
-resource "aws_iam_role_policy" "app_execution" {
-  name = "execution-${var.networking[0].application}"
-  role = aws_iam_role.app_execution.id
+    ec2_test_instances = {
+      # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
 
-  policy = <<-EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-           "Action": [
-               "logs:CreateLogStream",
-               "logs:PutLogEvents",
-               "ecr:GetAuthorizationToken"
-           ],
-           "Resource": "*",
-           "Effect": "Allow"
-      },
-      {
-            "Action": [
-              "ecr:BatchCheckLayerAvailability",
-              "ecr:GetDownloadUrlForLayer",
-              "ecr:BatchGetImage"
-            ],
-              "Resource": "arn:aws:ecr:*:${local.environment_management.account_ids[terraform.workspace]}:repository/testlab",
-            "Effect": "Allow"
-      },
-      {
-          "Action": [
-               "secretsmanager:GetSecretValue"
-           ],
-          "Resource": "arn:aws:secretsmanager:*:${local.environment_management.account_ids[terraform.workspace]}:secret:${var.networking[0].application}-db-master-*",
-          "Effect": "Allow"
+      example-test-1 = {
+        tags = {
+          server-type = "private"
+          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+          monitored   = false
+          os-type     = "Linux"
+          component   = "ndh"
+          environment = "development"
+        }
+        ebs_volumes = {
+          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
+        }
+        ami_name  = "RHEL-7.9_HVM-*"
+        ami_owner = "309956199498"
+        subnet_id = data.aws_subnet.private_subnets_a.id
+        availability_zone = "eu-west-2a"
       }
-    ]
-  }
-  EOF
-}
 
-resource "aws_iam_role" "app_task" {
-  name = "task-${var.networking[0].application}"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
+      example-test-2 = {
+        tags = {
+          server-type = "private"
+          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+          monitored   = false
+          os-type     = "Linux"
+          component   = "ndh"
+          environment = "development"
+        }
+        ebs_volumes = {
+          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
+        }
+        ami_name  = "RHEL-7.9_HVM-*"
+        ami_owner = "309956199498"
+        subnet_id = data.aws_subnet.private_subnets_b.id
+        availability_zone = "eu-west-2b"
+      }
     }
-  ]
-}
-EOF
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "task-${var.networking[0].application}"
-    },
-  )
-}
-
-resource "aws_iam_role_policy" "app_task" {
-  name = "task-${var.networking[0].application}"
-  role = aws_iam_role.app_task.id
-
-  policy = <<-EOF
-  {
-   "Version": "2012-10-17",
-   "Statement": [
-     {
-       "Effect": "Allow",
-       "Action": [
-            "ssmmessages:CreateControlChannel",
-            "ssmmessages:CreateDataChannel",
-            "ssmmessages:OpenControlChannel",
-            "ssmmessages:OpenDataChannel"
-       ],
-       "Resource": "*"
-     }
-   ]
   }
-  EOF
+
+  # create list of common managed policies that can be attached to ec2 instance profiles
+  ec2_common_managed_policies = [
+    aws_iam_policy.ec2_common_policy.arn
+  ]
+
 }
 
-#------------------------------------------------------------------------------
-# Load Balancer - External
-#------------------------------------------------------------------------------
 
-resource "aws_security_group" "external_lb" {
 
-  name        = "external-lb-${var.networking[0].application}"
-  description = "Allow inbound traffic to external load balancer"
+# EC2 Created via module
+module "ec2_test_instance" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.4.1"
+
+  providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
+  for_each                      = try(local.ec2_test.ec2_test_instances, {})
+  name                          = each.key
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.instance, lookup(each.value, "instance", { disable_api_stop = false }))
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_kms_key_id                = data.aws_kms_key.ebs_shared.arn
+  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
+  ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
+  ssm_parameters                = lookup(each.value, "ssm_parameters", null)
+  route53_records               = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
+  availability_zone        = each.value.availability_zone
+  subnet_id                = each.value.subnet_id
+  iam_resource_names_prefix = local.app_name
+  instance_profile_policies = local.ec2_common_managed_policies
+  business_unit            = local.business_unit
+  application_name         = local.application_name
+  environment              = local.environment
+  region                   = local.region
+  tags                     = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  account_ids_lookup       = local.environment_management.account_ids
+  cloudwatch_metric_alarms = {}
+}
+
+# EC2 Sec Group
+resource "aws_security_group" "example_ec2_sg" {
+  name        = "example_ec2_sg"
+  description = "Controls access to EC2"
   vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "external-lb-${var.networking[0].application}"
-    },
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
   )
 }
 
-resource "aws_security_group_rule" "external_lb_ingress_1" {
-
-  security_group_id = aws_security_group.external_lb.id
+resource "aws_security_group_rule" "ingress_traffic" {
+  for_each          = local.application_data.example_ec2_sg_rules
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.example_ec2_sg.id
+  to_port           = each.value.to_port
   type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks = [
-    "81.157.202.5/32"
-  ]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
-resource "aws_security_group_rule" "external_lb_egress_1" {
-
-  security_group_id        = aws_security_group.external_lb.id
+resource "aws_security_group_rule" "egress_traffic" {
+  for_each                 = local.application_data.example_ec2_sg_rules
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.example_ec2_sg.id
+  to_port                  = each.value.to_port
   type                     = "egress"
-  from_port                = 3000
-  to_port                  = 3000
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.app.id
+  source_security_group_id = aws_security_group.example_ec2_sg.id
 }
 
-resource "aws_security_group_rule" "external_lb_ingress_2" {
-
-  security_group_id = aws_security_group.external_lb.id
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks = [
-    "81.157.202.5/32"
-  ]
-}
-
-resource "aws_lb" "external" {
-
-  name                       = "external-${var.networking[0].application}"
-  internal                   = false
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.external_lb.id]
-  subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = false
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "external-${var.networking[0].application}"
-    },
-  )
-}
-
-resource "aws_lb_target_group" "external" {
-
-  name                 = "external-${var.networking[0].application}"
-  port                 = "3000"
-  protocol             = "HTTP"
-  target_type          = "ip"
-  deregistration_delay = "30"
-  vpc_id               = data.aws_vpc.shared.id
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "external-${var.networking[0].application}"
-    },
-  )
-}
-
-resource "aws_lb_listener" "external" {
-  depends_on = [
-    aws_acm_certificate_validation.external
-  ]
-
-  load_balancer_arn = aws_lb.external.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.external.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.external.arn
-  }
-}
-
-resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-sandbox.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.external.dns_name
-    zone_id                = aws_lb.external.zone_id
-    evaluate_target_health = true
-  }
-}
-
-resource "aws_acm_certificate" "external" {
-  domain_name       = "${var.networking[0].business-unit}-sandbox.modernisation-platform.service.justice.gov.uk"
-  validation_method = "DNS"
-
-  subject_alternative_names = ["*.${var.networking[0].business-unit}-sandbox.modernisation-platform.service.justice.gov.uk"]
-  tags = {
-    Environment = "test"
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_route53_record" "external_validation" {
-  provider = aws.core-vpc
-  for_each = {
-    for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = data.aws_route53_zone.external.zone_id
-}
-
-resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
-}
-
-#------------------------------------------------------------------------------
-# Load Balancer - inner
-#------------------------------------------------------------------------------
-
-resource "aws_security_group" "inner_lb" {
-
-  name        = "inner-lb-${var.networking[0].application}"
-  description = "Allow inbound traffic to inner load balancer"
-  vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "inner-lb-${var.networking[0].application}"
-    },
-  )
-}
-
-resource "aws_security_group_rule" "inner_lb_ingress_1" {
-
-  security_group_id        = aws_security_group.inner_lb.id
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.inner_lb.id
-}
-
-resource "aws_security_group_rule" "inner_lb_egress_1" {
-
-  security_group_id        = aws_security_group.inner_lb.id
-  type                     = "egress"
-  from_port                = 3000
-  to_port                  = 3000
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.app.id
-}
-
-resource "aws_lb" "inner" {
-
-  name                       = "inner-${var.networking[0].application}"
-  internal                   = true
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.inner_lb.id]
-  subnets                    = data.aws_subnets.shared-private.ids
-  enable_deletion_protection = false
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "inner-${var.networking[0].application}"
-    },
-  )
-}
-
-resource "aws_lb_target_group" "inner" {
-
-  name                 = "inner-${var.networking[0].application}"
-  port                 = "3000"
-  protocol             = "HTTP"
-  target_type          = "ip"
-  deregistration_delay = "30"
-  vpc_id               = data.aws_vpc.shared.id
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "inner-${var.networking[0].application}"
-    },
-  )
-}
-
-resource "aws_lb_listener" "inner" {
-  depends_on = [
-    aws_acm_certificate.inner
-  ]
-
-  load_balancer_arn = aws_lb.inner.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.inner.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.inner.arn
-  }
-}
-
-resource "aws_route53_record" "inner" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.inner.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-sandbox.modernisation-platform.internal"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.inner.dns_name
-    zone_id                = aws_lb.inner.zone_id
-    evaluate_target_health = true
-  }
-}
-
-resource "aws_acm_certificate" "inner" {
-  domain_name               = "${var.networking[0].business-unit}-sandbox.modernisation-platform.internal"
-  certificate_authority_arn = local.is_live[0] == "live" ? data.terraform_remote_state.core_network_services.outputs.acmpca_subordinate_live : data.terraform_remote_state.core_network_services.outputs.acmpca_subordinate_non_live
-
-  subject_alternative_names = ["*.${var.networking[0].business-unit}-sandbox.modernisation-platform.internal"]
-  tags = {
-    Environment = "test"
-  }
-}
-
-#------------------------------------------------------------------------------
-# Database
-#------------------------------------------------------------------------------
-resource "aws_security_group" "rds" {
-
-  name        = "db-${var.networking[0].application}"
-  description = "Allow inbound traffic from application"
-  vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "db-${var.networking[0].application}"
-    },
-  )
-}
-
-resource "aws_security_group_rule" "rds_ingress_1" {
-
-  security_group_id        = aws_security_group.rds.id
-  type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.app.id
-}
-
-resource "aws_security_group_rule" "rds_egress_1" {
-
-  security_group_id = aws_security_group.rds.id
-  type              = "egress"
-  from_port         = 0
+resource "aws_security_group_rule" "ingress_traffic_icmp_from_cp" {
+  description       = "Allowing ping from CP"
+  from_port         = 8 //Echo Request
+  protocol          = "ICMP"
+  security_group_id = aws_security_group.example_ec2_sg.id
   to_port           = 0
-  protocol          = -1
-  cidr_blocks       = ["0.0.0.0/0"]
+  type              = "ingress"
+  cidr_blocks       = ["172.20.0.0/16"] //Cloud Platform
 }
 
-resource "aws_db_subnet_group" "app" {
+#  Build EC2 "example-ec2"
+resource "aws_instance" "develop" {
+  #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
+  # Specify the instance type and ami to be used (this is the Amazon free tier option)
+  instance_type          = local.application_data.accounts[local.environment].instance_type
+  ami                    = local.application_data.accounts[local.environment].ami_image_id
+  vpc_security_group_ids = [aws_security_group.example_ec2_sg.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  monitoring             = true
+  ebs_optimized          = true
 
-  name        = var.networking[0].application
-  description = "Data subnets group"
-  subnet_ids  = data.aws_subnets.shared-data.ids
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+  # Increase the volume size of the root volume
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 20
+    encrypted   = true
+  }
+  tags = merge(local.tags,
+    { Name = lower(format("ec2-%s-%s-example", local.application_name, local.environment)) }
+  )
+  depends_on = [aws_security_group.example_ec2_sg]
+}
 
+# create single managed policy
+resource "aws_iam_policy" "ec2_common_policy" {
+  name        = "ec2-common-policy"
+  path        = "/"
+  description = "Common policy for all ec2 instances"
+  policy      = data.aws_iam_policy_document.ec2_common_combined.json
   tags = merge(
     local.tags,
     {
-      Name = var.networking[0].application
+      Name = "ec2-common-policy"
     },
   )
 }
 
-# Create and store database secret
-resource "random_password" "db_master_password" {
-
-  length  = 32
-  special = false
+# combine ec2-common policy documents
+data "aws_iam_policy_document" "ec2_common_combined" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.ec2_policy.json,
+  ]
 }
 
-resource "random_string" "secret_name_suffix" {
-  length  = 6
-  special = false
+# Has to be in the locals else
+data "aws_kms_key" "default_ebs" {
+  key_id = "alias/aws/ebs"
 }
 
-resource "aws_secretsmanager_secret" "master_password" {
+# custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
+data "aws_iam_policy_document" "ec2_policy" {
+  statement {
+    sid    = "CustomEc2Policy"
+    effect = "Allow"
+    actions = [
+      "ec2:*"
+    ]
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
 
-  name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
-
+#------------------------------------------------------------------------------
+# Keypair for ec2-user
+#------------------------------------------------------------------------------
+resource "aws_key_pair" "ec2-user" {
+  key_name   = "ec2-user"
+  public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
   tags = merge(
     local.tags,
     {
-      Name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
+      Name = "ec2-user"
     },
   )
 }
 
-resource "aws_secretsmanager_secret_version" "master_password" {
-  secret_id     = aws_secretsmanager_secret.master_password.id
-  secret_string = random_password.db_master_password.result
-}
-
-resource "aws_db_instance" "app" {
-
-  identifier             = var.networking[0].application
-  allocated_storage      = local.application_data.accounts[local.environment].rds_storage
-  engine                 = "postgres"
-  engine_version         = local.application_data.accounts[local.environment].rds_postgresql_version
-  instance_class         = local.application_data.accounts[local.environment].rds_instance_class
-  db_name                = var.networking[0].application
-  username               = "dbmain"
-  password               = random_password.db_master_password.result
-  vpc_security_group_ids = [aws_security_group.rds.id]
-  db_subnet_group_name   = aws_db_subnet_group.app.id
-  skip_final_snapshot    = true
+# Volumes built for use by EC2.
+resource "aws_kms_key" "ec2" {
+  description         = "Encryption key for EBS"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.ebs-kms.json
 
   tags = merge(
     local.tags,
     {
-      Name = var.networking[0].application
+      Name = "${local.application_name}-ebs-kms"
     }
   )
 }
 
-#------------------------------------------------------------------------------
-# Logging
-#------------------------------------------------------------------------------
+resource "aws_ebs_volume" "ebs_volume" {
+  availability_zone = "${local.application_data.accounts[local.environment].region}a"
+  type              = "gp3"
+  size              = 50
+  throughput        = 200
+  encrypted         = true
+  kms_key_id        = aws_kms_key.ec2.arn
+  tags = {
+    Name = "ebs-data-volume"
+  }
 
-resource "aws_cloudwatch_log_group" "app" {
-
-  name              = var.networking[0].application
-  retention_in_days = 90
-
-  tags = merge(
-    local.tags,
-    {
-      Name = var.networking[0].application
-    },
-  )
+  depends_on = [aws_instance.develop, aws_kms_key.ec2]
 }
+
+# Attach to the EC2
+resource "aws_volume_attachment" "mountvolumetoec2" {
+  device_name = "/dev/sdb"
+  instance_id = aws_instance.develop.id
+  volume_id   = aws_ebs_volume.ebs_volume.id
+}
+
+#### This file can be used to store data specific to the member account ####
+data "aws_iam_policy_document" "ebs-kms" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_109
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type = "Service"
+      identifiers = [
+      "ec2.amazonaws.com"]
+    }
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+      "arn:aws:iam::${data.aws_caller_identity.original_session.id}:root"]
+    }
+  }
+}
+
+# module "environment" {
+#   source = "../../modules/environment"
+
+#   providers = {
+#     aws.modernisation-platform = aws.modernisation-platform
+#     aws.core-network-services  = aws.core-network-services
+#     aws.core-vpc               = aws.core-vpc
+#   }
+
+#   environment_management = local.environment_management
+#   business_unit          = local.business_unit
+#   application_name       = local.application_name
+#   environment            = local.environment
+#   subnet_set             = local.subnet_set
+# }
