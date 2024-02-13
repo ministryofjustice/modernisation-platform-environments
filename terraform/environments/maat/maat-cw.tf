@@ -432,7 +432,7 @@ EOF
 ####### CLOUDWATCH ALERTING
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "Sev5SnsTopic" {
-  name = Sev5SnsTopic
+  name = "${local.application_name}-Sev5SnsTopic"
   tags = merge(
     local.tags,
     {
@@ -443,7 +443,7 @@ resource "aws_sns_topic" "Sev5SnsTopic" {
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "AlertCrimeAppsSnsTopic" {
-  name = AlertCrimeAppsSnsTopic
+  name = "${local.application_name}-AlertCrimeAppsSnsTopic"
   tags = merge(
     local.tags,
     {
