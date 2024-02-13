@@ -37,7 +37,7 @@ module "weblogic" {
     },
     {
       name      = "LDAP_CREDENTIAL"
-      valueFrom = module.ldap.delius_core_ldap_credential_arn
+      valueFrom = module.ldap.delius_core_ldap_bind_password_arn
     }
   ]
   container_port_config = [
