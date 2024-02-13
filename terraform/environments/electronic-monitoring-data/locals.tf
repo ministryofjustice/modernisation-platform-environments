@@ -16,7 +16,7 @@ locals {
   capita_cidr_ipv6s = []
 
   sftp_account_capita_test = {
-    name       = "capita_test"
+    name       = "test"
     ssh_keys   = local.capita_ssh_keys
     cidr_ipv4s = local.capita_cidr_ipv4s
     cidr_ipv6s = local.capita_cidr_ipv6s
@@ -55,7 +55,7 @@ locals {
   civica_cidr_ipv6s = []
 
   sftp_account_civica_test = {
-    name       = "civica_test"
+    name       = "test"
     ssh_keys   = local.civica_ssh_keys
     cidr_ipv4s = local.civica_cidr_ipv4s
     cidr_ipv6s = local.civica_cidr_ipv6s
