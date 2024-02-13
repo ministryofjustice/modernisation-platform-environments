@@ -445,7 +445,6 @@ resource "aws_sns_topic" "Sev5SnsTopic" {
 resource "aws_sns_topic" "AlertCrimeAppsSnsTopic" {
   name = AlertCrimeAppsSnsTopic
   tags = merge(
-  tags = merge(
     local.tags,
     {
       Name = "${local.application_name}-AlertCrimeAppsSnsTopic"
