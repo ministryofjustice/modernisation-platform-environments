@@ -21,10 +21,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_EscCPUoverThreshold" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${local.application_name}-ECS-CPU-high-threshold-alarm"
-    }
+    },
   )
 }
 
@@ -69,10 +69,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_EcsCPUNotRunning" {
   }
   comparison_operator = "LessThanOrEqualToThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${local.application_name}-ECS-CPU-not-running-alarm"
-    }
+    },
   )
 }
 
@@ -102,10 +102,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_status-check-failure-alarm" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      Name = "${var.appnameenv}-status-check-failure-alarm"
-    }
+      Name = "${local.application_name}-elb-4xx-error-alarm"
+    },
   )
 }
 
@@ -132,10 +132,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTime" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      Name = "${var.appnameenv}-alb-target-response-time-alarm"
-    }
+      Name = "${local.application_name}-alb-target-response-time-alarm"
+    },
   )
 }
 
@@ -156,10 +156,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTimeMaximum" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      Name = "${var.appnameenv}-alb-target-response-time-alarm-maximum"
-    }
+      Name = "${local.application_name}-alb-target-response-time-alarm-maximum"
+    },
   )
 }
 
@@ -181,10 +181,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_UnHealthyHosts" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      Name = "${var.appnameenv}-unhealthy-hosts-alarm"
-    }
+      Name = "${local.application_name}-unhealthy-hosts-alarm"
+    },
   )
 }
 
@@ -205,10 +205,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_RejectedConnectionCount" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      Name = "${var.appnameenv}-RejectevdConnectionCount-alarm"
-    }
+      Name = "${local.application_name}-RejectevdConnectionCount-alarm"
+    },
   )
 }
 
@@ -229,10 +229,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_http5xxError" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      Name = "${var.appnameenv}-http-5xx-error-alarm"
-    }
+      Name = "${local.application_name}-http-5xx-error-alarm"
+    },
   )
 }
 
@@ -253,10 +253,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB5xxError" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      Name = "${var.appnameenv}-elb-5xx-error-alarm"
-    }
+      Name = "${local.application_name}-elb-5xx-error-alarm"
+    },
   )
 }
 
@@ -277,10 +277,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_http4xxError" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      Name = "${var.appnameenv}-http-4xx-error-alarm"
-    }
+      Name = "${local.application_name}-elb-5xx-error-alarm"
+    },
   )
 }
 
@@ -301,10 +301,10 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB4xxError" {
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      Name = "${var.appnameenv}-elb-4xx-error-alarm"
-    }
+      Name = "${local.application_name}-elb-4xx-error-alarm"
+    },
   )
 }
 
@@ -434,10 +434,10 @@ EOF
 resource "aws_sns_topic" "Sev5SnsTopic" {
   name = Sev5SnsTopic
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      Name = Sev5SnsTopic
-    }
+      Name = "${local.application_name}-Sev5SnsTopic"
+    },
   )
 }
 
@@ -445,10 +445,11 @@ resource "aws_sns_topic" "Sev5SnsTopic" {
 resource "aws_sns_topic" "AlertCrimeAppsSnsTopic" {
   name = AlertCrimeAppsSnsTopic
   tags = merge(
-    var.tags,
+  tags = merge(
+    local.tags,
     {
-      Name = AlertCrimeAppsSnsTopic
-    }
+      Name = "${local.application_name}-AlertCrimeAppsSnsTopic"
+    },
   )
 }
 
