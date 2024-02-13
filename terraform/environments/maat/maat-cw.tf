@@ -49,6 +49,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_EcsMemoryOverThreshold" {
     {
       Name = "${local.application_name}-ECS-Memory-high-threshold-alarm"
     }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_EcsCPUNotRunning" {
@@ -429,25 +430,24 @@ EOF
 }
 
 ####### CLOUDWATCH ALERTING
-# SNS topic for monitoring to send alarms to
+
 resource "aws_sns_topic" "Sev5SnsTopic" {
   name = "${local.application_name}-Sev5SnsTopic"
   tags = merge(
     local.tags,
     {
       Name = "${local.application_name}-Sev5SnsTopic"
-    },
+    }
   )
 }
 
-# SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "AlertCrimeAppsSnsTopic" {
   name = "${local.application_name}-AlertCrimeAppsSnsTopic"
   tags = merge(
     local.tags,
     {
       Name = "${local.application_name}-AlertCrimeAppsSnsTopic"
-    },
+    }
   )
 }
 
