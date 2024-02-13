@@ -45,6 +45,7 @@ module "merge_api_service" {
   rds_engine_version                 = var.merge_config.rds_engine_version
   rds_instance_class                 = var.merge_config.rds_instance_class
   rds_port = 1521
+  snapshot_identifier                = "merge-snapshot"
   container_environment_vars = [
     {
       name  = "SERVER_SERVLET_CONTEXT_PATH"
