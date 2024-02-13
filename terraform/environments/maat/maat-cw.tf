@@ -451,15 +451,15 @@ resource "aws_sns_topic" "AlertCrimeAppsSnsTopic" {
   )
 }
 
-resource "aws_sns_topic_subscription" "pagerduty_Sev5_subscription" {
-  topic_arn = aws_sns_topic.Sev5SnsTopic.arn
-  protocol  = "https"
-  endpoint  = "https://events.pagerduty.com/integration/${local.application_data.accounts[local.environment].pagerduty_sev5_integration_key}/enqueue"
-}
+# resource "aws_sns_topic_subscription" "pagerduty_Sev5_subscription" {
+#   topic_arn = aws_sns_topic.Sev5SnsTopic.arn
+#   protocol  = "https"
+#   endpoint  = "https://events.pagerduty.com/integration/${local.application_data.accounts[local.environment].pagerduty_sev5_integration_key}/enqueue"
+# }
 
-resource "aws_sns_topic_subscription" "pagerduty_app_subscription" {
-  topic_arn = aws_sns_topic.AlertCrimeAppsSnsTopic.arn
-  protocol  = "https"
-  endpoint  = "https://events.pagerduty.com/integration/${local.application_data.accounts[local.environment].pagerduty_app_integration_key}/enqueue"
-}
+# resource "aws_sns_topic_subscription" "pagerduty_app_subscription" {
+#   topic_arn = aws_sns_topic.AlertCrimeAppsSnsTopic.arn
+#   protocol  = "https"
+#   endpoint  = "https://events.pagerduty.com/integration/${local.application_data.accounts[local.environment].pagerduty_app_integration_key}/enqueue"
+# }
 
