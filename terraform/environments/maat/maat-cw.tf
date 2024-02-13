@@ -320,16 +320,16 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB4xxError" {
 resource "aws_cloudwatch_dashboard" "maat_cloudwatch_dashboard" {
   dashboard_name = "MAAT"
   depends_on = [
-    aws_cloudwatch_metric_alarm.ApplicationELB4xxError,
-    aws_cloudwatch_metric_alarm.TargetResponseTime,
-    aws_cloudwatch_metric_alarm.http4xxError,
-    aws_cloudwatch_metric_alarm.ApplicationELB5xxError,
-    aws_cloudwatch_metric_alarm.http5xxError,
-    aws_cloudwatch_metric_alarm.RejectedConnectionCount,
-    aws_cloudwatch_metric_alarm.UnHealthyHosts,
-    aws_cloudwatch_metric_alarm.StatusCheckFailure,
-    aws_cloudwatch_metric_alarm.EcsMemoryOverThreshold,
-    aws_cloudwatch_metric_alarm.EscCPUoverThreshold,
+    aws_cloudwatch_metric_alarm.maat_ApplicationELB4xxError,
+    aws_cloudwatch_metric_alarm.maat_TargetResponseTime,
+    aws_cloudwatch_metric_alarm.maat_http4xxError,
+    aws_cloudwatch_metric_alarm.maat_ApplicationELB5xxError,
+    aws_cloudwatch_metric_alarm.maat_http5xxError,
+    aws_cloudwatch_metric_alarm.maat_RejectedConnectionCount,
+    aws_cloudwatch_metric_alarm.maat_UnHealthyHosts,
+    aws_cloudwatch_metric_alarm.maat_StatusCheckFailure,
+    aws_cloudwatch_metric_alarm.maat_EcsMemoryOverThreshold,
+    aws_cloudwatch_metric_alarm.maat_EscCPUoverThreshold,
   ]
   dashboard_body = <<EOF
 {
@@ -344,7 +344,7 @@ resource "aws_cloudwatch_dashboard" "maat_cloudwatch_dashboard" {
           "title" : "Application ELB 5xx Error",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.ApplicationELB5xxError.arn}"
+              "${aws_cloudwatch_metric_alarm.maat_ApplicationELB5xxError.arn}"
             ]
           },
           "view": "timeSeries",
@@ -362,7 +362,7 @@ resource "aws_cloudwatch_dashboard" "maat_cloudwatch_dashboard" {
           "title" : "Application ELB 4xx Error",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.http4xxError.arn}"
+              "${aws_cloudwatch_metric_alarm.maat_http4xxError.arn}"
             ]
           },
           "view": "timeSeries",
@@ -380,7 +380,7 @@ resource "aws_cloudwatch_dashboard" "maat_cloudwatch_dashboard" {
           "title" : "Application ELB Target Response Time",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.TargetResponseTime.arn}"
+              "${aws_cloudwatch_metric_alarm.maat_TargetResponseTime.arn}"
             ]
           },
           "view": "timeSeries",
@@ -398,7 +398,7 @@ resource "aws_cloudwatch_dashboard" "maat_cloudwatch_dashboard" {
           "title" : "ECS CPU",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.EscCPUoverThreshold.arn}"
+              "${aws_cloudwatch_metric_alarm.maat_EscCPUoverThreshold.arn}"
             ]
           },
           "view": "timeSeries",
@@ -416,7 +416,7 @@ resource "aws_cloudwatch_dashboard" "maat_cloudwatch_dashboard" {
           "title" : "ECS Memory",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.ecsmemoryoverthreshold.arn}"
+              "${aws_cloudwatch_metric_alarm.maat_ecsmemoryoverthreshold.arn}"
             ]
           },
           "view": "timeSeries",
