@@ -502,9 +502,16 @@ locals {
           security_groups = ["web", "app"]
         }
         http_enduser_db = {
-          description = "80: HTTP ingress for end-users"
+          description = "80: HTTP ingress for end-users" # Try to remove this later as it's not part of the Azure rule set
           from_port   = 80
           to_port     = 80
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        netbios_tcp_enduser = {
+          description = "137-139: TCP NetBIOS ingress from enduserclient"
+          from_port   = 137
+          to_port     = 139
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
@@ -555,6 +562,13 @@ locals {
           from_port   = 1434
           to_port     = 1434
           protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        winrm_tcp_db = {
+          description = "5985-5986: Allow WinRM from CAFM servers and other clients"
+          from_port   = 5985
+          to_port     = 5986
+          protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
         cafm_licensing_7071_db = {
