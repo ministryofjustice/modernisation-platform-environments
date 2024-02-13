@@ -1,6 +1,6 @@
 data "archive_file" "this" {
   type        = "zip"
-  source_dir  = "${path.module}/checksum_lambda.py"
+  source_file = "${path.module}/checksum_lambda.py"
   output_path = "${path.module}/checksum_lambda.zip"
 }
 
