@@ -21,7 +21,7 @@ mainSteps:
           $NewHostname = "{{newHostname}}"
 
           Set-Location -Path ([System.IO.Path]::GetTempPath())
-          $GitBranch = "DSOS-2601/powershell-fixes-for-win2012"
+          $GitBranch = "main"
           $Script = "ModPlatformAD/Join-ModPlatformAD.ps1"
           $ScriptArgs = @{"NewHostname" = $NewHostname}
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default

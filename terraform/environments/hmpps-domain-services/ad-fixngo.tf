@@ -36,6 +36,7 @@ locals {
       #   vpc_name                  = "live_data"
       #   vpc_security_group_name   = "ad_hmpp_dc_sg"
       #   tags = {
+      #     server-type = "DomainController"
       #     description = "domain controller for FixNGo azure.hmpp.root domain"
       #   }
       # }
@@ -48,6 +49,7 @@ locals {
       #   vpc_name                  = "live_data"
       #   vpc_security_group_name   = "ad_hmpp_dc_sg"
       #   tags = {
+      #     server-type = "DomainController"
       #     description = "domain controller for FixNGo azure.hmpp.root domain"
       #   }
       # }
@@ -60,46 +62,50 @@ locals {
       #   vpc_name                  = "live_data"
       #   vpc_security_group_name   = "ad_hmpp_rdlic_sg"
       #   tags = {
+      #     server-type = "RDLicensing"
       #     description = "remote desktop licensing server for FixNGo azure.hmpp.root domain"
       #   }
       # }
 
-      # ad-azure-dc-a = {
-      #   ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-      #   az_index                  = 0 # zone a
-      #   iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
-      #   instance_type             = "t3.large"
-      #   private_ip                = "10.26.8.20"
-      #   vpc_name                  = "non_live_data"
-      #   vpc_security_group_name   = "ad_azure_dc_sg"
-      #   tags = {
-      #     description = "domain controller for FixNGo azure.noms.root domain"
-      #   }
-      # }
-      # ad-azure-dc-b = {
-      #   ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-      #   az_index                  = 1 # zone b
-      #   iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
-      #   instance_type             = "t3.large"
-      #   private_ip                = "10.26.9.20"
-      #   vpc_name                  = "non_live_data"
-      #   vpc_security_group_name   = "ad_azure_dc_sg"
-      #   tags = {
-      #     description = "domain controller for FixNGo azure.noms.root domain"
-      #   }
-      # }
-      # ad-azure-rdlic = {
-      #   az_index                  = 2 # zone c
-      #   ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-      #   iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
-      #   instance_type             = "t3.medium"
-      #   private_ip                = null
-      #   vpc_name                  = "non_live_data"
-      #   vpc_security_group_name   = "ad_azure_rdlic_sg"
-      #   tags = {
-      #     description = "remote desktop licensing server for FixNGo azure.noms.root domain"
-      #   }
-      # }
+      ad-azure-dc-a = {
+        ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+        az_index                  = 0 # zone a
+        iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
+        instance_type             = "t3.large"
+        private_ip                = "10.26.8.20"
+        vpc_name                  = "non_live_data"
+        vpc_security_group_name   = "ad_azure_dc_sg"
+        tags = {
+          server-type = "DomainController"
+          description = "domain controller for FixNGo azure.noms.root domain"
+        }
+      }
+      ad-azure-dc-b = {
+        ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+        az_index                  = 1 # zone b
+        iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
+        instance_type             = "t3.large"
+        private_ip                = "10.26.9.20"
+        vpc_name                  = "non_live_data"
+        vpc_security_group_name   = "ad_azure_dc_sg"
+        tags = {
+          server-type = "DomainController"
+          description = "domain controller for FixNGo azure.noms.root domain"
+        }
+      }
+      ad-azure-rdlic = {
+        az_index                  = 2 # zone c
+        ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+        iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
+        instance_type             = "t3.medium"
+        private_ip                = null
+        vpc_name                  = "non_live_data"
+        vpc_security_group_name   = "ad_azure_rdlic_sg"
+        tags = {
+          server-type = "RDLicensing"
+          description = "remote desktop licensing server for FixNGo azure.noms.root domain"
+        }
+      }
     }
 
     ec2_iam_roles = {
@@ -627,6 +633,7 @@ resource "aws_instance" "ad_fixngo" {
   private_ip           = each.value.private_ip
   ##CSS subnet_id        = module.vpc[each.value.vpc_name].non_tgw_subnet_ids_map.private[each.value.az_index]
   subnet_id              = module.environment.subnet["private"][local.az[each.value.az_index]].id
+  user_data              = base64encode(file("./templates/ad-fixngo-ec2-user-data.yaml"))
   vpc_security_group_ids = [aws_security_group.ad_fixngo[each.value.vpc_security_group_name].id]
 
   # remove all ephemeral block devices
