@@ -37,6 +37,7 @@ locals {
         vpc_security_group_name   = "ad_hmpp_dc_sg"
         tags = {
           server-type = "DomainController"
+          domain-name = "azure.hmpp.root"
           description = "domain controller for FixNGo azure.hmpp.root domain"
         }
       }
@@ -50,6 +51,7 @@ locals {
         vpc_security_group_name   = "ad_hmpp_dc_sg"
         tags = {
           server-type = "DomainController"
+          domain-name = "azure.hmpp.root"
           description = "domain controller for FixNGo azure.hmpp.root domain"
         }
       }
@@ -63,6 +65,7 @@ locals {
         vpc_security_group_name   = "ad_hmpp_rdlic_sg"
         tags = {
           server-type = "RDLicensing"
+          domain-name = "azure.hmpp.root"
           description = "remote desktop licensing server for FixNGo azure.hmpp.root domain"
         }
       }
@@ -77,6 +80,7 @@ locals {
         vpc_security_group_name   = "ad_azure_dc_sg"
         tags = {
           server-type = "DomainController"
+          domain-name = "azure.noms.root"
           description = "domain controller for FixNGo azure.noms.root domain"
         }
       }
@@ -90,6 +94,7 @@ locals {
         vpc_security_group_name   = "ad_azure_dc_sg"
         tags = {
           server-type = "DomainController"
+          domain-name = "azure.noms.root"
           description = "domain controller for FixNGo azure.noms.root domain"
         }
       }
@@ -103,6 +108,7 @@ locals {
         vpc_security_group_name   = "ad_azure_rdlic_sg"
         tags = {
           server-type = "RDLicensing"
+          domain-name = "azure.noms.root"
           description = "remote desktop licensing server for FixNGo azure.noms.root domain"
         }
       }
