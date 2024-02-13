@@ -375,6 +375,7 @@ module "this_transfer_workflow_lambda" {
   source = "./checksum_lambda"
 
   data_store_bucket = var.data_store_bucket
+  supplier          = var.supplier
 }
 
 #------------------------------------------------------------------------------
