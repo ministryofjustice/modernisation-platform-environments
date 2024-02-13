@@ -431,8 +431,6 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_autoscaling_role_policy_atta
 
 resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
   family                   = "${local.application_name}-ecs-task-definition"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["EC2"]
   
   container_definitions = templatefile("maat-task-definition.json", 
     {
