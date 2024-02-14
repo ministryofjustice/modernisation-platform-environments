@@ -21,7 +21,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_cpu_over_threshold" {
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
   unit               = "Percent"
   dimensions = {
-    ClusterName = aws_ecs_cluster.app_ecs_cluster.name
+    ClusterName = aws_ecs_cluster.maat_app_ecs_cluster.name
     ServiceName = aws_ecs_service.maat_api_ecs_service.name
   }
   comparison_operator = "GreaterThanThreshold"
@@ -41,7 +41,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_memory_over_threshold" {
   ok_actions         = [aws_sns_topic.maat_api_alerting_topic.arn]
   unit               = "Percent"
   dimensions = {
-    ClusterName = aws_ecs_cluster.app_ecs_cluster.name
+    ClusterName = aws_ecs_cluster.maat_app_ecs_cluster.name
     ServiceName = aws_ecs_service.maat_api_ecs_service.name
   }
   comparison_operator = "GreaterThanThreshold"
