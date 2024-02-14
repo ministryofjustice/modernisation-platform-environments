@@ -17,7 +17,8 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external.arn
+  count                   = local.is-production ? 0 : 1
+  certificate_arn         = aws_acm_certificate.external[0].arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
