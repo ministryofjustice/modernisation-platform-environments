@@ -8,7 +8,7 @@ resource "aws_cloudwatch_log_group" "maat_api_ecs_cw_group" {
 }
 # ECS cluster alerting
 resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_cpu_over_threshold" {
-  alarm_name         = "${local.application_name}-ECS-CPU-high-threshold-alarm1"
+  alarm_name         = "${local.application_name}-api-ECS-CPU-high-threshold-alarm1"
   alarm_description  = "If the CPU exceeds the predefined threshold, this alarm will trigger. Please investigate."
   namespace          = "AWS/ECS"
   metric_name        = "CPUUtilization"
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_cpu_over_threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_memory_over_threshold" {
-  alarm_name         = "${local.application_name}-ECS-Memory-high-threshold-alarm"
+  alarm_name         = "${local.application_name}-api-ECS-Memory-high-threshold-alarm"
   alarm_description  = "If the memory util exceeds the predefined threshold, this alarm will trigger. Please investigate."
   namespace          = "AWS/ECS"
   metric_name        = "MemoryUtilization"
@@ -49,7 +49,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_memory_over_threshold" {
 
 # Application Load Balancer Alerting
 resource "aws_cloudwatch_metric_alarm" "maat_api_target_response_time" {
-  alarm_name         = "${local.application_name}-alb-target-response-time-alarm"
+  alarm_name         = "${local.application_name}-api-alb-target-response-time-alarm"
   alarm_description  = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received"
   namespace          = "AWS/ApplicationELB"
   metric_name        = "TargetResponseTime"
@@ -67,7 +67,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_target_response_time" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_target_response_time_maximum" {
-  alarm_name         = "${local.application_name}-alb-target-response-time-alarm-maximum"
+  alarm_name         = "${local.application_name}-api-alb-target-response-time-alarm-maximum"
   alarm_description  = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received. Triggered if the response is longer than 60s."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "TargetResponseTime"
@@ -85,7 +85,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_target_response_time_maximum" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_unhealthy_hosts" {
-  alarm_name         = "${local.application_name}-unhealthy-hosts-alarm"
+  alarm_name         = "${local.application_name}-api-unhealthy-hosts-alarm"
   alarm_description  = "The unhealthy hosts alarm triggers if your load balancer recognizes there is an unhealthy host and has been there for over 15 minutes."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "UnHealthyHostCount"
@@ -104,7 +104,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_unhealthy_hosts" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_rejected_connection_count" {
-  alarm_name         = "${local.application_name}-RejectedConnectionCount-alarm"
+  alarm_name         = "${local.application_name}-api-RejectedConnectionCount-alarm"
   alarm_description  = "There is no surge queue on ALB's. Alert triggers in ALB rejects too many requests, usually due to the backend being busy."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "RejectedConnectionCount"
@@ -122,7 +122,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_rejected_connection_count" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_http_5xx_error" {
-  alarm_name         = "${local.application_name}-http-5xx-error-alarm"
+  alarm_name         = "${local.application_name}-api-http-5xx-error-alarm"
   alarm_description  = "This alarm will trigger if we receive 4 5XX http alerts in a 5-minute period."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "HTTPCode_Target_5XX_Count"
@@ -140,7 +140,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_http_5xx_error" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_application_elb_5xx_error" {
-  alarm_name         = "${local.application_name}-elb-5xx-error-alarm"
+  alarm_name         = "${local.application_name}-api-elb-5xx-error-alarm"
   alarm_description  = "This alarm will trigger if we receive 4 5XX elb alerts in a 5-minute period."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "HTTPCode_ELB_5XX_Count"
@@ -158,7 +158,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_application_elb_5xx_error" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_http4xxError" {
-  alarm_name         = "${local.application_name}-http-4xx-error-alarm"
+  alarm_name         = "${local.application_name}-api-http-4xx-error-alarm"
   alarm_description  = "This alarm will trigger if we receive 4 4XX http alerts in a 5-minute period."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "HTTPCode_Target_4XX_Count"
@@ -176,7 +176,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_http4xxError" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_application_elb_4xx_error" {
-  alarm_name         = "${local.application_name}-elb-4xx-error-alarm"
+  alarm_name         = "${local.application_name}-api-elb-4xx-error-alarm"
   alarm_description  = "This alarm will trigger if we receive 4 4XX elb alerts in a 5-minute period."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "HTTPCode_ELB_4XX_Count"
