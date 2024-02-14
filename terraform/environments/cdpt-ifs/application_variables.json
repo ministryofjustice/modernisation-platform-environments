@@ -11,7 +11,7 @@
       "ec2_max_size": 2,
       "ec2_min_size": 1,
       "db_instance_class": "db.t3.small",
-      "db_user": "dbadmin",
+      "db_user": "admin",
       "db_allocated_storage": "100",
       "db_name": "ifs-dev",
       "env_name": "DEVELOPMENT",
