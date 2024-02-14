@@ -24,7 +24,7 @@ resource "aws_iam_role" "maat_ec2_instance_role" {
                "Service": "ec2.amazonaws.com"
             },
             "Effect": "Allow"
-        },
+        }
     ]
 }
 EOF
