@@ -56,7 +56,9 @@ tasks:
                 }
             },
             [PSCustomObject]@{
-              "rds-gateway" = @{}
+              "rds-gateway" = @{
+                "newHostname" = "tag:Name" 
+              }
             }
           )
 

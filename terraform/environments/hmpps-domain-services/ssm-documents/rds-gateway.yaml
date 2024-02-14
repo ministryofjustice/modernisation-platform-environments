@@ -12,7 +12,7 @@ mainSteps:
       runCommand:
         - |
           $ErrorActionPreference = "Stop" 
-          $GatewayHostname = "$env:computername"
+          $GatewayHostname = "{{newHostname}}"
 
           # Lookup domain configuration based on environment-name tag
           $Token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
@@ -58,6 +58,18 @@ mainSteps:
           $ServiceAccountPasswordSecureString = ConvertTo-SecureString $ServiceAccountPassword -AsPlainText -Force
           $Credentials = New-Object System.Management.Automation.PSCredential("$ServiceAccountUsername@$DomainNameFQDN", $ServiceAccountPasswordSecureString)
           $GatewayFQDN = "$GatewayHostname.$DomainNameFQDN"
+
+          function Test-RemoteConnection {
+            param([string]$computerName)
+            $result = Test-NetConnection -ComputerName $computerName -Port 3389  # You can change the port as needed
+            return $result.TcpTestSucceeded
+          }
+
+          # Check if gateway is ready after joining the domain
+           while (-not (Test-RemoteConnection -computerName $GatewayFQDN)) {
+            Write-Host "Waiting for $GatewayFQDN to be ready..."
+            Start-Sleep -Seconds 10
+          }
 
           Invoke-Command -ComputerName $GatewayFQDN -ArgumentList  $DomainNameFQDN  -credential $Credentials -scriptblock {
               $DomainNameFQDN = $args[0]
