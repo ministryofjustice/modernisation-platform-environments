@@ -187,7 +187,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_UnHealthyHosts" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_RejectedConnectionCount" {
-  alarm_name         = "${local.application_name}-RejectevdConnectionCount-alarm"
+  alarm_name         = "${local.application_name}-RejectedConnectionCount-alarm"
   alarm_description  = "There is no surge queue on ALB's. Alert triggers in ALB rejects too many requests, usually due to backend being busy."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "RejectedConnectionCount"
@@ -259,7 +259,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB5xxError" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_http4xxError" {
-  alarm_name         = "${local.application_name}-elb-5xx-error-alarm"
+  alarm_name         = "${local.application_name}-http-4xx-error-alarm"
   alarm_description  = "This alarm will trigger if we receive 4 4XX http alerts in a 5 minute period."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "HTTPCode_Target_4XX_Count"
@@ -277,7 +277,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_http4xxError" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-elb-5xx-error-alarm"
+      Name = "${local.application_name}-http-4xx-error-alarm"
     },
   )
 }
