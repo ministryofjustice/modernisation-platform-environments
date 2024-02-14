@@ -41,7 +41,7 @@ resource "aws_db_instance" "this" {
 
   manage_master_user_password = true
 
-  snapshot_identifier = var.snapshot_identifier != null && length(var.snapshot_identifier) > 0 ? var.snapshot_identifier : null
+  snapshot_identifier = var.snapshot_identifier != null 
 
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name                = var.rds_parameter_group_name
