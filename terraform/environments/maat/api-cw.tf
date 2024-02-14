@@ -198,10 +198,10 @@ resource "aws_sns_topic" "maat_api_alerting_topic" {
   name = "${local.application_name}-${local.environment}-alerting-topic"
 }
 
-resource "aws_sns_topic_subscription" "pagerduty_subscription" {
+resource "aws_sns_topic_subscription" "maat_api_pagerduty_subscription" {
   topic_arn = aws_sns_topic.maat_api_alerting_topic.arn
   protocol  = "https"
-  endpoint  = "https://events.pagerduty.com/integration/${local.pagerduty_integration_keys[local.maat_api_pagerduty_integration_key_name]}/enqueue"
+  endpoint  = "https://events.pagerduty.com/integration/${local.maat_api_pagerduty_integration_keys[local.maat_api_pagerduty_integration_key_name]}/enqueue"
 }
 
 # Pager duty integration
