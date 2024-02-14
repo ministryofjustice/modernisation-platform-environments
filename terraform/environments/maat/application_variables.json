@@ -81,13 +81,13 @@
       "maat_EcsMemoryOverThreshold":"75",
       "maat_ASGStatusFailureAlarmThreshold":"1",
       "maat_ALBTargetResponseTimeThreshold":"0",
-      "maat_ALBTargetResponseTimeThresholdMaximum":"10",
-      "maat_ALBUnhealthyAlarmThreshold":"10",
+      "maat_ALBTargetResponseTimeThresholdMaximum":"60",
+      "maat_ALBUnhealthyAlarmThreshold":"0",
       "maat_ALBRejectedAlarmThreshold":"10",
       "maat_ALBTarget5xxAlarmThreshold":"10",
       "maat_ALB5xxAlarmThreshold":"10",
       "maat_ALBTarget4xxAlarmThreshold":"10",
-      "maat_ALB4xxAlarmThreshold":"60",
+      "maat_ALB4xxAlarmThreshold":"10",
       "maat_pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
     },
     "test": {
