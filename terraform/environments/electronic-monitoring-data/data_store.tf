@@ -86,12 +86,18 @@ resource "aws_s3_bucket_notification" "data_store" {
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.checksum_lambda.arn
-    events              = ["s3:ObjectCreated:*"]
+    events              = [
+      "s3:ObjectCreated:Put",
+      "s3:ObjectCreated:Post"
+    ]
   }
 
   # lambda_function {
   #   lambda_function_arn = aws_lambda_function.analyse_zip_lambda.arn
-  #   events              = ["s3:ObjectCreated:*"]
+  #   events              = [
+    # "s3:ObjectCreated:Put",
+    # "s3:ObjectCreated:Post"
+  # ]
   #   filter_suffix       = ".zip"
   # }
 
