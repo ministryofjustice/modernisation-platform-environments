@@ -1,6 +1,12 @@
 ---
 schemaVersion: "2.2"
 description: "SSM Document for configuring an RDS gateway"
+parameters:
+  newHostname:
+    type: "String"
+    description: "By default uses the Name tag. Otherwise set to keep-existing or the desired hostname 15 chars or less"
+    default: "tag:Name"
+    maxChars: 15
 mainSteps:
   - name: ConfigureRDSGateway
     action: aws:runPowerShellScript
