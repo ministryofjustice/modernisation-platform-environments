@@ -75,6 +75,7 @@ locals {
     rds_allocated_storage = 20
     rds_username       = "admin"
     rds_port           = 5432
+    rds_license_model = "postgresql-license"
   }
 
   weblogic_config_dev = {
