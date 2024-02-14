@@ -207,18 +207,18 @@ resource "aws_sns_topic_subscription" "pagerduty_subscription" {
 # Pager duty integration
 
 # Get the map of pagerduty integration keys from the modernisation platform account
-data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+data "aws_secretsmanager_secret" "maat_api_pagerduty_integration_keys" {
   provider = aws.modernisation-platform
   name     = "pagerduty_integration_keys"
 }
-data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+data "aws_secretsmanager_secret_version" "maat_api_pagerduty_integration_keys" {
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
 }
 
 # Add a local to get the keys
 locals {
-  pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  maat_api_pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.maat_api_pagerduty_integration_keys.secret_string)
   maat_api_pagerduty_integration_key_name = local.application_data.accounts[local.environment].maat_api_pagerduty_integration_key_name
 }
 
@@ -229,7 +229,7 @@ module "pagerduty_core_alerts_non_prod" {
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.maat_api_alerting_topic.name]
-  pagerduty_integration_key = local.pagerduty_integration_keys["laa_maat_api_nonprod_alarms"]
+  pagerduty_integration_key = local.maat_api_pagerduty_integration_keys["laa_maat_api_nonprod_alarms"]
 }
 
 module "pagerduty_core_alerts_prod" {
@@ -238,5 +238,5 @@ module "pagerduty_core_alerts_prod" {
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.maat_api_alerting_topic.name]
-  pagerduty_integration_key = local.pagerduty_integration_keys["laa_maat_api_prod_alarms"]
+  pagerduty_integration_key = local.maat_api_pagerduty_integration_keys["laa_maat_api_prod_alarms"]
 }

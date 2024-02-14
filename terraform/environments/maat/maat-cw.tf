@@ -475,5 +475,5 @@ module "maat_pagerduty_core_alerts_prod" {
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.maat_alerting_topic.name]
-  pagerduty_integration_key = local.maat_pagerduty_integration_keys["laa_maat_prod_alarms"]
+  pagerduty_integration_key = local.maat_pagerduty_integration_keys["laa_maat_prod_alarm"]
 }
