@@ -64,8 +64,8 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2023-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
-          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy"])
+          user_data_raw                 = base64encode(file("./templates/rds-gateway-user-data.yaml"))
+          instance_profile_policies      = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy"])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]
