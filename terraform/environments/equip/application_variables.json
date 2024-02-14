@@ -993,5 +993,22 @@
       "to_port": 53,
       "protocol": "UDP"
     }
+  },
+  "azures_endpoint_rules": {
+    "TCP_5671": {
+      "from_port": 5671,
+      "to_port": 5671,
+      "protocol": "TCP"
+    },
+    "TCP_5672": {
+      "from_port": 5672,
+      "to_port": 5672,
+      "protocol": "TCP"
+    },
+    "TCP_9350_9354": {
+      "from_port": 9350,
+      "to_port": 9354,
+      "protocol": "TCP"
+    }
   }
 }

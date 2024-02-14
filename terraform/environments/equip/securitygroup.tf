@@ -213,6 +213,31 @@ resource "aws_security_group_rule" "egress_citrix-adc-vip_to_domain_controller_t
 
 ############################################################################
 
+#Inbound security group for azures connections
+
+resource "aws_security_group" "azures_ingres" {
+  name        = lower(format("secg-%s-%s-azures-ingress", local.application_name, local.environment))
+  description = "Security Group for azures ingress connections"
+  vpc_id      = data.aws_vpc.shared.id
+  tags = merge(local.tags,
+    { Name = lower(format("secg-%s-%s-azures-ingress", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_security_group_rule" "ingress_azures_traffic" {
+  for_each          = local.application_data.azures_endpoint_rules
+  description       = format("Ingress rules for azures connections %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.azures_ingres.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = ["10.0.0.0/24"]
+}
+
+
+############################################################################
+
 #Citrix ADC SNIP Security Group
 
 resource "aws_security_group" "citrix_adc_snip" {
