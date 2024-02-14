@@ -196,7 +196,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_RejectedConnectionCount" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBRejectedAlarmThreshold
+  threshold          = local.application_data.accounts[local.environment].maat_ALBRejectedAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name

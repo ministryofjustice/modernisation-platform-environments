@@ -172,7 +172,7 @@ resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
   name                  = "${local.application_name}-EC2-asg"
   desired_capacity      = local.application_data.accounts[local.environment].maat_ec2_asg_desired_capacity
   max_size              = local.application_data.accounts[local.environment].maat_ec2_asg_max_size
-  min_size              = local.application_data.accounts[local.environment].maat.ec2_asg_min_size
+  min_size              = local.application_data.accounts[local.environment].maat_ec2_asg_min_size
   metrics_granularity   = "1Minute"
 
 
