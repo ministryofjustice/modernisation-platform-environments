@@ -1,134 +1,96 @@
-"""
-Lambda function to add Checksum metadata to files.
+"""Lambda function to add Checksum metadata to files.
 
-Implementation taken from 
-https://aws.amazon.com/blogs/storage/enabling-and-validating-additional-checksums-on-existing-objects-in-amazon-s3/
+This function adds two tags to files that contain the SHA256 checksum as well
+as the BAse64 encoded SHA256 checksum (this is what AWS displays by default).
+
+To calculate a files SHA256 checksum locally in the command line (i.e. to
+compare) use:
+```
+shasum -a 256 path/to/file
+```
+
+and:
+
+```
+shasum -a 256 path/to/file | cut -f1 -d\ | xxd -r -p | base64
+```
+
+to encode it to Base64.
 """
+import base64
 import boto3
-import os
+import hashlib
+
 
 s3_client = boto3.client('s3')
-s3_resource = s3 = boto3.resource('s3')
+
 
 def handler(event, context):
-
     print(event)
 
+    event_type = event['Records'][0]['eventName']
+
     bucket = event['Records'][0]['s3']['bucket']['name']
-    key = event['Records'][0]['s3']['object']['key']
-    print(f"Object {key} was just uploaded in Bucket {bucket}.")
-    copy_source = {
-        'Bucket': bucket,
-        'Key': key
+    object_key = event['Records'][0]['s3']['object']['key']
+    print(f"{object_key = } was just added to {bucket = } via {event_type = }")
+
+    # Generate the SHA256 checksum of the object.
+    hash_value = generate_sha256_checksum(bucket, object_key)
+    
+    # Print the SHA256 checksum to CloudWatch logs.
+    print(f"SHA256 checksum of {object_key}: {hash_value}")
+    
+    hash_64 = convert_hash_to_base64(hash_value=hash_value)
+
+    # Print the Base 64 encoded SHA256 checksum to CloudWatch logs.
+    print(f"Base 64 SHA256 checksum of {object_key}: {hash_64}")
+
+    # Retrieve existing tags for the object
+    response = s3_client.get_object_tagging(
+        Bucket=bucket,
+        Key=object_key
+    )
+
+    additional_tags = {
+        'SHA-256 checksum': hash_value,
+        'Base64 SHA-256 checksum': hash_64,
     }
-
-    attributes = get_attributes(bucket, key)
     
-    # Only proceed if Checksums don't already exist
-    if attributes['Checksum'] is None:
-        print(f"Copying {key} to the same place but adding Checksum ...")
-        try:
-            # If using SSE-KMS
-            if 'EncryptionKey' in attributes:
-                s3_resource.meta.client.copy(
-                    copy_source,
-                    Bucket=bucket,
-                    Key=key,
-                    ExtraArgs={
-                        'ChecksumAlgorithm':os.environ['Checksum'],
-                        'StorageClass': attributes['StorageClass'],
-                        'ServerSideEncryption': attributes['Encryption'],
-                        'SSEKMSKeyId': attributes['EncryptionKey']
-                    }
-                )
-            # If using SSE-S3
-            elif attributes['Encryption'] is not None:
-                s3_resource.meta.client.copy(
-                    copy_source,
-                    Bucket=bucket,
-                    Key=key,
-                    ExtraArgs={
-                        'ChecksumAlgorithm':os.environ['Checksum'],
-                        'StorageClass': attributes['StorageClass'],
-                        'ServerSideEncryption': attributes['Encryption']
-                    }
-                )
-            # If not using any encryption - NOT RECOMMENDED
-            else:
-                print(os.environ['Checksum'])
-                s3_resource.meta.client.copy(
-                    copy_source,
-                    Bucket=bucket,
-                    Key=key,
-                    ExtraArgs={
-                        'ChecksumAlgorithm':os.environ['Checksum'],
-                        'StorageClass': attributes['StorageClass']
-                    }
-                )
-            print(f"SUCCESS: {key} now has a {os.environ['Checksum']} Checksum ")
-        except Exception as e:
-            print(e)
-            raise
-    else:
-        print(f"{key} already has a Checksum; No further action needed!")
+    # Merge existing tags with additional tags
+    existing_tags = response.get('TagSet', [])
+    existing_tags.extend([
+        { 'Key': key, 'Value': value }
+        for key, value in additional_tags.items()
+    ])
     
-    return
+    # Update tags for the object
+    s3_client.put_object_tagging(
+        Bucket=bucket,
+        Key=object_key,
+        Tagging={
+            'TagSet': existing_tags
+        }
+    )
 
-def get_attributes(bucket, key):
-    try:
-        attributes = {}
-        response = s3_client.get_object_attributes(
-            Bucket=bucket,
-            Key=key,
-            ObjectAttributes=['Checksum']
-        )
-        
-        # Check if the Object already has Checksums
-        print(f"Checking whether {key} already has Checksum ...")
-        if 'ChecksumCRC32' in response:
-            attributes['Checksum'] = 'ChecksumCRC32'
-            print(f"{key} already has a CRC32 Checksum!")
-            return attributes
-        elif 'ChecksumCRC32C' in response:
-            attributes['Checksum'] = 'ChecksumCRC32C'
-            print(f"{key} already has a CRC32C Checksum!")
-            return attributes
-        elif 'ChecksumSHA1' in response:
-            attributes['Checksum'] = 'ChecksumSHA1'
-            print(f"{key} already has a SHA1 Checksum!")
-            return attributes
-        elif 'ChecksumSHA256' in response:
-            attributes['Checksum'] = 'ChecksumSHA256'
-            print(f"{key} already has a SHA256 Checksum!")
-            return attributes
-        else:
-            print(f"{key} does not have a Checksum!")
-            attributes['Checksum'] = None
-            
-            print(f"Obtaining other attributes for {key} ...")
-            #Check Object's storage class
-            print(f"Checking Storage Class for {key} ...")
-            if 'StorageClass' not in response:
-                print(f"{key} is stored in S3-STANDARD.")
-                attributes['StorageClass'] = 'STANDARD'
-            else:
-                storage_class = response['StorageClass']
-                print(f"{key} is stored in {storage_class}.")
-                attributes['StorageClass'] = response['StorageClass']
-            
-            # Check Object's encryption
-            print(f"Checking Encryption for {key} ...")
-            if 'ServerSideEncryption' not in response:
-                print(f"{key} is not encrypted.")
-                attributes['Encryption'] = None
-            else:
-                print(f"{key} is encrypted.")
-                attributes['Encryption'] = response['ServerSideEncryption']
-                if response['ServerSideEncryption'] == 'aws:kms':
-                    attributes['EncryptionKey'] = response['SSEKMSKeyId']
-            
-            return attributes
+    print(f"Added tags = {list(additional_tags.keys())} to {object_key = }")
 
-    except Exception as e:
-        print(e)
-        raise
+    return None
+
+
+def generate_sha256_checksum(bucket_name, object_key):
+    # Retrieve the object data from S3
+    response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+    object_data = response['Body'].read()
+    
+    # Calculate the SHA256 checksum
+    sha256_hash = hashlib.sha256(object_data).hexdigest()
+
+    return sha256_hash
+
+
+def convert_hash_to_base64(hash_value):
+    # Convert hexdigest to bytes
+    binary_data = bytes.fromhex(hash_value)
+
+    # Encode bytes to base64
+    return base64.b64encode(binary_data).decode()
