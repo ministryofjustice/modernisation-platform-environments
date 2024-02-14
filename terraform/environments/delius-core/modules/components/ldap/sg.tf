@@ -51,6 +51,17 @@ resource "aws_security_group_rule" "allow_ldap_from_legacy_env" {
   cidr_blocks       = var.environment_config.migration_environment_private_cidr
 }
 
+resource "aws_security_group_rule" "allow_ldap_from_cp_env" {
+  for_each          = toset(["tcp", "udp"])
+  description       = "Allow inbound LDAP traffic from CP"
+  type              = "ingress"
+  from_port         = var.ldap_config.port
+  to_port           = var.ldap_config.port
+  protocol          = each.value
+  security_group_id = aws_security_group.ldap.id
+  cidr_blocks       = var.account_info.cp_cidr
+}
+
 resource "aws_security_group_rule" "efs_ingress_ldap" {
   type                     = "ingress"
   from_port                = 2049

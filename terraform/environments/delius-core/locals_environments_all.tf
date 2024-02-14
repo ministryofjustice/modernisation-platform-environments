@@ -6,6 +6,7 @@ locals {
     application_name = local.application_name
     mp_environment   = local.environment
     id               = data.aws_caller_identity.current.account_id
+    cp_cidr          = "172.20.0.0/16"
   }
 
   account_config = {
