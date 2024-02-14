@@ -14,7 +14,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_EscCPUoverThreshold" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].ECSCPUAlarmThreshold
+  threshold          = local.application_data.accounts[local.environment].maat_ECSCPUAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
@@ -38,7 +38,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_EcsMemoryOverThreshold" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].EcsMemoryOverThreshold
+  threshold          = local.application_data.accounts[local.environment].maat_EcsMemoryOverThreshold
   treat_missing_data = "breaching"
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
@@ -93,7 +93,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_StatusCheckFailure" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].ASGStatusFailureAlarmThreshold
+  threshold          = local.application_data.accounts[local.environment].maat_ASGStatusFailureAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.maat_ec2_scaling_group.name
@@ -123,7 +123,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTime" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBTargetResponseTimeThreshold
+  threshold          = local.application_data.accounts[local.environment].maat_ALBTargetResponseTimeThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -147,7 +147,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTimeMaximum" {
   evaluation_periods = "1"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBTargetResponseTimeThresholdMaximum
+  threshold          = local.application_data.accounts[local.environment].maat_ALBTargetResponseTimeThresholdMaximum
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -171,7 +171,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_UnHealthyHosts" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBUnhealthyAlarmThreshold
+  threshold          = local.application_data.accounts[local.environment].maat_ALBUnhealthyAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -220,7 +220,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_http5xxError" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBTarget5xxAlarmThreshold
+  threshold          = local.application_data.accounts[local.environment].maat_ALBTarget5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -244,7 +244,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB5xxError" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALB5xxAlarmThreshold
+  threshold          = local.application_data.accounts[local.environment].maat_ALB5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -268,7 +268,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_http4xxError" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBTarget4xxAlarmThreshold
+  threshold          = local.application_data.accounts[local.environment].maat_ALBTarget4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -292,7 +292,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB4xxError" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALB4xxAlarmThreshold 
+  threshold          = local.application_data.accounts[local.environment].maat_ALB4xxAlarmThreshold 
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name

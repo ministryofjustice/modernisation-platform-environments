@@ -170,9 +170,9 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
 resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
   name                  = "${local.application_name}-EC2-asg"
-  desired_capacity      = local.application_data.accounts[local.environment].ec2_asg_desired_capacity
-  max_size              = local.application_data.accounts[local.environment].ec2_asg_max_size
-  min_size              = local.application_data.accounts[local.environment].ec2_asg_min_size
+  desired_capacity      = local.application_data.accounts[local.environment].maat_ec2_asg_desired_capacity
+  max_size              = local.application_data.accounts[local.environment].maat_ec2_asg_max_size
+  min_size              = local.application_data.accounts[local.environment].maat.ec2_asg_min_size
   metrics_granularity   = "1Minute"
 
 
@@ -311,7 +311,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ec2_high_cpu_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = local.application_data.accounts[local.environment].ec2_cpu_scaling_up_threshold
+  threshold           = local.application_data.accounts[local.environment].maat_ec2_cpu_scaling_up_threshold
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_autoscaling_policy.maat_ec2_scaling_up_policy.arn]
@@ -330,7 +330,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ec2_low_cpu_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = local.application_data.accounts[local.environment].ec2_cpu_scaling_down_threshold
+  threshold           = local.application_data.accounts[local.environment].maat_ec2_cpu_scaling_down_threshold
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_autoscaling_policy.maat_ec2_scaling_down_policy.arn]
