@@ -33,7 +33,7 @@ resource "aws_db_subnet_group" "this" {
 resource "aws_db_instance" "this" {
   count          = var.create_rds ? 1 : 0
   engine         = var.rds_engine
-  license_model  = length(var.rds_license_model) > 0 ? var.rds_license_model : null
+  license_model  = var.rds_license_model != null ? var.rds_license_model : null
   engine_version = var.rds_engine_version
   instance_class = var.rds_instance_class
   identifier     = "${var.name}-${var.env_name}-db"
