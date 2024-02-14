@@ -24,7 +24,7 @@ resource "aws_iam_role" "maat_ec2_instance_role" {
                "Service": "ec2.amazonaws.com"
             },
             "Effect": "Allow"
-        }
+        },
     ]
 }
 EOF
@@ -61,6 +61,32 @@ resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
       },
     ]
   })
+}
+
+resource "aws_iam_policy" "maat_ec2_instance_role_policy_access_params" {
+  name = "${local.application_name}-ec2-instance-role-policy-access-params"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "ssm:GetParameters"
+        Resource = [
+          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat/*"
+        ]
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${local.application_name}-ec2-instance-role-policy-access-params"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "mmaat_ec2_instance_role_policy_attachment_access_params" {
+  role       = aws_iam_role.maat_ec2_instance_role.name
+  policy_arn = aws_iam_policy.maat_ec2_instance_role_policy_access_params.arn
 }
 
 resource "aws_iam_role_policy_attachment" "maat_ec2_instance_role_policy_attachment" {
