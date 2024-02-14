@@ -223,7 +223,7 @@ locals {
 }
 
 # link the sns topic to the service
-module "pagerduty_core_alerts_non_prod" {
+module "maat_api_pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.maat_api_alerting_topic
   ]
@@ -232,7 +232,7 @@ module "pagerduty_core_alerts_non_prod" {
   pagerduty_integration_key = local.maat_api_pagerduty_integration_keys["laa_maat_api_nonprod_alarms"]
 }
 
-module "pagerduty_core_alerts_prod" {
+module "maat_api_pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.maat_api_alerting_topic
   ]
