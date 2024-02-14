@@ -78,9 +78,9 @@ def get_attributes(bucket, key):
     try:
         attributes = {}
         response = s3_client.get_object_attributes(
-        Bucket=bucket,
-        Key=key,
-        ObjectAttributes=['Checksum']
+            Bucket=bucket,
+            Key=key,
+            ObjectAttributes=['Checksum']
         )
         
         # Check if the Object already has Checksums

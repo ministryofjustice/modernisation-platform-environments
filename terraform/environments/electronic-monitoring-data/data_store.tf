@@ -81,8 +81,28 @@ resource "aws_s3_bucket_logging" "data_store" {
   }
 }
 
+resource "aws_s3_bucket_notification" "data_store" {
+  bucket = aws_s3_bucket.bucket.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.checksum_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+
+  # lambda_function {
+  #   lambda_function_arn = aws_lambda_function.analyse_zip_lambda.arn
+  #   events              = ["s3:ObjectCreated:*"]
+  #   filter_suffix       = ".zip"
+  # }
+
+  depends_on = [
+    aws_lambda_permission.s3_allow_checksum_lambda,
+    # aws_lambda_permission.s3_allow_analyse_zip_lambda,
+  ]
+}
+
 #------------------------------------------------------------------------------
-# S3 batch job lambda function to calculate data store file checksums
+# S3 lambda function to calculate data store file checksums
 #------------------------------------------------------------------------------
 
 variable "checksum_algorithm" {
@@ -154,46 +174,12 @@ resource "aws_iam_role_policy" "checksum_lambda" {
   policy = data.aws_iam_policy_document.checksum_lambda.json
 }
 
-resource "aws_lambda_permission" "s3_invoke_checksum_lambda" {
-  statement_id  = "AllowExecutionFromS3"
+resource "aws_lambda_permission" "s3_allow_checksum_lambda" {
+  statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.checksum_lambda.arn
   principal     = "s3.amazonaws.com"
   source_arn    = "${aws_s3_bucket.data_store.arn}"
-  source_account = data.aws_caller_identity.current.account_id
-}
-
-resource "aws_iam_role" "s3_batch_checksum_lambda" {
-  name                = "s3-batch-checksum-lambda-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
-}
-
-data "aws_iam_policy_document" "s3_batch_checksum_lambda" {
-  statement {
-    sid = "S3Permissions"
-    effect  = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:PutObjectTagging",
-      "s3:GetObject",
-      "s3:GetObjectVersion",
-      "s3:GetObjectAcl",
-      "s3:GetObjectTagging",
-      "s3:ListBucket",
-      "s3:InitiateReplication",
-      "s3:GetReplicationConfiguration",
-      "s3:PutInventoryConfiguration"
-    ]
-    resources = ["${aws_s3_bucket.data_store.arn}/*"]
-  }
-}
-
-resource "aws_iam_role_policy" "s3_batch_checksum_lambda" {
-  name   = "checksum-lambda-iam-policy"
-  role   = aws_iam_role.s3_batch_checksum_lambda.id
-  policy = data.aws_iam_policy_document.s3_batch_checksum_lambda.json
 }
 
 #------------------------------------------------------------------------------
