@@ -8,14 +8,7 @@ variable "app_name" {
 
 # Account level info
 variable "account_info" {
-  type = object({
-    business_unit    = string,
-    region           = string,
-    vpc_id           = string,
-    application_name = string,
-    mp_environment   = string,
-    id               = string
-  })
+  type = any
 }
 
 variable "account_config" {
