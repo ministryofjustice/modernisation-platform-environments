@@ -2,6 +2,7 @@
 
 // ACM Public Certificate
 resource "aws_acm_certificate" "external" {
+  count             = local.is-production ? 0 : 1
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
