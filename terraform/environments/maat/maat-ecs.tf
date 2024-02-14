@@ -63,6 +63,32 @@ resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
   })
 }
 
+resource "aws_iam_policy" "maat_ec2_instance_role_policy_access_params" {
+  name = "${local.application_name}-ec2-instance-role-policy-access-params"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "ssm:GetParameters"
+        Resource = [
+          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat/*"
+        ]
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${local.application_name}-ec2-instance-role-policy-access-params"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "mmaat_ec2_instance_role_policy_attachment_access_params" {
+  role       = aws_iam_role.maat_ec2_instance_role.name
+  policy_arn = aws_iam_policy.maat_ec2_instance_role_policy_access_params.arn
+}
+
 resource "aws_iam_role_policy_attachment" "maat_ec2_instance_role_policy_attachment" {
   role       = aws_iam_role.maat_ec2_instance_role.name
   policy_arn = aws_iam_policy.maat_ec2_instance_role_policy.arn
@@ -431,6 +457,8 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_autoscaling_role_policy_atta
 
 resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
   family                   = "${local.application_name}-ecs-task-definition"
+  execution_role_arn       = aws_iam_role.maat_ec2_instance_role.arn
+  task_role_arn            = aws_iam_role.maat_ec2_instance_role.arn
   
   container_definitions = templatefile("maat-task-definition.json", 
     {
@@ -454,6 +482,8 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
     ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
     maat_ecs_log_group         = local.application_data.accounts[local.environment].maat_ecs_log_group
     maat_aws_stream_prefix      = local.application_data.accounts[local.environment].maat_aws_stream_prefix
+    env_account_region         = local.env_account_region
+    env_account_id             = local.env_account_id
     }
   )
 
