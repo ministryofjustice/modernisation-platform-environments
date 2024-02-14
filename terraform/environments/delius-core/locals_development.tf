@@ -72,6 +72,9 @@ locals {
     rds_engine         = "postgres"
     rds_engine_version = "15"
     rds_instance_class = "db.t3.small"
+    rds_allocated_storage = 20
+    rds_username       = "admin"
+    rds_port           = 5432
   }
 
   weblogic_config_dev = {
