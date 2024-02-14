@@ -27,20 +27,20 @@ locals {
       # rdlic        = remote desktop licensing server
       # a/b/c suffix = availability zone
 
-      ad-hmpp-dc-a = {
-        ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-        az_index                  = 0 # zone a
-        iam_instance_profile_role = "ad-fixngo-ec2-live-role"
-        instance_type             = "t3.large"
-        private_ip                = null
-        vpc_name                  = "live_data"
-        vpc_security_group_name   = "ad_hmpp_dc_sg"
-        tags = {
-          server-type = "DomainController"
-          domain-name = "azure.hmpp.root"
-          description = "domain controller for FixNGo azure.hmpp.root domain"
-        }
-      }
+#     ad-hmpp-dc-a = {
+#       ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+#       az_index                  = 0 # zone a
+#       iam_instance_profile_role = "ad-fixngo-ec2-live-role"
+#       instance_type             = "t3.large"
+#       private_ip                = null
+#       vpc_name                  = "live_data"
+#       vpc_security_group_name   = "ad_hmpp_dc_sg"
+#       tags = {
+#         server-type = "DomainController"
+#         domain-name = "azure.hmpp.root"
+#         description = "domain controller for FixNGo azure.hmpp.root domain"
+#       }
+#     }
 #     ad-hmpp-dc-b = {
 #       ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
 #       az_index                  = 1 # zone b
@@ -70,20 +70,20 @@ locals {
 #       }
 #     }
 
-#     ad-azure-dc-a = {
-#       ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
-#       az_index                  = 0 # zone a
-#       iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
-#       instance_type             = "t3.large"
-#       private_ip                = "10.26.8.20"
-#       vpc_name                  = "non_live_data"
-#       vpc_security_group_name   = "ad_azure_dc_sg"
-#       tags = {
-#         server-type = "DomainController"
-#         domain-name = "azure.noms.root"
-#         description = "domain controller for FixNGo azure.noms.root domain"
-#       }
-#     }
+      ad-azure-dc-a = {
+        ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
+        az_index                  = 0 # zone a
+        iam_instance_profile_role = "ad-fixngo-ec2-nonlive-role"
+        instance_type             = "t3.large"
+        private_ip                = "10.26.8.20"
+        vpc_name                  = "non_live_data"
+        vpc_security_group_name   = "ad_azure_dc_sg"
+        tags = {
+          server-type = "DomainController"
+          domain-name = "azure.noms.root"
+          description = "domain controller for FixNGo azure.noms.root domain"
+        }
+      }
 #     ad-azure-dc-b = {
 #       ami_name                  = "hmpps_windows_server_2022_release_2024-02-02T00-00-04.569Z"
 #       az_index                  = 1 # zone b
