@@ -482,6 +482,8 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
     ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
     maat_ecs_log_group         = local.application_data.accounts[local.environment].maat_ecs_log_group
     maat_aws_stream_prefix      = local.application_data.accounts[local.environment].maat_aws_stream_prefix
+    env_account_region         = local.env_account_region
+    env_account_id             = local.env_account_id
     }
   )
 
