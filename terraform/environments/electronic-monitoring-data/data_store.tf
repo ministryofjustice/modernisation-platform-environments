@@ -82,7 +82,7 @@ resource "aws_s3_bucket_logging" "data_store" {
 }
 
 resource "aws_s3_bucket_notification" "data_store" {
-  bucket = aws_s3_bucket.bucket.id
+  bucket = aws_s3_bucket.data_store.id
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.checksum_lambda.arn
