@@ -89,7 +89,7 @@ resource "aws_ssm_parameter" "maat_app_cma_client_secret" {
   }
 }
 
-resource "aws_ssm_parameter" "maat_app_bc_client_user_id" {
+resource "aws_ssm_parameter" "maat_app_bc_client_orig_id" {
   name  = "/maat/APP_BC_CLIENT_ORIG_ID"
   type  = "SecureString"
   value = "replace in console"
