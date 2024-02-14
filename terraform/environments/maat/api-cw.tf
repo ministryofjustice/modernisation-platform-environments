@@ -213,7 +213,7 @@ data "aws_secretsmanager_secret" "maat_api_pagerduty_integration_keys" {
 }
 data "aws_secretsmanager_secret_version" "maat_api_pagerduty_integration_keys" {
   provider  = aws.modernisation-platform
-  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+  secret_id = data.aws_secretsmanager_secret.maat_api_pagerduty_integration_keys.id
 }
 
 # Add a local to get the keys
