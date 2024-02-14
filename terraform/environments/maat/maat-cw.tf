@@ -431,20 +431,15 @@ EOF
 
 # Get the map of pagerduty integration keys from the modernisation platform account
 
-data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
-  provider = aws.modernisation-platform
-  name     = "pagerduty_integration_keys"
-}
+# data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+#   provider = aws.modernisation-platform
+#   name     = "pagerduty_integration_keys"
+# }
 
-data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
-  provider  = aws.modernisation-platform
-  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
-}
-
-# Add a local to get the keys
-locals {
-  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-}
+# data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+#   provider  = aws.modernisation-platform
+#   secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+# }
 
 # Add a local to get the keys
 locals {
@@ -465,7 +460,7 @@ resource "aws_sns_topic" "maat_alerting_topic" {
 }
 
 # link the sns topic to the service
-module "pagerduty_core_alerts_non_prod" {
+module "maat_pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.maat_alerting_topic
   ]
@@ -474,7 +469,7 @@ module "pagerduty_core_alerts_non_prod" {
   pagerduty_integration_key = local.pagerduty_integration_keys["laa_maat_nonprod_alarms"]
 }
 
-module "pagerduty_core_alerts_prod" {
+module "maat_pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.maat_alerting_topic
   ]
