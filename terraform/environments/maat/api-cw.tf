@@ -195,7 +195,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_application_elb_4xx_error" {
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "maat_api_alerting_topic" {
-  name = "${local.application_name}-${local.environment}-alerting-topic"
+  name = "${local.application_name}-api-${local.environment}-alerting-topic"
 }
 
 resource "aws_sns_topic_subscription" "maat_api_pagerduty_subscription" {
