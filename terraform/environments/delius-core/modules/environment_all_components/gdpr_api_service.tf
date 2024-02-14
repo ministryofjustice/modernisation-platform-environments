@@ -39,6 +39,14 @@ module "gdpr_api_service" {
   account_config                     = var.account_config
   health_check_path                  = "/gdpr/api/actuator/health"
   account_info                       = var.account_info
+  create_rds                         = var.merge_config.create_rds
+  rds_engine                         = var.merge_config.rds_engine
+  rds_engine_version                 = var.merge_config.rds_engine_version
+  rds_instance_class                 = var.merge_config.rds_instance_class
+  rds_port                           = var.merge_config.rds_port
+  rds_allocated_storage              = var.merge_config.rds_allocated_storage
+  rds_username                       = var.merge_config.rds_username
+  rds_license_model                  = var.merge_config.rds_license_model
   container_environment_vars = [
     {
       name  = "SERVER_SERVLET_CONTEXT_PATH"
