@@ -448,16 +448,16 @@ locals {
 }
 
 
-# Create SNS topic
-resource "aws_sns_topic" "maat_alerting_topic" {
-  name = "${local.application_name}-${local.environment}-alerting-topic"
-    tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-maat-alerting-topic"
-    }
-  )
-}
+# # Create SNS topic
+# resource "aws_sns_topic" "maat_alerting_topic" {
+#   name = "${local.application_name}-${local.environment}-alerting-topic"
+#     tags = merge(
+#     local.tags,
+#     {
+#       Name = "${local.application_name}-maat-alerting-topic"
+#     }
+#   )
+# }
 
 # Create SNS topic subscription
 resource "aws_sns_topic_subscription" "maat_pagerduty_subscription" {
