@@ -10,15 +10,15 @@ locals {
   region              = "eu-west-2"
 
 
-  autoscaling_schedules_default = {
-    "scale_up" = {
-      recurrence = "0 7 * * Mon-Fri"
-    }
-    "scale_down" = {
-      desired_capacity = 0
-      recurrence       = "0 19 * * Mon-Fri"
-    }    
-  }
+  # autoscaling_schedules_default = {
+  #   "scale_up" = {
+  #     recurrence = "0 7 * * Mon-Fri"
+  #   }
+  #   "scale_down" = {
+  #     desired_capacity = 0
+  #     recurrence       = "0 19 * * Mon-Fri"
+  #   }    
+  # }
 
   instance = {
     disable_api_termination      = false
@@ -69,17 +69,17 @@ locals {
       example-test-1 = {
         tags = {
           server-type = "private"
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+          description = "EC2_1"
           monitored   = false
           os-type     = "Linux"
           component   = "ndh"
           environment = "development"
         }
         ebs_volumes = {
-          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
+          "/dev/sdf" = { size = 20 }
         }
-        ami_name  = "RHEL-7.9_HVM-*"
-        ami_owner = "309956199498"
+        ami_name  = "amzn2-ami-kernel-5.10-hvm-2.0.20240131.0-x86_64-gp2"
+        ami_owner = "137112412989"
         subnet_id = data.aws_subnet.private_subnets_a.id
         availability_zone = "eu-west-2a"
       }
@@ -87,17 +87,17 @@ locals {
       example-test-2 = {
         tags = {
           server-type = "private"
-          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+          description = "EC2_2"
           monitored   = false
           os-type     = "Linux"
           component   = "ndh"
           environment = "development"
         }
         ebs_volumes = {
-          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
+          "/dev/sdf" = { size = 20 }
         }
-        ami_name  = "RHEL-7.9_HVM-*"
-        ami_owner = "309956199498"
+        ami_name  = "amzn2-ami-kernel-5.10-hvm-2.0.20240131.0-x86_64-gp2"
+        ami_owner = "137112412989"
         subnet_id = data.aws_subnet.private_subnets_b.id
         availability_zone = "eu-west-2b"
       }
@@ -106,28 +106,33 @@ locals {
 
   # This local provides a list of ingress rules for the ec2 security groups.
 
-    example_ec2_sg_ingress_rules = {
+  example_ec2_sg_ingress_rules = {
 
-      TCP_22 = {
-        from_port = 22
-        to_port = 22
-        protocol = "TCP"
-      }
+    TCP_22 = {
+      from_port = 22
+      to_port = 22
+      protocol = "TCP"
+      cidr_block = data.aws_vpc.shared.cidr_block
+    }
 
-      TCP_443 = {
-        from_port = 443
-        to_port = 443
-        protocol = "TCP"
-      }
+    TCP_443 = {
+      from_port = 443
+      to_port = 443
+      protocol = "TCP"
+      cidr_block = data.aws_vpc.shared.cidr_block
+    }
+
   }
 
-      example_ec2_sg_egress_rules = {
+  example_ec2_sg_egress_rules = {
 
-      TCP_ALL = {
-        from_port = 1
-        to_port = 65000
-        protocol = "TCP"
-      }
+    TCP_ALL = {
+      from_port = 1
+      to_port = 65000
+      protocol = "TCP"
+      cidr_block = "0.0.0.0/0"
+    }
+
   }
 
   # create list of common managed policies that can be attached to ec2 instance profiles
@@ -155,7 +160,7 @@ module "ec2_test_instance" {
   ebs_kms_key_id                = "" # module.environment.kms_keys["ebs"].arn
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
+  ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "example-ec2/")
   ssm_parameters                = lookup(each.value, "ssm_parameters", null)
   route53_records               = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
   availability_zone        = each.value.availability_zone
@@ -171,7 +176,8 @@ module "ec2_test_instance" {
   cloudwatch_metric_alarms = {}
 }
 
-# EC2 Sec Group
+###### EC2 Security Group ######
+
 resource "aws_security_group" "example_ec2_sg" {
   name        = "example_ec2_sg"
   description = "Controls access to EC2"
@@ -189,7 +195,7 @@ resource "aws_security_group_rule" "ingress_traffic" {
   security_group_id = aws_security_group.example_ec2_sg.id
   to_port           = each.value.to_port
   type              = "ingress"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [each.value.cidr_block]
 }
 
 resource "aws_security_group_rule" "egress_traffic" {
@@ -200,17 +206,7 @@ resource "aws_security_group_rule" "egress_traffic" {
   security_group_id        = aws_security_group.example_ec2_sg.id
   to_port                  = each.value.to_port
   type                     = "egress"
-  source_security_group_id = aws_security_group.example_ec2_sg.id
-}
-
-resource "aws_security_group_rule" "ingress_traffic_icmp_from_cp" {
-  description       = "Allowing ping from CP"
-  from_port         = 8 //Echo Request
-  protocol          = "ICMP"
-  security_group_id = aws_security_group.example_ec2_sg.id
-  to_port           = 0
-  type              = "ingress"
-  cidr_blocks       = ["172.20.0.0/16"] //Cloud Platform
+  cidr_blocks       = [each.value.cidr_block]
 }
 
 
@@ -235,7 +231,7 @@ data "aws_iam_policy_document" "ec2_common_combined" {
   ]
 }
 
-# Has to be in the locals else
+# Required.
 data "aws_kms_key" "default_ebs" {
   key_id = "alias/aws/ebs"
 }
@@ -246,7 +242,7 @@ data "aws_iam_policy_document" "ec2_policy" {
     sid    = "CustomEc2Policy"
     effect = "Allow"
     actions = [
-      "ec2:*"
+      "s3:List*"
     ]
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
@@ -266,19 +262,19 @@ resource "aws_key_pair" "ec2-user" {
   )
 }
 
-# Volumes built for use by EC2.
-resource "aws_kms_key" "ec2" {
-  description         = "Encryption key for EBS"
-  enable_key_rotation = true
-  policy              = data.aws_iam_policy_document.ebs-kms.json
+# # Volumes built for use by EC2.
+# resource "aws_kms_key" "ec2" {
+#   description         = "Encryption key for EBS"
+#   enable_key_rotation = true
+#   policy              = data.aws_iam_policy_document.ebs-kms.json
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-ebs-kms"
-    }
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "${local.application_name}-ebs-kms"
+#     }
+#   )
+# }
 
 
 
