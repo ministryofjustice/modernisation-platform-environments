@@ -40,7 +40,10 @@ module "merge_api_service" {
   rds_engine                         = var.merge_config.rds_engine
   rds_engine_version                 = var.merge_config.rds_engine_version
   rds_instance_class                 = var.merge_config.rds_instance_class
-  rds_port                           = 5432
+  rds_port                           = var.merge_config.rds_port
+  rds_allocated_storage              = var.merge_config.rds_allocated_storage
+  rds_username                       = var.merge_config.rds_username
+  rds_license_model                  = var.merge_config.rds_license_model
   container_environment_vars = [
     {
       name  = "SERVER_SERVLET_CONTEXT_PATH"
