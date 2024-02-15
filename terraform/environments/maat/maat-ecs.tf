@@ -474,7 +474,7 @@ resource "aws_iam_policy" "maat_ecs_policy_access_params" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "maat_ec2_instance_role_policy_attachment_access_params" {
+resource "aws_iam_role_policy_attachment" "maat_ecs_tasks_role_policy_attachment_access_params" {
   role       = aws_iam_role.maat_ecs_tasks_role.name
   policy_arn = aws_iam_policy.maat_ecs_policy_access_params.arn
 }
