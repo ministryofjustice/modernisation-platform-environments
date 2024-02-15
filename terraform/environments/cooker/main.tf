@@ -50,8 +50,8 @@ locals {
         user_data = <<EOF
             #!/bin/bash
             yum update -y
-            sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-            sudo systemctl status amazon-ssm-agent
+            yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+            systemctl status amazon-ssm-agent
             yum install httpd -y
             systemctl start httpd
             EOF
@@ -77,8 +77,8 @@ locals {
         user_data = <<EOF
             #!/bin/bash
             yum update -y
-            sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-            sudo systemctl status amazon-ssm-agent
+            yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+            systemctl status amazon-ssm-agent
             EOF
       }
 
