@@ -84,17 +84,21 @@ resource "aws_s3_bucket_logging" "data_store" {
 resource "aws_s3_bucket_notification" "data_store" {
   bucket = aws_s3_bucket.data_store.id
 
+  # Only for copy events as those are events triggered by data being copied
+  # from landing bucket.
   lambda_function {
     lambda_function_arn = aws_lambda_function.checksum_lambda.arn
     events              = [
-      "s3:ObjectCreated:*"
+      "s3:ObjectCreated:Copy"
     ]
   }
 
+  # Only for copy events as those are events triggered by data being copied
+  # from landing bucket.
   lambda_function {
     lambda_function_arn = aws_lambda_function.summarise_zip_lambda.arn
     events              = [
-      "s3:ObjectCreated:*"
+      "s3:ObjectCreated:Copy"
     ]
     filter_suffix       = ".zip"
   }
