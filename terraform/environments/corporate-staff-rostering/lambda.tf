@@ -18,7 +18,7 @@ module "ad-clean-up-lambda" {
   runtime          = "python3.8"
 
   create_role = false
-  lambda_role = aws_iam_role.lambda-ad-role[count.index].arn
+  lambda_role = aws_iam_role.lambda-ad-role.arn
 
   vpc_subnet_ids         = tolist(data.aws_subnets.shared-private.ids)
   vpc_security_group_ids = [module.baseline.security_groups["domain"].id]
