@@ -25,6 +25,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_cpu_over_threshold" {
     ServiceName = aws_ecs_service.maat_api_ecs_service.name
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-api-ECS-CPU-high-threshold-alarm1"
+    },
+  )  
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_memory_over_threshold" {
@@ -45,6 +51,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_memory_over_threshold" {
     ServiceName = aws_ecs_service.maat_api_ecs_service.name
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-api-ECS-Memory-high-threshold-alarm"
+    },
+  )  
 }
 
 # Application Load Balancer Alerting
@@ -64,6 +76,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_target_response_time" {
     LoadBalancer = aws_lb.maat_api_ecs_lb.name
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-api-alb-target-response-time-alarm"
+    },
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_target_response_time_maximum" {
@@ -82,6 +100,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_target_response_time_maximum" {
     LoadBalancer = aws_lb.maat_api_ecs_lb.name
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-api-alb-target-response-time-alarm-maximum"
+    },
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_unhealthy_hosts" {
@@ -101,6 +125,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_unhealthy_hosts" {
     TargetGroup  = aws_lb_target_group.maat_api_ecs_target_group.name
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-api-unhealthy-hosts-alarm"
+    },
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_rejected_connection_count" {
@@ -119,6 +149,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_rejected_connection_count" {
     LoadBalancer = aws_lb.maat_api_ecs_lb.name
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-api-RejectedConnectionCount-alarm"
+    },
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_http_5xx_error" {
@@ -137,6 +173,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_http_5xx_error" {
     LoadBalancer = aws_lb.maat_api_ecs_lb.name
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-api-http-5xx-error-alarm"
+    },
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_application_elb_5xx_error" {
@@ -155,6 +197,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_application_elb_5xx_error" {
     LoadBalancer = aws_lb.maat_api_ecs_lb.name
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-api-elb-5xx-error-alarm"
+    },
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_http4xxError" {
@@ -173,6 +221,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_http4xxError" {
     LoadBalancer = aws_lb.maat_api_ecs_lb.name
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-api-http-4xx-error-alarm"
+    },
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_application_elb_4xx_error" {
@@ -191,6 +245,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_application_elb_4xx_error" {
     LoadBalancer = aws_lb.maat_api_ecs_lb.name
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-api-elb-4xx-error-alarm"
+    },
+  )
 }
 
 # SNS topic for monitoring to send alarms to
