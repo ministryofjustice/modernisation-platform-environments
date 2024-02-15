@@ -29,7 +29,6 @@ locals {
     }
 
     ec2_instances = {
-      # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
 
       example-1 = {
         tags = {
@@ -51,7 +50,9 @@ locals {
         user_data = <<EOF
             #!/bin/bash
             yum update -y
-            yum install httpd
+            sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+            sudo systemctl status amazon-ssm-agent
+            yum install httpd -y
             systemctl start httpd
             EOF
       }
@@ -76,6 +77,8 @@ locals {
         user_data = <<EOF
             #!/bin/bash
             yum update -y
+            sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+            sudo systemctl status amazon-ssm-agent
             EOF
       }
 
@@ -120,7 +123,6 @@ locals {
   ]
 
 }
-
 
 
 # EC2 Created via module
