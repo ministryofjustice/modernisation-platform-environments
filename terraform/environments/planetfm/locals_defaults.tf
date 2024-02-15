@@ -17,7 +17,15 @@ locals {
     cloudwatch_metric_alarms = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+      {
+        instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["planetfm_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
+          threshold           = "0"  
+          evaluation_periods  = "3"
+          datapoints_to_alarm = "1"
+          period              = "10" # 5 seconds
+          alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 10 seconds looking across 30 seconds."
+        })
+      }
     )
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
   }
