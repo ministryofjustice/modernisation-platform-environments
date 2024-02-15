@@ -20,10 +20,10 @@ locals {
       {
         instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["planetfm_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
           threshold           = "0"  
-          evaluation_periods  = "3"
-          datapoints_to_alarm = "1"
-          period              = "10" # 5 seconds
-          alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 10 seconds looking across 30 seconds."
+          evaluation_periods  = "5"
+          datapoints_to_alarm = "2"
+          period              = "60"
+          alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 60 and trigger if there are 2 events in 5 minutes."
         })
       }
     )
