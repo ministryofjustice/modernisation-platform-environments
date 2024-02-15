@@ -47,7 +47,7 @@ locals {
   # CIVICA
   #----------------------------------------------------------------------------
   civica_ssh_keys   = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBCJBwZM5nMigS31soM45PITAHCmyhQpdDAkdX1liqnIZSd8A+zn3XQyVRy5E2a39gfsng5hAQetDFJKn+SaayATCQAzN0cJWlcrvtv314UsRV+PxO236sWVf+RwguUDZRQ==",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBK1ZcqH9f7jMPjoOdwQdykQHnOKpmYVVr5gneYtH0KEdhPUdWDE14sh4aOZPl3rDw8Pu7Kj356KJ0FEmKAl3ByJFn6+oBR9GcTpKVmTXUeYlAqptP5Sszr3Zgh0986v8Gw==",
   ]
   civica_cidr_ipv4s = [
     "20.0.26.153/32",

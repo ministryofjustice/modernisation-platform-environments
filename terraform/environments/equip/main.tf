@@ -394,23 +394,6 @@ module "win2019_SQL_multiple" {
 
 }
 
-
-################################################################################
-
-#data "aws_ami" "windows_2012_std_ami" {
-#  owners      = ["amazon"]
-#  most_recent = true
-#  filter {
-#    name   = "name"
-#    values = ["Windows_Server-2012-R2_RTM-English-64Bit-Base*"]
-#  }
-#  filter {
-#    name   = "virtualization-type"
-#    values = ["hvm"]
-#  }
-#}
-
-
 locals {
   win2012_STD_instances = {
     COR-A-EQP01 = {
@@ -728,11 +711,11 @@ module "win2022_STD_multiple" {
 
 
 locals {
-  win2019_STD_powerBI_instances = {
+  win2022_STD_powerBI_instances = {
     COR-A-GW01 = {
       instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
-      vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id]
+      vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id, aws_security_group.azures_ingres.id]
       root_block_device = [
         {
           encrypted   = true
@@ -770,10 +753,10 @@ module "PowerBI_server" {
   source = "./ec2-instance-module"
 
 
-  for_each = local.win2019_STD_powerBI_instances
+  for_each = local.win2022_STD_powerBI_instances
 
   name                   = "${local.name}-${each.key}"
-  ami                    = "ami-0df480245c4679e0b"
+  ami                    = "ami-088bb7db420bf535c"
   instance_type          = each.value.instance_type
   vpc_security_group_ids = each.value.vpc_security_group_ids
   subnet_id              = each.value.subnet_id
