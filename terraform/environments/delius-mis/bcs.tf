@@ -43,7 +43,11 @@ locals {
       enable_resource_name_dns_a_record    = true
       hostname_type                        = "resource-name"
     }
-    tags = local.tags
+
+    tags = merge(
+      local.tags,
+      { backup = true }
+    )
   }
 
 }
