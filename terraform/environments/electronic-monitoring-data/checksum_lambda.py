@@ -29,21 +29,21 @@ def handler(event, context):
     print(event)
 
     event_type = event['Records'][0]['eventName']
-
     bucket = event['Records'][0]['s3']['bucket']['name']
     object_key = event['Records'][0]['s3']['object']['key']
-    print(f"{object_key = } was just added to {bucket = } via {event_type = }")
+
+    print(f'{object_key = } added to {bucket = } via {event_type = }')
 
     # Generate the SHA256 checksum of the object.
     hash_value = generate_sha256_checksum(bucket, object_key)
     
     # Print the SHA256 checksum to CloudWatch logs.
-    print(f"SHA256 checksum of {object_key}: {hash_value}")
+    print(f'SHA256 checksum of {object_key}: {hash_value}')
     
     hash_64 = convert_hash_to_base64(hash_value=hash_value)
 
     # Print the Base 64 encoded SHA256 checksum to CloudWatch logs.
-    print(f"Base 64 SHA256 checksum of {object_key}: {hash_64}")
+    print(f'Base 64 SHA256 checksum of {object_key}: {hash_64}')
 
     # Retrieve existing tags for the object
     response = s3_client.get_object_tagging(
@@ -59,7 +59,7 @@ def handler(event, context):
     # Merge existing tags with additional tags
     existing_tags = response.get('TagSet', [])
     existing_tags.extend([
-        { 'Key': key, 'Value': value }
+        {'Key': key, 'Value': value}
         for key, value in additional_tags.items()
     ])
     
@@ -72,7 +72,7 @@ def handler(event, context):
         }
     )
 
-    print(f"Added tags = {list(additional_tags.keys())} to {object_key = }")
+    print(f'Added tags = {list(additional_tags.keys())} to {object_key = }')
 
     return None
 

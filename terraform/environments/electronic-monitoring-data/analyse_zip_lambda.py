@@ -1,5 +1,6 @@
 import boto3
 import io
+import json
 import zipfile
 
 
@@ -39,16 +40,18 @@ def handler(event, context):
     """
     print(event)
 
-    # Get the S3 bucket and key from the Lambda event
-    bucket_name = event['tasks'][0]['s3Bucket']
-    object_key = event['tasks'][0]['s3Key']
+    event_type = event['Records'][0]['eventName']
+    bucket = event['Records'][0]['s3']['bucket']['name']
+    object_key = event['Records'][0]['s3']['object']['key']
+
+    print(f'{object_key = } added to {bucket = } via {event_type = }')
     
     # Create S3 client
     s3_client = boto3.client('s3')
     
     # Read the contents of the zip file from S3
     response = s3_client.get_object(
-        Bucket=bucket_name,
+        Bucket=bucket,
         Key=object_key
     )
     
@@ -77,20 +80,26 @@ def handler(event, context):
                     current_dict[part] = {}
                 current_dict = current_dict[part]
         
-        # Print the directory structure in ASCII format
-        print("Ascii directory structure:")
-        dir_string = build_ascii_directory_structure(directory_structure)
-        print(dir_string)
+        print(f'\n\nJSON directory structure:\n{directory_structure}')
 
-        print(f"\n\nJSON directory structure:\n{directory_structure}")
+        print(f'\n\n Total files in {object_key}: {total_files}')
 
-        print(f"\n\n Total files in {object_key}: {total_files}")
-        
-        # Return the total number of files and directory structure
-        return {
-            'statusCode': 200,
-            'body': {
-                'total_files': total_files,
-                'directory_structure': directory_structure
-            }
+        # Writing the JSON file with the information
+        json_data = {
+            'total_objects': total_files,
+            'directory_structure': directory_structure
         }
+        json_content = json.dumps(json_data)
+
+        # Saving JSON content to a new file with .json extension
+        new_object_key = object_key + '.info.json'
+
+        s3_client.put_object(
+            Bucket=bucket, 
+            ey=new_object_key,
+            Body=json_content.encode('utf-8')
+        )
+
+        print(f'Info saved to {new_object_key}')
+
+        return None
