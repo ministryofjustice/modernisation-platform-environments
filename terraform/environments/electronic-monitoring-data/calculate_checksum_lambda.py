@@ -82,7 +82,7 @@ def handler(event, context):
 
     # Check if the object key ends with '.zip'
     if object_key.endswith('.zip'):
-        print(f"Stopping for'{object_key = }' as suffix other than '.zip'")
+        print(f"Summarising '{object_key = }' as has '.zip' extension")
 
         # Read the contents of the zip file from S3
         response = s3_client.get_object(
@@ -131,7 +131,7 @@ def handler(event, context):
 
             s3_client.put_object(
                 Bucket=bucket, 
-                ey=new_object_key,
+                Key=new_object_key,
                 Body=json_content.encode('utf-8')
             )
 

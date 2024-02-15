@@ -71,7 +71,7 @@ def handler(event, context):
 
         s3_client.put_object(
             Bucket=bucket, 
-            ey=new_object_key,
+            Key=new_object_key,
             Body=json_content.encode('utf-8')
         )
 
