@@ -1,5 +1,4 @@
 # Create user for MGN
-
 #tfsec:ignore:aws-iam-no-user-attached-policies
 #tfsec:ignore:AWS273
 resource "aws_iam_user" "mgn_user" {
@@ -45,7 +44,6 @@ resource "aws_iam_user_policy_attachment" "mgn_attach_policy_app_migrationfull_a
 }
 
 # AD clean up lambda IAM resources
-
 data "aws_iam_policy_document" "lambda_assume_role_policy" {
   statement {
     effect  = "Allow"
@@ -59,21 +57,41 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
 }
 
 resource "aws_iam_role" "lambda-ad-role" {
-  count = local.environment == "test" ? 1 : 0 # temporary
   name  = "LambdaFunctionADObjectCleanUp"
   tags  = local.tags
 
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
+# To be built after first apply
+# resource "aws_iam_policy" "lambda_eventbridge_policy" {
+#   name        = "ADLambdaEventBridgePolicy"
+#   description = "Policy allowing Lambda to be triggered by EventBridge"
+
+#   policy = jsonencode({
+#     "Version": "2012-10-17",
+#     "Statement": [
+#       {
+#         "Effect": "Allow",
+#         "Action": "lambda:InvokeFunction",
+#         "Resource": aws_lambda_function.ad-clean-up-lambda.arn
+#       }
+#     ]
+#   })
+# }
+
 resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
-  count      = local.environment == "test" ? 1 : 0 # temporary
-  role       = aws_iam_role.lambda-ad-role[count.index].name
+  role       = aws_iam_role.lambda-ad-role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_secrets_manager" {
-  count      = local.environment == "test" ? 1 : 0 # temporary
-  role       = aws_iam_role.lambda-ad-role[count.index].name
+  role       = aws_iam_role.lambda-ad-role.name
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
+
+# To be built after first apply
+# resource "aws_iam_role_policy_attachment" "lambda_eventbridge" {
+#   role       = aws_iam_role.lambda-ad-role.name
+#   policy_arn = aws_iam_policy.lambda_eventbridge_policy.arn
+# }

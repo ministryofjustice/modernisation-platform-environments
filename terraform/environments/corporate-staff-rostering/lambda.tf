@@ -1,3 +1,4 @@
+# START: lambda_ad_object_clean_up
 locals {
   lambda_ad_object_cleanup = {
     function_name = "AD-Object-Clean-Up"
@@ -6,8 +7,6 @@ locals {
 
 module "ad-clean-up-lambda" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function" # ref for V3.1
-  count  = local.environment == "test" ? 1 : 0                                             # temporary whilst on-going work
-
 
   application_name = local.lambda_ad_object_cleanup.function_name
   function_name    = local.lambda_ad_object_cleanup.function_name
@@ -24,6 +23,13 @@ module "ad-clean-up-lambda" {
   vpc_subnet_ids         = tolist(data.aws_subnets.shared-private.ids)
   vpc_security_group_ids = [module.baseline.security_groups["domain"].id]
 
+  # allowed_triggers = {
+  #   AllowExecutionFromCloudWatch = {
+  #     principal  = ""
+  #     source_arn = ""
+  #   }
+  # }
+
   tags = merge(
     local.tags,
     {
@@ -37,6 +43,26 @@ data "archive_file" "ad-cleanup-lambda" {
   source_dir  = "lambda/ad-clean-up"
   output_path = "lambda/ad-clean-up/ad-clean-up-lambda-payload-test.zip"
 }
+
+resource "aws_cloudwatch_event_rule" "ec2_state_change_terminated" {
+  name        = "Ec2StateChangedTerminated"
+  description = "Rule to trigger Lambda on EC2 state change"
+  
+  event_pattern = jsonencode({
+    "source": ["aws.ec2"],
+    "detail-type": ["EC2 Instance State-change Notification for EC2 termination event"],
+    "detail": {
+      "state": ["terminated"] 
+    }
+  })
+}
+
+# To be built after first apply
+# resource "aws_cloudwatch_event_target" "lambda_ad_clean_up" {
+#   rule      = aws_cloudwatch_event_rule.ec2_state_change_terminated.name
+#   target_id = "LambdaTarget"
+#   arn       = aws_lambda_function.ad-clean-up-lambda.arn
+# }
 
 # START: lambda_cw_logs_xml_to_json
 locals {
