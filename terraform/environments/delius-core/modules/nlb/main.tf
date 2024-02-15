@@ -53,6 +53,8 @@ resource "aws_lb_target_group" "this" {
   protocol = var.protocol
   vpc_id   = var.vpc_id
 
+  preserve_client_ip = "true"
+
   target_type          = "ip"
   deregistration_delay = "30"
   tags = merge(
