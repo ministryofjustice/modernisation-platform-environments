@@ -42,6 +42,9 @@ locals {
       cwagent-windows-application = {
         retention_in_days = 30
       }
+      cwagent-windows-application-json = {
+        retention_in_days = 30
+      }
     }
   )
   baseline_cloudwatch_log_metric_filters = {}
