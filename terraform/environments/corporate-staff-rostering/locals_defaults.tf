@@ -4,7 +4,6 @@ locals {
     database = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux,
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup,
       {
         cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2["cpu-utilization-high"], {
@@ -21,6 +20,15 @@ locals {
           threshold           = "40"
           alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 8 hours allowing for DB refreshes.  See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
         })
+      },
+      {
+        instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_linux["instance-or-cloudwatch-agent-stopped"], {
+          threshold           = "0"  
+          evaluation_periods  = "3"
+          datapoints_to_alarm = "1"
+          period              = "10" # 5 seconds
+          alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 10 seconds looking across 30 seconds."
+        })
       }
     )
     # This block can be removed when prod database goes live
@@ -32,12 +40,28 @@ locals {
     windows = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+      {
+        instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
+          threshold           = "0"  
+          evaluation_periods  = "3"
+          datapoints_to_alarm = "1"
+          period              = "10" # 5 seconds
+          alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 10 seconds looking across 30 seconds."
+        })
+      }
     )
     app = merge(
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows,
+      {
+        instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
+          threshold           = "0"  
+          evaluation_periods  = "3"
+          datapoints_to_alarm = "1"
+          period              = "10" # 5 seconds
+          alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 10 seconds looking across 30 seconds."
+        })
+      },
       {
         high-memory-usage = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows["high-memory-usage"], {
           threshold           = "75"
