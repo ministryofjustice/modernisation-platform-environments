@@ -56,7 +56,6 @@ resource "aws_instance" "ec2_ftp" {
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-FTP", local.application_name, local.environment)) },
-    { instance-scheduling = "skip-scheduling" },
     { backup = "true" }
   )
 
