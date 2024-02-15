@@ -62,7 +62,7 @@ module "ecs_service" {
 
   exec_enabled = true
 
-  ignore_changes_task_definition = true
+  ignore_changes_task_definition = true # task definition managed by Delius App team
   redeploy_on_apply              = false
   force_new_deployment           = false
 }
