@@ -23,13 +23,6 @@ module "ad-clean-up-lambda" {
   vpc_subnet_ids         = tolist(data.aws_subnets.shared-private.ids)
   vpc_security_group_ids = [module.baseline.security_groups["domain"].id]
 
-  # allowed_triggers = {
-  #   AllowExecutionFromCloudWatch = {
-  #     principal  = ""
-  #     source_arn = ""
-  #   }
-  # }
-
   tags = merge(
     local.tags,
     {
