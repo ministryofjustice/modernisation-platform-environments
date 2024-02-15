@@ -89,7 +89,7 @@ resource "aws_s3_bucket_notification" "data_store" {
   lambda_function {
     lambda_function_arn = aws_lambda_function.calculate_checksum_lambda.arn
     events              = [
-      "s3:ObjectCreated:Copy"
+      "s3:ObjectCreated:*"
     ]
   }
 
@@ -98,7 +98,7 @@ resource "aws_s3_bucket_notification" "data_store" {
   # lambda_function {
   #   lambda_function_arn = aws_lambda_function.summarise_zip_lambda.arn
   #   events              = [
-  #     "s3:ObjectCreated:Copy"
+  #     "s3:ObjectCreated:*"
   #   ]
   # }
 

@@ -35,8 +35,9 @@ def handler(event, context):
     event_type = event['Records'][0]['eventName']
     bucket = event['Records'][0]['s3']['bucket']['name']
     object_key = event['Records'][0]['s3']['object']['key']
+    size = event['Records'][0]['s3']['object']['size']
 
-    print(f'{object_key = } added to {bucket = } via {event_type = }')
+    print(f'{object_key = } of {size = }B added to {bucket = } via {event_type = }')
 
     # Generate the SHA256 checksum of the object.
     hash_value = generate_sha256_checksum(bucket, object_key)
@@ -140,15 +141,30 @@ def handler(event, context):
     return None
 
 
-def generate_sha256_checksum(bucket_name, object_key):
-    # Retrieve the object data from S3
-    response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
-    object_data = response['Body'].read()
-    
-    # Calculate the SHA256 checksum
-    sha256_hash = hashlib.sha256(object_data).hexdigest()
+def generate_sha256_checksum(bucket_name, object_key, chunk_size=4096):
+    # Create an S3 client
+    s3_client = boto3.client('s3')
 
-    return sha256_hash
+    # Initialize the SHA256 hash object
+    sha256_hash = hashlib.sha256()
+
+    # Retrieve the object data from S3 in chunks
+    try:
+        response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+        object_stream = response['Body']
+        
+        while True:
+            chunk = object_stream.read(chunk_size)
+            if not chunk:
+                break
+            sha256_hash.update(chunk)
+
+    except Exception as e:
+        print("Error:", e)
+        return None
+
+    # Calculate the SHA256 checksum
+    return sha256_hash.hexdigest()
 
 
 def convert_hash_to_base64(hash_value):
