@@ -465,6 +465,17 @@ resource "aws_iam_policy" "maat_ecs_policy_access_params" {
         Resource = [
           "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "cloudwatch:PutMetricData",
+          "sqs:*"
+        ]
+        Resource = "*"
       }
     ]
   })
