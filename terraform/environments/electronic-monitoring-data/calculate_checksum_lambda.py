@@ -1,7 +1,7 @@
 """Lambda function to add Checksum metadata to files.
 
 This function adds two tags to files that contain the SHA256 checksum as well
-as the BAse64 encoded SHA256 checksum (this is what AWS displays by default).
+as the Base64 encoded SHA256 checksum (this is what AWS displays by default).
 
 To calculate a files SHA256 checksum locally in the command line (i.e. to
 compare) use:
@@ -141,9 +141,12 @@ def handler(event, context):
     return None
 
 
-def generate_sha256_checksum(bucket_name, object_key, chunk_size=4096):
-    # Create an S3 client
-    s3_client = boto3.client('s3')
+def generate_sha256_checksum(
+    bucket_name,
+    object_key,
+    chunk_size=65536,  # 64 KB chunk.
+):
+    print(f'Using {chunk_size=}B to read object')
 
     # Initialize the SHA256 hash object
     sha256_hash = hashlib.sha256()

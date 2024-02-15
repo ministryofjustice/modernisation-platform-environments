@@ -128,8 +128,9 @@ resource "aws_lambda_function" "calculate_checksum_lambda" {
   function_name = "calculate-checksum-lambda"
   role          = aws_iam_role.calculate_checksum_lambda.arn
   handler       = "calculate_checksum_lambda.handler"
-  runtime       = "python3.9"
-  timeout       = 600
+  runtime       = "python3.12"
+  memory_size   = 1024
+  timeout       = 900
 
   environment {
     variables = {
@@ -193,7 +194,7 @@ resource "aws_lambda_function" "summarise_zip_lambda" {
   function_name = "summarise-zip-lambda"
   role          = aws_iam_role.summarise_zip_lambda.arn
   handler       = "summarise_zip_lambda.handler"
-  runtime       = "python3.9"
+  runtime       = "python3.12"
   timeout       = 600
 }
 
