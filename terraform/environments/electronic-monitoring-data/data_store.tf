@@ -87,23 +87,21 @@ resource "aws_s3_bucket_notification" "data_store" {
   lambda_function {
     lambda_function_arn = aws_lambda_function.checksum_lambda.arn
     events              = [
-      "s3:ObjectCreated:Put",
-      "s3:ObjectCreated:Post"
+      "s3:ObjectCreated:*"
     ]
   }
 
-  # lambda_function {
-  #   lambda_function_arn = aws_lambda_function.analyse_zip_lambda.arn
-  #   events              = [
-    # "s3:ObjectCreated:Put",
-    # "s3:ObjectCreated:Post"
-  # ]
-  #   filter_suffix       = ".zip"
-  # }
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.summarise_zip_lambda.arn
+    events              = [
+      "s3:ObjectCreated:*"
+    ]
+    filter_suffix       = ".zip"
+  }
 
   depends_on = [
     aws_lambda_permission.s3_allow_checksum_lambda,
-    # aws_lambda_permission.s3_allow_analyse_zip_lambda,
+    aws_lambda_permission.s3_allow_summarise_zip_lambda,
   ]
 }
 
@@ -116,7 +114,7 @@ variable "checksum_algorithm" {
   default     = "SHA256"
 }
 
-data "archive_file" "this" {
+data "archive_file" "checksum_lambda" {
   type        = "zip"
   source_file = "checksum_lambda.py"
   output_path = "checksum_lambda.zip"
@@ -181,7 +179,7 @@ resource "aws_iam_role_policy" "checksum_lambda" {
 }
 
 resource "aws_lambda_permission" "s3_allow_checksum_lambda" {
-  statement_id  = "AllowExecutionFromS3Bucket"
+  statement_id  = "AllowChecksumExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.checksum_lambda.arn
   principal     = "s3.amazonaws.com"
@@ -189,3 +187,53 @@ resource "aws_lambda_permission" "s3_allow_checksum_lambda" {
 }
 
 #------------------------------------------------------------------------------
+# S3 lambda function to perform zip file summary
+#------------------------------------------------------------------------------
+
+data "archive_file" "summarise_zip_lambda" {
+  type        = "zip"
+  source_file = "summarise_zip_lambda.py"
+  output_path = "summarise_zip_lambda.zip"
+}
+
+resource "aws_lambda_function" "summarise_zip_lambda" {
+  filename      = "summarise_zip_lambda.zip"
+  function_name = "ChecksumLambda"
+  role          = aws_iam_role.summarise_zip_lambda.arn
+  handler       = "summarise_zip_lambda.handler"
+  runtime       = "python3.9"
+  timeout       = 600
+}
+
+resource "aws_iam_role" "summarise_zip_lambda" {
+  name                = "summarise-zip-iam-role"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+data "aws_iam_policy_document" "summarise_zip_lambda" {
+  statement {
+    sid = "S3Permissions"
+    effect  = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = ["${aws_s3_bucket.data_store.arn}/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "summarise_zip_lambda" {
+  name   = "summarise-zip-iam-policy"
+  role   = aws_iam_role.summarise_zip_lambda.id
+  policy = data.aws_iam_policy_document.summarise_zip_lambda.json
+}
+
+resource "aws_lambda_permission" "s3_allow_summarise_zip_lambda" {
+  statement_id  = "AllowSummariseZipExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.summarise_zip_lambda.arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = "${aws_s3_bucket.data_store.arn}"
+}
