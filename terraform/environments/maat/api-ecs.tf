@@ -1,7 +1,7 @@
 ######################################
 # ECS Cluster and Service
 ######################################
-resource "aws_ecs_cluster" "app_ecs_cluster" {
+resource "aws_ecs_cluster" "maat_api_app_ecs_cluster" {
   name = "${local.application_name}-api-ecs-cluster"
 
   setting {
@@ -14,10 +14,10 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
   depends_on = [aws_lb_listener.maat_api_alb_http_listener]
 
   name                              = "${local.application_name}-api-ecs-service"
-  cluster                           = aws_ecs_cluster.app_ecs_cluster.id
+  cluster                           = aws_ecs_cluster.maat_api_app_ecs_cluster.id
   launch_type                       = "FARGATE"
   desired_count                     = local.application_data.accounts[local.environment].maat_api_ecs_service_desired_count
-  task_definition                   = aws_ecs_task_definition.TaskDefinition.arn
+  task_definition                   = aws_ecs_task_definition.maat_api_TaskDefinition.arn
   health_check_grace_period_seconds = 120
 
   network_configuration {
@@ -47,7 +47,7 @@ resource "aws_ecs_service" "maat_api_ecs_service" {
 ######################################
 # ECS TASK DEFINITION
 ######################################
-resource "aws_ecs_task_definition" "TaskDefinition" {
+resource "aws_ecs_task_definition" "maat_api_TaskDefinition" {
   family                   = "${local.application_name}-api-task-definition"
   cpu                      = local.application_data.accounts[local.environment].maat_api_ecs_cpu
   memory                   = local.application_data.accounts[local.environment].maat_api_ecs_memory
@@ -182,10 +182,10 @@ resource "aws_ecs_task_definition" "TaskDefinition" {
 ######################################
 # ECS Scaling
 ######################################
-resource "aws_appautoscaling_target" "ecs_service_scaling_target" {
+resource "aws_appautoscaling_target" "maat_api_ecs_service_scaling_target" {
   max_capacity       = local.application_data.accounts[local.environment].maat_api_ecs_service_max_count
   min_capacity       = local.application_data.accounts[local.environment].maat_api_ecs_service_min_count
-  resource_id        = "service/${aws_ecs_cluster.app_ecs_cluster.name}/${aws_ecs_service.maat_api_ecs_service.name}"
+  resource_id        = "service/${aws_ecs_cluster.maat_api_app_ecs_cluster.name}/${aws_ecs_service.maat_api_ecs_service.name}"
   role_arn           = aws_iam_role.maat_api_ecs_autoscaling_role.arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
@@ -194,9 +194,9 @@ resource "aws_appautoscaling_target" "ecs_service_scaling_target" {
 resource "aws_appautoscaling_policy" "maat_api_scaling_up_policy" {
   name               = "${local.application_name}-api-scaling-up"
   policy_type        = "StepScaling"
-  resource_id        = aws_appautoscaling_target.ecs_service_scaling_target.resource_id
-  scalable_dimension = aws_appautoscaling_target.ecs_service_scaling_target.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.ecs_service_scaling_target.service_namespace
+  resource_id        = aws_appautoscaling_target.maat_api_ecs_service_scaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.maat_api_ecs_service_scaling_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.maat_api_ecs_service_scaling_target.service_namespace
 
   step_scaling_policy_configuration {
     adjustment_type         = "ChangeInCapacity"
@@ -213,9 +213,9 @@ resource "aws_appautoscaling_policy" "maat_api_scaling_up_policy" {
 resource "aws_appautoscaling_policy" "maat_api_scaling_down_policy" {
   name               = "${local.application_name}-api-scaling-down"
   policy_type        = "StepScaling"
-  resource_id        = aws_appautoscaling_target.ecs_service_scaling_target.resource_id
-  scalable_dimension = aws_appautoscaling_target.ecs_service_scaling_target.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.ecs_service_scaling_target.service_namespace
+  resource_id        = aws_appautoscaling_target.maat_api_ecs_service_scaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.maat_api_ecs_service_scaling_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.maat_api_ecs_service_scaling_target.service_namespace
 
   step_scaling_policy_configuration {
     adjustment_type         = "ChangeInCapacity"
@@ -247,7 +247,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_high_cpu_service_alarm" {
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_up_policy.arn]
 
   dimensions = {
-    ClusterName = aws_ecs_cluster.app_ecs_cluster.name
+    ClusterName = aws_ecs_cluster.maat_api_app_ecs_cluster.name
     ServiceName = aws_ecs_service.maat_api_ecs_service.name
   }
 }
@@ -267,7 +267,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_low_cpu_service_alarm" {
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_down_policy.arn]
 
   dimensions = {
-    ClusterName = aws_ecs_cluster.app_ecs_cluster.name
+    ClusterName = aws_ecs_cluster.maat_api_app_ecs_cluster.name
     ServiceName = aws_ecs_service.maat_api_ecs_service.name
   }
 }
@@ -288,7 +288,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_high_memory_service_alarm" {
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_up_policy.arn]
 
   dimensions = {
-    ClusterName = aws_ecs_cluster.app_ecs_cluster.name
+    ClusterName = aws_ecs_cluster.maat_api_app_ecs_cluster.name
     ServiceName = aws_ecs_service.maat_api_ecs_service.name
   }
 }
@@ -308,7 +308,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_low_memory_service_alarm" {
   alarm_actions       = [aws_appautoscaling_policy.maat_api_scaling_down_policy.arn]
 
   dimensions = {
-    ClusterName = aws_ecs_cluster.app_ecs_cluster.name
+    ClusterName = aws_ecs_cluster.maat_api_app_ecs_cluster.name
     ServiceName = aws_ecs_service.maat_api_ecs_service.name
   }
 }
