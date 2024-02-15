@@ -63,22 +63,21 @@ resource "aws_iam_role" "lambda-ad-role" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
-# To be built after first apply
-# resource "aws_iam_policy" "lambda_eventbridge_policy" {
-#   name        = "ADLambdaEventBridgePolicy"
-#   description = "Policy allowing Lambda to be triggered by EventBridge"
+resource "aws_iam_policy" "lambda_eventbridge_policy" {
+  name        = "ADLambdaEventBridgePolicy"
+  description = "Policy allowing Lambda to be triggered by EventBridge"
 
-#   policy = jsonencode({
-#     "Version": "2012-10-17",
-#     "Statement": [
-#       {
-#         "Effect": "Allow",
-#         "Action": "lambda:InvokeFunction",
-#         "Resource": aws_lambda_function.ad-clean-up-lambda.arn
-#       }
-#     ]
-#   })
-# }
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": "lambda:InvokeFunction",
+        "Resource": aws_lambda_function.ad-clean-up-lambda.arn
+      }
+    ]
+  })
+}
 
 resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
   role       = aws_iam_role.lambda-ad-role.name
@@ -90,8 +89,7 @@ resource "aws_iam_role_policy_attachment" "lambda_secrets_manager" {
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
 
-# To be built after first apply
-# resource "aws_iam_role_policy_attachment" "lambda_eventbridge" {
-#   role       = aws_iam_role.lambda-ad-role.name
-#   policy_arn = aws_iam_policy.lambda_eventbridge_policy.arn
-# }
+resource "aws_iam_role_policy_attachment" "lambda_eventbridge" {
+  role       = aws_iam_role.lambda-ad-role.name
+  policy_arn = aws_iam_policy.lambda_eventbridge_policy.arn
+}

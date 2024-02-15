@@ -50,13 +50,13 @@ resource "aws_cloudwatch_event_rule" "ec2_state_change_terminated" {
   })
 }
 
-# To be built after first apply
-# resource "aws_cloudwatch_event_target" "lambda_ad_clean_up" {
-#   rule      = aws_cloudwatch_event_rule.ec2_state_change_terminated.name
-#   target_id = "LambdaTarget"
-#   arn       = aws_lambda_function.ad-clean-up-lambda.arn
-# }
+resource "aws_cloudwatch_event_target" "lambda_ad_clean_up" {
+  rule      = aws_cloudwatch_event_rule.ec2_state_change_terminated.name
+  target_id = "LambdaTarget"
+  arn       = aws_lambda_function.ad-clean-up-lambda.arn
+}
 
+# END: lambda_ad_object_clean_up
 # START: lambda_cw_logs_xml_to_json
 locals {
   lambda_cw_logs_xml_to_json = {
