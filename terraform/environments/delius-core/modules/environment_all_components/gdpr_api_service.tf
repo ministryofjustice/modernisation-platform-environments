@@ -36,7 +36,7 @@ module "gdpr_api_service" {
   alb_listener_rule_paths            = ["/gdpr/api", "/gdpr/api/*"]
 
   platform_vars     = var.platform_vars
-  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-gdpr-api-ecr-repo:${var.delius_microservice_configs.gdpr_api.api_image_tag}"
+  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-gdpr-api-ecr-repo:${var.delius_microservice_configs.gdpr_api.image_tag}"
   account_config    = var.account_config
   health_check_path = "/gdpr/api/actuator/health"
   account_info      = var.account_info
@@ -49,9 +49,6 @@ module "gdpr_api_service" {
   rds_allocated_storage = var.delius_microservice_configs.gdpr_api.rds_allocated_storage
   rds_username          = var.delius_microservice_configs.gdpr_api.rds_username
   rds_license_model     = var.delius_microservice_configs.gdpr_api.rds_license_model
-
-  ecs_connectivity_services_nlb           = aws_lb.delius_core_frontend
-  ecs_connectivity_services_nlb_listeners = aws_lb_listener.listener_https
 
   container_environment_vars = [
     {

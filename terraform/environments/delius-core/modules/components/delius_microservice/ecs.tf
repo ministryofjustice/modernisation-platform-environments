@@ -65,5 +65,4 @@ module "ecs_service" {
   ignore_changes_task_definition = true
   redeploy_on_apply              = false
   force_new_deployment           = false
-
 }

@@ -352,18 +352,6 @@ variable "container_cpu" {
   default     = 512
 }
 
-variable "ecs_connectivity_services_alb" {
-  description = "The NLB to use for the ECS connectivity"
-  type        = any
-  default     = null
-}
-
-variable "ecs_connectivity_services_alb_listeners" {
-  description = "The listeners to use for the ECS connectivity"
-  type        = any
-  default     = null
-}
-
 variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string

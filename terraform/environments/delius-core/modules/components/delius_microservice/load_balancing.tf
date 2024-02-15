@@ -83,7 +83,7 @@ resource "aws_lb_target_group" "service" {
   tags     = var.tags
 }
 
-resource "aws_lb_listener" "delius_microservices_listeners" {
+resource "aws_lb_listener" "services" {
   for_each = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
 
   load_balancer_arn = aws_lb.delius_microservices.arn
@@ -96,8 +96,7 @@ resource "aws_lb_listener" "delius_microservices_listeners" {
   }
 }
 
-resource "aws_route53_record" "services_alb_target_group" {
-  count    = var.ecs_connectivity_services_alb == null ? 0 : 1
+resource "aws_route53_record" "services_nlb_r53_record" {
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone_info.zone_id
   name     = "${var.name}.service.${var.env_name}.${var.account_config.dns_suffix}"
