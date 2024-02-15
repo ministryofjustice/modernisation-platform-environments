@@ -87,7 +87,7 @@ resource "aws_s3_bucket_notification" "data_store" {
   # Only for copy events as those are events triggered by data being copied
   # from landing bucket.
   lambda_function {
-    lambda_function_arn = aws_lambda_function.checksum_lambda.arn
+    lambda_function_arn = aws_lambda_function.calculate_checksum_lambda.arn
     events              = [
       "s3:ObjectCreated:Copy"
     ]
@@ -104,7 +104,7 @@ resource "aws_s3_bucket_notification" "data_store" {
   }
 
   depends_on = [
-    aws_lambda_permission.s3_allow_checksum_lambda,
+    aws_lambda_permission.s3_allow_calculate_checksum_lambda,
     aws_lambda_permission.s3_allow_summarise_zip_lambda,
   ]
 }
@@ -118,17 +118,17 @@ variable "checksum_algorithm" {
   default     = "SHA256"
 }
 
-data "archive_file" "checksum_lambda" {
+data "archive_file" "calculate_checksum_lambda" {
   type        = "zip"
-  source_file = "checksum_lambda.py"
-  output_path = "checksum_lambda.zip"
+  source_file = "calculate_checksum_lambda.py"
+  output_path = "calculate_checksum_lambda.zip"
 }
 
-resource "aws_lambda_function" "checksum_lambda" {
-  filename      = "checksum_lambda.zip"
-  function_name = "ChecksumLambda"
-  role          = aws_iam_role.checksum_lambda.arn
-  handler       = "checksum_lambda.handler"
+resource "aws_lambda_function" "calculate_checksum_lambda" {
+  filename      = "calculate_checksum_lambda.zip"
+  function_name = "calculate_checksum-lambda"
+  role          = aws_iam_role.calculate_checksum_lambda.arn
+  handler       = "calculate_checksum_lambda.handler"
   runtime       = "python3.9"
   timeout       = 600
 
@@ -139,24 +139,13 @@ resource "aws_lambda_function" "checksum_lambda" {
   }
 }
 
-data "aws_iam_policy_document" "lambda_assume_role" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role" "checksum_lambda" {
-  name                = "checksum-lambda-iam-role"
+resource "aws_iam_role" "calculate_checksum_lambda" {
+  name                = "calculate-checksum-lambda-iam-role"
   assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
 
-data "aws_iam_policy_document" "checksum_lambda" {
+data "aws_iam_policy_document" "calculate_checksum_lambda" {
   statement {
     sid = "S3Permissions"
     effect  = "Allow"
@@ -176,16 +165,16 @@ data "aws_iam_policy_document" "checksum_lambda" {
   }
 }
 
-resource "aws_iam_role_policy" "checksum_lambda" {
-  name   = "checksum-lambda-iam-policy"
-  role   = aws_iam_role.checksum_lambda.id
-  policy = data.aws_iam_policy_document.checksum_lambda.json
+resource "aws_iam_role_policy" "calculate_checksum_lambda" {
+  name   = "calculate_checksum-lambda-iam-policy"
+  role   = aws_iam_role.calculate_checksum_lambda.id
+  policy = data.aws_iam_policy_document.calculate_checksum_lambda.json
 }
 
-resource "aws_lambda_permission" "s3_allow_checksum_lambda" {
-  statement_id  = "AllowChecksumExecutionFromS3Bucket"
+resource "aws_lambda_permission" "s3_allow_calculate_checksum_lambda" {
+  statement_id  = "AllowCalculateChecksumExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.checksum_lambda.arn
+  function_name = aws_lambda_function.calculate_checksum_lambda.arn
   principal     = "s3.amazonaws.com"
   source_arn    = "${aws_s3_bucket.data_store.arn}"
 }
@@ -202,7 +191,7 @@ data "archive_file" "summarise_zip_lambda" {
 
 resource "aws_lambda_function" "summarise_zip_lambda" {
   filename      = "summarise_zip_lambda.zip"
-  function_name = "ChecksumLambda"
+  function_name = "summarise-zip-lambda"
   role          = aws_iam_role.summarise_zip_lambda.arn
   handler       = "summarise_zip_lambda.handler"
   runtime       = "python3.9"
