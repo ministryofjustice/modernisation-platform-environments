@@ -125,7 +125,7 @@ data "archive_file" "calculate_checksum_lambda" {
 
 resource "aws_lambda_function" "calculate_checksum_lambda" {
   filename      = "calculate_checksum_lambda.zip"
-  function_name = "calculate_checksum-lambda"
+  function_name = "calculate-checksum-lambda"
   role          = aws_iam_role.calculate_checksum_lambda.arn
   handler       = "calculate_checksum_lambda.handler"
   runtime       = "python3.9"
