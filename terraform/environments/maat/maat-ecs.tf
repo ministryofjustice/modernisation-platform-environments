@@ -476,6 +476,15 @@ resource "aws_iam_policy" "maat_ecs_policy_access_params" {
           "sqs:*"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage"
+        ]
+        Resource = "arn:aws:ecr:${local.env_account_region}:374269020027:repository/${local.application_name}-ecr-repo"
       }
     ]
   })
