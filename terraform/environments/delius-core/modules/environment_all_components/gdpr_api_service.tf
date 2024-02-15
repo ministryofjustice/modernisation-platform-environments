@@ -50,8 +50,9 @@ module "gdpr_api_service" {
   rds_username          = var.delius_microservice_configs.gdpr_api.rds_username
   rds_license_model     = var.delius_microservice_configs.gdpr_api.rds_license_model
 
-  ecs_connectivity_services_alb           = aws_lb.delius_microservices
-  ecs_connectivity_services_alb_listeners = aws_lb_listener.delius_microservices_listeners
+  ecs_connectivity_services_nlb           = aws_lb.delius_core_frontend
+  ecs_connectivity_services_nlb_listeners = aws_lb_listener.listener_https
+
   container_environment_vars = [
     {
       name  = "SERVER_SERVLET_CONTEXT_PATH"

@@ -80,6 +80,7 @@ locals {
     }
 
     merge_api = {
+      container_port        = 8080
       image_tag             = "REPLACE"
       create_rds            = true
       rds_engine            = "postgres"
