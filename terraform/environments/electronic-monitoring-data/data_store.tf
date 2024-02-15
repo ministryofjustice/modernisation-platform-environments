@@ -100,7 +100,6 @@ resource "aws_s3_bucket_notification" "data_store" {
     events              = [
       "s3:ObjectCreated:Copy"
     ]
-    filter_suffix       = ".zip"
   }
 
   depends_on = [

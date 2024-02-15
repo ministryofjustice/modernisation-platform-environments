@@ -44,8 +44,13 @@ def handler(event, context):
     bucket = event['Records'][0]['s3']['bucket']['name']
     object_key = event['Records'][0]['s3']['object']['key']
 
+    # Check if the object key ends with '.zip'
+    if not object_key.endswith('.zip'):
+        print(f"Stopping for'{object_key = }' as suffix other than '.zip'")
+        return None
+
     print(f'{object_key = } added to {bucket = } via {event_type = }')
-    
+
     # Create S3 client
     s3_client = boto3.client('s3')
     
