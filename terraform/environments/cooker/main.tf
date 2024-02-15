@@ -9,20 +9,8 @@ locals {
   business_unit       = var.networking[0].business-unit
   region              = "eu-west-2"
 
-
-  # autoscaling_schedules_default = {
-  #   "scale_up" = {
-  #     recurrence = "0 7 * * Mon-Fri"
-  #   }
-  #   "scale_down" = {
-  #     desired_capacity = 0
-  #     recurrence       = "0 19 * * Mon-Fri"
-  #   }    
-  # }
-
   instance = {
     disable_api_termination      = false
-    instance_type                = "t3a.small"
     key_name                     = try(aws_key_pair.ec2-user.key_name)
     monitoring                   = false
     metadata_options_http_tokens = "required"
@@ -32,44 +20,21 @@ locals {
   ec2_test = {
 
     tags = {
-      component = "test"
-    }
-
-    user_data_cloud_init = {
-      args = {
-        lifecycle_hook_name  = "ready-hook"
-        branch               = "main"
-        ansible_repo         = "modernisation-platform-configuration-management"
-        ansible_repo_basedir = "ansible"
-        ansible_args         = "--tags ec2provision"
-      }
-      scripts = [
-        "install-ssm-agent.sh.tftpl",
-        "ansible-ec2provision.sh.tftpl",
-        "post-ec2provision.sh.tftpl"
-      ]
+      component = "example-ec2-build-using-module"
     }
 
     route53_records = {
-      create_internal_record = true
+      create_internal_record = false
       create_external_record = false
     }
 
-    # user can manually increase the desired capacity to 1 via CLI/console
-    # to create an instance
-    # autoscaling_group = {
-    #   desired_capacity = 0
-    #   max_size         = 2
-    #   min_size         = 0
-    # }
-
-    ec2_test_instances = {
+    ec2_instances = {
       # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
 
-      example-test-1 = {
+      example-1 = {
         tags = {
           server-type = "private"
-          description = "EC2_1"
+          description = "ec2-example-1"
           monitored   = false
           os-type     = "Linux"
           component   = "ndh"
@@ -82,12 +47,19 @@ locals {
         ami_owner = "137112412989"
         subnet_id = data.aws_subnet.private_subnets_a.id
         availability_zone = "eu-west-2a"
+        instance_type = "t3.small"
+        user_data = <<EOF
+            #!/bin/bash
+            yum update -y
+            yum install httpd
+            systemctl start httpd
+            EOF
       }
 
-      example-test-2 = {
+      example-2 = {
         tags = {
           server-type = "private"
-          description = "EC2_2"
+          description = "ec2-example-2"
           monitored   = false
           os-type     = "Linux"
           component   = "ndh"
@@ -100,8 +72,15 @@ locals {
         ami_owner = "137112412989"
         subnet_id = data.aws_subnet.private_subnets_b.id
         availability_zone = "eu-west-2b"
+        instance_type = "t3.micro"
+        user_data = <<EOF
+            #!/bin/bash
+            yum update -y
+            EOF
       }
+
     }
+  
   }
 
   # This local provides a list of ingress rules for the ec2 security groups.
@@ -145,17 +124,17 @@ locals {
 
 
 # EC2 Created via module
-module "ec2_test_instance" {
+module "ec2_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.4.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
-  for_each                      = try(local.ec2_test.ec2_test_instances, {})
+  for_each                      = try(local.ec2_test.ec2_instances, {})
   name                          = each.key
   ami_name                      = each.value.ami_name
   ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
-  instance                      = merge(local.instance, lookup(each.value, "instance", { disable_api_stop = false }))
+  instance                      = merge(local.instance, lookup(each.value, "instance", { disable_api_stop = false, instance_type = try(each.value.instance_type) }))
   ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
   ebs_kms_key_id                = "" # module.environment.kms_keys["ebs"].arn
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
@@ -173,6 +152,7 @@ module "ec2_test_instance" {
   region                   = local.region
   tags                     = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup       = local.environment_management.account_ids
+  user_data_raw            = try(each.value.user_data, "")
   cloudwatch_metric_alarms = {}
 }
 
@@ -231,11 +211,6 @@ data "aws_iam_policy_document" "ec2_common_combined" {
   ]
 }
 
-# Required.
-data "aws_kms_key" "default_ebs" {
-  key_id = "alias/aws/ebs"
-}
-
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ec2_policy" {
   statement {
@@ -246,6 +221,12 @@ data "aws_iam_policy_document" "ec2_policy" {
     ]
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
+}
+
+
+# Required.
+data "aws_kms_key" "default_ebs" {
+  key_id = "alias/aws/ebs"
 }
 
 #------------------------------------------------------------------------------
@@ -261,22 +242,6 @@ resource "aws_key_pair" "ec2-user" {
     },
   )
 }
-
-# # Volumes built for use by EC2.
-# resource "aws_kms_key" "ec2" {
-#   description         = "Encryption key for EBS"
-#   enable_key_rotation = true
-#   policy              = data.aws_iam_policy_document.ebs-kms.json
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name}-ebs-kms"
-#     }
-#   )
-# }
-
-
 
 #### This file can be used to store data specific to the member account ####
 data "aws_iam_policy_document" "ebs-kms" {
@@ -306,18 +271,3 @@ data "aws_iam_policy_document" "ebs-kms" {
   }
 }
 
-# module "environment" {
-#   source = "../../modules/environment"
-
-#   providers = {
-#     aws.modernisation-platform = aws.modernisation-platform
-#     aws.core-network-services  = aws.core-network-services
-#     aws.core-vpc               = aws.core-vpc
-#   }
-
-#   environment_management = local.environment_management
-#   business_unit          = local.business_unit
-#   application_name       = local.application_name
-#   environment            = local.environment
-#   subnet_set             = local.subnet_set
-# }
