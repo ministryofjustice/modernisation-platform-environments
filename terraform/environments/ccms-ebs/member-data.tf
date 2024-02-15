@@ -57,20 +57,6 @@ data "aws_ami" "accessgate" {
   }
 }
 
-data "aws_ami" "oracle_db_dr" {
-  most_recent = true
-  owners      = [local.application_data.accounts[local.environment].ami_owner]
-
-  filter {
-    name   = "name"
-    values = [local.application_data.accounts[local.environment].orace_db_dr_ami_name]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 ## SNS IAM Policies
 
 # The policies below are not used. Saved for reference.

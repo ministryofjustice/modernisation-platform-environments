@@ -63,19 +63,27 @@ locals {
   gdpr_config_dev = {
     api_image_tag = "REPLACE"
     ui_image_tag  = "REPLACE"
-  }
-
-  merge_config_dev = {
-    api_image_tag      = "REPLACE"
-    ui_image_tag       = "REPLACE"
     create_rds         = true
     rds_engine         = "postgres"
     rds_engine_version = "15"
     rds_instance_class = "db.t3.small"
-    rds_allocated_storage = 20
-    rds_username       = "mergeadmin"
+    rds_allocated_storage = 30
+    rds_username       = "gdpr"
     rds_port           = 5432
     rds_license_model = "postgresql-license"
+  }
+
+  merge_config_dev = {
+    api_image_tag         = "REPLACE"
+    ui_image_tag          = "REPLACE"
+    create_rds            = true
+    rds_engine            = "postgres"
+    rds_engine_version    = "15"
+    rds_instance_class    = "db.t3.small"
+    rds_allocated_storage = 20
+    rds_username          = "dbadmin"
+    rds_port              = 5432
+    rds_license_model     = "postgresql-license"
   }
 
   weblogic_config_dev = {

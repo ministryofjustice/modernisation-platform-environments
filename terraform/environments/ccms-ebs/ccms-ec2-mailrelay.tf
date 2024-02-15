@@ -47,7 +47,7 @@ resource "aws_instance" "ec2_mailrelay" {
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-mailrelay", local.application_name, local.environment)) },
-    { instance-scheduling = "skip-scheduling" },
+    { instance-scheduling = "skip-auto-start" },
     { backup = "true" }
   )
 

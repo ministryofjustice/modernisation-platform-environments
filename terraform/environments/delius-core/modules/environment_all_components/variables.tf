@@ -8,14 +8,7 @@ variable "app_name" {
 
 # Account level info
 variable "account_info" {
-  type = object({
-    business_unit    = string,
-    region           = string,
-    vpc_id           = string,
-    application_name = string,
-    mp_environment   = string,
-    id               = string
-  })
+  type = any
 }
 
 variable "account_config" {
@@ -56,14 +49,7 @@ variable "db_config" {
 }
 
 variable "gdpr_config" {
-  type = object({
-    api_image_tag = string
-    ui_image_tag  = string
-  })
-  default = {
-    api_image_tag = "default_image_tag"
-    ui_image_tag  = "default_image_tag"
-  }
+  type = any
 }
 
 variable "merge_config" {
