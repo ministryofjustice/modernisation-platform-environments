@@ -4,36 +4,6 @@ import json
 import zipfile
 
 
-def build_ascii_directory_structure(directory_structure, indent=0, structure_string=""):
-    """
-    Recursively constructs the directory structure string.
-
-    Parameters
-    ----------
-    directory_structure
-        The directory structure to print.
-    indent
-        The current indentation level.
-    structure_string
-        The string to append the directory structure.
-
-    Returns
-    -------
-    str
-        The constructed directory structure string.
-    """
-    for key, value in directory_structure.items():
-        structure_string += '  ' * indent + f'- {key}\n'
-        if isinstance(value, dict):
-            structure_string = build_ascii_directory_structure(value, indent + 1, structure_string)
-        elif isinstance(value, list):
-            for item in value:
-                structure_string = build_ascii_directory_structure(item, indent + 1, structure_string)
-        else:
-            structure_string += '  ' * (indent + 1) + f'- {value}\n'
-    return structure_string
-
-
 def handler(event, context):
     """
     Read contents of a zip file and print directory structure and item count.
@@ -105,6 +75,6 @@ def handler(event, context):
             Body=json_content.encode('utf-8')
         )
 
-        print(f'Info saved to {new_object_key}')
+        print(f'Zip info saved to {new_object_key}')
 
         return None
