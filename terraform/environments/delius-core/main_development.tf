@@ -28,6 +28,7 @@ module "environment_dev" {
   gdpr_config            = local.gdpr_config_dev
   merge_config           = local.merge_config_dev
   user_management_config = local.user_management_config_dev
+  pwm_config             = local.pwm_config_dev
 
   account_info = local.account_info
 

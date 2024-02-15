@@ -107,3 +107,7 @@ variable "community_api" {
     db_name        = "default_db_name"
   }
 }
+
+variable "pwm_config" {
+  type = any
+}

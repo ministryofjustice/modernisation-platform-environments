@@ -113,4 +113,10 @@ locals {
     environment             = local.environment
     extra_user_data_content = "yum install -y openldap-clients"
   }
+
+  pwm_config_dev = {
+    image_tag   = "REPLACE"
+    create_alb  = true
+    is_internal = false
+  }
 }

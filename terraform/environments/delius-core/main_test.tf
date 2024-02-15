@@ -29,6 +29,7 @@ module "environment_test" {
   gdpr_config            = local.gdpr_config_test
   bastion_config         = local.bastion_config_test
   user_management_config = local.user_management_config_test
+  pwm_config             = local.pwm_config_test
 
   account_info = local.account_info
 
