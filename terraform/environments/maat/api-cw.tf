@@ -288,12 +288,6 @@ locals {
   maat_api_pagerduty_integration_key_name = local.application_data.accounts[local.environment].maat_api_pagerduty_integration_key_name
 }
 
-resource "aws_sns_topic_subscription" "maat_api_pagerduty_subscription" {
-  topic_arn = aws_sns_topic.maat_api_alerting_topic.arn
-  protocol  = "https"
-  endpoint  = "https://events.pagerduty.com/integration/${local.maat_api_pagerduty_integration_keys[local.maat_api_pagerduty_integration_key_name]}/enqueue"
-}
-
 # # link the sns topic to the service
 # module "maat_api_pagerduty_core_alerts_non_prod" {
 #   depends_on = [
