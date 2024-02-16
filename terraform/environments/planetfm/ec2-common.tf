@@ -38,18 +38,18 @@ locals {
   }
 }
 
-resource "aws_ssm_document" "ssm_documents" {
-  for_each = local.ssm_docs
+# resource "aws_ssm_document" "ssm_documents" {
+#   for_each = local.ssm_docs
 
-  name            = try(each.value.name, each.key)
-  document_type   = try(each.value.document_type, "Command")
-  document_format = try(each.value.format, "YAML")
-  content         = try(each.value.content)
+#   name            = try(each.value.name, each.key)
+#   document_type   = try(each.value.document_type, "Command")
+#   document_format = try(each.value.format, "YAML")
+#   content         = try(each.value.content)
 
-  tags = merge(
-    local.tags,
-    {
-      Name = try(each.value.name, each.key)
-    },
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = try(each.value.name, each.key)
+#     },
+#   )
+# }
