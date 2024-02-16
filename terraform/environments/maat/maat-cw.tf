@@ -124,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTime" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBTargetResponseTimeThreshold
-  treat_missing_data = "breaching"
+  treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
   }
@@ -197,7 +197,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_RejectedConnectionCount" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBRejectedAlarmThreshold
-  treat_missing_data = "notBreaching"
+  treat_missing_data = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
   }
@@ -221,7 +221,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_http5xxError" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBTarget5xxAlarmThreshold
-  treat_missing_data = "notBreaching"
+  treat_missing_data = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
   }
