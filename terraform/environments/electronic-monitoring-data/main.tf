@@ -62,15 +62,15 @@ module "g4s" {
 
     # Accounts for each system to be migrated.
     local.sftp_account_g4s_atrium,
-    # local.sftp_account_g4s_atv,
     local.sftp_account_g4s_cap_dw,
+    # local.sftp_account_g4s_integrity,
+    # local.sftp_account_g4s_telephony,
+    # local.sftp_account_g4s_fep,
+    # local.sftp_account_g4s_tasking,
+    # local.sftp_account_g4s_subject_history,
+    # local.sftp_account_g4s_atv,
     # local.sftp_account_g4s_emsys_mvp,
     # local.sftp_account_g4s_emsys_tpims,
-    # local.sftp_account_g4s_fep,
-    local.sftp_account_g4s_integrity,
-    # local.sftp_account_g4s_subject_history,
-    # local.sftp_account_g4s_tasking,
-    # local.sftp_account_g4s_telephony,
   ]
 
   data_store_bucket = aws_s3_bucket.data_store
