@@ -475,11 +475,11 @@ resource "aws_sns_topic" "maat_alerting_topic" {
 # #   pagerduty_integration_key = local.maat_pagerduty_integration_keys["laa_maat_nonprod_alarms"]
 # # }
 
-# module "maat_pagerduty_core_alerts" {
-#   depends_on = [
-#     aws_sns_topic.maat_alerting_topic
-#   ]
-#   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-#   sns_topics                = [aws_sns_topic.maat_alerting_topic.name]
-#   pagerduty_integration_key = local.application_data.accounts[local.environment].maat_pagerduty_integration_key_name
-# }
+module "maat_pagerduty_core_alerts" {
+  depends_on = [
+    aws_sns_topic.maat_alerting_topic
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.maat_alerting_topic.name]
+  pagerduty_integration_key = local.application_data.accounts[local.environment].maat_pagerduty_integration_key_name
+}
