@@ -264,6 +264,12 @@ resource "aws_sns_topic" "maat_api_alerting_topic" {
   name = "${local.application_name}-api-${local.environment}-alerting-topic"
 }
 
+resource "aws_sns_topic_subscription" "maat_api_pagerduty_subscription" {
+  topic_arn = aws_sns_topic.maat_api_alerting_topic.arn
+  protocol  = "https"
+  endpoint  = "https://events.pagerduty.com/integration/${local.maat_api_pagerduty_integration_keys[local.maat_api_pagerduty_integration_key_name]}/enqueue"
+}
+
 # Pager duty integration
 
 # Get the map of pagerduty integration keys from the modernisation platform account
@@ -282,7 +288,13 @@ locals {
   maat_api_pagerduty_integration_key_name = local.application_data.accounts[local.environment].maat_api_pagerduty_integration_key_name
 }
 
-# link the sns topic to the service
+resource "aws_sns_topic_subscription" "maat_api_pagerduty_subscription" {
+  topic_arn = aws_sns_topic.maat_api_alerting_topic.arn
+  protocol  = "https"
+  endpoint  = "https://events.pagerduty.com/integration/${local.maat_api_pagerduty_integration_keys[local.maat_api_pagerduty_integration_key_name]}/enqueue"
+}
+
+# # link the sns topic to the service
 # module "maat_api_pagerduty_core_alerts_non_prod" {
 #   depends_on = [
 #     aws_sns_topic.maat_api_alerting_topic
@@ -292,11 +304,11 @@ locals {
 #   pagerduty_integration_key = local.maat_api_pagerduty_integration_keys["laa_maat_api_nonprod_alarms"]
 # }
 
-module "maat_api_pagerduty_core_alerts" {
-  depends_on = [
-    aws_sns_topic.maat_api_alerting_topic
-  ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.maat_api_alerting_topic.name]
-  pagerduty_integration_key = local.maat_api_pagerduty_integration_key_name
-}
+# module "maat_api_pagerduty_core_alerts_prod" {
+#   depends_on = [
+#     aws_sns_topic.maat_api_alerting_topic
+#   ]
+#   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+#   sns_topics                = [aws_sns_topic.maat_api_alerting_topic.name]
+#   pagerduty_integration_key = local.maat_api_pagerduty_integration_keys["laa_maat_api_prod_alarms"]
+# }
