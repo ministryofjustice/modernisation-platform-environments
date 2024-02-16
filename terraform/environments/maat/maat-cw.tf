@@ -148,7 +148,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTimeMaximum" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBTargetResponseTimeThresholdMaximum
-  treat_missing_data = "notBreaching"
+  treat_missing_data = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
   }
@@ -172,7 +172,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_UnHealthyHosts" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBUnhealthyAlarmThreshold
-  treat_missing_data = "notBreaching"
+  treat_missing_data = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
     TargetGroup = aws_lb_target_group.external.arn
