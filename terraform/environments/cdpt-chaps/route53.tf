@@ -26,7 +26,7 @@ resource "aws_route53_record" "external_validation" {
 
   allow_overwrite = true
   name            = local.is-production ? tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name : local.domain_name_main[0]
-  records         = local.is-production ? [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value] : [local.domain_record_main]
+  records         = local.is-production ? [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value] : local.domain_record_main
   ttl             = 60
   type            = local.is-production ? tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type : local.domain_type_main[0]
   zone_id         = local.is-production ? data.aws_route53_zone.application_zone.zone_id : data.aws_route53_zone.network-services.zone_id
