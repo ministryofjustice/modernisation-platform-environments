@@ -27,7 +27,7 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
+  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=a319c417fe7d499acc7893cf19db6fd566e30822"
   container_definition_json = module.container_definition.json_map_encoded_list
   ecs_cluster_arn           = var.ecs_cluster_arn
   name                      = var.name
@@ -50,7 +50,7 @@ module "ecs_service" {
 
   ecs_load_balancers = [
     {
-      target_group_arn = aws_lb_target_group.this.arn
+      target_group_arn = aws_lb_target_group.frontend.arn
       container_name   = var.name
       container_port   = var.container_port_config[0].containerPort
     }
@@ -62,7 +62,7 @@ module "ecs_service" {
 
   exec_enabled = true
 
-  ignore_changes_task_definition = true
+  ignore_changes_task_definition = true # task definition managed by Delius App team
   redeploy_on_apply              = false
   force_new_deployment           = false
 }

@@ -1,14 +1,14 @@
 module "community_api" {
   source = "../components/delius_microservice"
 
-  name                  = var.community_api.name
+  name                  = "community-api"
   certificate_arn       = aws_acm_certificate.external.arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
   container_port_config = [
     {
-      containerPort = var.community_api.container_port
-      protocol      = var.community_api.protocol
+      containerPort = var.delius_microservice_configs.community_api.container_port
+      protocol      = "tcp"
     }
   ]
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
@@ -47,10 +47,11 @@ module "community_api" {
   # Two LBs (public and secure) are needed as show on the architecture diagram. There is an architectural discussion to be had if we could get away with just one LB instead
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
+
   # Please check with the app team what the rule path should be here.
   alb_listener_rule_paths = ["/secure", "/secure/*"]
   platform_vars           = var.platform_vars
-  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-community-api-ecr-repo:${var.community_api.image_tag}"
+  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-community-api-ecr-repo:${var.delius_microservice_configs.community_api.image_tag}"
   account_config          = var.account_config
   health_check_path       = "/health/ping"
   account_info            = var.account_info
@@ -102,4 +103,9 @@ module "community_api" {
       value = var.env_name
     }
   ]
+
+  providers = {
+    aws          = aws
+    aws.core-vpc = aws.core-vpc
+  }
 }
