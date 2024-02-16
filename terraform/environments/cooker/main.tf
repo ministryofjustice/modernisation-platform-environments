@@ -209,11 +209,10 @@ resource "aws_iam_policy" "ec2_common_policy" {
 # combine ec2-common policy documents
 data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
-    data.aws_iam_policy_document.ec2_policy.json,
+    data.aws_iam_policy_document.ec2_policy_1.json  
   ]
 }
 
-# custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ec2_policy" {
   statement {
     sid    = "CustomEc2Policy"
@@ -224,6 +223,7 @@ data "aws_iam_policy_document" "ec2_policy" {
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 }
+
 
 
 # Required.
