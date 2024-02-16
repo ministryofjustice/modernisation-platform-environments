@@ -40,7 +40,7 @@ locals {
           environment = "development"
         }
         ebs_volumes = {
-          "/dev/sdf" = { size = 20 }
+          "/dev/sdf" = { size = 20, type = "gp3" }
         }
         ami_name  = "amzn2-ami-kernel-5.10-hvm-2.0.20240131.0-x86_64-gp2"
         ami_owner = "137112412989"
@@ -67,7 +67,7 @@ locals {
           environment = "development"
         }
         ebs_volumes = {
-          "/dev/sdf" = { size = 20 }
+          "/dev/sdf" = { size = 20, type = "gp3" }
         }
         ami_name  = "amzn2-ami-kernel-5.10-hvm-2.0.20240131.0-x86_64-gp2"
         ami_owner = "137112412989"
@@ -124,6 +124,32 @@ locals {
 
 }
 
+# combine ec2-common policy documents
+data "aws_iam_policy_document" "ec2_common_combined" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.ec2_policy.json  
+  ]
+}
+
+data "aws_iam_policy_document" "ec2_policy" {
+  statement {
+    sid    = "AllowSSMAccess"
+    effect = "Allow"
+    actions = [
+      "ssm:StartSession",
+      "ssm:ResumeSession",
+      "ssm:TerminateSession",
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel",
+      "ec2messages:AcknowledgeMessage",
+      "ec2:DescribeInstances"
+    ]
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
+
 
 # EC2 Created via module
 module "ec2_instance" {
@@ -138,11 +164,9 @@ module "ec2_instance" {
   ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
   instance                      = merge(local.instance, lookup(each.value, "instance", { disable_api_stop = false, instance_type = try(each.value.instance_type) }))
   ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
-  ebs_kms_key_id                = "" # module.environment.kms_keys["ebs"].arn
+  ebs_kms_key_id                = "" # Suggest there that the default ebs key for the account is used instead as a default entry.
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "example-ec2/")
-  ssm_parameters                = lookup(each.value, "ssm_parameters", null)
   route53_records               = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
   availability_zone        = each.value.availability_zone
   subnet_id                = each.value.subnet_id
@@ -158,7 +182,8 @@ module "ec2_instance" {
   cloudwatch_metric_alarms = {}
 }
 
-###### EC2 Security Group ######
+
+###### EC2 Security Groups ######
 
 resource "aws_security_group" "example_ec2_sg" {
   name        = "example_ec2_sg"
@@ -206,30 +231,13 @@ resource "aws_iam_policy" "ec2_common_policy" {
   )
 }
 
-# combine ec2-common policy documents
-data "aws_iam_policy_document" "ec2_common_combined" {
-  source_policy_documents = [
-    data.aws_iam_policy_document.ec2_policy_1.json  
-  ]
-}
-
-data "aws_iam_policy_document" "ec2_policy" {
-  statement {
-    sid    = "CustomEc2Policy"
-    effect = "Allow"
-    actions = [
-      "s3:List*"
-    ]
-    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
-  }
-}
 
 
 
 # Required.
-data "aws_kms_key" "default_ebs" {
-  key_id = "alias/aws/ebs"
-}
+#data "aws_kms_key" "default_ebs" {
+#  key_id = "alias/aws/ebs"
+#}
 
 #------------------------------------------------------------------------------
 # Keypair for ec2-user
@@ -245,31 +253,4 @@ resource "aws_key_pair" "ec2-user" {
   )
 }
 
-#### This file can be used to store data specific to the member account ####
-data "aws_iam_policy_document" "ebs-kms" {
-  #checkov:skip=CKV_AWS_111
-  #checkov:skip=CKV_AWS_109
-  statement {
-    effect    = "Allow"
-    actions   = ["kms:*"]
-    resources = ["*"]
-
-    principals {
-      type = "Service"
-      identifiers = [
-      "ec2.amazonaws.com"]
-    }
-  }
-  statement {
-    effect    = "Allow"
-    actions   = ["kms:*"]
-    resources = ["*"]
-
-    principals {
-      type = "AWS"
-      identifiers = [
-      "arn:aws:iam::${data.aws_caller_identity.original_session.id}:root"]
-    }
-  }
-}
 
