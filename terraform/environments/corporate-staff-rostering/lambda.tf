@@ -53,7 +53,7 @@ resource "aws_cloudwatch_event_rule" "ec2_state_change_terminated" {
 resource "aws_cloudwatch_event_target" "lambda_ad_clean_up" {
   rule      = aws_cloudwatch_event_rule.ec2_state_change_terminated.name
   target_id = "LambdaTarget"
-  arn       = module.ad-clean-up-lambda.arn
+  arn       = module.ad-clean-up-lambda.lambda_function_arn
 }
 
 # END: lambda_ad_object_clean_up
