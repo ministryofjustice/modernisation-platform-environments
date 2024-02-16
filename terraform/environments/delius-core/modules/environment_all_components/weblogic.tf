@@ -44,7 +44,8 @@ module "weblogic" {
     {
       containerPort = var.delius_microservice_configs.weblogic.container_port
       protocol      = "tcp"
-  }]
+    }
+  ]
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
   env_name        = var.env_name
 

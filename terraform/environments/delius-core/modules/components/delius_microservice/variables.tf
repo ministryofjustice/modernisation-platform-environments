@@ -180,12 +180,6 @@ variable "health_check_grace_period_seconds" {
   default     = 60
 }
 
-variable "ecs_service_port" {
-  description = "The port on which the ECS service is exposing the container"
-  type        = number
-  default     = 443
-}
-
 variable "ecs_cluster_arn" {
   description = "The ARN of the ECS cluster"
   type        = string
