@@ -23,8 +23,10 @@ locals {
       component = "example-ec2-build-using-module"
     }
 
+
+    # Route53 DNS Records - the prefix for these is derrived from local.app_name.
     route53_records = {
-      create_internal_record = false
+      create_internal_record = true
       create_external_record = false
     }
 
