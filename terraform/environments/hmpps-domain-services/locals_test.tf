@@ -87,23 +87,29 @@ locals {
           description = "Windows Server 2022 for connecting to Azure domain"
           os-type     = "Windows"
           component   = "test"
-          server-type = "HmppsDomainServicesTest"
+          server-type = "RDGateway"
         }
       }
     }
 
     baseline_ec2_instances = {
+      test-rdgw-1-a = merge(local.rds_ec2_instance, {
+        config = merge(local.rds_ec2_instance.config, {
+          availability_zone = "eu-west-2a"
+        })
+        user_data_raw = base64encode(file("./templates/user-data-pwsh.yaml"))
+        tags = merge(local.rds_ec2_instance.tags, {
+          description = "Remote Desktop Gateway for azure.noms.root domain"
+        })
+      })
     }
 
     baseline_lbs = {
       public = merge(local.rds_lbs.public, {
         instance_target_groups = {
-          http1 = merge(local.rds_target_groups.http, {
+          test-rdgw-1-http = merge(local.rds_target_groups.http, {
             attachments = [
-            ]
-          })
-          https1 = merge(local.rds_target_groups.https, {
-            attachments = [
+              { ec2_instance_name = "test-rdgw-1-a" },
             ]
           })
         }
@@ -111,6 +117,20 @@ locals {
           http = local.rds_lb_listeners.http
           https = merge(local.rds_lb_listeners.https, {
             rules = {
+              test-rdgw-1-http = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdgw-1-http"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway1.test.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }
