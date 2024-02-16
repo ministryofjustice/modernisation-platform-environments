@@ -148,30 +148,30 @@ resource "aws_lb_listener_rule" "homepage_listener_rule" {
   depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }
 
-resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
-  listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 2
-  condition {
-    path_pattern {
-      values = [
-        "/NDelius*",
-        "/jspellhtml/*"
-      ]
-    }
-  }
-  #  action {
-  #    type             = "forward"
-  #    target_group_arn = module.weblogic.target_group_arn
-  #  }
-  action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "404"
-    }
-  }
-  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
-}
+#resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
+#  listener_arn = aws_lb_listener.listener_https.arn
+#  priority     = 2
+#  condition {
+#    path_pattern {
+#      values = [
+#        "/NDelius*",
+#        "/jspellhtml/*"
+#      ]
+#    }
+#  }
+#  #  action {
+#  #    type             = "forward"
+#  #    target_group_arn = module.weblogic.target_group_arn
+#  #  }
+#  action {
+#    type = "fixed-response"
+#    fixed_response {
+#      content_type = "text/plain"
+#      status_code  = "404"
+#    }
+#  }
+#  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
+#}
 
 resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
