@@ -92,7 +92,7 @@ locals {
     }
 
     baseline_ec2_instances = {
-      test-rdgw-1-a = merge(local.rds_ec2_instance, {
+      test-rdgw-1-b = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
           availability_zone = "eu-west-2a"
           user_data_raw     = base64encode(file("./templates/user-data-pwsh.yaml"))
@@ -109,7 +109,7 @@ locals {
         instance_target_groups = {
           test-rdgw-1-http = merge(local.rds_target_groups.http, {
             attachments = [
-              { ec2_instance_name = "test-rdgw-1-a" },
+              { ec2_instance_name = "test-rdgw-1-b" },
             ]
           })
         }
