@@ -118,13 +118,13 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTime" {
   alarm_description  = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "TargetResponseTime"
-  extended_statistic = "p1"
-  period             = "1"
-  evaluation_periods = "1"
+  extended_statistic = "p99"
+  period             = "60"
+  evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBTargetResponseTimeThreshold
-  treat_missing_data = "notBreaching"
+  treat_missing_data = "Breaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
   }
