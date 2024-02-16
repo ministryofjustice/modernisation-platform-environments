@@ -124,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTime" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBTargetResponseTimeThreshold
-  treat_missing_data = "notBreaching"
+  treat_missing_data = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
   }
@@ -475,5 +475,5 @@ module "maat_pagerduty_core_alerts" {
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.maat_alerting_topic.name]
-  pagerduty_integration_key = local.maat_pagerduty_integration_key_name
+  pagerduty_integration_key = local.application_data.accounts[local.environment].maat_pagerduty_integration_key_name
 }
