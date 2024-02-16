@@ -28,7 +28,9 @@ module "gdpr_api_service" {
       #value = "/${var.environment_name}/${var.project_name}/gdpr/api/client_secret" # delete
     }
   ]
-  ingress_security_groups            = []
+  db_ingress_security_groups = []
+  cluster_security_group_id  = aws_security_group.cluster.id
+
   bastion_sg_id                      = module.bastion_linux.bastion_security_group
   tags                               = var.tags
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn

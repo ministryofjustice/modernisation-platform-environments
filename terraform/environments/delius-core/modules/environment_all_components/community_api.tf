@@ -40,9 +40,11 @@ module "community_api" {
     #   valueFrom = "/${var.environment_name}/${var.project_name}/probation-integration/community-api/sentry-dsn"
     # }
   ]
-  ingress_security_groups = []
-  bastion_sg_id           = module.bastion_linux.bastion_security_group
-  tags                    = var.tags
+  db_ingress_security_groups = []
+  cluster_security_group_id  = aws_security_group.cluster.id
+
+  bastion_sg_id = module.bastion_linux.bastion_security_group
+  tags          = var.tags
   # TODO - This LB is a placeholder marked no 13 on the architecture diagram: https://dsdmoj.atlassian.net/wiki/spaces/DAM/pages/3773105057/High-Level+Architecture
   # Two LBs (public and secure) are needed as show on the architecture diagram. There is an architectural discussion to be had if we could get away with just one LB instead
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn

@@ -18,6 +18,11 @@ variable "env_name" {
   type        = string
 }
 
+variable "cluster_security_group_id" {
+  description = "Security group id for the cluster"
+  type        = string
+}
+
 
 variable "rds_license_model" {
   description = "RDS license model to use"
@@ -157,7 +162,7 @@ variable "rds_enabled_cloudwatch_logs_exports" {
   default     = null
 }
 
-variable "ingress_security_groups" {
+variable "db_ingress_security_groups" {
   description = "Additional RDS/elasticache ingress security groups"
   type        = list(string)
 }

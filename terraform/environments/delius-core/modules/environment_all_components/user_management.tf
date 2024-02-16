@@ -26,8 +26,11 @@ module "user_management" {
   health_check_grace_period_seconds = 600
   health_check_interval             = 30
 
-  ingress_security_groups = []
-  bastion_sg_id           = module.bastion_linux.bastion_security_group
+  db_ingress_security_groups = []
+
+  cluster_security_group_id = aws_security_group.cluster.id
+
+  bastion_sg_id = module.bastion_linux.bastion_security_group
 
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn

@@ -2,7 +2,7 @@
 resource "aws_lb_target_group" "frontend" {
   # checkov:skip=CKV_AWS_261
   name                 = "${var.env_name}-${var.name}"
-  port                 = var.ecs_service_port
+  port                 = var.container_port_config[0].containerPort
   protocol             = var.target_group_protocol
   vpc_id               = var.account_config.shared_vpc_id
   target_type          = "ip"
