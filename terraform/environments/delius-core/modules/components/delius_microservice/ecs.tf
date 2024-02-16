@@ -48,13 +48,12 @@ module "ecs_service" {
 
   health_check_grace_period_seconds = var.health_check_grace_period_seconds
 
-  ecs_load_balancers = [
-    {
-      target_group_arn = aws_lb_target_group.frontend.arn
-      container_name   = var.name
-      container_port   = var.container_port_config[0].containerPort
-    }
-  ]
+  ecs_load_balancers = concat([{
+    target_group_arn = aws_lb_target_group.frontend.arn
+    container_name   = var.name
+    container_port   = var.ecs_service_port
+    }],
+  values(local.ecs_nlbs))
 
   security_group_ids = [aws_security_group.ecs_service.id]
 
