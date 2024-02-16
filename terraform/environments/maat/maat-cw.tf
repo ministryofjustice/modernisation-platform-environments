@@ -124,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTime" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBTargetResponseTimeThreshold
-  treat_missing_data = "breaching"
+  treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
   }
@@ -148,7 +148,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTimeMaximum" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBTargetResponseTimeThresholdMaximum
-  treat_missing_data = "breaching"
+  treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
   }
@@ -172,7 +172,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_UnHealthyHosts" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBUnhealthyAlarmThreshold
-  treat_missing_data = "breaching"
+  treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
     TargetGroup = aws_lb_target_group.external.arn
@@ -197,7 +197,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_RejectedConnectionCount" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBRejectedAlarmThreshold
-  treat_missing_data = "breaching"
+  treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
   }
@@ -221,7 +221,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_http5xxError" {
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = local.application_data.accounts[local.environment].maat_ALBTarget5xxAlarmThreshold
-  treat_missing_data = "breaching"
+  treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
   }
@@ -459,21 +459,21 @@ resource "aws_sns_topic" "maat_alerting_topic" {
   )
 }
 
-resource "aws_sns_topic_subscription" "maat_pagerduty_subscription" {
-  topic_arn = aws_sns_topic.maat_alerting_topic.arn
-  protocol  = "https"
-  endpoint  = "https://events.pagerduty.com/integration/${local.maat_pagerduty_integration_keys[local.maat_pagerduty_integration_key_name]}/enqueue"
-}
-
-# # link the sns topic to the service
-# module "maat_pagerduty_core_alerts_non_prod" {
-#   depends_on = [
-#     aws_sns_topic.maat_alerting_topic
-#   ]
-#   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-#   sns_topics                = [aws_sns_topic.maat_alerting_topic.name]
-#   pagerduty_integration_key = local.maat_pagerduty_integration_keys["laa_maat_nonprod_alarms"]
+# resource "aws_sns_topic_subscription" "maat_pagerduty_subscription" {
+#   topic_arn = aws_sns_topic.maat_alerting_topic.arn
+#   protocol  = "https"
+#   endpoint  = "https://events.pagerduty.com/integration/${local.maat_pagerduty_integration_keys[local.maat_pagerduty_integration_key_name]}/enqueue"
 # }
+
+# # # link the sns topic to the service
+# # module "maat_pagerduty_core_alerts_non_prod" {
+# #   depends_on = [
+# #     aws_sns_topic.maat_alerting_topic
+# #   ]
+# #   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+# #   sns_topics                = [aws_sns_topic.maat_alerting_topic.name]
+# #   pagerduty_integration_key = local.maat_pagerduty_integration_keys["laa_maat_nonprod_alarms"]
+# # }
 
 # module "maat_pagerduty_core_alerts" {
 #   depends_on = [
