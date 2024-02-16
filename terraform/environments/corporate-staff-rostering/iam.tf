@@ -73,7 +73,7 @@ resource "aws_iam_policy" "lambda_eventbridge_policy" {
       {
         "Effect": "Allow",
         "Action": "lambda:InvokeFunction",
-        "Resource": module.ad-clean-up-lambda.arn
+        "Resource": module.ad-clean-up-lambda.lambda_function_arn
       }
     ]
   })
