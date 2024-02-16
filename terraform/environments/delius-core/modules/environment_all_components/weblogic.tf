@@ -66,9 +66,4 @@ module "weblogic" {
     aws.core-vpc = aws.core-vpc
   }
   bastion_sg_id = module.bastion_linux.bastion_security_group
-
-  depends_on = [
-    aws_lb_listener_rule.blocked_paths_listener_rule,
-    aws_lb_listener_rule.allowed_paths_listener_rule
-  ]
 }
