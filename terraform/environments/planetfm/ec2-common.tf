@@ -1,97 +1,55 @@
-resource "aws_ssm_document" "windows_domain_join" {
-  name            = "windows-domain-join"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/windows-domain-join.yaml")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "windows-domain-join"
-    },
-  )
+locals {
+  # this local is used in locals.tf
+  ssm_doc_cloudwatch_log_groups = {
+    for key, value in local.ssm_docs :
+    "/aws/ssm/${try(value.name, key)}" => {
+      retention_in_days = 30
+    }
+  }
+  ssm_docs = {
+    ami-build-automation = {
+      document_type = "Automation"
+      content       = file("./ssm-documents/ami-build-automation.yaml")
+    }
+    ami-build-command = {
+      content = file("./ssm-documents/ami-build-command.yaml")
+    }
+    disable-azure-services = {
+      content = file("./ssm-documents/disable-azure-services.yaml")
+    }
+    network-testing-tools = {
+      content = file("./ssm-documents/network-testing-tools.yaml")
+    }
+    remove-local-users-windows = {
+      content = file("./ssm-documents/remove-local-users-windows.yaml")
+    }
+    windows-cloudwatch-agent-config = {
+      content = file("./ssm-documents/windows-cloudwatch-agent-config.yaml")
+    }
+    windows-domain-join = {
+      content = file("./ssm-documents/windows-domain-join.yaml")
+    }
+    windows-domain-leave = {
+      content = file("./ssm-documents/windows-domain-leave.yaml")
+    }
+    # windows-psreadline-fix = {
+    #   content = file("./ssm-documents/windows-psreadline-fix.yaml")
+    # }
+  }
 }
 
-resource "aws_ssm_document" "cloud_watch_agent" {
-  name            = "windows-cloudwatch-agent-config"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/windows-cloudwatch-agent-config.yaml")
+resource "aws_ssm_document" "ssm_documents" {
+  for_each = local.ssm_docs
+
+  name            = try(each.value.name, each.key)
+  document_type   = try(each.value.document_type, "Command")
+  document_format = try(each.value.format, "YAML")
+  content         = try(each.value.content)
 
   tags = merge(
     local.tags,
     {
-      Name = "windows-cloudwatch-agent-config"
-    },
-  )
-}
-
-resource "aws_ssm_document" "ami_build_command" {
-  name            = "ami-build-command"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/ami-build-command.yaml")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "ami-build-command"
-    },
-  )
-}
-
-resource "aws_ssm_document" "ami_build_automation" {
-  name            = "ami-build-automation"
-  document_type   = "Automation"
-  document_format = "YAML"
-  content         = file("./ssm-documents/ami-build-automation.yaml")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "ami-build-automation"
-    },
-  )
-}
-
-resource "aws_ssm_document" "remove_local_users_windows" {
-  name            = "remove-local-users-windows"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/remove-local-users-windows.yaml")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "remove-local-users-windows"
-    },
-  )
-}
-
-resource "aws_ssm_document" "network-testing-tools" {
-  name            = "network-testing-tools"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/network-testing-tools.yaml")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "network-testing-tools"
-    },
-  )
-}
-
-resource "aws_ssm_document" "windows-domain-leave" {
-  name            = "windows-domain-leave"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/windows-domain-leave.yaml")
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "network-testing-tools"
+      Name = try(each.value.name, each.key)
     },
   )
 }
