@@ -2,7 +2,7 @@
 resource "aws_lb_target_group" "frontend" {
   # checkov:skip=CKV_AWS_261
   name                 = "${var.env_name}-${var.name}"
-  port                 = var.ecs_service_port
+  port                 = var.container_port_config[0].containerPort
   protocol             = var.target_group_protocol
   vpc_id               = var.account_config.shared_vpc_id
   target_type          = "ip"
@@ -22,10 +22,6 @@ resource "aws_lb_target_group" "frontend" {
     unhealthy_threshold = "5"
     matcher             = "200-499"
     timeout             = "5"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -76,11 +72,12 @@ resource "aws_vpc_security_group_ingress_rule" "from_vpc" {
 resource "aws_lb_target_group" "service" {
   for_each = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
 
-  name     = "${var.name}-service-at-${each.value}"
-  port     = each.value
-  protocol = "TCP"
-  vpc_id   = var.account_info.vpc_id
-  tags     = var.tags
+  name        = "${var.name}-service-at-${each.value}"
+  target_type = "ip"
+  port        = each.value
+  protocol    = "TCP"
+  vpc_id      = var.account_info.vpc_id
+  tags        = var.tags
 }
 
 resource "aws_lb_listener" "services" {

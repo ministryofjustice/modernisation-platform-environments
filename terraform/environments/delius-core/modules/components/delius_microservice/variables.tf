@@ -18,6 +18,11 @@ variable "env_name" {
   type        = string
 }
 
+variable "cluster_security_group_id" {
+  description = "Security group id for the cluster"
+  type        = string
+}
+
 
 variable "rds_license_model" {
   description = "RDS license model to use"
@@ -157,7 +162,7 @@ variable "rds_enabled_cloudwatch_logs_exports" {
   default     = null
 }
 
-variable "ingress_security_groups" {
+variable "db_ingress_security_groups" {
   description = "Additional RDS/elasticache ingress security groups"
   type        = list(string)
 }
@@ -178,12 +183,6 @@ variable "health_check_grace_period_seconds" {
   description = "The amount of time, in seconds, that Amazon ECS waits before unhealthy instances are shut down."
   type        = number
   default     = 60
-}
-
-variable "ecs_service_port" {
-  description = "The port on which the ECS service is exposing the container"
-  type        = number
-  default     = 443
 }
 
 variable "ecs_cluster_arn" {

@@ -51,7 +51,7 @@ module "ecs_service" {
   ecs_load_balancers = concat([{
     target_group_arn = aws_lb_target_group.frontend.arn
     container_name   = var.name
-    container_port   = var.ecs_service_port
+    container_port   = var.container_port_config[0].containerPort
     }],
   values(local.ecs_nlbs))
 

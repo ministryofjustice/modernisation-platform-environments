@@ -36,7 +36,7 @@ resource "aws_security_group" "elasticache" {
     to_port     = var.elasticache_port
     security_groups = concat(
       [var.bastion_sg_id],
-      var.ingress_security_groups
+      var.db_ingress_security_groups
     )
   }
 
