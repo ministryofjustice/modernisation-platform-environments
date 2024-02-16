@@ -473,7 +473,7 @@ locals {
       #       arn = length(aws_lb_target_group.private-lb-https-443) > 0 ? aws_lb_target_group.private-lb-https-443[0].arn : ""
       #     }
       #   }
-      #   idle_timeout    = 60 # 60 is default
+      #   idle_timeout    = 3600 # 60 is default
       #   security_groups = [] # no security groups for network load balancers
       #   subnets         = module.environment.subnets["public"].ids
       #   tags            = local.tags
@@ -496,7 +496,7 @@ locals {
         enable_delete_protection = false
         existing_target_groups = {
         }
-        idle_timeout    = 60 # 60 is default
+        idle_timeout    = 3600 # 60 is default
         security_groups = ["public_lb"]
         subnets         = module.environment.subnets["public"].ids
         tags            = local.tags
@@ -583,7 +583,7 @@ locals {
         force_destroy_bucket     = true
         enable_delete_protection = false
         existing_target_groups   = {}
-        idle_timeout             = 60 # 60 is default
+        idle_timeout             = 3600 # 60 is default
         security_groups          = ["private_lb"]
         subnets                  = module.environment.subnets["private"].ids
         tags                     = local.tags
