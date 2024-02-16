@@ -76,11 +76,12 @@ resource "aws_vpc_security_group_ingress_rule" "from_vpc" {
 resource "aws_lb_target_group" "service" {
   for_each = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
 
-  name     = "${var.name}-service-at-${each.value}"
-  port     = each.value
-  protocol = "TCP"
-  vpc_id   = var.account_info.vpc_id
-  tags     = var.tags
+  name        = "${var.name}-service-at-${each.value}"
+  target_type = "ip"
+  port        = each.value
+  protocol    = "TCP"
+  vpc_id      = var.account_info.vpc_id
+  tags        = var.tags
 }
 
 resource "aws_lb_listener" "services" {
