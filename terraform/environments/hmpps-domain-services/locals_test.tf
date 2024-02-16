@@ -79,7 +79,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         user_data_raw         = base64encode(file("./templates/user-data-pwsh.yaml"))
@@ -93,13 +93,14 @@ locals {
     }
 
     baseline_ec2_instances = {
-      test-rdgw-1-a = merge(local.rds_ec2_instance, {
+      test-rdgw-1-b = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
-          availability_zone = "eu-west-2a"
+          availability_zone = "eu-west-2b"
         })
         user_data_raw = base64encode(file("./templates/user-data-pwsh.yaml"))
         tags = merge(local.rds_ec2_instance.tags, {
           description = "Remote Desktop Gateway for azure.noms.root domain"
+          server-type = "RDGateway"
         })
       })
     }
@@ -109,7 +110,7 @@ locals {
         instance_target_groups = {
           test-rdgw-1-http = merge(local.rds_target_groups.http, {
             attachments = [
-              { ec2_instance_name = "test-rdgw-1-a" },
+              { ec2_instance_name = "test-rdgw-1-b" },
             ]
           })
         }
