@@ -202,6 +202,10 @@ module "weblogic_eis" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
+  depends_on = [
+    aws_lb_listener_rule.blocked_paths_listener_rule,
+    aws_lb_listener_rule.allowed_paths_listener_rule
+  ]
 }
 
 
