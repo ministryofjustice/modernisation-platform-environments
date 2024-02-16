@@ -44,7 +44,7 @@ locals {
       private = {
         enable_delete_protection = false # change to true before we actually use
         force_destroy_bucket     = false
-        idle_timeout             = "60"
+        idle_timeout             = "3600"
         internal_lb              = true
         security_groups          = ["private_lb"]
         subnets                  = module.environment.subnets["private"].ids
