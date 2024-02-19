@@ -88,7 +88,7 @@ resource "aws_s3_bucket_notification" "data_store" {
   # from landing bucket.
   lambda_function {
     lambda_function_arn = aws_lambda_function.calculate_checksum_lambda.arn
-    events              = [
+    events = [
       "s3:ObjectCreated:*"
     ]
   }
@@ -147,8 +147,8 @@ resource "aws_iam_role" "calculate_checksum_lambda" {
 
 data "aws_iam_policy_document" "calculate_checksum_lambda" {
   statement {
-    sid = "S3Permissions"
-    effect  = "Allow"
+    sid    = "S3Permissions"
+    effect = "Allow"
     actions = [
       "s3:PutObject",
       "s3:PutObjectTagging",
@@ -176,7 +176,7 @@ resource "aws_lambda_permission" "s3_allow_calculate_checksum_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.calculate_checksum_lambda.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = "${aws_s3_bucket.data_store.arn}"
+  source_arn    = aws_s3_bucket.data_store.arn
 }
 
 #------------------------------------------------------------------------------
@@ -206,8 +206,8 @@ resource "aws_iam_role" "summarise_zip_lambda" {
 
 data "aws_iam_policy_document" "summarise_zip_lambda" {
   statement {
-    sid = "S3Permissions"
-    effect  = "Allow"
+    sid    = "S3Permissions"
+    effect = "Allow"
     actions = [
       "s3:GetObject",
       "s3:PutObject",
@@ -228,5 +228,5 @@ resource "aws_lambda_permission" "s3_allow_summarise_zip_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.summarise_zip_lambda.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = "${aws_s3_bucket.data_store.arn}"
+  source_arn    = aws_s3_bucket.data_store.arn
 }

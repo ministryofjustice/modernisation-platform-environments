@@ -6,7 +6,7 @@ locals {
 
 module "ad-clean-up-lambda" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function" # ref for V3.1
-  count  = local.environment == "development" ? 1 : 0   # temporary
+  count  = local.environment == "development" ? 1 : 0                                      # temporary
 
 
   application_name = local.lambda_ad_object_cleanup.function_name
@@ -33,9 +33,9 @@ module "ad-clean-up-lambda" {
 }
 
 data "archive_file" "ad-cleanup-lambda" {
-  type             = "zip"
-  source_dir       = "lambda/ad-clean-up"
-  output_path      = "lambda/ad-clean-up/ad-clean-up-lambda-payload-test.zip"
+  type        = "zip"
+  source_dir  = "lambda/ad-clean-up"
+  output_path = "lambda/ad-clean-up/ad-clean-up-lambda-payload-test.zip"
 }
 
 data "aws_iam_policy_document" "lambda_assume_role_policy" {

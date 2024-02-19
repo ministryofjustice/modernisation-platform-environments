@@ -57,8 +57,8 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
 }
 
 resource "aws_iam_role" "lambda-ad-role" {
-  name  = "LambdaFunctionADObjectCleanUp"
-  tags  = local.tags
+  name = "LambdaFunctionADObjectCleanUp"
+  tags = local.tags
 
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
@@ -68,12 +68,12 @@ resource "aws_iam_policy" "lambda_eventbridge_policy" {
   description = "Policy allowing Lambda to be triggered by EventBridge"
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
-        "Effect": "Allow",
-        "Action": "lambda:InvokeFunction",
-        "Resource": module.ad-clean-up-lambda.lambda_function_arn
+        "Effect" : "Allow",
+        "Action" : "lambda:InvokeFunction",
+        "Resource" : module.ad-clean-up-lambda.lambda_function_arn
       }
     ]
   })

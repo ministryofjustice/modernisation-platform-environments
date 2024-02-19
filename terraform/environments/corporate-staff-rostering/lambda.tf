@@ -47,12 +47,12 @@ data "archive_file" "ad-cleanup-lambda" {
 resource "aws_cloudwatch_event_rule" "ec2_state_change_terminated" {
   name        = "Ec2StateChangedTerminated"
   description = "Rule to trigger Lambda on EC2 state change"
-  
+
   event_pattern = jsonencode({
-    "source": ["aws.ec2"],
-    "detail-type": ["EC2 Instance State-change Notification for EC2 termination event"],
-    "detail": {
-      "state": ["terminated"] 
+    "source" : ["aws.ec2"],
+    "detail-type" : ["EC2 Instance State-change Notification for EC2 termination event"],
+    "detail" : {
+      "state" : ["terminated"]
     }
   })
 }

@@ -39,7 +39,7 @@ module "baseline" {
     aws.us-east-1             = aws.us-east-1
   }
 
-  environment            = module.environment
+  environment = module.environment
 
   # bastion_linux = merge(
   #   local.baseline_bastion_linux,
@@ -109,7 +109,7 @@ module "baseline" {
     local.baseline_lbs,
     lookup(local.environment_config, "baseline_lbs", {})
   )
-  resource_explorer      = true
+  resource_explorer = true
   route53_resolvers = merge(
     module.baseline_presets.route53_resolvers,
     local.baseline_route53_resolvers,
@@ -132,7 +132,7 @@ module "baseline" {
     local.baseline_security_groups,
     lookup(local.environment_config, "baseline_security_groups", {})
   )
-  sns_topics             = merge(
+  sns_topics = merge(
     module.baseline_presets.sns_topics,
     local.baseline_sns_topics,
     lookup(local.environment_config, "baseline_sns_topics", {})

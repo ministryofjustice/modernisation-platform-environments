@@ -228,7 +228,7 @@ locals {
   enable_s3_file_transfer_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_trigger
 
   # step function notification lambda
-  step_function_notification_lambda_handler  = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
+  step_function_notification_lambda_handler = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
   step_function_notification_lambda_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.all_state_machine_policy}",

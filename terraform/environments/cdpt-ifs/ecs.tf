@@ -117,7 +117,7 @@ resource "aws_ecs_task_definition" "ifs_task_definition" {
           value = "${local.application_data.accounts[local.environment].db_name}"
         },
         {
-         name  = "CLIENT_ID"
+          name  = "CLIENT_ID"
           value = "${local.application_data.accounts[local.environment].client_id}"
         }
       ]
@@ -309,22 +309,22 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
-ingress {
-  description     = "allow access on HTTP from load balancer"
-  from_port       = 80
-  to_port         = 80
-  protocol        = "tcp"
-  cidr_blocks     = ["0.0.0.0/0"]
-  security_groups = [aws_security_group.ifs_lb_sc.id]
- }
+  ingress {
+    description     = "allow access on HTTP from load balancer"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks     = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.ifs_lb_sc.id]
+  }
 
- ingress {
-   description     = "Allow RDP ingress"
-   from_port       = 3389
-   to_port         = 3389
-   protocol        = "tcp"
-   security_groups = [module.bastion_linux.bastion_security_group]
- }
+  ingress {
+    description     = "Allow RDP ingress"
+    from_port       = 3389
+    to_port         = 3389
+    protocol        = "tcp"
+    security_groups = [module.bastion_linux.bastion_security_group]
+  }
 
   egress {
     description     = "Cluster EC2 loadbalancer egress rule"
@@ -349,7 +349,7 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_ecs_service" "ecs_service" {
-  depends_on = [aws_lb_listener.https_listener]
+  depends_on                        = [aws_lb_listener.https_listener]
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.ifs_task_definition.arn
@@ -444,7 +444,7 @@ resource "aws_key_pair" "ec2-user" {
   key_name   = "${local.application_name}-ec2"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwVil3c3Nh/F6S1IzMFUMhykwj1SwQEXVvNghpUW5Ncm82ibJqtVccgCFW96HoHO7Bv8jt5O+TrfENlNI6yywASKEiJRDNUpBBK/UCqXQrYJ0KTvJ7FHegQjrxBOM/Lo3o3IniB2lNTe8hijBMrdaeKivWjB2YKTJxLFdUdLFjBop5uH0gL5Or6+P5/CyKmkIftn3Wazyq4Oe3mYQhB9Gr45/T8/UZCPnWWZ/p7AB3hH5jVO3BqHsB0t3YqJrbCV3Uo85xM62BBBV0AcWXNADY2f4A+6zcUX6j6BIfgAmYP3EQCZBxFq0BgxurF7xIh7CIjl4iIMQJ0sz3uoyLdh9f alistair.curtis@MJ004521"
   tags       = local.tags
-  }
+}
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"

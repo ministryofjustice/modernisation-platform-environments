@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_cpu_over_threshold" {
     {
       Name = "${local.application_name}-api-ECS-CPU-high-threshold-alarm1"
     },
-  )  
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_memory_over_threshold" {
@@ -62,7 +62,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_ecs_memory_over_threshold" {
     {
       Name = "${local.application_name}-api-ECS-Memory-high-threshold-alarm"
     },
-  )  
+  )
 }
 
 # Application Load Balancer Alerting

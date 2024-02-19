@@ -21,5 +21,5 @@ variable "user_name" {
 }
 
 variable "vpc_id" {
-    description = "The vpc used for the SFTP server"
+  description = "The vpc used for the SFTP server"
 }
