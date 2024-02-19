@@ -362,3 +362,9 @@ variable "create_service_nlb" {
   type        = bool
   default     = false
 }
+
+variable "desired_count" {
+  description = "The desired count of the service"
+  type        = number
+  default     = 1
+}

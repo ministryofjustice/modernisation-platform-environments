@@ -39,6 +39,8 @@ module "ecs_service" {
   task_cpu    = var.container_cpu
   task_memory = var.container_memory
 
+  desired_count = var.desired_count
+
   service_role_arn   = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.service_role.name}"
   task_role_arn      = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_role.name}"
   task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_exec_role.name}"
