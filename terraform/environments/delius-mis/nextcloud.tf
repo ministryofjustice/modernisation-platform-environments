@@ -113,7 +113,7 @@ resource "aws_alb_listener" "nextcloud_https" {
 module "nextcloud_efs" {
   source = "../delius-core/modules/efs"
 
-  name           = "nextcloud-efs"
+  name           = "nextcloud"
   env_name       = local.environment
   creation_token = "${local.environment}-nextcloud-efs"
 
