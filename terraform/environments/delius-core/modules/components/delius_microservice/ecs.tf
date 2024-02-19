@@ -9,16 +9,16 @@ module "container_definition" {
 
   environment = var.rds_endpoint_environment_variable != "" ? concat(var.container_environment_vars, [{
     name  = var.rds_endpoint_environment_variable
-    value = aws_db_instance[0].this.endpoint
+    value = aws_db_instance.this[0].endpoint
     }]) : var.elasticache_endpoint_environment_variable != "" ? concat(var.container_environment_vars, [{
     name  = var.elasticache_endpoint_environment_variable
-    value = aws_elasticache_cluster[0].this.cluster_address
+    value = aws_elasticache_cluster.this[0].cluster_address
     }]) : var.rds_endpoint_environment_variable != "" && var.elasticache_endpoint_environment_variable != "" ? concat(var.container_environment_vars, [{
     name  = var.rds_endpoint_environment_variable
-    value = aws_db_instance[0].this.endpoint
+    value = aws_db_instance.this[0].endpoint
     }, {
     name  = var.elasticache_endpoint_environment_variable
-    value = aws_elasticache_cluster[0].this.cluster_address
+    value = aws_elasticache_cluster.this[0].cluster_address
   }]) : var.container_environment_vars
 
   secrets       = var.container_secrets
