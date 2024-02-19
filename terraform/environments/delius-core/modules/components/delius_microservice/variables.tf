@@ -355,3 +355,43 @@ variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string
 }
+
+variable "create_alb" {
+  description = "whether ALB will be created or not"
+  type        = bool
+  default     = false
+}
+
+variable "is_internal" {
+  description = "whether the alb is internal or not"
+  type        = bool
+  default     = false
+}
+
+variable "load_balancer_type" {
+  description = "type of load balancer to create"
+  type        = string
+  default     = "application"
+}
+
+variable "listener_port_https" {
+  description = "https port"
+  type        = number
+  default     = 443
+}
+
+variable "listener_port_http" {
+  description = "http port"
+  type        = number
+  default     = 8080
+}
+
+variable "listener_rules" {
+  description = "List of listener rules for the ALB"
+  type = list(object({
+    path   = string
+    action = string
+  }))
+
+  default = []
+}

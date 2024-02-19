@@ -72,3 +72,7 @@ variable "environments_in_account" {
   type    = list(string)
   default = []
 }
+
+variable "pwm_config" {
+  type = any
+}

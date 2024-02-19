@@ -32,5 +32,7 @@ module "environment_test" {
 
   delius_microservice_configs = local.delius_microservices_configs_test
 
+  pwm_config = local.pwm_config_test
+
   tags = local.tags
 }

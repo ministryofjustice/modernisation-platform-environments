@@ -31,5 +31,7 @@ module "environment_dev" {
 
   delius_microservice_configs = local.delius_microservices_configs_dev
 
+  pwm_config = local.pwm_config_dev
+
   tags = local.tags
 }

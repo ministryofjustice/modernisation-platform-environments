@@ -48,6 +48,26 @@ module "password_reset_service" {
   #TODO check the health end-point
   health_check_path = "/pwm/actuator/health"
   account_info      = var.account_info
+  create_alb        = var.pwm_config.create_alb
+  is_internal       = var.pwm_config.is_internal
+
+  listener_port_http  = 80
+  listener_port_https = 443
+
+  #   ssl_certificate_arn = "arn:aws:acm:region:account-id:certificate/certificate-id"
+
+  #   listener_rules = [
+  #     {
+  #       path   = "/REPLACEME"
+  #       action = "forward"
+  #     },
+  #     {
+  #       path   = "/REPLACEME"
+  #       action = "forward"
+  #     }
+  #   ]
+
+  listener_rules = []
 
   container_environment_vars = [
     {
@@ -70,16 +90,5 @@ module "password_reset_service" {
   providers = {
     aws          = aws
     aws.core-vpc = aws.core-vpc
-  }
-}
-
-#TODO move this to variable after merge
-
-variable "pwm_config" {
-  type = object({
-    image_tag = string
-  })
-  default = {
-    image_tag = "default_image_tag"
   }
 }
