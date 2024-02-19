@@ -42,7 +42,10 @@ module "nextcloud_service" {
     }
   ]
 
-  desired_count = 3
+  desired_count                      = 3
+  deployment_maximum_percent         = "200"
+  deployment_minimum_healthy_percent = "100"
+
 
   efs_volumes = [
     {
