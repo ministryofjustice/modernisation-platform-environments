@@ -36,3 +36,20 @@ resource "aws_route53_record" "external_validation" {
   type            = local.domain_type_main[0]
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
+
+resource "aws_route53_record" "external_validation_subdomain" {
+  provider = aws.core-vpc
+
+  allow_overwrite = true
+  name            = local.domain_name_sub[0]
+  records         = local.domain_record_sub
+  ttl             = 60
+  type            = local.domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+
+resource "aws_acm_certificate_validation" "nextcloud_external" {
+  certificate_arn         = aws_acm_certificate.nextcloud_external.arn
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+}
