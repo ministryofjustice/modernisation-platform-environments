@@ -37,7 +37,7 @@ resource "aws_security_group" "load_balancer_security_group" {
     description = "Allow ingress from white listed CIDRs"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = flatten([
+    cidr_blocks = sort(flatten([
       "20.49.214.199/32", # Azure Landing Zone Egress
       "20.49.214.228/32", # Azure Landing Zone Egress
       "20.26.11.71/32",   # Azure Landing Zone Egress
@@ -52,7 +52,7 @@ resource "aws_security_group" "load_balancer_security_group" {
       "107.23.255.0/26",   # us-east-1 Region
       "54.243.31.192/26",  # us-east-1 Region
       local.internal_security_group_cidrs
-    ])
+    ]))
 
     ipv6_cidr_blocks = [
       # Route53 Healthcheck Access Cidrs IPv6
