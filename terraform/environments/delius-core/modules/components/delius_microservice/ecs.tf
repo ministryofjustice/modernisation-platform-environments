@@ -6,10 +6,24 @@ module "container_definition" {
   container_cpu            = var.container_cpu
   essential                = true
   readonly_root_filesystem = false
-  environment              = var.container_environment_vars
-  secrets                  = var.container_secrets
-  port_mappings            = var.container_port_config
-  mount_points             = var.mount_points
+
+  environment = var.rds_endpoint_environment_variable != "" ? concat(var.container_environment_vars, [{
+    name  = var.rds_endpoint_environment_variable
+    value = aws_db_instance.this.endpoint
+    }]) : var.elasticache_endpoint_environment_variable != "" ? concat(var.container_environment_vars, [{
+    name  = var.elasticache_endpoint_environment_variable
+    value = aws_elasticache_cluster.this.cache_nodes[0].address
+    }]) : var.rds_endpoint_environment_variable != "" && var.elasticache_endpoint_environment_variable != "" ? concat(var.container_environment_vars, [{
+    name  = var.rds_endpoint_environment_variable
+    value = aws_db_instance.this.endpoint
+    }, {
+    name  = var.elasticache_endpoint_environment_variable
+    value = aws_elasticache_cluster.this.cache_nodes[0].address
+  }]) : var.container_environment_vars
+
+  secrets       = var.container_secrets
+  port_mappings = var.container_port_config
+  mount_points  = var.mount_points
   log_configuration = {
     logDriver = "awslogs"
     options = {

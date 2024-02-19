@@ -44,6 +44,12 @@ variable "rds_engine" {
   default     = null
 }
 
+variable "rds_endpoint_environment_variable" {
+  description = "Environment variable to store the RDS endpoint"
+  type        = string
+  default     = ""
+}
+
 variable "rds_engine_version" {
   description = "RDS engine version to use"
   type        = string
@@ -250,6 +256,12 @@ variable "elasticache_engine" {
   description = "The Elasticache engine"
   type        = string
   default     = "redis"
+}
+
+variable "elasticache_endpoint_environment_variable" {
+  description = "Environment variable to store the elasticache endpoint"
+  type        = string
+  default     = ""
 }
 
 variable "elasticache_engine_version" {
