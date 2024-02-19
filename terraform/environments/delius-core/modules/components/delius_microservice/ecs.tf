@@ -46,7 +46,7 @@ module "ecs_service" {
   task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_exec_role.name}"
 
   environment = var.env_name
-  namespace   = "delius-core"
+  namespace   = var.namespace
 
   health_check_grace_period_seconds = var.health_check_grace_period_seconds
 
@@ -56,6 +56,8 @@ module "ecs_service" {
     container_port   = var.container_port_config[0].containerPort
     }],
   values(local.ecs_nlbs))
+
+  efs_volumes = var.efs_volumes
 
   security_group_ids = [aws_security_group.ecs_service.id]
 

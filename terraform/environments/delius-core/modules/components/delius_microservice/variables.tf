@@ -13,6 +13,14 @@ variable "name" {
   type        = string
 }
 
+
+variable "namespace" {
+  description = "Namespace of the application"
+  type        = string
+  default     = "delius-core"
+}
+
+
 variable "env_name" {
   description = "Environment name short ie dev"
   type        = string
@@ -367,4 +375,10 @@ variable "desired_count" {
   description = "The desired count of the service"
   type        = number
   default     = 1
+}
+
+variable "efs_volumes" {
+  description = "The EFS volumes to mount"
+  type        = list(any)
+  default     = []
 }
