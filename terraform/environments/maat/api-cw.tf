@@ -262,12 +262,12 @@ resource "aws_cloudwatch_metric_alarm" "maat_api_application_elb_4xx_error" {
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "maat_api_alerting_topic" {
   name = "${local.application_name}-api-${local.environment}-alerting-topic"
-}
-
-resource "aws_sns_topic_subscription" "maat_api_pagerduty_subscription" {
-  topic_arn = aws_sns_topic.maat_api_alerting_topic.arn
-  protocol  = "https"
-  endpoint  = "https://events.pagerduty.com/integration/${local.maat_api_pagerduty_integration_keys[local.maat_api_pagerduty_integration_key_name]}/enqueue"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-maat-alerting-topic"
+    }
+)
 }
 
 # Pager duty integration
@@ -289,20 +289,12 @@ locals {
 }
 
 # link the sns topic to the service
-module "maat_api_pagerduty_core_alerts_non_prod" {
-  depends_on = [
-    aws_sns_topic.maat_api_alerting_topic
-  ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.maat_api_alerting_topic.name]
-  pagerduty_integration_key = local.maat_api_pagerduty_integration_keys["laa_maat_api_nonprod_alarms"]
-}
 
-module "maat_api_pagerduty_core_alerts_prod" {
+module "maat_api_pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.maat_api_alerting_topic
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.maat_api_alerting_topic.name]
-  pagerduty_integration_key = local.maat_api_pagerduty_integration_keys["laa_maat_api_prod_alarms"]
+  pagerduty_integration_key = local.maat_api_pagerduty_integration_keys[local.maat_api_pagerduty_integration_key_name]
 }
