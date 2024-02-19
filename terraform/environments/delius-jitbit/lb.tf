@@ -3,8 +3,6 @@
 
 module "ip_addresses" {
   source = "../../modules/ip_addresses"
-
-
 }
 
 #tfsec:ignore:aws-elb-alb-not-public
@@ -40,10 +38,10 @@ resource "aws_security_group" "load_balancer_security_group" {
     from_port   = 443
     to_port     = 443
     cidr_blocks = flatten([
-      "20.49.214.199/32",  # Azure Landing Zone Egress
-      "20.49.214.228/32",  # Azure Landing Zone Egress
-      "20.26.11.71/32",    # Azure Landing Zone Egress
-      "20.26.11.108/32",   # Azure Landing Zone Egress
+      "20.49.214.199/32", # Azure Landing Zone Egress
+      "20.49.214.228/32", # Azure Landing Zone Egress
+      "20.26.11.71/32",   # Azure Landing Zone Egress
+      "20.26.11.108/32",  # Azure Landing Zone Egress
       # Route53 Healthcheck Access Cidrs
       # London Region not support yet, so metrics are not yet publised, can be enabled at later stage for Route53 endpoint monitor
       "15.177.0.0/18",     # GLOBAL Region
