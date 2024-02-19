@@ -32,15 +32,16 @@ locals {
 
   maatdb_password_secret_name = "APP_MAATDB_DBPASSWORD_MLA1"
   task_definition = templatefile("task_definition.json", {
-    app_name            = local.application_name
-    ecr_url             = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
-    docker_image_tag    = local.application_data.accounts[local.environment].docker_image_tag
-    region              = local.application_data.accounts[local.environment].region
-    maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point
-    maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
-    maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
-    sentry_env          = local.environment
-    db_secret_arn       = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maatdb_password_secret_name}"
+    app_name                      = local.application_name
+    ecr_url                       = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
+    docker_image_tag              = local.application_data.accounts[local.environment].docker_image_tag
+    region                        = local.application_data.accounts[local.environment].region
+    maat_api_end_point            = local.application_data.accounts[local.environment].maat_api_end_point
+    maat_db_url                   = local.application_data.accounts[local.environment].maat_db_url
+    maat_libra_wsdl_url           = local.application_data.accounts[local.environment].maat_libra_wsdl_url
+    app_google_analytics_4_tag_id = local.application_data.accounts[local.environment].app_google_analytics_4_tag_id
+    sentry_env                    = local.environment
+    db_secret_arn                 = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maatdb_password_secret_name}"
   })
   ecs_target_capacity = 100
 

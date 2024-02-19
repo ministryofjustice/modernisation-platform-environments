@@ -75,12 +75,12 @@
         "value": "xray-daemon:2000"
       },
       {
-        "name": "SENTRY_ENVIRONMENT",
-        "value": "${sentry_env}"
+        "name": "APP_GOOGLE_ANALYTICS_4_TAG_ID",
+        "value": "${app_google_analytics_4_tag_id}"
       },
       {
-        "name": "APP_GOOGLE_ANALYTICS_4_TAG_ID",
-        "value": ""
+        "name": "SENTRY_ENVIRONMENT",
+        "value": "${sentry_env}"
       }
     ],
     "secrets": [
