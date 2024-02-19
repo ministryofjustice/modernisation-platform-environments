@@ -52,7 +52,7 @@ resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "freeablememory_under_threshold" {
   alarm_name                = "jitbit-rds-freeablememory-threshold"
-  comparison_operator       = "LessThanThreshold"
+  comparison_operator       = "LessThanLowerThreshold"
   evaluation_periods        = "5"
   threshold_metric_id       = "e1"
   alarm_description         = "Triggers alarm if RDS FreeableMemory crosses a threshold"
