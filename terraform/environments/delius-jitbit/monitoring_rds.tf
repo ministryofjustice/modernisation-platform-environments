@@ -50,6 +50,41 @@ resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
   )
 }
 
+resource "aws_cloudwatch_metric_alarm" "freeablememory_under_threshold" {
+  alarm_name                = "jitbit-rds-freeablememory-threshold"
+  comparison_operator       = "LessThanThreshold"
+  evaluation_periods        = "5"
+  threshold_metric_id       = "e1"
+  alarm_description         = "Triggers alarm if RDS FreeableMemory crosses a threshold"
+  insufficient_data_actions = []
+  alarm_actions             = [aws_sns_topic.jitbit_alerting.arn]
+  ok_actions                = [aws_sns_topic.jitbit_alerting.arn]
+  treat_missing_data        = "missing"
+
+  metric_query {
+    id          = "e1"
+    expression  = "ANOMALY_DETECTION_BAND(m1)"
+    label       = "FreeableMemory (Expected)"
+    return_data = "true"
+  }
+
+  metric_query {
+    id          = "m1"
+    return_data = "true"
+    metric {
+      metric_name = "FreeableMemory"
+      namespace   = "AWS/RDS"
+      period      = "60"
+      stat        = "Average"
+      unit        = "Count"
+
+      dimensions = {
+        DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+      }
+    }
+  }
+}
+
 resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
   alarm_name          = "jitbit-rds-read-latency-threshold"
   alarm_description   = "Triggers alarm if RDS read latency crosses a threshold"
