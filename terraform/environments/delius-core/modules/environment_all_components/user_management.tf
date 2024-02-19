@@ -8,6 +8,7 @@ module "user_management" {
   ]
   container_secrets = [
   ]
+  create_elasticache = true
   container_port_config = [
     {
       containerPort = var.delius_microservice_configs.user_management.container_port
