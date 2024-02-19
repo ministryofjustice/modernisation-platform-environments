@@ -1,14 +1,38 @@
-###########################################################################################
-#------------------------Comment out file if not required----------------------------------
-###########################################################################################
 
+
+# This self-contained example can be used to create EC2 instances using this module. Explanatory notes have been added
+# that cover the key elements as well as known limitations & issues. This example was developed and tested using the cooker environment
+# but should work just as well in any other member environment in modernisation-platform-environments.
+
+# NOTE - the example includes a reference to a public key "ec2-user.pub" in the directory ".ssh/${terraform.workspace}". Amend this directory
+# as required to refer to the public part of the key pair to be used.
+
+
+#------------------------------------------------------------------------------
+# Keypair for ec2-user
+#------------------------------------------------------------------------------
+resource "aws_key_pair" "ec2-user" {
+  key_name   = "ec2-user"
+  public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-user"
+    },
+  )
+}
+
+
+# This locals block contains variables required to create ec2 instances using the module.
 
 locals {
 
-  app_name = "ec2-test-instance"
+  app_name = "ec2-test" # This is used as the primary label to desribe the resources.
   business_unit       = var.networking[0].business-unit
   region              = "eu-west-2"
 
+
+  # This local is used by the module variable "instance".  
   instance = {
     disable_api_termination      = false
     key_name                     = try(aws_key_pair.ec2-user.key_name)
@@ -17,6 +41,8 @@ locals {
     vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
   }
 
+
+  # This local block contains the variables required to build one of more ec2s. 
   ec2_test = {
 
     tags = {
@@ -24,15 +50,13 @@ locals {
     }
 
 
-    # Route53 DNS Records - the prefix for these is derrived from local.app_name.
-    route53_records = {
-      create_internal_record = true
-      create_external_record = false
-    }
+    # The object ec2_instances requires one or more sub objects to be created. The key of each object (e.g. example-1) will
+    # be used for 'Name' tag values as well as prefix of R53 records (see above). Each contains an example of user-data and adds a 2nd
+    # ebs volume to the ec2 using the ebs_volumes local.
 
     ec2_instances = {
 
-      example-1 = {
+      example-1 = { # The first ec2.
         tags = {
           server-type = "private"
           description = "ec2-example-1"
@@ -44,9 +68,9 @@ locals {
         ebs_volumes = {
           "/dev/sdf" = { size = 20, type = "gp3" }
         }
-        ami_name  = "amzn2-ami-kernel-5.10-hvm-2.0.20240131.0-x86_64-gp2"
+        ami_name  = "amzn2-ami-kernel-5.10-hvm-2.0.20240131.0-x86_64-gp2" # Note the module requires the AMI name, not the ID.
         ami_owner = "137112412989"
-        subnet_id = data.aws_subnet.private_subnets_a.id
+        subnet_id = data.aws_subnet.private_subnets_a.id # This example creates the ec2 in a private subnet.
         availability_zone = "eu-west-2a"
         instance_type = "t3.small"
         user_data = <<EOF
@@ -57,9 +81,14 @@ locals {
             yum install httpd -y
             systemctl start httpd
             EOF
+        # Route53 DNS Records - the prefix for these is derrived from key of the ec2_instances list below.
+        route53_records = {
+          create_internal_record = true
+          create_external_record = false
+        }
       }
 
-      example-2 = {
+      example-2 = { # The second ec2.
         tags = {
           server-type = "private"
           description = "ec2-example-2"
@@ -82,13 +111,17 @@ locals {
             yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
             systemctl status amazon-ssm-agent
             EOF
+        route53_records = {
+          create_internal_record = true
+          create_external_record = false
+        }
       }
 
     }
   
   }
 
-  # This local provides a list of ingress rules for the ec2 security groups.
+  # This local provides a list of ingress and egress rules for the ec2 security group.
 
   example_ec2_sg_ingress_rules = {
 
@@ -126,13 +159,18 @@ locals {
 
 }
 
-# combine ec2-common policy documents
+
+
+
+# This item is used to combine emultiple policy documents though for this example only one policy document is created.
 data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ec2_policy.json  
   ]
 }
 
+
+# This policy document is added as an example. Note that the module does not support access via AWS Session Manager.
 data "aws_iam_policy_document" "ec2_policy" {
   statement {
     sid    = "AllowSSMAccess"
@@ -153,14 +191,15 @@ data "aws_iam_policy_document" "ec2_policy" {
 }
 
 
-# EC2 Created via module
+# This is the main call to the module. Note the for_each loop.
 module "ec2_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.4.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
-  for_each                      = try(local.ec2_test.ec2_instances, {})
+  for_each                      = try(local.ec2_test.ec2_instances, {}) # Iterates through each element of ec2_instances.
+  application_name              = local.app_name
   name                          = each.key
   ami_name                      = each.value.ami_name
   ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
@@ -169,13 +208,12 @@ module "ec2_instance" {
   ebs_kms_key_id                = "" # Suggest there that the default ebs key for the account is used instead as a default entry.
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
-  route53_records               = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
+  route53_records               = lookup(each.value, "route53_records", {})
   availability_zone        = each.value.availability_zone
   subnet_id                = each.value.subnet_id
   iam_resource_names_prefix = local.app_name
   instance_profile_policies = local.ec2_common_managed_policies
   business_unit            = local.business_unit
-  application_name         = local.application_name
   environment              = local.environment
   region                   = local.region
   tags                     = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
@@ -186,6 +224,8 @@ module "ec2_instance" {
 
 
 ###### EC2 Security Groups ######
+
+# Creates ingress & egress rules using the 'example_ec2_sg_ingress_rules' local.
 
 resource "aws_security_group" "example_ec2_sg" {
   name        = "example_ec2_sg"
@@ -219,7 +259,7 @@ resource "aws_security_group_rule" "egress_traffic" {
 }
 
 
-# create single managed policy
+# Creates a single managed policy using the combined policy documents.
 resource "aws_iam_policy" "ec2_common_policy" {
   name        = "ec2-common-policy"
   path        = "/"
@@ -233,26 +273,5 @@ resource "aws_iam_policy" "ec2_common_policy" {
   )
 }
 
-
-
-
-# Required.
-#data "aws_kms_key" "default_ebs" {
-#  key_id = "alias/aws/ebs"
-#}
-
-#------------------------------------------------------------------------------
-# Keypair for ec2-user
-#------------------------------------------------------------------------------
-resource "aws_key_pair" "ec2-user" {
-  key_name   = "ec2-user"
-  public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-ec2-user"
-    },
-  )
-}
 
 
