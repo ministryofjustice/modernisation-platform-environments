@@ -22,23 +22,6 @@ resource "aws_lb" "alb" {
 }
 
 # Listeners
-resource "aws_lb_listener" "alb_listener_http" {
-  count = var.create_alb ? 1 : 0
-
-  load_balancer_arn = aws_lb.alb[0].arn
-  port              = var.listener_port_http
-  protocol          = "HTTP"
-
-  default_action {
-    type = "fixed-response"
-    fixed_response {
-      status_code  = "200"
-      content_type = "text/plain"
-      message_body = "OK"
-    }
-  }
-}
-
 resource "aws_lb_listener" "alb_listener_https" {
   count = var.create_alb ? 1 : 0
 
