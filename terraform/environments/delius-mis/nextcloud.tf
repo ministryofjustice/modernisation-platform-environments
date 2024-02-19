@@ -29,7 +29,7 @@ module "nextcloud_service" {
     id               = data.aws_caller_identity.current.account_id
     cp_cidr          = "172.20.0.0/16"
   }
-  alb_security_group_id      = ""
+  alb_security_group_id      = aws_security_group.nextcloud_alb_sg.id
   bastion_sg_id              = module.bastion_linux.bastion_security_group
   certificate_arn            = ""
   cluster_security_group_id  = aws_security_group.cluster.id
@@ -59,13 +59,15 @@ module "nextcloud_service" {
     }
   ]
 
-  container_secrets          = []
-  db_ingress_security_groups = [module.bastion_linux.bastion_security_group]
-  ecs_cluster_arn            = module.ecs.ecs_cluster_arn
-  env_name                   = local.environment
-  health_check_path          = "/status.php"
-  microservice_lb_arn        = aws_alb.nextcloud.arn
-  name                       = "nextcloud"
+  container_secrets                  = []
+  db_ingress_security_groups         = [module.bastion_linux.bastion_security_group]
+  ecs_cluster_arn                    = module.ecs.ecs_cluster_arn
+  env_name                           = local.environment
+  health_check_path                  = "/status.php"
+  alb_listener_rule_paths            = ["/"]
+  microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn
+  microservice_lb_arn                = aws_alb.nextcloud.arn
+  name                               = "nextcloud"
   platform_vars = {
     environment_management = local.environment_management
   }
