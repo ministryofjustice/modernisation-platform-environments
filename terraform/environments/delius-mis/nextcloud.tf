@@ -124,3 +124,12 @@ module "nextcloud_efs" {
   subnet_ids = local.ordered_subnet_ids
   vpc_cidr   = data.aws_vpc.shared.cidr_block
 }
+
+resource "aws_security_group_rule" "efs_ingress_nextcloud" {
+  type                     = "ingress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  source_security_group_id = module.nextcloud_efs.sg_id
+  security_group_id        = module.nextcloud_service.service_security_group_id
+}
