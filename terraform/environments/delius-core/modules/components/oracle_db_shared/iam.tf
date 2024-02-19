@@ -230,18 +230,25 @@ resource "aws_iam_policy" "instance_ssm" {
 resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
   name = "EC2OracleEnterpriseManagementSecretsRole"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Action = "sts:AssumeRole",
-        Effect = "Allow",
-        Principal = {
-          AWS = "arn:aws:iam::${var.account_info.id}:role/instance-role-${var.env_name}-delius-db-*"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "ForAnyValue:ArnLike": {
+          "aws:PrincipalArn": "arn:aws:iam::${var.account_info.id}:role/instance-role-${var.env_name}-delius-db-*"
         }
       }
-    ]
-  })
+    }
+  ]
+}
+EOF
 }
 
 resource "aws_iam_role_policy_attachment" "allow_kms_keys_access" {
