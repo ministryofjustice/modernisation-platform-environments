@@ -14,12 +14,12 @@ locals {
 
   bcs_instance_ebs_volumes_config = {
     data = {
-      iops       = 1000
+      iops       = 3000
       throughput = 125
       type       = "gp3"
     }
     root = {
-      iops       = 1000
+      iops       = 3000
       throughput = 125
       type       = "gp3"
     }
