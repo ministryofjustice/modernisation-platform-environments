@@ -1,6 +1,10 @@
 # checkov:skip=CKV_AWS_226
 # checkov:skip=CKV2_AWS_28
 
+module "ip_addresses" {
+  source = "../../modules/ip_addresses"
+}
+
 #tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "external" {
   # checkov:skip=CKV_AWS_91
@@ -33,25 +37,11 @@ resource "aws_security_group" "load_balancer_security_group" {
     description = "Allow ingress from white listed CIDRs"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = [
-      "81.134.202.29/32",  # MoJ Digital VPN
-      "35.176.93.186/32",  # Global Protect VPN
-      "51.149.250.0/24",   # mojo_aws_prod_byoip_cidr
-      "51.149.249.0/29",   # ARK Corsham Internet Egress Exponential-E
-      "10.184.0.0/16",     # Global Protect AWS VPC
-      "217.33.148.210/32", # Digital studio
-      "195.59.75.0/24",    # ARK internet (DOM1)
-      "194.33.192.0/25",   # ARK internet (DOM1)
-      "194.33.193.0/25",   # ARK internet (DOM1)
-      "194.33.196.0/25",   # ARK internet (DOM1)
-      "194.33.197.0/25",   # ARK internet (DOM1)
-      "194.33.249.0/29",   # ARK Corsham Internet Egress Vodafone mojo_arkc_internet_egress_vodafone
-      "51.149.249.32/29",  # ARK Farnborough Internet Egress Exponential-E mojo_arkf_internet_egress_exponential_e
-      "194.33.248.0/29",   # ARK Farnborough Internet Egress Vodafone mojo_arkf_internet_egress_vodafone
-      "20.49.214.199/32",  # Azure Landing Zone Egress
-      "20.49.214.228/32",  # Azure Landing Zone Egress
-      "20.26.11.71/32",    # Azure Landing Zone Egress
-      "20.26.11.108/32",   # Azure Landing Zone Egress
+    cidr_blocks = flatten([
+      "20.49.214.199/32", # Azure Landing Zone Egress
+      "20.49.214.228/32", # Azure Landing Zone Egress
+      "20.26.11.71/32",   # Azure Landing Zone Egress
+      "20.26.11.108/32",  # Azure Landing Zone Egress
       # Route53 Healthcheck Access Cidrs
       # London Region not support yet, so metrics are not yet publised, can be enabled at later stage for Route53 endpoint monitor
       "15.177.0.0/18",     # GLOBAL Region
@@ -61,7 +51,8 @@ resource "aws_security_group" "load_balancer_security_group" {
       "54.228.16.0/26",    # eu-west-1 Region
       "107.23.255.0/26",   # us-east-1 Region
       "54.243.31.192/26",  # us-east-1 Region
-    ]
+      local.internal_security_group_cidrs
+    ])
 
     ipv6_cidr_blocks = [
       # Route53 Healthcheck Access Cidrs IPv6
