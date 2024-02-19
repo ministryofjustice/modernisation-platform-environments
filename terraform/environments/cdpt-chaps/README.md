@@ -17,9 +17,9 @@ The Ministerial Correspondence Unit (MCU) receives correspondence from MP on beh
 
 ### **Service URLs:**
 
-Prod: https://correspondence-handling-and-processing.service.justice.gov.uk/
-Staging: https://cdpt-chaps.hq-preproduction.modernisation-platform.service.justice.gov.uk/
-Dev: https://cdpt-chaps.hq-development.modernisation-platform.service.justice.gov.uk/
+Prod: <https://correspondence-handling-and-processing.service.justice.gov.uk/>
+Staging: <https://cdpt-chaps.hq-preproduction.modernisation-platform.service.justice.gov.uk/>
+Dev: <https://cdpt-chaps.hq-development.modernisation-platform.service.justice.gov.uk/>
 
 ### **Incident response hours:**
 
@@ -27,11 +27,11 @@ Office Hours, usually 9am - 6pm Monday to Friday
 
 ### **Incident contact details:**
 
-Email: CHAPS-Support@digital.justice.gov.uk Slack: #cdpt-chaps
+Email: <CHAPS-Support@digital.justice.gov.uk> Slack: #cdpt-chaps
 
 ### **Service team contact:**
 
-Email: CHAPS-Support@digital.justice.gov.uk Slack: #cdpt-chaps
+Email: <CHAPS-Support@digital.justice.gov.uk> Slack: #cdpt-chaps
 
 ### **Hosting environment:**
 
@@ -41,4 +41,4 @@ Modernisation Platform
 
 ### **Other URLs:**
 
-GitHub repo: https://github.com/ministryofjustice/CHAPS
+GitHub repo: <https://github.com/ministryofjustice/CHAPS>

@@ -175,7 +175,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_UnHealthyHosts" {
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
-    TargetGroup = aws_lb_target_group.external.arn
+    TargetGroup  = aws_lb_target_group.external.arn
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -292,7 +292,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB4xxError" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
-  threshold          = local.application_data.accounts[local.environment].maat_ALB4xxAlarmThreshold 
+  threshold          = local.application_data.accounts[local.environment].maat_ALB4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -451,7 +451,7 @@ locals {
 # Create SNS topic
 resource "aws_sns_topic" "maat_alerting_topic" {
   name = "${local.application_name}-${local.environment}-alerting-topic"
-    tags = merge(
+  tags = merge(
     local.tags,
     {
       Name = "${local.application_name}-maat-alerting-topic"

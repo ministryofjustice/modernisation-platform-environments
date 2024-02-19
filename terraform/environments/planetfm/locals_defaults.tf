@@ -19,7 +19,7 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
       {
         instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["planetfm_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
-          threshold           = "0"  
+          threshold           = "0"
           evaluation_periods  = "5"
           datapoints_to_alarm = "2"
           period              = "60"

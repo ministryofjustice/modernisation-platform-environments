@@ -1,6 +1,6 @@
 locals {
 
-domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value
     type   = dvo.resource_record_type
@@ -14,9 +14,9 @@ domain_types = { for dvo in aws_acm_certificate.external.domain_validation_optio
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
-ecr_url = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/cdpt-ifs-ecr-repo"
+  ecr_url = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/cdpt-ifs-ecr-repo"
 
-user_data = base64encode(templatefile("user_data.txt", {
+  user_data = base64encode(templatefile("user_data.txt", {
     cluster_name = "${local.application_name}-ecs-cluster"
   }))
 

@@ -38,7 +38,7 @@ locals {
   availability_zone = "eu-west-2a"
 
   baseline_presets_options = {
-    cloudwatch_log_groups                        = null
+    cloudwatch_log_groups = null
     # cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
     enable_application_environment_wildcard_cert = true
     enable_backup_plan_daily_and_weekly          = true

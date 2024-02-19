@@ -1,7 +1,7 @@
 # Variables
 locals {
-    maat_api_api_scope = local.application_data.accounts[local.environment].maat_api_api_scope
-    api_stage_name = "v1"
+  maat_api_api_scope = local.application_data.accounts[local.environment].maat_api_api_scope
+  api_stage_name     = "v1"
 }
 
 # API Gateway configuration

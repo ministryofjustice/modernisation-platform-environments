@@ -17,11 +17,11 @@ resource "aws_security_group" "maat_int_lb_sg" {
 
 resource "aws_security_group_rule" "maat_int_lb_sg_rule_transit_gw" {
   security_group_id = aws_security_group.maat_int_lb_sg.id
-  type             = "ingress"
-  protocol         = "tcp"
-  from_port        = 443
-  to_port          = 443
-  cidr_blocks      = ["172.20.0.0/16"] #The transit gateway cidr would need to replaced without something equivalent when migrated to MP 
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = ["172.20.0.0/16"] #The transit gateway cidr would need to replaced without something equivalent when migrated to MP 
 }
 
 
@@ -39,12 +39,12 @@ resource "aws_lb" "maat_internal_lb" {
 
   enable_deletion_protection = true
 
-#   access_logs {
-#     bucket  = local.existing_bucket_name != "" ? local.existing_bucket_name : module.lb-s3-access-logs[0].bucket.id
-#     prefix  = "${local.application_name}-InternalLoadBalancer"
-#     enabled = true
-#   }
-    
+  #   access_logs {
+  #     bucket  = local.existing_bucket_name != "" ? local.existing_bucket_name : module.lb-s3-access-logs[0].bucket.id
+  #     prefix  = "${local.application_name}-InternalLoadBalancer"
+  #     enabled = true
+  #   }
+
   tags = merge(
     local.tags,
     {
@@ -59,11 +59,11 @@ resource "aws_lb" "maat_internal_lb" {
 ######################################
 
 resource "aws_lb_target_group" "maat_internal_lb_target_group" {
-  name                  = "${local.application_name}-Int-LB-TG"
-  port                  = 80
-  protocol              = "HTTP"
-  vpc_id                = data.aws_vpc.shared.id
-  deregistration_delay  = 30
+  name                 = "${local.application_name}-Int-LB-TG"
+  port                 = 80
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  deregistration_delay = 30
 
   health_check {
     interval            = 15
@@ -75,9 +75,9 @@ resource "aws_lb_target_group" "maat_internal_lb_target_group" {
   }
 
   stickiness {
-    enabled          = true
-    type             = "lb_cookie"
-    cookie_duration  = 10800
+    enabled         = true
+    type            = "lb_cookie"
+    cookie_duration = 10800
   }
 }
 
@@ -127,16 +127,16 @@ resource "aws_route53_record" "internal_lb_non_prod" {
   name     = local.int_lb_url
   type     = "CNAME"
   ttl      = 300
-  records = [aws_lb.maat_internal_lb.dns_name]
+  records  = [aws_lb.maat_internal_lb.dns_name]
 }
 
 resource "aws_route53_record" "internal_lb_prod" {
   count    = local.environment == "production" ? 1 : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.production-network-services.zone_id # TODO The zone may change as this currently points to the same one that hosted the CloudFront record
-  name     = "tbc" # TODO Production URL to be confirmed
+  name     = "tbc"                                                     # TODO Production URL to be confirmed
   type     = "CNAME"
   ttl      = 300
-  records = [aws_lb.maat_internal_lb.dns_name]
+  records  = [aws_lb.maat_internal_lb.dns_name]
 }
 

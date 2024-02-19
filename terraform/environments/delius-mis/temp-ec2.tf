@@ -57,7 +57,7 @@ resource "aws_vpc_security_group_egress_rule" "ad_tcp" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ad_udp" {
-  for_each = toset(["53", "88", "123", "138", "389", "445","464"])
+  for_each = toset(["53", "88", "123", "138", "389", "445", "464"])
 
   description       = "Legacy AD UDP"
   security_group_id = aws_security_group.example.id

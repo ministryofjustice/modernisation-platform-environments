@@ -3,7 +3,7 @@ data "aws_ssoadmin_instances" "example" {
 }
 
 data "aws_identitystore_group" "example" {
-  provider = aws.sso-readonly
+  provider          = aws.sso-readonly
   identity_store_id = tolist(data.aws_ssoadmin_instances.example.identity_store_ids)[0]
 
   filter {

@@ -129,7 +129,7 @@ locals {
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
             branch = "oracle_11g_oasys_patchset_addition"
           })
@@ -367,7 +367,7 @@ locals {
         records = [
           # { name = "db.pp.${local.application_name}", type = "A", ttl = "300", records = ["10.40.40.133"] }, # for azure 
           { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
-          { name = "db.pp.onr", type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
+          { name = "db.pp.onr", type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },                         # for aws
         ]
         lb_alias_records = [
           # { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },

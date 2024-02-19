@@ -313,7 +313,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScanStarted" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance           = "$Instance"
       MalwareScanStarted = "$MalwareScanStarted"
     }
   }
@@ -329,7 +329,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScanFinished" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance            = "$Instance"
       MalwareScanFinished = "$MalwareScanFinished"
     }
   }
@@ -345,7 +345,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScanStopped" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance           = "$Instance"
       MalwareScanStopped = "$MalwareScanStopped"
     }
   }
@@ -361,7 +361,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareScanFailed" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance          = "$Instance"
       MalwareScanFailed = "$MalwareScanFailed"
     }
   }
@@ -377,7 +377,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareBehaviorDetected" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance                = "$Instance"
       MalwareBehaviorDetected = "$MalwareBehaviorDetected"
     }
   }
@@ -393,7 +393,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareStateDetected" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance             = "$Instance"
       MalwareStateDetected = "$MalwareStateDetected"
     }
   }
@@ -409,7 +409,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareSignatureFailed" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance               = "$Instance"
       MalwareSignatureFailed = "$MalwareSignatureFailed"
     }
   }
@@ -425,7 +425,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineFailed" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance            = "$Instance"
       MalwareEngineFailed = "$MalwareEngineFailed"
     }
   }
@@ -441,7 +441,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineOutofDate" {
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance               = "$Instance"
       MalwareEngineOutofDate = "$MalwareEngineOutofDate"
     }
   }
