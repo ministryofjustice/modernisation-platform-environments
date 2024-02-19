@@ -225,3 +225,50 @@ resource "aws_iam_policy" "instance_ssm" {
   name   = "${var.env_name}-delius-db-allow-access-ssm"
   policy = data.aws_iam_policy_document.instance_ssm.json
 }
+
+# new IAM role OEM setup to allow ec2s to access secrets manager and kms keys
+resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
+  name = "EC2OracleEnterpriseManagementSecretsRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${var.account_info.id}:role/instance-role-${var.env_name}-delius-db-*"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "allow_kms_keys_access" {
+  role       = aws_iam_role.EC2OracleEnterpriseManagementSecretsRole.name
+  policy_arn = aws_iam_policy.business_unit_kms_key_access.arn
+}
+
+data "aws_iam_policy_document" "OracleEnterpriseManagementSecretsPolicyDocument" {
+  statement {
+    sid    = "OracleEnterpriseManagementSecretsPolicyDocument"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [
+      "arn:aws:secretsmanager:*:*:secret:/oracle/database/EMREP/shared-*",
+      "arn:aws:secretsmanager:*:*:secret:/oracle/oem/shared-*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "OracleEnterpriseManagementSecretsPolicy" {
+  name   = "OracleEnterpriseManagementSecretsPolicy"
+  policy = data.aws_iam_policy_document.OracleEnterpriseManagementSecretsPolicyDocument.json
+}
+
+resource "aws_iam_role_policy_attachment" "OracleEnterpriseManagementSecretsPolicy" {
+  role       = aws_iam_role.EC2OracleEnterpriseManagementSecretsRole.name
+  policy_arn = aws_iam_policy.OracleEnterpriseManagementSecretsPolicy.arn
+}
