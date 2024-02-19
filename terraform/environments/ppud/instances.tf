@@ -213,7 +213,7 @@ resource "aws_instance" "s609693lo6vw107" {
 
 resource "aws_instance" "PPUDWEBSERVER2" {
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0ec820268ac25a648"
+  ami                    = "ami-0d372b74e1f38ab18"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
