@@ -64,7 +64,7 @@ module "nextcloud_service" {
   ecs_cluster_arn            = module.ecs.ecs_cluster_arn
   env_name                   = local.environment
   health_check_path          = "/status.php"
-  microservice_lb_arn        = ""
+  microservice_lb_arn        = aws_alb.nextcloud.arn
   name                       = "nextcloud"
   platform_vars = {
     environment_management = local.environment_management
