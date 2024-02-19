@@ -54,7 +54,7 @@ resource "aws_lb" "delius_microservices" {
 }
 
 resource "aws_security_group" "delius_microservices_service_nlb" {
-  name        = "${var.name}-service-alb"
+  name        = "${var.name}-service-nlb"
   description = "Security group for delius microservices service load balancer"
   vpc_id      = var.account_info.vpc_id
   tags        = var.tags
