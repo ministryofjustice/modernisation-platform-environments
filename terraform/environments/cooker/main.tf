@@ -112,7 +112,7 @@ locals {
             systemctl status amazon-ssm-agent
             EOF
         route53_records = {
-          create_internal_record = true
+          create_internal_record = false
           create_external_record = false
         }
       }
