@@ -42,6 +42,8 @@ module "nextcloud_service" {
     }
   ]
 
+  desired_count = 3
+
   efs_volumes = [
     {
       host_path = null
