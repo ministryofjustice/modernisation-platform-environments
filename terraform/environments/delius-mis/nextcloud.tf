@@ -31,7 +31,7 @@ module "nextcloud_service" {
   }
   alb_security_group_id      = aws_security_group.nextcloud_alb_sg.id
   bastion_sg_id              = module.bastion_linux.bastion_security_group
-  certificate_arn            = ""
+  certificate_arn            = aws_acm_certificate.nextcloud_external.arn
   cluster_security_group_id  = aws_security_group.cluster.id
   container_environment_vars = []
   container_image            = "nextcloud:latest"
