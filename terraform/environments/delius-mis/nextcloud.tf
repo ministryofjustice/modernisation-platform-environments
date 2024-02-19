@@ -37,7 +37,7 @@ module "nextcloud_service" {
   container_image            = "nextcloud:latest"
   container_port_config = [
     {
-      containerPort = "8666"
+      containerPort = "80"
       protocol      = "tcp"
     }
   ]
