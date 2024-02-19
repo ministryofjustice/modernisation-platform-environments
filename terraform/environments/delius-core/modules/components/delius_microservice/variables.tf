@@ -382,3 +382,9 @@ variable "efs_volumes" {
   type        = list(any)
   default     = []
 }
+
+variable "mount_points" {
+  description = "The mount points for the EFS volumes"
+  type        = list(any)
+  default     = []
+}

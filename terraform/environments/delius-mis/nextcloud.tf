@@ -47,7 +47,7 @@ module "nextcloud_service" {
   efs_volumes = [
     {
       host_path = null
-      name      = "delius-core-openldap"
+      name      = "nextcloud"
       efs_volume_configuration = [{
         file_system_id          = module.nextcloud_efs.fs_id
         root_directory          = "/"
@@ -60,6 +60,11 @@ module "nextcloud_service" {
       }]
     }
   ]
+  mount_points = [{
+    sourceVolume  = "nextcloud"
+    containerPath = "/var/www/"
+    readOnly      = false
+  }]
 
   container_secrets                  = []
   db_ingress_security_groups         = [module.bastion_linux.bastion_security_group]

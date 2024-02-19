@@ -9,6 +9,7 @@ module "container_definition" {
   environment              = var.container_environment_vars
   secrets                  = var.container_secrets
   port_mappings            = var.container_port_config
+  mount_points             = var.mount_points
   log_configuration = {
     logDriver = "awslogs"
     options = {
