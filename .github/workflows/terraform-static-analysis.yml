@@ -30,7 +30,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       with:
-        fetch-depth: 0
+        ref: '${GITHUB_REF}'
     - name: Run Analysis
       uses: ministryofjustice/github-actions/terraform-static-analysis@1b6396ceb7bf09e741789c4e7eb7b329d5113066 # v15.4.1
       env:
