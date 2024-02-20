@@ -69,10 +69,11 @@ module "nextcloud_service" {
     readOnly      = false
   }]
 
-  container_secrets                  = []
-  ecs_cluster_arn                    = module.ecs.ecs_cluster_arn
-  env_name                           = local.environment
-  health_check_path                  = "/status.php"
+  container_secrets = []
+  ecs_cluster_arn   = module.ecs.ecs_cluster_arn
+  env_name          = local.environment
+  #  health_check_path                  = "/status.php"
+  health_check_path                  = "/"
   alb_listener_rule_paths            = ["/"]
   microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn
   microservice_lb_arn                = aws_alb.nextcloud.arn
@@ -88,7 +89,7 @@ module "nextcloud_service" {
   rds_parameter_group_name = "default.mariadb10.6"
   rds_license_model        = "general-public-license"
 
-#  create_elasticache               = true
+  #  create_elasticache               = true
   elasticache_engine               = "redis"
   elasticache_engine_version       = "6.x"
   elasticache_node_type            = "cache.t3.small"
