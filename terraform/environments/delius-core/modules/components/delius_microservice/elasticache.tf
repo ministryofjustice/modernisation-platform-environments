@@ -8,7 +8,7 @@ resource "aws_elasticache_subnet_group" "this" {
 resource "aws_elasticache_cluster" "this" {
   count = var.create_elasticache ? 1 : 0
 
-  cluster_id                 = "cluster-example"
+  cluster_id                 = var.name
   engine                     = var.elasticache_engine
   node_type                  = var.elasticache_node_type
   num_cache_nodes            = var.elasticache_num_cache_nodes
