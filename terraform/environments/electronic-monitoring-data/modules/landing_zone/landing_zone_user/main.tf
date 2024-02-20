@@ -29,7 +29,7 @@ resource "aws_transfer_user" "this" {
     {
       supplier = var.user_name,
     },
-  }
+  )
 }
 
 resource "aws_iam_role" "this_transfer_user" {

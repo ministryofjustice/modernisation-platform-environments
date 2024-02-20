@@ -18,7 +18,7 @@ resource "aws_security_group" "this" {
     {
       supplier = var.user_name,
     },
-  }
+  )
 }
 
 resource "aws_vpc_security_group_ingress_rule" "this_ipv4" {
