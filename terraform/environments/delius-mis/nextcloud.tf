@@ -78,14 +78,16 @@ module "nextcloud_service" {
   microservice_lb_arn                = aws_alb.nextcloud.arn
   name                               = "nextcloud"
 
-  create_rds                       = true
-  rds_engine                       = "mariadb"
-  rds_engine_version               = "10.6"
-  rds_instance_class               = "db.t3.small"
-  rds_allocated_storage            = 20
-  rds_username                     = "dbadmin"
-  rds_port                         = 3306
-  rds_parameter_group_name         = "default.mariadb10.6"
+  create_rds               = true
+  rds_engine               = "mariadb"
+  rds_engine_version       = "10.6"
+  rds_instance_class       = "db.t3.small"
+  rds_allocated_storage    = 20
+  rds_username             = "dbadmin"
+  rds_port                 = 3306
+  rds_parameter_group_name = "default.mariadb10.6"
+  rds_license_model        = "general-public-license"
+
   create_elasticache               = true
   elasticache_engine               = "redis"
   elasticache_engine_version       = "6.x"
