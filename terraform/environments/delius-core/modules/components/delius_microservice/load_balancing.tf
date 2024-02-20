@@ -25,7 +25,6 @@ resource "aws_lb_target_group" "frontend" {
     timeout             = "5"
   }
 
-  depends_on = [aws_lb_listener_rule.alb]
 }
 
 resource "aws_lb_listener_rule" "alb" {
