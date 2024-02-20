@@ -70,6 +70,15 @@ resource "aws_vpc_security_group_ingress_rule" "from_vpc" {
   security_group_id = aws_security_group.delius_microservices_service_nlb.id
 }
 
+resource "aws_vpc_security_group_egress_rule" "nlb_to_ecs_service" {
+  for_each                     = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
+  ip_protocol                  = "TCP"
+  from_port                    = each.value
+  to_port                      = each.value
+  security_group_id            = aws_security_group.delius_microservices_service_nlb.id
+  referenced_security_group_id = aws_security_group.ecs_service.id
+}
+
 resource "aws_lb_target_group" "service" {
   for_each = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
 
