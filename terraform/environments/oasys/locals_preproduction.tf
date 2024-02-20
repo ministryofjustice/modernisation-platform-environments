@@ -348,8 +348,8 @@ locals {
       # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-preproduction.modernisation-platform.service.justice.gov.uk
         records = [
-          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db.pp.onr", type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         # lb_alias_records = [
         #   { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },     # pp.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk
@@ -365,9 +365,9 @@ locals {
           id = module.environment.vpc.id
         }
         records = [
-          # { name = "db.pp.${local.application_name}", type = "A", ttl = "300", records = ["10.40.40.133"] }, # for azure 
-          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
-          { name = "db.pp.onr", type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },                         # for aws
+          # { name = "db.pp.${local.application_name}", type = "A", ttl = "3600", records = ["10.40.40.133"] }, # for azure 
+          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
+          { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },                         # for aws
         ]
         lb_alias_records = [
           # { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },
