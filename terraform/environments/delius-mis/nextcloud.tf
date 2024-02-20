@@ -88,7 +88,7 @@ module "nextcloud_service" {
   rds_parameter_group_name = "default.mariadb10.6"
   rds_license_model        = "general-public-license"
 
-  create_elasticache               = true
+#  create_elasticache               = true
   elasticache_engine               = "redis"
   elasticache_engine_version       = "6.x"
   elasticache_node_type            = "cache.t3.small"
