@@ -3,6 +3,28 @@ resource "aws_security_group" "bcs" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
+data "aws_iam_policy_document" "secrets_manager" {
+  statement {
+    sid = "SecretPermissions"
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [
+      aws_secretsmanager_secret.ad_username.arn,
+      aws_secretsmanager_secret.ad_password.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "secrets_manager" {
+  name        = "read-access-to-secrets"
+  path        = "/"
+  description = "Allow ec2 instance to read secrets"
+  policy      = data.aws_iam_policy_document.secrets_manager.json
+
+  tags = local.tags
+}
+
 locals {
 
   bcs_instance_count = 3
@@ -26,7 +48,8 @@ locals {
   }
 
   bcs_instance_profile_policies = [
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    aws_iam_policy.secrets_manager.arn
   ]
 
   bcs_instance_config = {
@@ -85,7 +108,17 @@ module "bcs_instance" {
   iam_resource_names_prefix = "instance-bcs${count.index + 1}"
   instance_profile_policies = local.bcs_instance_profile_policies
 
-  user_data_raw = base64encode("")
+  user_data_raw = base64encode(
+    templatefile(
+      "${path.module}/templates/EC2LaunchV2.yaml.tftpl",
+      {
+        ad_username_secret_name = aws_secretsmanager_secret.ad_username.name
+        ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
+        ad_domain_name          = local.application_data.accounts[local.environment].legacy_ad_domain_name
+        ad_ip_list              = local.application_data.accounts[local.environment].legacy_ad_ip_list
+      }
+    )
+  )
 
   business_unit     = var.networking[0].business-unit
   application_name  = local.application_name
