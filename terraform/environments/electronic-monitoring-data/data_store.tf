@@ -129,7 +129,7 @@ resource "aws_lambda_function" "calculate_checksum_lambda" {
   role          = aws_iam_role.calculate_checksum_lambda.arn
   handler       = "calculate_checksum_lambda.handler"
   runtime       = "python3.12"
-  memory_size   = 1024
+  memory_size   = 4096
   timeout       = 900
 
   environment {
