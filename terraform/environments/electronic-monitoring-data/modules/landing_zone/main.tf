@@ -29,9 +29,12 @@ resource "random_string" "this" {
 resource "aws_s3_bucket" "landing_bucket" {
   bucket = "${var.supplier}-${random_string.this.result}"
 
-  tags = {
-    supplier = var.supplier
-  }
+  tags = merge(
+    local.tags,
+    {
+      supplier = var.supplier,
+    },
+  )
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "landing_bucket" {
@@ -107,8 +110,9 @@ module "log_bucket" {
 
   source_bucket = aws_s3_bucket.landing_bucket
   account_id    = var.account_id
+
   tags = {
-    supplier = var.supplier
+      supplier = var.supplier
   }
 }
 
@@ -122,9 +126,12 @@ resource "aws_kms_key" "this" {
   key_usage               = "ENCRYPT_DECRYPT"
   deletion_window_in_days = 30
 
-  tags = {
-    supplier = var.supplier
-  }
+  tags = merge(
+    local.tags,
+    {
+      supplier = var.supplier,
+    },
+  )
 }
 
 resource "aws_kms_key_policy" "this" {
@@ -170,9 +177,12 @@ resource "aws_kms_key_policy" "this" {
 resource "aws_eip" "this" {
   domain = "vpc"
 
-  tags = {
-    supplier = var.supplier
-  }
+  tags = merge(
+    local.tags,
+    {
+      supplier = var.supplier,
+    },
+  )
 }
 
 #------------------------------------------------------------------------------
@@ -195,10 +205,6 @@ resource "aws_transfer_server" "this" {
 
   domain = "S3"
 
-  tags = {
-    supplier = var.supplier
-  }
-
   security_policy_name = "TransferSecurityPolicy-2023-05"
 
   pre_authentication_login_banner = "\nHello there\n"
@@ -214,6 +220,13 @@ resource "aws_transfer_server" "this" {
   structured_log_destinations = [
     "${aws_cloudwatch_log_group.this.arn}:*"
   ]
+
+  tags = merge(
+    local.tags,
+    {
+      supplier = var.supplier,
+    },
+  )
 }
 
 resource "aws_iam_role" "iam_for_transfer" {
@@ -272,9 +285,12 @@ resource "aws_transfer_workflow" "this" {
     type = "DELETE"
   }
 
-  tags = {
-    supplier = var.supplier
-  }
+  tags = merge(
+    local.tags,
+    {
+      supplier = var.supplier,
+    },
+  )
 }
 
 resource "aws_iam_role" "this_transfer_workflow" {

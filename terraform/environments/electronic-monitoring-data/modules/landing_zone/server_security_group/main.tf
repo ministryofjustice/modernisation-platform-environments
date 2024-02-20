@@ -13,8 +13,11 @@ resource "aws_security_group" "this" {
     create_before_destroy = true
   }
 
-  tags = {
-    supplier = var.user_name
+  tags = merge(
+    local.tags,
+    {
+      supplier = var.user_name,
+    },
   }
 }
 
