@@ -168,8 +168,6 @@ resource "aws_kms_key_policy" "this" {
 #------------------------------------------------------------------------------
 
 resource "aws_eip" "this" {
-  count = var.create_server ? 1 : 0
-
   domain = "vpc"
 
   tags = {
@@ -218,6 +216,7 @@ resource "aws_transfer_server" "this" {
   structured_log_destinations = [
     "${aws_cloudwatch_log_group.this.arn}:*"
   ]
+
 }
 
 resource "aws_iam_role" "iam_for_transfer" {
