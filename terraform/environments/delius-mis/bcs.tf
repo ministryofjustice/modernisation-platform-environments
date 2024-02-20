@@ -25,7 +25,9 @@ locals {
     }
   }
 
-  bcs_instance_profile_policies = []
+  bcs_instance_profile_policies = [
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  ]
 
   bcs_instance_config = {
     associate_public_ip_address  = false
@@ -37,7 +39,12 @@ locals {
     metadata_options_http_tokens = "required"
     monitoring                   = true
     ebs_block_device_inline      = true
-    vpc_security_group_ids       = [aws_security_group.bcs.id]
+
+    vpc_security_group_ids = [
+      aws_security_group.legacy.id,
+      aws_security_group.bcs.id
+    ]
+
     private_dns_name_options = {
       enable_resource_name_dns_aaaa_record = false
       enable_resource_name_dns_a_record    = true
