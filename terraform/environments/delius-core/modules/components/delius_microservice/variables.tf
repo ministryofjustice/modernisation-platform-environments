@@ -13,6 +13,14 @@ variable "name" {
   type        = string
 }
 
+
+variable "namespace" {
+  description = "Namespace of the application"
+  type        = string
+  default     = "delius-core"
+}
+
+
 variable "env_name" {
   description = "Environment name short ie dev"
   type        = string
@@ -34,6 +42,12 @@ variable "rds_engine" {
   description = "RDS engine to use"
   type        = string
   default     = null
+}
+
+variable "rds_endpoint_environment_variable" {
+  description = "Environment variable to store the RDS endpoint"
+  type        = string
+  default     = ""
 }
 
 variable "rds_engine_version" {
@@ -204,6 +218,12 @@ variable "target_group_protocol" {
   default     = "HTTP"
 }
 
+variable "target_group_protocol_version" {
+  description = "The version of the protocol to use for the target group"
+  type        = string
+  default     = "HTTP2"
+}
+
 variable "certificate_arn" {
   description = "The ARN of the certificate to use for the target group"
   type        = string
@@ -242,6 +262,12 @@ variable "elasticache_engine" {
   description = "The Elasticache engine"
   type        = string
   default     = "redis"
+}
+
+variable "elasticache_endpoint_environment_variable" {
+  description = "Environment variable to store the elasticache endpoint"
+  type        = string
+  default     = ""
 }
 
 variable "elasticache_engine_version" {
@@ -354,4 +380,41 @@ variable "container_cpu" {
 variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string
+}
+
+
+variable "create_service_nlb" {
+  description = "Whether to create a service NLB"
+  type        = bool
+  default     = false
+}
+
+variable "desired_count" {
+  description = "The desired count of the service"
+  type        = number
+  default     = 1
+}
+
+variable "efs_volumes" {
+  description = "The EFS volumes to mount"
+  type        = list(any)
+  default     = []
+}
+
+variable "mount_points" {
+  description = "The mount points for the EFS volumes"
+  type        = list(any)
+  default     = []
+}
+
+variable "deployment_minimum_healthy_percent" {
+  type        = number
+  description = "The lower limit (as a percentage of `desired_count`) of the number of tasks that must remain running and healthy in a service during a deployment"
+  default     = 0
+}
+
+variable "deployment_maximum_percent" {
+  type        = number
+  description = "The upper limit of the number of tasks (as a percentage of `desired_count`) that can be running in a service during a deployment"
+  default     = 100
 }

@@ -5,12 +5,14 @@ module "merge_ui_service" {
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
+
   container_port_config = [
     {
       containerPort = var.delius_microservice_configs.merge_ui.container_port
       protocol      = "tcp"
     }
   ]
+
   ecs_cluster_arn            = module.ecs.ecs_cluster_arn
   container_secrets          = []
   db_ingress_security_groups = []
