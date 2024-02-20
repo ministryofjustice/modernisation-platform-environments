@@ -36,9 +36,11 @@ resource "aws_instance" "ec2_clamav" {
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-      { Name = "root-block" }
+      { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_accessgate, count.index + 1, "root")) },
+      { device-name = "/dev/sda1" }
     )
   }
+
   ebs_block_device {
     device_name = "/dev/sdb"
     volume_type = "gp3"
@@ -47,12 +49,14 @@ resource "aws_instance" "ec2_clamav" {
     encrypted  = true
     kms_key_id = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-      { Name = "swap" }
+      { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_clamav, count.index + 1, "swap")) },
+      { device-name = "/dev/sdb" }
     )
   }
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-ClamAV", local.application_name, local.environment)) },
+    { instance-role = local.application_data.accounts[local.environment].instance_role_clamav },
     { instance-scheduling = "skip-scheduling" },
     { backup = "true" }
   )

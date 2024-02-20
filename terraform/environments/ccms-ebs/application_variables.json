@@ -82,7 +82,14 @@
       "ebs_default_iops_test": 9000,
       "dbf_device": "nvme5n1",
       "dbf_path": "/CCMS/EBS/dbf",
-      "ebs_type_ebsdb_backup": "gp3"
+      "ebs_type_ebsdb_backup": "gp3",
+      "instance_role_accessgate": "accessgate",
+      "instance_role_clamav": "clamav",
+      "instance_role_ebsapps": "apps",
+      "instance_role_ebsdb": "db",
+      "instance_role_ftp": "ftp",
+      "instance_role_mailrelay": "mailrelay",
+      "instance_role_webgate": "webgate"
     },
     "test": {
       "short_env": "tst",
@@ -162,7 +169,14 @@
       "ebs_size_ebsdb_diag": 50,
       "dbf_device": "nvme2n1",
       "dbf_path": "/CCMS/EBS/dbf",
-      "ebs_type_ebsdb_backup": "io2"
+      "ebs_type_ebsdb_backup": "io2",
+      "instance_role_accessgate": "accessgate",
+      "instance_role_clamav": "clamav",
+      "instance_role_ebsapps": "apps",
+      "instance_role_ebsdb": "db",
+      "instance_role_ftp": "ftp",
+      "instance_role_mailrelay": "mailrelay",
+      "instance_role_webgate": "webgate"
     },
     "preproduction": {
       "short_env": "prep",
@@ -242,7 +256,14 @@
       "ebs_size_ebsdb_diag": 50,
       "dbf_device": "nvme3n1",
       "dbf_path": "/CCMS/EBS/dbf",
-      "ebs_type_ebsdb_backup": "io2"
+      "ebs_type_ebsdb_backup": "io2",
+      "instance_role_accessgate": "accessgate",
+      "instance_role_clamav": "clamav",
+      "instance_role_ebsapps": "apps",
+      "instance_role_ebsdb": "db",
+      "instance_role_ftp": "ftp",
+      "instance_role_mailrelay": "mailrelay",
+      "instance_role_webgate": "webgate"
     },
     "production": {
       "short_env": "prod",
@@ -324,7 +345,14 @@
       "dbf_path": "/CCMS/EBSPROD/dbf",
       "ebs_size_ebsdb_dbf2": 9000,
       "ebs_default_dbf2_iops": 10000,
-      "ebs_type_ebsdb_backup": "io2"
+      "ebs_type_ebsdb_backup": "io2",
+      "instance_role_accessgate": "accessgate",
+      "instance_role_clamav": "clamav",
+      "instance_role_ebsapps": "apps",
+      "instance_role_ebsdb": "db",
+      "instance_role_ftp": "ftp",
+      "instance_role_mailrelay": "mailrelay",
+      "instance_role_webgate": "webgate"
     }
   },
   "webgate_ebs": {
