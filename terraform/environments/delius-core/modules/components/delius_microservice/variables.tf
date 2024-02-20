@@ -218,6 +218,12 @@ variable "target_group_protocol" {
   default     = "HTTP"
 }
 
+variable "target_group_protocol_version" {
+  description = "The version of the protocol to use for the target group"
+  type        = string
+  default     = "HTTP2"
+}
+
 variable "certificate_arn" {
   description = "The ARN of the certificate to use for the target group"
   type        = string

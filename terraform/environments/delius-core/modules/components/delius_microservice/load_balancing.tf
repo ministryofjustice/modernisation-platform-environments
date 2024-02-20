@@ -4,6 +4,7 @@ resource "aws_lb_target_group" "frontend" {
   name                 = "${var.env_name}-${var.name}"
   port                 = var.container_port_config[0].containerPort
   protocol             = var.target_group_protocol
+  protocol_version     = var.target_group_protocol_version
   vpc_id               = var.account_config.shared_vpc_id
   target_type          = "ip"
   deregistration_delay = 30
