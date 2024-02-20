@@ -29,12 +29,12 @@ module "nextcloud_service" {
     id               = data.aws_caller_identity.current.account_id
     cp_cidr          = "172.20.0.0/16"
   }
-  alb_security_group_id      = aws_security_group.nextcloud_alb_sg.id
-  bastion_sg_id              = module.bastion_linux.bastion_security_group
-  certificate_arn            = aws_acm_certificate.nextcloud_external.arn
-  cluster_security_group_id  = aws_security_group.cluster.id
-  container_environment_vars = []
-  container_image            = "nextcloud:latest"
+  alb_security_group_id     = aws_security_group.nextcloud_alb_sg.id
+  bastion_sg_id             = module.bastion_linux.bastion_security_group
+  certificate_arn           = aws_acm_certificate.nextcloud_external.arn
+  cluster_security_group_id = aws_security_group.cluster.id
+
+  container_image = "nextcloud:latest"
   container_port_config = [
     {
       containerPort = "80"
@@ -69,7 +69,6 @@ module "nextcloud_service" {
     readOnly      = false
   }]
 
-  container_secrets = []
   ecs_cluster_arn   = module.ecs.ecs_cluster_arn
   env_name          = local.environment
   health_check_path = "/status.php"
@@ -89,7 +88,7 @@ module "nextcloud_service" {
   rds_parameter_group_name = "default.mariadb10.6"
   rds_license_model        = "general-public-license"
 
-  #  create_elasticache               = true
+  create_elasticache               = true
   elasticache_engine               = "redis"
   elasticache_engine_version       = "6.x"
   elasticache_node_type            = "cache.t3.small"
@@ -101,6 +100,44 @@ module "nextcloud_service" {
 
   rds_endpoint_environment_variable         = "MYSQL_HOST"
   elasticache_endpoint_environment_variable = "REDIS_HOST"
+
+  container_environment_vars = [
+    {
+      name  = "MYSQL_DATABASE"
+      value = "nextcloud"
+    },
+    {
+      name  = "MYSQL_USER"
+      value = "dbadmin"
+    },
+    {
+      name  = "MYSQL_PASSWORD"
+      value = "password"
+    },
+    {
+      name  = "REDIS_PORT"
+      value = "6379"
+    },
+    {
+      name  = "REDIS_PASSWORD"
+      value = "password"
+    },
+    {
+      name  = "NEXTCLOUD_ADMIN_USER"
+      value = "admin"
+    },
+    {
+      name  = "NEXTCLOUD_TRUSTED_DOMAINS"
+      value = aws_route53_record.nextcloud_external.fqdn
+    }
+  ]
+
+  container_secrets = [
+    {
+      name      = "NEXTCLOUD_ADMIN_PASSWORD"
+      valueFrom = aws_secretsmanager_secret.nextcloud_admin_password.arn
+    }
+  ]
 
   platform_vars = {
     environment_management = local.environment_management
@@ -175,4 +212,18 @@ resource "aws_security_group_rule" "efs_ingress_nextcloud" {
   protocol                 = "tcp"
   source_security_group_id = module.nextcloud_efs.sg_id
   security_group_id        = module.nextcloud_service.service_security_group_id
+}
+
+resource "aws_secretsmanager_secret" "nextcloud_admin_password" {
+  name = "nextcloud-admin-password"
+}
+
+resource "aws_secretsmanager_secret_version" "nextcloud_admin_password" {
+  secret_id     = aws_secretsmanager_secret.nextcloud_admin_password.id
+  secret_string = random_password.nextcloud_admin_password.result
+}
+
+resource "random_password" "nextcloud_admin_password" {
+  length  = 32
+  special = true
 }
