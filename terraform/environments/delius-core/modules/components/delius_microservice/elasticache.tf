@@ -47,3 +47,16 @@ resource "aws_security_group" "elasticache" {
     }
   )
 }
+
+resource "aws_elasticache_parameter_group" "this" {
+  name   = var.name
+  family = var.elasticache_parameter_group_family
+
+  dynamic "parameter" {
+    for_each = var.elasticache_parameters
+      content {
+        name  = parameter.key
+        value = parameter.value
+      }
+  }
+}
