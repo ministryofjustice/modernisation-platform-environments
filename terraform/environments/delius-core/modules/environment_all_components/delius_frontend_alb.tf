@@ -1,5 +1,5 @@
 locals {
-  frontend_url = "${var.env_name}.${var.account_config.dns_suffix}"
+  frontend_url      = "${var.env_name}.${var.account_config.dns_suffix}"
   globalprotect_ips = module.ip_addresses.moj_cidr.moj_aws_digital_macos_globalprotect_alpha
 }
 
@@ -139,6 +139,7 @@ resource "aws_lb_listener" "listener_http" {
 # Listener rules
 resource "aws_lb_listener_rule" "homepage_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 3
   condition {
     path_pattern {
       values = ["/"]

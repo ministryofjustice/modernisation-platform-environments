@@ -24,6 +24,7 @@ resource "aws_lb_target_group" "frontend" {
     matcher             = "200-499"
     timeout             = "5"
   }
+
 }
 
 resource "aws_lb_listener_rule" "alb" {
@@ -38,6 +39,9 @@ resource "aws_lb_listener_rule" "alb" {
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.frontend.arn
+  }
+  lifecycle {
+    replace_triggered_by = [aws_lb_target_group.frontend]
   }
 }
 

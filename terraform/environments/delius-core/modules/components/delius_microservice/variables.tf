@@ -50,6 +50,12 @@ variable "rds_endpoint_environment_variable" {
   default     = ""
 }
 
+variable "rds_password_secret_variable" {
+  description = "Secret variable to store the rds secretsmanager arn"
+  type        = string
+  default     = ""
+}
+
 variable "rds_engine_version" {
   description = "RDS engine version to use"
   type        = string
@@ -297,6 +303,18 @@ variable "elasticache_num_cache_nodes" {
   description = "The Elasticache number of cache nodes"
   type        = number
   default     = 1
+}
+
+variable "elasticache_parameter_group_family" {
+  description = "The Elasticache parameter group family"
+  type        = string
+  default     = "redis5.0"
+}
+
+variable "elasticache_parameters" {
+  description = "A map of elasticache parameter names & values"
+  type        = map(string)
+  default     = {}
 }
 
 variable "container_environment_vars" {

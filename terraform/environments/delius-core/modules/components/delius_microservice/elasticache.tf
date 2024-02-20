@@ -8,7 +8,7 @@ resource "aws_elasticache_subnet_group" "this" {
 resource "aws_elasticache_cluster" "this" {
   count = var.create_elasticache ? 1 : 0
 
-  cluster_id                 = "cluster-example"
+  cluster_id                 = var.name
   engine                     = var.elasticache_engine
   node_type                  = var.elasticache_node_type
   num_cache_nodes            = var.elasticache_num_cache_nodes
@@ -46,4 +46,17 @@ resource "aws_security_group" "elasticache" {
       Name = "${var.name}-${var.env_name}-database_security_group"
     }
   )
+}
+
+resource "aws_elasticache_parameter_group" "this" {
+  name   = var.name
+  family = var.elasticache_parameter_group_family
+
+  dynamic "parameter" {
+    for_each = var.elasticache_parameters
+      content {
+        name  = parameter.key
+        value = parameter.value
+      }
+  }
 }
