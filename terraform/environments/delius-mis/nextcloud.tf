@@ -70,7 +70,6 @@ module "nextcloud_service" {
   }]
 
   container_secrets                  = []
-  db_ingress_security_groups         = [module.bastion_linux.bastion_security_group]
   ecs_cluster_arn                    = module.ecs.ecs_cluster_arn
   env_name                           = local.environment
   health_check_path                  = "/status.php"
@@ -78,6 +77,26 @@ module "nextcloud_service" {
   microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn
   microservice_lb_arn                = aws_alb.nextcloud.arn
   name                               = "nextcloud"
+
+  create_rds                       = true
+  rds_engine                       = "mariadb"
+  rds_engine_version               = "10.6"
+  rds_instance_class               = "db.t3.small"
+  rds_allocated_storage            = 20
+  rds_username                     = "dbadmin"
+  rds_port                         = 3306
+  rds_parameter_group_name         = "default.mariadb10.6"
+  create_elasticache               = true
+  elasticache_engine               = "redis"
+  elasticache_engine_version       = "6.x"
+  elasticache_node_type            = "cache.t3.small"
+  elasticache_port                 = 6379
+  elasticache_parameter_group_name = "default.redis6.x"
+  elasticache_subnet_group_name    = "nextcloud-elasticache-subnet-group"
+
+  db_ingress_security_groups = [aws_security_group.cluster.id]
+
+
   platform_vars = {
     environment_management = local.environment_management
   }
