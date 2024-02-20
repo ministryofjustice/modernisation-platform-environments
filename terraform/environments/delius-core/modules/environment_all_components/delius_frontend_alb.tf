@@ -1,6 +1,12 @@
 locals {
-  frontend_url = "${var.env_name}.${var.account_config.dns_suffix}"
+  frontend_url      = "${var.env_name}.${var.account_config.dns_suffix}"
+  globalprotect_ips = module.ip_addresses.moj_cidr.moj_aws_digital_macos_globalprotect_alpha
 }
+
+module "ip_addresses" {
+  source = "../../../../modules/ip_addresses"
+}
+
 resource "aws_security_group" "delius_frontend_alb_security_group" {
   name        = format("%s - Delius Core Frontend Load Balancer", var.env_name)
   description = "controls access to and from delius front-end load balancer"
@@ -27,21 +33,23 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_https_global_protect_allowlist" {
+  for_each          = toset(local.globalprotect_ips)
   security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   description       = "access into delius core frontend alb over https"
   from_port         = "443"
   to_port           = "443"
   ip_protocol       = "tcp"
-  cidr_ipv4         = "35.176.93.186/32" # Global Protect VPN
+  cidr_ipv4         = each.key # Global Protect VPN
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_global_protect_allowlist" {
+  for_each          = toset(local.globalprotect_ips)
   security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   description       = "access into delius core frontend alb over http (will redirect)"
   from_port         = "80"
   to_port           = "80"
   ip_protocol       = "tcp"
-  cidr_ipv4         = "35.176.93.186/32" # Global Protect VPN
+  cidr_ipv4         = each.key # Global Protect VPN
 }
 
 #resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_service" {
@@ -131,6 +139,7 @@ resource "aws_lb_listener" "listener_http" {
 # Listener rules
 resource "aws_lb_listener_rule" "homepage_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 3
   condition {
     path_pattern {
       values = ["/"]

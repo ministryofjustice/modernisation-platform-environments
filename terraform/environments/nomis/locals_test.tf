@@ -16,6 +16,8 @@ locals {
   # baseline config
   test_config = {
 
+    baseline_cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ebs
+
     baseline_s3_buckets = {
       nomis-audit-archives = {
         custom_kms_key = module.environment.kms_keys["general"].arn

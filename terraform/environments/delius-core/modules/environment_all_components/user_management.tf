@@ -8,6 +8,14 @@ module "user_management" {
   ]
   container_secrets = [
   ]
+
+  create_elasticache = true
+
+  elasticache_parameters = {
+    "notify-keyspace-events" = "eA"
+    "cluster-enabled"        = "yes"
+  }
+
   container_port_config = [
     {
       containerPort = var.delius_microservice_configs.user_management.container_port

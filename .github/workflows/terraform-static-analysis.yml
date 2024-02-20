@@ -23,10 +23,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'workflow_dispatch' && github.event_name != 'schedule'
     steps:
+    - name: Extract branch name
+      shell: bash
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+      id: extract_branch
     - name: Checkout
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       with:
-        fetch-depth: 0
+        fetch-depth: 1
     - name: Run Analysis
       uses: ministryofjustice/github-actions/terraform-static-analysis@1b6396ceb7bf09e741789c4e7eb7b329d5113066 # v15.4.1
       env:

@@ -305,6 +305,18 @@ variable "elasticache_num_cache_nodes" {
   default     = 1
 }
 
+variable "elasticache_parameter_group_family" {
+  description = "The Elasticache parameter group family"
+  type        = string
+  default     = "redis5.0"
+}
+
+variable "elasticache_parameters" {
+  description = "A map of elasticache parameter names & values"
+  type        = map(string)
+  default     = {}
+}
+
 variable "container_environment_vars" {
   description = "Environment variables to pass to the container"
   type = list(object({
