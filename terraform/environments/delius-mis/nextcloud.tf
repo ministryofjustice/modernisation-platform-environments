@@ -96,6 +96,8 @@ module "nextcloud_service" {
 
   db_ingress_security_groups = [aws_security_group.cluster.id]
 
+  rds_endpoint_environment_variable         = "MYSQL_HOST"
+  elasticache_endpoint_environment_variable = "REDIS_HOST"
 
   platform_vars = {
     environment_management = local.environment_management
