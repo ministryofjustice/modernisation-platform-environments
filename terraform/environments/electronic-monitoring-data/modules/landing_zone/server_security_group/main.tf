@@ -14,7 +14,7 @@ resource "aws_security_group" "this" {
   }
 
   tags = merge(
-    local.tags,
+    var.local_tags,
     {
       supplier = var.user_name,
     },

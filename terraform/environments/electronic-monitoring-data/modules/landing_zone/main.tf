@@ -30,7 +30,7 @@ resource "aws_s3_bucket" "landing_bucket" {
   bucket = "${var.supplier}-${random_string.this.result}"
 
   tags = merge(
-    local.tags,
+    var.local_tags,
     {
       supplier = var.supplier,
     },
@@ -111,6 +111,7 @@ module "log_bucket" {
   source_bucket = aws_s3_bucket.landing_bucket
   account_id    = var.account_id
 
+  local_tags = var.local_tags
   tags = {
       supplier = var.supplier
   }
@@ -127,7 +128,7 @@ resource "aws_kms_key" "this" {
   deletion_window_in_days = 30
 
   tags = merge(
-    local.tags,
+    var.local_tags,
     {
       supplier = var.supplier,
     },
@@ -178,7 +179,7 @@ resource "aws_eip" "this" {
   domain = "vpc"
 
   tags = merge(
-    local.tags,
+    var.local_tags,
     {
       supplier = var.supplier,
     },
@@ -222,7 +223,7 @@ resource "aws_transfer_server" "this" {
   ]
 
   tags = merge(
-    local.tags,
+    var.local_tags,
     {
       supplier = var.supplier,
     },
@@ -286,7 +287,7 @@ resource "aws_transfer_workflow" "this" {
   }
 
   tags = merge(
-    local.tags,
+    var.local_tags,
     {
       supplier = var.supplier,
     },
@@ -371,6 +372,7 @@ module "landing_zone_users" {
   for_each = { for idx, item in var.user_accounts : idx => item }
 
   landing_bucket  = aws_s3_bucket.landing_bucket
+  local_tags      = var.local_tags
   ssh_keys        = each.value.ssh_keys
   supplier        = var.supplier
   transfer_server = aws_transfer_server.this
@@ -390,6 +392,7 @@ module "landing_zone_security_groups" {
 
   cidr_ipv4s = each.value.cidr_ipv4s
   cidr_ipv6s = each.value.cidr_ipv6s
+  local_tags = var.local_tags
   supplier   = var.supplier
   user_name  = each.value.name
   vpc_id     = var.vpc_id

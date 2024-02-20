@@ -5,7 +5,7 @@ resource "aws_s3_bucket" "this" {
   force_destroy = true
 
   tags = merge(
-    local.tags,
+    var.local_tags,
     var.tags,
   )
 }

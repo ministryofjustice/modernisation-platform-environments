@@ -22,6 +22,8 @@ module "capita" {
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
+
+  local_tags = local.tags
 }
 
 module "civica" {
@@ -46,6 +48,8 @@ module "civica" {
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
+
+  local_tags = local.tags
 }
 
 module "g4s" {
@@ -79,4 +83,6 @@ module "g4s" {
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
+
+  local_tags = local.tags
 }

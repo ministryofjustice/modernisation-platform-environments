@@ -7,6 +7,7 @@ module "data_store_log_bucket" {
 
   source_bucket = aws_s3_bucket.data_store
   account_id    = data.aws_caller_identity.current.account_id
+  local_tags    = local.tags
 }
 
 #------------------------------------------------------------------------------
