@@ -1,20 +1,20 @@
 module "capita" {
   source = "./modules/landing_zone/"
-  count  = (local.is-production || local.is-development) && local.switch_on_server_capita ? 1 : 0
+  create_server = local.switch_on_server_capita && (local.is-production || local.is-development) ? 1 : 0
 
   supplier = "capita"
 
   user_accounts = [
     # Developer access.
-    local.sftp_account_dev,
+    # local.sftp_account_dev,
 
     # Test account for supplier.
-    local.sftp_account_capita_test,
+    # local.sftp_account_capita_test,
 
     # Accounts for each system to be migrated.
-    local.sftp_account_capita_alcohol_monitoring,
-    local.sftp_account_capita_blob_storage,
-    local.sftp_account_capita_forms_and_subject_id,
+    # local.sftp_account_capita_alcohol_monitoring,
+    # local.sftp_account_capita_blob_storage,
+    # local.sftp_account_capita_forms_and_subject_id,
   ]
 
   data_store_bucket = aws_s3_bucket.data_store
@@ -27,19 +27,19 @@ module "capita" {
 
 module "civica" {
   source = "./modules/landing_zone/"
-  count  = (local.is-production || local.is-development) && local.switch_on_server_civica ? 1 : 0
+  create_server = local.switch_on_server_civica && (local.is-production || local.is-development) ? 1 : 0
 
   supplier = "civica"
 
   user_accounts = [
     # Developer access.
-    local.sftp_account_dev,
+    # local.sftp_account_dev,
 
     # Test account for supplier.
-    local.sftp_account_civica_test,
+    # local.sftp_account_civica_test,
 
     # Accounts for each system to be migrated.
-    local.sftp_account_civica_orca,
+    # local.sftp_account_civica_orca,
   ]
 
   data_store_bucket = aws_s3_bucket.data_store
@@ -52,7 +52,7 @@ module "civica" {
 
 module "g4s" {
   source = "./modules/landing_zone/"
-  count  = (local.is-production || local.is-development) && local.switch_on_server_g4s ? 1 : 0
+  create_server = local.switch_on_server_g4s && (local.is-production || local.is-development) ? 1 : 0
 
   supplier = "g4s"
 

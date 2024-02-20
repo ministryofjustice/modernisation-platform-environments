@@ -2,6 +2,10 @@ variable "account_id" {
   description = "The AWS account id"
 }
 
+variable "create_server" {
+  description = "Bool flag for creating server"
+}
+
 variable "data_store_bucket" {
   description = "The bucket landed data is moved to"
 }

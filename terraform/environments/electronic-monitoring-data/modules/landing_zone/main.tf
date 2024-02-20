@@ -168,6 +168,8 @@ resource "aws_kms_key_policy" "this" {
 #------------------------------------------------------------------------------
 
 resource "aws_eip" "this" {
+  count = var.create_server ? 1 : 0
+
   domain = "vpc"
 
   tags = {
@@ -182,6 +184,8 @@ resource "aws_eip" "this" {
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_server" "this" {
+  count = var.create_server ? 1 : 0
+
   protocols              = ["SFTP"]
   identity_provider_type = "SERVICE_MANAGED"
 
