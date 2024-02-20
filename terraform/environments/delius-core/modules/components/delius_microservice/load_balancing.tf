@@ -4,6 +4,7 @@ resource "aws_lb_target_group" "frontend" {
   name                 = "${var.env_name}-${var.name}"
   port                 = var.container_port_config[0].containerPort
   protocol             = var.target_group_protocol
+  protocol_version     = var.target_group_protocol_version
   vpc_id               = var.account_config.shared_vpc_id
   target_type          = "ip"
   deregistration_delay = 30
@@ -54,7 +55,7 @@ resource "aws_lb" "delius_microservices" {
 }
 
 resource "aws_security_group" "delius_microservices_service_nlb" {
-  name        = "${var.name}-service-alb"
+  name        = "${var.name}-service-nlb"
   description = "Security group for delius microservices service load balancer"
   vpc_id      = var.account_info.vpc_id
   tags        = var.tags
@@ -67,6 +68,15 @@ resource "aws_vpc_security_group_ingress_rule" "from_vpc" {
   cidr_ipv4         = var.account_config.shared_vpc_cidr
   ip_protocol       = "-1"
   security_group_id = aws_security_group.delius_microservices_service_nlb.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "nlb_to_ecs_service" {
+  for_each                     = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
+  ip_protocol                  = "TCP"
+  from_port                    = each.value
+  to_port                      = each.value
+  security_group_id            = aws_security_group.delius_microservices_service_nlb.id
+  referenced_security_group_id = aws_security_group.ecs_service.id
 }
 
 resource "aws_lb_target_group" "service" {

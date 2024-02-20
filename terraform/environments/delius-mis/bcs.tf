@@ -14,18 +14,20 @@ locals {
 
   bcs_instance_ebs_volumes_config = {
     data = {
-      iops       = 1000
+      iops       = 3000
       throughput = 125
       type       = "gp3"
     }
     root = {
-      iops       = 1000
+      iops       = 3000
       throughput = 125
       type       = "gp3"
     }
   }
 
-  bcs_instance_profile_policies = []
+  bcs_instance_profile_policies = [
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  ]
 
   bcs_instance_config = {
     associate_public_ip_address  = false
@@ -37,7 +39,12 @@ locals {
     metadata_options_http_tokens = "required"
     monitoring                   = true
     ebs_block_device_inline      = true
-    vpc_security_group_ids       = [aws_security_group.bcs.id]
+
+    vpc_security_group_ids = [
+      aws_security_group.legacy.id,
+      aws_security_group.bcs.id
+    ]
+
     private_dns_name_options = {
       enable_resource_name_dns_aaaa_record = false
       enable_resource_name_dns_a_record    = true
@@ -66,7 +73,7 @@ module "bcs_instance" {
   ami_name                      = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
   ami_owner                     = "self"
   instance                      = local.bcs_instance_config
-  ebs_kms_key_id                = data.aws_kms_key.ebs_shared.id
+  ebs_kms_key_id                = data.aws_kms_key.ebs_shared.arn
   ebs_volumes_copy_all_from_ami = false # probably need to look into integrating the volumes into the AMI
   ebs_volume_config             = local.bcs_instance_ebs_volumes_config
   ebs_volumes                   = local.bcs_instance_ebs_volumes

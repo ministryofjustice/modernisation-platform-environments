@@ -1,7 +1,7 @@
 resource "aws_elasticache_subnet_group" "this" {
   count      = var.create_elasticache ? 1 : 0
   name       = "elasticache-subnet-group-${var.name}-${var.env_name}"
-  subnet_ids = var.account_config.ordered_subnets.*.id
+  subnet_ids = var.account_config.ordered_private_subnet_ids
   tags       = var.tags
 }
 

@@ -61,15 +61,15 @@ module "g4s" {
     local.sftp_account_dev,
 
     # Test account for supplier.
-    local.sftp_account_g4s_test,
+    # local.sftp_account_g4s_test,
 
     # Accounts for each system to be migrated.
-    local.sftp_account_g4s_atrium,
-    local.sftp_account_g4s_cap_dw,
-    # local.sftp_account_g4s_integrity,
-    # local.sftp_account_g4s_telephony,
-    # local.sftp_account_g4s_fep,
-    # local.sftp_account_g4s_tasking,
+    # local.sftp_account_g4s_atrium,
+    # local.sftp_account_g4s_cap_dw,
+    local.sftp_account_g4s_integrity,
+    local.sftp_account_g4s_telephony,
+    local.sftp_account_g4s_fep,
+    local.sftp_account_g4s_tasking,
     # local.sftp_account_g4s_subject_history,
     # local.sftp_account_g4s_atv,
     # local.sftp_account_g4s_emsys_mvp,

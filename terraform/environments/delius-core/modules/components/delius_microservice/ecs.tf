@@ -6,9 +6,24 @@ module "container_definition" {
   container_cpu            = var.container_cpu
   essential                = true
   readonly_root_filesystem = false
-  environment              = var.container_environment_vars
-  secrets                  = var.container_secrets
-  port_mappings            = var.container_port_config
+
+  environment = var.rds_endpoint_environment_variable != "" ? concat(var.container_environment_vars, [{
+    name  = var.rds_endpoint_environment_variable
+    value = aws_db_instance.this[0].endpoint
+    }]) : var.elasticache_endpoint_environment_variable != "" ? concat(var.container_environment_vars, [{
+    name  = var.elasticache_endpoint_environment_variable
+    value = aws_elasticache_cluster.this[0].cluster_address
+    }]) : var.rds_endpoint_environment_variable != "" && var.elasticache_endpoint_environment_variable != "" ? concat(var.container_environment_vars, [{
+    name  = var.rds_endpoint_environment_variable
+    value = aws_db_instance.this[0].endpoint
+    }, {
+    name  = var.elasticache_endpoint_environment_variable
+    value = aws_elasticache_cluster.this[0].cluster_address
+  }]) : var.container_environment_vars
+
+  secrets       = var.container_secrets
+  port_mappings = var.container_port_config
+  mount_points  = var.mount_points
   log_configuration = {
     logDriver = "awslogs"
     options = {
@@ -39,12 +54,16 @@ module "ecs_service" {
   task_cpu    = var.container_cpu
   task_memory = var.container_memory
 
+  desired_count                      = var.desired_count
+  deployment_maximum_percent         = var.deployment_maximum_percent
+  deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
+
   service_role_arn   = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.service_role.name}"
   task_role_arn      = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_role.name}"
   task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_exec_role.name}"
 
   environment = var.env_name
-  namespace   = "delius-core"
+  namespace   = var.namespace
 
   health_check_grace_period_seconds = var.health_check_grace_period_seconds
 
@@ -54,6 +73,8 @@ module "ecs_service" {
     container_port   = var.container_port_config[0].containerPort
     }],
   values(local.ecs_nlbs))
+
+  efs_volumes = var.efs_volumes
 
   security_group_ids = [aws_security_group.ecs_service.id]
 

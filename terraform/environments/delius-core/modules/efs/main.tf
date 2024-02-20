@@ -36,7 +36,7 @@ resource "aws_efs_access_point" "ldap" {
   tags = merge(
     var.tags,
     {
-      Name = "${var.env_name}-ldap-efs-access-point"
+      Name = "${var.env_name}-${var.name}-efs-access-point"
     }
   )
   lifecycle {
@@ -46,14 +46,14 @@ resource "aws_efs_access_point" "ldap" {
 
 # Security Group
 resource "aws_security_group" "default" {
-  name        = "${var.env_name}-ldap-efs"
-  description = "Allow traffic between ldap service and efs in ${var.env_name}"
+  name        = "${var.env_name}-${var.name}-efs"
+  description = "Allow traffic between ${var.name} service and efs in ${var.env_name}"
   vpc_id      = var.vpc_id
 
   tags = merge(
     var.tags,
     {
-      Name = "ldap-efs-${var.env_name}"
+      Name = "${var.name}-efs-${var.env_name}"
     }
   )
 

@@ -1,7 +1,7 @@
 module "efs" {
   source = "../../efs"
 
-  name           = "ldap-efs-${var.env_name}"
+  name           = "ldap"
   env_name       = var.env_name
   creation_token = "${var.env_name}-ldap"
 
