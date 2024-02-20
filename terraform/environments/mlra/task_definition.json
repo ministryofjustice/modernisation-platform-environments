@@ -75,10 +75,6 @@
         "value": "xray-daemon:2000"
       },
       {
-        "name": "APP_GOOGLE_ANALYTICS_4_TAG_ID",
-        "value": "${app_google_analytics_4_tag_id}"
-      },
-      {
         "name": "SENTRY_ENVIRONMENT",
         "value": "${sentry_env}"
       }
@@ -87,6 +83,10 @@
       {
         "name": "APP_DB_PASSWORD",
         "valueFrom": "${db_secret_arn}"
+      },
+      {
+        "name": "google.analytics.4.tag.id",
+        "valueFrom": "${google_analytics_4_tag_id}"
       }
     ]
   }
