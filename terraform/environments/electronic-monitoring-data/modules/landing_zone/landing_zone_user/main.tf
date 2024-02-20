@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "transfer_assume_role" {
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_user" "this" {
-  server_id = var.transfer_server.id
+  server_id = coalesce(var.transfer_server.id, "")
   user_name = var.user_name
   role      = aws_iam_role.this_transfer_user.arn
 
