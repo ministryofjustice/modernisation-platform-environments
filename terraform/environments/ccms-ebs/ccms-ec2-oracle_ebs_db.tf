@@ -191,7 +191,6 @@ resource "aws_ebs_volume" "backup" {
     { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, count.index + 1, "backup")) },
     { device-name = "/dev/sdn" }
   )
-  )
 }
 
 resource "aws_volume_attachment" "backup_att" {
