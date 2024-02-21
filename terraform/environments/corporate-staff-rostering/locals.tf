@@ -47,9 +47,12 @@ locals {
       }
     }
   )
-  baseline_cloudwatch_log_metric_filters = {}
-  baseline_ec2_autoscaling_groups        = {}
-  baseline_ec2_instances                 = {}
+  baseline_cloudwatch_log_metric_filters = merge(
+    local.application_log_metric_filters,
+    {},
+  )
+  baseline_ec2_autoscaling_groups = {}
+  baseline_ec2_instances          = {}
   baseline_iam_policies = {
     CSRWebServerPolicy = {
       description = "Policy allowing access to instances via the Serial Console"
