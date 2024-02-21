@@ -10,7 +10,7 @@ variable "setup_dms_iam" {
   default     = false
 }
 
-variable "setup_dms_nomis_endpoint" {
+variable "setup_dms_source_endpoint" {
   type    = bool
   default = false
 }

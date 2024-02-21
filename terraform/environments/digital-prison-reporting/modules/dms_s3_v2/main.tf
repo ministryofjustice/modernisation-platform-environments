@@ -96,7 +96,7 @@ resource "aws_dms_replication_task" "dms-replication" {
 ### DMS Endpoints
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "dms-s3-target-source" {
-  count = var.setup_dms_endpoints && var.setup_dms_nomis_endpoint ? 1 : 0
+  count = var.setup_dms_endpoints && var.setup_dms_source_endpoint ? 1 : 0
 
   database_name = var.source_db_name
   endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-source-endpoint"
