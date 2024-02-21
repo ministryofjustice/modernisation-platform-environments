@@ -24,7 +24,9 @@ locals {
       })
     })
     iwfm-enterprise-server-terminated = merge(local.application_log_metric_filters_defaults, {
-      pattern = "{ $.Event.RenderingInfo.Message = %^iWFM Enterprise Server \\(PID \\d+\\) terminated\\.% }"
+      # `\x28` and `\x29` denote `(` and `)` respectively.
+      # this is because AWS do not allow parentheses in the filter pattern.
+      pattern = "{ $.Event.RenderingInfo.Message = %^iWFM Enterprise Server \\x28PID \\d+\\x29 terminated\\.% }"
 
       metric_transformation = merge(local.application_log_metric_filters_defaults.metric_transformation, {
         name = "iWFMEnterpriseServerTerminated"
@@ -38,7 +40,9 @@ locals {
       })
     })
     invision-http-server-terminated = merge(local.application_log_metric_filters_defaults, {
-      pattern = "{ $.Event.RenderingInfo.Message = %^InVision HTTP Server \\(PID \\d+\\) terminated\\.% }"
+      # `\x28` and `\x29` denote `(` and `)` respectively.
+      # this is because AWS do not allow parentheses in the filter pattern.
+      pattern = "{ $.Event.RenderingInfo.Message = %^InVision HTTP Server \\x28PID \\d+\\x29 terminated\\.% }"
 
       metric_transformation = merge(local.application_log_metric_filters_defaults.metric_transformation, {
         name = "InVisionHTTPServerTerminated"
