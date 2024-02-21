@@ -88,10 +88,10 @@ locals {
           protocol    = -1
           self        = true
         }
-        http8080 = {
-          description     = "Allow http8080 ingress"
-          from_port       = 8080
-          to_port         = 8080
+        http7777 = {
+          description     = "Allow http7777 ingress"
+          from_port       = 7777
+          to_port         = 7777
           protocol        = "tcp"
           security_groups = ["public"]
         }
