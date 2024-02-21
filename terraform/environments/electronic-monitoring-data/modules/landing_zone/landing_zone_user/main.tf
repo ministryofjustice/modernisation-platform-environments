@@ -24,9 +24,12 @@ resource "aws_transfer_user" "this" {
 
   home_directory = "/${var.landing_bucket.id}/"
 
-  tags = {
-    supplier = var.user_name
-  }
+  tags = merge(
+    var.local_tags,
+    {
+      supplier = var.user_name,
+    },
+  )
 }
 
 resource "aws_iam_role" "this_transfer_user" {

@@ -6,6 +6,10 @@ variable "data_store_bucket" {
   description = "The bucket landed data is moved to"
 }
 
+variable "local_tags" {
+  description = "The predefined local.tags"
+}
+
 variable "subnet_ids" {
   description = "The subnet ids used for the SFTP server"
   type        = list(string)
