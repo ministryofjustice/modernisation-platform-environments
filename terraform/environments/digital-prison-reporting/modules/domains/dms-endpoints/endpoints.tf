@@ -4,7 +4,7 @@ module "dms_endpoints" {
 
   setup_dms_endpoints      = var.setup_dms_endpoints
   setup_dms_iam            = var.setup_dms_iam
-  setup_dms_nomis_endpoint = var.setup_dms_nomis_endpoint
+  setup_dms_nomis_endpoint = var.setup_dms_source_endpoint
   setup_dms_s3_endpoint    = var.setup_dms_s3_endpoint
   source_engine_name       = var.source_engine_name
   dms_source_name          = var.dms_source_name
