@@ -125,7 +125,7 @@ locals {
           nomis-combined-reporting-environment = "t1"
         })
       })
-      t1-ncr-bip-cms-1 = merge(local.bip_cms_ec2_default, {
+      t1-ncr-bip-cms = merge(local.bip_cms_ec2_default, {
         cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
         config = merge(local.bip_cms_ec2_default.config, {
           instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
