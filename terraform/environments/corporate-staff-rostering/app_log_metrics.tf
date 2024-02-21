@@ -24,7 +24,7 @@ locals {
       })
     })
     iwfm-enterprise-server-terminated = merge(local.application_log_metric_filters_defaults, {
-      pattern = "{ $.Event.RenderingInfo.Message = %^iWFM Enterprise Server (PID \\d+) terminated\\.% }"
+      pattern = "{ $.Event.RenderingInfo.Message = %^iWFM Enterprise Server \\(PID \\d+\\) terminated\\.% }"
 
       metric_transformation = merge(local.application_log_metric_filters_defaults.metric_transformation, {
         name = "iWFMEnterpriseServerTerminated"
@@ -38,7 +38,7 @@ locals {
       })
     })
     invision-http-server-terminated = merge(local.application_log_metric_filters_defaults, {
-      pattern = "{ $.Event.RenderingInfo.Message = %^InVision HTTP Server (PID \\d+) terminated\\.% }"
+      pattern = "{ $.Event.RenderingInfo.Message = %^InVision HTTP Server \\(PID \\d+\\) terminated\\.% }"
 
       metric_transformation = merge(local.application_log_metric_filters_defaults.metric_transformation, {
         name = "InVisionHTTPServerTerminated"
