@@ -39,9 +39,11 @@ resource "aws_instance" "ec2_ftp" {
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-      { Name = "root-block" }
+      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ftp, "root")) },
+      { device-name = "/dev/sda1" }
     )
   }
+
   ebs_block_device {
     device_name = "/dev/sdb"
     volume_type = "gp3"
@@ -50,12 +52,14 @@ resource "aws_instance" "ec2_ftp" {
     encrypted  = true
     kms_key_id = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-      { Name = "swap" }
+      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ftp, "ftp")) },
+      { device-name = "/dev/sda1" }
     )
   }
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-FTP", local.application_name, local.environment)) },
+    { instance-role = local.application_data.accounts[local.environment].instance_role_ftp },
     { backup = "true" }
   )
 
