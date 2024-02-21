@@ -1,7 +1,7 @@
 # additional infra for these metrics can be found in the lambda sources
 locals {
   application_log_metric_filters_meta = {
-    log_group_name = local.lambda_cw_logs_xml_to_json.monitored_log_group
+    log_group_name = "cwagent-windows-application-json"
     namespace      = "ApplicationLogMetrics"
   }
   application_log_metric_filters_defaults = {
