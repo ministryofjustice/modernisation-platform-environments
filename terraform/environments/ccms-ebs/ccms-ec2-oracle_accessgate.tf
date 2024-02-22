@@ -90,7 +90,7 @@ resource "aws_instance" "ec2_accessgate" {
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
       { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_accessgate, count.index + 1, "ccms")) },
-      { device-name = "/dev/sdd" }
+      { device-name = "/dev/sdh" }
     )
   }
 
