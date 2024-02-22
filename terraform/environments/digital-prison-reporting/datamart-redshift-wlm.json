@@ -15,7 +15,7 @@
           {
             "metric_name": "query_execution_time",
             "operator": ">",
-            "value": 30
+            "value": 600
           }
         ],
         "action": "abort"
