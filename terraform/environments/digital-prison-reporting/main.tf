@@ -984,6 +984,14 @@ module "datamart" {
   # Endpoint access - only available when using the ra3.x type, for S3 Simple Service
   create_endpoint_access = false
 
+  # Parameter Group Parameters, including Work Load Management
+  parameter_group_parameters = {
+    wlm_json_configuration = {
+      name = "wlm_json_configuration"
+      value = jsonencode(jsondecode(file("./datamart-redshift-wlm.json")))
+    }
+  }
+
   # Scheduled actions
   create_scheduled_action_iam_role = local.create_scheduled_action_iam_role
   create_redshift_schedule         = local.create_redshift_schedule
