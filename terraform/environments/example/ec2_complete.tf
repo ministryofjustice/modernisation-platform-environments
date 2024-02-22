@@ -176,7 +176,7 @@ data "aws_iam_policy_document" "ec2_complete_policy" {
 
 # This is the main call to the module. Note the for_each loop.
 module "ec2_complete_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.4.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=edc55b4005b7039e5b54ad7805e89a473fe3c3dd" # v2.4.1
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
