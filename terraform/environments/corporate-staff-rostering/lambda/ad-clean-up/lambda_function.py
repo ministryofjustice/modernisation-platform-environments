@@ -83,7 +83,7 @@ def determine_domain(environment_tag):
 # function to search active directory if an instance is terminated
 def lambda_handler(event, context):
 
-    if event["detail"]["state"] == "stopped":  # to be updated to terminated
+    if event["detail"]["state"] == "terminated":
         instance_id = event["detail"]["instance-id"]
 
         # creates an ec2 connection for terminated instance
