@@ -1,4 +1,4 @@
-output "target_group_arn" {
+output "target_group_arn" { 
   value = aws_lb_target_group.frontend.arn
 }
 
@@ -7,5 +7,6 @@ output "service_security_group_id" {
 }
 
 output "rds_password_secret_arn" {
+  count = var.create_rds : 1 ? 0
   value = "${aws_db_instance.this[0].master_user_secret[0].secret_arn}:password:AWSCURRENT"
 }
