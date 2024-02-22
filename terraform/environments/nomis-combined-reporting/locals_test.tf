@@ -113,7 +113,7 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-tomcat-admin-a = merge(local.tomcat_admin_ec2_default, {
+      t1-ncr-web-a = merge(local.tomcat_admin_ec2_default, {
         cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
         config = merge(local.tomcat_admin_ec2_default.config, {
           instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
