@@ -95,6 +95,13 @@ locals {
           protocol        = "tcp"
           security_groups = ["public"]
         }
+        http7010 = {
+          description     = "Allow http7010 ingress"
+          from_port       = 7010
+          to_port         = 7010
+          protocol        = "tcp"
+          security_groups = ["public"]
+        }
       }
       egress = {
         all = {
