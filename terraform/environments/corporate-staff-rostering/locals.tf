@@ -84,9 +84,6 @@ locals {
   baseline_secretsmanager_secrets = {}
 
   baseline_security_groups = {
-    migration-web-sg  = local.security_groups.Web-SG-migration
-    migration-app-sg  = local.security_groups.App-SG-migration
-    domain-controller = local.security_groups.domain-controller-access
     domain            = local.security_groups.domain
     web               = local.security_groups.web
     app               = local.security_groups.app
