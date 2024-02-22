@@ -10,6 +10,10 @@ variable "cidr_ipv6s" {
   default     = []
 }
 
+variable "local_tags" {
+  description = "The predefined local.tags"
+}
+
 variable "supplier" {
   description = "The name of the supplier the SFTP server is for"
   type        = string

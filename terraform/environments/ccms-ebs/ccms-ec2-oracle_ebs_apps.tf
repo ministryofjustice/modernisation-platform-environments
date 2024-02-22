@@ -35,7 +35,8 @@ resource "aws_instance" "ec2_ebsapps" {
     volume_size = 50
     encrypted   = true
     tags = merge(local.tags,
-      { Name = "root-block" }
+      { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_ebsapps, count.index + 1, "root")) },
+      { device-name = "/dev/sda1" }
     )
   }
   # swap
@@ -45,6 +46,10 @@ resource "aws_instance" "ec2_ebsapps" {
     volume_size = 20
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_ebsapps, count.index + 1, "swap")) },
+      { device-name = "/dev/sdb" }
+    )
   }
   # temp
   ebs_block_device {
@@ -53,6 +58,10 @@ resource "aws_instance" "ec2_ebsapps" {
     volume_size = 100
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_ebsapps, count.index + 1, "temp")) },
+      { device-name = "/dev/sdc" }
+    )
   }
   # home
   ebs_block_device {
@@ -61,6 +70,10 @@ resource "aws_instance" "ec2_ebsapps" {
     volume_size = 100
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_ebsapps, count.index + 1, "home")) },
+      { device-name = "/dev/sdd" }
+    )
   }
 
   # non-AMI mappings start at /dev/sdh
@@ -72,6 +85,10 @@ resource "aws_instance" "ec2_ebsapps" {
     iops        = local.application_data.accounts[local.environment].ebsapps_default_iops
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_ebsapps, count.index + 1, "export-home")) },
+      { device-name = "/dev/sdh" }
+    )
   }
   # u01
   ebs_block_device {
@@ -81,6 +98,10 @@ resource "aws_instance" "ec2_ebsapps" {
     iops        = local.application_data.accounts[local.environment].ebsapps_default_iops
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_ebsapps, count.index + 1, "u01")) },
+      { device-name = "/dev/sdi" }
+    )
   }
   # u03
   ebs_block_device {
@@ -90,10 +111,15 @@ resource "aws_instance" "ec2_ebsapps" {
     iops        = local.application_data.accounts[local.environment].ebsapps_default_iops
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_ebsapps, count.index + 1, "u03")) },
+      { device-name = "/dev/sdj" }
+    )
   }
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-ebsapps-%s", local.application_name, local.environment, count.index + 1)) },
+    { instance-role = local.application_data.accounts[local.environment].instance_role_ebsapps },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
     { backup = "true" }
   )

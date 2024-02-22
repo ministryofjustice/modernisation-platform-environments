@@ -126,6 +126,11 @@ locals {
       image_tag      = "REPLACE"
       container_port = 8080
     }
+
+    pdf_creation = {
+      image_tag      = "5.7.6"
+      container_port = 80
+    }
   }
 
   bastion_config_dev = {

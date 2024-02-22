@@ -7,6 +7,7 @@ module "data_store_log_bucket" {
 
   source_bucket = aws_s3_bucket.data_store
   account_id    = data.aws_caller_identity.current.account_id
+  local_tags    = local.tags
 }
 
 #------------------------------------------------------------------------------
@@ -15,6 +16,8 @@ module "data_store_log_bucket" {
 
 resource "aws_s3_bucket" "data_store" {
   bucket_prefix = "em-data-store-"
+
+  tags = local.tags
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "data_store" {
@@ -137,6 +140,8 @@ resource "aws_lambda_function" "calculate_checksum_lambda" {
       Checksum = var.checksum_algorithm
     }
   }
+
+  tags = local.tags
 }
 
 resource "aws_iam_role" "calculate_checksum_lambda" {
@@ -196,6 +201,8 @@ resource "aws_lambda_function" "summarise_zip_lambda" {
   handler       = "summarise_zip_lambda.handler"
   runtime       = "python3.12"
   timeout       = 600
+
+  tags = local.tags
 }
 
 resource "aws_iam_role" "summarise_zip_lambda" {

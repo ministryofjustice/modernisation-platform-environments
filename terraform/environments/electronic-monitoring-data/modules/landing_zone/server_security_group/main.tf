@@ -13,9 +13,12 @@ resource "aws_security_group" "this" {
     create_before_destroy = true
   }
 
-  tags = {
-    supplier = var.user_name
-  }
+  tags = merge(
+    var.local_tags,
+    {
+      supplier = var.user_name,
+    },
+  )
 }
 
 resource "aws_vpc_security_group_ingress_rule" "this_ipv4" {

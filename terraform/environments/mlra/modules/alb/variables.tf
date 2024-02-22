@@ -7,7 +7,10 @@ variable "tags" {
   description = "Common tags to be used by all resources"
 }
 
-variable "environment" {}
+variable "environment" {
+  type        = string
+  description = "Environment of the application e.g. development"
+}
 
 variable "application_name" {
   type        = string
