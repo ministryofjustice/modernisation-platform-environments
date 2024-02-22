@@ -5,11 +5,6 @@ locals {
     enduserclient = [
       "10.0.0.0/8"
     ]
-    # NOTE: REMOVE THIS WHEN MOVE TO NEW SG's
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-    ])
     rdp = {
       inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.0.0/16"]
     }
@@ -41,11 +36,6 @@ locals {
     enduserclient = [
       "10.0.0.0/8"
     ]
-    # NOTE: REMOVE THIS WHEN MOVE TO NEW SG's
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-    ])
     rdp = {
       inbound = flatten([
         module.ip_addresses.azure_fixngo_cidrs.prod,
