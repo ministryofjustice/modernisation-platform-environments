@@ -1,7 +1,6 @@
 [
   {
     "name": "Default queue",
-    "query_concurrency": 15,
     "query_group": [],
     "query_group_wild_card": 0,
     "user_group": [],
