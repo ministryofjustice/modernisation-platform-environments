@@ -102,6 +102,20 @@ locals {
           protocol        = "tcp"
           security_groups = ["public"]
         }
+        http8005 = {
+          description     = "Allow http8005 ingress"
+          from_port       = 8005
+          to_port         = 8005
+          protocol        = "tcp"
+          security_groups = ["public"]
+        }
+        http8443 = {
+          description     = "Allow http8443 ingress"
+          from_port       = 8443
+          to_port         = 8443
+          protocol        = "tcp"
+          security_groups = ["public"]
+        }
       }
       egress = {
         all = {
