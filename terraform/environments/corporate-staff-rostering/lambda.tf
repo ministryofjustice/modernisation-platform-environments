@@ -11,9 +11,10 @@ module "ad-clean-up-lambda" {
   application_name = local.lambda_ad_object_cleanup.function_name
   function_name    = local.lambda_ad_object_cleanup.function_name
   description      = "Lambda to remove corresponding computer object from Active Directory upon server termination"
+  
   package_type     = "Zip"
-  filename         = data.archive_file.ad-cleanup-lambda.output_path
-  source_code_hash = data.archive_file.ad-cleanup-lambda.output_base64sha256
+  filename         = "${path.module}/lambda/ad-clean-up/deployment_package.zip"
+  source_code_hash = filebase64sha256("${path.module}/lambda/ad-clean-up/deployment_package.zip")
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.8"
 
@@ -36,12 +37,6 @@ module "ad-clean-up-lambda" {
       Name = "ad-object-clean-up-lambda"
     },
   )
-}
-
-data "archive_file" "ad-cleanup-lambda" {
-  type        = "zip"
-  source_dir  = "lambda/ad-clean-up"
-  output_path = "lambda/ad-clean-up-lambda-payload-test.zip"
 }
 
 resource "aws_cloudwatch_event_rule" "ec2_state_change_terminated" {
