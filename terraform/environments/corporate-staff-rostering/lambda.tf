@@ -45,7 +45,7 @@ resource "aws_cloudwatch_event_rule" "ec2_state_change_terminated" {
 
   event_pattern = jsonencode({
     "source" : ["aws.ec2"],
-    "detail-type" : ["EC2 Instance State-change Notification for EC2 termination event"],
+    "detail-type" : ["EC2 Instance State-change Notification"],
     "detail" : {
       "state" : ["terminated"]
     }
@@ -79,6 +79,7 @@ module "lambda_cw_logs_xml_to_json" {
   source_code_hash = filebase64sha256("${path.module}/lambda/cw-xml-to-json/deployment_package.zip")
   runtime          = "python3.12"
   handler          = "lambda_function.lambda_handler"
+  timeout          = 60
 
   policy_json_attached = true
   policy_json = jsonencode({
