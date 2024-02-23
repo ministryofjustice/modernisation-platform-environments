@@ -39,11 +39,11 @@ module "ad-clean-up-lambda" {
   )
 }
 
-# data "archive_file" "ad-cleanup-lambda" {
-#   type        = "zip"
-#   source_dir  = "lambda/ad-clean-up"
-#   output_path = "lambda/ad-clean-up-lambda-payload-test.zip"
-# }
+data "archive_file" "ad-cleanup-lambda" {
+  type        = "zip"
+  source_dir  = "lambda/ad-clean-up"
+  output_path = "lambda/ad-clean-up-lambda-payload-test.zip"
+}
 
 resource "aws_cloudwatch_event_rule" "ec2_state_change_terminated" {
   name        = "Ec2StateChangedTerminated"
