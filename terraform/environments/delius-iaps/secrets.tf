@@ -26,6 +26,6 @@ resource "aws_secretsmanager_secret_version" "ad_password" {
   secret_id     = aws_secretsmanager_secret.ad_password.id
   secret_string = random_password.ad_password.result
   lifecycle {
-      ignore_changes = [all] # ignore everything as we only want to create this once at env initialisation
+    ignore_changes = all # ignore everything as we only want to create this once at env initialisation
   }
 }
