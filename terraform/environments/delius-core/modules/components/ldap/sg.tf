@@ -40,17 +40,6 @@ resource "aws_security_group_rule" "top_ldap_from_bastion" {
   source_security_group_id = var.bastion_sg_id
 }
 
-resource "aws_security_group_rule" "allow_ldap_from_cp_env" {
-  for_each          = toset(["tcp", "udp"])
-  description       = "Allow inbound LDAP traffic from CP"
-  type              = "ingress"
-  from_port         = var.ldap_config.port
-  to_port           = var.ldap_config.port
-  protocol          = each.value
-  security_group_id = aws_security_group.ldap.id
-  cidr_blocks       = [var.account_info.cp_cidr]
-}
-
 resource "aws_security_group_rule" "allow_ldap_from_legacy_env" {
   for_each          = toset(["tcp", "udp"])
   description       = "Allow inbound LDAP traffic from corresponding legacy VPC"

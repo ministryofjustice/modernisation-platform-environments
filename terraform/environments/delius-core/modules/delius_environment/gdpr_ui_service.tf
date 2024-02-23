@@ -1,18 +1,16 @@
-module "pdf_creation" {
-  source = "../components/delius_microservice"
+module "gdpr_ui_service" {
+  source = "../helpers/delius_microservice"
 
-  name                  = "pdf-creation"
+  name                  = "gdpr-ui"
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
-
   container_port_config = [
     {
-      containerPort = var.delius_microservice_configs.pdf_creation.container_port
+      containerPort = var.delius_microservice_configs.gdpr_ui.container_port
       protocol      = "tcp"
     }
   ]
-
   ecs_cluster_arn            = module.ecs.ecs_cluster_arn
   container_secrets          = []
   db_ingress_security_groups = []
@@ -23,11 +21,11 @@ module "pdf_creation" {
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
-  alb_listener_rule_paths    = ["/pdf/creation", "/pdf/creation/*"]
+  alb_listener_rule_paths    = ["/gdpr/ui", "/gdpr/ui/*"]
   platform_vars              = var.platform_vars
-  container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-pdf-creation-ecr-repo:${var.delius_microservice_configs.pdf_creation.image_tag}"
+  container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-gdpr-ui-ecr-repo:${var.delius_microservice_configs.gdpr_ui.image_tag}"
   account_config             = var.account_config
-  health_check_path          = "/pdf/creation/"
+  health_check_path          = "/gdpr/ui/homepage"
   account_info               = var.account_info
   container_environment_vars = []
 
@@ -35,18 +33,4 @@ module "pdf_creation" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
-}
-
-
-resource "aws_ssm_parameter" "pdfcreation_secret" {
-  name  = "/${var.env_name}/delius/newtech/web/params_secret_key"
-  type  = "SecureString"
-  value = "DEFAULT"
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "pdfcreation_secret" {
-  name = aws_ssm_parameter.pdfcreation_secret.name
 }
