@@ -5,7 +5,7 @@
 
 module "environment_test" {
   #  We're in dev account and test environment, could reference different version
-  source = "modules/delius_environment"
+  source = "./modules/delius_environment"
   count  = local.is-test ? 1 : 0
 
   providers = {
