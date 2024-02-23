@@ -1,7 +1,8 @@
 ## ALB target group and listener rule
 resource "aws_lb_target_group" "frontend" {
   # checkov:skip=CKV_AWS_261
-  name_prefi           = "${var.env_name}-${var.name}"
+  # https://github.com/hashicorp/terraform-provider-aws/issues/16889
+  name_prefix          = "${var.env_name}-${var.name}"
   port                 = var.container_port_config[0].containerPort
   protocol             = var.target_group_protocol
   protocol_version     = var.target_group_protocol_version
