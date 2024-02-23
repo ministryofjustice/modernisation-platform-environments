@@ -1,12 +1,3 @@
-locals {
-  frontend_url      = "${var.env_name}.${var.account_config.dns_suffix}"
-  globalprotect_ips = module.ip_addresses.moj_cidr.moj_aws_digital_macos_globalprotect_alpha
-}
-
-module "ip_addresses" {
-  source = "../../../../modules/ip_addresses"
-}
-
 resource "aws_security_group" "ancillary_alb_security_group" {
   name        = format("%s - Delius Core Frontend Load Balancer", var.env_name)
   description = "controls access to and from delius front-end load balancer"
@@ -68,7 +59,7 @@ resource "aws_lb" "delius_core_ancillary" {
 }
 
 
-resource "aws_lb_listener" "listener_https" {
+resource "aws_lb_listener" "ancillary_https" {
   load_balancer_arn = aws_lb.delius_core_ancillary.id
   port              = 443
   protocol          = "HTTPS"
@@ -84,7 +75,7 @@ resource "aws_lb_listener" "listener_https" {
   }
 }
 
-resource "aws_lb_listener" "listener_http" {
+resource "aws_lb_listener" "ancillary_http" {
   load_balancer_arn = aws_lb.delius_core_ancillary.id
   port              = "80"
   protocol          = "HTTP"
