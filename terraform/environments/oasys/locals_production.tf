@@ -1,5 +1,16 @@
 # environment specific settings
 locals {
+
+  production_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "oasys_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
+      }
+    }
+  }
+
   production_config = {
 
     ec2_common = {
@@ -33,10 +44,10 @@ locals {
       private = {
         enable_delete_protection = false # change to true before we actually use
         force_destroy_bucket     = false
-        idle_timeout             = "60"
+        idle_timeout             = "3600"
         internal_lb              = true
         security_groups          = ["private_lb"]
-        public_subnets           = module.environment.subnets["private"].ids
+        subnets                  = module.environment.subnets["private"].ids
         existing_target_groups   = {}
         tags                     = local.tags
         listeners = {
@@ -63,9 +74,9 @@ locals {
     baseline_route53_zones = {
       # (module.environment.domains.public.short_name) = { # "oasys.service.justice.gov.uk"
       #   records = [
-      #     { name = "db", type = "A", ttl = "300", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-      #     { name = "trn.db", type = "A", ttl = "300", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-      #     { name = "ptc.db", type = "A", ttl = "300", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+      #     { name = "db", type = "A", ttl = "3600", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
+      #     { name = "trn.db", type = "A", ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+      #     { name = "ptc.db", type = "A", ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
       #   ]
       #   lb_alias_records = [
       #     { name = "web", type = "A", lbs_map_key = "private" },     #     web.oasys.service.justice.gov.uk
@@ -73,6 +84,27 @@ locals {
       #     { name = "ptc.web", type = "A", lbs_map_key = "private" }, # ptc.web.oasys.service.justice.gov.uk
       #   ]
       # }
+    }
+
+    baseline_cloudwatch_log_groups = {
+      session-manager-logs = {
+        retention_in_days = 400
+      }
+      cwagent-var-log-messages = {
+        retention_in_days = 90
+      }
+      cwagent-var-log-secure = {
+        retention_in_days = 400
+      }
+      cwagent-windows-system = {
+        retention_in_days = 90
+      }
+      cwagent-oasys-autologoff = {
+        retention_in_days = 400
+      }
+      cwagent-web-logs = {
+        retention_in_days = 90
+      }
     }
   }
 }

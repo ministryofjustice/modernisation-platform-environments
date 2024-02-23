@@ -54,6 +54,11 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_cloudwatch_log_groups", {})
   )
 
+  cloudwatch_log_metric_filters = merge(
+    local.baseline_cloudwatch_log_metric_filters,
+    lookup(local.baseline_environment_config, "baseline_cloudwatch_log_metric_filters", {})
+  )
+
   ec2_autoscaling_groups = merge(
     local.baseline_ec2_autoscaling_groups,
     lookup(local.baseline_environment_config, "baseline_ec2_autoscaling_groups", {})
@@ -116,6 +121,11 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_s3_buckets", {})
   )
 
+  secretsmanager_secrets = merge(
+    local.baseline_secretsmanager_secrets,
+    lookup(local.baseline_environment_config, "baseline_secretsmanager_secrets", {})
+  )
+
   security_groups = merge(
     local.baseline_security_groups,
     lookup(local.baseline_environment_config, "baseline_security_groups", {})
@@ -128,6 +138,7 @@ module "baseline" {
   )
 
   ssm_parameters = merge(
+    module.baseline_presets.ssm_parameters,
     local.baseline_ssm_parameters,
     lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
   )

@@ -144,12 +144,14 @@ variable "ec2_autoscaling_groups" {
       user_data_raw                 = optional(string)
       iam_resource_names_prefix     = optional(string, "ec2")
       instance_profile_policies     = list(string)
+      secretsmanager_secrets_prefix = optional(string, "")
       ssm_parameters_prefix         = optional(string, "")
       subnet_name                   = optional(string)
       availability_zone             = optional(string)
     })
     instance = object({
       disable_api_termination      = bool
+      disable_api_stop             = optional(bool, false)
       instance_type                = string
       key_name                     = string
       monitoring                   = optional(bool, true)
@@ -233,10 +235,19 @@ variable "ec2_autoscaling_groups" {
       }))
       value = optional(string)
     })))
+    secretsmanager_secrets = optional(map(object({
+      description             = optional(string)
+      kms_key_id              = optional(string, "general")
+      recovery_window_in_days = optional(number)
+      random = optional(object({
+        length  = number
+        special = optional(bool)
+      }))
+      value = optional(string)
+    })))
     lb_target_groups = optional(map(object({
       port                 = optional(number)
       protocol             = optional(string)
-      target_type          = string
       deregistration_delay = optional(number)
       health_check = optional(object({
         enabled             = optional(bool)
@@ -245,6 +256,7 @@ variable "ec2_autoscaling_groups" {
         matcher             = optional(string)
         path                = optional(string)
         port                = optional(number)
+        protocol            = optional(string)
         timeout             = optional(number)
         unhealthy_threshold = optional(number)
       }))
@@ -254,11 +266,6 @@ variable "ec2_autoscaling_groups" {
         cookie_duration = optional(number)
         cookie_name     = optional(string)
       }))
-      attachments = optional(list(object({
-        target_id         = string
-        port              = optional(number)
-        availability_zone = optional(string)
-      })), [])
     })), {})
     cloudwatch_metric_alarms = optional(map(object({
       comparison_operator = string
@@ -292,11 +299,13 @@ variable "ec2_instances" {
       iam_resource_names_prefix     = optional(string, "ec2")
       instance_profile_policies     = list(string)
       ssm_parameters_prefix         = optional(string, "")
+      secretsmanager_secrets_prefix = optional(string, "")
       subnet_name                   = string
       availability_zone             = string
     })
     instance = object({
       disable_api_termination      = bool
+      disable_api_stop             = optional(bool, false)
       instance_type                = string
       key_name                     = string
       monitoring                   = optional(bool, true)
@@ -341,6 +350,16 @@ variable "ec2_instances" {
       type        = optional(string, "SecureString")
       kms_key_id  = optional(string, "general")
       file        = optional(string)
+      random = optional(object({
+        length  = number
+        special = optional(bool)
+      }))
+      value = optional(string)
+    })))
+    secretsmanager_secrets = optional(map(object({
+      description             = optional(string)
+      kms_key_id              = optional(string, "general")
+      recovery_window_in_days = optional(number)
       random = optional(object({
         length  = number
         special = optional(bool)
@@ -485,6 +504,7 @@ variable "iam_policies" {
     path        = optional(string, "/")
     description = optional(string)
     statements = list(object({
+      sid       = optional(string, null)
       effect    = string
       actions   = list(string)
       resources = list(string)
@@ -505,10 +525,22 @@ variable "iam_policies" {
 variable "iam_roles" {
   description = "map of iam roles to create, where the key is the name of the role"
   type = map(object({
-    assume_role_policy_principals_type        = string
-    assume_role_policy_principals_identifiers = list(string)
-    policy_attachments                        = optional(list(string), [])
-    tags                                      = optional(map(string), {})
+    assume_role_policy = list(object({
+      sid     = optional(string)
+      effect  = string
+      actions = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    }))
+    policy_attachments = optional(list(string), [])
+    tags               = optional(map(string), {})
   }))
   default = {}
 }
@@ -536,18 +568,48 @@ variable "key_pairs" {
 variable "lbs" {
   description = "map of load balancers and associated resources using loadbalancer and lb_listener modules"
   type = map(object({
-    enable_delete_protection = optional(bool, false)
-    force_destroy_bucket     = optional(bool, false)
-    idle_timeout             = string
-    internal_lb              = optional(bool, false)
-    access_logs              = optional(bool, true)
-    load_balancer_type       = optional(string, "application")
-    security_groups          = list(string)
-    public_subnets           = list(string)
+    enable_delete_protection         = optional(bool, false)
+    force_destroy_bucket             = optional(bool, false)
+    idle_timeout                     = optional(string)
+    internal_lb                      = optional(bool, false)
+    access_logs                      = optional(bool, true)
+    load_balancer_type               = optional(string, "application")
+    security_groups                  = list(string)
+    subnets                          = list(string)
+    existing_bucket_name             = optional(string, "")                      # NOTE: module default value is empty string ""
+    enable_cross_zone_load_balancing = optional(bool, false)                     # network and gateway lb types only, application lb's this is always true
+    dns_record_client_routing_policy = optional(string, "any_availability_zone") # network load-balancer types only
+    s3_versioning                    = optional(bool, true)
+    instance_target_groups = optional(map(object({
+      port                 = optional(number)
+      protocol             = optional(string)
+      deregistration_delay = optional(number)
+      health_check = optional(object({
+        enabled             = optional(bool)
+        interval            = optional(number)
+        healthy_threshold   = optional(number)
+        matcher             = optional(string)
+        path                = optional(string)
+        port                = optional(number)
+        protocol            = optional(string)
+        timeout             = optional(number)
+        unhealthy_threshold = optional(number)
+      }))
+      stickiness = optional(object({
+        enabled         = optional(bool)
+        type            = string
+        cookie_duration = optional(number)
+        cookie_name     = optional(string)
+      }))
+      attachments = optional(list(object({
+        ec2_instance_name = string
+        port              = optional(number)
+        availability_zone = optional(string)
+      })), [])
+    })), {})
     existing_target_groups = optional(map(object({
       arn = string
     })), {})
-    tags = optional(map(string), {})
     lb_target_groups = optional(map(object({
       port                 = optional(number)
       deregistration_delay = optional(number)
@@ -567,11 +629,6 @@ variable "lbs" {
         cookie_duration = optional(number)
         cookie_name     = optional(string)
       }))
-      attachments = optional(list(object({
-        target_id         = string
-        port              = optional(number)
-        availability_zone = optional(string)
-      })), [])
     })), {})
     listeners = optional(map(object({
       alarm_target_group_names  = optional(list(string), [])
@@ -659,6 +716,7 @@ variable "lbs" {
       })), {})
       tags = optional(map(string), {})
     })), {})
+    tags = optional(map(string), {})
   }))
   default = {}
 }
@@ -726,6 +784,7 @@ variable "s3_buckets" {
     replication_region  = optional(string)
     bucket_policy       = optional(list(string), ["{}"])
     bucket_policy_v2 = optional(list(object({
+      sid     = optional(string, null)
       effect  = string
       actions = list(string)
       principals = optional(object({
@@ -779,6 +838,7 @@ variable "s3_buckets" {
     force_destroy        = optional(bool, false)
     sse_algorithm        = optional(string, "aws:kms")
     iam_policies = optional(map(list(object({
+      sid     = optional(string, null)
       effect  = string
       actions = list(string)
       principals = optional(object({
@@ -810,20 +870,22 @@ variable "secretsmanager_secrets" {
   #   my_db1_1 = local.my_database_secrets
   #   my_db2_2 = local.my_database_secrets
   # }
-  # Will create SSM params as follows
+  # Will create secretsmanager secrets as follows
   # /database/my_db1_1/asm_password
   # /database/my_db1_1/sys_password
   # /database/my_db2_2/asm_password
   # /database/my_db2_2/sys_password
   #
-  description = "Create a placeholder SecretManager secret, or a secret with a given value (randomly generated, from file, or value set directly).  Use this instead of SSM Parameters secure strings if you need to share the secret across accounts.  The top-level key is used as a prefix for the secret name, e.g. /database/db1.  Then define a map of secrets to create underneath that prefix.  Secret name is {prefix}{top-level-map-key}{postfix}{secrets-map-key}"
+  description = "Create a placeholder SecretManager secret, or a secret with a given value (randomly generated, from file, or value set directly).  The top-level key is used as a prefix for the secret name, e.g. /database/db1.  Then define a map of secrets to create underneath that prefix.  Secret name is {prefix}{top-level-map-key}{postfix}{secrets-map-key}.  Set recovery_window_in_days to zero if you want to delete secret immediately"
   type = map(object({
     prefix     = optional(string, "")
     postfix    = optional(string, "/")
     kms_key_id = optional(string, "general")
     policy = optional(list(object({
-      effect  = string
-      actions = list(string)
+      sid       = optional(string, null)
+      effect    = string
+      actions   = list(string)
+      resources = list(string)
       principals = optional(object({
         type        = string
         identifiers = list(string)
@@ -834,12 +896,26 @@ variable "secretsmanager_secrets" {
         values   = list(string)
       })), [])
     })))
-    recovery_window_in_days = optional(number, 0)
+    recovery_window_in_days = optional(number)
     secrets = map(object({
       description = optional(string)
-      type        = optional(string, "SecureString")
       file        = optional(string)
       kms_key_id  = optional(string)
+      policy = optional(list(object({
+        sid       = optional(string, null)
+        effect    = string
+        actions   = list(string)
+        resources = list(string)
+        principals = optional(object({
+          type        = string
+          identifiers = list(string)
+        }))
+        conditions = optional(list(object({
+          test     = string
+          variable = string
+          values   = list(string)
+        })), [])
+      })))
       random = optional(object({
         length  = number
         special = optional(bool)
@@ -943,4 +1019,14 @@ variable "resource_explorer" {
   description = "Enables AWS Resource Explorer"
   type        = bool
   default     = false
+}
+
+variable "cost_usage_report" {
+  description = "Enables AWS Cost Usage Report"
+  type = object({
+    create = bool
+  })
+  default = {
+    create = false
+  }
 }

@@ -88,7 +88,7 @@ resource "aws_instance" "s609693lo6vw100" {
 
 resource "aws_instance" "s609693lo6vw101" {
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0fe72f8cd9b3d4df6"
+  ami                    = "ami-07315ed3a1b524be8"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -128,6 +128,27 @@ resource "aws_instance" "s609693lo6vw103" {
   }
 }
 
+resource "aws_instance" "s609693lo6vw110" {
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0c261875f6ed81278"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw110"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
 resource "aws_instance" "s609693lo6vw106" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0f9ea6b08039bb33b"
@@ -146,6 +167,26 @@ resource "aws_instance" "s609693lo6vw106" {
     Name        = "s609693lo6vw106"
     patch_group = "dev_win_patch"
     backup      = true
+  }
+}
+
+resource "aws_instance" "s609693lo6vw111" {
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-005cac270289ea0de"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Dev-Box-VW106[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw111"
+    patch_group = "dev_win_patch"
   }
 }
 
@@ -172,7 +213,7 @@ resource "aws_instance" "s609693lo6vw107" {
 
 resource "aws_instance" "PPUDWEBSERVER2" {
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-06135685d04b2ebea"
+  ami                    = "ami-0be53fc5198dbd294"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -496,6 +537,7 @@ resource "aws_instance" "s618358rgvw205" {
   }
 }
 
+
 resource "aws_instance" "s618358rgsw025p" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0b8f6843db88aa8a6"
@@ -586,7 +628,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
 
 resource "aws_instance" "docker-build-server" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0b026d11830afcbac"
+  ami                    = "ami-050d499cfdd1ff7d4"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id

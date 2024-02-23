@@ -3,7 +3,7 @@ resource "aws_ssm_parameter" "ec2-user-ssh-key" {
   name        = format("/%s/ec2-user-ssh-key", var.env_name)
   type        = "SecureString"
   value       = "initial_value_to_be_changed"
-  key_id      = var.account_config.general_shared_kms_key_arn
+  key_id      = var.account_config.kms_keys.general_shared
   description = format("ssh private key for ec2-user used for the %s environment", var.env_name)
   tags        = local.tags
 

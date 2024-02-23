@@ -28,6 +28,15 @@ resource "aws_security_group_rule" "tcp_5439_ingress_bastion" {
   type                     = "ingress"
 }
 
+resource "aws_security_group_rule" "tcp_5439_ingress_customer" {
+  cidr_blocks       = ["10.0.0.0/8"]
+  from_port         = 5439
+  protocol          = "TCP"
+  security_group_id = aws_security_group.wepi_sg_allow_redshift.id
+  to_port           = 5439
+  type              = "ingress"
+}
+
 resource "aws_security_group_rule" "tcp_443_egress_s3" {
   from_port         = 443
   prefix_list_ids   = [data.aws_vpc_endpoint.s3.prefix_list_id]

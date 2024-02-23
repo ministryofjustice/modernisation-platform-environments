@@ -9,6 +9,7 @@ data "aws_iam_policy_document" "this" {
     for_each = each.value.statements
 
     content {
+      sid       = statement.value.sid
       effect    = statement.value.effect
       actions   = statement.value.actions
       resources = statement.value.resources
@@ -45,4 +46,8 @@ resource "aws_iam_policy" "this" {
   tags = merge(local.tags, {
     Name = each.key
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }

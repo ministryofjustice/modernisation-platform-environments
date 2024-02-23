@@ -30,5 +30,6 @@ for param in $params; do
     dir=$(dirname ssm-parameters/$PROFILE/$param)
     mkdir -p $dir
     echo "$value" > ssm-parameters/$PROFILE/$param
+    # aws ssm get-parameter-history --name $param --profile $PROFILE --no-paginate > ssm-parameters/$PROFILE/.$param.history.json
   fi
 done

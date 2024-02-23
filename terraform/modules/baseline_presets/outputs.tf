@@ -27,6 +27,20 @@ output "cloudwatch_metric_alarms" {
   value       = local.cloudwatch_metric_alarms
 }
 
+output "cloudwatch_metric_alarms_by_sns_topic" {
+  description = "Map of sns topic key to cloudwatch metric alarms grouped by namespace, where the default action is the sns topic key"
+
+  value = {
+    for sns_key, sns_value in local.sns_topics : sns_key => {
+      for namespace_key, namespace_value in local.cloudwatch_metric_alarms : namespace_key => {
+        for alarm_key, alarm_value in namespace_value : alarm_key => merge(alarm_value, {
+          alarm_actions = [sns_key]
+        })
+      }
+    }
+  }
+}
+
 output "ec2_autoscaling_group" {
   description = "Common EC2 autoscaling group configuration for ec2_autoscaling_group module"
 
@@ -67,10 +81,24 @@ output "iam_policies" {
   }
 }
 
+output "iam_policy_statements_ec2" {
+  description = "Map of iam policy statements for ec2 instances"
+
+  value = local.iam_policy_statements_ec2
+}
+
+output "iam_policy_statements_s3" {
+  description = "Map of iam policy statements for s3 buckets"
+
+  value = local.iam_policy_statements_s3
+}
+
 output "key_pairs" {
   description = "Common key pairs to create"
 
-  value = local.key_pairs
+  value = {
+    for key, value in local.key_pairs : key => value if contains(local.key_pairs_filter, key)
+  }
 }
 
 output "kms_grants" {
@@ -100,14 +128,24 @@ output "s3_bucket_policies" {
 output "s3_iam_policies" {
   description = "Map of common iam_policies that can be used to give access to s3_buckets"
 
-  value = var.options.s3_iam_policies != null ? {
-    for key, value in local.s3_iam_policies : key => value if contains(var.options.s3_iam_policies, key)
-  } : local.s3_iam_policies
+  value = local.requested_s3_iam_policies
 }
 
 output "s3_buckets" {
   description = "Map of s3_buckets"
   value       = local.s3_buckets
+}
+
+output "s3_lifecycle_rules" {
+  description = "Map of s3 lifecycle rules that can be used for buckets"
+  value       = local.s3_lifecycle_rules
+}
+
+output "ssm_parameters" {
+  description = "Map of common ssm parameters to create"
+  value = {
+    for key, value in local.ssm_parameters : key => value if contains(local.ssm_parameters_filter, key)
+  }
 }
 
 output "sns_topics" {

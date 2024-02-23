@@ -4,11 +4,19 @@ resource "aws_security_group" "ncas_lb_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow access on HTTPS for the MOJ VPN"
+    description = "allow access on HTTPS for the Dom1 Cisco VPN"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
+    cidr_blocks = ["194.33.192.1/32"]
+  }
+
+  ingress {
+    description = "allow access on HTTPS for the Global Protect VPN"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["35.176.93.186/32"]
   }
 
   // Allow all User IPs
@@ -32,7 +40,10 @@ resource "aws_security_group" "ncas_lb_sc" {
       "52.67.148.55/32",
       "194.33.192.0/25",
       "213.121.161.112/28",
-      "2.219.137.231/32"
+      "2.219.137.231/32",
+      "18.169.147.172/32",
+      "18.130.148.126/32",
+      "35.176.148.126/32"
     ]
   }
 
@@ -131,12 +142,12 @@ resource "aws_lb_target_group" "ncas_target_group" {
 
   health_check {
     healthy_threshold   = "3"
-    interval            = "15"
+    interval            = "30"
     protocol            = "HTTP"
     port                = "80"
-    unhealthy_threshold = "3"
+    unhealthy_threshold = "5"
     matcher             = "200-302"
-    timeout             = "5"
+    timeout             = "10"
   }
 
 }
@@ -155,4 +166,9 @@ resource "aws_lb_listener" "ncas_lb" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.ncas_target_group.arn
   }
+}
+
+resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
+  resource_arn = aws_lb.ncas_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.ncas_web_acl.arn
 }

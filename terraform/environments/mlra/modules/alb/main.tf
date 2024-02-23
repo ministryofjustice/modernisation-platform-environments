@@ -8,7 +8,6 @@ locals {
       to_port         = var.security_group_ingress_to_port
       protocol        = var.security_group_ingress_protocol
       prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-      # cidr_blocks     = ["0.0.0.0/0"]
     }
   }
 
@@ -124,7 +123,7 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 
 module "s3-bucket" {
   count  = var.existing_bucket_name == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
   providers = {
     aws.bucket-replication = aws.bucket-replication

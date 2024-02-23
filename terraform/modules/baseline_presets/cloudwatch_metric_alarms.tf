@@ -31,7 +31,7 @@ locals {
         period              = "86400"
         statistic           = "Minimum"
         threshold           = "14"
-        alarm_description   = "Triggers if an ACM certificate has not automatically renewed and is expiring soon. Automatic renewal should happen 60 days prior to expiration."
+        alarm_description   = "Triggers if an ACM certificate has not automatically renewed and is expiring soon. Automatic renewal should happen 60 days prior to expiration. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340266"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
@@ -46,7 +46,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "95"
-        alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 15 minutes"
+        alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 15 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326064583"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       instance-status-check-failed = {
@@ -58,7 +58,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if there has been an instance status check failure within last hour. This monitors the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
+        alarm_description   = "Triggers if there has been an instance status check failure within last hour. This monitors the software and network configuration of your individual instance. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326491009"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       system-status-check-failed = {
@@ -70,7 +70,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if there has been a system status check failure within last hour.  This monitors the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
+        alarm_description   = "Triggers if there has been a system status check failure within last hour.  This monitors the AWS systems on which your instance runs. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326359363"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
@@ -85,7 +85,7 @@ locals {
         period              = "60"
         statistic           = "Minimum"
         threshold           = "15"
-        alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4305453159/Disk+Free+alarm+-+Windows"
+        alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       high-memory-usage = {
@@ -97,7 +97,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "95"
-        alarm_description   = "Triggers if memory usage is continually high for one hour"
+        alarm_description   = "Triggers if memory usage is continually high for one hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326523370"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
@@ -112,7 +112,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "85"
-        alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
+        alarm_description   = "Triggers if free disk space falls below the threshold for an hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       high-memory-usage = {
@@ -124,7 +124,7 @@ locals {
         period              = "60"
         statistic           = "Average"
         threshold           = "95"
-        alarm_description   = "Triggers if memory usage is continually high for one hour"
+        alarm_description   = "Triggers if memory usage is continually high for one hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326523370"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       cpu-iowait-high = {
@@ -136,46 +136,150 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "40"
-        alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 3 hours"
+        alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 3 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+
+    }
+
+    ec2_instance_cwagent_collectd_service_status_os = {
+      service-status-error-os-layer = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_service_status_os_value"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if an os-layer linux service such as chronyd or amazon-ssm-agent is stopped or in error. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615406350"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
-
-    ec2_instance_cwagent_collectd = {
-      chronyd-stopped = {
+    ec2_instance_cwagent_collectd_service_status_app = {
+      service-status-error-app-layer = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "collectd_chronyd_value"
+        metric_name         = "collectd_service_status_app_value"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if the chronyd service has stopped"
+        alarm_description   = "Triggers if an application-layer linux service such as weblogic is stopped or in error. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615406362"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      cloudwatch-agent-stopped = {
+    }
+    ec2_instance_cwagent_collectd_connectivity_test = {
+      connectivity-test-all-failed = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "collectd_amazoncloudwatchagent_value"
+        metric_name         = "collectd_connectivity_test_value"
         period              = "60"
-        statistic           = "Maximum"
+        statistic           = "Minimum"
         threshold           = "1"
-        alarm_description   = "Triggers if the cloudwatch agent service has stopped"
+        alarm_description   = "Triggers if all netcat tests defined by connectivity-tests tag fail. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615274774"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-      ssm-agent-stopped = {
+    }
+    ec2_instance_cwagent_collectd_textfile_monitoring = {
+      textfile-monitoring-metric-error = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "collectd_amazonssmagent_value"
+        metric_name         = "collectd_textfile_monitoring_value"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if the ssm agent service has stopped"
+        alarm_description   = "Triggers if any metric collected via /opt/textfile_monitoring is in error, e.g. nomis batch or misload. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      textfile-monitoring-metric-not-updated = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_seconds"
+        period              = "300"
+        statistic           = "Maximum"
+        threshold           = "129600"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if any metric in /opt/textfile_monitoring hasn't been updated for over 36 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325966186"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+    ec2_instance_cwagent_collectd_oracle_db_connected = {
+      oracle-db-disconnected = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_oracle_db_connected_value"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if an oracle database defined in oracle-sids tag is disconnected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698"
+        # Slack integration is via Oracle Enterprise Management rather than cloudwatch
+        # alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+    ec2_instance_cwagent_collectd_oracle_db_backup = {
+      oracle-db-rman-backup-error = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_rman_backup_value"
+        period              = "300"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if a scheduled oracle rman db backup has failed. See collectd-textfile-monitoring and oracle-db-backup role"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      oracle-db-rman-backup-did-not-run = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_rman_backup_seconds"
+        period              = "300"
+        statistic           = "Maximum"
+        threshold           = "129600"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if rman_backup metric not collected or not updated for over 36 hours"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+    ec2_instance_or_cwagent_stopped_linux = {
+      instance-or-cloudwatch-agent-stopped = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "cpu_usage_idle"
+        period              = "60"
+        namespace           = "CWAgent"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 5 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+    ec2_instance_or_cwagent_stopped_windows = {
+      instance-or-cloudwatch-agent-stopped = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "CPU_IDLE"
+        period              = "60"
+        namespace           = "CWAgent"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 5 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
@@ -189,8 +293,114 @@ locals {
         period              = "60"
         statistic           = "Average"
         threshold           = "1"
-        alarm_description   = "Triggers if the number of unhealthy hosts in the target table group is at least one for 3 minutes"
+        alarm_description   = "Triggers if the number of unhealthy hosts in the target table group is at least one for 3 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340278"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+    network_lb = {
+      unhealthy-network-load-balancer-host = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "UnHealthyHostCount"
+        namespace           = "AWS/NetworkELB"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "Triggers if the number of unhealthy network loadbalancer hosts in the target table group is at least one for 3 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340278"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+    ebs = {
+      volume_disk_iops_reached = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "ebs_volume_disk_iops"
+        period              = "60"
+        namespace           = "AWS/EBS"
+        statistic           = "Maximum"
+        threshold           = "14400"
+        treat_missing_data  = "notBreaching"
+        alarm_description   = "Triggers if Volume disk IOPS limit is greater than or equal to 90%"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        metric_query = {
+          id          = "e3"
+          expression  = "e1+e2"
+          label       = "Total IOPs"
+          return_data = "true"
+        }
+        metric_query = {
+          id          = "e1"
+          expression  = "m1/PERIOD(m1)"
+          label       = "Read IOPs"
+          metric = {
+            metric_name = "VolumeReadOps"
+            namespace   = "AWS/EBS"
+            period      = 60
+            stat        = "Max"
+            dimensions = {
+              VolumeId = "*"
+            }
+          }
+        }
+        metric_query = {
+          id          = "e2"
+          expression  = "m2/PERIOD(m2)"
+          label       = "Write IOPs"
+          metric = {
+            metric_name = "VolumeWriteOps"
+            namespace   = "AWS/EBS"
+            period      = 60
+            stat        = "Max"
+            dimensions = {
+              VolumeId = "*"
+            }
+          }
+        }
+      }
+      volume_disk_throughput_reached = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "ebs_volume_disk_throughput"
+        period              = "60"
+        namespace           = "AWS/EBS"
+        statistic           = "Maximum"
+        threshold           = "900"
+        treat_missing_data  = "notBreaching"
+        alarm_description   = "Triggers if Volume disk throughput limit is greater than or equal to 90%"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        metric_query = {
+          id          = "e1"
+          expression  = "((m1+m2)/1048576)/PERIOD(m1)"
+          label       = "Total Throughput (MiB/s)"
+          return_data = true
+        }
+        metric_query = {
+          id = "m1"
+          metric = {
+            metric_name = "VolumeReadOps"
+            namespace   = "AWS/EBS"
+            period      = 60
+            stat        = "Sum"
+            dimensions = {
+              VolumeId = "*"
+            }
+          }
+        }
+        metric_query = {
+          id = "m2"
+          metric = {
+            metric_name = "VolumeWriteOps"
+            namespace   = "AWS/EBS"
+            period      = 60
+            stat        = "Sum"
+            dimensions = {
+              VolumeId = "*"
+            }
+          }
+        }
       }
     }
   }

@@ -12,12 +12,16 @@ locals {
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
+    enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
+    enable_hmpps_domain                          = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
     enable_oracle_secure_web                     = true
     enable_ec2_put_parameter                     = false
+    enable_ec2_user_keypair                      = true
+    cloudwatch_metric_alarms_default_actions     = ["planetfm_pagerduty"]
     cloudwatch_metric_alarms                     = {}
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
@@ -25,14 +29,32 @@ locals {
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    sns_topics               = {}
+    sns_topics = {
+      pagerduty_integrations = {
+        planetfm_pagerduty = "planetfm_alarms"
+      }
+    }
   }
 
-  baseline_acm_certificates         = {}
-  baseline_cloudwatch_log_groups    = {}
-  baseline_ec2_autoscaling_groups   = {}
-  baseline_ec2_instances            = {}
-  baseline_iam_policies             = {}
+  baseline_acm_certificates       = {}
+  baseline_cloudwatch_log_groups  = merge(
+    local.ssm_doc_cloudwatch_log_groups, {}
+  )
+    
+  baseline_ec2_autoscaling_groups = {}
+  baseline_ec2_instances          = {}
+  baseline_iam_policies = {
+    SSMPolicy = {
+      description = "Policy to allow ssm actions"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "ssm:SendCommand"
+        ]
+        resources = ["*"]
+      }]
+    }
+  }
   baseline_iam_roles                = {}
   baseline_iam_service_linked_roles = {}
   baseline_key_pairs                = {}
@@ -48,19 +70,15 @@ locals {
   }
 
   baseline_security_groups = {
-    data-db = local.security_groups.data_db
+    loadbalancer              = local.security_groups.loadbalancer
+    web                       = local.security_groups.web
+    app                       = local.security_groups.app
+    database                  = local.security_groups.database
+    domain                    = local.security_groups.domain
+    jumpserver                = local.security_groups.jumpserver
+    remotedesktop_sessionhost = local.security_groups.remotedesktop_sessionhost
   }
 
-  baseline_sns_topics = {}
-
-  baseline_ssm_parameters = {
-    # ssm params at root level
-    "" = {
-      prefix  = ""
-      postfix = ""
-      parameters = {
-        ec2-user_pem = {}
-      }
-    }
-  }
+  baseline_sns_topics     = {}
+  baseline_ssm_parameters = {}
 }

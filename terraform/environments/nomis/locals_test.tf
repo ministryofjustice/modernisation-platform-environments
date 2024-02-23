@@ -1,22 +1,50 @@
 # nomis-test environment settings
 locals {
 
+  # baseline presets config
+  test_baseline_presets_options = {
+    enable_observability_platform_monitoring = true
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "nomis_nonprod_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_non_prod"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
+      }
+    }
+  }
+
   # baseline config
   test_config = {
 
-    cloudwatch_metric_alarms_dbnames = [
-      "T1CNOM",
-      "T1NDH",
-      "T1MIS",
-      "T1CNMAUD",
-      "T2CNOM",
-      "T2NDH",
-      "T3CNOM"
-    ]
+    baseline_cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ebs
 
-    cloudwatch_metric_alarms_dbnames_misload = [
-      "T1MIS"
-    ]
+    baseline_s3_buckets = {
+      nomis-audit-archives = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.DevelopmentReadOnlyAccessBucketPolicy
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+
+      nomis-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.DevelopmentReadOnlyAccessBucketPolicy
+        ]
+      }
+
+      # use this bucket for storing artefacts for use across all accounts
+      ec2-image-builder-nomis = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+    }
 
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
@@ -37,152 +65,319 @@ locals {
       }
     }
 
-    baseline_ssm_parameters = {
-      # T1
-      "t1-nomis-db-1-a/CNOMT1"  = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-a/NDHT1"   = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-a/TRDATT1" = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-a/ORSYST1" = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-b/CNOMT1"  = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-b/NDHT1"   = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-b/TRDATT1" = local.database_instance_ssm_parameters
-      "t1-nomis-db-1-b/ORSYST1" = local.database_instance_ssm_parameters
-      "t1-nomis-db-2-a/MIST1"   = local.database_instance_ssm_parameters
-      "t1-nomis-db-2-b/MIST1"   = local.database_instance_ssm_parameters
-      "t1-nomis-db-2-a"         = local.database_ec2_misload_ssm_parameters
-      "t1-nomis-db-2-b"         = local.database_ec2_misload_ssm_parameters
-      "t1-nomis-web-a"          = local.weblogic_ssm_parameters
-      "t1-nomis-web-b"          = local.weblogic_ssm_parameters
-      "t1-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
-      "t1-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
-      "t2-nomis-xtag-a"         = local.xtag_weblogic_ssm_parameters
-      "t2-nomis-xtag-b"         = local.xtag_weblogic_ssm_parameters
+    baseline_iam_policies = {
+      Ec2T1DatabasePolicy = {
+        description = "Permissions required for T1 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T2DatabasePolicy = {
+        description = "Permissions required for T2 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T3DatabasePolicy = {
+        description = "Permissions required for T3 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T1WeblogicPolicy = {
+        description = "Permissions required for T1 Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-*",
+            ]
+          }
+        ]
+      }
+      Ec2T2WeblogicPolicy = {
+        description = "Permissions required for T2 Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-*",
+            ]
+          }
+        ]
+      }
+      Ec2T3WeblogicPolicy = {
+        description = "Permissions required for T3 Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t3/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/weblogic-*",
+            ]
+          }
+        ]
+      }
+    }
 
-      # T2
-      "t2-nomis-db-1-a/CNOMT2"  = local.database_instance_ssm_parameters
-      "t2-nomis-db-1-a/NDHT2"   = local.database_instance_ssm_parameters
-      "t2-nomis-db-1-a/TRDATT2" = local.database_instance_ssm_parameters
-      "t2-nomis-db-1-b/CNOMT2"  = local.database_instance_ssm_parameters
-      "t2-nomis-db-1-b/NDHT2"   = local.database_instance_ssm_parameters
-      "t2-nomis-db-1-b/TRDATT2" = local.database_instance_ssm_parameters
-      "t2-nomis-web-a"          = local.weblogic_ssm_parameters
-      "t2-nomis-web-b"          = local.weblogic_ssm_parameters
-
-      # T3
-      "t3-nomis-web-a" = local.weblogic_ssm_parameters
-      "t3-nomis-web-b" = local.weblogic_ssm_parameters
+    baseline_secretsmanager_secrets = {
+      "/oracle/weblogic/t1"       = local.weblogic_secretsmanager_secrets
+      "/oracle/weblogic/t2"       = local.weblogic_secretsmanager_secrets
+      "/oracle/weblogic/t3"       = local.weblogic_secretsmanager_secrets
+      "/oracle/database/T1CNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/T1NDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/T1TRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/T1CNMAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/T1MIS"    = local.database_mis_secretsmanager_secrets
+      "/oracle/database/T1ORSYS"  = local.database_secretsmanager_secrets
+      "/oracle/database/T2CNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/T2NDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/T2TRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/T3CNOM"   = local.database_nomis_secretsmanager_secrets
     }
 
     baseline_ec2_autoscaling_groups = {
-      # blue deployment
-      t1-nomis-web-a = merge(local.weblogic_ec2_a, {
-        tags = merge(local.weblogic_ec2_a.tags, {
-          nomis-environment    = "t1"
-          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name       = "T1CNOM"
-        })
-      })
 
-      # green deployment
-      t1-nomis-web-b = merge(local.weblogic_ec2_b, {
-        tags = merge(local.weblogic_ec2_b.tags, {
-          nomis-environment    = "t1"
-          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name       = "T1CNOM"
-        })
-      })
-
-      t1-nomis-xtag-a = merge(local.xtag_ec2_a, {
-        tags = merge(local.xtag_ec2_a.tags, {
-          nomis-environment    = "t1"
-          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name       = "T1CNOM"
-          ndh-ems-hostname     = "t1pml0005"
-        })
-      })
-      t1-nomis-xtag-b = merge(local.xtag_ec2_b, {
-        tags = merge(local.xtag_ec2_b.tags, {
-          nomis-environment    = "t1"
-          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name       = "T1CNOM"
-          ndh-ems-hostname     = "t1pml0005"
-        })
-      })
-
-      # blue deployment
-      t2-nomis-web-a = merge(local.weblogic_ec2_a, {
-        tags = merge(local.weblogic_ec2_a.tags, {
-          nomis-environment    = "t2"
-          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name       = "T2CNOM"
-        })
-      })
-
-      # green deployment
-      t2-nomis-web-b = merge(local.weblogic_ec2_b, {
-        tags = merge(local.weblogic_ec2_b.tags, {
-          nomis-environment    = "t2"
-          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name       = "T2CNOM"
-        })
-      })
-
-      t2-nomis-xtag-a = merge(local.xtag_ec2_a, {
-        tags = merge(local.xtag_ec2_a.tags, {
-          nomis-environment    = "t2"
-          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name       = "T2CNOM"
-          ndh-ems-hostname     = "t2pml0008"
-        })
-      })
-      t2-nomis-xtag-b = merge(local.xtag_ec2_b, {
-        tags = merge(local.xtag_ec2_b.tags, {
-          nomis-environment    = "t2"
-          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name       = "T2CNOM"
-          ndh-ems-hostname     = "t2pml0008"
-        })
-      })
-
-      # blue deployment
-      t3-nomis-web-a = merge(local.weblogic_ec2_a, {
-        tags = merge(local.weblogic_ec2_a.tags, {
-          nomis-environment    = "t3"
-          oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name       = "T3CNOM"
-        })
-        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
+      # NOT-ACTIVE (blue deployment)
+      t1-nomis-web-a = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 0
         })
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2T1WeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "t1"
+          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T1CNOM"
+          deployment           = "blue"
+        })
       })
 
-      # green deployment
-      t3-nomis-web-b = merge(local.weblogic_ec2_b, {
-        instance = merge(local.weblogic_ec2_b.instance, {
-          instance_type = "t2.xlarge"
+      # ACTIVE (green deployment)
+      t1-nomis-web-b = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 1
         })
-        tags = merge(local.weblogic_ec2_b.tags, {
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2T1WeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "t1"
+          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T1CNOM"
+          deployment           = "green"
+        })
+      })
+
+      # NOT-ACTIVE (blue deployment)
+      t2-nomis-web-a = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 0
+        })
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2T2WeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "t2"
+          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T2CNOM"
+          deployment           = "blue"
+        })
+      })
+
+      # ACTIVE (green deployment)
+      t2-nomis-web-b = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 1
+        })
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2T2WeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "t2"
+          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T2CNOM"
+          deployment           = "green"
+        })
+      })
+
+      # NOT-ACTIVE (blue deployment)
+      t3-nomis-web-a = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 0
+        })
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2T3WeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
           nomis-environment    = "t3"
           oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T3CNOM"
-        })
-        autoscaling_group = merge(local.weblogic_ec2_b.autoscaling_group, {
-          desired_capacity = 1
+          deployment           = "blue"
         })
       })
 
-      test-jumpserver-a = merge(local.jumpserver_ec2_default, {
-        config = merge(local.jumpserver_ec2_default.config, {
+      # ACTIVE (green deployment)
+      t3-nomis-web-b = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 1
+        })
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2T3WeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "t3"
+          oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T3CNOM"
+          deployment           = "green"
+        })
+      })
+
+      test-jumpserver-a = merge(local.jumpserver_ec2, {
+        config = merge(local.jumpserver_ec2.config, {
           user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
             ie_compatibility_mode_site_list = join(",", [
               "t1-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
@@ -216,109 +411,180 @@ locals {
     }
 
     baseline_ec2_instances = {
-      t1-nomis-db-1-a = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
+      t1-nomis-db-1-a = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
+        )
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2T1DatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 500 }
+          flash = { total_size = 50 }
+        })
+        tags = merge(local.database_ec2.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS database"
           oracle-sids         = "T1CNOM T1NDH T1TRDAT T1ORSYS"
           instance-scheduling = "skip-scheduling"
         })
-        config = merge(local.database_ec2_a.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+      })
+
+      t1-nomis-db-2-a = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
+          local.database_ec2_cloudwatch_metric_alarms.misload,
+        )
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2T1DatabasePolicy",
+          ])
         })
-        user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
-          args = merge(local.database_ec2_a.user_data_cloud_init.args, {
-            branch = "d264cc523daa4ee5bf60d254120874bbc7b55525"
-          })
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 100 }
         })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-          data  = { total_size = 500 }
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 700 }
           flash = { total_size = 50 }
         })
-      })
-
-      t1-nomis-db-2-a = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
+        tags = merge(local.database_ec2.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS Audit and MIS database"
           oracle-sids         = "T1MIS T1CNMAUD"
           instance-scheduling = "skip-scheduling"
-          misload-target      = "T1PRWK4DY1B0001.azure.noms.root"
-        })
-        config = merge(local.database_ec2_a.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
-        })
-        user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
-          args = merge(local.database_ec2_a.user_data_cloud_init.args, {
-            branch = "d264cc523daa4ee5bf60d254120874bbc7b55525"
-          })
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-          data  = { total_size = 500 }
-          flash = { total_size = 50 }
+          misload-dbname      = "T1MIS"
         })
       })
 
-      t2-nomis-db-1-a = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
+      t1-nomis-xtag-a = merge(local.xtag_ec2, {
+        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        config = merge(local.xtag_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+            "Ec2T1WeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
+          args = merge(local.xtag_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.xtag_ec2.tags, {
+          nomis-environment    = "t1"
+          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T1CNOM"
+          ndh-ems-hostname     = "t1-ems.test.ndh.nomis.service.justice.gov.uk"
+        })
+      })
+
+      t2-nomis-db-1-a = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
+        )
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2T2DatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 500 }
+          flash = { total_size = 50 }
+        })
+        tags = merge(local.database_ec2.tags, {
           nomis-environment   = "t2"
           description         = "T2 NOMIS database"
           oracle-sids         = "T2CNOM T2NDH T2TRDAT"
           instance-scheduling = "skip-scheduling"
         })
-        config = merge(local.database_ec2_a.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
+      })
+
+      t2-nomis-xtag-a = merge(local.xtag_ec2, {
+        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        config = merge(local.xtag_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+            "Ec2T2WeblogicPolicy",
+          ])
         })
-        user_data_cloud_init = merge(local.database_ec2_a.user_data_cloud_init, {
-          args = merge(local.database_ec2_a.user_data_cloud_init.args, {
-            branch = "d264cc523daa4ee5bf60d254120874bbc7b55525"
+        user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
+          args = merge(local.xtag_ec2.user_data_cloud_init.args, {
+            branch = "main"
           })
         })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-          data  = { total_size = 500 }
-          flash = { total_size = 50 }
+        tags = merge(local.xtag_ec2.tags, {
+          nomis-environment    = "t2"
+          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T2CNOM"
+          ndh-ems-hostname     = "t2-ems.test.ndh.nomis.service.justice.gov.uk"
         })
       })
 
-      t3-nomis-db-1 = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
+      t3-nomis-db-1 = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
+        )
+        config = merge(local.database_ec2.config, {
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2T3DatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 2500 }
+          flash = { total_size = 500 }
+        })
+        tags = merge(local.database_ec2.tags, {
           nomis-environment   = "t3"
           description         = "T3 NOMIS database to replace Azure T3PDL0070"
           oracle-sids         = "T3CNOM"
           instance-scheduling = "skip-scheduling"
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 500 }
-        })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-          data  = { total_size = 2000 }
-          flash = { total_size = 500 }
         })
       })
 
     }
 
     baseline_lbs = {
+
       # AWS doesn't let us call it internal
       private = {
         internal_lb              = true
         enable_delete_protection = false
         force_destroy_bucket     = true
         idle_timeout             = 3600
-        public_subnets           = module.environment.subnets["private"].ids
+        subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private-lb"]
 
         listeners = {
@@ -340,9 +606,6 @@ locals {
                     values = [
                       "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-                      "c-t1.test.nomis.az.justice.gov.uk",
-                      "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -358,6 +621,9 @@ locals {
                     values = [
                       "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.az.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -366,7 +632,14 @@ locals {
           })
 
           https = merge(local.weblogic_lb_listeners.https, {
-            alarm_target_group_names = ["t1-nomis-web-a-http-7777"]
+            alarm_target_group_names = [
+              # "t1-nomis-web-a-http-7777",
+              "t1-nomis-web-b-http-7777",
+              # "t2-nomis-web-a-http-7777",
+              "t2-nomis-web-b-http-7777",
+              # "t3-nomis-web-a-http-7777",
+              "t3-nomis-web-b-http-7777",
+            ]
             rules = {
               t1-nomis-web-a-http-7777 = {
                 priority = 300
@@ -379,9 +652,6 @@ locals {
                     values = [
                       "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-                      "c-t1.test.nomis.az.justice.gov.uk",
-                      "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -397,6 +667,9 @@ locals {
                     values = [
                       "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.az.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -412,9 +685,6 @@ locals {
                     values = [
                       "t2-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t2-nomis-web-a.test.nomis.service.justice.gov.uk",
-                      "c-t2.test.nomis.az.justice.gov.uk",
-                      "c-t2.test.nomis.service.justice.gov.uk",
-                      "t2-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -430,6 +700,9 @@ locals {
                     values = [
                       "t2-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t2-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t2.test.nomis.az.justice.gov.uk",
+                      "c-t2.test.nomis.service.justice.gov.uk",
+                      "t2-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -547,18 +820,6 @@ locals {
           { name = "t3-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-t3", type = "A", lbs_map_key = "private" },
         ]
-      }
-    }
-
-    baseline_s3_buckets = {
-      # use this bucket for storing artefacts for use across all accounts
-      ec2-image-builder-nomis = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
   }

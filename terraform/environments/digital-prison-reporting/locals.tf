@@ -33,8 +33,10 @@ locals {
   generic_lambda           = "${local.project}-generic-lambda"
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
   # DMS Specific
-  setup_dms_instance      = local.application_data.accounts[local.environment].setup_dms_instance
-  enable_replication_task = local.application_data.accounts[local.environment].enable_dms_replication_task
+  setup_dms_instance                = local.application_data.accounts[local.environment].setup_dms_instance
+  enable_replication_task           = local.application_data.accounts[local.environment].enable_dms_replication_task
+  setup_fake_data_dms_instance      = local.application_data.accounts[local.environment].setup_fake_data_dms_instance
+  enable_fake_data_replication_task = local.application_data.accounts[local.environment].enable_fake_data_dms_replication_task
   # DataMart Specific
   datamart_endpoint = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["host"]
   datamart_port     = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["port"]
@@ -51,12 +53,48 @@ locals {
   reporting_hub_num_workers  = local.application_data.accounts[local.environment].reporting_hub_num_workers
   reporting_hub_log_level    = local.application_data.accounts[local.environment].reporting_hub_spark_log_level
 
-  reporting_hub_kinesis_reader_batch_duration_seconds = local.application_data.accounts[local.environment].reporting_hub_kinesis_reader_batch_duration_seconds
+  reporting_hub_batch_duration_seconds      = local.application_data.accounts[local.environment].reporting_hub_batch_duration_seconds
+  reporting_hub_add_idle_time_between_reads = local.application_data.accounts[local.environment].reporting_hub_add_idle_time_between_reads
+
+  reporting_hub_idle_time_between_reads_in_millis = local.application_data.accounts[local.environment].reporting_hub_idle_time_between_reads_in_millis
+
+  reporting_hub_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_retry_max_attempts
+  reporting_hub_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_min_wait_millis
+  reporting_hub_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_max_wait_millis
+
+  reporting_hub_domain_refresh_enabled = local.application_data.accounts[local.environment].reporting_hub_domain_refresh_enabled
+
+  # Reporting Hub Batch Job
+  reporting_hub_batch_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_batch_job_worker_type
+  reporting_hub_batch_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_batch_job_num_workers
+  reporting_hub_batch_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_batch_job_log_level
+
+  reporting_hub_batch_job_schema_cache_max_size = local.application_data.accounts[local.environment].reporting_hub_batch_job_schema_cache_max_size
+
+  reporting_hub_batch_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_attempts
+  reporting_hub_batch_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_min_wait_millis
+  reporting_hub_batch_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_wait_millis
+
+  # Reporting Hub CDC Job
+  reporting_hub_cdc_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_cdc_job_worker_type
+  reporting_hub_cdc_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_cdc_job_num_workers
+  reporting_hub_cdc_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_cdc_job_log_level
+
+  reporting_hub_cdc_job_schema_cache_max_size = local.application_data.accounts[local.environment].reporting_hub_cdc_job_schema_cache_max_size
+
+  reporting_hub_cdc_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_max_attempts
+  reporting_hub_cdc_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_min_wait_millis
+  reporting_hub_cdc_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_max_wait_millis
 
   # Refresh Job
   refresh_job_worker_type = local.application_data.accounts[local.environment].refresh_job_worker_type
   refresh_job_num_workers = local.application_data.accounts[local.environment].refresh_job_num_workers
   refresh_job_log_level   = local.application_data.accounts[local.environment].refresh_job_log_level
+
+  # Common Maintenance Job settings
+  maintenance_job_retry_max_attempts    = local.application_data.accounts[local.environment].maintenance_job_retry_max_attempts
+  maintenance_job_retry_min_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_min_wait_millis
+  maintenance_job_retry_max_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_max_wait_millis
 
   # Compact Raw Job
   compact_raw_job_worker_type = local.application_data.accounts[local.environment].compact_raw_job_worker_type
@@ -76,6 +114,12 @@ locals {
   compact_curated_job_log_level   = local.application_data.accounts[local.environment].compact_curated_job_log_level
   compact_curated_job_schedule    = local.application_data.accounts[local.environment].compact_curated_job_schedule
 
+  # Compact Domain Job
+  compact_domain_job_worker_type = local.application_data.accounts[local.environment].compact_domain_job_worker_type
+  compact_domain_job_num_workers = local.application_data.accounts[local.environment].compact_domain_job_num_workers
+  compact_domain_job_log_level   = local.application_data.accounts[local.environment].compact_domain_job_log_level
+  compact_domain_job_schedule    = local.application_data.accounts[local.environment].compact_domain_job_schedule
+
   # Retention (vacuum) Raw Job
   retention_raw_job_worker_type = local.application_data.accounts[local.environment].retention_raw_job_worker_type
   retention_raw_job_num_workers = local.application_data.accounts[local.environment].retention_raw_job_num_workers
@@ -94,10 +138,27 @@ locals {
   retention_curated_job_log_level   = local.application_data.accounts[local.environment].retention_curated_job_log_level
   retention_curated_job_schedule    = local.application_data.accounts[local.environment].retention_curated_job_schedule
 
+  # Retention (vacuum) Domain Job
+  retention_domain_job_worker_type = local.application_data.accounts[local.environment].retention_domain_job_worker_type
+  retention_domain_job_num_workers = local.application_data.accounts[local.environment].retention_domain_job_num_workers
+  retention_domain_job_log_level   = local.application_data.accounts[local.environment].retention_domain_job_log_level
+  retention_domain_job_schedule    = local.application_data.accounts[local.environment].retention_domain_job_schedule
+
+  # Hive Table Creation Job
+  hive_table_creation_job_schema_cache_max_size = local.application_data.accounts[local.environment].hive_table_creation_job_schema_cache_max_size
+
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
   s3_read_access_policy  = "${local.project}_s3_read_policy"
   apigateway_get_policy  = "${local.project}_apigateway_get_policy"
+  invoke_lambda_policy   = "${local.project}_invoke_lambda_policy"
+
+  trigger_glue_job_policy = "${local.project}_start_glue_job_policy"
+  start_dms_task_policy   = "${local.project}_start_dms_task_policy"
+
+  s3_all_object_actions_policy = "${local.project}_s3_all_object_actions_policy"
+  all_state_machine_policy     = "${local.project}_all_state_machine_policy"
+  dynamo_db_access_policy      = "${local.project}_dynamo_db_access_policy"
 
   # DPR Alerts
   enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
@@ -159,12 +220,81 @@ locals {
   create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
+  reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
+
+  # s3 transfer
+  scheduled_s3_file_transfer_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_days
+  scheduled_s3_file_transfer_schedule       = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_schedule
+  enable_s3_file_transfer_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_trigger
+
+  # step function notification lambda
+  step_function_notification_lambda_handler = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
+  step_function_notification_lambda_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.all_state_machine_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.dynamo_db_access_policy}"
+  ]
+
+  # Datamart
+  create_scheduled_action_iam_role = local.application_data.accounts[local.environment].setup_scheduled_action_iam_role
+  create_redshift_schedule         = local.application_data.accounts[local.environment].setup_redshift_schedule
+
+  # Enable CW alarms
+  enable_cw_alarm                   = local.application_data.accounts[local.environment].alarms.setup_cw_alarms
+  enable_redshift_health_check      = local.application_data.accounts[local.environment].alarms.redshift.health_check.enable
+  thrld_redshift_health_check       = local.application_data.accounts[local.environment].alarms.redshift.health_check.threshold
+  period_redshift_health_check      = local.application_data.accounts[local.environment].alarms.redshift.health_check.period
+  enable_dms_stop_check             = local.application_data.accounts[local.environment].alarms.dms.stop_check.enable
+  thrld_dms_stop_check              = local.application_data.accounts[local.environment].alarms.dms.stop_check.threshold
+  period_dms_stop_check             = local.application_data.accounts[local.environment].alarms.dms.stop_check.period
+  enable_dms_start_check            = local.application_data.accounts[local.environment].alarms.dms.start_check.enable
+  thrld_dms_start_check             = local.application_data.accounts[local.environment].alarms.dms.start_check.threshold
+  period_dms_start_check            = local.application_data.accounts[local.environment].alarms.dms.start_check.period
+  enable_dms_cpu_check              = local.application_data.accounts[local.environment].alarms.dms.cpu_check.enable
+  thrld_dms_cpu_check               = local.application_data.accounts[local.environment].alarms.dms.cpu_check.threshold
+  period_dms_cpu_check              = local.application_data.accounts[local.environment].alarms.dms.cpu_check.period
+  enable_dms_freemem_check          = local.application_data.accounts[local.environment].alarms.dms.freemem_check.enable
+  thrld_dms_freemem_check           = local.application_data.accounts[local.environment].alarms.dms.freemem_check.threshold
+  period_dms_freemem_check          = local.application_data.accounts[local.environment].alarms.dms.freemem_check.period
+  enable_dms_freeablemem_check      = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.enable
+  thrld_dms_freeablemem_check       = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.threshold
+  period_dms_freeablemem_check      = local.application_data.accounts[local.environment].alarms.dms.freeablemem_check.period
+  enable_dms_swapusage_check        = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.enable
+  thrld_dms_swapusage_check         = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.threshold
+  period_dms_swapusage_check        = local.application_data.accounts[local.environment].alarms.dms.swapusage_check.period
+  enable_dms_network_trans_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_trans_tp_check.enable
+  thrld_dms_network_trans_tp_check  = local.application_data.accounts[local.environment].alarms.dms.network_trans_tp_check.threshold
+  period_dms_network_trans_tp_check = local.application_data.accounts[local.environment].alarms.dms.network_trans_tp_check.period
+  enable_dms_network_rec_tp_check   = local.application_data.accounts[local.environment].alarms.dms.network_rec_tp_check.enable
+  thrld_dms_network_rec_tp_check    = local.application_data.accounts[local.environment].alarms.dms.network_rec_tp_check.threshold
+  period_dms_network_rec_tp_check   = local.application_data.accounts[local.environment].alarms.dms.network_rec_tp_check.period
+  enable_dms_cdc_src_lat_check      = local.application_data.accounts[local.environment].alarms.dms.cdc_src_lat_check.enable
+  thrld_dms_cdc_src_lat_check       = local.application_data.accounts[local.environment].alarms.dms.cdc_src_lat_check.threshold
+  period_dms_cdc_src_lat_check      = local.application_data.accounts[local.environment].alarms.dms.cdc_src_lat_check.period
+  enable_dms_cdc_targ_lat_check     = local.application_data.accounts[local.environment].alarms.dms.cdc_targ_lat_check.enable
+  thrld_dms_cdc_targ_lat_check      = local.application_data.accounts[local.environment].alarms.dms.cdc_targ_lat_check.threshold
+  period_dms_cdc_targ_lat_check     = local.application_data.accounts[local.environment].alarms.dms.cdc_targ_lat_check.period
+  enable_dms_cdc_inc_events_check   = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.enable
+  thrld_dms_cdc_inc_events_check    = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.threshold
+  period_dms_cdc_inc_events_check   = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.period
+
+  # CW Insights
+  enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
+
+  # Sonatype Secrets
+  setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
+
   nomis_secrets_placeholder = {
     db_name  = "nomis"
     password = "placeholder"
     user     = "placeholder"
     endpoint = "0.0.0.0"
     port     = "1521"
+  }
+
+  sonatype_secrets_placeholder = {
+    user     = "placeholder"
+    password = "placeholder"
   }
 
   # Evaluate Redshift Secrets and Populate

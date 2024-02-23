@@ -35,7 +35,7 @@ provider "aws" {
   alias  = "core-network-services"
   region = "eu-west-2"
   assume_role {
-    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-dns-records" : "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
+    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-log-records" : "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
 }
 
@@ -45,5 +45,23 @@ provider "aws" {
   region = "us-east-1"
   assume_role {
     role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccessUSEast"
+  }
+}
+
+# Provider for creating resources in eu-central-1, eg Bedrock resources
+provider "aws" {
+  alias  = "eu-central-1"
+  region = "eu-central-1"
+  assume_role {
+    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureBedrockEuCentral"
+  }
+}
+
+# Provider for reading resources from root account IdentityStore
+provider "aws" {
+  region = "eu-west-2"
+  alias  = "sso-readonly"
+  assume_role {
+    role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
 }

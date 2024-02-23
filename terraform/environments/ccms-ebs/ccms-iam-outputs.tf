@@ -55,3 +55,13 @@ output "aws_iam_policy_rman_to_s3_policy" {
   description = "aws_iam_policy rman_to_s3 policy"
   value       = aws_iam_policy.rman_to_s3.policy
 }
+
+output "aws_iam_policy_oracle_licensing_arn" {
+  description = "aws_iam_policy oracle_licensing arn"
+  value       = aws_iam_policy.oracle_licensing.arn
+}
+
+output "aws_iam_policy_oracle_licensing_policy" {
+  description = "aws_iam_policy oracle_licensing policy"
+  value       = aws_iam_policy.oracle_licensing.policy
+}

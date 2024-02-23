@@ -163,7 +163,7 @@ locals {
 }
 
 resource "aws_redshift_scheduled_action" "this" {
-  for_each = { for k, v in var.scheduled_actions : k => v if var.create_redshift_cluster }
+  for_each = { for k, v in var.scheduled_actions : k => v if var.create_redshift_cluster && var.create_redshift_schedule }
 
   name        = each.value.name
   description = try(each.value.description, null)

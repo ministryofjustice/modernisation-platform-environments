@@ -241,3 +241,14 @@ tasks:
 
             $sourc.Save()       
           }
+
+      - frequency: once
+        type: powershell
+        runAs: admin
+        # Hide shutdown and restart buttons in start menu
+        content: |-
+          $registryStartMenuPath = "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\Start\"
+          if(Test-Path -Path $registryStartMenuPath){
+            Set-ItemProperty -Path "$($registryStartMenuPath)HideRestart" -Name "value" -Value 1
+            Set-ItemProperty -Path "$($registryStartMenuPath)HideShutDown" -Name "value" -Value 1
+          }

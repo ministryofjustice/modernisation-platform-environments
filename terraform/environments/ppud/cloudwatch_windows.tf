@@ -199,6 +199,12 @@ resource "aws_cloudwatch_log_group" "SQL-Server-Logs" {
   retention_in_days = 365
 }
 
+resource "aws_cloudwatch_log_group" "Windows-Defender-Logs" {
+  count             = local.is-production == true ? 1 : 0
+  name              = "Windows-Defender-Logs"
+  retention_in_days = 365
+}
+
 #Metric Filters
 
 resource "aws_cloudwatch_log_metric_filter" "ServiceStatus-Running" {
@@ -291,6 +297,152 @@ resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Failed" {
     value     = "0"
     dimensions = {
       Instance = "$Instance"
+    }
+  }
+}
+
+# Windows Defender Event Metrics
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareScanStarted" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareScanStarted"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "[date, time, Instance, MalwareScanStarted, status=1000]"
+  metric_transformation {
+    name      = "MalwareScanStarted"
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
+      Instance           = "$Instance"
+      MalwareScanStarted = "$MalwareScanStarted"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareScanFinished" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareScanFinished"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "[date, time, Instance, MalwareScanFinished, status=1001]"
+  metric_transformation {
+    name      = "MalwareScanFinished"
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
+      Instance            = "$Instance"
+      MalwareScanFinished = "$MalwareScanFinished"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareScanStopped" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareScanStopped"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "[date, time, Instance, MalwareScanStopped, status=1002]"
+  metric_transformation {
+    name      = "MalwareScanStopped"
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
+      Instance           = "$Instance"
+      MalwareScanStopped = "$MalwareScanStopped"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareScanFailed" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareScanFailed"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "[date, time, Instance, MalwareScanFailed, status=1005]"
+  metric_transformation {
+    name      = "MalwareScanFailed"
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
+      Instance          = "$Instance"
+      MalwareScanFailed = "$MalwareScanFailed"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareBehaviorDetected" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareBehaviorDetected"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "[date, time, Instance, MalwareBehaviorDetected, status=1015]"
+  metric_transformation {
+    name      = "MalwareBehaviorDetected"
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
+      Instance                = "$Instance"
+      MalwareBehaviorDetected = "$MalwareBehaviorDetected"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareStateDetected" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareStateDetected"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "[date, time, Instance, MalwareStateDetected, status=1116]"
+  metric_transformation {
+    name      = "MalwareStateDetected"
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
+      Instance             = "$Instance"
+      MalwareStateDetected = "$MalwareStateDetected"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareSignatureFailed" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareSignatureFailed"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "[date, time, Instance, MalwareSignatureFailed, status=2001]"
+  metric_transformation {
+    name      = "MalwareSignatureFailed"
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
+      Instance               = "$Instance"
+      MalwareSignatureFailed = "$MalwareSignatureFailed"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareEngineFailed" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareEngineFailed"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "[date, time, Instance, MalwareEngineFailed, status=2003]"
+  metric_transformation {
+    name      = "MalwareEngineFailed"
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
+      Instance            = "$Instance"
+      MalwareEngineFailed = "$MalwareEngineFailed"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MalwareEngineOutofDate" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MalwareEngineOutofDate"
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[count.index].name
+  pattern        = "[date, time, Instance, MalwareEngineOutofDate, status=2005]"
+  metric_transformation {
+    name      = "MalwareEngineOutofDate"
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
+      Instance               = "$Instance"
+      MalwareEngineOutofDate = "$MalwareEngineOutofDate"
     }
   }
 }

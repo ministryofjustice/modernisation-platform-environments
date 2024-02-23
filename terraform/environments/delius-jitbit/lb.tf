@@ -1,6 +1,10 @@
 # checkov:skip=CKV_AWS_226
 # checkov:skip=CKV2_AWS_28
 
+module "ip_addresses" {
+  source = "../../modules/ip_addresses"
+}
+
 #tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "external" {
   # checkov:skip=CKV_AWS_91
@@ -33,15 +37,11 @@ resource "aws_security_group" "load_balancer_security_group" {
     description = "Allow ingress from white listed CIDRs"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = [
-      "81.134.202.29/32",  # MoJ Digital VPN
-      "217.33.148.210/32", # Digital studio
-      "195.59.75.0/24",    # ARK internet (DOM1)
-      "194.33.192.0/25",   # ARK internet (DOM1)
-      "194.33.193.0/25",   # ARK internet (DOM1)
-      "194.33.196.0/25",   # ARK internet (DOM1)
-      "194.33.197.0/25",   # ARK internet (DOM1)
-
+    cidr_blocks = flatten([
+      "20.49.214.199/32", # Azure Landing Zone Egress
+      "20.49.214.228/32", # Azure Landing Zone Egress
+      "20.26.11.71/32",   # Azure Landing Zone Egress
+      "20.26.11.108/32",  # Azure Landing Zone Egress
       # Route53 Healthcheck Access Cidrs
       # London Region not support yet, so metrics are not yet publised, can be enabled at later stage for Route53 endpoint monitor
       "15.177.0.0/18",     # GLOBAL Region
@@ -51,7 +51,13 @@ resource "aws_security_group" "load_balancer_security_group" {
       "54.228.16.0/26",    # eu-west-1 Region
       "107.23.255.0/26",   # us-east-1 Region
       "54.243.31.192/26",  # us-east-1 Region
-    ]
+      "195.59.75.0/24",    # ARK internet (DOM1)
+      "194.33.192.0/25",   # ARK internet (DOM1)
+      "194.33.193.0/25",   # ARK internet (DOM1)
+      "194.33.196.0/25",   # ARK internet (DOM1)
+      "194.33.197.0/25",   # ARK internet (DOM1)
+      local.internal_security_group_cidrs
+    ])
 
     ipv6_cidr_blocks = [
       # Route53 Healthcheck Access Cidrs IPv6
@@ -80,29 +86,7 @@ resource "aws_security_group" "load_balancer_security_group" {
   )
 }
 
-# # Temporary until we can validate ACM cert during migration of production
-# # The LB SG will block inbound on HTTP 80 but this is to get the apply to work
-# resource "aws_lb_listener" "listener-prod" {
-#   count             = local.is-production ? 1 : 0
-#   load_balancer_arn = aws_lb.external.id
-#   port              = 80
-#   protocol          = "HTTP"
-
-#   default_action {
-#     target_group_arn = aws_lb_target_group.target_group_fargate.id
-#     type             = "forward"
-#   }
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = local.application_name
-#     }
-#   )
-# }
-
 resource "aws_lb_listener" "listener" {
-  # count             = local.is-production ? 0 : 1
   load_balancer_arn = aws_lb.external.id
   port              = 443
   protocol          = "HTTPS"

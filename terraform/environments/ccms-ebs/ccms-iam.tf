@@ -177,3 +177,105 @@ resource "aws_iam_role_policy_attachment" "rman_to_s3_policy" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.rman_to_s3.arn
 }
+
+# Oracle Licensing policy
+resource "aws_iam_policy" "oracle_licensing" {
+  name        = "oracle_licensing_policy-${local.environment}"
+  description = "Allows licensing metrics to be captured"
+
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Action" : [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:PutObjectAcl",
+            "s3:ListBucket",
+            "s3:DeleteObject"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::license-manager-artifact-bucket/*",
+            "arn:aws:s3:::license-manager-artifact-bucket"
+          ],
+          "Effect" : "Allow",
+          "Sid" : "SSMS3BucketPolicy"
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "oracle_licensing_policy" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = aws_iam_policy.oracle_licensing.arn
+}
+
+# Access to LZ buckets.
+resource "aws_iam_policy" "access_to_lz_buckets" {
+  name        = "access_to_lz_buckets-${local.environment}"
+  description = "Allows licensing metrics to be captured"
+
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Sid" : "AccessToLZBuckets",
+          "Effect" : "Allow",
+          "Action" : [
+            "s3:DeleteObject",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:PutObject"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::laa-ccms-inbound-*",
+            "arn:aws:s3:::laa-ccms-outbound-*"
+          ]
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "access_to_lz_buckets_policy" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = aws_iam_policy.access_to_lz_buckets.arn
+}
+
+#Moved member infrastructure IAM resources from MP repo
+
+#tfsec:ignore:aws-iam-no-user-attached-policies
+resource "aws_iam_user" "email" {
+  #checkov:skip=CKV_AWS_273: "Skipping as tfsec check is also set to ignore"
+  name = format("%s-%s-email_user", local.application_name, local.environment)
+  tags = merge(local.tags,
+    { Name = format("%s-%s-email_user", local.application_name, local.environment) }
+  )
+}
+
+resource "aws_iam_access_key" "email" {
+  user = aws_iam_user.email.name
+}
+
+#tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_user_policy" "email_policy" {
+  name   = "AmazonSesSendingAccess"
+  user   = aws_iam_user.email.name
+  policy = data.aws_iam_policy_document.email.json
+}
+
+# Following AWS recommended policy
+#tfsec:ignore:aws-iam-no-policy-wildcards
+data "aws_iam_policy_document" "email" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_356: Policy follows AWS guidance
+  statement {
+    actions = [
+      "ses:SendRawEmail"
+    ]
+    resources = ["*"]
+  }
+}

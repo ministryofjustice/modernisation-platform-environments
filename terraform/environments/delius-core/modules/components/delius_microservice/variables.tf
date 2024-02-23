@@ -1,0 +1,438 @@
+variable "account_config" {
+  description = "Account config to pass to the instance"
+  type        = any
+}
+
+variable "account_info" {
+  description = "Account info to pass to the instance"
+  type        = any
+}
+
+variable "name" {
+  description = "Name of the application"
+  type        = string
+}
+
+
+variable "namespace" {
+  description = "Namespace of the application"
+  type        = string
+  default     = "delius-core"
+}
+
+
+variable "env_name" {
+  description = "Environment name short ie dev"
+  type        = string
+}
+
+variable "cluster_security_group_id" {
+  description = "Security group id for the cluster"
+  type        = string
+}
+
+
+variable "rds_license_model" {
+  description = "RDS license model to use"
+  type        = string
+  default     = "license-included"
+}
+
+variable "rds_engine" {
+  description = "RDS engine to use"
+  type        = string
+  default     = null
+}
+
+variable "rds_endpoint_environment_variable" {
+  description = "Environment variable to store the RDS endpoint"
+  type        = string
+  default     = ""
+}
+
+variable "rds_password_secret_variable" {
+  description = "Secret variable to store the rds secretsmanager arn"
+  type        = string
+  default     = ""
+}
+
+variable "rds_engine_version" {
+  description = "RDS engine version to use"
+  type        = string
+  default     = null
+}
+
+variable "rds_instance_class" {
+  description = "RDS instance class to use"
+  type        = string
+  default     = null
+}
+
+variable "rds_username" {
+  description = "RDS database username"
+  type        = string
+  default     = null
+}
+
+variable "snapshot_identifier" {
+  description = "RDS snapshot identifier"
+  type        = string
+  default     = null
+}
+
+variable "rds_parameter_group_name" {
+  description = "RDS parameter group name"
+  type        = string
+  default     = null
+}
+
+variable "rds_deletion_protection" {
+  description = "RDS deletion protection"
+  type        = bool
+  default     = false
+}
+
+variable "rds_delete_automated_backups" {
+  description = "RDS delete automated backups"
+  type        = bool
+  default     = false
+}
+
+variable "rds_skip_final_snapshot" {
+  description = "RDS skip final snapshot"
+  type        = bool
+  default     = false
+}
+
+variable "rds_port" {
+  description = "RDS port"
+  type        = number
+  default     = null
+}
+
+variable "rds_allocated_storage" {
+  description = "RDS allocated storage"
+  type        = number
+  default     = null
+}
+
+variable "rds_max_allocated_storage" {
+  description = "RDS allocated storage"
+  type        = number
+  default     = null
+}
+
+variable "rds_storage_type" {
+  description = "RDS storage type"
+  type        = string
+  default     = "gp2"
+}
+
+variable "maintenance_window" {
+  description = "RDS/elasticache maintenance window"
+  type        = string
+  default     = "mon:03:00-mon:04:00"
+}
+
+variable "rds_auto_major_version_upgrade" {
+  description = "RDS auto major version upgrade"
+  type        = bool
+  default     = false
+}
+
+variable "rds_backup_retention_period" {
+  description = "RDS backup retention period"
+  type        = number
+  default     = 7
+}
+
+variable "rds_backup_window" {
+  description = "RDS backup window"
+  type        = string
+  default     = "00:00-03:00"
+}
+
+variable "rds_iam_database_authentication_enabled" {
+  description = "RDS iam database authentication enabled"
+  type        = bool
+  default     = false
+}
+
+variable "rds_multi_az" {
+  description = "RDS multi az"
+  type        = bool
+  default     = false
+}
+
+variable "rds_monitoring_interval" {
+  description = "RDS monitoring interval"
+  type        = number
+  default     = 60
+}
+
+variable "rds_performance_insights_enabled" {
+  description = "RDS performance insights enabled"
+  type        = bool
+  default     = false
+}
+
+variable "rds_enabled_cloudwatch_logs_exports" {
+  description = "RDS enabled cloudwatch logs exports"
+  type        = list(string)
+  default     = null
+}
+
+variable "db_ingress_security_groups" {
+  description = "Additional RDS/elasticache ingress security groups"
+  type        = list(string)
+}
+
+variable "tags" {
+  description = "Tags to apply to the instance"
+  type        = map(string)
+}
+
+
+variable "platform_vars" {
+  type = object({
+    environment_management = any
+  })
+}
+
+variable "health_check_grace_period_seconds" {
+  description = "The amount of time, in seconds, that Amazon ECS waits before unhealthy instances are shut down."
+  type        = number
+  default     = 60
+}
+
+variable "ecs_cluster_arn" {
+  description = "The ARN of the ECS cluster"
+  type        = string
+}
+
+variable "container_port_config" {
+  description = "The port configuration for the container. First in list is used for Load Balancer Configuration"
+  type = list(object({
+    containerPort = number
+    protocol      = string
+  }))
+}
+
+variable "target_group_protocol" {
+  description = "The protocol to use for the target group"
+  type        = string
+  default     = "HTTP"
+}
+
+variable "target_group_protocol_version" {
+  description = "The version of the protocol to use for the target group"
+  type        = string
+  default     = "HTTP2"
+}
+
+variable "certificate_arn" {
+  description = "The ARN of the certificate to use for the target group"
+  type        = string
+}
+
+variable "microservice_lb_arn" {
+  description = "The ARN of the load balancer to use for the target group"
+  type        = string
+}
+
+variable "microservice_lb_https_listener_arn" {
+  description = "The ARN of the load balancer HTTPS listener to use for the target group"
+  type        = string
+  default     = null
+}
+
+variable "create_rds" {
+  description = "Whether to create an RDS instance"
+  type        = bool
+  default     = false
+}
+
+variable "create_elasticache" {
+  description = "Whether to create an Elasticache instance"
+  type        = bool
+  default     = false
+}
+
+variable "elasticache_node_type" {
+  description = "The Elasticache node type"
+  type        = string
+  default     = "cache.m4.large"
+}
+
+variable "elasticache_engine" {
+  description = "The Elasticache engine"
+  type        = string
+  default     = "redis"
+}
+
+variable "elasticache_endpoint_environment_variable" {
+  description = "Environment variable to store the elasticache endpoint"
+  type        = string
+  default     = ""
+}
+
+variable "elasticache_engine_version" {
+  description = "The Elasticache engine version"
+  type        = string
+  default     = "5.0.6"
+}
+
+variable "elasticache_port" {
+  description = "The Elasticache port"
+  type        = number
+  default     = 6379
+}
+
+variable "elasticache_parameter_group_name" {
+  description = "The Elasticache parameter group name"
+  type        = string
+  default     = "default.redis5.0"
+}
+
+variable "elasticache_subnet_group_name" {
+  description = "The Elasticache subnet group name"
+  type        = string
+  default     = "default"
+}
+variable "elasticache_num_cache_nodes" {
+  description = "The Elasticache number of cache nodes"
+  type        = number
+  default     = 1
+}
+
+variable "elasticache_parameter_group_family" {
+  description = "The Elasticache parameter group family"
+  type        = string
+  default     = "redis5.0"
+}
+
+variable "elasticache_parameters" {
+  description = "A map of elasticache parameter names & values"
+  type        = map(string)
+  default     = {}
+}
+
+variable "container_environment_vars" {
+  description = "Environment variables to pass to the container"
+  type = list(object({
+    name  = string
+    value = string
+  }))
+}
+variable "container_secrets" {
+  description = "Secrets to pass to the container"
+  type = list(object({
+    name      = string
+    valueFrom = string
+  }))
+}
+
+variable "alb_security_group_id" {
+  description = "The security group ID of the ALB"
+  type        = string
+}
+
+variable "health_check_path" {
+  description = "The health check path for the alb target group"
+  type        = string
+}
+
+variable "health_check_interval" {
+  description = "The health check interval for the alb target group"
+  type        = string
+  default     = "300"
+}
+
+variable "alb_stickiness_enabled" {
+  description = "Enable or disable stickiness"
+  type        = string
+  default     = true
+}
+
+variable "alb_stickiness_type" {
+  description = "Type of stickiness for the alb target group"
+  type        = string
+  default     = "lb_cookie"
+}
+
+variable "alb_listener_rule_priority" {
+  description = "Priority of the alb listener"
+  type        = number
+  default     = null
+}
+
+variable "alb_listener_rule_paths" {
+  description = "Paths to use for the alb listener rule"
+  type        = list(string)
+  default     = null
+}
+
+variable "cloudwatch_error_pattern" {
+  description = "The cloudwatch error pattern to use for the alarm"
+  type        = string
+  default     = "/error/"
+}
+
+variable "container_image" {
+  description = "The container image to use"
+  type        = string
+}
+
+variable "container_memory" {
+  description = "The container memory to use"
+  type        = number
+  default     = 1024
+}
+
+variable "container_cpu" {
+  description = "The container cpu to use"
+  type        = number
+  default     = 512
+}
+
+variable "bastion_sg_id" {
+  description = "Security group id of the bastion"
+  type        = string
+}
+
+
+variable "create_service_nlb" {
+  description = "Whether to create a service NLB"
+  type        = bool
+  default     = false
+}
+
+variable "desired_count" {
+  description = "The desired count of the service"
+  type        = number
+  default     = 1
+}
+
+variable "efs_volumes" {
+  description = "The EFS volumes to mount"
+  type        = list(any)
+  default     = []
+}
+
+variable "mount_points" {
+  description = "The mount points for the EFS volumes"
+  type        = list(any)
+  default     = []
+}
+
+variable "deployment_minimum_healthy_percent" {
+  type        = number
+  description = "The lower limit (as a percentage of `desired_count`) of the number of tasks that must remain running and healthy in a service during a deployment"
+  default     = 0
+}
+
+variable "deployment_maximum_percent" {
+  type        = number
+  description = "The upper limit of the number of tasks (as a percentage of `desired_count`) that can be running in a service during a deployment"
+  default     = 100
+}

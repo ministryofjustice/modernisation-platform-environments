@@ -19,7 +19,7 @@ locals {
     ])
     ssh = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     https = flatten([
       "10.0.0.0/8",
@@ -34,11 +34,11 @@ locals {
       module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
       module.ip_addresses.azure_studio_hosting_cidrs.devtest,
       module.ip_addresses.azure_nomisapi_cidrs.devtest,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
   }
   security_group_cidrs_preprod_prod = {
@@ -47,7 +47,7 @@ locals {
     ])
     ssh = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     https = flatten([
       "10.0.0.0/8",
@@ -62,11 +62,11 @@ locals {
       module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
       module.ip_addresses.azure_studio_hosting_cidrs.prod,
       module.ip_addresses.azure_nomisapi_cidrs.prod,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
   }
 

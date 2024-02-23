@@ -1,4 +1,3 @@
-# nomis-test environment settings
 locals {
 
   # baseline config
@@ -18,5 +17,8 @@ locals {
       }
     }
 
+    baseline_route53_zones = {
+      "test.planetfm.service.justice.gov.uk" = {}
+    }
   }
 }

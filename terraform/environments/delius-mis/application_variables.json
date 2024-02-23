@@ -1,0 +1,18 @@
+{
+  "accounts": {
+    "development": {
+      "legacy_counterpart_cidr": "10.162.32.0/20",
+      "legacy_ad_domain_name": "delius-mis-dev.local",
+      "legacy_ad_ip_list": ["10.162.36.235", "10.162.35.251"]
+    },
+    "test": {
+      "example_var": "test-data"
+    },
+    "preproduction": {
+      "example_var": "preproduction-data"
+    },
+    "production": {
+      "example_var": "production-data"
+    }
+  }
+}

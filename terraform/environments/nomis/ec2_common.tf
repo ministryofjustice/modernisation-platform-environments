@@ -3,6 +3,9 @@
 #------------------------------------------------------------------------------
 
 resource "aws_ssm_document" "session_manager_settings" {
+  #checkov:skip=CKV_AWS_112: "Ensure Session Manager data is encrypted in transit"
+  #checkov:skip=CKV_AWS_113: "Ensure Session Manager logs are enabled and encrypted"
+  # Review in DSOS-2229
   name            = "SSM-SessionManagerRunShell"
   document_type   = "Session"
   document_format = "JSON"
@@ -74,21 +77,22 @@ resource "aws_ssm_document" "cloud_watch_agent" {
 # Patch Management - Run Ansible Roles manually from SSM document
 #------------------------------------------------------------------------------
 
-resource "aws_ssm_document" "run_ansible_patches" {
-  name            = "RunAnsiblePatches"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/run-ansible-patches.yaml")
-  target_type     = "/AWS::EC2::Instance"
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "run-ansible-patches"
-    },
-  )
-}
-
+# Disabling - we need to migrate to new solution for CI/CD user and this isn't
+# being used in practice.
+#resource "aws_ssm_document" "run_ansible_patches" {
+#  name            = "RunAnsiblePatches"
+#  document_type   = "Command"
+#  document_format = "YAML"
+#  content         = file("./ssm-documents/run-ansible-patches.yaml")
+#  target_type     = "/AWS::EC2::Instance"
+#
+#  tags = merge(
+#    local.tags,
+#    {
+#      Name = "run-ansible-patches"
+#    },
+#  )
+#}
 
 #------------------------------------------------------------------------------
 # Patch Manager
@@ -320,6 +324,8 @@ resource "aws_iam_role" "cloudwatch-datasource-role" {
 }
 
 data "aws_iam_policy_document" "cloudwatch_datasource" {
+  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  # Review in DSOS-2229
   statement {
     sid    = "AllowReadingMetricsFromCloudWatch"
     effect = "Allow"

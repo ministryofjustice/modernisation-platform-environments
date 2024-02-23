@@ -17,24 +17,29 @@ locals {
     }
   }
 }
-
 data "aws_iam_policy_document" "assume_role" {
   for_each = var.iam_roles
 
-  version = "2012-10-17"
-  statement {
-    sid    = ""
-    effect = "Allow"
-    actions = [
-      "sts:AssumeRole",
-    ]
-    principals {
-      type = each.value.assume_role_policy_principals_type
-
-      # allow account names to be specified rather than the full arn
-      identifiers = [for id in each.value.assume_role_policy_principals_identifiers :
-        lookup(var.environment.account_root_arns, id, null) != null ? var.environment.account_root_arns[id] : id
-      ]
+  dynamic "statement" {
+    for_each = each.value.assume_role_policy
+    content {
+      effect  = statement.value.effect
+      actions = statement.value.actions
+      dynamic "principals" {
+        for_each = statement.value.principals != null ? [statement.value.principals] : []
+        content {
+          type        = principals.value.type
+          identifiers = [for identifier in principals.value.identifiers : try(var.environment.account_root_arns[identifier], identifier)]
+        }
+      }
+      dynamic "condition" {
+        for_each = statement.value.conditions
+        content {
+          test     = condition.value.test
+          variable = condition.value.variable
+          values   = condition.value.values
+        }
+      }
     }
   }
 }

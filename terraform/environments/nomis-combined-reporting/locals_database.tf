@@ -1,5 +1,31 @@
 locals {
 
+  database_ssm_parameters = {
+    parameters = {
+      passwords = { description = "database passwords" }
+    }
+  }
+  database_secretsmanager_secrets = {
+    secrets = {
+      passwords = { description = "database passwords" }
+    }
+  }
+
+  database_cloudwatch_metric_alarms = {
+    standard = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
+    )
+    db_connected = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+    )
+    db_backup = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+    )
+  }
+
   database_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.db, {
@@ -31,22 +57,7 @@ locals {
 
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
-    ssm_parameters = {
-      ASMSYS = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSYS password"
-      }
-      ASMSNMP = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSNMP password"
-      }
-    }
+    secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
     tags = {
       ami                  = "hmpps_ol_8_5_oracledb_19c"

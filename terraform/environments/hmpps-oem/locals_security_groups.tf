@@ -2,26 +2,26 @@ locals {
 
   security_group_cidrs_devtest = {
     oracle_db = flatten([
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_target_hosts = flatten([
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_console = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
   }
   security_group_cidrs_preprod_prod = {
     oracle_db = flatten([
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_target_hosts = flatten([
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_console = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
   }
   security_group_cidrs_by_environment = {

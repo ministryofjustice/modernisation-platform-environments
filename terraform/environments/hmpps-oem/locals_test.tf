@@ -1,30 +1,30 @@
 # nomis-test environment settings
 locals {
 
+  # baseline presets config
+  test_baseline_presets_options = {}
+
   # baseline config
   test_config = {
 
-    baseline_ssm_parameters = {
-      "test-oem/TRCVCAT"   = local.oem_database_instance_ssm_parameters
-      "test-oem/EMREP"     = local.oem_emrep_ssm_parameters
-      "test-oem/OEM"       = local.oem_ssm_parameters
-      "test-oem-a/TRCVCAT" = local.oem_database_instance_ssm_parameters
-      "test-oem-a/EMREP"   = local.oem_emrep_ssm_parameters
-      "test-oem-a/OEM"     = local.oem_ssm_parameters
-      "test-oem-b/TRCVCAT" = local.oem_database_instance_ssm_parameters
-      "test-oem-b/EMREP"   = local.oem_emrep_ssm_parameters
-      "test-oem-b/OEM"     = local.oem_ssm_parameters
+    baseline_secretsmanager_secrets = {
+      "/oracle/oem"              = local.oem_secretsmanager_secrets
+      "/oracle/database/EMREP"   = local.oem_secretsmanager_secrets
+      "/oracle/database/TRCVCAT" = local.oem_secretsmanager_secrets
     }
 
     baseline_ec2_autoscaling_groups = {
       test-oem = merge(local.oem_ec2_default, {
+        autoscaling_group = merge(local.oem_ec2_default.autoscaling_group, {
+          desired_capacity = 0
+        })
         user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
           args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
             branch = "main"
           })
         })
         tags = merge(local.oem_ec2_default.tags, {
-            oracle-sids = "EMREP TRCVCAT"
+          oracle-sids = "EMREP TRCVCAT"
         })
       })
     }
@@ -39,17 +39,10 @@ locals {
             branch = "45027fb7482eb7fb601c9493513bb73658780dda" # 2023-08-11
           })
         })
+        tags = merge(local.oem_ec2_default.tags, {
+          oracle-sids = "EMREP TRCVCAT"
+        })
       })
-      # test-oem-b = merge(local.oem_ec2_default, {
-      #   config = merge(local.oem_ec2_default.config, {
-      #     availability_zone = "eu-west-2b"
-      #   })
-      #   user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
-      #     args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-      #       branch = "main"
-      #     })
-      #   })
-      # })
     }
 
     baseline_s3_buckets = {
@@ -71,5 +64,6 @@ locals {
         ]
       }
     }
+
   }
 }

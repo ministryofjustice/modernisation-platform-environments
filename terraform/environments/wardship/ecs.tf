@@ -6,8 +6,9 @@ resource "aws_ecs_cluster" "wardship_cluster" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "wardshipFamily_logs" {
-  name = "/ecs/wardshipFamily"
+resource "aws_cloudwatch_log_group" "deployment_logs" {
+  name              = "/aws/events/deploymentLogs"
+  retention_in_days = "7"
 }
 
 resource "aws_ecs_task_definition" "wardship_task_definition" {
@@ -21,7 +22,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
   container_definitions = jsonencode([
     {
       name      = "wardship-container"
-      image     = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
+      image     = "${aws_ecr_repository.wardship_ecr_repo.repository_url}:latest"
       cpu       = 1024
       memory    = 2048
       essential = true
@@ -32,14 +33,6 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
           hostPort      = 80
         }
       ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.wardshipFamily_logs.name}"
-          awslogs-region        = "eu-west-2"
-          awslogs-stream-prefix = "ecs"
-        }
-      }
       environment = [
         {
           name  = "RDS_HOSTNAME"
@@ -96,8 +89,8 @@ resource "aws_ecs_service" "wardship_ecs_service" {
   task_definition                   = aws_ecs_task_definition.wardship_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
-  desired_count                     = 1
-  health_check_grace_period_seconds = 90
+  desired_count                     = 2
+  health_check_grace_period_seconds = 180
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
@@ -237,7 +230,127 @@ resource "aws_security_group" "ecs_service" {
   }
 }
 
-resource "aws_ecr_repository" "wardship-ecr-repo" {
+resource "aws_ecr_repository" "wardship_ecr_repo" {
   name         = "wardship-ecr-repo"
   force_delete = true
+}
+
+# AWS EventBridge rule
+resource "aws_cloudwatch_event_rule" "ecs_events" {
+  name        = "ecs-events"
+  description = "Capture all ECS events"
+
+  event_pattern = jsonencode({
+    "source" : ["aws.ecs"],
+    "detail" : {
+      "clusterArn" : [aws_ecs_cluster.wardship_cluster.arn]
+    }
+  })
+}
+
+# AWS EventBridge target
+resource "aws_cloudwatch_event_target" "logs" {
+  depends_on = [aws_cloudwatch_log_group.deployment_logs]
+  rule       = aws_cloudwatch_event_rule.ecs_events.name
+  target_id  = "send-to-cloudwatch"
+  arn        = aws_cloudwatch_log_group.deployment_logs.arn
+}
+
+resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
+  policy_document = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "TrustEventsToStoreLogEvent",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : ["events.amazonaws.com", "delivery.logs.amazonaws.com"]
+        },
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/*:*"
+      }
+    ]
+  })
+  policy_name = "TrustEventsToStoreLogEvents"
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
+  count               = local.is-development ? 0 : 1
+  alarm_name          = "ecs-cpu-utilization-alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CpuUtilized"
+  namespace           = "ECS/ContainerInsights"
+  period              = "120"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "This metric checks if CPU utilization is high - threshold set to 80%"
+  alarm_actions       = [aws_sns_topic.wardship_utilisation_alarm[0].arn]
+  dimensions = {
+    ClusterName = aws_ecs_cluster.wardship_cluster.name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
+  count               = local.is-development ? 0 : 1
+  alarm_name          = "ecs-memory-utilization-alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "MemoryUtilized"
+  namespace           = "ECS/ContainerInsights"
+  period              = "120"
+  statistic           = "Average"
+  threshold           = "1600"
+  alarm_description   = "This metric checks if memory utilization is high - threshold set to 1600MB"
+  alarm_actions       = [aws_sns_topic.wardship_utilisation_alarm[0].arn]
+  dimensions = {
+    ClusterName = aws_ecs_cluster.wardship_cluster.name
+  }
+}
+
+resource "aws_sns_topic" "wardship_utilisation_alarm" {
+  count = local.is-development ? 0 : 1
+  name  = "wardship_utilisation_alarm"
+}
+
+# Pager duty integration
+
+# Get the map of pagerduty integration keys from the modernisation platform account
+data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+}
+
+# Add a local to get the keys
+locals {
+  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+}
+
+# link the sns topic to the service - preprod
+module "pagerduty_core_alerts_non_prod" {
+  count = local.is-preproduction ? 1 : 0
+  depends_on = [
+    aws_sns_topic.wardship_utilisation_alarm
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
+  pagerduty_integration_key = local.pagerduty_integration_keys["wardship_non_prod_alarms"]
+}
+
+# link the sns topic to the service - prod
+module "pagerduty_core_alerts_prod" {
+  count = local.is-production ? 1 : 0
+  depends_on = [
+    aws_sns_topic.wardship_utilisation_alarm
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
+  pagerduty_integration_key = local.pagerduty_integration_keys["wardship_prod_alarms"]
 }

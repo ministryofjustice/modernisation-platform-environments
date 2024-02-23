@@ -90,3 +90,25 @@ module "pagerduty_integration_key" {
     }
   )
 }
+
+# SonaType Secrets
+module "sonatype_registry_secrets" {
+  count = local.setup_sonatype_secrets ? 1 : 0
+
+  source               = "./modules/secrets_manager"
+  name                 = "${local.project}-sonatype-registry-${local.environment}"
+  description          = "SonaType Registry Secrets"
+  type                 = "KEY_VALUE"
+  secrets              = local.sonatype_secrets_placeholder
+  ignore_secret_string = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "monitoring"
+      Jira           = "DPR2-69"
+      Resource_Type  = "Secret"
+      Name           = "${local.project}-sonatype-registry-${local.environment}"
+    }
+  )
+}

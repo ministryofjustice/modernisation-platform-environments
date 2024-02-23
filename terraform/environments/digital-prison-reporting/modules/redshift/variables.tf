@@ -33,6 +33,12 @@ variable "create_redshift_cluster" {
   default     = false
 }
 
+variable "create_redshift_schedule" {
+  description = "Determines whether to create Redshift cluster needs a pause/resume Schedule"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)

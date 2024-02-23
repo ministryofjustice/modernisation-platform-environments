@@ -106,8 +106,9 @@ resource "aws_launch_template" "ec2_template" {
 resource "aws_autoscaling_group" "bastion_linux_daily" {
   launch_template {
     id      = aws_launch_template.ec2_template.id
-    version = "$Latest"
+    version = aws_launch_template.ec2_template.latest_version
   }
+
   availability_zones        = ["${var.aws_region}a"]
   name                      = "${var.name}_daily"
   max_size                  = 1
@@ -121,6 +122,11 @@ resource "aws_autoscaling_group" "bastion_linux_daily" {
     key                 = "type"
     value               = "aws_autoscaling_group"
     propagate_at_launch = true
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+    triggers = ["launch_template", "desired_capacity"] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
   }
 
   dynamic "tag" {

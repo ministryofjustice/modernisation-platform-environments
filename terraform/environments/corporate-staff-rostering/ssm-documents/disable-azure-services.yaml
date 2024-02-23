@@ -1,0 +1,30 @@
+---
+schemaVersion: "2.2"
+description:  "Powershell doc to disable Azure services on migrated Windows Azure ami's"
+mainSteps:
+  - name: DisableAzureServices
+    action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
+    inputs:
+      runCommand:
+        - |
+          # Disables the following Azure Services:
+
+          # Microsoft Monitoring Agent 
+          # Windows Azure Guest Agent
+          # Windows Azure Network Agent
+
+          $services = @('HealthService', 'WindowsAzureGuestAgent', 'WindowsAzureNetAgentSvc')
+
+          foreach ($service in $services) {
+            if (Get-Service -Name $service -ErrorAction SilentlyContinue) {
+              Write-Host "Disabling $service"
+              Stop-Service -Name $service -Force
+              Set-Service -Name $service -StartupType Disabled
+            } else {
+              Write-Host "$service doesn't exist"
+            }
+          }

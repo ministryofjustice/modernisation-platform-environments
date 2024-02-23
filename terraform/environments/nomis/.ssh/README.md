@@ -10,6 +10,7 @@ Then update the SSM parameters with [put-keys.sh](put-keys.sh)
 
 ## Using the keys
 Run [get-keys.sh](get-keys.sh) from this directory to download all of the keys.
+Run [create-links.sh](create-links.sh) from this directory to create soft links in your ~/.ssh directory
 
 Example ssh config found [here](https://github.com/ministryofjustice/dso-useful-stuff/blob/main/.ssh/config)
 This assumes keys are stored under your .ssh directory, e.g. `~/.ssh/nomis-development/ec2-user`

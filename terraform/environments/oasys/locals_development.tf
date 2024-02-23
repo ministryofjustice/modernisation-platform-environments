@@ -1,5 +1,16 @@
 # environment specific settings
 locals {
+
+  development_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "oasys_nonprod_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_non_prod"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
+      }
+    }
+  }
+
   development_config = {
 
     ec2_common = {
@@ -13,20 +24,24 @@ locals {
     }
 
 
-    baseline_s3_buckets = {
-
-    }
+    baseline_s3_buckets = {}
 
     baseline_ec2_instances = {
-      "dev-${local.application_name}-db-a" = local.database_a
+      # "dev-${local.application_name}-db-a" = local.database_a
 
     }
 
     baseline_ec2_autoscaling_groups = {
 
       # "dev-${local.application_name}-db-b" = merge(local.database_b, {
-      #   autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-      #   tags                  = local.database_tags
+      #   instance              = merge(module.baseline_presets.ec2_instance.instance.default_db, {
+      #     disable_api_termination      = false
+      #   })
+      #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "app-and-env-vars"
+      #     })
+      #   })
       # })
 
       # "dev-${local.application_name}-web-a" = local.webserver_a
@@ -64,9 +79,9 @@ locals {
       #       arn = length(aws_lb_target_group.internal-lb-https-443) > 0 ? aws_lb_target_group.internal-lb-https-443[0].arn : ""
       #     }
       #   }
-      #   idle_timeout    = 60 # 60 is default
+      #   idle_timeout    = 3600 # 60 is default
       #   security_groups = [] # no security groups for network load balancers
-      #   public_subnets  = module.environment.subnets["public"].ids
+      #   subnets         = module.environment.subnets["public"].ids
       #   tags            = local.tags
       #   listeners = {
       #     https = {
@@ -87,9 +102,9 @@ locals {
       #   force_destroy_bucket     = true
       #   enable_delete_protection = false
       #   existing_target_groups   = {}
-      #   idle_timeout             = 60 # 60 is default
+      #   idle_timeout             = 3600 # 60 is default
       #   security_groups          = ["private_lb_internal", "private_lb_external"]
-      #   public_subnets           = module.environment.subnets["public"].ids
+      #   subnets                  = module.environment.subnets["public"].ids
       #   tags                     = local.tags
 
       #   listeners = {
@@ -158,6 +173,27 @@ locals {
       #   lb_alias_records = [
       #   ]
       # }
+    }
+
+    baseline_cloudwatch_log_groups = {
+      session-manager-logs = {
+        retention_in_days = 1
+      }
+      cwagent-var-log-messages = {
+        retention_in_days = 1
+      }
+      cwagent-var-log-secure = {
+        retention_in_days = 1
+      }
+      cwagent-windows-system = {
+        retention_in_days = 1
+      }
+      cwagent-oasys-autologoff = {
+        retention_in_days = 1
+      }
+      cwagent-web-logs = {
+        retention_in_days = 1
+      }
     }
   }
 }

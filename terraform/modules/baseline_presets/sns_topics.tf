@@ -22,7 +22,7 @@ locals {
       display_name      = "Pager duty integration for ${value}"
       kms_master_key_id = "general"
       subscriptions = {
-        "${key}" = {
+        (key) = {
           protocol = "https"
           endpoint = "https://events.pagerduty.com/integration/${var.environment.pagerduty_integration_keys[value]}/enqueue"
         }

@@ -27,7 +27,11 @@ module "baseline_presets" {
 
   environment  = module.environment
   ip_addresses = module.ip_addresses
-  options      = local.baseline_presets_options
+
+  options = merge(
+    local.baseline_presets_options,
+    local.baseline_environment_presets_options,
+  )
 }
 
 module "baseline" {
@@ -153,6 +157,7 @@ module "baseline" {
   )
 
   ssm_parameters = merge(
+    module.baseline_presets.ssm_parameters,
     local.baseline_ssm_parameters,
     lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
   )

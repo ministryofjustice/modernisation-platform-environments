@@ -17,7 +17,7 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 ### **Service URLs:**
 
-<!--  The URL(s) of the service’s production environment, and test environments if possible--> End users: https://equip-portal.equip.service.justice.gov.uk/
+<!--  The URL(s) of the service’s production environment, and test environments if possible--> End users: <https://equip-portal.equip.service.justice.gov.uk/>
 
 Nimbus (editable version available only to EQuiP team: <https://gateway.equip.service.justice.gov.uk/>
 
@@ -27,11 +27,11 @@ Nimbus (editable version available only to EQuiP team: <https://gateway.equip.se
 
 ### **Incident contact details:**
 
-<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. --> equip.admin@justice.gov.uk
+<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. --> <equip.admin@justice.gov.uk>
 
 ### **Service team contact:**
 
-<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.--> equip.admin@justice.gov.uk
+<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.--> <equip.admin@justice.gov.uk>
 
 ### **Hosting environment:**
 

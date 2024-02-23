@@ -13,28 +13,29 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   name             = "WindowsOSAndMicrosoftApps"
   description      = "Patch both Windows and Microsoft apps"
   operating_system = "WINDOWS"
+  approved_patches = ["KB890830"]
 
   approval_rule {
-    approve_after_days = 14
+    approve_after_days = 5
 
     patch_filter {
       key    = "PRODUCT"
-      values = ["WindowsServer2012", "WindowsServer2016", "WindowsServer2019", "WindowsServer2022"]
+      values = ["WindowsServer2016", "WindowsServer2019", "WindowsServer2022"]
     }
     patch_filter {
-      key    = "CLASSIFICATION"
-      values = ["CriticalUpdates", "SecurityUpdates"]
+      key = "CLASSIFICATION"
+      #     values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups"] - November 2023
+      values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups", "DefinitionUpdates"]
     }
 
     patch_filter {
       key    = "MSRC_SEVERITY"
-      values = ["Critical", "Important", "Moderate"]
+      values = ["Critical", "Important", "Moderate","Unspecified"]
     }
   }
 
   approval_rule {
-    approve_after_days = 14
-
+    approve_after_days = 5
     patch_filter {
       key    = "PATCH_SET"
       values = ["APPLICATION"]
@@ -43,7 +44,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     # Filter on Microsoft product if necessary
     patch_filter {
       key    = "PRODUCT"
-      values = ["Office2003", "Office2007", "Office2010", "Office 2013", "Office 2016", "Office2019", "Office2021"]
+      values = ["Office 2003", "Office 2007", "Office 2010", "Office 2013", "Office 2016", "Office 2019", "Office 2021", "Office 365"]
     }
   }
 }
@@ -51,9 +52,9 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
 
 # Create Maintenance Windows
 
-# Development : First Monday of the month at 18:00
-# UAT: First Tuesday of the month at 18:00
-# Production: Second Tuesday of the month at 20:00
+# Development : Third Tuesday of the month at 18:00
+# UAT: Third Tuesday of the month at 18:00
+# Production: Fourth Tuesday of the month at 20:00
 
 resource "aws_ssm_maintenance_window" "patch_maintenance_window" {
   name              = local.application_data.accounts[local.environment].patch_maintenance_window_name

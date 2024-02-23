@@ -41,49 +41,19 @@ resource "aws_instance" "ec2_mailrelay" {
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-      { Name = "root-block" }
+      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_mailrelay, "root")) },
+      { device-name = "/dev/sda1" }
     )
   }
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-mailrelay", local.application_name, local.environment)) },
-    { instance-scheduling = "skip-scheduling" },
+    { instance-role = local.application_data.accounts[local.environment].instance_role_mailrelay },
+    { instance-scheduling = "skip-auto-start" },
     { backup = "true" }
   )
 
   depends_on = [aws_security_group.ec2_sg_mailrelay]
-}
-
-resource "aws_security_group" "ec2_sg_mailrelay" {
-  name        = "ec2_sg_mailrelay"
-  description = "Security Group for the Mailrelay server"
-  vpc_id      = data.aws_vpc.shared.id
-  tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-mailrelay", local.application_name, local.environment)) }
-  )
-}
-
-resource "aws_security_group_rule" "ingress_traffic_mailrelay" {
-  for_each          = local.application_data.ec2_sg_mailrelay_ingress_rules
-  security_group_id = aws_security_group.ec2_sg_mailrelay.id
-  type              = "ingress"
-  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol          = each.value.protocol
-  from_port         = each.value.from_port
-  to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env]
-}
-
-resource "aws_security_group_rule" "egress_traffic_mailrelay" {
-  for_each          = local.application_data.ec2_sg_mailrelay_egress_rules
-  security_group_id = aws_security_group.ec2_sg_mailrelay.id
-  type              = "egress"
-  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol          = each.value.protocol
-  from_port         = each.value.from_port
-  to_port           = each.value.to_port
-  cidr_blocks       = [each.value.destination_cidr]
-  //  source_security_group_id = aws_security_group.ec2_sg_mailrelay.id
 }
 
 module "cw-mailrelay-ec2" {

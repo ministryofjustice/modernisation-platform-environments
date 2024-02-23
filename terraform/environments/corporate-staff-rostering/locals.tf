@@ -12,24 +12,45 @@ locals {
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
+    enable_azure_sas_token                       = true
+    enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
+    enable_hmpps_domain                          = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
-    enable_oracle_secure_web                     = true
-    enable_ec2_put_parameter                     = false
-    cloudwatch_metric_alarms                     = {}
+    enable_ec2_oracle_enterprise_managed_server  = true
+    enable_ec2_user_keypair                      = true
+    cloudwatch_metric_alarms_default_actions     = ["csr_pagerduty"]
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    sns_topics               = {}
+    sns_topics = {
+      pagerduty_integrations = {
+        csr_pagerduty = "csr_alarms"
+      }
+    }
   }
 
-  baseline_acm_certificates       = {}
-  baseline_cloudwatch_log_groups  = {}
+  baseline_acm_certificates = {}
+  baseline_cloudwatch_log_groups = merge(
+    local.ssm_doc_cloudwatch_log_groups,
+    {
+      cwagent-windows-application = {
+        retention_in_days = 30
+      }
+      cwagent-windows-application-json = {
+        retention_in_days = 30
+      }
+    }
+  )
+  baseline_cloudwatch_log_metric_filters = merge(
+    local.application_log_metric_filters,
+    {},
+  )
   baseline_ec2_autoscaling_groups = {}
   baseline_ec2_instances          = {}
   baseline_iam_policies = {
@@ -40,6 +61,7 @@ locals {
         actions = [
           "ec2-instance-connect:SendSerialConsoleSSHPublicKey",
           "ssm:SendCommand",
+          "ds:describeDirectories",
         ]
         resources = ["*"]
       }]
@@ -57,32 +79,21 @@ locals {
     s3-bucket = {
       iam_policies = module.baseline_presets.s3_iam_policies
     }
-    csr-db-backup-bucket = {
-      custom_kms_key = module.environment.kms_keys["general"].arn
-      iam_policies   = module.baseline_presets.s3_iam_policies
-    }
   }
 
+  baseline_secretsmanager_secrets = {}
+
   baseline_security_groups = {
-    data-db           = local.security_groups.data_db
-    migration-web-sg  = local.security_groups.Web-SG-migration
-    migration-app-sg  = local.security_groups.App-SG-migration
-    migration-db-sg   = local.security_groups.DB-SG-migration
-    domain-controller = local.security_groups.domain-controller-access
+    domain            = local.security_groups.domain
+    web               = local.security_groups.web
+    app               = local.security_groups.app
+    load-balancer     = local.security_groups.load-balancer
+    database          = local.security_groups.database
+    jumpserver        = local.security_groups.jumpserver
   }
+
+  baseline_ssm_parameters = {}
 
   baseline_sns_topics = {}
 
-  baseline_ssm_parameters = {
-    # ssm params at root level
-    "" = {
-      prefix  = ""
-      postfix = ""
-      parameters = {
-        ec2-user_pem = {}
-        test-param-1 = { description = "for SSM docs test" }
-        test-param-2 = { description = "for SSM docs test" }
-      }
-    }
-  }
 }

@@ -11,6 +11,8 @@ in the `validation_records_external` output.
 Step 2: Set the `external_validation_records_created` variable to true
 to validate the certificate.
 
+If the DNS zone which is being added to a certificate is in azure i.e. in example.az.justice.gov.uk then the step which needs to be carried out BEFORE Step 2. is as follows: these need to be created manually by adding them to dso-infra-azure-fixngo repo under the relevant locals. See NOMSDigitalStudioProduction1/webops-prod/dns_records.tf for an example.
+
 Example usage:
 
 ```

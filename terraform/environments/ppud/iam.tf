@@ -185,6 +185,8 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_lambda_role" 
 # SNS IAM Policies
 ###################
 
+## Production
+
 data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
   count     = local.is-production == true ? 1 : 0
   policy_id = "SnsTopicId"
@@ -215,5 +217,99 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     resources = [
       aws_sns_topic.cw_alerts[0].arn
     ]
+  }
+}
+
+## UAT
+
+data "aws_iam_policy_document" "sns_topic_policy_uat_ec2cw" {
+  count     = local.is-preproduction == true ? 1 : 0
+  policy_id = "SnsUATTopicId"
+  statement {
+    sid = "statement1"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Allow"
+    actions = [
+      "SNS:GetTopicAttributes",
+      "SNS:SetTopicAttributes",
+      "SNS:AddPermission",
+      "SNS:DeleteTopic",
+      "SNS:Subscribe",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:Publish",
+      "SNS:Receive"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceOwner"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+
+    resources = [
+      aws_sns_topic.cw_uat_alerts[0].arn
+    ]
+  }
+}
+
+####################################################
+# IAM User, Policy for MGN
+####################################################
+
+#tfsec:ignore:aws-iam-no-user-attached-policies 
+#tfsec:ignore:AWS273
+resource "aws_iam_user" "mgn_user" {
+  #checkov:skip=CKV_AWS_273: "Skipping as tfsec check is also set to ignore"
+  name = "MGN-Test"
+  tags = local.tags
+}
+#tfsec:ignore:aws-iam-no-user-attached-policies
+resource "aws_iam_user_policy_attachment" "mgn_attach_policy" {
+  #tfsec:ignore:aws-iam-no-user-attached-policies
+  #checkov:skip=CKV_AWS_40: "Skipping as tfsec check is also ignored"
+  user       = aws_iam_user.mgn_user.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSApplicationMigrationFullAccess"
+}
+
+####################################################
+# IAM User, Policy, Access Key for email
+####################################################
+
+#tfsec:ignore:aws-iam-no-user-attached-policies
+resource "aws_iam_user" "email" {
+  #checkov:skip=CKV_AWS_273: "Skipping as tfsec check is also ignored"
+  count = local.is-production == false ? 1 : 0
+  name  = format("%s-%s-email_user", local.application_name, local.environment)
+  tags = merge(local.tags,
+    { Name = format("%s-%s-email_user", local.application_name, local.environment) }
+  )
+}
+
+resource "aws_iam_access_key" "email" {
+  count = local.is-production == false ? 1 : 0
+  user  = aws_iam_user.email[0].name
+}
+
+#tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_user_policy" "email_policy" {
+  # checkov:skip=CKV_AWS_40:"Directly attaching the policy makes more sense here"
+  count  = local.is-production == false ? 1 : 0
+  name   = "AmazonSesSendingAccess"
+  user   = aws_iam_user.email[0].name
+  policy = data.aws_iam_policy_document.email.json
+}
+
+#tfsec:ignore:aws-iam-no-policy-wildcards
+data "aws_iam_policy_document" "email" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_356: Policy follows AWS guidance
+  statement {
+    actions = [
+      "ses:SendRawEmail"
+    ]
+    resources = ["*"]
   }
 }

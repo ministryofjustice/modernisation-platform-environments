@@ -23,18 +23,23 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'workflow_dispatch' && github.event_name != 'schedule'
     steps:
+    - name: Extract branch name
+      shell: bash
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+      id: extract_branch
     - name: Checkout
-      uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       with:
-        fetch-depth: 0
+        fetch-depth: 1
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@7c689fe2de15e1692f5cceceb132919ab854081c # v14
+      uses: ministryofjustice/github-actions/terraform-static-analysis@1b6396ceb7bf09e741789c4e7eb7b329d5113066 # v15.4.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         scan_type: changed
         tfsec_exclude: AWS095
         tflint_exclude: terraform_unused_declarations
+        tflint_call_module_type: none        
 
   terraform-static-analysis-full-scan:
     permissions:
@@ -44,32 +49,34 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     steps:
     - name: Checkout
-      uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@7c689fe2de15e1692f5cceceb132919ab854081c # v14
+      uses: ministryofjustice/github-actions/terraform-static-analysis@1b6396ceb7bf09e741789c4e7eb7b329d5113066 # v15.4.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         scan_type: full
         tfsec_exclude: AWS095
         tflint_exclude: terraform_unused_declarations
-
+        tflint_call_module_type: none
+        
   terraform-static-analysis-scheduled-scan:
     name: Terraform Static Analysis - scheduled scan of all directories
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule'
     steps:
     - name: Checkout
-      uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@7c689fe2de15e1692f5cceceb132919ab854081c
+      uses: ministryofjustice/github-actions/terraform-static-analysis@1b6396ceb7bf09e741789c4e7eb7b329d5113066 # v15.4.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         scan_type: full
         tfsec_exclude: AWS095
         tflint_exclude: terraform_unused_declarations
+        tflint_call_module_type: none

@@ -4,14 +4,22 @@ resource "aws_security_group" "dacp_lb_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow access on HTTPS for the MOJ VPN"
+    description = "allow access on HTTPS for the Dom1 Cisco VPN"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
+    cidr_blocks = ["194.33.192.1/32"]
   }
 
-  // whitelist all IPs from the tacticalproducts prod load balancer security group
+  ingress {
+    description = "allow access on HTTPS for the Global Protect VPN"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["35.176.93.186/32"]
+  }
+
+  // whitelist user IPs
   ingress {
     from_port = 443
     to_port   = 443
@@ -30,7 +38,10 @@ resource "aws_security_group" "dacp_lb_sc" {
       "93.56.171.15/32",
       "213.121.161.124/32",
       "188.172.252.34/32",
-      "194.33.197.0/25"
+      "194.33.197.0/25",
+      "18.169.147.172/32",
+      "18.130.148.126/32",
+      "35.176.148.126/32"
     ]
   }
 
@@ -129,12 +140,12 @@ resource "aws_lb_target_group" "dacp_target_group" {
 
   health_check {
     healthy_threshold   = "3"
-    interval            = "15"
+    interval            = "30"
     protocol            = "HTTP"
     port                = "80"
-    unhealthy_threshold = "3"
+    unhealthy_threshold = "5"
     matcher             = "200-302"
-    timeout             = "5"
+    timeout             = "10"
   }
 
 }
@@ -153,4 +164,9 @@ resource "aws_lb_listener" "dacp_lb" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.dacp_target_group.arn
   }
+}
+
+resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
+  resource_arn = aws_lb.dacp_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.dacp_web_acl.arn
 }

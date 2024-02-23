@@ -195,3 +195,489 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
     }
   }
 }
+
+resource "aws_load_balancer_policy" "ingestion-ssl" {
+  load_balancer_name = aws_elb.ingestion_lb.name
+  policy_name        = "ingestion-lb-ssl"
+  policy_type_name   = "SSLNegotiationPolicyType"
+
+  policy_attribute {
+    name  = "Protocol-TLSv1"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "Protocol-SSLv3"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "Protocol-TLSv1.1"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "Protocol-TLSv1.2"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "Server-Defined-Cipher-Order"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-EDH-DSS-DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-ECDSA-AES128-GCM-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-RSA-AES128-GCM-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-ECDSA-AES128-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-RSA-AES128-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-ECDSA-AES128-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-RSA-AES128-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-ECDSA-AES256-GCM-SHA384"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-RSA-AES256-GCM-SHA384"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-ECDSA-AES256-SHA384"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-RSA-AES256-SHA384"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-RSA-AES256-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-ECDSA-AES256-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "AES128-GCM-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "AES128-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "AES128-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "AES256-GCM-SHA384"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "AES256-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "AES256-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-DSS-AES128-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "CAMELLIA128-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EDH-RSA-DES-CBC3-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DES-CBC3-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-RSA-RC4-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "RC4-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ECDHE-ECDSA-RC4-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-DSS-AES256-GCM-SHA384"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-RSA-AES256-GCM-SHA384"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-RSA-AES256-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-DSS-AES256-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-RSA-AES256-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-DSS-AES256-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-RSA-CAMELLIA256-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-DSS-CAMELLIA256-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "CAMELLIA256-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EDH-DSS-DES-CBC3-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-DSS-AES128-GCM-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-RSA-AES128-GCM-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-RSA-AES128-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-DSS-AES128-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-RSA-CAMELLIA128-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-DSS-CAMELLIA128-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-AES128-GCM-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-AES128-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-AES128-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-AES256-GCM-SHA384"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-AES256-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-AES256-SHA256"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-CAMELLIA128-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-CAMELLIA256-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-DES-CBC3-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-RC4-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "ADH-SEED-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-DSS-SEED-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-RSA-SEED-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EDH-DSS-DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EDH-RSA-DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "IDEA-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "RC4-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "SEED-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DES-CBC3-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DES-CBC-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "RC2-CBC-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "PSK-AES256-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "PSK-3DES-EDE-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "KRB5-DES-CBC3-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "KRB5-DES-CBC3-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "PSK-AES128-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "PSK-RC4-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "KRB5-RC4-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "KRB5-RC4-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "KRB5-DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "KRB5-DES-CBC-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-EDH-RSA-DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-EDH-RSA-DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "DHE-RSA-AES128-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-ADH-DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-RC2-CBC-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-KRB5-RC2-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-KRB5-DES-CBC-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-KRB5-RC2-CBC-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-KRB5-DES-CBC-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-ADH-RC4-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-RC4-MD5"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-KRB5-RC4-SHA"
+    value = "true"
+  }
+
+  policy_attribute {
+    name  = "EXP-KRB5-RC4-MD5"
+    value = "true"
+  }
+
+}
+
+resource "aws_load_balancer_listener_policy" "ingestion-listener-policies" {
+  load_balancer_name = aws_elb.ingestion_lb.name
+  load_balancer_port = 443
+
+  policy_names = [
+    aws_load_balancer_policy.ingestion-ssl.policy_name,
+  ]
+}

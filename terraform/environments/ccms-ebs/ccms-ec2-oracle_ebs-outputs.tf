@@ -87,27 +87,27 @@ output "aws_volume_attachment_arch_att_volume_id" {
 
 #
 
-output "aws_ebs_volume_dbf_arn" {
-  description = "aws_ebs_volume dbf arn"
-  value       = aws_ebs_volume.dbf.arn
-}
+#output "aws_ebs_volume_dbf_arn" {
+#  description = "aws_ebs_volume dbf arn"
+#  value       = aws_ebs_volume.dbf.arn
+#}
 
 #
 
-output "aws_volume_attachment_dbf_att_device_name" {
-  description = "aws_volume_attachment dbf_att device_name"
-  value       = aws_volume_attachment.dbf_att.device_name
-}
+#output "aws_volume_attachment_dbf_att_device_name" {
+#  description = "aws_volume_attachment dbf_att device_name"
+#  value       = aws_volume_attachment.dbf_att.device_name
+#}
 
-output "aws_volume_attachment_dbf_att_instance_id" {
-  description = "aws_volume_attachment dbf_att instance_id"
-  value       = aws_volume_attachment.dbf_att.instance_id
-}
+#output "aws_volume_attachment_dbf_att_instance_id" {
+#  description = "aws_volume_attachment dbf_att instance_id"
+#  value       = aws_volume_attachment.dbf_att.instance_id
+#}
 
-output "aws_volume_attachment_dbf_att_volume_id" {
-  description = "aws_volume_attachment dbf_att volume_id"
-  value       = aws_volume_attachment.dbf_att.volume_id
-}
+#output "aws_volume_attachment_dbf_att_volume_id" {
+#  description = "aws_volume_attachment dbf_att volume_id"
+#  value       = aws_volume_attachment.dbf_att.volume_id
+#}
 
 #
 
@@ -231,11 +231,12 @@ output "aws_volume_attachment_diag_att_volume_id" {
 
 #
 
-output "aws_cloudwatch_metric_alarm_disk_free_dbf_arn" {
-  description = "aws_cloudwatch_metric_alarm disk_free_dbf arn"
-  value       = aws_cloudwatch_metric_alarm.disk_free_dbf.arn
-}
-output "aws_cloudwatch_metric_alarm_disk_free_dbf_id" {
-  description = "aws_cloudwatch_metric_alarm disk_free_dbf id"
-  value       = aws_cloudwatch_metric_alarm.disk_free_dbf.id
-}
+#output "aws_cloudwatch_metric_alarm_disk_free_ebsdb_ccms_ebs_dbf_arn" {
+#  description = "aws_cloudwatch_metric_alarm disk_free_ebsdb_ccms_ebs_dbf arn"
+#  value       = aws_cloudwatch_metric_alarm.disk_free_ebsdb_ccms_ebs_dbf.arn
+#}
+
+#output "aws_cloudwatch_metric_alarm_disk_free_ebsdb_ccms_ebs_dbf_id" {
+#  description = "aws_cloudwatch_metric_alarm disk_free_ebsdb_ccms_ebs_dbf id"
+#  value       = aws_cloudwatch_metric_alarm.disk_free_ebsdb_ccms_ebs_dbf.id
+#}

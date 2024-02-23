@@ -2,12 +2,10 @@ locals {
   ##
   # Variables used across multiple areas
   ##
-  domain = "modernisation-platform.service.justice.gov.uk"
-  # domain           = local.is-production ? "jitbit.cr.probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
-  app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
-  # non_prod_app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
-  # prod_app_url     = "helpdesk.${local.domain}"
-  # app_url          = local.is-production ? local.prod_app_url : local.non_prod_app_url
+  domain           = local.is-production ? "jitbit.cr.probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  non_prod_app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
+  prod_app_url     = "helpdesk.${local.domain}"
+  app_url          = local.is-production ? local.prod_app_url : local.non_prod_app_url
 
   app_port = local.application_data.accounts[local.environment].server_port
 
@@ -27,4 +25,11 @@ locals {
   domain_record_sub  = [for k, v in local.domain_types : v.record if k == local.app_url]
   domain_type_main   = [for k, v in local.domain_types : v.type if k == local.domain]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k == local.app_url]
+
+  internal_security_group_cidrs = flatten([
+    module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+    module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
+    module.ip_addresses.moj_cidrs.trusted_mojo_public
+  ])
+
 }

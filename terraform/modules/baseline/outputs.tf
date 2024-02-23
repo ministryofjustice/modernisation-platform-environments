@@ -105,10 +105,7 @@ output "secretsmanager" {
   value = {
     secrets = aws_secretsmanager_secret.this
     secret_versions = {
-      for key, value in merge(
-        aws_secretsmanager_secret_version.fixed,
-        aws_secretsmanager_secret_version.placeholder
-        ) : key => {
+      for key, value in aws_secretsmanager_secret_version.fixed : key => {
         arn            = value.arn
         id             = value.id
         secret_id      = value.secret_id

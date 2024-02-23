@@ -33,6 +33,10 @@ resource "aws_db_subnet_group" "jitbit" {
   tags = local.tags
 }
 
+locals {
+  skip_final_snapshot = try(local.application_data.accounts[local.environment].db_skip_final_snapshot, false)
+}
+
 resource "aws_db_instance" "jitbit" {
   engine         = "sqlserver-se"
   license_model  = "license-included"
@@ -49,8 +53,8 @@ resource "aws_db_instance" "jitbit" {
   parameter_group_name        = "default.sqlserver-se-15.0"
   deletion_protection         = local.application_data.accounts[local.environment].db_deletion_protection
   delete_automated_backups    = local.application_data.accounts[local.environment].db_delete_automated_backups
-  skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
-  final_snapshot_identifier   = try(local.application_data.accounts[local.environment].db_final_snapshot_identifier, null)
+  skip_final_snapshot         = local.skip_final_snapshot
+  final_snapshot_identifier   = !local.skip_final_snapshot ? "${local.application_name}-${local.environment}-database-final-snapshot" : null
   allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
   storage_type                = local.application_data.accounts[local.environment].db_storage_type
@@ -76,15 +80,6 @@ resource "aws_db_instance" "jitbit" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database", local.application_name, local.environment)) }
   )
-
-  # Temporarily adding this to avoiding recreation of the prod database while some investigation is taking place
-  # This list has to be static so will for a short time affect other environments too
-  lifecycle {
-    ignore_changes = [
-      snapshot_identifier,
-      final_snapshot_identifier
-    ]
-  }
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {

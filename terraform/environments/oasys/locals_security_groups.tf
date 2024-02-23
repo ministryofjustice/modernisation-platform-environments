@@ -21,31 +21,69 @@ locals {
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     http7xxx = flatten([
       "10.0.0.0/8",
     ])
   }
-  security_group_cidrs_preprod_prod = {
+  security_group_cidrs_preprod = {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
     ])
     ssh = module.ip_addresses.azure_fixngo_cidrs.prod
     https_internal = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      "10.0.0.0/8",
+      # module.ip_addresses.azure_studio_hosting_cidrs.prod,
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
+      module.ip_addresses.external_cidrs.cloud_platform
     ])
     oracle_db = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      "10.40.40.0/24", # pp oasys
+      "10.40.37.0/24", # pp prison nomis
+      module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
-      "${module.ip_addresses.mp_cidr[module.environment.vpc_name]}",
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
+    http7xxx = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+    ])
+  }
+  security_group_cidrs_prod = {
+    icmp = flatten([
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
+    ])
+    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
+    https_internal = flatten([
+      "10.0.0.0/8",
+      # module.ip_addresses.azure_studio_hosting_cidrs.prod,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+    ])
+    https_external = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
+      module.ip_addresses.external_cidrs.cloud_platform
+    ])
+    oracle_db = flatten([
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      "10.40.6.0/24", # prod oasys
+      "10.40.3.0/24", # prod prison nomis
+      module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
+    ])
+    oracle_oem_agent = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -54,8 +92,8 @@ locals {
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
     test          = local.security_group_cidrs_devtest
-    preproduction = local.security_group_cidrs_preprod_prod
-    production    = local.security_group_cidrs_preprod_prod
+    preproduction = local.security_group_cidrs_preprod
+    production    = local.security_group_cidrs_prod
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
@@ -244,7 +282,7 @@ locals {
           security_groups = [
             "private_lb",
             # "private-jumpserver",
-            # "private-web",
+            "private_web",
             # "bastion-linux",
           ]
         }
@@ -256,8 +294,8 @@ locals {
           cidr_blocks = local.security_group_cidrs.oracle_db
           security_groups = [
             "private_lb",
-            # "private-jumpserver",
-            # "private-web",
+            "bip",
+            "private_web",
             # "bastion-linux",
           ]
         }
@@ -311,7 +349,7 @@ locals {
           from_port       = 9704
           to_port         = 9704
           protocol        = "tcp"
-          security_groups = []
+          security_groups = ["data"]
           cidr_blocks     = local.security_group_cidrs.http7xxx
         }
       }

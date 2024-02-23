@@ -113,6 +113,11 @@ variable "lz_vpc_cidr" {
   description = "The CIDR range of the LAA LZ"
 }
 
+variable "managementcidr" {
+  type        = string
+  description = "The CIDR range of the LAA Management"
+}
+
 
 variable "deletion_protection" {
   type        = string
