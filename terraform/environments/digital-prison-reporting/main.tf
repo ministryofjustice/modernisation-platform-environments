@@ -223,10 +223,10 @@ module "glue_hive_table_creation_job" {
   )
 
   arguments = {
-    "--extra-jars"           = local.glue_jobs_latest_jar_location
-    "--class"                = "uk.gov.justice.digital.job.HiveTableCreationJob"
-    "--dpr.aws.region"       = local.account_region
-    "--dpr.config.s3.bucket" = module.s3_glue_job_bucket.bucket_id,
+    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--class"                     = "uk.gov.justice.digital.job.HiveTableCreationJob"
+    "--dpr.aws.region"            = local.account_region
+    "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id,
     "--dpr.raw.archive.s3.path"   = "s3://${module.s3_raw_archive_bucket.bucket_id}"
     "--dpr.structured.s3.path"    = "s3://${module.s3_structured_bucket.bucket_id}"
     "--dpr.curated.s3.path"       = "s3://${module.s3_curated_bucket.bucket_id}"
@@ -288,10 +288,10 @@ module "glue_s3_file_transfer_job" {
   )
 
   arguments = {
-    "--extra-jars"           = local.glue_jobs_latest_jar_location
-    "--class"                = "uk.gov.justice.digital.job.S3FileTransferJob"
-    "--dpr.aws.region"       = local.account_region
-    "--dpr.config.s3.bucket" = module.s3_glue_job_bucket.bucket_id,
+    "--extra-jars"                            = local.glue_jobs_latest_jar_location
+    "--class"                                 = "uk.gov.justice.digital.job.S3FileTransferJob"
+    "--dpr.aws.region"                        = local.account_region
+    "--dpr.config.s3.bucket"                  = module.s3_glue_job_bucket.bucket_id,
     "--dpr.file.transfer.source.bucket"       = module.s3_raw_bucket.bucket_id
     "--dpr.file.transfer.destination.bucket"  = module.s3_raw_archive_bucket.bucket_id
     "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
@@ -354,10 +354,10 @@ module "glue_switch_prisons_hive_data_location_job" {
   )
 
   arguments = {
-    "--extra-jars"           = local.glue_jobs_latest_jar_location
-    "--class"                = "uk.gov.justice.digital.job.SwitchHiveTableJob"
-    "--dpr.aws.region"       = local.account_region
-    "--dpr.config.s3.bucket" = module.s3_glue_job_bucket.bucket_id,
+    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--class"                     = "uk.gov.justice.digital.job.SwitchHiveTableJob"
+    "--dpr.aws.region"            = local.account_region
+    "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id,
     "--dpr.prisons.database"      = module.glue_prisons_database.db_name
     "--dpr.contract.registryName" = module.s3_schema_registry_bucket.bucket_id
     "--dpr.schema.cache.max.size" = local.hive_table_creation_job_schema_cache_max_size
@@ -413,10 +413,10 @@ module "glue_s3_data_deletion_job" {
   )
 
   arguments = {
-    "--extra-jars"           = local.glue_jobs_latest_jar_location
-    "--class"                = "uk.gov.justice.digital.job.S3DataDeletionJob"
-    "--dpr.aws.region"       = local.account_region
-    "--dpr.config.s3.bucket" = module.s3_glue_job_bucket.bucket_id,
+    "--extra-jars"                     = local.glue_jobs_latest_jar_location
+    "--class"                          = "uk.gov.justice.digital.job.S3DataDeletionJob"
+    "--dpr.aws.region"                 = local.account_region
+    "--dpr.config.s3.bucket"           = module.s3_glue_job_bucket.bucket_id,
     "--dpr.allowed.s3.file.extensions" = "*"
     "--dpr.log.level"                  = local.refresh_job_log_level
   }
@@ -469,7 +469,7 @@ module "glue_stop_glue_instance_job" {
     "--extra-jars"     = local.glue_jobs_latest_jar_location
     "--class"          = "uk.gov.justice.digital.job.StopGlueInstanceJob"
     "--dpr.aws.region" = local.account_region
-    "--dpr.log.level" = local.refresh_job_log_level
+    "--dpr.log.level"  = local.refresh_job_log_level
   }
 }
 
@@ -983,6 +983,14 @@ module "datamart" {
 
   # Endpoint access - only available when using the ra3.x type, for S3 Simple Service
   create_endpoint_access = false
+
+  # Parameter Group Parameters, including Work Load Management
+  parameter_group_parameters = {
+    wlm_json_configuration = {
+      name = "wlm_json_configuration"
+      value = jsonencode(jsondecode(file("./datamart-redshift-wlm.json")))
+    }
+  }
 
   # Scheduled actions
   create_scheduled_action_iam_role = local.create_scheduled_action_iam_role

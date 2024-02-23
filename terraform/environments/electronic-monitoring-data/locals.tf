@@ -4,8 +4,8 @@ locals {
   # CAPITA
   #----------------------------------------------------------------------------
   capita_ssh_keys = [
-      "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBFc140uxPfjq1ilaOxcLYbnyIau2vURzKWFHLsxra+5Vf1nSZypOZ/g9eavBxcf2tkxBjgTx06BeRh3j+QhA8rnV9vKtyh9ZXIe5SNcrGlsGLKMyn+eB05Dt2m58oyMwWA==",
-    ]
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBFc140uxPfjq1ilaOxcLYbnyIau2vURzKWFHLsxra+5Vf1nSZypOZ/g9eavBxcf2tkxBjgTx06BeRh3j+QhA8rnV9vKtyh9ZXIe5SNcrGlsGLKMyn+eB05Dt2m58oyMwWA==",
+  ]
   capita_cidr_ipv4s = [
     "82.203.33.112/28",
     "82.203.33.128/28",
@@ -21,7 +21,7 @@ locals {
     cidr_ipv4s = local.capita_cidr_ipv4s
     cidr_ipv6s = local.capita_cidr_ipv6s
   }
-  
+
   sftp_account_capita_alcohol_monitoring = {
     name       = "alcohol_monitoring"
     ssh_keys   = local.capita_ssh_keys
@@ -46,8 +46,8 @@ locals {
   #----------------------------------------------------------------------------
   # CIVICA
   #----------------------------------------------------------------------------
-  civica_ssh_keys   = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBCJBwZM5nMigS31soM45PITAHCmyhQpdDAkdX1liqnIZSd8A+zn3XQyVRy5E2a39gfsng5hAQetDFJKn+SaayATCQAzN0cJWlcrvtv314UsRV+PxO236sWVf+RwguUDZRQ==",
+  civica_ssh_keys = [
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBK1ZcqH9f7jMPjoOdwQdykQHnOKpmYVVr5gneYtH0KEdhPUdWDE14sh4aOZPl3rDw8Pu7Kj356KJ0FEmKAl3ByJFn6+oBR9GcTpKVmTXUeYlAqptP5Sszr3Zgh0986v8Gw==",
   ]
   civica_cidr_ipv4s = [
     "20.0.26.153/32",
@@ -71,14 +71,14 @@ locals {
   #----------------------------------------------------------------------------
   # G4S
   #----------------------------------------------------------------------------
-  g4s_ssh_keys   = [
+  g4s_ssh_keys = [
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBK85G9UwgU1KKgsYXfTWDsT4MqGSmjku1XGpH1EqmSuXLk5lmwFsgoLqqsROq2oEw2Yrr3uLyNVY2Dl6Pfm+dkdljfbPtqku+AkRSkhDo4K7bIwhWPh7HImcalxhde6BUA== ecdsa-key-20240208",
   ]
   g4s_cidr_ipv4s = [
     "18.135.195.129/32",
   ]
   g4s_cidr_ipv6s = []
-  
+
   sftp_account_g4s_test = {
     name       = "test"
     ssh_keys   = local.g4s_ssh_keys
@@ -95,6 +95,13 @@ locals {
 
   sftp_account_g4s_atv = {
     name       = "atv"
+    ssh_keys   = local.g4s_ssh_keys
+    cidr_ipv4s = local.g4s_cidr_ipv4s
+    cidr_ipv6s = local.g4s_cidr_ipv6s
+  }
+
+  sftp_account_g4s_cap_dw = {
+    name       = "cap_dw"
     ssh_keys   = local.g4s_ssh_keys
     cidr_ipv4s = local.g4s_cidr_ipv4s
     cidr_ipv6s = local.g4s_cidr_ipv6s
@@ -154,7 +161,7 @@ locals {
   #----------------------------------------------------------------------------
   sftp_account_dev = {
     name = "dev_access"
-    ssh_keys   = [
+    ssh_keys = [
       # Matt Price
       "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBA3BsCFaNiGxbmJffRi9q/W3aLmZWgqE6QkeFJD5O6F4nDdjsV1R0ZMUvTSoi3tKqoAE+1RYYj2Ra/F1buHov9e+sFPrlMl0wql6uMsBA1ndiIiKuq+NLY1NOxEvqm2J9Q==",
       # Matt Heery

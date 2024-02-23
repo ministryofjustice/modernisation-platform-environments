@@ -3,6 +3,28 @@ resource "aws_security_group" "bcs" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
+data "aws_iam_policy_document" "secrets_manager" {
+  statement {
+    sid = "SecretPermissions"
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [
+      aws_secretsmanager_secret.ad_username.arn,
+      aws_secretsmanager_secret.ad_password.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "secrets_manager" {
+  name        = "read-access-to-secrets"
+  path        = "/"
+  description = "Allow ec2 instance to read secrets"
+  policy      = data.aws_iam_policy_document.secrets_manager.json
+
+  tags = local.tags
+}
+
 locals {
 
   bcs_instance_count = 3
@@ -14,18 +36,21 @@ locals {
 
   bcs_instance_ebs_volumes_config = {
     data = {
-      iops       = 1000
+      iops       = 3000
       throughput = 125
       type       = "gp3"
     }
     root = {
-      iops       = 1000
+      iops       = 3000
       throughput = 125
       type       = "gp3"
     }
   }
 
-  bcs_instance_profile_policies = []
+  bcs_instance_profile_policies = [
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    aws_iam_policy.secrets_manager.arn
+  ]
 
   bcs_instance_config = {
     associate_public_ip_address  = false
@@ -37,13 +62,22 @@ locals {
     metadata_options_http_tokens = "required"
     monitoring                   = true
     ebs_block_device_inline      = true
-    vpc_security_group_ids       = [aws_security_group.bcs.id]
+
+    vpc_security_group_ids = [
+      aws_security_group.legacy.id,
+      aws_security_group.bcs.id
+    ]
+
     private_dns_name_options = {
       enable_resource_name_dns_aaaa_record = false
       enable_resource_name_dns_a_record    = true
       hostname_type                        = "resource-name"
     }
-    tags = local.tags
+
+    tags = merge(
+      local.tags,
+      { backup = true }
+    )
   }
 
 }
@@ -62,7 +96,7 @@ module "bcs_instance" {
   ami_name                      = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
   ami_owner                     = "self"
   instance                      = local.bcs_instance_config
-  ebs_kms_key_id                = data.aws_kms_key.ebs_shared.id
+  ebs_kms_key_id                = data.aws_kms_key.ebs_shared.arn
   ebs_volumes_copy_all_from_ami = false # probably need to look into integrating the volumes into the AMI
   ebs_volume_config             = local.bcs_instance_ebs_volumes_config
   ebs_volumes                   = local.bcs_instance_ebs_volumes
@@ -74,7 +108,17 @@ module "bcs_instance" {
   iam_resource_names_prefix = "instance-bcs${count.index + 1}"
   instance_profile_policies = local.bcs_instance_profile_policies
 
-  user_data_raw = base64encode("")
+  user_data_raw = base64encode(
+    templatefile(
+      "${path.module}/templates/EC2LaunchV2.yaml.tftpl",
+      {
+        ad_username_secret_name = aws_secretsmanager_secret.ad_username.name
+        ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
+        ad_domain_name          = local.application_data.accounts[local.environment].legacy_ad_domain_name
+        ad_ip_list              = local.application_data.accounts[local.environment].legacy_ad_ip_list
+      }
+    )
+  )
 
   business_unit     = var.networking[0].business-unit
   application_name  = local.application_name

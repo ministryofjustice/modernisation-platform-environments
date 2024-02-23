@@ -1,12 +1,6 @@
 ---
 schemaVersion: "2.2"
 description: "SSM Document for configuring an RDS gateway"
-parameters:
-  newHostname:
-    type: "String"
-    description: "By default uses the Name tag. Otherwise set to keep-existing or the desired hostname 15 chars or less"
-    default: "tag:Name"
-    maxChars: 15
 mainSteps:
   - name: ConfigureRDSGateway
     action: aws:runPowerShellScript
@@ -18,13 +12,13 @@ mainSteps:
       runCommand:
         - |
           $ErrorActionPreference = "Stop" 
-          $GatewayHostname = "{{newHostname}}"
 
           # Lookup domain configuration based on environment-name tag
           $Token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
           $InstanceId = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $Token} -Method GET -Uri http://169.254.169.254/latest/meta-data/instance-id
           $TagsRaw = aws ec2 describe-tags --filters "Name=resource-id,Values=$InstanceId"
           $Tags = "$TagsRaw" | ConvertFrom-Json
+          $GatewayHostname = ($Tags.Tags | Where-Object  {$_.Key -eq "name"}).Value
           $EnvironmentNameTag = ($Tags.Tags | Where-Object  {$_.Key -eq "environment-name"}).Value
           $Environment = $EnvironmentNameTag.Split("-")[-1]
           $ServiceAccountUsername = "svc_configure_windows"
@@ -76,6 +70,8 @@ mainSteps:
             Write-Host "Waiting for $GatewayFQDN to be ready..."
             Start-Sleep -Seconds 10
           }
+
+          winrm s winrm/config/client '@{TrustedHosts="$GatewayFQDN"}'
 
           Invoke-Command -ComputerName $GatewayFQDN -ArgumentList  $DomainNameFQDN  -credential $Credentials -scriptblock {
               $DomainNameFQDN = $args[0]

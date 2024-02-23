@@ -4,7 +4,10 @@ resource "aws_s3_bucket" "this" {
 
   force_destroy = true
 
-  tags = var.tags
+  tags = merge(
+    var.local_tags,
+    var.tags,
+  )
 }
 
 resource "aws_s3_bucket_versioning" "this" {

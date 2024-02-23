@@ -22,8 +22,8 @@ resource "aws_vpc_security_group_egress_rule" "ecs_service_to_db" {
 resource "aws_vpc_security_group_ingress_rule" "alb_to_ecs_service" {
   security_group_id            = aws_security_group.ecs_service.id
   description                  = "load balancer to ecs service"
-  from_port                    = var.ecs_service_port
-  to_port                      = var.ecs_service_port
+  from_port                    = var.container_port_config[0].containerPort
+  to_port                      = var.container_port_config[0].containerPort
   ip_protocol                  = "tcp"
   referenced_security_group_id = var.alb_security_group_id
 }
@@ -38,13 +38,22 @@ resource "aws_security_group_rule" "ecs_service_tls_egress" {
   security_group_id = aws_security_group.ecs_service.id
 }
 
-# Possibly switch to bastion only ingress rule
-resource "aws_security_group_rule" "vpc_to_ecs_service_ingress" {
-  description       = "Allow inbound traffic from VPC"
-  type              = "ingress"
-  from_port         = var.ecs_service_port
-  to_port           = var.ecs_service_port
-  protocol          = "TCP"
-  security_group_id = aws_security_group.ecs_service.id
-  cidr_blocks       = [var.account_config.shared_vpc_cidr]
+resource "aws_security_group_rule" "all_cluster_to_ecs_service_tcp" {
+  for_each                 = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
+  security_group_id        = aws_security_group.ecs_service.id
+  type                     = "ingress"
+  from_port                = each.value
+  to_port                  = each.value
+  protocol                 = "tcp"
+  source_security_group_id = var.cluster_security_group_id
+}
+
+resource "aws_security_group_rule" "bastion_to_ecs_service_tcp" {
+  for_each                 = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
+  security_group_id        = aws_security_group.ecs_service.id
+  type                     = "ingress"
+  from_port                = each.value
+  to_port                  = each.value
+  protocol                 = "tcp"
+  source_security_group_id = var.bastion_sg_id
 }

@@ -19,20 +19,18 @@ module "environment_test" {
   app_name      = local.application_name
   platform_vars = local.platform_vars
 
-  account_config         = local.account_config
-  environment_config     = local.environment_config_test
-  ldap_config            = local.ldap_config_test
-  db_config              = local.db_config_test
-  weblogic_config        = local.weblogic_config_test
-  weblogic_eis_config    = local.weblogic_eis_config_test
-  merge_config           = local.merge_config_test
-  gdpr_config            = local.gdpr_config_test
-  bastion_config         = local.bastion_config_test
-  user_management_config = local.user_management_config_test
+  account_config = local.account_config
+  account_info   = local.account_info
 
-  account_info = local.account_info
-
+  environment_config      = local.environment_config_test
   environments_in_account = local.delius_environments_per_account.test
+
+  bastion_config = local.bastion_config_test
+
+  ldap_config = local.ldap_config_test
+  db_config   = local.db_config_test
+
+  delius_microservice_configs = local.delius_microservices_configs_test
 
   tags = local.tags
 }

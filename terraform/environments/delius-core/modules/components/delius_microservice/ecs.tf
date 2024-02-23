@@ -6,9 +6,12 @@ module "container_definition" {
   container_cpu            = var.container_cpu
   essential                = true
   readonly_root_filesystem = false
-  environment              = var.container_environment_vars
-  secrets                  = var.container_secrets
-  port_mappings            = var.container_port_config
+
+  environment = concat(var.container_environment_vars, local.rds_env_vars, local.elasticache_env_vars)
+
+  secrets       = concat(var.container_secrets, local.rds_secrets)
+  port_mappings = var.container_port_config
+  mount_points  = var.mount_points
   log_configuration = {
     logDriver = "awslogs"
     options = {
@@ -27,7 +30,7 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
+  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=a319c417fe7d499acc7893cf19db6fd566e30822"
   container_definition_json = module.container_definition.json_map_encoded_list
   ecs_cluster_arn           = var.ecs_cluster_arn
   name                      = var.name
@@ -39,22 +42,27 @@ module "ecs_service" {
   task_cpu    = var.container_cpu
   task_memory = var.container_memory
 
+  desired_count                      = var.desired_count
+  deployment_maximum_percent         = var.deployment_maximum_percent
+  deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
+
   service_role_arn   = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.service_role.name}"
   task_role_arn      = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_role.name}"
   task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_exec_role.name}"
 
   environment = var.env_name
-  namespace   = "delius-core"
+  namespace   = var.namespace
 
   health_check_grace_period_seconds = var.health_check_grace_period_seconds
 
-  ecs_load_balancers = [
-    {
-      target_group_arn = aws_lb_target_group.this.arn
-      container_name   = var.name
-      container_port   = var.container_port_config[0].containerPort
-    }
-  ]
+  ecs_load_balancers = concat([{
+    target_group_arn = aws_lb_target_group.frontend.arn
+    container_name   = var.name
+    container_port   = var.container_port_config[0].containerPort
+    }],
+  values(local.ecs_nlbs))
+
+  efs_volumes = var.efs_volumes
 
   security_group_ids = [aws_security_group.ecs_service.id]
 
@@ -62,7 +70,7 @@ module "ecs_service" {
 
   exec_enabled = true
 
-  ignore_changes_task_definition = true
+  ignore_changes_task_definition = true # task definition managed by Delius App team
   redeploy_on_apply              = false
   force_new_deployment           = false
 }

@@ -1,5 +1,4 @@
 # Create user for MGN
-
 #tfsec:ignore:aws-iam-no-user-attached-policies
 #tfsec:ignore:AWS273
 resource "aws_iam_user" "mgn_user" {
@@ -59,21 +58,60 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
 }
 
 resource "aws_iam_role" "lambda-ad-role" {
-  count = local.environment == "test" ? 1 : 0 # temporary
-  name  = "LambdaFunctionADObjectCleanUp"
-  tags  = local.tags
+  name = "LambdaFunctionADObjectCleanUp"
+  tags = local.tags
 
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
-  count      = local.environment == "test" ? 1 : 0 # temporary
-  role       = aws_iam_role.lambda-ad-role[count.index].name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+resource "aws_iam_policy" "lambda-ad-policy" {
+  name = "LambdaADObjectCleanUpPolicy"
+  description = "Policy to grant AD lambda function VPC access"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "ec2:CreateNetworkInterface",
+          "ec2:Describe*",
+          "ec2:DeleteNetworkInterface",
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:UnassignPrivateIpAddresses"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_secrets_manager" {
-  count      = local.environment == "test" ? 1 : 0 # temporary
-  role       = aws_iam_role.lambda-ad-role[count.index].name
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+data "aws_iam_policy" "HmppsDomainSecrets" {
+  name = "HmppsDomainSecretsPolicy"
 }
+
+data "aws_iam_policy" "BusinessUnitKmsCmk" {
+  name = "BusinessUnitKmsCmkPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_secrets" {
+  role       = aws_iam_role.lambda-ad-role.name
+  policy_arn = data.aws_iam_policy.HmppsDomainSecrets.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_kms" {
+  role       = aws_iam_role.lambda-ad-role.name
+  policy_arn = data.aws_iam_policy.BusinessUnitKmsCmk.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda-ad-policy-attachment" {
+  role       = aws_iam_role.lambda-ad-role.name
+  policy_arn = aws_iam_policy.lambda-ad-policy.arn
+}
+
+
+
+

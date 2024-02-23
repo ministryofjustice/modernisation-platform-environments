@@ -473,7 +473,7 @@ locals {
       #       arn = length(aws_lb_target_group.private-lb-https-443) > 0 ? aws_lb_target_group.private-lb-https-443[0].arn : ""
       #     }
       #   }
-      #   idle_timeout    = 60 # 60 is default
+      #   idle_timeout    = 3600 # 60 is default
       #   security_groups = [] # no security groups for network load balancers
       #   subnets         = module.environment.subnets["public"].ids
       #   tags            = local.tags
@@ -496,7 +496,7 @@ locals {
         enable_delete_protection = false
         existing_target_groups = {
         }
-        idle_timeout    = 60 # 60 is default
+        idle_timeout    = 3600 # 60 is default
         security_groups = ["public_lb"]
         subnets         = module.environment.subnets["public"].ids
         tags            = local.tags
@@ -583,7 +583,7 @@ locals {
         force_destroy_bucket     = true
         enable_delete_protection = false
         existing_target_groups   = {}
-        idle_timeout             = 60 # 60 is default
+        idle_timeout             = 3600 # 60 is default
         security_groups          = ["private_lb"]
         subnets                  = module.environment.subnets["private"].ids
         tags                     = local.tags
@@ -686,8 +686,8 @@ locals {
       # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
         records = [
-          { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "300", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db.t1.${local.application_name}", type = "CNAME", ttl = "300", records = ["t1-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "3600", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.t1.${local.application_name}", type = "CNAME", ttl = "3600", records = ["t1-oasys-db-a.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         # lb_alias_records = [
         #   { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
@@ -704,8 +704,8 @@ locals {
           id = module.environment.vpc.id
         }
         records = [
-          { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "300", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
-          { name = "db.t1.${local.application_name}", type = "CNAME", ttl = "300", records = ["t1-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
+          { name = "db.t2.${local.application_name}", type = "CNAME", ttl = "3600", records = ["t2-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
+          { name = "db.t1.${local.application_name}", type = "CNAME", ttl = "3600", records = ["t1-oasys-db-a.oasys.hmpps-test.modernisation-platform.internal"] },
         ]
         lb_alias_records = [
           # { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },

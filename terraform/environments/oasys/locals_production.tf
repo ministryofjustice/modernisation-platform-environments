@@ -44,7 +44,7 @@ locals {
       private = {
         enable_delete_protection = false # change to true before we actually use
         force_destroy_bucket     = false
-        idle_timeout             = "60"
+        idle_timeout             = "3600"
         internal_lb              = true
         security_groups          = ["private_lb"]
         subnets                  = module.environment.subnets["private"].ids
@@ -74,9 +74,9 @@ locals {
     baseline_route53_zones = {
       # (module.environment.domains.public.short_name) = { # "oasys.service.justice.gov.uk"
       #   records = [
-      #     { name = "db", type = "A", ttl = "300", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-      #     { name = "trn.db", type = "A", ttl = "300", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-      #     { name = "ptc.db", type = "A", ttl = "300", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+      #     { name = "db", type = "A", ttl = "3600", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
+      #     { name = "trn.db", type = "A", ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+      #     { name = "ptc.db", type = "A", ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
       #   ]
       #   lb_alias_records = [
       #     { name = "web", type = "A", lbs_map_key = "private" },     #     web.oasys.service.justice.gov.uk

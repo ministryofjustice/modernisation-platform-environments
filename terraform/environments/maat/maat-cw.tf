@@ -12,9 +12,9 @@ resource "aws_cloudwatch_metric_alarm" "maat_EscCPUoverThreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn, aws_sns_topic.AlertCrimeAppsSnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn, aws_sns_topic.AlertCrimeAppsSnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].ECSCPUAlarmThreshold
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_ECSCPUAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
@@ -36,9 +36,9 @@ resource "aws_cloudwatch_metric_alarm" "maat_EcsMemoryOverThreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].EcsMemoryOverThreshold
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_EcsMemoryOverThreshold
   treat_missing_data = "breaching"
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
@@ -60,8 +60,8 @@ resource "aws_cloudwatch_metric_alarm" "maat_EcsCPUNotRunning" {
   statistic          = "SampleCount"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn, aws_sns_topic.AlertCrimeAppsSnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn, aws_sns_topic.AlertCrimeAppsSnsTopic.arn]
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
   threshold          = 0
   treat_missing_data = "breaching"
   dimensions = {
@@ -83,8 +83,6 @@ resource "aws_cloudwatch_metric_alarm" "maat_EcsCPUNotRunning" {
 # 
 #####################################
 
-#######   StatusCheckFailure CLOUDWATCH ALARM
-
 resource "aws_cloudwatch_metric_alarm" "maat_StatusCheckFailure" {
   alarm_name         = "${local.application_name}-status-check-failure-alarm"
   alarm_description  = "If a status check failure occurs on an instance, please investigate. http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html."
@@ -93,9 +91,9 @@ resource "aws_cloudwatch_metric_alarm" "maat_StatusCheckFailure" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn, aws_sns_topic.AlertCrimeAppsSnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn, aws_sns_topic.AlertCrimeAppsSnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].ASGStatusFailureAlarmThreshold
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_ASGStatusFailureAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.maat_ec2_scaling_group.name
@@ -123,9 +121,9 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTime" {
   extended_statistic = "p99"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBTargetResponseTimeThreshold
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_ALBTargetResponseTimeThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -147,9 +145,9 @@ resource "aws_cloudwatch_metric_alarm" "maat_TargetResponseTimeMaximum" {
   statistic          = "Maximum"
   period             = "60"
   evaluation_periods = "1"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBTargetResponseTimeThresholdMaximum
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_ALBTargetResponseTimeThresholdMaximum
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -171,13 +169,13 @@ resource "aws_cloudwatch_metric_alarm" "maat_UnHealthyHosts" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBUnhealthyAlarmThreshold
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_ALBUnhealthyAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
-    TargetGroup = aws_lb_target_group.external.arn
+    TargetGroup  = aws_lb_target_group.external.arn
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
@@ -189,16 +187,16 @@ resource "aws_cloudwatch_metric_alarm" "maat_UnHealthyHosts" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_RejectedConnectionCount" {
-  alarm_name         = "${local.application_name}-RejectevdConnectionCount-alarm"
+  alarm_name         = "${local.application_name}-RejectedConnectionCount-alarm"
   alarm_description  = "There is no surge queue on ALB's. Alert triggers in ALB rejects too many requests, usually due to backend being busy."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "RejectedConnectionCount"
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBRejectedAlarmThreshold
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_ALBRejectedAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -220,9 +218,9 @@ resource "aws_cloudwatch_metric_alarm" "maat_http5xxError" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBTarget5xxAlarmThreshold
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_ALBTarget5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -244,9 +242,9 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB5xxError" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALB5xxAlarmThreshold
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_ALB5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -261,16 +259,16 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB5xxError" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "maat_http4xxError" {
-  alarm_name         = "${local.application_name}-elb-5xx-error-alarm"
+  alarm_name         = "${local.application_name}-http-4xx-error-alarm"
   alarm_description  = "This alarm will trigger if we receive 4 4XX http alerts in a 5 minute period."
   namespace          = "AWS/ApplicationELB"
   metric_name        = "HTTPCode_Target_4XX_Count"
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALBTarget4xxAlarmThreshold
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_ALBTarget4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -279,7 +277,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_http4xxError" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-elb-5xx-error-alarm"
+      Name = "${local.application_name}-http-4xx-error-alarm"
     },
   )
 }
@@ -292,9 +290,9 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB4xxError" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  alarm_actions      = [aws_sns_topic.Sev5SnsTopic.arn]
-  ok_actions         = [aws_sns_topic.Sev5SnsTopic.arn]
-  threshold          = local.application_data.accounts[local.environment].ALB4xxAlarmThreshold 
+  alarm_actions      = [aws_sns_topic.maat_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maat_alerting_topic.arn]
+  threshold          = local.application_data.accounts[local.environment].maat_ALB4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
     LoadBalancer = aws_lb.external.name
@@ -311,7 +309,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ApplicationELB4xxError" {
 
 #####################################
 #
-# Dashboard creation and configuration
+# Dashboard creation and pagerduty configuration
 # 
 #####################################
 
@@ -429,37 +427,45 @@ resource "aws_cloudwatch_dashboard" "maat_cloudwatch_dashboard" {
 EOF
 }
 
-####### CLOUDWATCH ALERTING
+####### CLOUDWATCH PAGERDUTY ALERTING
 
-resource "aws_sns_topic" "Sev5SnsTopic" {
-  name = "${local.application_name}-Sev5SnsTopic"
+# Get the map of pagerduty integration keys from the modernisation platform account
+
+data "aws_secretsmanager_secret" "maat_pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+
+data "aws_secretsmanager_secret_version" "maat_pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.maat_pagerduty_integration_keys.id
+}
+
+# Add a local to get the keys
+locals {
+  maat_pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.maat_pagerduty_integration_keys.secret_string)
+  maat_pagerduty_integration_key_name = local.application_data.accounts[local.environment].maat_pagerduty_integration_key_name
+}
+
+
+# Create SNS topic
+resource "aws_sns_topic" "maat_alerting_topic" {
+  name = "${local.application_name}-${local.environment}-alerting-topic"
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-Sev5SnsTopic"
+      Name = "${local.application_name}-maat-alerting-topic"
     }
   )
 }
 
-resource "aws_sns_topic" "AlertCrimeAppsSnsTopic" {
-  name = "${local.application_name}-AlertCrimeAppsSnsTopic"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-AlertCrimeAppsSnsTopic"
-    }
-  )
+
+# link the sns topic to the service
+module "maat_pagerduty_core_alerts" {
+  depends_on = [
+    aws_sns_topic.maat_alerting_topic
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.maat_alerting_topic.name]
+  pagerduty_integration_key = local.maat_pagerduty_integration_keys[local.maat_pagerduty_integration_key_name]
 }
-
-# resource "aws_sns_topic_subscription" "pagerduty_Sev5_subscription" {
-#   topic_arn = aws_sns_topic.Sev5SnsTopic.arn
-#   protocol  = "https"
-#   endpoint  = "https://events.pagerduty.com/integration/${local.application_data.accounts[local.environment].pagerduty_sev5_integration_key}/enqueue"
-# }
-
-# resource "aws_sns_topic_subscription" "pagerduty_app_subscription" {
-#   topic_arn = aws_sns_topic.AlertCrimeAppsSnsTopic.arn
-#   protocol  = "https"
-#   endpoint  = "https://events.pagerduty.com/integration/${local.application_data.accounts[local.environment].pagerduty_app_integration_key}/enqueue"
-# }
-

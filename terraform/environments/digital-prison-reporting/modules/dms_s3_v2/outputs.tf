@@ -26,7 +26,7 @@ output "dms_target_endpoint_arn" {
 }
 
 output "dms_source_endpoint_arn" {
-  value = var.setup_dms_endpoints && var.setup_dms_nomis_endpoint ? join("", aws_dms_endpoint.dms-s3-target-source.*.endpoint_arn) : ""
+  value = var.setup_dms_endpoints && var.setup_dms_source_endpoint ? join("", aws_dms_endpoint.dms-s3-target-source.*.endpoint_arn) : ""
 }
 
 output "dms_s3_iam_policy_admin_arn" {

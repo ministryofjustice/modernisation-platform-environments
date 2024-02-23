@@ -77,16 +77,16 @@
       {
         "name": "SENTRY_ENVIRONMENT",
         "value": "${sentry_env}"
-      },
-      {
-        "name": "APP_GOOGLE_ANALYTICS_4_TAG_ID",
-        "value": ""
       }
     ],
     "secrets": [
       {
         "name": "APP_DB_PASSWORD",
         "valueFrom": "${db_secret_arn}"
+      },
+      {
+        "name": "APP_GOOGLE_ANALYTICS_4_TAG_ID",
+        "valueFrom": "${google_analytics_4_tag_id}"
       }
     ]
   }

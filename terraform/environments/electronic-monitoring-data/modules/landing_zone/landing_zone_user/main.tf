@@ -24,17 +24,20 @@ resource "aws_transfer_user" "this" {
 
   home_directory = "/${var.landing_bucket.id}/"
 
-  tags = {
-    supplier = var.user_name
-  }
+  tags = merge(
+    var.local_tags,
+    {
+      supplier = var.user_name,
+    },
+  )
 }
 
 resource "aws_iam_role" "this_transfer_user" {
-  name                = "${var.supplier}-${var.user_name}-transfer-user-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
+  name               = "${var.supplier}-${var.user_name}-transfer-user-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.transfer_assume_role.json
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
-    ]
+  ]
 }
 
 resource "aws_iam_role_policy" "this_transfer_user" {
@@ -68,6 +71,6 @@ resource "aws_transfer_ssh_key" "this" {
   server_id = var.transfer_server.id
   user_name = aws_transfer_user.this.user_name
 
-  for_each  = { for ssh_key in var.ssh_keys : ssh_key => ssh_key }
-  body      = each.key
+  for_each = { for ssh_key in var.ssh_keys : ssh_key => ssh_key }
+  body     = each.key
 }

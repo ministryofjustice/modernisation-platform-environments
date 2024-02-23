@@ -7,7 +7,7 @@ module "password_reset_service" {
   env_name              = var.env_name
   container_port_config = [
     {
-      containerPort = 8080
+      containerPort = var.delius_microservice_configs.pwm.container_port
       protocol      = "tcp"
     }
   ]
@@ -30,16 +30,20 @@ module "password_reset_service" {
       #value = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/ldap_admin_password"
     }
   ]
-  ingress_security_groups = []
-  bastion_sg_id           = module.bastion_linux.bastion_security_group
+  db_ingress_security_groups = []
+
+  cluster_security_group_id = aws_security_group.cluster.id
+
+  bastion_sg_id = module.bastion_linux.bastion_security_group
 
   tags                               = var.tags
   microservice_lb_arn                = aws_lb.delius_core_frontend.arn
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
+
   #TODO - check the path based routing based on shared ALB or dedicated
   alb_listener_rule_paths = ["/password-reset"]
   platform_vars           = var.platform_vars
-  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management-ecr-repo:${var.pwm_config.image_tag}"
+  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management-ecr-repo:${var.delius_microservice_configs.pwm.image_tag}"
   account_config          = var.account_config
   #TODO check the health end-point
   health_check_path = "/pwm/actuator/health"
@@ -62,6 +66,11 @@ module "password_reset_service" {
       }))
     }
   ]
+
+  providers = {
+    aws          = aws
+    aws.core-vpc = aws.core-vpc
+  }
 }
 
 #TODO move this to variable after merge

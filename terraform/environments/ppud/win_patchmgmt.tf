@@ -20,7 +20,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
 
     patch_filter {
       key    = "PRODUCT"
-      values = ["WindowsServer2012", "WindowsServer2016", "WindowsServer2019", "WindowsServer2022"]
+      values = ["WindowsServer2016", "WindowsServer2019", "WindowsServer2022"]
     }
     patch_filter {
       key = "CLASSIFICATION"
@@ -30,7 +30,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
 
     patch_filter {
       key    = "MSRC_SEVERITY"
-      values = ["Critical", "Important", "Moderate"]
+      values = ["Critical", "Important", "Moderate","Unspecified"]
     }
   }
 

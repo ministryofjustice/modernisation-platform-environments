@@ -129,7 +129,7 @@ locals {
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
             branch = "oracle_11g_oasys_patchset_addition"
           })
@@ -203,7 +203,7 @@ locals {
         enable_delete_protection = false
         existing_target_groups = {
         }
-        idle_timeout    = 60 # 60 is default
+        idle_timeout    = 3600 # 60 is default
         security_groups = ["public_lb"]
         subnets         = module.environment.subnets["public"].ids
         tags            = local.tags
@@ -272,7 +272,7 @@ locals {
         force_destroy_bucket     = true
         enable_delete_protection = false
         existing_target_groups   = {}
-        idle_timeout             = 60 # 60 is default
+        idle_timeout             = 3600 # 60 is default
         security_groups          = ["private_lb"]
         subnets                  = module.environment.subnets["private"].ids
         tags                     = local.tags
@@ -348,8 +348,8 @@ locals {
       # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-preproduction.modernisation-platform.service.justice.gov.uk
         records = [
-          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db.pp.onr", type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         # lb_alias_records = [
         #   { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },     # pp.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk
@@ -365,9 +365,9 @@ locals {
           id = module.environment.vpc.id
         }
         records = [
-          # { name = "db.pp.${local.application_name}", type = "A", ttl = "300", records = ["10.40.40.133"] }, # for azure 
-          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
-          { name = "db.pp.onr", type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
+          # { name = "db.pp.${local.application_name}", type = "A", ttl = "3600", records = ["10.40.40.133"] }, # for azure 
+          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
+          { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },                         # for aws
         ]
         lb_alias_records = [
           # { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },

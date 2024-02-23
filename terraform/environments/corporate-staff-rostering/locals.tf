@@ -42,11 +42,17 @@ locals {
       cwagent-windows-application = {
         retention_in_days = 30
       }
+      cwagent-windows-application-json = {
+        retention_in_days = 30
+      }
     }
   )
-  baseline_cloudwatch_log_metric_filters = {}
-  baseline_ec2_autoscaling_groups        = {}
-  baseline_ec2_instances                 = {}
+  baseline_cloudwatch_log_metric_filters = merge(
+    local.application_log_metric_filters,
+    {},
+  )
+  baseline_ec2_autoscaling_groups = {}
+  baseline_ec2_instances          = {}
   baseline_iam_policies = {
     CSRWebServerPolicy = {
       description = "Policy allowing access to instances via the Serial Console"
@@ -78,9 +84,6 @@ locals {
   baseline_secretsmanager_secrets = {}
 
   baseline_security_groups = {
-    migration-web-sg  = local.security_groups.Web-SG-migration
-    migration-app-sg  = local.security_groups.App-SG-migration
-    domain-controller = local.security_groups.domain-controller-access
     domain            = local.security_groups.domain
     web               = local.security_groups.web
     app               = local.security_groups.app

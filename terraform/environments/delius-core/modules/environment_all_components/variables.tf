@@ -44,34 +44,11 @@ variable "ldap_config" {
   }
 }
 
+variable "delius_microservice_configs" {
+  type = any
+}
+
 variable "db_config" {
-  type = any
-}
-
-variable "gdpr_config" {
-  type = object({
-    api_image_tag = string
-    ui_image_tag  = string
-  })
-  default = {
-    api_image_tag = "default_image_tag"
-    ui_image_tag  = "default_image_tag"
-  }
-}
-
-variable "merge_config" {
-  type = any
-}
-
-variable "weblogic_config" {
-  type = any
-}
-
-variable "weblogic_eis_config" {
-  type = any
-}
-
-variable "user_management_config" {
   type = any
 }
 
@@ -94,23 +71,4 @@ variable "bastion_config" {
 variable "environments_in_account" {
   type    = list(string)
   default = []
-}
-
-variable "community_api" {
-  type = object({
-    name           = string
-    image_tag      = string
-    container_port = number
-    host_port      = number
-    protocol       = string
-    db_name        = string
-  })
-  default = {
-    name           = "community-api"
-    image_tag      = "default_image_tag"
-    container_port = 8080
-    host_port      = 8080
-    protocol       = "tcp"
-    db_name        = "default_db_name"
-  }
 }

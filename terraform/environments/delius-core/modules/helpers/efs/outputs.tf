@@ -14,3 +14,7 @@ output "sg_id" {
 output "sg_arn" {
   value = aws_security_group.default.arn
 }
+
+output "access_point_id" {
+  value = aws_efs_access_point.ldap.id
+}

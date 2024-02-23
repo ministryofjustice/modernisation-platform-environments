@@ -13,8 +13,21 @@ variable "name" {
   type        = string
 }
 
+
+variable "namespace" {
+  description = "Namespace of the application"
+  type        = string
+  default     = "delius-core"
+}
+
+
 variable "env_name" {
   description = "Environment name short ie dev"
+  type        = string
+}
+
+variable "cluster_security_group_id" {
+  description = "Security group id for the cluster"
   type        = string
 }
 
@@ -29,6 +42,18 @@ variable "rds_engine" {
   description = "RDS engine to use"
   type        = string
   default     = null
+}
+
+variable "rds_endpoint_environment_variable" {
+  description = "Environment variable to store the RDS endpoint"
+  type        = string
+  default     = ""
+}
+
+variable "rds_password_secret_variable" {
+  description = "Secret variable to store the rds secretsmanager arn"
+  type        = string
+  default     = ""
 }
 
 variable "rds_engine_version" {
@@ -157,7 +182,7 @@ variable "rds_enabled_cloudwatch_logs_exports" {
   default     = null
 }
 
-variable "ingress_security_groups" {
+variable "db_ingress_security_groups" {
   description = "Additional RDS/elasticache ingress security groups"
   type        = list(string)
 }
@@ -180,12 +205,6 @@ variable "health_check_grace_period_seconds" {
   default     = 60
 }
 
-variable "ecs_service_port" {
-  description = "The port on which the ECS service is exposing the container"
-  type        = number
-  default     = 443
-}
-
 variable "ecs_cluster_arn" {
   description = "The ARN of the ECS cluster"
   type        = string
@@ -203,6 +222,12 @@ variable "target_group_protocol" {
   description = "The protocol to use for the target group"
   type        = string
   default     = "HTTP"
+}
+
+variable "target_group_protocol_version" {
+  description = "The version of the protocol to use for the target group"
+  type        = string
+  default     = "HTTP2"
 }
 
 variable "certificate_arn" {
@@ -245,6 +270,12 @@ variable "elasticache_engine" {
   default     = "redis"
 }
 
+variable "elasticache_endpoint_environment_variable" {
+  description = "Environment variable to store the elasticache endpoint"
+  type        = string
+  default     = ""
+}
+
 variable "elasticache_engine_version" {
   description = "The Elasticache engine version"
   type        = string
@@ -272,6 +303,18 @@ variable "elasticache_num_cache_nodes" {
   description = "The Elasticache number of cache nodes"
   type        = number
   default     = 1
+}
+
+variable "elasticache_parameter_group_family" {
+  description = "The Elasticache parameter group family"
+  type        = string
+  default     = "redis5.0"
+}
+
+variable "elasticache_parameters" {
+  description = "A map of elasticache parameter names & values"
+  type        = map(string)
+  default     = {}
 }
 
 variable "container_environment_vars" {
@@ -355,4 +398,41 @@ variable "container_cpu" {
 variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string
+}
+
+
+variable "create_service_nlb" {
+  description = "Whether to create a service NLB"
+  type        = bool
+  default     = false
+}
+
+variable "desired_count" {
+  description = "The desired count of the service"
+  type        = number
+  default     = 1
+}
+
+variable "efs_volumes" {
+  description = "The EFS volumes to mount"
+  type        = list(any)
+  default     = []
+}
+
+variable "mount_points" {
+  description = "The mount points for the EFS volumes"
+  type        = list(any)
+  default     = []
+}
+
+variable "deployment_minimum_healthy_percent" {
+  type        = number
+  description = "The lower limit (as a percentage of `desired_count`) of the number of tasks that must remain running and healthy in a service during a deployment"
+  default     = 0
+}
+
+variable "deployment_maximum_percent" {
+  type        = number
+  description = "The upper limit of the number of tasks (as a percentage of `desired_count`) that can be running in a service during a deployment"
+  default     = 100
 }

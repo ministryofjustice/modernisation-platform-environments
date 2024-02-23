@@ -8,14 +8,17 @@ resource "aws_security_group" "this" {
   name        = "${var.supplier}-${var.user_name}-inbound-ips"
   description = "Allowed IP addresses for ${var.user_name} on ${var.supplier} server"
   vpc_id      = var.vpc_id
-  
+
   lifecycle {
     create_before_destroy = true
   }
 
-  tags = {
-    supplier = var.user_name
-  }
+  tags = merge(
+    var.local_tags,
+    {
+      supplier = var.user_name,
+    },
+  )
 }
 
 resource "aws_vpc_security_group_ingress_rule" "this_ipv4" {

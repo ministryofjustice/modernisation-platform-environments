@@ -24,6 +24,13 @@ resource "aws_iam_role" "maat_ec2_instance_role" {
                "Service": "ec2.amazonaws.com"
             },
             "Effect": "Allow"
+        },
+        {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "ecs-tasks.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
         }
     ]
 }
@@ -34,59 +41,33 @@ resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
   name = "${local.application_name}-ec2-instance-role-policy"
 
   policy = jsonencode({
-   Version = "2012-10-17"
-   Statement = [
+    Version = "2012-10-17"
+    Statement = [
       {
         Effect = "Allow"
         Action = [
-            "ecs:CreateCluster",
-            "ecs:DeregisterContainerInstance",
-            "ecs:DiscoverPollEndpoint",
-            "ecs:Poll",
-            "ecs:RegisterContainerInstance",
-            "ecs:StartTelemetrySession",
-            "ecs:Submit*",
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents",
-            "logs:DescribeLogStreams",
-            "ecr:*",
-            "xray:PutTraceSegments",
-            "xray:PutTelemetryRecords",
-            "xray:GetSamplingRules",
-            "xray:GetSamplingTargets",
-            "xray:GetSamplingStatisticSummaries"
+          "ecs:CreateCluster",
+          "ecs:DeregisterContainerInstance",
+          "ecs:DiscoverPollEndpoint",
+          "ecs:Poll",
+          "ecs:RegisterContainerInstance",
+          "ecs:StartTelemetrySession",
+          "ecs:Submit*",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams",
+          "ecr:*",
+          "xray:PutTraceSegments",
+          "xray:PutTelemetryRecords",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:GetSamplingStatisticSummaries"
         ]
         Resource = "*"
       },
     ]
   })
-}
-
-resource "aws_iam_policy" "maat_ec2_instance_role_policy_access_params" {
-  name = "${local.application_name}-ec2-instance-role-policy-access-params"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = "ssm:GetParameters"
-        Resource = [
-          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat/*"
-        ]
-      }
-    ]
-  })
-
-  tags = {
-    Name = "${local.application_name}-ec2-instance-role-policy-access-params"
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "mmaat_ec2_instance_role_policy_attachment_access_params" {
-  role       = aws_iam_role.maat_ec2_instance_role.name
-  policy_arn = aws_iam_policy.maat_ec2_instance_role_policy_access_params.arn
 }
 
 resource "aws_iam_role_policy_attachment" "maat_ec2_instance_role_policy_attachment" {
@@ -127,9 +108,9 @@ resource "aws_ecs_cluster" "maat_ecs_cluster" {
 ##### EC2 launch config/template -----
 
 resource "aws_launch_template" "maat_ec2_launch_template" {
-  name_prefix            = "${local.application_name}-ec2-launch-template"
-  image_id               = local.application_data.accounts[local.environment].ami_id
-  instance_type          = local.application_data.accounts[local.environment].instance_type
+  name_prefix   = "${local.application_name}-ec2-launch-template"
+  image_id      = local.application_data.accounts[local.environment].ami_id
+  instance_type = local.application_data.accounts[local.environment].instance_type
 
   monitoring {
     enabled = true
@@ -140,11 +121,11 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
   }
 
   network_interfaces {
-    security_groups             = [aws_security_group.maat_ecs_security_group.id]
+    security_groups = [aws_security_group.maat_ecs_security_group.id]
   }
 
   user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
-    maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group, app_ecs_cluster = aws_ecs_cluster.maat_ecs_cluster.name }))
+  maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group, app_ecs_cluster = aws_ecs_cluster.maat_ecs_cluster.name }))
 
   tag_specifications {
     resource_type = "instance"
@@ -168,12 +149,12 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
 #### EC2 Scaling Group  -----
 
 resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
-  vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
-  name                  = "${local.application_name}-EC2-asg"
-  desired_capacity      = local.application_data.accounts[local.environment].ec2_asg_desired_capacity
-  max_size              = local.application_data.accounts[local.environment].ec2_asg_max_size
-  min_size              = local.application_data.accounts[local.environment].ec2_asg_min_size
-  metrics_granularity   = "1Minute"
+  vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
+  name                = "${local.application_name}-EC2-asg"
+  desired_capacity    = local.application_data.accounts[local.environment].maat_ec2_asg_desired_capacity
+  max_size            = local.application_data.accounts[local.environment].maat_ec2_asg_max_size
+  min_size            = local.application_data.accounts[local.environment].maat_ec2_asg_min_size
+  metrics_granularity = "1Minute"
 
 
   launch_template {
@@ -195,21 +176,21 @@ resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
 #### EC2 Scaling Policies 
 
 resource "aws_autoscaling_policy" "maat_ec2_scaling_up_policy" {
-  name               = "${local.application_name}-ec2-scaling-up"
-  policy_type        = "SimpleScaling"
-  adjustment_type         = "ChangeInCapacity"
+  name                   = "${local.application_name}-ec2-scaling-up"
+  policy_type            = "SimpleScaling"
+  adjustment_type        = "ChangeInCapacity"
   autoscaling_group_name = aws_autoscaling_group.maat_ec2_scaling_group.name
-  cooldown                = 60
-  scaling_adjustment          = 1
+  cooldown               = 60
+  scaling_adjustment     = 1
 }
 
 resource "aws_autoscaling_policy" "maat_ec2_scaling_down_policy" {
-  name               = "${local.application_name}-ec2-scaling-down"
-  policy_type        = "SimpleScaling"
-  adjustment_type         = "ChangeInCapacity"
+  name                   = "${local.application_name}-ec2-scaling-down"
+  policy_type            = "SimpleScaling"
+  adjustment_type        = "ChangeInCapacity"
   autoscaling_group_name = aws_autoscaling_group.maat_ec2_scaling_group.name
-  cooldown                = 60
-  scaling_adjustment          = -1
+  cooldown               = 60
+  scaling_adjustment     = -1
 }
 
 #### ECS Security Groups -----
@@ -239,11 +220,11 @@ resource "aws_security_group_rule" "outbound" {
 }
 
 resource "aws_security_group_rule" "maat_sg_rule_int_lb_to_ecs" {
-  security_group_id       = aws_security_group.maat_ecs_security_group.id
-  type                    = "ingress"
-  from_port               = 0
-  to_port                 = 0
-  protocol               = "-1"
+  security_group_id        = aws_security_group.maat_ecs_security_group.id
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = aws_security_group.maat_int_lb_sg.id
 }
 
@@ -297,7 +278,7 @@ resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ec2" {
 resource "aws_cloudwatch_log_group" "ec2_cloudwatch_log_group" {
   name              = local.application_data.accounts[local.environment].maat_ec2_log_group
   retention_in_days = 90
-  kms_key_id = aws_kms_key.maat_ec2_cloudwatch_log_key.arn
+  kms_key_id        = aws_kms_key.maat_ec2_cloudwatch_log_key.arn
 }
 
 ##### EC2 CloudWatch Alarms
@@ -311,7 +292,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ec2_high_cpu_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = local.application_data.accounts[local.environment].ec2_cpu_scaling_up_threshold
+  threshold           = local.application_data.accounts[local.environment].maat_ec2_cpu_scaling_up_threshold
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_autoscaling_policy.maat_ec2_scaling_up_policy.arn]
@@ -330,7 +311,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ec2_low_cpu_alarm" {
   statistic           = "Average"
   period              = 60
   evaluation_periods  = 3
-  threshold           = local.application_data.accounts[local.environment].ec2_cpu_scaling_down_threshold
+  threshold           = local.application_data.accounts[local.environment].maat_ec2_cpu_scaling_down_threshold
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_autoscaling_policy.maat_ec2_scaling_down_policy.arn]
@@ -376,18 +357,18 @@ resource "aws_iam_policy" "maat_ecs_service_role_policy" {
   name = "${local.application_name}-ecs-service-role-policy"
 
   policy = jsonencode({
-   Version = "2012-10-17"
-   Statement = [
+    Version = "2012-10-17"
+    Statement = [
       {
         Effect = "Allow"
         Action = [
-            "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-            "elasticloadbalancing:DeregisterTargets",
-            "elasticloadbalancing:Describe*",
-            "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-            "elasticloadbalancing:RegisterTargets",
-            "ec2:Describe*",
-            "ec2:AuthorizeSecurityGroupIngress"
+          "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+          "elasticloadbalancing:DeregisterTargets",
+          "elasticloadbalancing:Describe*",
+          "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+          "elasticloadbalancing:RegisterTargets",
+          "ec2:Describe*",
+          "ec2:AuthorizeSecurityGroupIngress"
         ]
         Resource = "*"
       },
@@ -430,17 +411,17 @@ resource "aws_iam_policy" "maat_ecs_autoscaling_role_policy" {
   name = "${local.application_name}-ecs-autoscaling-role-policy"
 
   policy = jsonencode({
-   Version = "2012-10-17"
-   Statement = [
+    Version = "2012-10-17"
+    Statement = [
       {
         Effect = "Allow"
         Action = [
-            "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-            "application-autoscaling:*",
-            "cloudwatch:DescribeAlarms",
-            "cloudwatch:PutMetricAlarm",
-            "ecs:DescribeServices",
-            "ecs:UpdateService"
+          "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+          "application-autoscaling:*",
+          "cloudwatch:DescribeAlarms",
+          "cloudwatch:PutMetricAlarm",
+          "ecs:DescribeServices",
+          "ecs:UpdateService"
         ]
         Resource = "*"
       },
@@ -453,37 +434,82 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_autoscaling_role_policy_atta
   policy_arn = aws_iam_policy.maat_ecs_autoscaling_role_policy.arn
 }
 
+resource "aws_iam_policy" "maat_ecs_policy_access_params" {
+  name = "${local.application_name}-ecs-policy-access-params"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "ssm:GetParameters"
+        Resource = [
+          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "cloudwatch:PutMetricData",
+          "sqs:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage"
+        ]
+        Resource = "arn:aws:ecr:${local.env_account_region}:374269020027:repository/${local.application_name}-ecr-repo"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${local.application_name}-ecs-policy-access-params"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "maat_ecs_tasks_role_policy_attachment_access_params" {
+  role       = aws_iam_role.maat_ec2_instance_role.name
+  policy_arn = aws_iam_policy.maat_ecs_policy_access_params.arn
+}
 #### ECS TASK DEFINITION -------
 
 resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
-  family                   = "${local.application_name}-ecs-task-definition"
-  execution_role_arn       = aws_iam_role.maat_ec2_instance_role.arn
-  task_role_arn            = aws_iam_role.maat_ec2_instance_role.arn
-  
-  container_definitions = templatefile("maat-task-definition.json", 
+  family             = "${local.application_name}-ecs-task-definition"
+  execution_role_arn = aws_iam_role.maat_ec2_instance_role.arn
+  # task_role_arn            = aws_iam_role.maat_ec2_instance_role.arn
+
+  container_definitions = templatefile("maat-task-definition.json",
     {
-    maat_docker_image_tag       = local.application_data.accounts[local.environment].maat_docker_image_tag
-    xray_docker_image_tag       = local.application_data.accounts[local.environment].xray_docker_image_tag
-    region                      = local.application_data.accounts[local.environment].region
-    sentry_env                  = local.environment
-    maat_orch_base_url          = local.application_data.accounts[local.environment].maat_orch_base_url
-    maat_ccp_base_url           = local.application_data.accounts[local.environment].maat_ccp_base_url
-    maat_orch_oauth_url         = local.application_data.accounts[local.environment].maat_orch_oauth_url
-    maat_ccc_oauth_url          = local.application_data.accounts[local.environment].maat_ccc_oauth_url
-    maat_cma_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_cma_endpoint_auth_url
-    maat_ccp_endpoint_auth_url  = local.application_data.accounts[local.environment].maat_ccp_endpoint_auth_url
-    maat_db_url                 = local.application_data.accounts[local.environment].maat_db_url
-    maat_ccc_base_url           = local.application_data.accounts[local.environment].maat_ccc_base_url
-    maat_caa_oauth_url          = local.application_data.accounts[local.environment].maat_caa_oauth_url
-    maat_bc_endpoint_url        = local.application_data.accounts[local.environment].maat_bc_endpoint_url
-    maat_mlra_url               = local.application_data.accounts[local.environment].maat_mlra_url
-    maat_caa_base_url           = local.application_data.accounts[local.environment].maat_caa_base_url
-    maat_cma_base_url           = local.application_data.accounts[local.environment].maat_cma_base_url
-    ecr_url                     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
-    maat_ecs_log_group         = local.application_data.accounts[local.environment].maat_ecs_log_group
-    maat_aws_stream_prefix      = local.application_data.accounts[local.environment].maat_aws_stream_prefix
-    env_account_region         = local.env_account_region
-    env_account_id             = local.env_account_id
+      maat_docker_image_tag      = local.application_data.accounts[local.environment].maat_docker_image_tag
+      xray_docker_image_tag      = local.application_data.accounts[local.environment].xray_docker_image_tag
+      region                     = local.application_data.accounts[local.environment].region
+      sentry_env                 = local.environment
+      maat_orch_base_url         = local.application_data.accounts[local.environment].maat_orch_base_url
+      maat_ccp_base_url          = local.application_data.accounts[local.environment].maat_ccp_base_url
+      maat_orch_oauth_url        = local.application_data.accounts[local.environment].maat_orch_oauth_url
+      maat_ccc_oauth_url         = local.application_data.accounts[local.environment].maat_ccc_oauth_url
+      maat_cma_endpoint_auth_url = local.application_data.accounts[local.environment].maat_cma_endpoint_auth_url
+      maat_ccp_endpoint_auth_url = local.application_data.accounts[local.environment].maat_ccp_endpoint_auth_url
+      maat_db_url                = local.application_data.accounts[local.environment].maat_db_url
+      maat_ccc_base_url          = local.application_data.accounts[local.environment].maat_ccc_base_url
+      maat_caa_oauth_url         = local.application_data.accounts[local.environment].maat_caa_oauth_url
+      maat_bc_endpoint_url       = local.application_data.accounts[local.environment].maat_bc_endpoint_url
+      maat_mlra_url              = local.application_data.accounts[local.environment].maat_mlra_url
+      maat_caa_base_url          = local.application_data.accounts[local.environment].maat_caa_base_url
+      maat_cma_base_url          = local.application_data.accounts[local.environment].maat_cma_base_url
+      ecr_url                    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
+      maat_ecs_log_group         = local.application_data.accounts[local.environment].maat_ecs_log_group
+      maat_aws_stream_prefix     = local.application_data.accounts[local.environment].maat_aws_stream_prefix
+      env_account_region         = local.env_account_region
+      env_account_id             = local.env_account_id
     }
   )
 
@@ -602,12 +628,12 @@ resource "aws_cloudwatch_log_group" "maat_ecs_cloudwatch_log_group" {
 #### ECS Service ------
 
 resource "aws_ecs_service" "maat_ecs_service" {
-  name                              = "${local.application_name}-ecs-service"
-  cluster                           = aws_ecs_cluster.maat_ecs_cluster.id
-  desired_count                     = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
-  task_definition                   = aws_ecs_task_definition.maat_ecs_task_definition.arn
+  name            = "${local.application_name}-ecs-service"
+  cluster         = aws_ecs_cluster.maat_ecs_cluster.id
+  desired_count   = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
+  task_definition = aws_ecs_task_definition.maat_ecs_task_definition.arn
   # iam_role                          = aws_iam_role.maat_ecs_service_role.arn
-  depends_on                        = [aws_lb_listener.external, aws_lb_listener.maat_internal_lb_https_listener]
+  depends_on = [aws_lb_listener.external, aws_lb_listener.maat_internal_lb_https_listener]
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
@@ -620,7 +646,7 @@ resource "aws_ecs_service" "maat_ecs_service" {
     target_group_arn = aws_lb_target_group.external.arn
   }
 
-    load_balancer {
+  load_balancer {
     container_name   = upper(local.application_name)
     container_port   = 8080
     target_group_arn = aws_lb_target_group.maat_internal_lb_target_group.arn

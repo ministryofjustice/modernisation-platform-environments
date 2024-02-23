@@ -7,27 +7,30 @@ locals {
     }
   }
   ssm_docs = {
-    windows-domain-join = {
-      content = file("./ssm-documents/windows-domain-join.yaml")
-    }
-    windows-cloudwatch-agent-config = {
-      content = file("./ssm-documents/windows-cloudwatch-agent-config.yaml")
-    }
-    ami-build-command = {
-      content = file("./ssm-documents/ami-build-command.yaml")
-    }
     ami-build-automation = {
       document_type = "Automation"
       content       = file("./ssm-documents/ami-build-automation.yaml")
     }
-    leave-windows-domain = {
-      content = file("./ssm-documents/leave-windows-domain.yaml")
+    ami-build-command = {
+      content = file("./ssm-documents/ami-build-command.yaml")
+    }
+    disable-azure-services = {
+      content = file("./ssm-documents/disable-azure-services.yaml")
+    }
+    network-testing-tools = {
+      content = file("./ssm-documents/network-testing-tools.yaml")
     }
     remove-local-users-windows = {
       content = file("./ssm-documents/remove-local-users-windows.yaml")
     }
-    network-testing-tools = {
-      content = file("./ssm-documents/network-testing-tools.yaml")
+    windows-cloudwatch-agent-config = {
+      content = file("./ssm-documents/windows-cloudwatch-agent-config.yaml")
+    }
+    windows-domain-join = {
+      content = file("./ssm-documents/windows-domain-join.yaml")
+    }
+    windows-domain-leave = {
+      content = file("./ssm-documents/windows-domain-leave.yaml")
     }
     # windows-psreadline-fix = {
     #   content = file("./ssm-documents/windows-psreadline-fix.yaml")
