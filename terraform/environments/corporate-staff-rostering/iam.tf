@@ -64,6 +64,31 @@ resource "aws_iam_role" "lambda-ad-role" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
+resource "aws_iam_policy" "lambda-ad-policy" {
+  name = "LambdaADObjectCleanUpPolicy"
+  description = "Policy to grant AD lambda function VPC access"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "ec2:CreateNetworkInterface",
+          "ec2:Describe*",
+          "ec2:DeleteNetworkInterface",
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:UnassignPrivateIpAddresses"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
 data "aws_iam_policy" "HmppsDomainSecrets" {
   name = "HmppsDomainSecretsPolicy"
 }
@@ -82,9 +107,9 @@ resource "aws_iam_role_policy_attachment" "lambda_kms" {
   policy_arn = data.aws_iam_policy.BusinessUnitKmsCmk.arn
 }
 
-resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
+resource "aws_iam_role_policy_attachment" "lambda-ad-policy-attachment" {
   role       = aws_iam_role.lambda-ad-role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+  policy_arn = aws_iam_policy.lambda-ad-policy.arn
 }
 
 

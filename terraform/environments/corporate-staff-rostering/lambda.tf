@@ -17,6 +17,7 @@ module "ad-clean-up-lambda" {
   source_code_hash = filebase64sha256("${path.module}/lambda/ad-clean-up/deployment_package.zip")
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.12"
+  timeout          = 60
 
   create_role = false
   lambda_role = aws_iam_role.lambda-ad-role.arn
@@ -79,7 +80,6 @@ module "lambda_cw_logs_xml_to_json" {
   source_code_hash = filebase64sha256("${path.module}/lambda/cw-xml-to-json/deployment_package.zip")
   runtime          = "python3.12"
   handler          = "lambda_function.lambda_handler"
-  timeout          = 60
 
   policy_json_attached = true
   policy_json = jsonencode({
