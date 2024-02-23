@@ -1,7 +1,7 @@
 ## ALB target group and listener rule
 resource "aws_lb_target_group" "frontend" {
   # checkov:skip=CKV_AWS_261
-  name                 = "${var.env_name}-${var.name}"
+  name_prefi           = "${var.env_name}-${var.name}"
   port                 = var.container_port_config[0].containerPort
   protocol             = var.target_group_protocol
   protocol_version     = var.target_group_protocol_version
@@ -25,6 +25,9 @@ resource "aws_lb_target_group" "frontend" {
     timeout             = "5"
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener_rule" "alb" {
@@ -39,9 +42,6 @@ resource "aws_lb_listener_rule" "alb" {
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.frontend.arn
-  }
-  lifecycle {
-    replace_triggered_by = [aws_lb_target_group.frontend]
   }
 }
 
