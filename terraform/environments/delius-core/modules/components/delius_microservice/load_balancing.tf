@@ -78,8 +78,9 @@ resource "aws_route53_record" "alb_r53_record" {
   name     = "${var.name}.${var.env_name}.${var.account_config.dns_suffix}"
   type     = "CNAME"
   alias {
-    name    = var.microservice_lb.dns_name
-    zone_id = var.microservice_lb.zone_id
+    evaluate_target_health = true
+    name                   = var.microservice_lb.dns_name
+    zone_id                = var.microservice_lb.zone_id
   }
 }
 
