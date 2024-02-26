@@ -372,6 +372,13 @@ variable "alb_listener_rule_paths" {
   default     = null
 }
 
+
+variable "alb_listener_rule_host_header" {
+  description = "Host header to use for the alb listener rule"
+  type        = string
+  default     = null
+}
+
 variable "cloudwatch_error_pattern" {
   description = "The cloudwatch error pattern to use for the alarm"
   type        = string
