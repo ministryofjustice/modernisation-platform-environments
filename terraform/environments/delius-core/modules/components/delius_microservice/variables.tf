@@ -235,9 +235,9 @@ variable "certificate_arn" {
   type        = string
 }
 
-variable "microservice_lb_arn" {
-  description = "The ARN of the load balancer to use for the target group"
-  type        = string
+variable "microservice_lb" {
+  description = "load balancer to use for the target group"
+  type        = any
 }
 
 variable "microservice_lb_https_listener_arn" {

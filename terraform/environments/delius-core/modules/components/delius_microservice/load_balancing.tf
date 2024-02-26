@@ -57,7 +57,7 @@ resource "aws_lb_listener_rule" "alb_path" {
 }
 
 resource "aws_lb_listener_rule" "alb_header" {
-  count        = var.alb_listener_rule_host_headers != null ? 1 : 0
+  count        = var.alb_listener_rule_host_header != null ? 1 : 0
   listener_arn = var.microservice_lb_https_listener_arn
   priority     = var.alb_listener_rule_priority != null ? var.alb_listener_rule_priority : null
   condition {
@@ -71,6 +71,17 @@ resource "aws_lb_listener_rule" "alb_header" {
   }
 }
 
+resource "aws_route53_record" "alb_r53_record" {
+  count    = var.alb_listener_rule_host_header != null ? 1 : 0
+  provider = aws.core-vpc
+  zone_id  = var.account_config.route53_inner_zone_info.zone_id
+  name     = "${var.name}.${var.env_name}.${var.account_config.dns_suffix}"
+  type     = "CNAME"
+  alias {
+    name    = var.microservice_lb.dns_name
+    zone_id = var.microservice_lb.zone_id
+  }
+}
 
 # NLB for service interconnectivity
 
