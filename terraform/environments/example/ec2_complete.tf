@@ -24,9 +24,9 @@ resource "aws_key_pair" "ec2-user-complete" {
 
 locals {
 
-  comp_app_name            = "ec2-complete" # This is used as the primary label to desribe the resources.
-  comp_business_unit       = var.networking[0].business-unit
-  comp_region              = "eu-west-2"
+  comp_app_name      = "ec2-complete" # This is used as the primary label to desribe the resources.
+  comp_business_unit = var.networking[0].business-unit
+  comp_region        = "eu-west-2"
 
 
   # This local is used by the module variable "instance".  
@@ -63,12 +63,12 @@ locals {
         ebs_volumes = {
           "/dev/sdf" = { size = 20, type = "gp3" }
         }
-        ami_name  = "amzn2-ami-kernel-5.10-hvm-2.0.20240131.0-x86_64-gp2" # Note the module requires the AMI name, not the ID.
-        ami_owner = "137112412989"
-        subnet_id = data.aws_subnet.private_subnets_a.id # This example creates the ec2 in a private subnet.
+        ami_name          = "amzn2-ami-kernel-5.10-hvm-2.0.20240131.0-x86_64-gp2" # Note the module requires the AMI name, not the ID.
+        ami_owner         = "137112412989"
+        subnet_id         = data.aws_subnet.private_subnets_a.id # This example creates the ec2 in a private subnet.
         availability_zone = "eu-west-2a"
-        instance_type = "t3.small"
-        user_data = <<EOF
+        instance_type     = "t3.small"
+        user_data         = <<EOF
             #!/bin/bash
             yum update -y
             yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
@@ -95,12 +95,12 @@ locals {
         ebs_volumes = {
           "/dev/sdf" = { size = 20, type = "gp3" }
         }
-        ami_name  = "amzn2-ami-kernel-5.10-hvm-2.0.20240131.0-x86_64-gp2"
-        ami_owner = "137112412989"
-        subnet_id = data.aws_subnet.private_subnets_b.id
+        ami_name          = "amzn2-ami-kernel-5.10-hvm-2.0.20240131.0-x86_64-gp2"
+        ami_owner         = "137112412989"
+        subnet_id         = data.aws_subnet.private_subnets_b.id
         availability_zone = "eu-west-2b"
-        instance_type = "t3.micro"
-        user_data = <<EOF
+        instance_type     = "t3.micro"
+        user_data         = <<EOF
             #!/bin/bash
             yum update -y
             yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
@@ -115,27 +115,27 @@ locals {
   }
 
   # This local provides a list of ingress and egress rules for the ec2 security group.
-  
+
   complete_ec2_sg_ingress_rules = {
     TCP_22 = {
-      from_port = 22
-      to_port = 22
-      protocol = "TCP"
+      from_port  = 22
+      to_port    = 22
+      protocol   = "TCP"
       cidr_block = data.aws_vpc.shared.cidr_block
     }
     TCP_443 = {
-      from_port = 443
-      to_port = 443
-      protocol = "TCP"
+      from_port  = 443
+      to_port    = 443
+      protocol   = "TCP"
       cidr_block = data.aws_vpc.shared.cidr_block
     }
   }
 
   complete_ec2_sg_egress_rules = {
     TCP_ALL = {
-      from_port = 1
-      to_port = 65000
-      protocol = "TCP"
+      from_port  = 1
+      to_port    = 65000
+      protocol   = "TCP"
       cidr_block = "0.0.0.0/0"
     }
   }
@@ -150,7 +150,7 @@ locals {
 # This item is used to combine emultiple policy documents though for this example only one policy document is created.
 data "aws_iam_policy_document" "ec2_complete_common_combined" {
   source_policy_documents = [
-    data.aws_iam_policy_document.ec2_complete_policy.json  
+    data.aws_iam_policy_document.ec2_complete_policy.json
   ]
 }
 
@@ -192,17 +192,17 @@ module "ec2_complete_instance" {
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
   route53_records               = lookup(each.value, "route53_records", {})
-  availability_zone        = each.value.availability_zone
-  subnet_id                = each.value.subnet_id
-  iam_resource_names_prefix = local.comp_app_name
-  instance_profile_policies = local.ec2_complete_common_managed_policies
-  business_unit            = local.comp_business_unit
-  environment              = local.environment
-  region                   = local.comp_region
-  tags                     = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
-  account_ids_lookup       = local.environment_management.account_ids
-  user_data_raw            = try(each.value.user_data, "")
-  cloudwatch_metric_alarms = {}
+  availability_zone             = each.value.availability_zone
+  subnet_id                     = each.value.subnet_id
+  iam_resource_names_prefix     = local.comp_app_name
+  instance_profile_policies     = local.ec2_complete_common_managed_policies
+  business_unit                 = local.comp_business_unit
+  environment                   = local.environment
+  region                        = local.comp_region
+  tags                          = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  account_ids_lookup            = local.environment_management.account_ids
+  user_data_raw                 = try(each.value.user_data, "")
+  cloudwatch_metric_alarms      = {}
 }
 
 ###### EC2 Security Groups ######
@@ -230,13 +230,13 @@ resource "aws_security_group_rule" "complete_ingress_traffic" {
 }
 
 resource "aws_security_group_rule" "complete_egress_traffic" {
-  for_each                 = local.complete_ec2_sg_egress_rules
-  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port                = each.value.from_port
-  protocol                 = each.value.protocol
-  security_group_id        = aws_security_group.example_ec2_sg.id
-  to_port                  = each.value.to_port
-  type                     = "egress"
+  for_each          = local.complete_ec2_sg_egress_rules
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.example_ec2_sg.id
+  to_port           = each.value.to_port
+  type              = "egress"
   cidr_blocks       = [each.value.cidr_block]
 }
 

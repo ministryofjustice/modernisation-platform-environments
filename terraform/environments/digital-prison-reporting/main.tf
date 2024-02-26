@@ -987,7 +987,7 @@ module "datamart" {
   # Parameter Group Parameters, including Work Load Management
   parameter_group_parameters = {
     wlm_json_configuration = {
-      name = "wlm_json_configuration"
+      name  = "wlm_json_configuration"
       value = jsonencode(jsondecode(file("./datamart-redshift-wlm.json")))
     }
   }
