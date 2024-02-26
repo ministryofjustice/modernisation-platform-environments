@@ -13,6 +13,20 @@ locals {
   # add a cloud watch windows SSM param if the file is present
   cloud_watch_windows_filename = "./templates/cloud_watch_windows.json"
 
+  ssm_documents_filter = flatten([
+    var.options.enable_hmpps_domain ? ["ad-join-windows"] : [],
+    var.options.enable_hmpps_domain ? ["ad-leave-windows"] : [],
+  ])
+
+  ssm_documents = {
+    for item in fileset("${path.module}/ssm-documents", "*.yaml") :
+    trimsuffix(item, ".yaml") => {
+      document_type   = "Command"
+      document_format = "YAML"
+      content         = file("${path.module}/ssm-documents/${item}")
+    }
+  }
+
   ssm_parameters_filter = flatten([
     length(local.account_names_for_account_ids_ssm_parameter) != 0 ? ["account"] : [],
     var.options.enable_azure_sas_token ? ["/azure"] : [],

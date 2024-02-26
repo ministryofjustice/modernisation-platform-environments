@@ -1009,6 +1009,17 @@ variable "ssm_parameters" {
   default = {}
 }
 
+variable "ssm_documents" {
+  description = "A map of ssm documents to create where map key is the document name"
+  type = map(object({
+    content         = string
+    document_format = optional(string)
+    document_type   = string
+    tags            = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "tags" {
   description = "Any additional tags to apply to all resources, in addition to those provided by environment module"
   type        = map(string)
