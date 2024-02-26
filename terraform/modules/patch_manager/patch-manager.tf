@@ -12,6 +12,7 @@ data "aws_ssm_patch_baseline" "predefined" {
 }
 
 resource "aws_ssm_patch_baseline" "baseline-custom" {
+  count            = var.use_predefined_baseline == false ? 1 : 0
   name             = "MOJ-CustomBaseline-${var.application}-${var.environment}"
   description      = "Custom Patch Baseline for ${var.application}-${var.environment}"
   operating_system = "WINDOWS"
@@ -45,7 +46,7 @@ resource "aws_cloudwatch_log_group" "this" {
 resource "aws_ssm_maintenance_window_task" "this" {
   description     = "Maintenance window task for ${var.application}-${var.environment}"
   task_type       = "RUN_COMMAND"
-  task_arn        = "AWS-DefaultPatchBaseline"
+  task_arn        = "AWS-RunPatchBaseline"
   priority        = 1
   max_concurrency = "1" # Patch one instance at a time
   max_errors      = "0" # Stop after the first error result
