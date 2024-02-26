@@ -4,11 +4,14 @@
 # tags demonstrate inheritance due to merges in the module
 locals {
   environment_config_test = {
-    migration_environment_private_cidr = ["10.162.8.0/22", "10.162.4.0/22", "10.162.0.0/22"]
-    migration_environment_db_cidr      = ["10.162.14.0/25", "10.162.13.0/24", "10.162.12.0/24"]
-    legacy_engineering_vpc_cidr        = "10.161.98.0/25"
-    ec2_user_ssh_key                   = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
-    homepage_path                      = "/"
+    migration_environment_private_cidr     = ["10.162.8.0/22", "10.162.4.0/22", "10.162.0.0/22"]
+    migration_environment_db_cidr          = ["10.162.14.0/25", "10.162.13.0/24", "10.162.12.0/24"]
+    migration_environment_full_name        = "del-test"
+    migration_environment_abbreviated_name = "del"
+    migration_environment_short_name       = "test"
+    legacy_engineering_vpc_cidr            = "10.161.98.0/25"
+    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+    homepage_path                          = "/"
   }
 
   ldap_config_test = {
