@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "transfer_assume_role" {
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_user" "this" {
-  server_id = var.transfer_server.id
+  server_id = var.transfer_server_id
   user_name = var.user_name
   role      = aws_iam_role.this_transfer_user.arn
 
@@ -68,7 +68,7 @@ data "aws_iam_policy_document" "this_transfer_user" {
 #------------------------------------------------------------------------------
 
 resource "aws_transfer_ssh_key" "this" {
-  server_id = var.transfer_server.id
+  server_id = var.transfer_server_id
   user_name = aws_transfer_user.this.user_name
 
   for_each = { for ssh_key in var.ssh_keys : ssh_key => ssh_key }
