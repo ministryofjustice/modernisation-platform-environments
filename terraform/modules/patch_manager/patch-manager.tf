@@ -1,6 +1,6 @@
 # Set a predefined baseline if specified, otherwise set a custom baseline
 resource "aws_ssm_default_patch_baseline" "this" {
-  baseline_id      = var.use_predefined_baseline == true ? data.aws_ssm_patch_baseline.predefined[0].id : aws_ssm_patch_baseline.baseline-custom.id
+  baseline_id      = var.use_predefined_baseline == true ? data.aws_ssm_patch_baseline.predefined[0].id : aws_ssm_patch_baseline.baseline-custom[0].id
   operating_system = "WINDOWS"
 }
 
