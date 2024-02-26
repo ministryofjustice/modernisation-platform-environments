@@ -14,8 +14,8 @@ locals {
   cloud_watch_windows_filename = "./templates/cloud_watch_windows.json"
 
   ssm_documents_filter = flatten([
-    var.options.enable_hmpps_domain ? ["ad-join-windows"] : [],
-    var.options.enable_hmpps_domain ? ["ad-leave-windows"] : [],
+    var.options.enable_hmpps_domain ? ["ec2-ad-join-windows"] : [],
+    var.options.enable_hmpps_domain ? ["ec2-ad-leave-windows"] : [],
   ])
 
   ssm_documents = {
