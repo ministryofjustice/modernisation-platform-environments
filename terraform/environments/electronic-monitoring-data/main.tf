@@ -3,6 +3,8 @@ module "capita" {
 
   supplier = "capita"
 
+  create_server = local.switch_on_server_capita && (local.is-production || local.is-development)
+
   user_accounts = [
     # Developer access.
     local.sftp_account_dev,
@@ -28,6 +30,8 @@ module "capita" {
 
 module "civica" {
   source = "./modules/landing_zone/"
+
+  create_server = local.switch_on_server_civica && (local.is-production || local.is-development)
 
   supplier = "civica"
 
@@ -56,6 +60,8 @@ module "g4s" {
   source = "./modules/landing_zone/"
 
   supplier = "g4s"
+
+  create_server = local.switch_on_server_g4s && (local.is-production || local.is-development)
 
   user_accounts = [
     # Developer access.

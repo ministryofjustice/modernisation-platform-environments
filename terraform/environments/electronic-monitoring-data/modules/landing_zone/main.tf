@@ -182,6 +182,8 @@ resource "aws_eip" "this" {
 module "sftp_server" {
   source = "./landing_zone_server"
 
+  count = var.create_server ? 1 : 0
+
   data_store_bucket = var.data_store_bucket
   eip_id            = aws_eip.this.id
   kms_key           = aws_kms_key.this
