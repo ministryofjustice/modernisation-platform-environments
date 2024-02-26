@@ -63,21 +63,17 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
     ]
   }
 
-  dynamic "statement" {
-
-    for_each  = (local.legacy_s3_bucket != null ? [local.legacy_s3_bucket] : [])
-    content {
-      sid    = "AllowAccessToLegacyS3OracleBackups"
-      effect = "Allow"
-      actions = [
-        "s3:Get*",
-        "s3:List*"
-      ]
-      resources = [
-        "arn:aws:s3:::${local.legacy_s3_bucket }",
-        "arn:aws:s3:::${local.legacy_s3_bucket }/*"
-      ]
-    }
+  statement {
+    sid    = "AllowAccessToLegacyS3OracleBackups"
+    effect = "Allow"
+    actions = [
+      "s3:Get*",
+      "s3:List*"
+    ]
+    resources = [
+      "arn:aws:s3:::eu-west-2-${var.environment_config.migration_environment_full_name}-oracledb-backups",
+      "arn:aws:s3:::eu-west-2-${var.environment_config.migration_environment_full_name}-oracledb-backups/*"
+    ]
   }
 
   statement {
