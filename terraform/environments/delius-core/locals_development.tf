@@ -131,6 +131,11 @@ locals {
       image_tag      = "5.7.6"
       container_port = 80
     }
+
+    newtech = {
+      image_tag      = "5.7.6"
+      container_port = 80
+    }
   }
 
   bastion_config_dev = {
