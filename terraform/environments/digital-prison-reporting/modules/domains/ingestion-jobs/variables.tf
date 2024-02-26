@@ -228,12 +228,12 @@ variable "glue_cdc_execution_class" {
 
 variable "glue_cdc_job_worker_type" {
   type        = string
-  default     = "G.1X"
+  default     = "G.025X"
   description = "(Optional) The type of predefined worker that is allocated when a job runs."
 
   validation {
     condition     = contains(["Standard", "G.025X", "G.1X", "G.2X"], var.glue_cdc_job_worker_type)
-    error_message = "Accepts a value of Standard, G.1X, or G.2X."
+    error_message = "Accepts a value of Standard, G.025X, G.1X, or G.2X."
   }
 }
 
