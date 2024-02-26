@@ -5,24 +5,6 @@ resource "aws_security_group" "ancillary_alb_security_group" {
   tags        = local.tags
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_https_allowlist" {
-  security_group_id = aws_security_group.ancillary_alb_security_group.id
-  description       = "access into delius core frontend alb over https"
-  from_port         = "443"
-  to_port           = "443"
-  ip_protocol       = "tcp"
-  cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
-}
-
-resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_http_allowlist" {
-  security_group_id = aws_security_group.ancillary_alb_security_group.id
-  description       = "access into delius core frontend alb over http (will redirect)"
-  from_port         = "80"
-  to_port           = "80"
-  ip_protocol       = "tcp"
-  cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
-}
-
 resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_https_global_protect_allowlist" {
   for_each          = toset(local.globalprotect_ips)
   security_group_id = aws_security_group.ancillary_alb_security_group.id
