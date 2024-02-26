@@ -106,6 +106,11 @@ locals {
       }
     }
 
+    user_data_raw = {
+      for item in fileset("${path.module}/ec2-user-data", "*.yaml") :
+      trimsuffix(item, ".yaml") => base64encode(file("${path.module}/ec2-user-data/${item}"))
+    }
+
     route53_records = {
       internal_only = {
         create_internal_record = true

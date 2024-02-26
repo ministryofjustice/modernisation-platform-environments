@@ -43,7 +43,7 @@ locals {
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy"])
-          user_data_raw                 = base64encode(file("./templates/user-data-pwsh.yaml"))
+          user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]
@@ -70,7 +70,7 @@ locals {
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy"])
-          user_data_raw                 = base64encode(file("./templates/user-data-pwsh.yaml"))
+          user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]
@@ -95,7 +95,7 @@ locals {
       test-rdgw-1-a = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
           availability_zone = "eu-west-2a"
-          user_data_raw     = base64encode(file("./templates/user-data-pwsh.yaml"))
+          user_data_raw     = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
         })
         tags = merge(local.rds_ec2_instance.tags, {
           description = "Remote Desktop Gateway for azure.noms.root domain"

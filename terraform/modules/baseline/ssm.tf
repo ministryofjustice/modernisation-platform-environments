@@ -46,6 +46,19 @@ locals {
   }
 }
 
+resource "aws_ssm_document" "this" {
+  for_each = var.ssm_documents
+
+  name            = each.key
+  document_type   = each.value.document_type
+  document_format = each.value.document_format
+  content         = each.value.content
+
+  tags = merge(local.tags, each.value.tags, {
+    Name = each.key
+  })
+}
+
 resource "random_password" "this" {
   for_each = local.ssm_random_passwords
 
