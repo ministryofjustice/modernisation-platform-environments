@@ -1,5 +1,5 @@
 resource "aws_security_group" "ancillary_alb_security_group" {
-  name        = format("%s - Delius Core Frontend Load Balancer", var.env_name)
+  name        = format("%s - Delius Core Ancilliary Load Balancer", var.env_name)
   description = "controls access to and from delius front-end load balancer"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
