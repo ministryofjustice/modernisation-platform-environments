@@ -12,7 +12,7 @@ resource "aws_cloudwatch_dashboard" "ecs_rds" {
     {
       name                     = var.name,
       env_name                 = var.env_name,
-      load_balancer_arn        = var.microservice_lb_arn,
+      load_balancer_arn        = var.microservice_lb.arn,
       target_group_arn         = aws_lb_target_group.frontend.arn,
       rds_db_identifier        = aws_db_instance.this[0].identifier
       ecs_service_name         = "${var.env_name}-${var.name}"
@@ -30,7 +30,7 @@ resource "aws_cloudwatch_dashboard" "ecs" {
     {
       name                     = var.name,
       env_name                 = var.env_name,
-      load_balancer_arn        = var.microservice_lb_arn,
+      load_balancer_arn        = var.microservice_lb.arn,
       target_group_arn         = aws_lb_target_group.frontend.arn,
       ecs_service_name         = "${var.env_name}-${var.name}"
       ecs_cluster_name         = local.cluster_name,

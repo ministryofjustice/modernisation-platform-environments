@@ -187,7 +187,7 @@ module "weblogic_eis" {
 
   cluster_security_group_id = aws_security_group.cluster.id
 
-  microservice_lb_arn                = aws_lb.delius_core_frontend.arn
+  microservice_lb               = aws_lb.delius_core_frontend
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
   alb_listener_rule_paths            = ["/eis"]
 

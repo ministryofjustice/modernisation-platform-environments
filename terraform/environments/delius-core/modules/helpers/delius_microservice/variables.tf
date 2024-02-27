@@ -235,9 +235,9 @@ variable "certificate_arn" {
   type        = string
 }
 
-variable "microservice_lb_arn" {
-  description = "The ARN of the load balancer to use for the target group"
-  type        = string
+variable "microservice_lb" {
+  description = "load balancer to use for the target group"
+  type        = any
 }
 
 variable "microservice_lb_https_listener_arn" {
@@ -369,6 +369,13 @@ variable "alb_listener_rule_priority" {
 variable "alb_listener_rule_paths" {
   description = "Paths to use for the alb listener rule"
   type        = list(string)
+  default     = null
+}
+
+
+variable "alb_listener_rule_host_header" {
+  description = "Host header to use for the alb listener rule"
+  type        = string
   default     = null
 }
 
