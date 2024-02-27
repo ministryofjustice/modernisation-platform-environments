@@ -1,8 +1,8 @@
-resource "aws_route53_record" "external" {
+resource "aws_route53_record" "alb_frontend" {
   provider = aws.core-vpc
 
   zone_id = var.account_config.route53_external_zone.zone_id
-  name    = local.frontend_url
+  name    = "ndelius.${var.env_name}.${var.account_config.dns_suffix}"
   type    = "A"
 
   alias {
@@ -37,7 +37,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
 resource "aws_acm_certificate" "external" {
   domain_name               = "modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
-  subject_alternative_names = [local.frontend_url]
+  subject_alternative_names = ["*.${var.env_name}.${var.account_config.dns_suffix}"]
   tags                      = local.tags
 
   lifecycle {
