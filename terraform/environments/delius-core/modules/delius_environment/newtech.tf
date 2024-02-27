@@ -1,5 +1,5 @@
 module "newtech" {
-  source = "../components/delius_microservice"
+  source = "../helpers/delius_microservice"
 
   name                  = "newtech"
   certificate_arn       = local.certificate_arn
