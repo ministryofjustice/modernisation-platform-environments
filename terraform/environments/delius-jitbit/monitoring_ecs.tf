@@ -2,11 +2,12 @@
 locals {
   cluster_name = split("/", module.ecs.ecs_cluster_arn)[1]
 }
+
 # Alarm for high CPU usage
 resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold" {
   alarm_name                = "jitbit-ecs-cpu-threshold"
   comparison_operator       = "GreaterThanUpperThreshold"
-  evaluation_periods        = "5"
+  evaluation_periods        = "2"
   threshold_metric_id       = "e1"
   alarm_description         = "Triggers alarm if ECS CPU crosses a threshold"
   insufficient_data_actions = []
@@ -27,7 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold" {
     metric {
       metric_name = "CpuUtilized"
       namespace   = "ECS/ContainerInsights"
-      period      = "60"
+      period      = "120"
       stat        = "Average"
       unit        = "Count"
 
@@ -42,7 +43,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold" {
 resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold" {
   alarm_name                = "jitbit-ecs-memory-threshold"
   comparison_operator       = "GreaterThanUpperThreshold"
-  evaluation_periods        = "5"
+  evaluation_periods        = "2"
   threshold_metric_id       = "e1"
   alarm_description         = "Triggers alarm if ECS memory crosses a threshold"
   insufficient_data_actions = []
@@ -63,7 +64,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold" {
     metric {
       metric_name = "MemoryUtilized"
       namespace   = "ECS/ContainerInsights"
-      period      = "60"
+      period      = "120"
       stat        = "Average"
       unit        = "Count"
 
