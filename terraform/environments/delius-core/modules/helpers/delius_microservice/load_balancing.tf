@@ -74,7 +74,7 @@ resource "aws_lb_listener_rule" "alb_header" {
 resource "aws_route53_record" "alb_r53_record" {
   count    = var.alb_listener_rule_host_header != null ? 1 : 0
   provider = aws.core-vpc
-  zone_id  = var.account_config.route53_inner_zone_info.zone_id
+  zone_id  = var.account_config.route53_external_zone.zone_id
   name     = var.alb_listener_rule_host_header
   type     = "CNAME"
   alias {

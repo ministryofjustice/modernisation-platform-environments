@@ -41,7 +41,6 @@ module "password_reset_service" {
   microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
 
   #TODO - check the path based routing based on shared ALB or dedicated
-  #   alb_listener_rule_paths = ["/password-reset"]
   alb_listener_rule_host_header = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
   platform_vars                 = var.platform_vars
   container_image               = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management-ecr-repo:${var.delius_microservice_configs.pwm.image_tag}"
