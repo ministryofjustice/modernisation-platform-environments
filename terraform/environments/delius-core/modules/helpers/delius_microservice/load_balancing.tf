@@ -78,7 +78,7 @@ resource "aws_route53_record" "alb_r53_record" {
   name     = var.alb_listener_rule_host_header
   type     = "CNAME"
   alias {
-    evaluate_target_health = true
+    evaluate_target_health = false
     name                   = var.microservice_lb.dns_name
     zone_id                = var.microservice_lb.zone_id
   }
