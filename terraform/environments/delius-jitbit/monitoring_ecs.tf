@@ -54,7 +54,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold" {
 
   metric_query {
     id          = "e1"
-    expression  = "ANOMALY_DETECTION_BAND(m1)"
+    expression  = "ANOMALY_DETECTION_BAND(m1,4)"
     label       = "MemoryUtilization (Expected)"
     return_data = "true"
   }
@@ -67,7 +67,6 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold" {
       namespace   = "AWS/ECS"
       period      = "120"
       stat        = "Average"
-      unit        = "Count"
 
       dimensions = {
         ClusterName = local.cluster_name
