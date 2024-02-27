@@ -1,5 +1,5 @@
 module "nextcloud_service" {
-  source = "../delius-core/modules/components/delius_microservice"
+  source = "../delius-core/modules/helpers/delius_microservice"
 
   account_config = {
     shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
@@ -189,7 +189,7 @@ resource "aws_alb_listener" "nextcloud_https" {
 }
 
 module "nextcloud_efs" {
-  source = "../delius-core/modules/efs"
+  source = "../delius-core/modules/helpers/efs"
 
   name           = "nextcloud"
   env_name       = local.environment

@@ -1,5 +1,5 @@
 module "nlb" {
-  source = "../../nlb"
+  source = "../../helpers/nlb"
 
   providers = {
     aws                       = aws

@@ -1,5 +1,5 @@
 module "efs" {
-  source = "../../efs"
+  source = "../../helpers/efs"
 
   name           = "ldap"
   env_name       = var.env_name
