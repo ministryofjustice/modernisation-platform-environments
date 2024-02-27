@@ -129,7 +129,7 @@ locals {
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        instance = merge(local.database_a.instance, {
+        instance = merge(local.database_onr_a.instance, {
           instance_type = "r6i.2xlarge"
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
