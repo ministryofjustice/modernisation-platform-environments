@@ -72,14 +72,3 @@ module "password_reset_service" {
     aws.core-vpc = aws.core-vpc
   }
 }
-
-#TODO move this to variable after merge
-
-variable "pwm_config" {
-  type = object({
-    image_tag = string
-  })
-  default = {
-    image_tag = "default_image_tag"
-  }
-}
