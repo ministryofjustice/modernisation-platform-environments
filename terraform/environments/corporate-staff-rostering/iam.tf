@@ -44,6 +44,7 @@ resource "aws_iam_user_policy_attachment" "mgn_attach_policy_app_migrationfull_a
 }
 
 # AD clean up lambda IAM resources
+
 data "aws_iam_policy_document" "lambda_assume_role_policy" {
   statement {
     effect  = "Allow"
@@ -63,33 +64,54 @@ resource "aws_iam_role" "lambda-ad-role" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
-resource "aws_iam_policy" "lambda_eventbridge_policy" {
-  name        = "ADLambdaEventBridgePolicy"
-  description = "Policy allowing Lambda to be triggered by EventBridge"
+resource "aws_iam_policy" "lambda-ad-policy" {
+  name = "LambdaADObjectCleanUpPolicy"
+  description = "Policy to grant AD lambda function VPC access"
 
   policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
+    Version = "2012-10-17"
+    Statement = [
       {
-        "Effect" : "Allow",
-        "Action" : "lambda:InvokeFunction",
-        "Resource" : module.ad-clean-up-lambda.lambda_function_arn
-      }
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "ec2:CreateNetworkInterface",
+          "ec2:Describe*",
+          "ec2:DeleteNetworkInterface",
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:UnassignPrivateIpAddresses"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
     ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda-vpc-attachment" {
-  role       = aws_iam_role.lambda-ad-role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+data "aws_iam_policy" "HmppsDomainSecrets" {
+  name = "HmppsDomainSecretsPolicy"
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_secrets_manager" {
-  role       = aws_iam_role.lambda-ad-role.name
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+data "aws_iam_policy" "BusinessUnitKmsCmk" {
+  name = "BusinessUnitKmsCmkPolicy"
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_eventbridge" {
+resource "aws_iam_role_policy_attachment" "lambda_secrets" {
   role       = aws_iam_role.lambda-ad-role.name
-  policy_arn = aws_iam_policy.lambda_eventbridge_policy.arn
+  policy_arn = data.aws_iam_policy.HmppsDomainSecrets.arn
 }
+
+resource "aws_iam_role_policy_attachment" "lambda_kms" {
+  role       = aws_iam_role.lambda-ad-role.name
+  policy_arn = data.aws_iam_policy.BusinessUnitKmsCmk.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda-ad-policy-attachment" {
+  role       = aws_iam_role.lambda-ad-role.name
+  policy_arn = aws_iam_policy.lambda-ad-policy.arn
+}
+
+
+
+

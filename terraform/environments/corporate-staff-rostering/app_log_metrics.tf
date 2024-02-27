@@ -2,7 +2,7 @@
 locals {
   application_log_metric_filters_meta = {
     log_group_name = "cwagent-windows-application-json"
-    namespace      = "ApplicationLogMetrics"
+    namespace      = "ApplicationLog"
   }
   application_log_metric_filters_defaults = {
     log_group_name = local.application_log_metric_filters_meta.log_group_name

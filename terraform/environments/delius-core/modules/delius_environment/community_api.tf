@@ -1,5 +1,5 @@
 module "community_api" {
-  source = "../components/delius_microservice"
+  source = "../helpers/delius_microservice"
 
   name                  = "community-api"
   certificate_arn       = aws_acm_certificate.external.arn
@@ -47,7 +47,7 @@ module "community_api" {
   tags          = var.tags
   # TODO - This LB is a placeholder marked no 13 on the architecture diagram: https://dsdmoj.atlassian.net/wiki/spaces/DAM/pages/3773105057/High-Level+Architecture
   # Two LBs (public and secure) are needed as show on the architecture diagram. There is an architectural discussion to be had if we could get away with just one LB instead
-  microservice_lb_arn                = aws_lb.delius_core_frontend.arn
+  microservice_lb               = aws_lb.delius_core_frontend
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
   # Please check with the app team what the rule path should be here.

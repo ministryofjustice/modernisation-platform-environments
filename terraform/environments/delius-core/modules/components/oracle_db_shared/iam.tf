@@ -265,6 +265,7 @@ data "aws_iam_policy_document" "OracleEnterpriseManagementSecretsPolicyDocument"
     ]
     resources = [
       "arn:aws:secretsmanager:*:*:secret:/oracle/database/EMREP/shared-*",
+      "arn:aws:secretsmanager:*:*:secret:/oracle/database/*RCVCAT/shared-*",
       "arn:aws:secretsmanager:*:*:secret:/oracle/oem/shared-*"
     ]
   }

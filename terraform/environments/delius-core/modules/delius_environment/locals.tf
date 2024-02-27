@@ -21,4 +21,5 @@ locals {
 
   certificate_arn = aws_acm_certificate.external.arn
 
+  globalprotect_ips = module.ip_addresses.moj_cidr.moj_aws_digital_macos_globalprotect_alpha
 }

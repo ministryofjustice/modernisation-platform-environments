@@ -1,5 +1,5 @@
 module "weblogic" {
-  source                = "../components/delius_microservice"
+  source                = "../helpers/delius_microservice"
   account_config        = var.account_config
   account_info          = var.account_info
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
@@ -49,8 +49,8 @@ module "weblogic" {
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
   env_name        = var.env_name
 
-  health_check_path   = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
-  microservice_lb_arn = aws_lb.delius_core_frontend.arn
+  health_check_path = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+  microservice_lb   = aws_lb.delius_core_frontend
 
   name                       = "weblogic"
   container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${var.delius_microservice_configs.weblogic.image_tag}"

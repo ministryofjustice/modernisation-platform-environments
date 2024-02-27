@@ -9,6 +9,10 @@ parameters:
 mainSteps:
   - name: installCWAgent
     action: aws:runDocument
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
     inputs:
       documentType: SSMDocument
       documentPath: AWS-ConfigureAWSPackage
@@ -17,6 +21,10 @@ mainSteps:
         name: AmazonCloudWatchAgent
   - name: configureCWAgent
     action: aws:runDocument
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
     inputs:
       documentType: SSMDocument
       documentPath: AmazonCloudWatch-ManageAgent

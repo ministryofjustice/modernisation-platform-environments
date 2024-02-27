@@ -75,7 +75,7 @@ locals {
 
   baseline_secretsmanager_secrets = {}
   baseline_security_groups        = local.security_groups
+  baseline_ssm_documents          = {}
   baseline_ssm_parameters         = {}
-
-  baseline_sns_topics = {}
+  baseline_sns_topics             = {}
 }

@@ -64,15 +64,15 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
   }
 
   statement {
-    sid    = "AllowAccessToS3OracleBackups"
+    sid    = "AllowAccessToLegacyS3OracleBackups"
     effect = "Allow"
     actions = [
       "s3:Get*",
       "s3:List*"
     ]
     resources = [
-      "arn:aws:s3:::eu-west-2-dmd-mis-dev-oracledb-backups",
-      "arn:aws:s3:::eu-west-2-dmd-mis-dev-oracledb-backups/*"
+      "arn:aws:s3:::eu-west-2-${var.environment_config.migration_environment_full_name}-oracledb-backups",
+      "arn:aws:s3:::eu-west-2-${var.environment_config.migration_environment_full_name}-oracledb-backups/*"
     ]
   }
 

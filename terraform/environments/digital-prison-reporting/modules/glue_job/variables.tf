@@ -177,8 +177,8 @@ variable "worker_type" {
   description = "(Optional) The type of predefined worker that is allocated when a job runs."
 
   validation {
-    condition     = contains(["Standard", "G.1X", "G.2X"], var.worker_type)
-    error_message = "Accepts a value of Standard, G.1X, or G.2X."
+    condition     = contains(["Standard", "G.025X", "G.1X", "G.2X"], var.worker_type)
+    error_message = "Accepts a value of Standard, G.025X, G.1X, or G.2X."
   }
 }
 

@@ -1,5 +1,5 @@
 module "ldap_ecs_policies" {
-  source       = "../../ecs_policies"
+  source       = "../../helpers/ecs_policies"
   env_name     = var.env_name
   service_name = "ldap"
   tags         = var.tags
