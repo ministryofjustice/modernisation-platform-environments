@@ -1,5 +1,5 @@
 module "development" {
-  count                   = local.is-development == "-development" ? 1 : 0
+  count                   = local.is-development == true ? 1 : 0
   source                  = "../../modules/patch_manager"
   application             = "hmpps-domain-services"
   environment             = "development"
