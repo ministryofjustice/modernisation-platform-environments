@@ -1,5 +1,5 @@
 module "merge_api_service" {
-  source                = "../components/delius_microservice"
+  source                = "../helpers/delius_microservice"
   name                  = "merge-api"
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id

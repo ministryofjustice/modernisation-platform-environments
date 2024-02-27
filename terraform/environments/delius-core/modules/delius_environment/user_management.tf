@@ -1,5 +1,5 @@
 module "user_management" {
-  source                = "../components/delius_microservice"
+  source                = "../helpers/delius_microservice"
   account_config        = var.account_config
   account_info          = var.account_info
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id

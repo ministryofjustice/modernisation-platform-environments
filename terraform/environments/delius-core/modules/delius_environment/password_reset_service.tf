@@ -1,5 +1,5 @@
 module "password_reset_service" {
-  source = "../components/delius_microservice"
+  source = "../helpers/delius_microservice"
 
   name                  = "password-reset"
   certificate_arn       = local.certificate_arn

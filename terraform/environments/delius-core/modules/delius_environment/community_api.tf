@@ -1,5 +1,5 @@
 module "community_api" {
-  source = "../components/delius_microservice"
+  source = "../helpers/delius_microservice"
 
   name                  = "community-api"
   certificate_arn       = aws_acm_certificate.external.arn

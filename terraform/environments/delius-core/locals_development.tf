@@ -94,6 +94,7 @@ locals {
       rds_port              = 5432
       rds_license_model     = "postgresql-license"
     }
+
     merge_ui = {
       image_tag      = "REPLACE"
       container_port = 80
