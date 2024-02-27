@@ -3,7 +3,7 @@ resource "aws_security_group" "ancillary_alb_security_group" {
   description = "controls access to and from delius front-end load balancer"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
-    lifecycle {
+  lifecycle {
     create_before_destroy = true
   }
 }
@@ -33,7 +33,7 @@ resource "aws_lb" "delius_core_ancillary" {
   # checkov:skip=CKV_AWS_91
   # checkov:skip=CKV2_AWS_28
 
-  name               = "${var.app_name}-${var.env_name}-weblogic-alb"
+  name               = "${var.app_name}-${var.env_name}-ancilliary-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ancillary_alb_security_group.id]
