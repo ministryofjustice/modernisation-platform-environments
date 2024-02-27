@@ -20,10 +20,43 @@
       "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:ifs-cdpt-dev-staging-feb-12-2024"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "environment_name": "staging",
+      "container_port": 80,
+      "client_id": "6a941975-c916-4189-b650-e7b1f1ed7975",
+      "ami_image_id": "ami-06cdd5b44c17085ed",
+      "instance_type": "t3.medium",
+      "app_count": 2,
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 3,
+      "ec2_min_size": 2,
+      "db_instance_class": "db.t3.small",
+      "db_user": "dbadmin",
+      "db_allocated_storage": "100",
+      "db_name": "ifs-dev",
+      "env_name": "STAGING",
+      "db_instance_identifier": "db-ifs-staging",
+      "s3_bucket_name": "ifs-staging-bucket",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:ifs-cdpt-dev-staging-feb-12-2024"
+    
     },
     "production": {
-      "example_var": "production-data"
+      "environment_name": "production",
+      "container_port": 80,
+
+      "ami_image_id": "ami-06cdd5b44c17085ed",
+      "instance_type": "t3.medium",
+      "app_count": 2,
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 3,
+      "ec2_min_size": 2,
+      "db_instance_class": "db.t3.small",
+      "db_user": "dbadmin",
+      "db_allocated_storage": "100",
+      "db_name": "IntegratedFraud",
+      "env_name": "PRODUCTION",
+      "db_instance_identifier": "db-ifs-production",
+      "s3_bucket_name": "ifs-production-bucket",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:ifs-production-feb-27-2024"
     }
   }
 }
