@@ -3,6 +3,9 @@ resource "aws_security_group" "ancillary_alb_security_group" {
   description = "controls access to and from delius front-end load balancer"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
+    lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_https_global_protect_allowlist" {
