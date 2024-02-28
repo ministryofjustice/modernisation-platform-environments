@@ -18,9 +18,21 @@ locals {
       patch_day                 = "THU"
     }
 
-    baseline_bastion_linux = {
-      public_key_data = local.public_key_data.keys[local.environment]
-      tags            = local.tags
+    baseline_s3_buckets     = {}
+    baseline_ssm_parameters = {}
+
+    # baseline_bastion_linux = {
+    #   public_key_data = local.public_key_data.keys[local.environment]
+    #   tags            = local.tags
+    # }
+
+    baseline_secretsmanager_secrets = {
+    }
+
+    baseline_iam_policies = {
+    }
+
+    baseline_ec2_instances = {
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -38,7 +50,25 @@ locals {
       # })
     }
 
-    baseline_acm_certificates = {}
+    # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
+    # if making changes, comment out the listeners that use the cert, edit the cert, recreate the listeners
+    baseline_acm_certificates = {
+      "pd_${local.application_name}_cert" = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = "oasys.service.justice.gov.uk"
+        subject_alternate_names = [
+          "*.oasys.service.justice.gov.uk",
+          "*.az.justice.gov.uk",
+          "*.*.az.justice.gov.uk",
+        ]
+        external_validation_records_created = false
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        tags = {
+          description = "cert for ${local.application_name} ${local.environment} domains"
+        }
+      }
+    }
 
     baseline_lbs = {
       private = {
@@ -69,6 +99,7 @@ locals {
           }
         }
       }
+
     }
 
     baseline_route53_zones = {
