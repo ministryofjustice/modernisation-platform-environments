@@ -76,7 +76,7 @@ resource "aws_route53_record" "alb_r53_record" {
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_external_zone.zone_id
   name     = var.alb_listener_rule_host_header
-  type     = "CNAME"
+  type     = "A"
   alias {
     evaluate_target_health = false
     name                   = var.microservice_lb.dns_name
