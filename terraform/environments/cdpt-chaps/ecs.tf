@@ -75,8 +75,8 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
     {
       name      = "${local.application_name}-container"
       image     = "${local.ecr_url}:${local.application_data.accounts[local.environment].environment_name}"
-      cpu       = 1024
-      memory    = 1024
+      cpu       = 2048
+      memory    = 2048
       essential = true
       portMappings = [
         {
