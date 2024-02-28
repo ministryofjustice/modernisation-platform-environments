@@ -37,7 +37,7 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux
     )
-    windows = merge(
+    web = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
       {
@@ -133,7 +133,7 @@ locals {
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["domain", "web", "jumpserver"]
     })
-    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.windows
+    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.web
   })
 
 }
