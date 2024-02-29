@@ -286,6 +286,12 @@ variable "replication_instance_class" {
   default     = "dms.t2.micro"
 }
 
+variable "allow_major_version_upgrade" {
+  description = "Indicates that major version upgrades are allowed"
+  type        = bool
+  default     = false
+}
+
 #--------------------------------------------------------------
 # Network
 #--------------------------------------------------------------
