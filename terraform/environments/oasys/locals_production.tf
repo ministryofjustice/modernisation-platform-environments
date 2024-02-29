@@ -59,7 +59,9 @@ locals {
         domain_name = "oasys.service.justice.gov.uk"
         subject_alternate_names = [
           "*.oasys.service.justice.gov.uk",
-          "*.az.justice.gov.uk",
+          "bridge-oasys.az.justice.gov.uk",
+          "oasys.az.justice.gov.uk",
+          "p-oasys.az.justice.gov.uk",
           "*.oasys.az.justice.gov.uk",
           "*.bridge-oasys.az.justice.gov.uk",
           "*.p-oasys.az.justice.gov.uk",
@@ -71,7 +73,7 @@ locals {
         }
       }
     }
-
+    
     baseline_lbs = {
       private = {
         enable_delete_protection = false # change to true before we actually use
