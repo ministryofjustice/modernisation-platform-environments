@@ -1149,7 +1149,7 @@ module "dms_nomis_to_s3_ingestor" {
   dms_target_name              = "s3"
   short_name                   = "nomis"
   migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.7" # Upgrade
+  replication_instance_version = "3.5.1" # Upgrade
   replication_instance_class   = "dms.t3.medium"
   subnet_ids = [
     data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
