@@ -1,0 +1,14 @@
+# ccms-ssm-document-test.yaml
+---
+schemaVersion: "2.2"
+description: Perform a healthcheck on the target instance
+mainSteps:
+  - name: TestSSMdocument
+    action: aws:runShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Linux
+    inputs:
+      runCommand:
+        - "tail -n 16 /var/log/messages"
