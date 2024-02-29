@@ -60,7 +60,9 @@ locals {
         subject_alternate_names = [
           "*.oasys.service.justice.gov.uk",
           "*.az.justice.gov.uk",
-          "*.*.az.justice.gov.uk",
+          "*.oasys.az.justice.gov.uk",
+          "*.bridge-oasys.az.justice.gov.uk",
+          "*.p-oasys.az.justice.gov.uk",
         ]
         external_validation_records_created = false
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
