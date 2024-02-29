@@ -1,5 +1,5 @@
 resource "aws_oam_link" "source_account_oam_link" {
-  label_template  = "nomis"
+  label_template  = "oasys"
   resource_types  = ["AWS::CloudWatch::Metric"]
   sink_identifier = var.monitoring_account_sink_identifier
 }

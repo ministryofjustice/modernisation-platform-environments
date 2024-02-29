@@ -7,3 +7,10 @@ variable "monitoring_account_id" {
   type = string
   default = "775245656481" # hmpps-oem-test account
 }
+
+variable "options" {
+  description = "Map of options controlling what resources to return"
+  type = object({
+    enable_hmpps-oem_monitoring = optional(bool, false)
+  })
+}
