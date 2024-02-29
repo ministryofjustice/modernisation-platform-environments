@@ -1,6 +1,11 @@
 # nomis-test environment settings
 locals {
 
+  # cloudwatch monitoring config
+  test_cloudwatch_monitoring_options = {
+    enable_cloudwatch_monitoring_account = false
+  }
+
   # baseline presets config
   test_baseline_presets_options = {}
 

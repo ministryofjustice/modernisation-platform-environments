@@ -235,6 +235,18 @@ locals {
     }
   }
 
+  LBGraphedMetricsHeading = {
+    type   = "text"
+    x      = 0
+    y      = 9
+    width  = 24
+    height = 1
+    properties = {
+      markdown   = "## LoadBalancer Graphed Metrics"
+      background = "solid"
+    }
+  }
+
   EC2GraphedMetricsHeading = {
     type   = "text"
     x      = 0

@@ -1,9 +1,11 @@
 resource "aws_oam_sink" "monitoring_account_oam_sink" {
+  count = var.options.enable_cloudwatch_monitoring_account ? 1 : 0
   name = "HMPPSOemSink"
 }
 
 resource "aws_oam_sink_policy" "monitoring_account_oam_sink_policy" {
-  sink_identifier = aws_oam_sink.monitoring_account_oam_sink.id
+  count = var.options.enable_cloudwatch_monitoring_account ? 1 : 0
+  sink_identifier = aws_oam_sink.monitoring_account_oam_sink[0]
 
   policy = jsonencode ({
     Version = "2012-10-17"

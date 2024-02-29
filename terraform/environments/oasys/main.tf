@@ -145,4 +145,5 @@ module "baseline" {
 }
 module "cloudwatch_dashboard" {
   source = "./cloudwatch_dashboard"
+  options = local.cloudwatch_monitoring_options
 }
