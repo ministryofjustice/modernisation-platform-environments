@@ -188,5 +188,4 @@ locals {
   }
 
   cloudwatch_monitoring_options = local.environment_cloudwatch_monitoring_options[local.environment]
-
 }

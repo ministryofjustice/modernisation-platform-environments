@@ -1,6 +1,6 @@
 variable "source_account_ids" {
   type = list(string)
-  default = ["612659970365", "546088120047"]
+  default = ["612659970365", "546088120047"] #nomis-test and oasys-test
 }
 
 variable "options" {
