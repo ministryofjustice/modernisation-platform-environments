@@ -3,7 +3,7 @@ locals {
 
   # cloudwatch monitoring config
   test_cloudwatch_monitoring_options = {
-    enable_hmpps-oem_monitoring = false
+    enable_hmpps-oem_monitoring = true
   }
 
   # baseline presets config
