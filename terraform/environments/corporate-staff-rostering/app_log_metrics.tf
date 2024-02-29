@@ -49,4 +49,32 @@ locals {
       })
     })
   }
+  application_log_metric_alarms_defaults = {
+    namespace           = local.application_log_metric_filters_meta.namespace
+    period              = 60
+    evaluation_periods  = 1
+    statistic           = "Sum"
+    comparison_operator = "GreaterThanThreshold"
+    threshold           = 2
+  }
+  # these alarms are applied directly to ec2 instances.
+  # see the configs for individual instances.
+  application_log_metric_alarms = {
+    app = {
+      iwfm-enterprise-server-started = merge(local.application_log_metric_alarms_defaults, {
+        metric_name = local.application_log_metric_filters.iwfm-enterprise-server-started.metric_transformation.name
+      })
+      iwfm-enterprise-server-terminated = merge(local.application_log_metric_alarms_defaults, {
+        metric_name = local.application_log_metric_filters.iwfm-enterprise-server-terminated.metric_transformation.name
+      })
+    }
+    web = {
+      invision-http-server-started = merge(local.application_log_metric_alarms_defaults, {
+        metric_name = local.application_log_metric_filters.invision-http-server-started.metric_transformation.name
+      })
+      invision-http-server-terminated = merge(local.application_log_metric_alarms_defaults, {
+        metric_name = local.application_log_metric_filters.invision-http-server-terminated.metric_transformation.name
+      })
+    }
+  }
 }
