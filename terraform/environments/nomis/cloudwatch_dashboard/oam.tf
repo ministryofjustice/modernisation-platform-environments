@@ -32,7 +32,7 @@ data "aws_iam_policy" "policy" {
 }
 
 resource "aws_iam_role" "aws_cloudwatch_metrics_role" {
-  name = "ClouWatch-CrossAccountSharingRole"
+  name = "CloudWatch-CrossAccountSharingRole"
   assume_role_policy = jsonencode(local.policy)
 }
 
