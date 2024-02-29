@@ -32,7 +32,7 @@
       "db_instance_class": "db.t3.small",
       "db_user": "dbadmin",
       "db_allocated_storage": "100",
-      "db_name": "ifs-dev",
+      "db_name": "ifs-staging",
       "env_name": "STAGING",
       "db_instance_identifier": "db-ifs-staging",
       "s3_bucket_name": "ifs-staging-bucket",
