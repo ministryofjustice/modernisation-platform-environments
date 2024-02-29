@@ -101,7 +101,6 @@ locals {
           }
         }
       }
-
     }
 
     baseline_route53_zones = {
