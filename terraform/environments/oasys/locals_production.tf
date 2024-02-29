@@ -27,9 +27,92 @@ locals {
     # }
 
     baseline_secretsmanager_secrets = {
+      "/oracle/database/PDOASYS"  = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/PTCOASYS" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/TRNOASYS" = local.secretsmanager_secrets_oasys_db
+      
+      # "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
+      # "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
+      # "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
+      # "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
+      # "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
+      # "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
+
+      # for azure, remove when migrated to aws db
+      # "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
+
+      # "/oracle/bip/production" = local.secretsmanager_secrets_bip
     }
 
     baseline_iam_policies = {
+      Ec2ProdWebPolicy = {
+        description = "Permissions required for Prod Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PDOASYS/apex-passwords*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/OASPROD/apex-passwords*",
+            ]
+          }
+        ]
+      }
+      Ec2ProdDatabasePolicy = {
+        description = "Permissions required for Prod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
+            ]
+          },
+        ]
+      }
+      Ec2ProdBipPolicy = {
+        description = "Permissions required for preprod Bip EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/bip-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/bip-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/bip/production/*",
+            ]
+          }
+        ]
+      }
     }
 
     baseline_ec2_instances = {
