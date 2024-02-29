@@ -66,7 +66,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4" {
 
 resource "aws_db_subnet_group" "db" {
   name       = "db-subnet-group"
-  subnet_ids = sort(data.aws_subnets.shared-data.ids)
+  subnet_ids = data.aws_subnets.shared-public.ids
   
   tags = local.tags
 }
