@@ -4,16 +4,24 @@ locals {
   # CAPITA
   #----------------------------------------------------------------------------
   capita_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBFc140uxPfjq1ilaOxcLYbnyIau2vURzKWFHLsxra+5Vf1nSZypOZ/g9eavBxcf2tkxBjgTx06BeRh3j+QhA8rnV9vKtyh9ZXIe5SNcrGlsGLKMyn+eB05Dt2m58oyMwWA==",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBMzzvEd8KCDG8lp9O6/D2tHK8aKZKIQiPWbcoPxr0I9CmDhr+DNVH8MnevXFrMx+aVreuK0lHEHWKInJBrxHXaK8OnsJjZwYjzAQSG4oBZYmHFW8r7xDkbKelOby0gNDzg==",
   ]
   capita_cidr_ipv4s = [
+    "195.59.155.38",  # This is missing a subnet so is invalid.
+  ]
+  capita_cidr_ipv6s = []
+
+  ddc_ssh_keys = [
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBFc140uxPfjq1ilaOxcLYbnyIau2vURzKWFHLsxra+5Vf1nSZypOZ/g9eavBxcf2tkxBjgTx06BeRh3j+QhA8rnV9vKtyh9ZXIe5SNcrGlsGLKMyn+eB05Dt2m58oyMwWA==",
+  ]
+  ddc_cidr_ipv4s = [
     "82.203.33.112/28",
     "82.203.33.128/28",
     "85.115.52.0/24",
     "85.115.53.0/24",
     "85.115.54.0/24",
   ]
-  capita_cidr_ipv6s = []
+  ddc_cidr_ipv6s = []
 
   sftp_account_capita_test = {
     name       = "test"
@@ -24,20 +32,27 @@ locals {
 
   sftp_account_capita_alcohol_monitoring = {
     name       = "alcohol_monitoring"
-    ssh_keys   = local.capita_ssh_keys
-    cidr_ipv4s = local.capita_cidr_ipv4s
-    cidr_ipv6s = local.capita_cidr_ipv6s
+    ssh_keys   = local.ddc_ssh_keys
+    cidr_ipv4s = local.ddc_cidr_ipv4s
+    cidr_ipv6s = local.ddc_cidr_ipv6s
   }
 
   sftp_account_capita_blob_storage = {
     name       = "blob_storage"
-    ssh_keys   = local.capita_ssh_keys
-    cidr_ipv4s = local.capita_cidr_ipv4s
-    cidr_ipv6s = local.capita_cidr_ipv6s
+    ssh_keys   = local.ddc_ssh_keys
+    cidr_ipv4s = local.ddc_cidr_ipv4s
+    cidr_ipv6s = local.ddc_cidr_ipv6s
   }
 
   sftp_account_capita_forms_and_subject_id = {
     name       = "forms_and_subject_id"
+    ssh_keys   = local.ddc_ssh_keys
+    cidr_ipv4s = local.ddc_cidr_ipv4s
+    cidr_ipv6s = local.ddc_cidr_ipv6s
+  }
+
+  sftp_account_capita_specials_mailbox = {
+    name       = "specials_mailbox"
     ssh_keys   = local.capita_ssh_keys
     cidr_ipv4s = local.capita_cidr_ipv4s
     cidr_ipv6s = local.capita_cidr_ipv6s
