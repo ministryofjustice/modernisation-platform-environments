@@ -23,7 +23,7 @@
       "db_deletion_protection": "true",
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "cr-jitbit-dev-db-snapshot-for-testing-migration-to-mp-copy"
+      "db_snapshot_identifier": "rds:delius-jitbit-development-database-2024-03-01-06-19"
     },
     "development": {
       "migration_source_account_id": "377957503799",
