@@ -5,7 +5,6 @@ description: Perform a healthcheck on the target instance
 parameters:
   action:
     type: String
-    default: "status"
     allowedValues:
     - restart
     - start
