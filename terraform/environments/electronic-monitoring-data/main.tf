@@ -8,13 +8,13 @@ module "capita" {
     # local.sftp_account_dev,
 
     # Test account for supplier.
-    local.sftp_account_capita_test,
+    # local.sftp_account_capita_test,
 
     # Accounts for each system to be migrated.
-    local.sftp_account_capita_alcohol_monitoring,
-    local.sftp_account_capita_blob_storage,
-    local.sftp_account_capita_forms_and_subject_id,
     local.sftp_account_capita_specials_mailbox,
+    # local.sftp_account_capita_alcohol_monitoring,
+    # local.sftp_account_capita_blob_storage,
+    # local.sftp_account_capita_forms_and_subject_id,
   ]
 
   data_store_bucket = aws_s3_bucket.data_store
