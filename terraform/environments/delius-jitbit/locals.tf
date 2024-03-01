@@ -24,10 +24,13 @@ locals {
 
   domain_name_main   = [for k, v in local.domain_types : v.name if k == local.domain]
   domain_name_sub    = [for k, v in local.domain_types : v.name if k == local.app_url]
+  domain_name_sub_sandbox = [for k, v in local.domain_types : v.name if k == local.sandbox_app_url]
   domain_record_main = [for k, v in local.domain_types : v.record if k == local.domain]
   domain_record_sub  = [for k, v in local.domain_types : v.record if k == local.app_url]
+  domain_record_sub_sandbox = [for k, v in local.domain_types : v.record if k == local.sandbox_app_url]
   domain_type_main   = [for k, v in local.domain_types : v.type if k == local.domain]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k == local.app_url]
+  domain_type_sub_sandbox = [for k, v in local.domain_types : v.type if k == local.sandbox_app_url]
 
   internal_security_group_cidrs = flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
