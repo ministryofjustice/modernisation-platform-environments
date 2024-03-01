@@ -62,6 +62,7 @@ locals {
           "ec2-instance-connect:SendSerialConsoleSSHPublicKey",
           "ssm:SendCommand",
           "ds:describeDirectories",
+          "secretsmanager:GetSecretValue",
         ]
         resources = ["*"]
       }]
