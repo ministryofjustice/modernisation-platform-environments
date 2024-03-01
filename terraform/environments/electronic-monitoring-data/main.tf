@@ -5,7 +5,7 @@ module "capita" {
 
   user_accounts = [
     # Developer access.
-    local.sftp_account_dev,
+    # local.sftp_account_dev,
 
     # Test account for supplier.
     local.sftp_account_capita_test,
@@ -14,6 +14,7 @@ module "capita" {
     local.sftp_account_capita_alcohol_monitoring,
     local.sftp_account_capita_blob_storage,
     local.sftp_account_capita_forms_and_subject_id,
+    local.sftp_account_capita_specials_mailbox,
   ]
 
   data_store_bucket = aws_s3_bucket.data_store
