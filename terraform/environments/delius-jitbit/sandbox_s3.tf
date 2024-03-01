@@ -1,4 +1,6 @@
 module "jitbit_bucket_sandbox" {
+  count = local.is-development ? 1 : 0
+  
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   providers = {
@@ -84,7 +86,7 @@ module "jitbit_bucket_sandbox" {
 }
 
 resource "aws_s3_bucket_intelligent_tiering_configuration" "jitbit_sandbox" {
-  bucket = module.jitbit_bucket_sandbox.bucket.id
+  bucket = module.jitbit_bucket_sandbox[0].bucket.id
   name   = "JitbitBucketTiering"
 
   status = "Enabled"
