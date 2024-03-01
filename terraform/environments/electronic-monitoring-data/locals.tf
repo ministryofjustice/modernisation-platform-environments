@@ -7,7 +7,7 @@ locals {
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBMzzvEd8KCDG8lp9O6/D2tHK8aKZKIQiPWbcoPxr0I9CmDhr+DNVH8MnevXFrMx+aVreuK0lHEHWKInJBrxHXaK8OnsJjZwYjzAQSG4oBZYmHFW8r7xDkbKelOby0gNDzg==",
   ]
   capita_cidr_ipv4s = [
-    "195.59.155.38",  # This is missing a subnet so is invalid.
+    "195.59.155.38/32",
   ]
   capita_cidr_ipv6s = []
 
