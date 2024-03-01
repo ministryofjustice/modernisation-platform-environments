@@ -41,7 +41,7 @@ mainSteps:
     inputs:
       runCommand:
         - "service chronyd start"
- - name: ServiceStop
+  - name: ServiceStop
     action: aws:runShellScript
     isEnd: true
     precondition:
