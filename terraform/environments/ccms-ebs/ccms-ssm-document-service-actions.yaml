@@ -1,7 +1,7 @@
 # ccms-ssm-document-test.yaml
 ---
 schemaVersion: "2.2"
-description: Perform a healthcheck on the target instance
+description: Perform an action on a selected service.
 parameters:
   action:
     type: String
@@ -10,44 +10,20 @@ parameters:
     - restart
     - start
     - stop
+  service:
+    type: String
+    allowedValues:
+    - chronyd
+    - postfix
+    - sshd
 mainSteps:
   - name: ServiceStatus
     action: aws:runShellScript
     isEnd: true
     precondition:
       StringEquals:
-        - "{{ action }}"
-        - "status"
+        - platformType
+        - Linux
     inputs:
       runCommand:
-        - "service chronyd status"
-  - name: ServiceRestart
-    action: aws:runShellScript
-    isEnd: true
-    precondition:
-      StringEquals:
-        - "{{ action }}"
-        - "restart"
-    inputs:
-      runCommand:
-        - "service chronyd restart"
-  - name: ServiceStart
-    action: aws:runShellScript
-    isEnd: true
-    precondition:
-      StringEquals:
-        - "{{ action }}"
-        - "start"
-    inputs:
-      runCommand:
-        - "service chronyd start"
-  - name: ServiceStop
-    action: aws:runShellScript
-    isEnd: true
-    precondition:
-      StringEquals:
-        - "{{ action }}"
-        - "stop"
-    inputs:
-      runCommand:
-        - "service chronyd stop"
+        - "systemctl {{ action }} {{ service }}"
