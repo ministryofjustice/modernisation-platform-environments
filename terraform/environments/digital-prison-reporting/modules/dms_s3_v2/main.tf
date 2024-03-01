@@ -109,6 +109,8 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
   ssl_mode      = "none"
   username      = var.source_app_username
 
+  postgres_settings = var.postgres_settings
+
   extra_connection_attributes = var.extra_attributes
 
   tags = merge(

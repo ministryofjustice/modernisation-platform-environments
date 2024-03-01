@@ -252,6 +252,11 @@ variable "source_address" {
   description = "Default Source Address"
 }
 
+variable "postgres_settings" {
+  default = {}
+  description = "Postgres Endpoint Settings"
+}
+
 variable "bucket_name" {
   type    = string
   default = ""

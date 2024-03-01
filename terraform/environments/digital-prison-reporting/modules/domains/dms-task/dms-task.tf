@@ -15,6 +15,7 @@ module "dms_task" {
   dms_source_endpoint       = var.dms_source_endpoint
   dms_target_endpoint       = var.dms_target_endpoint
   short_name                = var.short_name
+  postgres_settings         = var.postgres_settings
 
   tags = var.tags
 }
