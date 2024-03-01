@@ -5,13 +5,22 @@ description: Perform a healthcheck on the target instance
 parameters:
   action:
     type: String
-    default: status
     allowedValues:
+    - status
     - restart
     - start
-    - status
     - stop
 mainSteps:
+  - name: ServiceStatus
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - "{{ action }}"
+        - "status"
+    inputs:
+      runCommand:
+        - "service chronyd status"
   - name: ServiceRestart
     action: aws:runShellScript
     isEnd: true
@@ -32,17 +41,7 @@ mainSteps:
     inputs:
       runCommand:
         - "service chronyd start"
-  - name: ServiceStatus
-    action: aws:runShellScript
-    isEnd: true
-    precondition:
-      StringEquals:
-        - "{{ action }}"
-        - "status"
-    inputs:
-      runCommand:
-        - "service chronyd status"
-  - name: ServiceStop
+ - name: ServiceStop
     action: aws:runShellScript
     isEnd: true
     precondition:
