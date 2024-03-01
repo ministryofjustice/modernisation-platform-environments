@@ -40,9 +40,7 @@ resource "aws_acm_certificate" "external" {
   domain_name       = local.domain
   validation_method = "DNS"
 
-  subject_alternative_names = [
-    local.app_url
-  ]
+  subject_alternative_names = local.acm_subject_alternative_names
   tags = {
     Environment = local.environment
   }

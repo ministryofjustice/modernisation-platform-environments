@@ -86,6 +86,8 @@ module "jitbit_bucket_sandbox" {
 }
 
 resource "aws_s3_bucket_intelligent_tiering_configuration" "jitbit_sandbox" {
+  count = local.is-development ? 1 : 0
+  
   bucket = module.jitbit_bucket_sandbox[0].bucket.id
   name   = "JitbitBucketTiering"
 

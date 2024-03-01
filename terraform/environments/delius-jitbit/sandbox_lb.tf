@@ -89,7 +89,7 @@ resource "aws_lb_listener" "listener_sandbox" {
   load_balancer_arn = aws_lb.external_sandbox[0].id
   port              = 443
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external_sandbox[0].arn
+  certificate_arn   = aws_acm_certificate.external.arn
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {

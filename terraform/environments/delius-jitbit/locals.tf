@@ -6,6 +6,9 @@ locals {
   non_prod_app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
   prod_app_url     = "helpdesk.${local.domain}"
   app_url          = local.is-production ? local.prod_app_url : local.non_prod_app_url
+  sandbox_app_url = "${var.networking[0].application}-sandbox.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
+
+  acm_subject_alternative_names = local.is-development ? [local.app_url, local.sandbox_app_url] : [local.app_url]
 
   app_port = local.application_data.accounts[local.environment].server_port
 
