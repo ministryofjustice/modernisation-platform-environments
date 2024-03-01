@@ -1,6 +1,11 @@
 # environment specific settings
 locals {
 
+  # cloudwatch monitoring config
+  test_cloudwatch_monitoring_options = {
+    enable_hmpps-oem_monitoring = true
+  }
+
   test_baseline_presets_options = {
     enable_observability_platform_monitoring = true
     sns_topics = {

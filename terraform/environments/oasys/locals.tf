@@ -462,4 +462,13 @@ locals {
   baseline_secretsmanager_secrets        = {}
   baseline_sns_topics                    = {}
   baseline_ssm_parameters                = {}
+
+  environment_cloudwatch_monitoring_options = {
+    development   = local.development_cloudwatch_monitoring_options 
+    test          = local.test_cloudwatch_monitoring_options
+    preproduction = local.preproduction_cloudwatch_monitoring_options
+    production    = local.production_cloudwatch_monitoring_options
+  }
+
+  cloudwatch_monitoring_options = local.environment_cloudwatch_monitoring_options[local.environment]
 }
