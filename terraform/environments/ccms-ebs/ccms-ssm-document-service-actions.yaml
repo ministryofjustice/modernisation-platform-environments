@@ -1,0 +1,50 @@
+# ccms-ssm-document-test.yaml
+---
+schemaVersion: "2.2"
+description: Perform a healthcheck on the target instance
+parameters:
+  action:
+    type: String
+    default: "status"
+    allowedValues:
+    - restart
+    - start
+    - status
+    - stop
+mainSteps:
+  - name: ServiceRestart
+    action: aws:runShellScript
+    precondition:
+      StringEquals:
+        - "{{ action }}"
+        - "restart"
+    inputs:
+      runCommand:
+        - "service chronyd restart"
+  - name: ServiceStart
+    action: aws:runShellScript
+    precondition:
+      StringEquals:
+        - "{{ action }}"
+        - "start"
+    inputs:
+      runCommand:
+        - "service chronyd start"
+  - name: ServiceStatus
+    action: aws:runShellScript
+    precondition:
+      StringEquals:
+        - "{{ action }}"
+        - "status"
+    inputs:
+      runCommand:
+        - "id; service chronyd status"
+  - name: ServiceStop
+    action: aws:runShellScript
+    precondition:
+      StringEquals:
+        - "{{ action }}"
+        - "stop"
+    inputs:
+      runCommand:
+        - "service chronyd stop"
