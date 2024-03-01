@@ -13,6 +13,7 @@ module "dms_instance" {
   vpc_cidr                     = var.vpc_cidr
   vpc                          = var.vpc
   short_name                   = var.short_name
+  allow_major_version_upgrade  = var.allow_major_version_upgrade
 
   tags = var.tags
 }
