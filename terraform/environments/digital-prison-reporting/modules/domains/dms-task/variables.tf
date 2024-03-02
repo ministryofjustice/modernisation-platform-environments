@@ -74,9 +74,3 @@ variable "short_name" {
   type    = string
   default = ""
 }
-
-variable "postgres_settings" {
-  type        = map(string)
-  default     = {}
-  description = "(Optional) Postgres Settings."
-}

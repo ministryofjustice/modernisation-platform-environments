@@ -225,3 +225,9 @@ variable "source_username" {
   description = "Username to access the source database"
   default     = ""
 }
+
+variable "postgres_settings" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Postgres Settings."
+}

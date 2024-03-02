@@ -19,6 +19,7 @@ module "dms_endpoints" {
   source_db_port           = var.source_db_port
   extra_attributes         = var.extra_attributes
   bucket_name              = var.bucket_name
+  postgres_settings        = var.postgres_settings
 
   tags = var.tags
 }
