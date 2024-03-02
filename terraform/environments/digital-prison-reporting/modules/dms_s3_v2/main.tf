@@ -109,7 +109,7 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
   ssl_mode      = "none"
   username      = var.source_app_username
 
-  postgres_settings = var.postgres_settings
+  postgres_settings = var.source_engine_name == "postgres" ? var.postgres_settings : null
 
   extra_connection_attributes = var.extra_attributes
 
