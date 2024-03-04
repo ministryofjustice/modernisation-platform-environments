@@ -21,4 +21,7 @@ resource "aws_secretsmanager_secret_version" "db_app_connection_string_sandbox" 
   count         = local.is-development ? 1 : 0
   secret_id     = aws_secretsmanager_secret.db_app_connection_string_sandbox[0].id
   secret_string = "user id=OfficeUser;data source=${aws_db_instance.jitbit_sandbox[0].address};initial catalog=Office;password=${jsondecode(data.aws_secretsmanager_secret_version.rds_password[0].secret_string)["password"]}"
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
