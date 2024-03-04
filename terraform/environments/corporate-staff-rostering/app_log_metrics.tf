@@ -56,6 +56,7 @@ locals {
     statistic           = "Sum"
     comparison_operator = "GreaterThanThreshold"
     threshold           = 2
+    treat_missing_data  = "ignore"
   }
   # these alarms are applied directly to ec2 instances.
   # see the configs for individual instances.
