@@ -35,7 +35,7 @@ resource "aws_secretsmanager_secret" "dps" {
     {
       Name          = "external/${local.project}-${each.value}-source-secrets"
       Resource_Type = "Secrets"
-      Source        = Nomis
+      Source        = "DPS"
       Domain        = each.value
       Jira          = "DPR2-341"
     }
@@ -43,7 +43,7 @@ resource "aws_secretsmanager_secret" "dps" {
 }
 
 resource "aws_secretsmanager_secret_version" "dps" {
-  secret_id     = aws_secretsmanager_secret[each.key].id
+  secret_id     = aws_secretsmanager_secret.dps[each.key].id
   secret_string = jsonencode(local.dps_secrets_placeholder)
 
   lifecycle {
