@@ -11,7 +11,7 @@ module "ad-clean-up-lambda" {
   application_name = local.lambda_ad_object_cleanup.function_name
   function_name    = local.lambda_ad_object_cleanup.function_name
   description      = "Lambda to remove corresponding computer object from Active Directory upon server termination"
-  
+
   package_type     = "Zip"
   filename         = "${path.module}/lambda/ad-clean-up/deployment_package.zip"
   source_code_hash = filebase64sha256("${path.module}/lambda/ad-clean-up/deployment_package.zip")

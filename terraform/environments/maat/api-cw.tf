@@ -267,7 +267,7 @@ resource "aws_sns_topic" "maat_api_alerting_topic" {
     {
       Name = "${local.application_name}-maat-alerting-topic"
     }
-)
+  )
 }
 
 # Pager duty integration

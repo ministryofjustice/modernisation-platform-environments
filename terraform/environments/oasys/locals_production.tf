@@ -35,7 +35,7 @@ locals {
       "/oracle/database/PDOASYS"  = local.secretsmanager_secrets_oasys_db
       "/oracle/database/PTCOASYS" = local.secretsmanager_secrets_oasys_db
       "/oracle/database/TRNOASYS" = local.secretsmanager_secrets_oasys_db
-      
+
       # "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
       # "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
       # "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db

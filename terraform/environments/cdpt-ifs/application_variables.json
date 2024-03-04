@@ -37,7 +37,6 @@
       "db_instance_identifier": "db-ifs-staging",
       "s3_bucket_name": "ifs-staging-bucket",
       "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:ifs-cdpt-dev-staging-feb-12-2024"
-    
     },
     "production": {
       "environment_name": "production",

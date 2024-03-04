@@ -65,7 +65,7 @@ resource "aws_iam_role" "lambda-ad-role" {
 }
 
 resource "aws_iam_policy" "lambda-ad-policy" {
-  name = "LambdaADObjectCleanUpPolicy"
+  name        = "LambdaADObjectCleanUpPolicy"
   description = "Policy to grant AD lambda function VPC access"
 
   policy = jsonencode({

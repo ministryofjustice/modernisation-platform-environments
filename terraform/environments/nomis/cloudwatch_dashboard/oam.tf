@@ -19,8 +19,8 @@ locals {
         "Effect" : "Allow",
         "Principal" : {
           "AWS" : var.monitoring_account_id
-          },
-          "Action" : "sts:AssumeRole"
+        },
+        "Action" : "sts:AssumeRole"
       }
     ]
   }

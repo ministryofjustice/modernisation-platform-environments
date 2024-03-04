@@ -3,7 +3,7 @@ resource "aws_security_group" "delius_frontend_alb_security_group" {
   description = "controls access to and from delius front-end load balancer"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
-    lifecycle {
+  lifecycle {
     create_before_destroy = true
   }
 }
