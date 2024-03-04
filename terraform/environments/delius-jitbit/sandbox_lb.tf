@@ -124,7 +124,7 @@ resource "aws_lb_target_group" "target_group_fargate_sandbox" {
   health_check {
     path                = "/User/Login?ReturnUrl=%2f"
     healthy_threshold   = "5"
-    interval            = "120"
+    interval            = "30"
     protocol            = "HTTP"
     unhealthy_threshold = "2"
     matcher             = "200-499"
