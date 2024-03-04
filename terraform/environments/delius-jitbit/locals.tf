@@ -32,6 +32,8 @@ locals {
   domain_type_sub    = [for k, v in local.domain_types : v.type if k == local.app_url]
   domain_type_sub_sandbox = [for k, v in local.domain_types : v.type if k == local.sandbox_app_url]
 
+  validation_record_fqdns = local.is-development ? [local.domain_name_main[0], local.domain_name_sub[0], local.domain_name_sub_sandbox[0]] : [local.domain_name_main[0], local.domain_name_sub[0]]
+
   internal_security_group_cidrs = flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
