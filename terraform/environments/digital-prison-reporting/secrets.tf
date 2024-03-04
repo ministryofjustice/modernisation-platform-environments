@@ -24,6 +24,33 @@ resource "aws_secretsmanager_secret_version" "nomis" {
   }
 }
 
+# DPS Source Secrets
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret" "dps" {
+  for_each = toset(local.dps_domains_list)
+  name = "external/${local.project}-${each.value}-source-secrets"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-${each.value}-source-secrets"
+      Resource_Type = "Secrets"
+      Source        = Nomis
+      Domain        = each.value
+      Jira          = "DPR2-341"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "dps" {
+  secret_id     = aws_secretsmanager_secret[each.key].id
+  secret_string = jsonencode(local.dps_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
 # Redshift Access Secrets
 resource "aws_secretsmanager_secret" "redshift" {
   name = "dpr-redshift-sqlworkbench-${local.env}"
