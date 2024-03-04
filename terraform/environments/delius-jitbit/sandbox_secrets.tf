@@ -20,5 +20,5 @@ data "aws_secretsmanager_secret_version" "rds_password" {
 resource "aws_secretsmanager_secret_version" "db_app_connection_string_sandbox" {
   count         = local.is-development ? 1 : 0
   secret_id     = aws_secretsmanager_secret.db_app_connection_string_sandbox[0].id
-  secret_string = "user id=${aws_db_instance.jitbit_sandbox[0].username};data source=${aws_db_instance.jitbit_sandbox[0].address};initial catalog=Office;password=${data.aws_secretsmanager_secret_version.rds_password.secret_string}"
+  secret_string = "user id=OfficeUser;data source=${aws_db_instance.jitbit_sandbox[0].address};initial catalog=Office;password=${jsondecode(data.aws_secretsmanager_secret_version.rds_password.secret_string)["password"]}"
 }
