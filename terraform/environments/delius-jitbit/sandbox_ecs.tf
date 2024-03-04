@@ -92,6 +92,6 @@ resource "aws_security_group_rule" "alb_sandbox" {
 resource "aws_cloudwatch_log_group" "jitbit_sandbox" {
   count = local.is-development ? 1 : 0
 
-  name              = format("%s-%s-ecs", "sandbox", local.application_name)
+  name              = format("%s-%s-ecs", local.application_name, "sandbox")
   retention_in_days = 30
 }
