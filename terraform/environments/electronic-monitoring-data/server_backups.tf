@@ -31,7 +31,7 @@ resource "aws_db_instance" "database" {
   maintenance_window                  = "Mon:00:00-Mon:03:00"
   deletion_protection                 = false
 
-#   option_group_name                   = aws_db_option_group.db_option_group.name
+  option_group_name                   = aws_db_option_group.sqlserver_backup_restore.name
 
   iam_database_authentication_enabled = false
 
@@ -73,80 +73,62 @@ resource "aws_db_subnet_group" "db" {
 
 #------------------------------------------------------------------------------
 
-# resource "aws_db_option_group" "db_option_group" {
-#   name                     = "option-group"
-#   option_group_description = "Terraform Option Group"
-#   engine_name              = "sqlserver-se"
-#   major_engine_version     = "15.00"
+resource "aws_db_option_group" "sqlserver_backup_restore" {
+  name                     = "option-group"
+  option_group_description = "Terraform Option Group"
+  engine_name              = "sqlserver-se"
+  major_engine_version     = "13.00"
 
-#   option {
-#     option_name = "SQLSERVER_BACKUP_RESTORE"
+  option {
+    option_name = "SQLSERVER_BACKUP_RESTORE"
 
-#     option_settings {
-#       name  = "IAM_ROLE_ARN"
-#       value = aws_iam_role.s3_database_backups_role.arn
-#     }
-#   }
-# }
+    option_settings {
+      name  = "IAM_ROLE_ARN"
+      value = aws_iam_role.s3_database_backups_role.arn
+    }
+  }
+}
 
 # #------------------------------------------------------------------------------
 
-# data "aws_iam_policy_document" "s3-access-policy" {
-#   version = "2012-10-17"
-#   statement {
-#     sid    = ""
-#     effect = "Allow"
-#     actions = [
-#       "sts:AssumeRole",
-#     ]
-#     principals {
-#       type = "Service"
-#       identifiers = [
-#         "rds.amazonaws.com",
-#       ]
-#     }
-#   }
-# }
+data "aws_iam_policy_document" "rds-s3-access-policy" {
+  version = "2012-10-17"
+  statement {
+    sid    = ""
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole",
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "rds.amazonaws.com",
+      ]
+    }
+  }
+}
 
-# resource "aws_iam_role" "s3_database_backups_role" {
-#   name               = "${local.application_name}-s3-database-backups-role"
-#   assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name}-s3-db-backups-role"
-#     }
-#   )
-# }
+resource "aws_iam_role" "s3_database_backups_role" {
+  name               = "s3-database-backups-role"
+  assume_role_policy = data.aws_iam_policy_document.rds-s3-access-policy.json
+  tags = local.tags
+}
 
-# data "aws_iam_policy_document" "data_store" {
-#   statement {
-#     sid = "EnforceTLSv12orHigher"
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["*"]
-#     }
-#     effect  = "Deny"
-#     actions = ["s3:*"]
-#     resources = [
-#       aws_s3_bucket.data_store.arn,
-#       "${aws_s3_bucket.data_store.arn}/*"
-#     ]
-#     condition {
-#       test     = "NumericLessThan"
-#       variable = "s3:TlsVersion"
-#       values   = [1.2]
-#     }
-#   }
-# }
+data "aws_iam_policy_document" "rds_data_store_access" {
+  statement {
+    sid    = "AllowReadDataStore"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = ["${aws_s3_bucket.data_store.arn}/*"]
+  }
+}
 
-# resource "aws_iam_role_policy_attachment" "s3_database_backups_attachment" {
-#   role       = aws_iam_role.s3_database_backups_role.name
-#   policy_arn = aws_iam_policy.s3_database_backups_policy.arn
-# }
-
-
-
+resource "aws_iam_role_policy" "this_transfer_workflow" {
+  role   = aws_iam_role.s3_database_backups_role.name
+  policy = data.aws_iam_policy_document.rds_data_store_access.json
+}
 
 #------------------------------------------------------------------------------
 
