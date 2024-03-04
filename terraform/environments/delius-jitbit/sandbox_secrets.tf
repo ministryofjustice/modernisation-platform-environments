@@ -13,6 +13,7 @@ resource "aws_secretsmanager_secret" "db_app_connection_string_sandbox" {
 }
 
 data "aws_secretsmanager_secret_version" "rds_password" {
+  count     = local.is-development ? 1 : 0
   secret_id = aws_db_instance.jitbit_sandbox[0].master_user_secret[0].secret_arn
 }
 
