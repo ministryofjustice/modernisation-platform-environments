@@ -336,7 +336,7 @@ locals {
       "/dev/sdj" = { # FLASH01
         label = "flash"
         type  = "gp3"
-        size  = 300
+        size  = 600
       }
       # "/dev/sdk" = { # FLASH02
       # }
