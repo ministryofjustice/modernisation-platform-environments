@@ -30,7 +30,7 @@ resource "aws_ssm_maintenance_window" "this" {
 resource "aws_ssm_maintenance_window_target" "this" {
   window_id     = aws_ssm_maintenance_window.this.id
   resource_type = "INSTANCE"
-  description   = "${var.application}-${var.environment}} target"
+  description   = "${var.application}-${var.environment} target"
 
   targets {
     key    = "tag:environment-name"
@@ -61,9 +61,12 @@ resource "aws_ssm_maintenance_window_task" "this" {
 
   task_invocation_parameters {
     run_command_parameters {
-      comment          = "Windows Patch Baseline Install"
-      document_version = "$LATEST"
-      timeout_seconds  = 3600
+      comment              = "Windows Patch Baseline Install"
+      document_version     = "$LATEST"
+      timeout_seconds      = 3600
+      output_s3_bucket     = aws_s3_bucket.this.id
+      output_s3_key_prefix = "patch-logs"
+
       cloudwatch_config {
         cloudwatch_log_group_name = aws_cloudwatch_log_group.this.id
         cloudwatch_output_enabled = true
