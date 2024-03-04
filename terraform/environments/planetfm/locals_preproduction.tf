@@ -73,7 +73,7 @@ locals {
         }
         tags = merge(local.defaults_app_ec2.tags, {
           pre-migration     = "PPFAW011"
-          description       = "RDS session host & app server"
+          description       = "RDS session host and app server"
           ami               = "pp-cafm-a-11-a"
         })
       })
