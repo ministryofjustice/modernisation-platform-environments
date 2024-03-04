@@ -284,6 +284,7 @@ locals {
   # Sonatype Secrets
   setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
 
+  # Nomis Secrets PlaceHolder 
   nomis_secrets_placeholder = {
     db_name  = "nomis"
     password = "placeholder"
@@ -291,6 +292,16 @@ locals {
     endpoint = "0.0.0.0"
     port     = "1521"
   }
+  
+  # DPS Secrets PlaceHolder
+  dps_domains_list = local.application_data.accounts[local.environment].dps_domains
+  dps_secrets_placeholder = {
+    db_name  = "dps"
+    password = "placeholder"
+    user     = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "5432"
+  }  
 
   sonatype_secrets_placeholder = {
     user     = "placeholder"
