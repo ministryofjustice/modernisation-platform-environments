@@ -331,9 +331,9 @@ locals {
           return_data = "true"
         }
         metric_query = {
-          id          = "e1"
-          expression  = "m1/PERIOD(m1)"
-          label       = "Read IOPs"
+          id         = "e1"
+          expression = "m1/PERIOD(m1)"
+          label      = "Read IOPs"
           metric = {
             metric_name = "VolumeReadOps"
             namespace   = "AWS/EBS"
@@ -345,9 +345,9 @@ locals {
           }
         }
         metric_query = {
-          id          = "e2"
-          expression  = "m2/PERIOD(m2)"
-          label       = "Write IOPs"
+          id         = "e2"
+          expression = "m2/PERIOD(m2)"
+          label      = "Write IOPs"
           metric = {
             metric_name = "VolumeWriteOps"
             namespace   = "AWS/EBS"

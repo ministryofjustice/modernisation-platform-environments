@@ -10,7 +10,7 @@ variable "tags" {
 }
 
 variable "environment_config" {
-  type        = any
+  type = any
 }
 
 variable "account_config" {

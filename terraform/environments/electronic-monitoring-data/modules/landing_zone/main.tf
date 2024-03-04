@@ -113,7 +113,7 @@ module "log_bucket" {
 
   local_tags = var.local_tags
   tags = {
-      supplier = var.supplier
+    supplier = var.supplier
   }
 }
 

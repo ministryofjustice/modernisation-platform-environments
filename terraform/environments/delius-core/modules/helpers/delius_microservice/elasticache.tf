@@ -54,9 +54,9 @@ resource "aws_elasticache_parameter_group" "this" {
 
   dynamic "parameter" {
     for_each = var.elasticache_parameters
-      content {
-        name  = parameter.key
-        value = parameter.value
-      }
+    content {
+      name  = parameter.key
+      value = parameter.value
+    }
   }
 }

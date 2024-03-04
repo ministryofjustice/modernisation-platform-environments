@@ -20,7 +20,7 @@ module "merge_ui_service" {
 
   bastion_sg_id                      = module.bastion_linux.bastion_security_group
   tags                               = var.tags
-  microservice_lb               = aws_lb.delius_core_frontend
+  microservice_lb                    = aws_lb.delius_core_frontend
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
   alb_listener_rule_paths    = ["/merge/ui", "/merge/ui/*"]

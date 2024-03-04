@@ -219,7 +219,7 @@ locals {
   baseline_sns_topics = {}
 
   environment_cloudwatch_monitoring_options = {
-    development   = local.development_cloudwatch_monitoring_options 
+    development   = local.development_cloudwatch_monitoring_options
     test          = local.test_cloudwatch_monitoring_options
     preproduction = local.preproduction_cloudwatch_monitoring_options
     production    = local.production_cloudwatch_monitoring_options
