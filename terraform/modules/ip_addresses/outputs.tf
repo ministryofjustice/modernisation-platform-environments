@@ -58,6 +58,11 @@ output "azure_studio_hosting_cidr" {
   description = "Azure Studio Hosting AKS cidrs: map(string)"
 }
 
+output "azure_studio_hosting_public" {
+  value       = local.azure_studio_hosting_public
+  description = "Azure Studio Hosting AKS public ips: map(string)"
+}
+
 output "azure_studio_hosting_cidrs" {
   value       = local.azure_studio_hosting_cidrs
   description = "Azure Studio Hosting AKS aggregate cidrs: map(list(string))"

@@ -1,6 +1,11 @@
 # environment specific settings
 locals {
 
+  # cloudwatch monitoring config
+  preproduction_cloudwatch_monitoring_options = {
+    enable_hmpps-oem_monitoring = false
+  }
+
   preproduction_baseline_presets_options = {
     sns_topics = {
       pagerduty_integrations = {
@@ -12,6 +17,7 @@ locals {
   }
 
   preproduction_config = {
+    
     ec2_common = {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
@@ -128,6 +134,9 @@ locals {
           instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
+        })
+        instance = merge(local.database_onr_a.instance, {
+          instance_type = "r6i.2xlarge"
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {

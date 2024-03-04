@@ -41,7 +41,7 @@ resource "aws_lb_target_group" "frontend" {
   }
 }
 
-resource "aws_lb_listener_rule" "alb" {
+resource "aws_lb_listener_rule" "alb_path" {
   count        = var.alb_listener_rule_paths != null ? 1 : 0
   listener_arn = var.microservice_lb_https_listener_arn
   priority     = var.alb_listener_rule_priority != null ? var.alb_listener_rule_priority : null
@@ -56,6 +56,33 @@ resource "aws_lb_listener_rule" "alb" {
   }
 }
 
+resource "aws_lb_listener_rule" "alb_header" {
+  count        = var.alb_listener_rule_host_header != null ? 1 : 0
+  listener_arn = var.microservice_lb_https_listener_arn
+  priority     = var.alb_listener_rule_priority != null ? var.alb_listener_rule_priority : null
+  condition {
+    host_header {
+      values = [var.alb_listener_rule_host_header]
+    }
+  }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
+
+resource "aws_route53_record" "alb_r53_record" {
+  count    = var.alb_listener_rule_host_header != null ? 1 : 0
+  provider = aws.core-vpc
+  zone_id  = var.account_config.route53_external_zone.zone_id
+  name     = var.alb_listener_rule_host_header
+  type     = "CNAME"
+  alias {
+    evaluate_target_health = false
+    name                   = var.microservice_lb.dns_name
+    zone_id                = var.microservice_lb.zone_id
+  }
+}
 
 # NLB for service interconnectivity
 

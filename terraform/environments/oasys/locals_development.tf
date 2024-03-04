@@ -1,6 +1,11 @@
 # environment specific settings
 locals {
 
+  # cloudwatch monitoring config
+  development_cloudwatch_monitoring_options = {
+    enable_hmpps-oem_monitoring = false
+  }
+
   development_baseline_presets_options = {
     sns_topics = {
       pagerduty_integrations = {

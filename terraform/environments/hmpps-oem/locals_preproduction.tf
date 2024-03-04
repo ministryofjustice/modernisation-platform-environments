@@ -1,6 +1,11 @@
 # nomis-preproduction environment settings
 locals {
 
+  # cloudwatch monitoring config
+  preproduction_cloudwatch_monitoring_options = {
+    enable_cloudwatch_monitoring_account = false
+  }
+
   # baseline presets config
   preproduction_baseline_presets_options = {}
 

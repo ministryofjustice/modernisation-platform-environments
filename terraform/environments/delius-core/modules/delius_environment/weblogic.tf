@@ -49,8 +49,8 @@ module "weblogic" {
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
   env_name        = var.env_name
 
-  health_check_path   = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
-  microservice_lb_arn = aws_lb.delius_core_frontend.arn
+  health_check_path = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+  microservice_lb   = aws_lb.delius_core_frontend
 
   name                       = "weblogic"
   container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${var.delius_microservice_configs.weblogic.image_tag}"

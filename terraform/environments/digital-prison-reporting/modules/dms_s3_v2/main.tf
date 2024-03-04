@@ -14,6 +14,7 @@ resource "aws_dms_replication_instance" "dms-s3-target-instance" {
   replication_instance_id      = "${var.name}-instance-${var.env}"
   replication_subnet_group_id  = aws_dms_replication_subnet_group.dms-s3-target-subnet-group[0].id
   vpc_security_group_ids       = aws_security_group.dms_s3_target_sec_group[*].id
+  allow_major_version_upgrade  = var.allow_major_version_upgrade
 
   tags = merge(
     var.tags,
