@@ -40,9 +40,7 @@ resource "aws_acm_certificate" "external" {
   domain_name       = local.domain
   validation_method = "DNS"
 
-  subject_alternative_names = [
-    local.app_url
-  ]
+  subject_alternative_names = local.acm_subject_alternative_names
   tags = {
     Environment = local.environment
   }
@@ -88,6 +86,19 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
+resource "aws_route53_record" "external_validation_subdomain_sandbox" {
+  count = local.is-development ? 1 : 0
+  provider = aws.core-vpc
+
+  allow_overwrite = true
+  name            = local.domain_name_sub_sandbox[0]
+  records         = local.domain_record_sub_sandbox
+  ttl             = 60
+  type            = local.domain_type_sub_sandbox[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+
 resource "aws_route53_record" "external_validation_subdomain_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
@@ -102,5 +113,5 @@ resource "aws_route53_record" "external_validation_subdomain_prod" {
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = local.validation_record_fqdns
 }
