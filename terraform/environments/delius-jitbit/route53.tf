@@ -103,7 +103,7 @@ resource "aws_route53_record" "external_validation_subdomain_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
-  allow_overwrite = true
+    allow_overwrite = true
   name            = local.domain_name_sub[0]
   records         = local.domain_record_sub
   ttl             = 60

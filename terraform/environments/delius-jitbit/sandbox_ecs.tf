@@ -3,8 +3,8 @@ module "ecs_sandbox" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
 
-  environment = "sandbox"
-  name        = local.application_name
+  environment = local.environment
+  name        = "${local.application_name}-sandbox"
 
   tags = local.tags
 }
