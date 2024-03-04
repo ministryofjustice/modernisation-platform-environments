@@ -2,32 +2,34 @@
 resource "aws_db_instance" "database" {
 #   count = local.is-production ? 1 : 0
 
-  identifier    = "terraform-db-instance-test"
-  username      = "admin"
-  password      = "Test-123"
-  license_model = "license-included"
+  identifier                          = "terraform-db-instance-test"
 
-  engine         = "sqlserver-se"
-  engine_version = "13.00.6435.1.v1"
-  instance_class = "db.m5.large"
+  engine                              = "sqlserver-se"
+  engine_version                      = "13.00.6435.1.v1"
+  instance_class                      = "db.m5.large"
 
-  storage_type          = "gp2"
-  allocated_storage     = 50
+  storage_type                        = "gp2"
+  allocated_storage                   = 50
   max_allocated_storage = 1000
-  storage_encrypted     = true
+  storage_encrypted                   = true
 
-  multi_az          = false
-  availability_zone = "eu-west-2b"
+  multi_az                            = false
 
-  db_subnet_group_name   = aws_db_subnet_group.db.id
-  vpc_security_group_ids = [aws_security_group.db.id]
-  publicly_accessible    = true
-  port                   = 1433
+  db_subnet_group_name                = aws_db_subnet_group.db.id
+
+  vpc_security_group_ids              = [aws_security_group.db.id]
+
+  publicly_accessible = true
+  port = 1433
+
+  license_model                       = "license-included"
+  username                            = "admin"
+  password                            = "Test-123"
 
   auto_minor_version_upgrade = true
-  skip_final_snapshot        = true
-  maintenance_window         = "Mon:00:00-Mon:03:00"
-  deletion_protection        = false
+  skip_final_snapshot = true
+  maintenance_window                  = "Mon:00:00-Mon:03:00"
+  deletion_protection                 = false
 
 #   option_group_name                   = aws_db_option_group.db_option_group.name
 
@@ -64,7 +66,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4" {
 
 resource "aws_db_subnet_group" "db" {
   name       = "db-subnet-group"
-  subnet_ids = sort(data.aws_subnets.shared-public.ids)
+  subnet_ids = data.aws_subnets.shared-public.ids
   
   tags = local.tags
 }
