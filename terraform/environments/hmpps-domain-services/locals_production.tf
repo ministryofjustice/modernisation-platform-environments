@@ -42,7 +42,7 @@ locals {
           availability_zone = "eu-west-2a"
         })
         tags = merge(local.rds_ec2_instance.tags, {
-          description = "Remote Desktop Gateway for hmpp.noms.root domain"
+          description = "Remote Desktop Gateway for azure.hmpp.root domain"
         })
       })
       pd-rdgw-1-b = merge(local.rds_ec2_instance, {
@@ -50,7 +50,7 @@ locals {
           availability_zone = "eu-west-2b"
         })
         tags = merge(local.rds_ec2_instance.tags, {
-          description = "Remote Desktop Gateway for hmpp.noms.root domain"
+          description = "Remote Desktop Gateway for azure.hmpp.root domain"
         })
       })
       pd-rds-1-a = merge(local.rds_ec2_instance, {
@@ -63,7 +63,7 @@ locals {
           instance_type = "t3.large"
         })
         tags = merge(local.rds_ec2_instance.tags, {
-          description = "Remote Desktop Services for hmpp.noms.root domain"
+          description = "Remote Desktop Services for azure.hmpp.root domain"
         })
       })
     }
