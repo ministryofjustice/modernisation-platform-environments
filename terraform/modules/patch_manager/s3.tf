@@ -11,6 +11,7 @@ resource "aws_s3_bucket_policy" "this" {
 
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
+    sid    = "AllowLoggingToS3"
     effect = "Allow"
     actions = [
       "s3:GetObject",
