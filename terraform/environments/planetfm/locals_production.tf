@@ -111,7 +111,7 @@ locals {
         }
         tags = {
           pre-migration     = "PDFWA0011"
-          description       = "RDS session host & app server"
+          description       = "RDS session host and app server"
           ami               = "pd-cafm-a-11-a"
         }
         route53_records = {
@@ -137,7 +137,7 @@ locals {
         }
         tags = {
           pre-migration     = "PDFAW0012"
-          description       = "RDS session host & app Server"
+          description       = "RDS session host and app Server"
           ami               = "pd-cafm-a-12-b"
         }
         route53_records = {
@@ -163,7 +163,7 @@ locals {
         }
         tags = {
           pre-migration     = "PDFAW0013"
-          description       = "RDS session host & App Server"
+          description       = "RDS session host and App Server"
           ami               = "pd-cafm-a-13-a"
         }
         route53_records = {
