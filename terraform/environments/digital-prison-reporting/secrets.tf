@@ -43,6 +43,8 @@ resource "aws_secretsmanager_secret" "dps" {
 }
 
 resource "aws_secretsmanager_secret_version" "dps" {
+  for_each = toset(local.dps_domains_list)
+
   secret_id     = aws_secretsmanager_secret.dps[each.key].id
   secret_string = jsonencode(local.dps_secrets_placeholder)
 
