@@ -141,16 +141,146 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
+      t1-ncr-tomcat-admin-a = merge(local.tomcat_admin_ec2_default, {
+        autoscaling_group = merge(local.tomcat_admin_ec2_default.autoscaling_group, {
+          desired_capacity = 0
+        })
+        cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
+        config = merge(local.tomcat_admin_ec2_default.config, {
+          instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
+            "Ec2T1ReportingPolicy",
+          ])
+        })
+        tags = merge(local.tomcat_admin_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+          deployment                           = "green"
+        })
+      })
+      t1-ncr-tomcat-admin-b = merge(local.tomcat_admin_ec2_default, {
+        autoscaling_group = merge(local.tomcat_admin_ec2_default.autoscaling_group, {
+          desired_capacity = 0
+        })
+        cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
+        config = merge(local.tomcat_admin_ec2_default.config, {
+          instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
+            "Ec2T1ReportingPolicy",
+          ])
+        })
+        tags = merge(local.tomcat_admin_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+          deployment                           = "green"
+        })
+      })
+      t1-ncr-bip-cms-a = merge(local.bip_cms_ec2_default, {
+        autoscaling_group = merge(local.bip_cms_ec2_default.autoscaling_group, {
+          desired_capacity = 0
+        })
+        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
+        config = merge(local.bip_cms_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
+            "Ec2T1ReportingPolicy",
+          ])
+        })
+        tags = merge(local.bip_cms_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform CMS installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+          deployment                           = "green"
+        })
+      })
+      t1-ncr-bip-cms-b = merge(local.bip_cms_ec2_default, {
+        autoscaling_group = merge(local.bip_cms_ec2_default.autoscaling_group, {
+          desired_capacity = 0
+        })
+        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
+        config = merge(local.bip_cms_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
+            "Ec2T1ReportingPolicy",
+          ])
+        })
+        tags = merge(local.bip_cms_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+          deployment                           = "blue"
+        })
+      })
     }
     baseline_lbs = {
       private = {
         internal_lb              = true
         enable_delete_protection = false
         force_destrroy_bucket    = true
+        load_balancer_type       = "application"
         idle_timeout             = 3600
         subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private"]
+        instance_target_groups = {
+          t1-ncr-cms = {
+            port     = 7777
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              path                = "/"
+              healthy_threshold   = 3
+              unhealthy_threshold = 5
+              timeout             = 5
+              interval            = 30
+              matcher             = "200-399"
+              port                = 7777
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "t1-ncr-cms" },
+            ]
+          }
+        }
         listeners = {
+          http = {
+            port     = 7777
+            protocol = "HTTP"
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+          }
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+            rules = {
+              t1-ncr-cms = {
+                priority = 4580
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-ncr-cms"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-ncr-cms.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          }
         }
       }
     }
@@ -160,8 +290,6 @@ locals {
           { name = "t1-ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.reporting.nomis.service.justice.gov.uk"] },
           { name = "t1-ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1-ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1-ncr-cms", type = "CNAME", ttl = "300", records = ["t1-ncr-cms.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1-ncr-web-admin", type = "CNAME", ttl = "300", records = ["t1-ncr-web-admin.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           # T1
