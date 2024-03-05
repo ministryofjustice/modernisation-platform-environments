@@ -1,9 +1,9 @@
-data "aws_secretsmanager_secret" "server_backups" {
+resource "aws_secretsmanager_secret" "server_backups" {
   name = "server_backups"
 }
 
-data "aws_secretsmanager_secret_version" "server_backups" {
-  secret_id = data.aws_secretsmanager_secret.server_backups.id
+resource "aws_secretsmanager_secret_version" "server_backups" {
+  secret_id = aws_secretsmanager_secret.server_backups.id
   secret_string = random_password.random_password.result
 }
 
@@ -18,8 +18,8 @@ resource "aws_db_instance" "database_2022" {
 
   identifier    = "database-v2022"
   license_model = "license-included"
-  username      = jsondecode(data.aws_secretsmanager_secret_version.server_backups.secret_string)["username"]
-  password      = jsondecode(data.aws_secretsmanager_secret_version.server_backups.secret_string)["password"]
+  username      = "admin"
+  password      = aws_secretsmanager_secret_version.server_backups.arn
 
   engine         = "sqlserver-se"
   engine_version = "16.00.4105.2.v1"
