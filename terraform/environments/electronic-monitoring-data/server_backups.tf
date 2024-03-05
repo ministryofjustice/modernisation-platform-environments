@@ -4,6 +4,12 @@ data "aws_secretsmanager_secret" "server_backups" {
 
 data "aws_secretsmanager_secret_version" "server_backups" {
   secret_id = data.aws_secretsmanager_secret.server_backups.id
+  secret_string = random_password.random_password.result
+}
+
+resource "random_password" "random_password" {
+  length  = 32
+  special = false
 }
 
 #------------------------------------------------------------------------------
