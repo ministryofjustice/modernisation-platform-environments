@@ -1,0 +1,55 @@
+variable "env_name" {
+  type = string
+}
+
+variable "app_name" {
+  type = string
+}
+
+# Account level info
+variable "account_info" {
+  type = any
+}
+
+variable "account_config" {
+  type = any
+}
+
+variable "environment_config" {
+  type = any
+}
+
+variable "bastion_config" {
+  type = any
+}
+
+variable "bcs_config" {
+  type = any
+}
+
+variable "bps_config" {
+  type = any
+}
+
+variable "bws_config" {
+  type = any
+}
+
+variable "dis_config" {
+  type = any
+}
+
+variable "tags" {
+  type = any
+}
+
+variable "platform_vars" {
+  type = object({
+    environment_management = any
+  })
+}
+
+variable "environments_in_account" {
+  type    = list(string)
+  default = []
+}
