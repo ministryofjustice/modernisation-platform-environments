@@ -7,43 +7,39 @@ data "aws_secretsmanager_secret_version" "server_backups" {
 }
 
 #------------------------------------------------------------------------------
-resource "aws_db_instance" "database" {
+resource "aws_db_instance" "database_2022" {
 #   count = local.is-production ? 1 : 0
 
-  identifier                          = "terraform-db-instance-test"
+  identifier = "database-v2022"
 
-  engine                              = "sqlserver-se"
-  engine_version                      = "13.00.6435.1.v1"
-  instance_class                      = "db.m5.large"
+  engine         = "sqlserver-se"
+  engine_version = "16.00.4105.2.v1"
+  instance_class = "db.m5.large"
 
-  storage_type                        = "gp2"
-  allocated_storage                   = 100
-  max_allocated_storage               = 5000
-  storage_encrypted                   = true
+  storage_type          = "gp2"
+  allocated_storage     = 100
+  max_allocated_storage = 5000
+  storage_encrypted     = true
 
-  multi_az                            = false
+  multi_az = false
 
-  db_subnet_group_name    = aws_db_subnet_group.db.id
-  vpc_security_group_ids  = [aws_security_group.db.id]
-  publicly_accessible     = true
-  port                    = 1433
+  db_subnet_group_name   = aws_db_subnet_group.db.id
+  vpc_security_group_ids = [aws_security_group.db.id]
+  publicly_accessible    = true
+  port                   = 1433
 
   license_model = "license-included"
   username = jsondecode(data.aws_secretsmanager_secret_version.server_backups.secret_string)["username"]
   password = jsondecode(data.aws_secretsmanager_secret_version.server_backups.secret_string)["password"]
 
-
   auto_minor_version_upgrade = true
-  skip_final_snapshot = true
-  maintenance_window                  = "Mon:00:00-Mon:03:00"
-  deletion_protection                 = false
+  skip_final_snapshot        = true
+  maintenance_window         = "Mon:00:00-Mon:03:00"
+  deletion_protection        = false
 
-  option_group_name                   = aws_db_option_group.sqlserver_backup_restore.name
+  option_group_name = aws_db_option_group.sqlserver_backup_restore_2022.name
 
   iam_database_authentication_enabled = false
-
-#   kms_key_id                          = aws_kms_key.rds.arn
-#   enabled_cloudwatch_logs_exports     = ["error"]
 
   tags = local.tags
 }
@@ -80,11 +76,11 @@ resource "aws_db_subnet_group" "db" {
 
 #------------------------------------------------------------------------------
 
-resource "aws_db_option_group" "sqlserver_backup_restore" {
-  name                     = "option-group"
+resource "aws_db_option_group" "sqlserver_backup_restore_2022" {
+  name                     = "sqlserver-v2022"
   option_group_description = "Terraform Option Group"
   engine_name              = "sqlserver-se"
-  major_engine_version     = "13.00"
+  major_engine_version     = "16.00"
 
   option {
     option_name = "SQLSERVER_BACKUP_RESTORE"
