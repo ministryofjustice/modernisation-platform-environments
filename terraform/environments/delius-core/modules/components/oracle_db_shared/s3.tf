@@ -87,6 +87,18 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
       "arn:aws:s3:::*"
     ]
   }
+
+  statement {
+    sid    = "allowAccessToOracleStatisticsBucket"
+    effect = "Allow"
+    actions = [
+      "s3:*"
+    ]
+    resources = [
+      "${module.s3_bucket_oracle_statistics.bucket.arn}",
+      "${module.s3_bucket_oracle_statistics.bucket.arn}/*"
+    ]
+  }
 }
 
 resource "aws_iam_policy" "oracledb_backup_bucket_access" {
@@ -164,4 +176,44 @@ resource "aws_s3_bucket_inventory" "oracledb_backuppieces" {
       bucket_arn = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn
     }
   }
+}
+
+# Buckets for storing Oracle Statistics Backup Dump Files
+module "s3_bucket_oracle_statistics" {
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  bucket_name         = "${var.env_name}-oracle-statistics-backup-data"
+  versioning_enabled  = false
+  ownership_controls  = "BucketOwnerEnforced"
+  replication_enabled = false
+  custom_kms_key      = var.account_config.kms_keys.general_shared
+
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 365
+      }
+    }
+  ]
+
+  tags = var.tags
 }
