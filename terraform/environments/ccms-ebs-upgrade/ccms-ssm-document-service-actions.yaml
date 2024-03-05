@@ -3,27 +3,29 @@
 schemaVersion: "2.2"
 description: Perform an action on a selected service.
 parameters:
-  service:
-    type: String
-    allowedValues:
-    - chronyd
-    - postfix
-    - sshd
   action:
     type: String
     allowedValues:
-    - status
-    - restart
     - start
     - stop
 mainSteps:
-  - name: ServiceActions
+  - name: startAPP
     action: aws:runShellScript
     isEnd: true
     precondition:
       StringEquals:
-        - platformType
-        - Linux
+        - "{{ action }}"
+        - start
     inputs:
       runCommand:
-        - "systemctl {{ action }} {{ service }}"
+        - "/home/applmgr/scripts/startAPP.sh"
+  - name: stopAPP
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - "{{ action }}"
+        - stop
+    inputs:
+      runCommand:
+        - "/home/applmgr/scripts/stopAPP.sh"
