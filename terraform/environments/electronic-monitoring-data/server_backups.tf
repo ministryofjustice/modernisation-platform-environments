@@ -10,7 +10,10 @@ data "aws_secretsmanager_secret_version" "server_backups" {
 resource "aws_db_instance" "database_2022" {
 #   count = local.is-production ? 1 : 0
 
-  identifier = "database-v2022"
+  identifier    = "database-v2022"
+  license_model = "license-included"
+  username      = jsondecode(data.aws_secretsmanager_secret_version.server_backups.secret_string)["username"]
+  password      = jsondecode(data.aws_secretsmanager_secret_version.server_backups.secret_string)["password"]
 
   engine         = "sqlserver-se"
   engine_version = "16.00.4105.2.v1"
@@ -27,10 +30,6 @@ resource "aws_db_instance" "database_2022" {
   vpc_security_group_ids = [aws_security_group.db.id]
   publicly_accessible    = true
   port                   = 1433
-
-  license_model = "license-included"
-  username = jsondecode(data.aws_secretsmanager_secret_version.server_backups.secret_string)["username"]
-  password = jsondecode(data.aws_secretsmanager_secret_version.server_backups.secret_string)["password"]
 
   auto_minor_version_upgrade = true
   skip_final_snapshot        = true
@@ -78,7 +77,7 @@ resource "aws_db_subnet_group" "db" {
 
 resource "aws_db_option_group" "sqlserver_backup_restore_2022" {
   name                     = "sqlserver-v2022"
-  option_group_description = "Terraform Option Group"
+  option_group_description = "SQL server backup restoration using engine 16.x"
   engine_name              = "sqlserver-se"
   major_engine_version     = "16.00"
 
@@ -90,6 +89,8 @@ resource "aws_db_option_group" "sqlserver_backup_restore_2022" {
       value = aws_iam_role.s3_database_backups_role.arn
     }
   }
+
+  tags = local.tags
 }
 
 # #------------------------------------------------------------------------------
@@ -114,6 +115,7 @@ data "aws_iam_policy_document" "rds-s3-access-policy" {
 resource "aws_iam_role" "s3_database_backups_role" {
   name               = "s3-database-backups-role"
   assume_role_policy = data.aws_iam_policy_document.rds-s3-access-policy.json
+
   tags = local.tags
 }
 
