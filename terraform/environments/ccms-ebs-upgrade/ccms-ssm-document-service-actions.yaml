@@ -6,9 +6,20 @@ parameters:
   action:
     type: String
     allowedValues:
+    - status
     - start
     - stop
 mainSteps:
+  - name: statusAPP
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - "{{ action }}"
+        - status
+    inputs:
+      runCommand:
+        - "/home/applmgr/scripts/statusAPP.sh"
   - name: startAPP
     action: aws:runShellScript
     isEnd: true
