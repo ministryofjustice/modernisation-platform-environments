@@ -1,9 +1,9 @@
-resource "aws_secretsmanager_secret" "server_backups" {
-  name = "server_backups"
+resource "aws_secretsmanager_secret" "db_password" {
+  name = "db_password"
 }
 
-resource "aws_secretsmanager_secret_version" "server_backups" {
-  secret_id = aws_secretsmanager_secret.server_backups.id
+resource "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = aws_secretsmanager_secret.db_password.id
   secret_string = random_password.random_password.result
 }
 
@@ -19,7 +19,7 @@ resource "aws_db_instance" "database_2022" {
   identifier    = "database-v2022"
   license_model = "license-included"
   username      = "admin"
-  password      = aws_secretsmanager_secret_version.server_backups.arn
+  password      = aws_secretsmanager_secret_version.db_password.arn
 
   engine         = "sqlserver-se"
   engine_version = "16.00.4105.2.v1"
