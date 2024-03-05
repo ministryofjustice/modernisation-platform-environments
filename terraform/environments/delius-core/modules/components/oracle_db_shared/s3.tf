@@ -92,8 +92,7 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
     sid    = "allowAccessToOracleStatisticsBucket"
     effect = "Allow"
     actions = [
-      "s3:Get*",
-      "s3:List*"
+      "s3:*"
     ]
     resources = [
       "${module.s3_bucket_oracle_statistics.bucket.arn}",
