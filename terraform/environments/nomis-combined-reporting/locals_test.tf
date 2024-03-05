@@ -210,7 +210,6 @@ locals {
       private = {
         internal_lb              = true
         enable_delete_protection = false
-        force_destrroy_bucket    = true
         load_balancer_type       = "application"
         idle_timeout             = 3600
         subnets                  = module.environment.subnets["private"].ids
