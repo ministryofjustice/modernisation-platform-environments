@@ -19,7 +19,7 @@ resource "aws_db_instance" "database_2022" {
   identifier    = "database-v2022"
   license_model = "license-included"
   username      = "admin"
-  password      = aws_secretsmanager_secret_version.db_password.arn
+  password      = aws_secretsmanager_secret_version.db_password.secret_string
 
   engine         = "sqlserver-se"
   engine_version = "16.00.4105.2.v1"
