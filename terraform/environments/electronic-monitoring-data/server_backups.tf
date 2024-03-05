@@ -1,3 +1,11 @@
+data "aws_secretsmanager_secret" "server_backups" {
+  name = "server_backups"
+}
+
+data "aws_secretsmanager_secret_version" "server_backups" {
+  secret_id = data.aws_secretsmanager_secret.server_backups.id
+}
+
 #------------------------------------------------------------------------------
 resource "aws_db_instance" "database" {
 #   count = local.is-production ? 1 : 0
@@ -9,22 +17,21 @@ resource "aws_db_instance" "database" {
   instance_class                      = "db.m5.large"
 
   storage_type                        = "gp2"
-  allocated_storage                   = 50
-  max_allocated_storage = 1000
+  allocated_storage                   = 100
+  max_allocated_storage               = 5000
   storage_encrypted                   = true
 
   multi_az                            = false
 
-  db_subnet_group_name                = aws_db_subnet_group.db.id
+  db_subnet_group_name    = aws_db_subnet_group.db.id
+  vpc_security_group_ids  = [aws_security_group.db.id]
+  publicly_accessible     = true
+  port                    = 1433
 
-  vpc_security_group_ids              = [aws_security_group.db.id]
+  license_model = "license-included"
+  username = jsondecode(data.aws_secretsmanager_secret_version.server_backups.secret_string)["username"]
+  password = jsondecode(data.aws_secretsmanager_secret_version.server_backups.secret_string)["password"]
 
-  publicly_accessible = true
-  port = 1433
-
-  license_model                       = "license-included"
-  username                            = "admin"
-  password                            = "Test-123"
 
   auto_minor_version_upgrade = true
   skip_final_snapshot = true
