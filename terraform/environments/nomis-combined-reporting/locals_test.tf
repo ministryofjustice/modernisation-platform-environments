@@ -150,7 +150,7 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          t1-ncr-cms = {
+          t1-ncr-cms-a = {
             port     = 7777
             protocol = "HTTP"
             health_check = {
@@ -185,7 +185,7 @@ locals {
               }
             }
             rules = {
-              t1-ncr-cms = {
+              t1-ncr-cms-a = {
                 priority = 4000
                 actions = [{
                   type              = "forward"
@@ -215,11 +215,11 @@ locals {
               }
             }
             rules = {
-              t1-ncr-cms = {
+              t1-ncr-cms-a = {
                 priority = 4580
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-cms"
+                  target_group_name = "t1-ncr-cms-a"
                 }]
                 conditions = [{
                   host_header = {
