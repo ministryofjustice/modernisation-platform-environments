@@ -1,7 +1,7 @@
 module "pwm" {
   source = "../helpers/delius_microservice"
 
-  name                  = "password-manager"
+  name                  = "password-management"
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
@@ -38,7 +38,7 @@ module "pwm" {
 
   platform_vars = var.platform_vars
 
-  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-manager:${var.delius_microservice_configs.pwm.image_tag}"
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management:${var.delius_microservice_configs.pwm.image_tag}"
   account_config  = var.account_config
   #TODO check the health end-point
   health_check_path = "/pwm/actuator/health"
