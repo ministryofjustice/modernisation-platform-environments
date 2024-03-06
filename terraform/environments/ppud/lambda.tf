@@ -98,14 +98,14 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_start" {
 data "archive_file" "zip_the_disable_alarm_code" {
   count       = local.is-production == true ? 1 : 0
   type        = "zip"
-  source_file  = "${path.module}/disable_cpu_alarm/disable_cpu_alarm.py"
+  source_dir  = "${path.module}/disable_cpu_alarm/"
   output_path = "${path.module}/disable_cpu_alarm/disable_cpu_alarm.zip"
 }
 
 data "archive_file" "zip_the_enable_alarm_code" {
   count       = local.is-production == true ? 1 : 0
   type        = "zip"
-  source_file  = "${path.module}/enable_cpu_alarm/enable_cpu_alarm.py"
+  source_dir  = "${path.module}/enable_cpu_alarm/"
   output_path = "${path.module}/enable_cpu_alarm/enable_cpu_alarm.zip"
 }
 
@@ -119,7 +119,7 @@ resource "aws_cloudwatch_event_rule" "disable_cpu_alarm" {
   count               = local.is-production == true ? 1 : 0
   name                = "disable_cpu_alarm"
   description         = "Runs Weekly every Saturday at 00:00am GMT"
-  schedule_expression = "cron(0 14 ? * WED *)" # Time Zone is in UTC
+  schedule_expression = "cron(30 14 ? * WED *)" # Time Zone is in UTC
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_disable_cpu_alarm" {
@@ -144,7 +144,7 @@ resource "aws_cloudwatch_event_rule" "enable_cpu_alarm" {
   count               = local.is-production == true ? 1 : 0
   name                = "enable_cpu_alarm"
   description         = "Runs Weekly every Sunday at 08:00pm GMT"
-  schedule_expression = "cron(0 16 ? * WED *)" # Time Zone is in UTC
+  schedule_expression = "cron(0 15 ? * WED *)" # Time Zone is in UTC
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_enable_cpu_alarm" {
