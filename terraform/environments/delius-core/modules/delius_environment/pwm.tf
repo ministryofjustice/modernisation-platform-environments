@@ -102,10 +102,11 @@ resource "aws_ses_domain_dkim" "pwm" {
 }
 
 resource "aws_route53_record" "pwm_amazonses_dkim_record" {
-  count   = 3
-  zone_id = var.account_config.route53_external_zone.zone_id
-  name    = "${aws_ses_domain_dkim.example.pwm[count.index]}._domainkey"
-  type    = "CNAME"
-  ttl     = "600"
-  records = ["${aws_ses_domain_dkim.pwm.dkim_tokens[count.index]}.dkim.amazonses.com"]
+  provider = aws.core-vpc
+  count    = 3
+  zone_id  = var.account_config.route53_external_zone.zone_id
+  name     = "${aws_ses_domain_dkim.example.pwm[count.index]}._domainkey"
+  type     = "CNAME"
+  ttl      = "600"
+  records  = ["${aws_ses_domain_dkim.pwm.dkim_tokens[count.index]}.dkim.amazonses.com"]
 }
