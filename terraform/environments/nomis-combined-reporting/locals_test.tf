@@ -168,7 +168,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "t1-ncr-cms" },
+              { ec2_instance_name = "t1-ncr-cms-a" },
             ]
           }
         }
