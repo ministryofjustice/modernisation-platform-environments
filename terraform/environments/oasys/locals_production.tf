@@ -36,17 +36,17 @@ locals {
       "/oracle/database/PTCOASYS" = local.secretsmanager_secrets_oasys_db
       "/oracle/database/TRNOASYS" = local.secretsmanager_secrets_oasys_db
 
-      # "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
-      # "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
+      "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
+      "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
+      "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
+      "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
+      "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
+      "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
 
       # for azure, remove when migrated to aws db
       # "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
 
-      # "/oracle/bip/production" = local.secretsmanager_secrets_bip
+      "/oracle/bip/production" = local.secretsmanager_secrets_bip
     }
 
     baseline_iam_policies = {
@@ -202,22 +202,22 @@ locals {
       #   })
       # })
 
-      # "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
-      #   config = merge(local.database_a.config, {
-      #     instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
-      #       "Ec2PtcTrnDatabasePolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.database_a.instance, {
-      #     instance_type = "r6i.2xlarge"
-      #   })
-      #   tags = merge(local.database_a.tags, {
-      #     description                             = "practice and training ${local.application_name} database"
-      #     "${local.application_name}-environment" = "ptc"
-      #     #bip-db-name                             = "PDBIPINF"
-      #     oracle-sids                             = "PTCOASYS TRNOASYS"
-      #   })
-      # })
+      "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
+        config = merge(local.database_a.config, {
+          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+            "Ec2PtcTrnDatabasePolicy",
+          ])
+        })
+        instance = merge(local.database_a.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_a.tags, {
+          description                             = "practice and training ${local.application_name} database"
+          "${local.application_name}-environment" = "ptc"
+          #bip-db-name                             = "PDBIPINF"
+          oracle-sids                             = "PTCOASYS TRNOASYS"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -308,18 +308,35 @@ locals {
     }
 
     baseline_route53_zones = {
-      # (module.environment.domains.public.short_name) = { # "oasys.service.justice.gov.uk"
-      #   records = [
-      #     { name = "db", type = "A", ttl = "3600", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-      #     { name = "trn.db", type = "A", ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-      #     { name = "ptc.db", type = "A", ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-      #   ]
-      #   lb_alias_records = [
-      #     { name = "web", type = "A", lbs_map_key = "private" },     #     web.oasys.service.justice.gov.uk
-      #     { name = "trn.web", type = "A", lbs_map_key = "private" }, # trn.web.oasys.service.justice.gov.uk
-      #     { name = "ptc.web", type = "A", lbs_map_key = "private" }, # ptc.web.oasys.service.justice.gov.uk
-      #   ]
-      # }
+      #
+      # public
+      #
+      (module.environment.domains.public.business_unit_environment) = { # hmpps-production.modernisation-platform.service.justice.gov.uk
+        records = [
+          # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "trn.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "ptc.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
+          # { name = "trn.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          # { name = "ptc.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+        ]
+      }
+      #
+      # internal/private
+      #
+      (module.environment.domains.internal.business_unit_environment) = { # hmpps-production.modernisation-platform.internal
+        vpc = {                                                           # this makes it a private hosted zone
+          id = module.environment.vpc.id
+        }
+        records = [
+          # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
+          # { name = "trn.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "ptc.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.40.133"] }, #        "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
+          # { name = "trn.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          # { name = "ptc.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+        ]
+      }
     }
 
     baseline_cloudwatch_log_groups = {
