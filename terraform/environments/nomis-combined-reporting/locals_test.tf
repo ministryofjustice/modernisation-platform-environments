@@ -189,12 +189,12 @@ locals {
                 priority = 4000
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-cms"
+                  target_group_name = "t1-ncr-cms-a"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-cms.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                      "t1-ncr-cms-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -224,7 +224,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-cms.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                      "t1-ncr-cms-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
