@@ -17,17 +17,14 @@ module "pwm" {
     {
       name      = "SECURITY_KEY"
       valueFrom = "REPLACE"
-      #   "/${var.environment_name}/${var.project_name}/pwm/pwm/security_key"
     },
     {
       name      = "CONFIG_PASSWORD"
       valueFrom = aws_ssm_parameter.delius_core_pwm_config_password.arn
-      #value = "/${var.environment_name}/${var.project_name}/pwm/pwm/config_password"
     },
     {
       name      = "LDAP_PASSWORD"
-      valueFrom = module.ldap.delius_core_ldap_bind_password_arn
-      #value = "/${var.environment_name}/${var.project_name}/apacheds/apacheds/ldap_admin_password"
+      valueFrom = aws_ssm_parameter.ldap_admin_password.arn
     }
   ]
   db_ingress_security_groups = []
@@ -57,8 +54,7 @@ module "pwm" {
       value = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
         ldap_host_url = "ldap://${module.ldap.nlb_dns_name}:${var.ldap_config.port}"
         ldap_user     = module.ldap.delius_core_ldap_principal_arn
-        # site_url  = "https://${aws_route53_record.public_dns.fqdn}"
-        site_url = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
+        pwm_url       = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
         # email_smtp_address = "smtp.${data.terraform_remote_state.vpc.outputs.private_zone_name}"
         email_smtp_address = "REPLACE"
         # email_from_address = "no-reply@${data.terraform_remote_state.vpc.outputs.public_zone_name}"
@@ -88,7 +84,7 @@ resource "aws_ses_domain_identity_verification" "pwm" {
 
 resource "aws_route53_record" "pwm_ses_verification_record" {
   zone_id = var.account_config.route53_external_zone.zone_id
-  name    = "_amazonses.${aws_ses_domain_identity.example.id}"
+  name    = "_amazonses.${aws_ses_domain_identity.pwm.id}"
   type    = "TXT"
   ttl     = "600"
   records = [aws_ses_domain_identity.pwm.verification_token]

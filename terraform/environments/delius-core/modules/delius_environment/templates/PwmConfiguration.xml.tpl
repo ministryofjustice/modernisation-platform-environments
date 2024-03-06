@@ -44,7 +44,7 @@
     </setting>
     <setting key="ldap.proxy.password" syntax="PASSWORD" profile="default">
       <label>LDAP Proxy Password</label>
-      <value plaintext="true">${ldap_password}</value>
+      <value plaintext="true">$${LDAP_PASSWORD}</value>
     </setting>
     <setting key="ldap.rootContexts" syntax="STRING_ARRAY" profile="default">
       <label>LDAP Contextless Login Roots</label>
