@@ -180,7 +180,7 @@ resource "aws_s3_bucket_inventory" "oracledb_backuppieces" {
 
 # Buckets for storing Oracle Statistics Backup Dump Files
 module "s3_bucket_oracle_statistics" {
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
   bucket_name         = "${var.env_name}-oracle-statistics-backup-data"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
