@@ -376,7 +376,7 @@ locals {
         }
         tags = {
           pre-migration     = "PDCWW00003"
-          description       = "Web Server Region 3 and 5"
+          description       = "Web Server Region 3 and 4"
           os-type           = "Windows"
           ami               = "pd-csr-w-3-a"
           component         = "web"
