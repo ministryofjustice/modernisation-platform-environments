@@ -131,8 +131,12 @@ data "aws_iam_policy_document" "rds_data_store_access" {
     effect = "Allow"
     actions = [
       "s3:GetObject",
+      "s3:ListBucket",
     ]
-    resources = ["${aws_s3_bucket.data_store.arn}/*"]
+    resources = [
+        aws_s3_bucket.data_store.arn,
+        "${aws_s3_bucket.data_store.arn}/*",
+    ]
   }
 }
 
