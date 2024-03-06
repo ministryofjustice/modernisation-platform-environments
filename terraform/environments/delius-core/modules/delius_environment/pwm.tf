@@ -42,11 +42,11 @@ module "pwm" {
 
 
   alb_listener_rule_host_header = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
-  
-  platform_vars                 = var.platform_vars
 
-  container_image               = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-manager:${var.delius_microservice_configs.pwm.image_tag}"
-  account_config                = var.account_config
+  platform_vars = var.platform_vars
+
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-manager:${var.delius_microservice_configs.pwm.image_tag}"
+  account_config  = var.account_config
   #TODO check the health end-point
   health_check_path = "/pwm/actuator/health"
   account_info      = var.account_info
@@ -55,12 +55,10 @@ module "pwm" {
     {
       name = "CONFIG_XML_BASE64"
       value = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
-        region    = var.account_info["region"]
-        ldap_url  = "ldap://${module.ldap.nlb_dns_name}:${var.ldap_config.port}"
-        ldap_user = module.ldap.delius_core_ldap_principal_arn
-        user_base = "REPLACE"
+        ldap_host_url = "ldap://${module.ldap.nlb_dns_name}:${var.ldap_config.port}"
+        ldap_user     = module.ldap.delius_core_ldap_principal_arn
         # site_url  = "https://${aws_route53_record.public_dns.fqdn}"
-        site_url = "REPLACE"
+        site_url = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
         # email_smtp_address = "smtp.${data.terraform_remote_state.vpc.outputs.private_zone_name}"
         email_smtp_address = "REPLACE"
         # email_from_address = "no-reply@${data.terraform_remote_state.vpc.outputs.public_zone_name}"
@@ -73,4 +71,30 @@ module "pwm" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
+}
+
+
+#############
+# SES
+#############"
+
+resource "aws_ses_domain_identity" "pwm" {
+  domain = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
+}
+
+resource "aws_ses_domain_identity_verification" "pwm" {
+  domain = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
+}
+
+resource "aws_route53_record" "pwm_ses_verification_record" {
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = "_amazonses.${aws_ses_domain_identity.example.id}"
+  type    = "TXT"
+  ttl     = "600"
+  records = [aws_ses_domain_identity.pwm.verification_token]
+}
+
+resource "aws_ses_domain_identity_verification" "pwm_ses_verification" {
+  domain     = aws_ses_domain_identity.pwm.id
+  depends_on = [aws_route53_record.pwm_ses_verification_record]
 }
