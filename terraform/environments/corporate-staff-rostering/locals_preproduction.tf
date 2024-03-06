@@ -97,12 +97,13 @@ locals {
         secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
         tags = {
-          description = "PP CSR DB server"
-          ami         = "base_ol_8_5"
-          os-type     = "Linux"
-          component   = "test"
-          server-type = "csr-db"
-          oracle-sids = "PPIWFM"
+          pre-migration = "PPCDL00019"
+          description   = "PP CSR DB server"
+          ami           = "base_ol_8_5"
+          os-type       = "Linux"
+          component     = "test"
+          server-type   = "csr-db"
+          oracle-sids   = "PPIWFM"
         }
       })
 
@@ -121,9 +122,8 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          description       = "Migrated server PPCAW00013"
-          app-config-status = "pending"
-          csr-region        = "Region 1"
+          pre-migration     = "PPCAW00013"
+          description       = "Application Server Region 1"
           os-type           = "Windows"
           ami               = "pp-csr-a-13-a"
           component         = "app"
@@ -149,9 +149,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 56 }
         }
         tags = {
-          description       = "Migrated server PPCAW00014"
-          app-config-status = "configured"
-          csr-region        = "Region 2"
+          pre-migration     = "PPCAW00014"
+          description       = "Application Server Region 2"
           os-type           = "Windows"
           ami               = "pp-csr-a-14-b"
           component         = "app"
@@ -177,9 +176,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description       = "Migrated server PPCAW00017"
-          app-config-status = "configured"
-          csr-region        = "Region 3"
+          pre-migration     = "PPCAW00017"
+          description       = "Application Server Region 3"
           os-type           = "Windows"
           ami               = "pp-csr-a-17-a"
           component         = "app"
@@ -205,9 +203,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description       = "Migrated server PPCAW00018"
-          app-config-status = "pending"
-          csr-region        = "Region 4"
+          pre-migration     = "PPCAW00018"
+          description       = "Application Server Region 4"
           os-type           = "Windows"
           ami               = "pp-csr-a-18-b"
           component         = "app"
@@ -231,9 +228,8 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          description       = "Migrated server PPCAW00002"
-          app-config-status = "pending"
-          csr-region        = "Region 5"
+          pre-migration     = "PPCAW00002"
+          description       = "Application Server Region 5"
           os-type           = "Windows"
           ami               = "pp-csr-a-2-b"
           component         = "app"
@@ -257,9 +253,8 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          description       = "Migrated server PPCAW00003"
-          app-config-status = "pending"
-          csr-region        = "Region 6"
+          pre-migration     = "PPCAW00003"
+          description       = "Application Server Region 6"
           os-type           = "Windows"
           ami               = "pp-csr-a-3-a"
           component         = "app"
@@ -285,9 +280,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description       = "Migrated server PPCAW00015 Training Server A"
-          app-config-status = "pending"
-          csr-region        = "Training Server A"
+          pre-migration     = "PPCAW00015"
+          description       = "Application Server Training A"
           os-type           = "Windows"
           ami               = "pp-csr-a-15-a"
           component         = "trainingA"
@@ -313,9 +307,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description       = "Migrated server PPCAW00016 Training Server B"
-          app-config-status = "pending"
-          csr-region        = "Training Server B"
+          pre-migration     = "PPCAW00016"
+          description       = "Application Server Training B"
           os-type           = "Windows"
           ami               = "pp-csr-a-16-b"
           component         = "trainingB"
@@ -341,9 +334,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
-          description       = "Migrated server PPCWW00001"
-          app-config-status = "pending"
-          csr-region        = "Region 1 and 2"
+          pre-migration     = "PPCWW00001"
+          description       = "Web Server Region 1 and 2"
           os-type           = "Windows"
           ami               = "PPCWW00001"
           component         = "web"
@@ -369,9 +361,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
-          description       = "Migrated server PPCWW00002"
-          app-config-status = "configured"
-          csr-region        = "Region 1 and 2"
+          pre-migration     = "PPCWW00002"
+          description       = "Web Server Region 1 and 2"
           os-type           = "Windows"
           ami               = "pp-csr-w-2-b"
           component         = "web"
@@ -396,9 +387,8 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 129 }
         }
         tags = {
-          description       = "Migrated server PPCWW00005"
-          app-config-status = "configured"
-          csr-region        = "Region 3 and 4"
+          pre-migration     = "PPCWW00005"
+          description       = "Web Server Region 3 and 4"
           os-type           = "Windows"
           ami               = "PPCWW00005"
           component         = "web"
@@ -424,9 +414,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
-          description       = "Migrated server PPCWW00006"
-          app-config-status = "pending"
-          csr-region        = "Region 3 and 4"
+          pre-migration     = "PPCWW00006"
+          description       = "Web Server Region 3 and 4"
           os-type           = "Windows"
           ami               = "pp-csr-w-6-b"
           component         = "web"
@@ -450,11 +439,10 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          description       = "Rebuild of PP-csr-w-7-a using pp-csr-w-8-b ami "
-          app-config-status = "pending"
-          csr-region        = "Region 5 and 6"
+          pre-migration     = "PPCWW00007"
+          description       = "Web Server Region 5 and 6"
           os-type           = "Windows"
-          ami               = "pp-csr-w-8-b"
+          ami               = "pp-csr-w-8-b" # rebuilt using pp-csr-w-8-b AMI
           component         = "web"
         }
         route53_records = {
@@ -476,9 +464,8 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          description       = "Migrated server PPCWW00008"
-          app-config-status = "pending"
-          csr-region        = "Region 5 and 6"
+          pre-migration     = "PPCWW00008"
+          description       = "Web Server Region 5 and 6"
           os-type           = "Windows"
           ami               = "pp-csr-w-8-b"
           component         = "web"
@@ -504,9 +491,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 56 }
         }
         tags = {
-          description       = "Migrated server PPCWW00003"
-          app-config-status = "pending"
-          csr-region        = "Training Server A and B"
+          pre-migration     = "PPCWW00003"
+          description       = "Web Server Training A and B"
           os-type           = "Windows"
           ami               = "pp-csr-w-3-a"
           component         = "trainingab"
@@ -532,9 +518,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
-          description       = "Migrated server PPCWW00004"
-          app-config-status = "pending"
-          csr-region        = "Training Server A and B"
+          pre-migration     = "PPCWW00004"
+          description       = "Web Server Training A and B"
           os-type           = "Windows"
           ami               = "pp-csr-w-4-b"
           component         = "trainingab"
@@ -544,38 +529,8 @@ locals {
           create_external_record = true
         }
       })
+  }
 
-    }
-
-    baseline_ec2_autoscaling_groups = {
-      pp-web-tst-1 = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "hmpps_windows_server_2022_release_2023-*" # Microsoft Windows Server 2022 Base
-          ami_owner                     = "754260907303"
-          ebs_volumes_copy_all_from_ami = false
-          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
-        })
-
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["web", "domain", "jumpserver"]
-          instance_type          = "t3.medium"
-
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 256 }
-        }
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0 # set to 0 while testing
-        })
-        tags = {
-          description = "Test Windows Web Server 2019"
-          os-type     = "Windows"
-          component   = "Test"
-          server-type = "test-windows-server"
-        }
-      }
-    }
 
     baseline_lbs = {
       r12 = {
