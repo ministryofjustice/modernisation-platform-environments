@@ -15,10 +15,6 @@ module "pwm" {
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
   container_secrets = [
     {
-      name      = "SECURITY_KEY"
-      valueFrom = "REPLACE"
-    },
-    {
       name      = "CONFIG_PASSWORD"
       valueFrom = aws_ssm_parameter.delius_core_pwm_config_password.arn
     },
@@ -60,6 +56,10 @@ module "pwm" {
         # email_from_address = "no-reply@${data.terraform_remote_state.vpc.outputs.public_zone_name}"
         email_from_address = "REPLACE"
       }))
+    },
+    {
+      name  = "SECURITY_KEY"
+      value = "REPLACE"
     }
   ]
 
