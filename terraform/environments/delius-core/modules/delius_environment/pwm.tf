@@ -1,7 +1,7 @@
-module "password_reset_service" {
+module "pwm" {
   source = "../helpers/delius_microservice"
 
-  name                  = "password-reset"
+  name                  = "password-manager"
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
@@ -40,10 +40,12 @@ module "password_reset_service" {
   microservice_lb                    = aws_lb.delius_core_ancillary
   microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
 
-  #TODO - check the path based routing based on shared ALB or dedicated
+
   alb_listener_rule_host_header = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
+  
   platform_vars                 = var.platform_vars
-  container_image               = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management-ecr-repo:${var.delius_microservice_configs.pwm.image_tag}"
+
+  container_image               = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-manager:${var.delius_microservice_configs.pwm.image_tag}"
   account_config                = var.account_config
   #TODO check the health end-point
   health_check_path = "/pwm/actuator/health"

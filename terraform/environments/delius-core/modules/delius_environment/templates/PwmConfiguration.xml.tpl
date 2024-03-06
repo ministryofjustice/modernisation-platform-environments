@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PwmConfiguration pwmVersion="1.9.1" xmlVersion="4" createTime="1970-01-01T00:00:00Z">
+<PwmConfiguration pwmVersion="2.0.6" xmlVersion="4" createTime="1970-01-01T00:00:00Z">
   <localeBundle bundle="password.pwm.i18n.Display" key="Title_Application">
     <value><![CDATA[National Delius - Account Self Service]]></value>
   </localeBundle>
@@ -18,9 +18,13 @@
       <label>Security Key</label>
       <value plaintext="true">$${SECURITY_KEY}</value>
     </setting>
+     <setting key="pwm.appProperty.overrides" modifyTime="2023-10-24T00:19:49Z" syntax="STRING_ARRAY" syntaxVersion="0">
+    <label>Settings ⇨ Application ⇨ Application ⇨ App Property Overrides</label>
+    <value>security.http.permittedUrlPathCharacters=^[a-zA-Z0-9-_=\\s]*$</value>
+  </setting>
     <setting key="template.ldap" syntax="SELECT">
       <label>LDAP Vendor Default Settings</label>
-      <value><![CDATA[DEFAULT]]></value>
+      <value><![CDATA[OPEN_LDAP]]></value>
     </setting>
     <setting key="template.storage" syntax="SELECT">
       <label>Storage Default Settings</label>
@@ -32,19 +36,19 @@
     </setting>
     <setting key="ldap.serverUrls" syntax="STRING_ARRAY" profile="default">
       <label>LDAP URLs</label>
-      <value><![CDATA[${ldap_url}]]></value>
+      <value><![CDATA[${ldap_host_url}]]></value>
     </setting>
     <setting key="ldap.proxy.username" syntax="STRING" profile="default">
       <label>LDAP Proxy User</label>
-      <value><![CDATA[${ldap_user}]]></value>
+      <value><![CDATA[cn=admin,dc=moj,dc=com]]></value>
     </setting>
     <setting key="ldap.proxy.password" syntax="PASSWORD" profile="default">
       <label>LDAP Proxy Password</label>
-      <value plaintext="true">$${LDAP_PASSWORD}</value>
+      <value plaintext="true">${ldap_password}</value>
     </setting>
     <setting key="ldap.rootContexts" syntax="STRING_ARRAY" profile="default">
       <label>LDAP Contextless Login Roots</label>
-      <value><![CDATA[${user_base}]]></value>
+      <value><![CDATA[ou=Users,dc=moj,dc=com]]></value>
     </setting>
     <setting key="ldap.guidAttribute" syntax="STRING" profile="default">
       <label>LDAP GUID Attribute</label>
@@ -52,11 +56,11 @@
     </setting>
     <setting key="ldap.testuser.username" syntax="STRING" profile="default">
       <label>LDAP Test User</label>
-      <value><![CDATA[cn=pwm-test,${user_base}]]></value>
+      <value><![CDATA[cn=pwm-test,ou=Users,dc=moj,dc=com]]></value>
     </setting>
     <setting key="pwmAdmin.queryMatch" syntax="USER_PERMISSION" syntaxVersion="2">
       <label>Administrator Permission</label>
-      <value>{"ldapBase":"${user_base}","ldapQuery":"(pwmAdmin=TRUE)","type":"ldapQuery"}</value>
+      <value>{"ldapBase":"ou=Users,dc=moj,dc=com","ldapQuery":"(pwmAdmin=TRUE)","type":"ldapQuery"}</value>
     </setting>
     <setting key="pwm.publishStats.enable" syntax="BOOLEAN">
       <label>Enable Anonymous Statistics Publishing</label>
@@ -68,7 +72,7 @@
     </setting>
     <setting key="pwm.selfURL" syntax="STRING">
       <label>Site URL</label>
-      <value><![CDATA[${site_url}]]></value>
+      <value><![CDATA[${pwm_url}]]></value>
     </setting>
     <setting key="pwm.introURL" syntax="SELECT">
       <label>Intro URL</label>
@@ -141,11 +145,11 @@
     </setting>
     <setting key="email.smtp.address" syntax="STRING" profile="default">
       <label>SMTP Server Address</label>
-      <value><![CDATA[${email_smtp_address}]]></value>
+      <value><![CDATA[{pwm_ses_endpoint}]]></value>
     </setting>
     <setting key="email.default.fromAddress" syntax="STRING">
       <label>Default From Address</label>
-      <value><![CDATA[${email_from_address}]]></value>
+      <value><![CDATA[{pwm_ses_from_address}]]></value>
     </setting>
     <setting key="network.allowMultiIPSession" syntax="BOOLEAN">
       <label>Allow Roaming Source Network Address</label>
@@ -162,6 +166,14 @@
     <setting key="enableSessionVerification" syntax="SELECT">
       <label>Sticky Session Verification</label>
       <value><![CDATA[OFF]]></value>
+    </setting>
+    <setting key="token.storageMethod" syntax="SELECT">
+      <label>Token Storage Method</label>
+      <value><![CDATA[STORE_LOCALDB]]></value>
+    </setting>
+    <setting key="token.length" syntax="SELECT">
+      <label>Token Length</label>
+      <value><![CDATA[64]]></value>
     </setting>
   </settings>
 </PwmConfiguration>
