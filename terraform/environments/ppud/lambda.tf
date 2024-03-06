@@ -40,7 +40,6 @@ resource "aws_lambda_function" "terraform_lambda_func_start" {
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_to_lambda_role]
 }
 
-
 ########################################
 # EventBridge rules to Lambda functions
 ########################################
@@ -92,6 +91,24 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_start" {
   source_arn    = aws_cloudwatch_event_rule.start_instance[0].arn
 }
 
+#####################################
+# Create a ZIP of Python Application
+#####################################
+
+data "archive_file" "zip_the_disable_alarm_code" {
+  count       = local.is-production == true ? 1 : 0
+  type        = "zip"
+  source_dir  = "${path.module}/disable_alarm/"
+  output_path = "${path.module}/disable_alarm/disable_cpu_alarm.zip"
+}
+
+data "archive_file" "zip_the_enable_alarm_code" {
+  count       = local.is-production == true ? 1 : 0
+  type        = "zip"
+  source_dir  = "${path.module}/enable_alarm/"
+  output_path = "${path.module}/enable_alarm/enable_cpu_alarm.zip"
+}
+
 ########################################
 # EventBridge rules to Lambda functions
 ########################################
@@ -102,7 +119,7 @@ resource "aws_cloudwatch_event_rule" "disable_cpu_alarm" {
   count               = local.is-production == true ? 1 : 0
   name                = "disable_cpu_alarm"
   description         = "Runs Weekly every Saturday at 00:00am GMT"
-  schedule_expression = "cron(0 0 0 ? * SAT *)" # Time Zone is in UTC
+  schedule_expression = "cron(0 0 ? * SAT *)" # Time Zone is in UTC
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_disable_cpu_alarm" {
@@ -127,7 +144,7 @@ resource "aws_cloudwatch_event_rule" "enable_cpu_alarm" {
   count               = local.is-production == true ? 1 : 0
   name                = "enable_cpu_alarm"
   description         = "Runs Weekly every Sunday at 08:00pm GMT"
-  schedule_expression = "cron(0 0 20 ? * SUN *)" # Time Zone is in UTC
+  schedule_expression = "cron(0 20 ? * SUN *)" # Time Zone is in UTC
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_enable_cpu_alarm" {
@@ -154,11 +171,11 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_enable_cpu_alarm" {
 
 resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
   count         = local.is-production == true ? 1 : 0
-  filename      = "${path.module}/disable_alarm/disable_cpu_alarm.py"
+  filename      = "${path.module}/disable_alarm/disable_cpu_alarm.zip"
   function_name = "disable_cpu_alarm_function"
   role          = aws_iam_role.lambda_role[0].arn
   handler       = "disable_cpu_alarm.lambda_handler"
-  runtime       = "python3.9"
+  runtime       = "python3.12"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_to_lambda_role]
 }
 
@@ -166,10 +183,10 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
 
 resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   count         = local.is-production == true ? 1 : 0
-  filename      = "${path.module}/enable_alarm/enable_cpu_alarm.py"
+  filename      = "${path.module}/enable_alarm/enable_cpu_alarm.zip"
   function_name = "enable_cpu_alarm_function"
   role          = aws_iam_role.lambda_role[0].arn
   handler       = "enable_cpu_alarm.lambda_handler"
-  runtime       = "python3.9"
+  runtime       = "python3.12"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_to_lambda_role]
 }
