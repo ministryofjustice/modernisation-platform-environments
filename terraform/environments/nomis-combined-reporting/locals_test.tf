@@ -244,7 +244,7 @@ locals {
         lb_alias_records = [
           # T1
           { name = "t1-ncr-cms", type = "A", lbs_map_key = "private" },
-          { name = "t1-ncr-tomcat-admin-a", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-tomcat-admin", type = "A", lbs_map_key = "private" },
         ]
       }
     }
