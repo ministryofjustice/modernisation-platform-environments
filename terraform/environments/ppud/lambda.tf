@@ -98,15 +98,15 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_start" {
 data "archive_file" "zip_the_disable_alarm_code" {
   count       = local.is-production == true ? 1 : 0
   type        = "zip"
-  source_dir  = "${path.module}/disable_alarm/"
-  output_path = "${path.module}/disable_alarm/disable_cpu_alarm.zip"
+  source_file  = "${path.module}/disable_cpu_alarm/disable_cpu_alarm.py"
+  output_path = "${path.module}/disable_cpu_alarm/disable_cpu_alarm.zip"
 }
 
 data "archive_file" "zip_the_enable_alarm_code" {
   count       = local.is-production == true ? 1 : 0
   type        = "zip"
-  source_dir  = "${path.module}/enable_alarm/"
-  output_path = "${path.module}/enable_alarm/enable_cpu_alarm.zip"
+  source_file  = "${path.module}/enable_cpu_alarm/enable_cpu_alarm.py"
+  output_path = "${path.module}/enable_cpu_alarm/enable_cpu_alarm.zip"
 }
 
 ########################################
