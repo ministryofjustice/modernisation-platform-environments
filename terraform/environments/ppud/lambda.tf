@@ -171,7 +171,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_enable_cpu_alarm" {
 
 resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
   count         = local.is-production == true ? 1 : 0
-  filename      = "${path.module}/disable_alarm/disable_cpu_alarm.zip"
+  filename      = "${path.module}/disable_cpu_alarm/disable_cpu_alarm.zip"
   function_name = "disable_cpu_alarm_function"
   role          = aws_iam_role.lambda_role[0].arn
   handler       = "disable_cpu_alarm.lambda_handler"
@@ -183,7 +183,7 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
 
 resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   count         = local.is-production == true ? 1 : 0
-  filename      = "${path.module}/enable_alarm/enable_cpu_alarm.zip"
+  filename      = "${path.module}/enable_cpu_alarm/enable_cpu_alarm.zip"
   function_name = "enable_cpu_alarm_function"
   role          = aws_iam_role.lambda_role[0].arn
   handler       = "enable_cpu_alarm.lambda_handler"
