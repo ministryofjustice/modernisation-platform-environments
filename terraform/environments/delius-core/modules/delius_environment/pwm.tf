@@ -64,7 +64,6 @@ module "pwm" {
   ]
 
   ignore_changes_task_definition = false
-  redeploy_on_apply              = true
 
   providers = {
     aws          = aws
