@@ -83,11 +83,12 @@ resource "aws_ses_domain_identity_verification" "pwm" {
 }
 
 resource "aws_route53_record" "pwm_ses_verification_record" {
-  zone_id = var.account_config.route53_external_zone.zone_id
-  name    = "_amazonses.${aws_ses_domain_identity.pwm.id}"
-  type    = "TXT"
-  ttl     = "600"
-  records = [aws_ses_domain_identity.pwm.verification_token]
+  provider = aws.core-vpc
+  zone_id  = var.account_config.route53_external_zone.zone_id
+  name     = "_amazonses.${aws_ses_domain_identity.pwm.id}"
+  type     = "TXT"
+  ttl      = "600"
+  records  = [aws_ses_domain_identity.pwm.verification_token]
 }
 
 resource "aws_ses_domain_identity_verification" "pwm_ses_verification" {
