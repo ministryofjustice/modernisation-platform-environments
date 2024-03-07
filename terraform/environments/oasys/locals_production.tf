@@ -33,9 +33,7 @@ locals {
 
     baseline_secretsmanager_secrets = {
       "/oracle/database/PDOASYS"  = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/PTCOASYS" = local.secretsmanager_secrets_oasys_db # delete after copied entries over
       "/oracle/database/PROASYS"  = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/TRNOASYS" = local.secretsmanager_secrets_oasys_db # delete after copied entries over
       "/oracle/database/TROASYS"  = local.secretsmanager_secrets_oasys_db 
 
       "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
