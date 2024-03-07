@@ -149,7 +149,7 @@ resource "aws_route53_record" "services_nlb_r53_record" {
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone_info.zone_id
   name     = "${var.name}.service.${var.env_name}.${var.account_config.dns_suffix}"
-  type     = "CNAME"
+  type     = "A"
   alias {
     evaluate_target_health = false
     name                   = aws_lb.delius_microservices.dns_name
