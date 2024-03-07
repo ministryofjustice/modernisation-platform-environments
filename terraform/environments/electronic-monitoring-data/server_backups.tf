@@ -149,6 +149,7 @@ data "aws_iam_policy_document" "rds_data_store_access" {
     actions = [
       "kms:Decrypt",
       "s3:ListBucket",
+      "s3:GetBucketLocation",
     ]
     resources = [
         aws_s3_bucket.data_store.arn,
@@ -158,7 +159,11 @@ data "aws_iam_policy_document" "rds_data_store_access" {
     sid    = "AllowReadDataStore"
     effect = "Allow"
     actions = [
+      "s3:GetObjectMetaData",
       "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload",
     ]
     resources = [
         "${aws_s3_bucket.data_store.arn}/*",
