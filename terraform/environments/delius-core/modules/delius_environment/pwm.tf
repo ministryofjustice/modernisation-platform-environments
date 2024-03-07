@@ -66,8 +66,6 @@ module "pwm" {
     }
   ]
 
-  ignore_changes_task_definition = false
-
   providers = {
     aws          = aws
     aws.core-vpc = aws.core-vpc
