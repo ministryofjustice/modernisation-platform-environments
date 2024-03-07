@@ -53,8 +53,8 @@ module "pwm" {
   health_check_interval = "30"
   account_info          = var.account_info
 
-  task_cpu                           = 1024
-  task_memory                        = 2048
+  container_cpu                      = 1024
+  container_memory                   = 2048
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
 
