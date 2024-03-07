@@ -76,6 +76,17 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4" {
   cidr_ipv4 = "46.69.144.146/32"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "db_ipv4" {
+  security_group_id = aws_security_group.db.id
+  description       = "madetech ip"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+
+  # madetech
+  cidr_ipv4 = "79.173.131.202/32"
+}
+
 resource "aws_db_subnet_group" "db" {
   name       = "db-subnet-group"
   subnet_ids = data.aws_subnets.shared-public.ids
