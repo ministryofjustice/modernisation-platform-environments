@@ -28,6 +28,7 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "ecr:BatchGetImage",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
+                "logs:DescribeLogGroups",
                 "s3:ListBucket",
                 "s3:*Object*",
                 "kms:Decrypt",
