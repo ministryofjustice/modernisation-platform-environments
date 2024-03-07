@@ -205,6 +205,7 @@ locals {
       #   })
       # })
 
+      # vm.nr_hugepages = 1600 on this vm
       "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
@@ -214,6 +215,52 @@ locals {
         instance = merge(local.database_a.instance, {
           instance_type = "r6i.2xlarge"
         })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 300
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 150
+            type  = "gp3"
+          }
+          "/dev/sdf" = { # DATA02
+            label = "data"
+            size  = 150
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 200
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
+        ebs_volume_config = {
+          data = {
+            iops       = 500
+            type       = "gp3"
+            throughput = 125
+            total_size = 200
+          }
+          flash = {
+            iops       = 500
+            type       = "gp3"
+            throughput = 125
+            total_size = 50
+          }
+        }
         tags = merge(local.database_a.tags, {
           description                             = "practice and training ${local.application_name} database"
           "${local.application_name}-environment" = "ptctrn"
