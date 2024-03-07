@@ -1,7 +1,7 @@
 module "pwm" {
   source = "../helpers/delius_microservice"
 
-  name                  = "pwm"
+  name                  = "pwd-manager"
   certificate_arn       = local.certificate_arn
   alb_security_group_id = aws_security_group.ancillary_alb_security_group.id
   env_name              = var.env_name
