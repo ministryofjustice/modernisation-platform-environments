@@ -244,7 +244,7 @@ locals {
         }
         ebs_volume_config = {
           data = {
-            iops       = 500
+            iops       = 1500
             type       = "gp3"
             throughput = 125
             total_size = 200
