@@ -57,7 +57,7 @@ module "pwm" {
         # email_smtp_address = "smtp.${data.terraform_remote_state.vpc.outputs.private_zone_name}"
         email_smtp_address = "production-smtp-relay-70e032e2738d0a27.elb.eu-west-2.amazonaws.com"
         # email_from_address = "no-reply@${data.terraform_remote_state.vpc.outputs.public_zone_name}"
-        email_from_address = "no-reply@pwm.${var.env_name}.${var.account_config.dns_suffix}"
+        email_from_address = "noreply-ndelius-pwm-${var.env_name}@digital.justice.gov.uk"
       }))
     },
     {
