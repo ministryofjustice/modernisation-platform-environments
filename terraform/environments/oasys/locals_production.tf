@@ -49,6 +49,7 @@ locals {
       # "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
 
       "/oracle/bip/production" = local.secretsmanager_secrets_bip
+      "/oracle/bip/trn"        = local.secretsmanager_secrets_bip
     }
 
     baseline_iam_policies = {
