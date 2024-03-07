@@ -33,8 +33,8 @@ locals {
 
     baseline_secretsmanager_secrets = {
       "/oracle/database/PDOASYS"  = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/PTCOASYS" = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/TRNOASYS" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/PROASYS"  = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/TROASYS"  = local.secretsmanager_secrets_oasys_db 
 
       # "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
       # "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
@@ -43,10 +43,13 @@ locals {
       # "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
       # "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
 
+      "/oracle/database/TRBIPINF" = local.secretsmanager_secrets_bip_db
+
       # for azure, remove when migrated to aws db
       # "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
 
-      # "/oracle/bip/production" = local.secretsmanager_secrets_bip
+      "/oracle/bip/production" = local.secretsmanager_secrets_bip
+      "/oracle/bip/trn"        = local.secretsmanager_secrets_bip
     }
 
     baseline_iam_policies = {
@@ -202,22 +205,64 @@ locals {
       #   })
       # })
 
-      # "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
-      #   config = merge(local.database_a.config, {
-      #     instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
-      #       "Ec2PtcTrnDatabasePolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.database_a.instance, {
-      #     instance_type = "r6i.2xlarge"
-      #   })
-      #   tags = merge(local.database_a.tags, {
-      #     description                             = "practice and training ${local.application_name} database"
-      #     "${local.application_name}-environment" = "ptc"
-      #     #bip-db-name                             = "PDBIPINF"
-      #     oracle-sids                             = "PTCOASYS TRNOASYS"
-      #   })
-      # })
+      # vm.nr_hugepages = 1600 on this vm
+      "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
+        config = merge(local.database_a.config, {
+          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+            "Ec2PtcTrnDatabasePolicy",
+          ])
+        })
+        instance = merge(local.database_a.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 300
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 300
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 200
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
+        ebs_volume_config = {
+          data = {
+            iops       = 1500
+            type       = "gp3"
+            throughput = 125
+            total_size = 200
+          }
+          flash = {
+            iops       = 500
+            type       = "gp3"
+            throughput = 125
+            total_size = 50
+          }
+        }
+        tags = merge(local.database_a.tags, {
+          description                             = "practice and training ${local.application_name} database"
+          "${local.application_name}-environment" = "ptctrn"
+          #bip-db-name                             = "PDBIPINF"
+          oracle-sids                             = "PROASYS TROASYS TRBIPINF"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -277,30 +322,172 @@ locals {
     }
 
     baseline_lbs = {
+      # public = {
+      #   internal_lb              = false
+      #   access_logs              = false
+      #   s3_versioning            = false
+      #   force_destroy_bucket     = true
+      #   enable_delete_protection = false
+      #   existing_target_groups   = {}
+      #   idle_timeout             = 3600 # 60 is default
+      #   security_groups          = ["public_lb"]
+      #   subnets                  = module.environment.subnets["public"].ids
+      #   tags                     = local.tags
+
+      #   listeners = {
+      #     https = {
+      #       port                      = 443
+      #       protocol                  = "HTTPS"
+      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
+      #       certificate_names_or_arns = ["pd_${local.application_name}_cert"]
+      #       default_action = {
+      #         type = "fixed-response"
+      #         fixed_response = {
+      #           content_type = "text/plain"
+      #           message_body = "Use www.oasys.service.justice.gov.uk, or for practice ptc.oasys.service.justice.gov.uk, or for training trn.oasys.service.justice.gov.uk"
+      #           status_code  = "200"
+      #         }
+      #       }
+      #       # default_action = {
+      #       #   type              = "forward"
+      #       #   target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
+      #       # }
+      #       rules = {
+      #         pd-web-http-8080 = {
+      #           priority = 100
+      #           actions = [{
+      #             type              = "forward"
+      #             target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
+      #           }]
+      #           conditions = [
+      #             {
+      #               host_header = {
+      #                 values = [
+      #                   "oasys.service.justice.gov.uk",
+      #                   "bridge-oasys.az.justice.gov.uk",
+      #                   "www.oasys.service.justice.gov.uk",
+      #                 ]
+      #               }
+      #             }
+      #           ]
+      #         }
+      #         pd-web-a-http-8080 = {
+      #           priority = 200
+      #           actions = [{
+      #             type              = "forward"
+      #             target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
+      #           }]
+      #           conditions = [
+      #             {
+      #               host_header = {
+      #                 values = [
+      #                   "a.oasys.service.justice.gov.uk",
+      #                 ]
+      #               }
+      #             }
+      #           ]
+      #         }
+      #         pd-web-b-http-8080 = {
+      #           priority = 200
+      #           actions = [{
+      #             type              = "forward"
+      #             target_group_name = "pd-${local.application_name}-web-b-pb-http-8080"
+      #           }]
+      #           conditions = [
+      #             {
+      #               host_header = {
+      #                 values = [
+      #                   "b.oasys.service.justice.gov.uk",
+      #                 ]
+      #               }
+      #             }
+      #           ]
+      #         }
+      #       }
+      #     }
+      #   }
+      # }
       private = {
-        enable_delete_protection = false # change to true before we actually use
-        force_destroy_bucket     = false
-        idle_timeout             = "3600"
         internal_lb              = true
+        access_logs              = true
+        s3_versioning            = false
+        force_destroy_bucket     = false
+        enable_delete_protection = false
+        existing_target_groups   = {}
+        idle_timeout             = 3600 # 60 is default
         security_groups          = ["private_lb"]
         subnets                  = module.environment.subnets["private"].ids
-        existing_target_groups   = {}
         tags                     = local.tags
         listeners = {
           https = {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            certificate_names_or_arns = ["pd_${local.application_name}_cert"]
             default_action = {
               type = "fixed-response"
               fixed_response = {
                 content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
+                message_body = "use int.oasys.service.justice.gov.uk, or for practice ptc-int.oasys.service.justice.gov.uk, or for training trn-int.oasys.service.justice.gov.uk"
+                status_code  = "200"
               }
             }
+            # default_action = {
+            #   type              = "forward"
+            #   target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
+            # }
             rules = {
+              # pd-web-http-8080 = {
+              #   priority = 100
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "int.oasys.service.justice.gov.uk",
+              #           "oasys-ukwest.oasys.az.justice.gov.uk",
+              #           "oasys.az.justice.gov.uk",
+              #           "p-oasys.az.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
+              # pd-web-a-http-8080 = {
+              #   priority = 200
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "a-int.oasys.service.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
+              # pd-web-b-http-8080 = {
+              #   priority = 200
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "pd-${local.application_name}-web-b-pv-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "b-int.oasys.service.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
             }
           }
         }
@@ -308,18 +495,35 @@ locals {
     }
 
     baseline_route53_zones = {
-      # (module.environment.domains.public.short_name) = { # "oasys.service.justice.gov.uk"
-      #   records = [
-      #     { name = "db", type = "A", ttl = "3600", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-      #     { name = "trn.db", type = "A", ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-      #     { name = "ptc.db", type = "A", ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-      #   ]
-      #   lb_alias_records = [
-      #     { name = "web", type = "A", lbs_map_key = "private" },     #     web.oasys.service.justice.gov.uk
-      #     { name = "trn.web", type = "A", lbs_map_key = "private" }, # trn.web.oasys.service.justice.gov.uk
-      #     { name = "ptc.web", type = "A", lbs_map_key = "private" }, # ptc.web.oasys.service.justice.gov.uk
-      #   ]
-      # }
+      #
+      # public
+      #
+      (module.environment.domains.public.business_unit_environment) = { # hmpps-production.modernisation-platform.service.justice.gov.uk
+        records = [
+          # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "trn.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "ptc.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
+          # { name = "trn.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          # { name = "ptc.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+        ]
+      }
+      #
+      # internal/private
+      #
+      (module.environment.domains.internal.business_unit_environment) = { # hmpps-production.modernisation-platform.internal
+        vpc = {                                                           # this makes it a private hosted zone
+          id = module.environment.vpc.id
+        }
+        records = [
+          # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
+          # { name = "trn.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "ptc.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.40.133"] }, #        "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
+          # { name = "trn.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          # { name = "ptc.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+        ]
+      }
     }
 
     baseline_cloudwatch_log_groups = {
