@@ -145,11 +145,11 @@
     </setting>
     <setting key="email.smtp.address" syntax="STRING" profile="default">
       <label>SMTP Server Address</label>
-      <value><![CDATA[{pwm_ses_endpoint}]]></value>
+      <value><![CDATA[$${pwm_ses_endpoint}]]></value>
     </setting>
     <setting key="email.default.fromAddress" syntax="STRING">
       <label>Default From Address</label>
-      <value><![CDATA[{pwm_ses_from_address}]]></value>
+      <value><![CDATA[$${pwm_ses_from_address}]]></value>
     </setting>
     <setting key="network.allowMultiIPSession" syntax="BOOLEAN">
       <label>Allow Roaming Source Network Address</label>
