@@ -76,7 +76,7 @@ module "pwm" {
     },
     {
       name  = "SECURITY_KEY"
-      value = "REPLACE"
+      value = "${uuid()}"
     }
   ]
 

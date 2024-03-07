@@ -9,7 +9,7 @@
   <properties type="config">
     <!-- Set saveConfigOnStart=true to encrypt plaintext passwords on startup -->
     <property key="saveConfigOnStart">true</property>
-    <property key="configPasswordHash">$${PWM_CONFIG_PASSWORD_HASH}</property>
+    <property key="configPasswordHash">$${CONFIG_PASSWORD_HASH}</property>
     <property key="configIsEditable">false</property>
     <property key="configEpoch">1</property>
   </properties>
