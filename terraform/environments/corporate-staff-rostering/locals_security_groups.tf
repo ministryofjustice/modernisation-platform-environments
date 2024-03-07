@@ -8,9 +8,7 @@ locals {
     rdp = {
       inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.0.0/16"]
     }
-    # rdgateway = {
-    #   inbound = [module.ip_addresses.mp_cidr.preproduction_production]
-    # }
+    rdgateway = [module.ip_addresses.mp_cidr.development_test]
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -44,9 +42,7 @@ locals {
         module.ip_addresses.azure_fixngo_cidrs.prod,
       ])
     }
-    # rdgateway = {
-    #   inbound = [module.ip_addresses.mp_cidr.preproduction_production]
-    # }
+    rdgateway = [module.ip_addresses.mp_cidr.preproduction_production]
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -207,20 +203,18 @@ locals {
           cidr_blocks = local.security_group_cidrs.jumpservers
         }
         rdp_tcp_gw = {
-          description = "3389: Allow RDP ingress from domain services RDGateway"
+          description = "3389: Allow RDP ingress from hmpps domain services RDGateway"
           from_port   = 3389
           to_port     = 3389
           protocol    = "TCP"
-          # cidr_blocks = local.security_group_cidrs.rdgateway
-          cidr_blocks = ["10.27.0.0/16"]
+          cidr_blocks = local.security_group_cidrs.rdgateway
         }
         rdp_udp_gw = {
-          description = "3389: Allow RDP ingress from domain services RDGateway"
+          description = "3389: Allow RDP ingress from hmpps domain services RDGateway"
           from_port   = 3389
           to_port     = 3389
           protocol    = "UDP"
-          # cidr_blocks = local.security_group_cidrs.rdgateway
-          cidr_blocks = ["10.27.0.0/16"]
+          cidr_blocks = local.security_group_cidrs.rdgateway
         }
         winrm_web = {
           description = "5985-6: Allow WinRM ingress"
@@ -343,20 +337,18 @@ locals {
           cidr_blocks = local.security_group_cidrs.jumpservers
         }
         rdp_tcp_gw = {
-          description = "3389: Allow RDP ingress from domain services RDGateway"
+          description = "3389: Allow RDP ingress from hmpps domain services RDGateway"
           from_port   = 3389
           to_port     = 3389
           protocol    = "TCP"
-          # cidr_blocks = local.security_group_cidrs.rdgateway
-          cidr_blocks = ["10.27.0.0/16"]
+          cidr_blocks = local.security_group_cidrs.rdgateway
         }
         rdp_udp_gw = {
-          description = "3389: Allow RDP ingress from domain services RDGateway"
+          description = "3389: Allow RDP ingress from hmpps domain services RDGateway"
           from_port   = 3389
           to_port     = 3389
           protocol    = "UDP"
-          # cidr_blocks = local.security_group_cidrs.rdgateway
-          cidr_blocks = ["10.27.0.0/16"]
+          cidr_blocks = local.security_group_cidrs.rdgateway
         }
         winrm_app = {
           description = "5985-6: Allow WinRM ingress"
