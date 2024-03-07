@@ -3,7 +3,7 @@ module "pwm" {
 
   name                  = "pwm"
   certificate_arn       = local.certificate_arn
-  alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+  alb_security_group_id = aws_security_group.ancillary_alb_security_group.id
   env_name              = var.env_name
   container_port_config = [
     {
@@ -38,11 +38,14 @@ module "pwm" {
 
   platform_vars = var.platform_vars
 
-  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management:${var.delius_microservice_configs.pwm.image_tag}"
-  account_config  = var.account_config
-  #TODO check the health end-point
-  health_check_path = "/pwm/actuator/health"
-  account_info      = var.account_info
+  container_image       = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management:${var.delius_microservice_configs.pwm.image_tag}"
+  account_config        = var.account_config
+  health_check_path     = "/"
+  health_check_interval = "30"
+  account_info          = var.account_info
+
+  deployment_maximum_percent         = 200
+  deployment_minimum_healthy_percent = 100
 
   container_environment_vars = [
     {

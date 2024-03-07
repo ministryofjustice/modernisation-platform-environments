@@ -28,6 +28,13 @@ resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_http_globa
   cidr_ipv4         = each.key # Global Protect VPN
 }
 
+resource "aws_vpc_security_group_egress_rule" "ancillary_alb_egress_private" {
+  security_group_id = aws_security_group.ancillary_alb_security_group.id
+  description       = "Access into alb over http (will redirect)"
+  ip_protocol       = "-1"
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
+}
+
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_ancillary" {
   # checkov:skip=CKV_AWS_91
