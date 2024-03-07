@@ -131,7 +131,7 @@ locals {
       }
     }
     web = {
-      description = "Security group for CSR web servers"
+      description = "New security group for web-servers"
       ingress = {
         all-from-self = {
           description = "Allow all ingress to self"
@@ -276,7 +276,7 @@ locals {
       }
     }
     app = {
-      description = "Security group for CSR application servers"
+      description = "New security group for application servers"
       ingress = {
         all-from-self = {
           description     = "Allow all ingress to self"
