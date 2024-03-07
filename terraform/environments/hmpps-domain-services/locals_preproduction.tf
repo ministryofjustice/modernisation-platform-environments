@@ -36,7 +36,7 @@ locals {
           availability_zone = "eu-west-2a"
         })
         tags = merge(local.rds_ec2_instance.tags, {
-          description = "Remote Desktop Gateway for hmpp.noms.root domain"
+          description = "Remote Desktop Gateway for azure.hmpp.root domain"
         })
       })
       pp-rds-1-a = merge(local.rds_ec2_instance, {
@@ -46,7 +46,7 @@ locals {
           instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy"])
         })
         tags = merge(local.rds_ec2_instance.tags, {
-          description = "Remote Desktop Services for hmpp.noms.root domain"
+          description = "Remote Desktop Services for azure.hmpp.root domain"
         })
       })
     }

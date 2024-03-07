@@ -2,17 +2,17 @@
 #tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "ad_username" {
   #checkov:skip=CKV_AWS_149
-  name                    = "legacy-ad-username"
+  name                    = "${var.env_name}-legacy-ad-username"
   recovery_window_in_days = 0
 
-  tags = local.tags
+  tags = var.tags
 }
 
 #tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "ad_password" {
   #checkov:skip=CKV_AWS_149
-  name                    = "legacy-ad-password"
+  name                    = "${var.env_name}-legacy-ad-password"
   recovery_window_in_days = 0
 
-  tags = local.tags
+  tags = var.tags
 }

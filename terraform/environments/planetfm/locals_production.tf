@@ -29,7 +29,8 @@ locals {
           "/dev/sdi"  = { type = "gp3", size = 250 } # U: drive
         }
         tags = merge(local.defaults_database_ec2.tags, {
-          description       = "Copy of PDFDW0030 SQL Server"
+          pre-migration     = "PDFDW0030"
+          description       = "SQL Server"
           app-config-status = "pending"
           ami               = "pd-cafm-db-a"
         })
@@ -58,7 +59,8 @@ locals {
           "/dev/sdi"  = { type = "gp3", size = 250 } # U: drive
         }
         tags = merge(local.defaults_database_ec2.tags, {
-          description       = "copy of PDFDW0031 SQL resilient Server"
+          pre-migration     = "PDFDW0031"
+          description       = "SQL resilient Server"
           app-config-status = "pending"
           ami               = "pd-cafm-db-b"
         })
@@ -82,11 +84,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         tags = {
-          description       = "RDS Session Host and CAFM App Server/PFME Licence Server copy of PDFAW0010"
-          app-config-status = "pending"
-          os-type           = "Windows"
+          pre-migration     = "PDFAW0010"
+          description       = "RDS Session Host and CAFM App Server/PFME Licence Server"
           ami               = "pd-cafm-a-10-b"
-          component         = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -110,11 +110,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         tags = {
-          description       = "CAFM App server copy of PDFWA0011"
-          app-config-status = "pending"
-          os-type           = "Windows"
+          pre-migration     = "PDFWA0011"
+          description       = "RDS session host and app server"
           ami               = "pd-cafm-a-11-a"
-          component         = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -138,11 +136,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         tags = {
-          description       = "RDS Session Host and CAFM App Server. Copy of PDFAW0012"
-          app-config-status = "pending"
-          os-type           = "Windows"
+          pre-migration     = "PDFAW0012"
+          description       = "RDS session host and app Server"
           ami               = "pd-cafm-a-12-b"
-          component         = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -166,11 +162,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 28 }
         }
         tags = {
-          description       = "RDS Session Host and CAFM App Server. Copy of PDFAW0013"
-          app-config-status = "pending"
-          os-type           = "Windows"
+          pre-migration     = "PDFAW0013"
+          description       = "RDS session host and App Server"
           ami               = "pd-cafm-a-13-a"
-          component         = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -196,11 +190,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 28 }
         }
         tags = {
-          description       = "CAFM Asset Management. Copy of PDFWW00036"
-          app-config-status = "pending"
-          os-type           = "Windows"
+          pre-migration     = "PDFWW00036"
+          description       = "CAFM Asset Management"
           ami               = "pd-cafm-w-36-b"
-          component         = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -224,11 +216,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 28 }
         }
         tags = {
-          description       = "CAFM Assessment Management copy of PFWW00037"
-          app-config-status = "pending"
-          os-type           = "Windows"
+          pre-migration     = "PFWW00037"
+          description       = "CAFM Assessment Management"
           ami               = "pd-cafm-w-37-a"
-          component         = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -252,11 +242,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 100 }
         }
         tags = {
-          description       = "CAFM Web Training migrated server PDFWW3QCP660001"
-          app-config-status = "pending"
-          os-type           = "Windows"
+          pre-migration     = "PDFWW3QCP660001"
+          description       = "CAFM Web Training"
           ami               = "pd-cafm-w-38-b"
-          component         = "web"
         }
         route53_records = {
           create_internal_record = true

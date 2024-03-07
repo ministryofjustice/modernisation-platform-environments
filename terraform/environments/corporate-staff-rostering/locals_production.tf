@@ -93,60 +93,57 @@ locals {
         secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
         tags = {
-          description = "PD CSR Oracle primary DB server"
-          ami         = "base_ol_8_5"
-          os-type     = "Linux"
-          component   = "data"
-          server-type = "csr-db"
-          backup      = "false" # opt out of mod platform default backup plan
+          pre-migration = "PDCDL00013"
+          description   = "PD CSR Oracle primary DB server"
+          ami           = "base_ol_8_5"
+          os-type       = "Linux"
+          component     = "data"
+          server-type   = "csr-db"
+          backup        = "false" # opt out of mod platform default backup plan
         }
       })
 
-      #  removing temporarily due to licensing considerations
-      # pd-csr-db-b = merge(local.defaults_database_ec2, {
-      #   config = merge(local.defaults_database_ec2.config, {
-      #     ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
-      #     availability_zone = "${local.region}b"
-      #     instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
-      #       "Ec2ProdDatabasePolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.defaults_database_ec2.instance, {
-      #     instance_type                = "r6i.xlarge"
-      #     disable_api_stop             = true
-      #     metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-      #   })
+      pd-csr-db-b = merge(local.defaults_database_ec2, {
+        config = merge(local.defaults_database_ec2.config, {
+          ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
+          availability_zone = "${local.region}b"
+          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        instance = merge(local.defaults_database_ec2.instance, {
+          instance_type                = "r6i.xlarge"
+          disable_api_stop             = true
+          metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+        })
 
-      #   ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
-      #     "/dev/sda1" = { label = "root", size = 30 }
-      #     "/dev/sdb"  = { label = "app", size = 100 } # /u01
-      #     "/dev/sdc"  = { label = "app", size = 500 } # /u02
-      #   })
+        ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
+          "/dev/sda1" = { label = "root", size = 30 }
+          "/dev/sdb"  = { label = "app", size = 100 } # /u01
+          "/dev/sdc"  = { label = "app", size = 500 } # /u02
+        })
 
-      #   ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
-      #     data = {
-      #       iops       = 3000
-      #       throughput = 125
-      #       total_size = 1000
-      #     }
-      #     flash = {
-      #       iops       = 3000
-      #       throughput = 125
-      #       total_size = 100
-      #     }
-      #   })
+        ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
+          data = {
+            total_size = 1500
+          }
+          flash = {
+            total_size = 100
+          }
+        })
 
-      #   secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
+        secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
 
-      #   tags = {
-      #     description = "PD CSR Oracle secondary DB server"
-      #     ami         = "base_ol_8_5"
-      #     os-type     = "Linux"
-      #     component   = "data"
-      #     server-type = "csr-db"
-      #     backup      = "false" # opt out of mod platform default backup plan
-      #   }
-      # })
+        tags = {
+          pre-migration = "PDCDL00014"
+          description   = "PD CSR Oracle secondary DB server"
+          ami           = "base_ol_8_5"
+          os-type       = "Linux"
+          component     = "data"
+          server-type   = "csr-db"
+          backup        = "false" # opt out of mod platform default backup plan
+        }
+      })
 
       pd-csr-a-7-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
@@ -163,9 +160,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          description       = "Migrated server PDCAW00007"
-          app-config-status = "pending"
-          csr-region        = "Region 1"
+          pre-migration     = "PDCAW00007"
+          description       = "Application Server Region 1"
           os-type           = "Windows"
           ami               = "pd-csr-a-7-a"
           component         = "app"
@@ -191,9 +187,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          description       = "Migrated server PDCAW00008"
-          app-config-status = "pending"
-          csr-region        = "Region 2"
+          pre-migration     = "PDCAW00008"
+          description       = "Application Server Region 2"
           os-type           = "Windows"
           ami               = "pd-csr-a-8-b"
           component         = "app"
@@ -219,9 +214,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description       = "Migrated server PDCAW00009"
-          app-config-status = "pending"
-          csr-region        = "Region 3"
+          pre-migration     = "PDCAW00009"
+          description       = "Application Server Region 3"
           os-type           = "Windows"
           ami               = "pd-csr-a-9-a"
           component         = "app"
@@ -247,9 +241,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          description       = "Migrated server PDCAW00010"
-          app-config-status = "pending"
-          csr-region        = "Region 4"
+          pre-migration     = "PDCAW00010"
+          description       = "Application Server Region 4"
           os-type           = "Windows"
           ami               = "pd-csr-a-10-b"
           component         = "app"
@@ -275,9 +268,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description       = "Migrated server PDCAW00011"
-          app-config-status = "pending"
-          csr-region        = "Region 5"
+          pre-migration     = "PDCAW00011"
+          description       = "Application Server Region 5"
           os-type           = "Windows"
           ami               = "pd-csr-a-11-a"
           component         = "app"
@@ -302,9 +294,8 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 112 }
         }
         tags = {
-          description       = "Migrated server PDCAW00012"
-          app-config-status = "pending"
-          csr-region        = "Region 6"
+          pre-migration     = "PDCAW00012"
+          description       = "Application Server Region 6"
           os-type           = "Windows"
           ami               = "pd-csr-a-12-b"
           component         = "app"
@@ -330,9 +321,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          description       = "Migrated server PDCWW00001"
-          app-config-status = "pending"
-          csr-region        = "Region 1 and 2"
+          pre-migration     = "PDCWW00001"
+          description       = "Web Server Region 1 and 2"
           os-type           = "Windows"
           ami               = "pd-csr-w-1-a"
           component         = "web"
@@ -358,9 +348,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          description       = "Migrated server PDCWW00002"
-          app-config-status = "pending"
-          csr-region        = "Region 1 and 2"
+          pre-migration     = "PDCWW00002"
+          description       = "Web Server Region 1 and 2"
           os-type           = "Windows"
           ami               = "pd-csr-w-2-b"
           component         = "web"
@@ -386,9 +375,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description       = "Migrated server PDCWW00003"
-          app-config-status = "pending"
-          csr-region        = "Region 3 and 4"
+          pre-migration     = "PDCWW00003"
+          description       = "Web Server Region 3 and 4"
           os-type           = "Windows"
           ami               = "pd-csr-w-3-a"
           component         = "web"
@@ -414,9 +402,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description       = "Migrated server PDCWW00004"
-          app-config-status = "pending"
-          csr-region        = "Region 3 and 4"
+          pre-migration     = "PDCWW00004"
+          description       = "Web Server Region 3 and 4"
           os-type           = "Windows"
           ami               = "pd-csr-w-4-b"
           component         = "web"
@@ -442,9 +429,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          description       = "Migrated server PDCWW00005"
-          app-config-status = "pending"
-          csr-region        = "Region 5 and 6"
+          pre-migration     = "PDCWW00005"
+          description       = "Web Server Region 5 and 6"
           os-type           = "Windows"
           ami               = "pd-csr-w-5-a"
           component         = "web"
@@ -470,9 +456,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          description       = "Migrated server PDCWW00006"
-          app-config-status = "pending"
-          csr-region        = "Region 5 and 6"
+          pre-migration     = "PDCWW00006"
+          description       = "Web Server Region 5 and 6"
           os-type           = "Windows"
           ami               = "pd-csr-w-6-b"
           component         = "web"

@@ -69,8 +69,6 @@ variable "bastion_linux" {
     public_key_data         = map(string)
     allow_ssh_commands      = optional(bool, true)
     bucket_name             = optional(string, "bastion")
-    bucket_versioning       = optional(bool, true)
-    bucket_force_destroy    = optional(bool, true)
     log_auto_clean          = optional(string, "Enabled")
     log_standard_ia_days    = optional(number, 30)
     log_glacier_days        = optional(number, 60)

@@ -65,6 +65,36 @@ locals {
           }
         ]
       }
+      Ec2PracticeWebPolicy = {
+        description = "Permissions required for practice Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PTCOASYS/apex-passwords*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/OASYSPTC/apex-passwords*",
+            ]
+          }
+        ]
+      }
+      Ec2TrainingWebPolicy = {
+        description = "Permissions required for training Web EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/TRNOASYS/apex-passwords*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/OASYSTRN/apex-passwords*",
+            ]
+          }
+        ]
+      }
       Ec2ProdDatabasePolicy = {
         description = "Permissions required for Prod Database EC2s"
         statements = [
@@ -102,6 +132,45 @@ locals {
           },
         ]
       }
+      Ec2PtcTrnDatabasePolicy = {
+        description = "Permissions required for practice and training Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PTC/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PTC*/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*TRN/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/TRN*/*",
+            ]
+          },
+        ]
+      }
       Ec2ProdBipPolicy = {
         description = "Permissions required for preprod Bip EC2s"
         statements = [
@@ -121,19 +190,64 @@ locals {
     }
 
     baseline_ec2_instances = {
+      #"pd-${local.application_name}-db-a" = merge(local.database_a, {
+      #   config = merge(local.database_a.config, {
+      #     instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+      #       "Ec2ProdDatabasePolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.database_a.tags, {
+      #     bip-db-name                             = "PDBIPINF"
+      #     oracle-sids                             = "PDBIPINF PDOASYS"
+      #   })
+      # })
+
+      # "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
+      #   config = merge(local.database_a.config, {
+      #     instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+      #       "Ec2PtcTrnDatabasePolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.database_a.instance, {
+      #     instance_type = "r6i.2xlarge"
+      #   })
+      #   tags = merge(local.database_a.tags, {
+      #     description                             = "practice and training ${local.application_name} database"
+      #     "${local.application_name}-environment" = "ptc"
+      #     #bip-db-name                             = "PDBIPINF"
+      #     oracle-sids                             = "PTCOASYS TRNOASYS"
+      #   })
+      # })
     }
 
     baseline_ec2_autoscaling_groups = {
+      # "pd-${local.application_name}-web-a" = merge(local.webserver_a, {
+      #   tags = merge(local.webserver_a.tags, {
+      #     oracle-db-sid                           = "PDOASYS"
+      #   })
+      # })
+      
+      # "pd-${local.application_name}-web-ptc-a" = merge(local.webserver_a, {
+      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #     ssm_parameters_prefix     = "ec2-web-ptc/"
+      #     iam_resource_names_prefix = "ec2-web-ptc"
+      #   })
+      #   tags = merge(local.webserver_a.tags, {
+      #     description                             = "${local.environment} practice ${local.application_name} web"
+      #     "${local.application_name}-environment" = "ptc"
+      #     oracle-db-sid                           = "PTCOASYS"
+      #   })
+      # })
+      
       # "pd-${local.application_name}-web-trn-a" = merge(local.webserver_a, {
       #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name                  = "${local.application_name}_webserver_release_*"
       #     ssm_parameters_prefix     = "ec2-web-trn/"
       #     iam_resource_names_prefix = "ec2-web-trn"
       #   })
       #   tags = merge(local.webserver_a.tags, {
       #     description                             = "${local.environment} training ${local.application_name} web"
       #     "${local.application_name}-environment" = "trn"
-      #     oracle-db-sid                           = "OASTRN"
+      #     oracle-db-sid                           = "TRNOASYS"
       #   })
       # })
     }

@@ -26,7 +26,8 @@ locals {
           "/dev/sdg"  = { type = "gp3", size = 200 }
         }
         tags = merge(local.defaults_database_ec2.tags, {
-          description       = "copy of PPFDW0030 SQL Server"
+          pre-migration     = "PPFDW0030"
+          description       = "SQL Server"
           app-config-status = "pending"
           ami               = "pp-cafm-db-a"
         })
@@ -49,9 +50,9 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         tags = merge(local.defaults_app_ec2.tags, {
-          description       = "Migrated server PPFAW0010 PFME Licence Server"
+          pre-migration     = "PPFAW0010"
+          description       = "RDS Session Host and CAFM App Server/PFME Licence Server"
           ami               = "pp-cafm-a-10-b"
-          app-config-status = "pending"
         })
       })
 
@@ -71,9 +72,9 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         tags = merge(local.defaults_app_ec2.tags, {
-          description       = "Migrated server PPFAW011 RDS session host app server"
+          pre-migration     = "PPFAW011"
+          description       = "RDS session host and app server"
           ami               = "pp-cafm-a-11-a"
-          app-config-status = "pending"
         })
       })
 
@@ -94,9 +95,9 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         tags = merge(local.defaults_web_ec2.tags, {
-          description       = "Migrated server PPFWW0004 Web Portal Server"
+          pre-migration     = "PPFWW0004"
+          description       = "Web Portal Server"
           ami               = "pp-cafm-w-4-b"
-          app-config-status = "pending"
         })
       })
 
@@ -116,9 +117,9 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         tags = merge(local.defaults_web_ec2.tags, {
+          pre-migration     = "PPFWW0005"
           description       = "Migrated server PPFWW0005 Web Portal Server"
           ami               = "pp-cafm-w-5-a"
-          app-config-status = "pending"
         })
       })
     }
