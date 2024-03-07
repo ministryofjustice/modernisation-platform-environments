@@ -55,9 +55,9 @@ module "pwm" {
         ldap_user     = module.ldap.delius_core_ldap_principal_arn
         pwm_url       = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
         # email_smtp_address = "smtp.${data.terraform_remote_state.vpc.outputs.private_zone_name}"
-        email_smtp_address = "REPLACE"
+        email_smtp_address = "production-smtp-relay-70e032e2738d0a27.elb.eu-west-2.amazonaws.com"
         # email_from_address = "no-reply@${data.terraform_remote_state.vpc.outputs.public_zone_name}"
-        email_from_address = "REPLACE"
+        email_from_address = "no-reply@pwm.${var.env_name}.${var.account_config.dns_suffix}"
       }))
     },
     {
@@ -120,40 +120,40 @@ resource "aws_route53_record" "pwm_amazonses_dkim_record" {
 # SES SMTP User
 ######################
 
-resource "aws_iam_user" "pwm_ses_smtp_user" {
-  name = "pwm-smtp-user"
-}
+# resource "aws_iam_user" "pwm_ses_smtp_user" {
+#   name = "pwm-smtp-user"
+# }
+#
+# resource "aws_iam_access_key" "pwm_ses_smtp_user" {
+#   user = aws_iam_user.pwm_ses_smtp_user.name
+# }
+#
+# resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
+#   name = "pwm-ses-smtp-user-policy"
+#   user = aws_iam_user.pwm_ses_smtp_user.name
+#
+#   policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         Effect = "Allow",
+#         Action = [
+#           "ses:SendRawEmail",
+#           "ses:SendEmail"
+#         ],
+#         Resource = "*"
+#       }
+#     ]
+#   })
+# }
 
-resource "aws_iam_access_key" "pwm_ses_smtp_user" {
-  user = aws_iam_user.pwm_ses_smtp_user.name
-}
-
-resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
-  name = "pwm-ses-smtp-user-policy"
-  user = aws_iam_user.pwm_ses_smtp_user.name
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "ses:SendRawEmail",
-          "ses:SendEmail"
-        ],
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-resource "aws_ssm_parameter" "pwm_ses_smtp_user" {
-  name = "/pwm/ses_smtp"
-  type = "SecureString"
-  value = jsonencode({
-    user              = aws_iam_user.pwm_ses_smtp_user.name,
-    key               = aws_iam_access_key.pwm_ses_smtp_user.id,
-    secret            = aws_iam_access_key.pwm_ses_smtp_user.secret
-    ses_smtp_password = aws_iam_access_key.pwm_ses_smtp_user.ses_smtp_password_v4
-  })
-}
+# resource "aws_ssm_parameter" "pwm_ses_smtp_user" {
+#   name = "/pwm/ses_smtp"
+#   type = "SecureString"
+#   value = jsonencode({
+#     user              = aws_iam_user.pwm_ses_smtp_user.name,
+#     key               = aws_iam_access_key.pwm_ses_smtp_user.id,
+#     secret            = aws_iam_access_key.pwm_ses_smtp_user.secret
+#     ses_smtp_password = aws_iam_access_key.pwm_ses_smtp_user.ses_smtp_password_v4
+#   })
+# }
