@@ -23,11 +23,20 @@ module "pwm" {
       valueFrom = aws_ssm_parameter.ldap_admin_password.arn
     }
   ]
+
   db_ingress_security_groups = []
 
   cluster_security_group_id = aws_security_group.cluster.id
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
+
+  ecs_service_ingress_security_group_ids = []
+  ecs_service_egress_security_group_ids = [{
+    security_group_id            = aws_security_group.cluster.id
+    ip_protocol                  = "tcp"
+    port                         = 389
+    referenced_security_group_id = module.ldap.security_group_id
+  }]
 
   tags                               = var.tags
   microservice_lb                    = aws_lb.delius_core_ancillary
@@ -71,6 +80,8 @@ module "pwm" {
     aws.core-vpc = aws.core-vpc
   }
 }
+
+
 
 
 #############
