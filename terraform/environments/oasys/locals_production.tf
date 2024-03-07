@@ -36,12 +36,12 @@ locals {
       "/oracle/database/PROASYS"  = local.secretsmanager_secrets_oasys_db
       "/oracle/database/TROASYS"  = local.secretsmanager_secrets_oasys_db 
 
-      "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
-      "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
-      "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
-      "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
-      "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
-      "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
+      # "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
+      # "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
+      # "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
+      # "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
+      # "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
+      # "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
 
       "/oracle/database/TRBIPINF" = local.secretsmanager_secrets_bip_db
 
@@ -218,7 +218,7 @@ locals {
           description                             = "practice and training ${local.application_name} database"
           "${local.application_name}-environment" = "ptctrn"
           #bip-db-name                             = "PDBIPINF"
-          oracle-sids                             = "PTCOASYS TRNOASYS"
+          oracle-sids                             = "PROASYS TROASYS TRBIPINF"
         })
       })
     }
