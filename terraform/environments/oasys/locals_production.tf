@@ -221,7 +221,7 @@ locals {
             type  = "gp3"
           }
           "/dev/sdc" = { # /u02
-            size  = 300
+            size  = 500
             label = "app"
             type  = "gp3"
           }
