@@ -31,7 +31,7 @@ resource "aws_db_instance" "database_2022" {
   instance_class = "db.m5.large"
 
   storage_type          = "gp2"
-  allocated_storage     = 2000
+  allocated_storage     = 2100
   max_allocated_storage = 2500
   storage_encrypted     = true
 
@@ -50,6 +50,8 @@ resource "aws_db_instance" "database_2022" {
   option_group_name = aws_db_option_group.sqlserver_backup_restore_2022.name
 
   iam_database_authentication_enabled = false
+
+  apply_immediately = true
 
   tags = local.tags
 }
