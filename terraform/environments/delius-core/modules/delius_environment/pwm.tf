@@ -32,10 +32,15 @@ module "pwm" {
 
   ecs_service_ingress_security_group_ids = []
   ecs_service_egress_security_group_ids = [{
-    security_group_id = aws_security_group.cluster.id
-    ip_protocol       = "tcp"
-    port              = 389
-    cidr_ipv4         = var.account_config.shared_vpc_cidr
+    ip_protocol = "tcp"
+    port        = 389
+    cidr_ipv4   = var.account_config.shared_vpc_cidr
+    },
+    {
+      ip_protocol = "tcp"
+      port        = 25
+      cidr_ipv4   = "10.180.104/22" # https://github.com/ministryofjustice/staff-infrastructure-network-services/blob/main/README.md#smtp-relay-service
+
   }]
 
   tags                               = var.tags
