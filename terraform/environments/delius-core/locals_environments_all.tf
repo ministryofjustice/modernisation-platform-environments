@@ -51,4 +51,8 @@ locals {
     { "environment-name" = terraform.workspace },
     { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
   )
+
+  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  integration_key_lookup     = local.is-production ? "delius_core_prod_alarms" : "delius_core_nonprod_alarms"
+  pagerduty_integration_key  = local.pagerduty_integration_keys[local.integration_key_lookup]
 }
