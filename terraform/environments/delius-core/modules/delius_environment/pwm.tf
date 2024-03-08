@@ -39,7 +39,7 @@ module "pwm" {
     {
       ip_protocol = "tcp"
       port        = 25
-      cidr_ipv4   = "10.180.104/22" # https://github.com/ministryofjustice/staff-infrastructure-network-services/blob/main/README.md#smtp-relay-service
+      cidr_ipv4   = "10.180.104.0/22" # https://github.com/ministryofjustice/staff-infrastructure-network-services/blob/main/README.md#smtp-relay-service
 
   }]
 
