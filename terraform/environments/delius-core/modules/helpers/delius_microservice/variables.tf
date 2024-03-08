@@ -443,3 +443,43 @@ variable "deployment_maximum_percent" {
   description = "The upper limit of the number of tasks (as a percentage of `desired_count`) that can be running in a service during a deployment"
   default     = 100
 }
+
+variable "ignore_changes_task_definition" {
+  description = "Ignore changes to the task definition"
+  type        = bool
+  default     = true
+}
+
+variable "redeploy_on_apply" {
+  description = "Redeploy the ecs service on apply"
+  type        = bool
+  default     = false
+}
+
+variable "force_new_deployment" {
+  description = "Force a new deployment"
+  type        = bool
+  default     = false
+}
+
+variable "ecs_service_ingress_security_group_ids" {
+  description = "Security group ids to allow ingress to the ECS service"
+  type = list(object({
+    referenced_security_group_id = optional(string, null)
+    cidr_ipv4                    = optional(string, null)
+    port                         = number
+    ip_protocol                  = string
+  }))
+  default = []
+}
+
+variable "ecs_service_egress_security_group_ids" {
+  description = "Security group ids to allow egress from the ECS service"
+  type = list(object({
+    referenced_security_group_id = optional(string, null)
+    cidr_ipv4                    = optional(string, null)
+    port                         = optional(number, null)
+    ip_protocol                  = string
+  }))
+  default = []
+}

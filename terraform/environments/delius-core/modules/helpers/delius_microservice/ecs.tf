@@ -70,7 +70,7 @@ module "ecs_service" {
 
   exec_enabled = true
 
-  ignore_changes_task_definition = true # task definition managed by Delius App team
-  redeploy_on_apply              = false
-  force_new_deployment           = false
+  ignore_changes_task_definition = var.ignore_changes_task_definition # task definition managed by Delius App team
+  redeploy_on_apply              = var.redeploy_on_apply
+  force_new_deployment           = var.force_new_deployment
 }
