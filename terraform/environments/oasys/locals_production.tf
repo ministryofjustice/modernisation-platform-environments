@@ -213,7 +213,7 @@ locals {
           ])
         })
         instance = merge(local.database_a.instance, {
-          instance_type = "r6i.2xlarge"
+          instance_type = "r6i.xlarge"
         })
         ebs_volumes = {
           "/dev/sdb" = { # /u01
