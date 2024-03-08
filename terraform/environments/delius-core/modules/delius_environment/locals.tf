@@ -36,5 +36,5 @@ locals {
     "217.138.45.109/32", # Unilink AOVPN
     "217.138.45.110/32", # Unilink AOVPN
   ]
-  all_ingress_ips = merge(local.globalprotect_ips, local.unilink_ips)
+  all_ingress_ips = concat(local.globalprotect_ips, local.unilink_ips)
 }
