@@ -28,3 +28,16 @@ data "aws_subnets" "shared-private-c" {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*c"
   }
 }
+
+# Pager duty integration
+
+# Get the map of pagerduty integration keys from the modernisation platform account
+data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+
+data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+}
