@@ -9,7 +9,7 @@ resource "aws_security_group" "ancillary_alb_security_group" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_https_global_protect_allowlist" {
-  for_each          = toset(local.globalprotect_ips)
+  for_each          = toset(local.all_ingress_ips)
   security_group_id = aws_security_group.ancillary_alb_security_group.id
   description       = "Access into alb over https"
   from_port         = "443"
@@ -19,7 +19,7 @@ resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_https_glob
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_http_global_protect_allowlist" {
-  for_each          = toset(local.globalprotect_ips)
+  for_each          = toset(local.all_ingress_ips)
   security_group_id = aws_security_group.ancillary_alb_security_group.id
   description       = "Access into alb over http (will redirect)"
   from_port         = "80"
