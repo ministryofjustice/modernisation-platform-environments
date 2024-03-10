@@ -321,7 +321,7 @@ locals {
   all_tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}"
+      Name = local.application_name
     }
   )
 }
