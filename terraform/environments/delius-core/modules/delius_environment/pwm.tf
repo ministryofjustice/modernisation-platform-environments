@@ -143,7 +143,7 @@ resource "aws_route53_record" "pwm_amazonses_dkim_record" {
 #####################
 
 resource "aws_iam_user" "pwm_ses_smtp_user" {
-  name = "pwm-smtp-user"
+  name = "${var.env_name}-pwm-smtp-user"
 }
 
 resource "aws_iam_access_key" "pwm_ses_smtp_user" {
@@ -151,7 +151,7 @@ resource "aws_iam_access_key" "pwm_ses_smtp_user" {
 }
 
 resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
-  name = "pwm-ses-smtp-user-policy"
+  name = "${var.env_name}-pwm-ses-smtp-user-policy"
   user = aws_iam_user.pwm_ses_smtp_user.name
 
   policy = jsonencode({
