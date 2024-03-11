@@ -86,7 +86,7 @@ module "pwm" {
   ]
 
   ignore_changes_task_definition = false
-  force_new_deployment           = true
+  force_new_deployment           = false
 
   providers = {
     aws          = aws
