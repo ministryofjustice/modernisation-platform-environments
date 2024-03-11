@@ -212,11 +212,11 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
 resource "aws_lb" "wardship_lb" {
   name                       = "wardship-load-balancer"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.wardship_lb_sc.id, aws_security_group.lb_sc_pingdom.id]
+  security_groups            = [aws_security_group.wardship_lb_sc.id, aws_security_group.lb_sc_pingdom.id, aws_security_group.lb_sc_pingdom_2.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
-  depends_on                 = [aws_security_group.wardship_lb_sc, aws_security_group.lb_sc_pingdom]
+  depends_on                 = [aws_security_group.wardship_lb_sc, aws_security_group.lb_sc_pingdom, aws_security_group.lb_sc_pingdom_2]
 }
 
 resource "aws_lb_target_group" "wardship_target_group" {
