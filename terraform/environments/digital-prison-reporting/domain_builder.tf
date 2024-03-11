@@ -39,7 +39,7 @@ module "domain_builder_backend_Lambda" {
   tracing       = local.lambda_dbuilder_tracing
   timeout       = 60
 
-  lambda_log_retention_in_days = local.lambda_log_retention_in_days
+  log_retention_in_days = local.lambda_log_retention_in_days
 
   env_vars = {
     "DOMAIN_API_KEY"       = module.domain_builder_api_key[0].secret
