@@ -229,7 +229,7 @@ resource "aws_codebuild_project" "selenium" {
   source {
     type      = "GITHUB"
     location  = "https://github.com/ministryofjustice/laa-${var.app_name}-application.git"
-    buildspec = "testspec-lz.yml"
+    buildspec = "testspec-mp.yml"
   }
 
   tags = merge(
