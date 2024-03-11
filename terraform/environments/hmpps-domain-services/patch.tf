@@ -4,6 +4,5 @@ module "development" {
   application      = "hmpps-domain-services"
   environment      = "development"
   schedule         = "cron(15 23 ? * * *)" # 11.15pm today
-  approved_patches = ["KB5034682", "KB5034770"]
 }
 

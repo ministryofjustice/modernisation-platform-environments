@@ -1,7 +1,6 @@
 resource "aws_s3_bucket" "this" {
   bucket        = "${var.application}-${var.environment}-patch-logs"
   force_destroy = true
-
 }
 
 resource "aws_s3_bucket_policy" "this" {
@@ -38,4 +37,3 @@ data "aws_iam_policy_document" "bucket_policy_patch_access" {
 }
 
 data "aws_caller_identity" "current" {}
-
