@@ -80,7 +80,7 @@ resource "aws_s3_bucket_logging" "test_dump" {
 module "ap_transfer_log_bucket" {
   source = "./modules/s3_log_bucket"
 
-  source_bucket = aws_s3_bucket.ap_transfer
+  source_bucket = aws_s3_bucket.test_dump
   account_id    = data.aws_caller_identity.current.account_id
   local_tags    = local.tags
 }
@@ -116,7 +116,7 @@ resource "aws_lambda_function" "ap_transfer_lambda" {
 
 resource "aws_iam_role" "ap_transfer_lambda" {
   name                = "ap-transfer-iam-role"
-  assume_role_policy  = transfer.aws_iam_policy_document.ap_transfer_lambda.json
+  assume_role_policy  = data.aws_iam_policy_document.ap_transfer_lambda.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
 
@@ -128,7 +128,7 @@ resource "aws_iam_role_policy" "ap_transfer_lambda" {
 }
 
 
-resource "aws_iam_policy_document" "ap_transfer_lambda" {
+data "aws_iam_policy_document" "ap_transfer_lambda" {
   statement {
     sid    = "RDS access"
     effect = "Allow"
