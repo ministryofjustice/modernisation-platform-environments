@@ -64,8 +64,6 @@ locals {
             "Ec2ProdDatabasePolicy",
           ])
         })
-        # IMPORTANT: remove this line when the DB is live in Production
-        cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.database_awaiting_deployment
         instance = merge(local.defaults_database_ec2.instance, {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token

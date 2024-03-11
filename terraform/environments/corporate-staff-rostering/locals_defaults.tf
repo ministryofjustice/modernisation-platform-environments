@@ -31,12 +31,6 @@ locals {
         })
       }
     )
-    # This block can be removed when prod database goes live
-    database_awaiting_deployment = merge(
-      module.baseline_presets.cloudwatch_metric_alarms.ec2,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux
-    )
     web = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
