@@ -142,7 +142,7 @@ resource "aws_lb_target_group_attachment" "lb_tga_portal" {
 
 resource "aws_lb_target_group_attachment" "lb_tga_analytics" {
   target_group_arn = aws_lb_target_group.lb_tg_analytics.arn
-  target_id        = join("", module.win2012_STD_multiple["COR-A-SF01"].private_ip)
+  target_id        = join("", module.win2022_STD_multiple["COR-A-EQP04"].private_ip)
 }
 
 resource "aws_lb_listener" "lb_listener_https" {
