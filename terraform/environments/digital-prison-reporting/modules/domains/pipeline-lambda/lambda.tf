@@ -12,6 +12,8 @@ module "step_function_notification_lambda" {
   tracing       = var.step_function_notification_lambda_tracing
   timeout       = 300 # 5 minutes
 
+  log_retention_in_days = var.lambda_log_retention_in_days
+
   vpc_settings = {
     subnet_ids         = var.lambda_subnet_ids         # NEW
     security_group_ids = var.lambda_security_group_ids # NEW

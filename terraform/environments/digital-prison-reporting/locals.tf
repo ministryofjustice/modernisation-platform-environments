@@ -31,6 +31,8 @@ locals {
   cloud_platform_cidr      = "172.20.0.0/16"
   enable_dpr_cloudtrail    = local.application_data.accounts[local.environment].enable_cloud_trail
   generic_lambda           = "${local.project}-generic-lambda"
+
+  lambda_log_retention_in_days = local.application_data.accounts[local.environment].lambda_log_retention_in_days
   enable_generic_lambda_sg = true # True for all Envs, Common SG Group
   # DMS Specific
   setup_dms_instance                = local.application_data.accounts[local.environment].setup_dms_instance
@@ -46,6 +48,7 @@ locals {
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
   glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+  glue_log_retention_in_days = local.application_data.accounts[local.environment].glue_log_retention_in_days
   # Reporting Hub Job
   reporting_hub_driver_mem   = local.application_data.accounts[local.environment].reporting_hub_spark_driver_mem
   reporting_hub_executor_mem = local.application_data.accounts[local.environment].reporting_hub_spark_executor_mem

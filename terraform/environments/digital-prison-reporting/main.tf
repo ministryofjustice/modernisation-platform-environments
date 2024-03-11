@@ -206,12 +206,12 @@ module "glue_hive_table_creation_job" {
   aws_kms_key                  = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.1X"
+  worker_type                 = "G.025X"
   number_of_workers           = 2
   max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
-  log_group_retention_in_days = 1
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -271,12 +271,12 @@ module "glue_s3_file_transfer_job" {
   aws_kms_key                  = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.1X"
+  worker_type                 = "G.025X"
   number_of_workers           = 2
   max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
-  log_group_retention_in_days = 1
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -337,12 +337,12 @@ module "glue_switch_prisons_hive_data_location_job" {
   aws_kms_key                  = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.1X"
+  worker_type                 = "G.025X"
   number_of_workers           = 2
   max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
-  log_group_retention_in_days = 1
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -396,12 +396,12 @@ module "glue_s3_data_deletion_job" {
   aws_kms_key                  = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.1X"
+  worker_type                 = "G.025X"
   number_of_workers           = 2
   max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
-  log_group_retention_in_days = 1
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -449,12 +449,12 @@ module "glue_stop_glue_instance_job" {
   aws_kms_key                  = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.1X"
+  worker_type                 = "G.025X"
   number_of_workers           = 2
   max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
-  log_group_retention_in_days = 1
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
