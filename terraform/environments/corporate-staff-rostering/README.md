@@ -8,28 +8,39 @@ _If you have any questions surrounding this page please post in the `#team-name`
 ## Mandatory Information
 
 ### **Last review date:**
-
-<!-- Adding the last date this page was reviewed, with any accompanying information -->
+11/03/2024
 
 ### **Description:**
 
-<!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+CSR provides scheduling, annual leave & overtime for around 30,000 Prison Officers and Operational Support Grades. All CSR components are running in Production, with Preproduction hosting training app and web servers. The service is in Modernisation Platform live as of 09/03/2024. 
 
 ### **Service URLs:**
 
-<!--  The URL(s) of the service’s production environment, and test environments if possible-->
+*Production:*
+Region 1 - North East & West Midlands - r1.csr.service.justice.gov.uk
+Region 2 - Yorkshire & Humbleside, and High Security - r2.csr.service.justice.gov.uk
+Region 3 - North West & London - r3.csr.service.justice.gov.uk
+Region 4 - Wales & South Central - r4.csr.service.justice.gov.uk
+Region 5 - Eastern & South West - r5.csr.service.justice.gov.uk
+Region 6 - East Midlands, and Kent & Sussex - r6.csr.service.justice.gov.uk
+
+*Training Servers:*
+traina.pp.csr.service.justice.gov.uk
+trainb.pp.csr.service.justice.gov.uk
+
 
 ### **Incident response hours:**
 
-<!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+24/7/365 cover is provided by the Application Support Team for application issues, and DBAs for database issues.
 
 ### **Incident contact details:**
 
-<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
+Email hmpps-nomis-mis-load@moj-digital-tools.pagerduty.com for database issues. 
 
 ### **Service team contact:**
 
-<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
+ask-digital-studio-ops
+digital-studio-operations-team@digital.justice.gov.uk
 
 ### **Hosting environment:**
 
