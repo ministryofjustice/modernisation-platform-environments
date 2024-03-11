@@ -1,0 +1,149 @@
+#------------------------------------------------------------------------------
+# S3 bucket for ap transfer logs
+#------------------------------------------------------------------------------
+
+resource "aws_s3_bucket" "test_dump" {
+  bucket_prefix = "test-dump-"
+
+  tags = local.tags
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "test_dump" {
+  bucket = aws_s3_bucket.test_dump.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "test_dump" {
+  bucket                  = aws_s3_bucket.test_dump.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "test_dump" {
+  bucket = aws_s3_bucket.test_dump.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_policy" "test_dump" {
+  bucket = aws_s3_bucket.test_dump.id
+  policy = data.aws_iam_policy_document.test_dump.json
+}
+
+data "aws_iam_policy_document" "test_dump" {
+  statement {
+    sid = "EnforceTLSv12orHigher"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect  = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.test_dump.arn,
+      "${aws_s3_bucket.test_dump.arn}/*"
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = [1.2]
+    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "test_dump" {
+  bucket = aws_s3_bucket.test_dump.id
+
+  target_bucket = module.ap_transfer_log_bucket.bucket_id
+  target_prefix = "log/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
+#------------------------------------------------------------------------------
+# S3 bucket for ap transfer logs
+#------------------------------------------------------------------------------
+
+module "ap_transfer_log_bucket" {
+  source = "./modules/s3_log_bucket"
+
+  source_bucket = aws_s3_bucket.ap_transfer
+  account_id    = data.aws_caller_identity.current.account_id
+  local_tags    = local.tags
+}
+
+
+#------------------------------------------------------------------------------
+# S3 lambda function and IAM role definition
+#------------------------------------------------------------------------------
+data "archive_file" "ap_transfer_lambda" {
+  type        = "zip"
+  source_file = "ap_transfer_lambda.py"
+  output_path = "ap_transfer_lambda.zip"
+}
+
+
+resource "aws_lambda_function" "ap_transfer_lambda" {
+  filename      = "ap_transfer_lambda.zip"
+  function_name = "ap-transfer-lambda"
+  role          = aws_iam_role.ap_transfer_lambda.arn
+  handler       = "ap_transfer_lambda.handler"
+  runtime       = "python3.12"
+  memory_size   = 4096
+  timeout       = 900
+
+  tags = local.tags
+
+  vpc_config {
+    // Assuming the subnets are associated with the RDS and appropriate for the Lambda as well
+    subnet_ids         = data.aws_subnets.shared-public.ids
+    security_group_ids = [aws_security_group.db.id]
+  }
+}
+
+resource "aws_iam_role" "ap_transfer_lambda" {
+  name                = "ap-transfer-iam-role"
+  assume_role_policy  = transfer.aws_iam_policy_document.ap_transfer_lambda.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+
+resource "aws_iam_role_policy" "ap_transfer_lambda" {
+    name = "ap_transfer_lambda"
+    role = ap-transfer.ap_transfer_lambda
+    policy = aws_iam_policy_document.ap_transfer_lambda.json
+}
+
+
+resource "aws_iam_policy_document" "ap_transfer_lambda" {
+  statement {
+    sid    = "RDS access"
+    effect = "Allow"
+
+    actions = [
+    "rds:Connect",
+    "rds:Query",
+    "rds:DescribeDBInstances"
+    ]
+    resources = ["database-v2022/*"]
+    }
+    statement {
+      sid    = "secrets access"
+      effect = "Allow"
+      actions = ["secretsmanager:GetSecretValue"]
+      resources = [aws_secretsmanager_secret.db_password.arn]
+    }
+}
