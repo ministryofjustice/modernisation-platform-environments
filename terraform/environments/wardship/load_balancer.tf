@@ -62,7 +62,7 @@ resource "aws_security_group" "wardship_lb_sc" {
   }
 }
 
-resource "aws_security_group" "wardship_lb_sc_pingdom" {
+resource "aws_security_group" "lb_sc_pingdom" {
   name        = "load balancer Pingdom security group"
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -135,7 +135,7 @@ resource "aws_security_group" "wardship_lb_sc_pingdom" {
   }
 }
 
-resource "aws_security_group" "wardship_lb_sc_pingdom_2" {
+resource "aws_security_group" "lb_sc_pingdom_2" {
   name        = "load balancer Pingdom security group 2"
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
