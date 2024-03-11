@@ -26,7 +26,7 @@ module "transfer_comp_Lambda" {
   lambda_trigger = false
   layers         = [module.transfer_comp_lambda_layer.lambda_layer_arn, ]
 
-  lambda_log_retention_in_days = local.lambda_log_retention_in_days
+  log_retention_in_days = local.lambda_log_retention_in_days
 
   env_vars = {
     "DB_CONNECTION_STRING" = "jdbc:redshift://${local.datamart_endpoint}/datamart"
