@@ -3,7 +3,6 @@ resource "aws_ssm_document" "extract-upload-patches" {
   name            = "extract-upload-patches"
   document_type   = "Command"
   document_format = "YAML"
- # content         = file("./patch_manager/ExtractAndUploadPatches.yaml")
   content         = file("${path.module}/ExtractAndUploadPatches.yaml")
 
 }
