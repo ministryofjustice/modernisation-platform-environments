@@ -1,5 +1,5 @@
 resource "aws_route53_record" "external_sandbox" {
-  count    = local.is-development ? 1 : 0
+  count = local.is-development ? 1 : 0
 
   provider = aws.core-vpc
 

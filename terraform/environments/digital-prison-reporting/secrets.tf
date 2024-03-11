@@ -28,7 +28,7 @@ resource "aws_secretsmanager_secret_version" "nomis" {
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "dps" {
   for_each = toset(local.dps_domains_list)
-  name = "external/${local.project}-${each.value}-source-secrets"
+  name     = "external/${local.project}-${each.value}-source-secrets"
 
   tags = merge(
     local.all_tags,

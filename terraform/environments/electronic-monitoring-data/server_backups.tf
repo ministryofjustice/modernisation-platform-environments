@@ -6,7 +6,7 @@ resource "aws_secretsmanager_secret" "db_password" {
 }
 
 resource "aws_secretsmanager_secret_version" "db_password" {
-  secret_id = aws_secretsmanager_secret.db_password.id
+  secret_id     = aws_secretsmanager_secret.db_password.id
   secret_string = random_password.random_password.result
 }
 
@@ -19,7 +19,7 @@ resource "random_password" "random_password" {
 # RDS SQL server 2022 database
 #------------------------------------------------------------------------------
 resource "aws_db_instance" "database_2022" {
-#   count = local.is-production ? 1 : 0
+  #   count = local.is-production ? 1 : 0
 
   identifier    = "database-v2022"
   license_model = "license-included"
@@ -90,7 +90,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
 resource "aws_db_subnet_group" "db" {
   name       = "db-subnet-group"
   subnet_ids = data.aws_subnets.shared-public.ids
-  
+
   tags = local.tags
 }
 
@@ -152,7 +152,7 @@ data "aws_iam_policy_document" "rds_data_store_access" {
       "s3:GetBucketLocation",
     ]
     resources = [
-        aws_s3_bucket.data_store.arn,
+      aws_s3_bucket.data_store.arn,
     ]
   }
   statement {
@@ -166,7 +166,7 @@ data "aws_iam_policy_document" "rds_data_store_access" {
       "s3:AbortMultipartUpload",
     ]
     resources = [
-        "${aws_s3_bucket.data_store.arn}/*",
+      "${aws_s3_bucket.data_store.arn}/*",
     ]
   }
 }

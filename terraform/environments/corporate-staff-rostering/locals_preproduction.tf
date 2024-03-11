@@ -122,11 +122,11 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          pre-migration     = "PPCAW00013"
-          description       = "Application Server Region 1"
-          os-type           = "Windows"
-          ami               = "pp-csr-a-13-a"
-          component         = "app"
+          pre-migration = "PPCAW00013"
+          description   = "Application Server Region 1"
+          os-type       = "Windows"
+          ami           = "pp-csr-a-13-a"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -149,11 +149,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 56 }
         }
         tags = {
-          pre-migration     = "PPCAW00014"
-          description       = "Application Server Region 2"
-          os-type           = "Windows"
-          ami               = "pp-csr-a-14-b"
-          component         = "app"
+          pre-migration = "PPCAW00014"
+          description   = "Application Server Region 2"
+          os-type       = "Windows"
+          ami           = "pp-csr-a-14-b"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -176,11 +176,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          pre-migration     = "PPCAW00017"
-          description       = "Application Server Region 3"
-          os-type           = "Windows"
-          ami               = "pp-csr-a-17-a"
-          component         = "app"
+          pre-migration = "PPCAW00017"
+          description   = "Application Server Region 3"
+          os-type       = "Windows"
+          ami           = "pp-csr-a-17-a"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -203,11 +203,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          pre-migration     = "PPCAW00018"
-          description       = "Application Server Region 4"
-          os-type           = "Windows"
-          ami               = "pp-csr-a-18-b"
-          component         = "app"
+          pre-migration = "PPCAW00018"
+          description   = "Application Server Region 4"
+          os-type       = "Windows"
+          ami           = "pp-csr-a-18-b"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -228,11 +228,11 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          pre-migration     = "PPCAW00002"
-          description       = "Application Server Region 5"
-          os-type           = "Windows"
-          ami               = "pp-csr-a-2-b"
-          component         = "app"
+          pre-migration = "PPCAW00002"
+          description   = "Application Server Region 5"
+          os-type       = "Windows"
+          ami           = "pp-csr-a-2-b"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -253,11 +253,11 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          pre-migration     = "PPCAW00003"
-          description       = "Application Server Region 6"
-          os-type           = "Windows"
-          ami               = "pp-csr-a-3-a"
-          component         = "app"
+          pre-migration = "PPCAW00003"
+          description   = "Application Server Region 6"
+          os-type       = "Windows"
+          ami           = "pp-csr-a-3-a"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -280,11 +280,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          pre-migration     = "PPCAW00015"
-          description       = "Application Server Training A"
-          os-type           = "Windows"
-          ami               = "pp-csr-a-15-a"
-          component         = "trainingA"
+          pre-migration = "PPCAW00015"
+          description   = "Application Server Training A"
+          os-type       = "Windows"
+          ami           = "pp-csr-a-15-a"
+          component     = "trainingA"
         }
         route53_records = {
           create_internal_record = true
@@ -307,11 +307,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          pre-migration     = "PPCAW00016"
-          description       = "Application Server Training B"
-          os-type           = "Windows"
-          ami               = "pp-csr-a-16-b"
-          component         = "trainingB"
+          pre-migration = "PPCAW00016"
+          description   = "Application Server Training B"
+          os-type       = "Windows"
+          ami           = "pp-csr-a-16-b"
+          component     = "trainingB"
         }
         route53_records = {
           create_internal_record = true
@@ -334,11 +334,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
-          pre-migration     = "PPCWW00001"
-          description       = "Web Server Region 1 and 2"
-          os-type           = "Windows"
-          ami               = "PPCWW00001"
-          component         = "web"
+          pre-migration = "PPCWW00001"
+          description   = "Web Server Region 1 and 2"
+          os-type       = "Windows"
+          ami           = "PPCWW00001"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -361,11 +361,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
-          pre-migration     = "PPCWW00002"
-          description       = "Web Server Region 1 and 2"
-          os-type           = "Windows"
-          ami               = "pp-csr-w-2-b"
-          component         = "web"
+          pre-migration = "PPCWW00002"
+          description   = "Web Server Region 1 and 2"
+          os-type       = "Windows"
+          ami           = "pp-csr-w-2-b"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -387,11 +387,11 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 129 }
         }
         tags = {
-          pre-migration     = "PPCWW00005"
-          description       = "Web Server Region 3 and 4"
-          os-type           = "Windows"
-          ami               = "PPCWW00005"
-          component         = "web"
+          pre-migration = "PPCWW00005"
+          description   = "Web Server Region 3 and 4"
+          os-type       = "Windows"
+          ami           = "PPCWW00005"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -414,11 +414,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
-          pre-migration     = "PPCWW00006"
-          description       = "Web Server Region 3 and 4"
-          os-type           = "Windows"
-          ami               = "pp-csr-w-6-b"
-          component         = "web"
+          pre-migration = "PPCWW00006"
+          description   = "Web Server Region 3 and 4"
+          os-type       = "Windows"
+          ami           = "pp-csr-w-6-b"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -439,11 +439,11 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          pre-migration     = "PPCWW00007"
-          description       = "Web Server Region 5 and 6"
-          os-type           = "Windows"
-          ami               = "pp-csr-w-8-b" # rebuilt using pp-csr-w-8-b AMI
-          component         = "web"
+          pre-migration = "PPCWW00007"
+          description   = "Web Server Region 5 and 6"
+          os-type       = "Windows"
+          ami           = "pp-csr-w-8-b" # rebuilt using pp-csr-w-8-b AMI
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -464,11 +464,11 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         tags = {
-          pre-migration     = "PPCWW00008"
-          description       = "Web Server Region 5 and 6"
-          os-type           = "Windows"
-          ami               = "pp-csr-w-8-b"
-          component         = "web"
+          pre-migration = "PPCWW00008"
+          description   = "Web Server Region 5 and 6"
+          os-type       = "Windows"
+          ami           = "pp-csr-w-8-b"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -491,11 +491,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 56 }
         }
         tags = {
-          pre-migration     = "PPCWW00003"
-          description       = "Web Server Training A and B"
-          os-type           = "Windows"
-          ami               = "pp-csr-w-3-a"
-          component         = "trainingab"
+          pre-migration = "PPCWW00003"
+          description   = "Web Server Training A and B"
+          os-type       = "Windows"
+          ami           = "pp-csr-w-3-a"
+          component     = "trainingab"
         }
         route53_records = {
           create_internal_record = true
@@ -518,18 +518,18 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         tags = {
-          pre-migration     = "PPCWW00004"
-          description       = "Web Server Training A and B"
-          os-type           = "Windows"
-          ami               = "pp-csr-w-4-b"
-          component         = "trainingab"
+          pre-migration = "PPCWW00004"
+          description   = "Web Server Training A and B"
+          os-type       = "Windows"
+          ami           = "pp-csr-w-4-b"
+          component     = "trainingab"
         }
         route53_records = {
           create_internal_record = true
           create_external_record = true
         }
       })
-  }
+    }
 
 
     baseline_lbs = {
