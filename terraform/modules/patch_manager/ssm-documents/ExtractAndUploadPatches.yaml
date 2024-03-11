@@ -1,0 +1,60 @@
+schemaVersion: "2.2"
+description: "Extract successful patches and upload to s3 bucket"
+mainSteps:
+  -
+    action: "aws:runPowerShellScript"
+    name: "ExtractAndUploadPatches"
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
+    inputs:
+      runCommand:
+        - |
+          $Token = Invoke-RestMethod -Method Put -Uri http://169.254.169.254/latest/api/token -Headers @{"X-aws-ec2-metadata-token-ttl-seconds" = "21600"}
+          $InstanceId = Invoke-RestMethod -Method Get -Uri http://169.254.169.254/latest/meta-data/instance-id -Headers @{"X-aws-ec2-metadata-token" = $Token}
+          $OperatingSystem=Get-ComputerInfo -Property WindowsProductName
+          $OS=$OperatingSystem.WindowsProductName.replace(' ','')
+          $WorkingDir = "C:\patches"
+          $PatchResultsTemp = "$WorkingDir\patchresults.txt"
+          $PatchesYaml="$WorkingDir\${OS}Patches.yaml"
+          $SSMLogsPath = "C:\ProgramData\Amazon\SSM\InstanceData\${InstanceId}\document\orchestration"
+          $PatchesBucket = "s3://hmpps-domain-services-development-patch-logs"
+
+          New-Item -ItemType Directory -Force -Path $WorkingDir > $null
+
+          # Get the latest patch summary from SSM logs
+          $LatestPatchSummary = Get-ChildItem -Recurse -filter "stdout" $SSMLogsPath | `
+          Sort LastWriteTime -Descending | `
+          Select-String -Pattern "NonCompliantSeverity" | `
+          Select-Object -First 1 | `
+          Select path
+
+          # Extract successful patches to a temporary file
+          Select-String -Path $LatestPatchSummary.Path  -Pattern "Success" -CaseSensitive | `
+          Select-Object -ExpandProperty Line | Out-File $PatchResultsTemp
+
+          # Extract patch ids from the temporary file
+          [string[]]$patches = (Get-Content $PatchResultsTemp) -replace '  .*$'
+
+          Function CreatePatchesYaml() {
+              Add-Content -Path $PatchesYaml -Value 'patches:'
+              foreach ($patch in $patches)  {
+                  Add-Content -Path $PatchesYaml -Value '    -'
+                  Add-Content -Path $PatchesYaml -Value "        id: '$patch'"
+              }
+          }
+
+          # Create yaml containing patch ids
+          If (Test-Path -path $PatchesYaml -PathType Leaf) {
+              Remove-Item -path $PatchesYaml
+              CreatePatchesYaml
+              Remove-Item -path $PatchResultsTemp
+          }
+          Else {
+              CreatePatchesYaml
+              Remove-Item -path $PatchResultsTemp
+          }
+          
+          # Upload patch yaml to bucket
+          aws s3 cp $PatchesYaml  "$PatchesBucket/windows/${OS}Patches.yaml"
