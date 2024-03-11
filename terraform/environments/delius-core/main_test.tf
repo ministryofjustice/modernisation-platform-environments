@@ -33,4 +33,6 @@ module "environment_test" {
   delius_microservice_configs = local.delius_microservices_configs_test
 
   tags = local.tags
+
+  pagerduty_integration_key = local.pagerduty_integration_key
 }
