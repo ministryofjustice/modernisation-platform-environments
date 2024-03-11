@@ -18,8 +18,11 @@ locals {
   route53_resolver_rules_all = {
     azure-fixngo-devtest-domain = {
       domain_name = "azure.noms.root"
-      target_ips  = var.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
-      rule_type   = "FORWARD"
+      target_ips = flatten([
+        module.ip_addresses.azure_fixngo_ips.devtest_domain_controllers,
+        module.ip_addresses.mp_ips.ad_fixngo_azure_domain_controllers,
+      ])
+      rule_type = "FORWARD"
     }
     azure-fixngo-production-domain = {
       domain_name = "azure.hmpp.root"

@@ -10,6 +10,17 @@ locals {
     ad-azure-rdlic = "10.20.108.6"
   }
 
+  mp_ips = {
+    ad_fixngo_hmpp_domain_controllers = [
+      local.mp_ip["ad-hmpp-dc-a"],
+      local.mp_ip["ad-hmpp-dc-b"],
+    ]
+    ad_fixngo_azure_domain_controllers = [
+      local.mp_ip["ad-azure-dc-a"],
+      local.mp_ip["ad-azure-dc-b"],
+    ]
+  }
+
   mp_cidr = {
     # Aggregate ranges
     development_test         = "10.26.0.0/16"
