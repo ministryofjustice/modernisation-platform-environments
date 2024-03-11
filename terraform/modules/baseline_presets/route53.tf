@@ -19,7 +19,7 @@ locals {
     azure-fixngo-devtest-domain = {
       domain_name = "azure.noms.root"
       target_ips = flatten([
-        var.ip_addresses.azure_fixngo_ips.devtest_domain_controllers,
+        var.ip_addresses.azure_fixngo_ips.devtest.domain_controllers,
         var.ip_addresses.mp_ips.ad_fixngo_azure_domain_controllers,
       ])
       rule_type = "FORWARD"
