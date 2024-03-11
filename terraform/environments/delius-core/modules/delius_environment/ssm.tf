@@ -289,21 +289,8 @@ module "s3_bucket_ssm_sessions" {
   versioning_enabled = false
 
   providers = {
-    aws.bucket-replication = aws.bucket-replication
+    aws.bucket-replication = aws
   }
-
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-    }
-  ]
 
   tags = var.tags
 }
