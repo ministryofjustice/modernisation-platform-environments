@@ -163,7 +163,7 @@ module "domain_builder_flyway_Lambda" {
   lambda_trigger     = true
   trigger_bucket_arn = module.s3_artifacts_store.bucket_arn
 
-  lambda_log_retention_in_days = local.lambda_log_retention_in_days
+  log_retention_in_days = local.lambda_log_retention_in_days
 
   env_vars = {
     "DB_CONNECTION_STRING" = "jdbc:postgresql://${module.domain_builder_backend_db.rds_host}/${local.rds_dbuilder_db_identifier}"
