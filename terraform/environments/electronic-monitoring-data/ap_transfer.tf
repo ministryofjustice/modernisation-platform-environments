@@ -123,8 +123,8 @@ resource "aws_iam_role" "ap_transfer_lambda" {
 
 resource "aws_iam_role_policy" "ap_transfer_lambda" {
     name = "ap_transfer_lambda"
-    role = ap-transfer.ap_transfer_lambda
-    policy = aws_iam_policy_document.ap_transfer_lambda.json
+    role = aws_iam_role.ap_transfer_lambda.id
+    policy = data.aws_iam_policy_document.ap_transfer_lambda.json
 }
 
 
