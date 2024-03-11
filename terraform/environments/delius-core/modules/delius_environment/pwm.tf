@@ -170,7 +170,7 @@ resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
 }
 
 resource "aws_ssm_parameter" "pwm_ses_smtp_user" {
-  name = "/pwm/ses_smtp"
+  name = "/dev/pwm/ses_smtp"
   type = "SecureString"
   value = jsonencode({
     user              = aws_iam_user.pwm_ses_smtp_user.name,
