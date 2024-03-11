@@ -1,13 +1,17 @@
-variable "account_id" {
-  description = "The AWS account id"
-}
-
-variable "create_server" {
-  description = "Bool flag for creating server"
-}
-
 variable "data_store_bucket" {
   description = "The bucket landed data is moved to"
+}
+
+variable "eip_id" {
+    description = "The elastic IP address"
+}
+
+variable "kms_key" {
+  description = "The KMS key for server cloudlog encryption"
+}
+
+variable "landing_bucket" {
+  description = "The landing bucket that data is placed in"
 }
 
 variable "local_tags" {

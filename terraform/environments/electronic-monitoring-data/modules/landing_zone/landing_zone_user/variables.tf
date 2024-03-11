@@ -16,8 +16,8 @@ variable "supplier" {
   type        = string
 }
 
-variable "transfer_server" {
-  description = "The SFTP server"
+variable "transfer_server_id" {
+  description = "The SFTP server id"
 }
 
 variable "user_name" {
