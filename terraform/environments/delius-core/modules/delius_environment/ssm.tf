@@ -276,3 +276,34 @@ resource "aws_ssm_parameter" "delius_core_merge_db_pool_password" {
   }
   tags = local.tags
 }
+
+
+######################################
+# S3 Bucket for ssm session manager
+######################################
+module "s3_bucket_ssm_sessions" {
+
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+
+  bucket_prefix      = "${var.env_name}-ssm-sessions"
+  versioning_enabled = false
+
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+    }
+  ]
+
+  tags = var.tags
+}
