@@ -11,7 +11,7 @@ module "bastion_linux" {
   }
 
   # s3 - used for logs and user ssh public keys
-  bucket_name          = var.bastion_linux.bucket_name
+  bucket_name = var.bastion_linux.bucket_name
 
   # public keys
   public_key_data = var.bastion_linux.public_key_data

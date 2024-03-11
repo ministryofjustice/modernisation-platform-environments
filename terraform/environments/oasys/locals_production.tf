@@ -32,9 +32,9 @@ locals {
     # }
 
     baseline_secretsmanager_secrets = {
-      "/oracle/database/PDOASYS"  = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/PROASYS"  = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/TROASYS"  = local.secretsmanager_secrets_oasys_db 
+      "/oracle/database/PDOASYS" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/PROASYS" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/TROASYS" = local.secretsmanager_secrets_oasys_db
 
       # "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
       # "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
@@ -259,7 +259,7 @@ locals {
           description                             = "practice and training ${local.application_name} database"
           "${local.application_name}-environment" = "ptctrn"
           #bip-db-name                             = "PDBIPINF"
-          oracle-sids                             = "PROASYS TROASYS TRBIPINF"
+          oracle-sids = "PROASYS TROASYS TRBIPINF"
         })
       })
     }
@@ -270,7 +270,7 @@ locals {
       #     oracle-db-sid                           = "PDOASYS"
       #   })
       # })
-      
+
       # "pd-${local.application_name}-web-ptc-a" = merge(local.webserver_a, {
       #   config = merge(module.baseline_presets.ec2_instance.config.default, {
       #     ssm_parameters_prefix     = "ec2-web-ptc/"
@@ -282,7 +282,7 @@ locals {
       #     oracle-db-sid                           = "PTCOASYS"
       #   })
       # })
-      
+
       # "pd-${local.application_name}-web-trn-a" = merge(local.webserver_a, {
       #   config = merge(module.baseline_presets.ec2_instance.config.default, {
       #     ssm_parameters_prefix     = "ec2-web-trn/"

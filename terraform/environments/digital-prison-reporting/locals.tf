@@ -292,7 +292,7 @@ locals {
     endpoint = "0.0.0.0"
     port     = "1521"
   }
-  
+
   # DPS Secrets PlaceHolder
   dps_domains_list = local.application_data.accounts[local.environment].dps_domains
   dps_secrets_placeholder = {
@@ -301,7 +301,7 @@ locals {
     user     = "placeholder"
     endpoint = "0.0.0.0"
     port     = "5432"
-  }  
+  }
 
   sonatype_secrets_placeholder = {
     user     = "placeholder"
