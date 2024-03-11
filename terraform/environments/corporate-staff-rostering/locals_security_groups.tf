@@ -22,7 +22,10 @@ locals {
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.devtest_core,
     ])
-    domain_controllers = module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers
+    domain_controllers = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers,
+      module.ip_addresses.mp_cidrs.ad_fixngo_azure_domain_controllers,
+    ])
     jumpservers        = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
   }
 
@@ -56,7 +59,10 @@ locals {
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.prod_core,
     ])
-    domain_controllers = module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers
+    domain_controllers = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers,
+      module.ip_addresses.mp_cidrs.ad_fixngo_hmpp_domain_controllers,
+    ])
     jumpservers        = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
   }
   security_group_cidrs_by_environment = {

@@ -9,16 +9,12 @@ locals {
 
     # DevTest Domain Controllers
     MGMCW0002    = "10.102.0.196"
-    tc_mgt_dc_01 = "10.102.0.199"
-    tc_mgt_dc_02 = "10.102.0.200"
   }
 
   azure_fixngo_ips = {
     devtest = {
       domain_controllers = [
         local.azure_fixngo_ip.MGMCW0002,
-        local.azure_fixngo_ip.tc_mgt_dc_01,
-        local.azure_fixngo_ip.tc_mgt_dc_02,
       ]
     }
     prod = {
@@ -54,8 +50,6 @@ locals {
     noms_prod_domain_controller_pcmcw1012 = "10.40.64.133/32"
 
     noms_devtest_domain_controller_MGMCW0002    = "10.102.0.196/32"
-    noms_devtest_domain_controller_tc_mgt_dc_01 = "10.102.0.199/32"
-    noms_devtest_domain_controller_tc_mgt_dc_02 = "10.102.0.200/32"
   }
 
   noms_live_subnet = {
@@ -169,8 +163,6 @@ locals {
 
     devtest_domain_controllers = [
       local.azure_fixngo_cidr.noms_devtest_domain_controller_MGMCW0002,
-      local.azure_fixngo_cidr.noms_devtest_domain_controller_tc_mgt_dc_01,
-      local.azure_fixngo_cidr.noms_devtest_domain_controller_tc_mgt_dc_02,
     ]
 
     devtest_jumpservers = [
