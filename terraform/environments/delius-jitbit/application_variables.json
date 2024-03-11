@@ -1,6 +1,6 @@
 {
   "accounts": {
-    "sandbox" : {
+    "sandbox": {
       "migration_source_account_id": "377957503799",
       "migration_source_account_name": "cr-jitbit-dev",
       "server_port": "5000",

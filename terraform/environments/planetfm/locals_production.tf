@@ -84,9 +84,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         tags = {
-          pre-migration     = "PDFAW0010"
-          description       = "RDS Session Host and CAFM App Server/PFME Licence Server"
-          ami               = "pd-cafm-a-10-b"
+          pre-migration = "PDFAW0010"
+          description   = "RDS Session Host and CAFM App Server/PFME Licence Server"
+          ami           = "pd-cafm-a-10-b"
         }
         route53_records = {
           create_internal_record = true
@@ -110,9 +110,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         tags = {
-          pre-migration     = "PDFWA0011"
-          description       = "RDS session host and app server"
-          ami               = "pd-cafm-a-11-a"
+          pre-migration = "PDFWA0011"
+          description   = "RDS session host and app server"
+          ami           = "pd-cafm-a-11-a"
         }
         route53_records = {
           create_internal_record = true
@@ -136,9 +136,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         tags = {
-          pre-migration     = "PDFAW0012"
-          description       = "RDS session host and app Server"
-          ami               = "pd-cafm-a-12-b"
+          pre-migration = "PDFAW0012"
+          description   = "RDS session host and app Server"
+          ami           = "pd-cafm-a-12-b"
         }
         route53_records = {
           create_internal_record = true
@@ -162,9 +162,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 28 }
         }
         tags = {
-          pre-migration     = "PDFAW0013"
-          description       = "RDS session host and App Server"
-          ami               = "pd-cafm-a-13-a"
+          pre-migration = "PDFAW0013"
+          description   = "RDS session host and App Server"
+          ami           = "pd-cafm-a-13-a"
         }
         route53_records = {
           create_internal_record = true
@@ -190,9 +190,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 28 }
         }
         tags = {
-          pre-migration     = "PDFWW00036"
-          description       = "CAFM Asset Management"
-          ami               = "pd-cafm-w-36-b"
+          pre-migration = "PDFWW00036"
+          description   = "CAFM Asset Management"
+          ami           = "pd-cafm-w-36-b"
         }
         route53_records = {
           create_internal_record = true
@@ -216,9 +216,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 28 }
         }
         tags = {
-          pre-migration     = "PFWW00037"
-          description       = "CAFM Assessment Management"
-          ami               = "pd-cafm-w-37-a"
+          pre-migration = "PFWW00037"
+          description   = "CAFM Assessment Management"
+          ami           = "pd-cafm-w-37-a"
         }
         route53_records = {
           create_internal_record = true
@@ -242,9 +242,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 100 }
         }
         tags = {
-          pre-migration     = "PDFWW3QCP660001"
-          description       = "CAFM Web Training"
-          ami               = "pd-cafm-w-38-b"
+          pre-migration = "PDFWW3QCP660001"
+          description   = "CAFM Web Training"
+          ami           = "pd-cafm-w-38-b"
         }
         route53_records = {
           create_internal_record = true
