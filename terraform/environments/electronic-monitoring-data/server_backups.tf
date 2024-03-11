@@ -74,8 +74,11 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4" {
   from_port         = 1433
   to_port           = 1433
 
-  # fy nhy
-  cidr_ipv4 = "46.69.144.146/32"
+  # whitelisted ips
+  cidr_blocks = [
+    "46.69.144.146/32",
+    "152.37.111.98/32"
+    ]
 }
 
 resource "aws_db_subnet_group" "db" {
