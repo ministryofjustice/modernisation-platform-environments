@@ -152,7 +152,7 @@ locals {
       # NOT-ACTIVE (blue deployment)
       prod-nomis-web-a = merge(local.weblogic_ec2, {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 2
         })
         ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
@@ -160,6 +160,9 @@ locals {
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
           ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "r4.2xlarge"
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
