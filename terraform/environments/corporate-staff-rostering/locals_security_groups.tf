@@ -24,9 +24,9 @@ locals {
     ])
     domain_controllers = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers,
-      module.ip_addresses.mp_cidrs.ad_fixngo_azure_domain_controllers,
+      # module.ip_addresses.mp_cidrs.ad_fixngo_azure_domain_controllers, # hits rule limit, remove azure DCs first
     ])
-    jumpservers        = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
+    jumpservers = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
   }
 
   security_group_cidrs_preprod_prod = {
@@ -63,7 +63,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers,
       module.ip_addresses.mp_cidrs.ad_fixngo_hmpp_domain_controllers,
     ])
-    jumpservers        = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
+    jumpservers = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
