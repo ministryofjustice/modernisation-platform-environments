@@ -181,11 +181,11 @@
     </setting>
     <setting key="email.smtp.username" syntax="SELECT">
       <label>SMTP Server User Name</label>
-      <value>$${SES_USERNAME}</value>
+      <value><![CDATA[$${SES_USERNAME}]</value>
     </setting>
     <setting key="email.smtp.userpassword" syntax="SELECT">
       <label>SMTP Server Password</label>
-      <value>$${SES_PASSWORD}</value>
+      <value><![CDATA[$${SES_PASSWORD}]</value>
     </setting>
     <setting key="email.smtp.port" syntax="SELECT">
       <label>SMTP Server Port</label>
