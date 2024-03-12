@@ -179,17 +179,17 @@
       <label>SMTP Connection Type</label>
       <value><![CDATA[START_TLS]]></value>
     </setting>
-    <setting key="email.smtp.username" syntax="SELECT">
+    <setting key="email.smtp.username" syntax="PASSWORD">
       <label>SMTP Server User Name</label>
       <value><![CDATA[$${SES_USERNAME}]</value>
     </setting>
-    <setting key="email.smtp.userpassword" syntax="SELECT">
+    <setting key="email.smtp.userpassword" syntax="STRING">
       <label>SMTP Server Password</label>
       <value><![CDATA[$${SES_PASSWORD}]</value>
     </setting>
-    <setting key="email.smtp.port" syntax="SELECT">
+    <setting key="email.smtp.port" syntax="NUMERIC">
       <label>SMTP Server Port</label>
-      <value><![CDATA[587]]></value>
+      <value>587</value>
     </setting>
   </settings>
 </PwmConfiguration>
