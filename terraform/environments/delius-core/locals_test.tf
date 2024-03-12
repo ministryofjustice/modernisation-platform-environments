@@ -130,7 +130,7 @@ locals {
     }
 
     pwm = {
-      image_tag      = "8250028248-1"
+      image_tag      = "8250538047-1"
       container_port = 8080
     }
 

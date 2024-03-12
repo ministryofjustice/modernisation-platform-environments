@@ -99,7 +99,7 @@ module "pwm" {
     },
     {
       name  = "SECURITY_KEY"
-      value = "${uuid()}"
+      value = "${base64encode(uuid())}"
     }
   ]
 
