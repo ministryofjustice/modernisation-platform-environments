@@ -166,10 +166,10 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PTC/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PTC*/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*TRN/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/TRN*/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PR/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PR*/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*TR/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/TR*/*",
             ]
           },
         ]
