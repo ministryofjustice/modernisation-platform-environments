@@ -4,11 +4,12 @@ from ldap3 import Server, Connection, SUBTREE
 
 
 # checks for objects within active directory
-def check_ad_for_object(hostname, domain_fqdn, domain_name, search_base, account_id):
+def check_ad_for_object(hostname, domain_fqdn, domain_name, search_base, account_id, secret_suffix):
 
     # create a secrets manager connection
     secrets_manager = boto3.client("secretsmanager")
-    secret_arn = f"arn:aws:secretsmanager:eu-west-2:{account_id}:secret:/microsoft/AD/{domain_fqdn}/shared-passwords-*"
+    secret_arn = f"arn:aws:secretsmanager:eu-west-2:{account_id}:secret:/microsoft/AD/{domain_fqdn}/shared-passwords-{secret_suffix}"
+    print(secret_arn)
     
     # extract the secret value from hmpps-domain-services-test / hmpps-domain-services-prod
     secret_value_response = secrets_manager.get_secret_value(SecretId=secret_arn)
@@ -61,19 +62,21 @@ def determine_domain(environment_tag):
     if "development" in environment_tag.split("-") or "test" in environment_tag.split(
         "-"
     ):
-        domain_info["domain_type"] = "dev/test"
-        domain_info["domain_name"] = "azure"
-        domain_info["domain_fqdn"] = "noms"
-        domain_info["search_base"] = "ou=Managed-Windows-Servers,ou=Computers,dc=azure,dc=noms,dc=root"
-        domain_info['account_id'] = "161282055413" # hmpps-domain-services-test
+        domain_info["domain_type"]   = "dev/test"
+        domain_info["domain_name"]   = "azure"
+        domain_info["domain_fqdn"]   = "noms"
+        domain_info["search_base"]   = "ou=Managed-Windows-Servers,ou=Computers,dc=azure,dc=noms,dc=root"
+        domain_info['account_id']    = "161282055413" # hmpps-domain-services-test
+        domain_info['secret_suffix'] = "HZv6pW"
     elif "preproduction" in environment_tag.split(
         "-"
     ) or "production" in environment_tag.split("-"):
-        domain_info["domain_type"] = "preprod/prod"
-        domain_info["domain_name"] = "hmpp"
-        domain_info["domain_fqdn"] = "hmpp"
-        domain_info["search_base"] = "ou=MEMBER_SERVERS,dc=azure,dc=hmpp,dc=root"
-        domain_info['account_id'] = "905761223702" # hmpps-domain-services-production
+        domain_info["domain_type"]   = "preprod/prod"
+        domain_info["domain_name"]   = "hmpp"
+        domain_info["domain_fqdn"]   = "hmpp"
+        domain_info["search_base"]   = "ou=MEMBER_SERVERS,dc=azure,dc=hmpp,dc=root"
+        domain_info['account_id']    = "905761223702" # hmpps-domain-services-production
+        domain_info['secret_suffix'] = "NLo3yC"
     else:
         print("Unexpected environment-name tag. Aborting lambda function...")
         return None
@@ -101,11 +104,12 @@ def lambda_handler(event, context):
         # obtain terminated instance environment-name value
         resource_environment = "environment-name"
         environment_tag = get_tag_value(tags, resource_environment)
+        print(f"Server environment is: {environment_tag}")
 
         # determine appropriate domain variables
         domain = determine_domain(environment_tag)
         print(domain)
-        print("Domain is: {}".format(domain["domain_type"]))
+        print("Server belongs to {} domain".format(domain["domain_type"]))
 
         # pass hostname and domain variables into AD oject deletion function
         if hostname is not None and domain is not None:
@@ -114,7 +118,8 @@ def lambda_handler(event, context):
                 domain["domain_fqdn"],
                 domain["domain_name"],
                 domain["search_base"],
-                domain["account_id"]
+                domain["account_id"],
+                domain["secret_suffix"]
             )
             print(f"The Active Directory object {hostname} has been deleted.")
         else:
