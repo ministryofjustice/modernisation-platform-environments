@@ -30,11 +30,12 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=a319c417fe7d499acc7893cf19db6fd566e30822"
+  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
   container_definition_json = module.container_definition.json_map_encoded_list
-  ecs_cluster_arn           = var.ecs_cluster_arn
-  name                      = var.name
-  vpc_id                    = var.account_config.shared_vpc_id
+
+  ecs_cluster_arn = var.ecs_cluster_arn
+  name            = var.name
+  vpc_id          = var.account_config.shared_vpc_id
 
   launch_type  = "FARGATE"
   network_mode = "awsvpc"
