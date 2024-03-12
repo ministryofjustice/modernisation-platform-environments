@@ -166,7 +166,7 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
       "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
+        config = merge(local.webserver_a.config, {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-pp/"
           iam_resource_names_prefix = "ec2-web-pp"
