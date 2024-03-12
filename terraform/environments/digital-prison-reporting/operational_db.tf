@@ -1,4 +1,4 @@
-module "domain_builder_cli_agent" {
+module "operational_db_server" {
   source = "./modules/compute_node"
 
   enable_compute_node         = true
