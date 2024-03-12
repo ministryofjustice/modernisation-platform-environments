@@ -15,7 +15,7 @@ module "dms_instance" {
   short_name                   = var.short_name
   allow_major_version_upgrade  = var.allow_major_version_upgrade
 
-  dms_log_group_retention_in_days = var.dms_log_group_retention_in_days
+  dms_log_retention_in_days = var.dms_log_retention_in_days
 
   tags = var.tags
 }

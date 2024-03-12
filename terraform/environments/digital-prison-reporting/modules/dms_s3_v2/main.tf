@@ -3,7 +3,7 @@ resource "aws_cloudwatch_log_group" "dms-instance-log-group" {
   count = var.setup_dms_instance ? 1 : 0
   name  = "dms-tasks-${var.name}-instance-${var.env}"
 
-  retention_in_days = var.dms_log_group_retention_in_days
+  retention_in_days = var.dms_log_retention_in_days
 
   tags = merge(
     var.tags,
