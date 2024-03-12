@@ -2,6 +2,9 @@
 #### DPR Specific ####
 locals {
   project = local.application_data.accounts[local.environment].project_short_id
+
+  other_log_retention_in_days = local.application_data.accounts[local.environment].other_log_retention_in_days
+
   # glue_db                       = local.application_data.accounts[local.environment].glue_db_name
   # glue_db_data_domain           = local.application_data.accounts[local.environment].glue_db_data_domain
   description             = local.application_data.accounts[local.environment].db_description
@@ -26,6 +29,8 @@ locals {
   create_datamart         = local.application_data.accounts[local.environment].setup_redshift
   redshift_cluster_name   = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
   kinesis_stream_ingestor = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-ingestor-${local.environment}"
+
+  glue_job_common_log_level = local.application_data.accounts[local.environment].glue_job_common_log_level
 
   kinesis_endpoint         = "https://kinesis.eu-west-2.amazonaws.com"
   cloud_platform_cidr      = "172.20.0.0/16"

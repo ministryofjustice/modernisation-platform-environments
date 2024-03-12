@@ -32,7 +32,7 @@ module "glue_reporting_hub_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
-  log_group_retention_in_days  = 1
+  log_group_retention_in_days  = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -98,7 +98,7 @@ module "glue_reporting_hub_batch_job" {
   max_concurrent                = 64
   region                        = local.account_region
   account                       = local.account_id
-  log_group_retention_in_days   = 1
+  log_group_retention_in_days   = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -151,7 +151,7 @@ module "glue_reporting_hub_cdc_job" {
   max_concurrent                = 64
   region                        = local.account_region
   account                       = local.account_id
-  log_group_retention_in_days   = 1
+  log_group_retention_in_days   = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -236,7 +236,7 @@ module "glue_hive_table_creation_job" {
     "--dpr.prisons.database"      = module.glue_prisons_database.db_name
     "--dpr.contract.registryName" = module.s3_schema_registry_bucket.bucket_id
     "--dpr.schema.cache.max.size" = local.hive_table_creation_job_schema_cache_max_size
-    "--dpr.log.level"             = local.refresh_job_log_level
+    "--dpr.log.level"             = local.glue_job_common_log_level
   }
 
   depends_on = [
@@ -297,7 +297,7 @@ module "glue_s3_file_transfer_job" {
     "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
     "--dpr.file.transfer.delete.copied.files" = true,
     "--dpr.allowed.s3.file.extensions"        = "*",
-    "--dpr.log.level"                         = local.refresh_job_log_level
+    "--dpr.log.level"                         = local.glue_job_common_log_level
   }
 
   depends_on = [
@@ -361,7 +361,7 @@ module "glue_switch_prisons_hive_data_location_job" {
     "--dpr.prisons.database"      = module.glue_prisons_database.db_name
     "--dpr.contract.registryName" = module.s3_schema_registry_bucket.bucket_id
     "--dpr.schema.cache.max.size" = local.hive_table_creation_job_schema_cache_max_size
-    "--dpr.log.level"             = local.refresh_job_log_level
+    "--dpr.log.level"             = local.glue_job_common_log_level
   }
 
   depends_on = [
@@ -418,7 +418,7 @@ module "glue_s3_data_deletion_job" {
     "--dpr.aws.region"                 = local.account_region
     "--dpr.config.s3.bucket"           = module.s3_glue_job_bucket.bucket_id,
     "--dpr.allowed.s3.file.extensions" = "*"
-    "--dpr.log.level"                  = local.refresh_job_log_level
+    "--dpr.log.level"                  = local.glue_job_common_log_level
   }
 
   depends_on = [
@@ -469,7 +469,7 @@ module "glue_stop_glue_instance_job" {
     "--extra-jars"     = local.glue_jobs_latest_jar_location
     "--class"          = "uk.gov.justice.digital.job.StopGlueInstanceJob"
     "--dpr.aws.region" = local.account_region
-    "--dpr.log.level"  = local.refresh_job_log_level
+    "--dpr.log.level"  = local.glue_job_common_log_level
   }
 }
 
@@ -1013,7 +1013,7 @@ module "datamart" {
   logging = {
     enable               = true
     log_destination_type = "cloudwatch"
-    retention_period     = 1
+    retention_period     = local.other_log_retention_in_days
     log_exports          = ["useractivitylog", "userlog", "connectionlog"]
   }
 
