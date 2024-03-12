@@ -191,7 +191,7 @@ locals {
         ]
       }
       Ec2ProdBipPolicy = {
-        description = "Permissions required for preprod Bip EC2s"
+        description = "Permissions required for prod Bip EC2s"
         statements = [
           {
             effect = "Allow"
@@ -279,22 +279,19 @@ locals {
         })
       })
 
-      # "trn-${local.application_name}-bip-a" = merge(local.bip_a, {
-      #   config = merge(local.bip_a.config, {
-      #     instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
-      #       "Ec2TrnBipPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_a.instance, {
-      #     instance_type = "t3.xlarge"
-      #   })
-      #   tags = merge(local.bip_a.tags, {
-      #     bip-db-name       = "TRBIPINF"
-      #     bip-db-hostname   = "ptctrn-oasys-db-a"
-      #     oasys-db-name     = "TROASYS"
-      #     oasys-db-hostname = "ptctrn-oasys-db-a"
-      #   })
-      # })
+      "trn-${local.application_name}-bip-a" = merge(local.bip_a, {
+        config = merge(local.bip_a.config, {
+          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+            "Ec2TrnBipPolicy",
+          ])
+        })
+        tags = merge(local.bip_a.tags, {
+          bip-db-name       = "TRBIPINF"
+          bip-db-hostname   = "ptctrn-oasys-db-a"
+          oasys-db-name     = "TROASYS"
+          oasys-db-hostname = "ptctrn-oasys-db-a"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -304,37 +301,37 @@ locals {
       #   })
       # })
 
-      # "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ssm_parameters_prefix     = "ec2-web-ptc/"
-      #     iam_resource_names_prefix = "ec2-web-ptc"
-      #     instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
-      #       "Ec2PtcWebPolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.webserver_a.tags, {
-      #     description                             = "${local.environment} practice ${local.application_name} web"
-      #     "${local.application_name}-environment" = "ptc"
-      #     oracle-db-sid                           = "PROASYS"
-      #     oracle-db-hostname                      = "db.ptc.oasys.hmpps-preproduction.modernisation-platform.internal"
-      #   })
-      # })
+      "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ssm_parameters_prefix     = "ec2-web-ptc/"
+          iam_resource_names_prefix = "ec2-web-ptc"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2PtcWebPolicy",
+          ])
+        })
+        tags = merge(local.webserver_a.tags, {
+          description                             = "${local.environment} practice ${local.application_name} web"
+          "${local.application_name}-environment" = "ptc"
+          oracle-db-sid                           = "PROASYS"
+          oracle-db-hostname                      = "db.ptc.oasys.hmpps-production.modernisation-platform.internal"
+        })
+      })
 
-      # "trn-${local.application_name}-web-a" = merge(local.webserver_a, {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ssm_parameters_prefix     = "ec2-web-trn/"
-      #     iam_resource_names_prefix = "ec2-web-trn"
-      #     instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
-      #       "Ec2TrnWebPolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.webserver_a.tags, {
-      #     description                             = "${local.environment} training ${local.application_name} web"
-      #     "${local.application_name}-environment" = "trn"
-      #     oracle-db-sid                           = "TROASYS"
-      #     oracle-db-hostname                      = "db.trn.oasys.hmpps-preproduction.modernisation-platform.internal"
-      #   })
-      # })
+      "trn-${local.application_name}-web-a" = merge(local.webserver_a, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ssm_parameters_prefix     = "ec2-web-trn/"
+          iam_resource_names_prefix = "ec2-web-trn"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2TrnWebPolicy",
+          ])
+        })
+        tags = merge(local.webserver_a.tags, {
+          description                             = "${local.environment} training ${local.application_name} web"
+          "${local.application_name}-environment" = "trn"
+          oracle-db-sid                           = "TROASYS"
+          oracle-db-hostname                      = "db.trn.oasys.hmpps-production.modernisation-platform.internal"
+        })
+      })
     }
 
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
@@ -556,7 +553,7 @@ locals {
           id = module.environment.vpc.id
         }
         records = [
-          # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
+          # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # for aws
           { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.40.133"] }, #        "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
