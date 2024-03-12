@@ -23,8 +23,8 @@ resource "aws_ssm_maintenance_window_target" "this" {
   description   = "${var.application}-${var.environment} target"
 
   targets {
-    key    = "tag:environment-name"
-    values = ["${var.application}-${var.environment}"]
+    key    = "tag:${keys(var.target_tag)[0]}"
+    values = [values(var.target_tag)[0]]
   }
 }
 

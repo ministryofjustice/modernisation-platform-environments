@@ -19,3 +19,7 @@ variable "operating_system" {
   type    = string
   default = "WINDOWS"
 }
+
+variable "target_tag" {
+  type = map
+}
