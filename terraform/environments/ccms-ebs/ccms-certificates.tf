@@ -49,22 +49,24 @@ resource "aws_route53_record" "external_validation" {
     aws_instance.ec2_accessgate
   ]
 
-  provider = aws.core-network-services
-
   for_each = {
     for dvo in local.cert_opts : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
+      name     = dvo.resource_record_name
+      record   = dvo.resource_record_value
+      type     = dvo.resource_record_type
+      zone_id  = dvo.resource_record_domain_validation_options[0].resource_record.name
+      provider = dvo.domain_name == "modernisation-platform.service.justice.gov.uk" ? aws.core-network-services : aws.core-vpc
     }
   }
+  
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = local.cert_zone_id
+  zone_id         = each.value.zone_id
 }
+
 
 resource "aws_acm_certificate_validation" "external" {
   count = local.is-production ? 1 : 1
