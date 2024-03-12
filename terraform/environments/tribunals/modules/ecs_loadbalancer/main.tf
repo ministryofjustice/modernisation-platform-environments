@@ -44,7 +44,7 @@ resource "aws_lb_target_group" "tribunals_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = var.vpc_shared_id
-  target_type          = "instance"
+  target_type          = "ip"
   deregistration_delay = 30
 
   stickiness {
