@@ -41,7 +41,7 @@ module "transport" {
   aws_acm_certificate_external      = aws_acm_certificate.external
 }
 
-/*module "appeals" {
+module "appeals" {
   source                            = "./modules/tribunal"
   app_name                          = "appeals"
   app_url                           = "administrativeappeals"
@@ -72,7 +72,7 @@ module "transport" {
   vpc_shared_id                     = data.aws_vpc.shared.id 
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-}*/
+}
 
 /*module "ahmlr" {
   source                            = "./modules/tribunal"
