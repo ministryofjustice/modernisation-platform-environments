@@ -35,17 +35,29 @@ module "pwm" {
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
   ecs_service_ingress_security_group_ids = []
-  ecs_service_egress_security_group_ids = [{
-    ip_protocol = "tcp"
-    port        = 389
-    cidr_ipv4   = var.account_config.shared_vpc_cidr
+  ecs_service_egress_security_group_ids = [
+    {
+      ip_protocol = "tcp"
+      port        = 389
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
     },
     {
       ip_protocol = "tcp"
       port        = 25
       cidr_ipv4   = "10.180.104.0/22" # https://github.com/ministryofjustice/staff-infrastructure-network-services/blob/main/README.md#smtp-relay-service
 
-  }]
+    },
+    {
+      ip_protocol = "tcp"
+      port        = 587
+      cidr_ipv4   = "0.0.0.0/0"
+    },
+    {
+      ip_protocol = "tcp"
+      port        = 465
+      cidr_ipv4   = "0.0.0.0/0"
+    }
+  ]
 
   tags                               = var.tags
   microservice_lb                    = aws_lb.delius_core_ancillary
