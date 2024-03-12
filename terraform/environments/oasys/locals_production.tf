@@ -68,7 +68,7 @@ locals {
           }
         ]
       }
-      Ec2PracticeWebPolicy = {
+      Ec2PtcWebPolicy = {
         description = "Permissions required for practice Web EC2s"
         statements = [
           {
@@ -77,13 +77,13 @@ locals {
               "secretsmanager:GetSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PTCOASYS/apex-passwords*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PROASYS/apex-passwords*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/OASYSPTC/apex-passwords*",
             ]
           }
         ]
       }
-      Ec2TrainingWebPolicy = {
+      Ec2TrnWebPolicy = {
         description = "Permissions required for training Web EC2s"
         statements = [
           {
@@ -92,7 +92,7 @@ locals {
               "secretsmanager:GetSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/TRNOASYS/apex-passwords*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/TROASYS/apex-passwords*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/OASYSTRN/apex-passwords*",
             ]
           }
@@ -172,6 +172,22 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/TR*/*",
             ]
           },
+        ]
+      }
+      Ec2TrnBipPolicy = {
+        description = "Permissions required for training Bip EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*TR/bip-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/TR*/bip-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/bip/trn/*",
+            ]
+          }
         ]
       }
       Ec2ProdBipPolicy = {
@@ -262,6 +278,23 @@ locals {
           oracle-sids = "PROASYS TROASYS TRBIPINF"
         })
       })
+
+      # "trn-${local.application_name}-bip-a" = merge(local.bip_a, {
+      #   config = merge(local.bip_a.config, {
+      #     instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+      #       "Ec2TrnBipPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.bip_a.instance, {
+      #     instance_type = "t3.xlarge"
+      #   })
+      #   tags = merge(local.bip_a.tags, {
+      #     bip-db-name       = "TRBIPINF"
+      #     bip-db-hostname   = "ptctrn-oasys-db-a"
+      #     oasys-db-name     = "TROASYS"
+      #     oasys-db-hostname = "ptctrn-oasys-db-a"
+      #   })
+      # })
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -271,27 +304,35 @@ locals {
       #   })
       # })
 
-      # "pd-${local.application_name}-web-ptc-a" = merge(local.webserver_a, {
+      # "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
       #   config = merge(module.baseline_presets.ec2_instance.config.default, {
       #     ssm_parameters_prefix     = "ec2-web-ptc/"
       #     iam_resource_names_prefix = "ec2-web-ptc"
+      #     instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+      #       "Ec2PtcWebPolicy",
+      #     ])
       #   })
       #   tags = merge(local.webserver_a.tags, {
       #     description                             = "${local.environment} practice ${local.application_name} web"
       #     "${local.application_name}-environment" = "ptc"
-      #     oracle-db-sid                           = "PTCOASYS"
+      #     oracle-db-sid                           = "PROASYS"
+      #     oracle-db-hostname                      = "db.ptc.oasys.hmpps-preproduction.modernisation-platform.internal"
       #   })
       # })
 
-      # "pd-${local.application_name}-web-trn-a" = merge(local.webserver_a, {
+      # "trn-${local.application_name}-web-a" = merge(local.webserver_a, {
       #   config = merge(module.baseline_presets.ec2_instance.config.default, {
       #     ssm_parameters_prefix     = "ec2-web-trn/"
       #     iam_resource_names_prefix = "ec2-web-trn"
+      #     instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+      #       "Ec2TrnWebPolicy",
+      #     ])
       #   })
       #   tags = merge(local.webserver_a.tags, {
       #     description                             = "${local.environment} training ${local.application_name} web"
       #     "${local.application_name}-environment" = "trn"
-      #     oracle-db-sid                           = "TRNOASYS"
+      #     oracle-db-sid                           = "TROASYS"
+      #     oracle-db-hostname                      = "db.trn.oasys.hmpps-preproduction.modernisation-platform.internal"
       #   })
       # })
     }
@@ -500,11 +541,11 @@ locals {
       (module.environment.domains.public.business_unit_environment) = { # hmpps-production.modernisation-platform.service.justice.gov.uk
         records = [
           # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          # { name = "trn.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          # { name = "ptc.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-          # { name = "trn.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-          # { name = "ptc.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          # { name = "db.trn${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          # { name = "db.ptc.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
         ]
       }
       #
@@ -516,11 +557,11 @@ locals {
         }
         records = [
           # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
-          # { name = "trn.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          # { name = "ptc.db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.40.133"] }, #        "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-          # { name = "trn.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-          # { name = "ptc.db.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          # { name = "db.trn.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          # { name = "db.ptc.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
         ]
       }
     }
