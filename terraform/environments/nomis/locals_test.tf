@@ -229,6 +229,8 @@ locals {
             "Ec2T1WeblogicPolicy",
           ])
         })
+        instance = merge(local.weblogic_ec2.instance, {
+        })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
             branch = "main"
@@ -283,6 +285,8 @@ locals {
             "Ec2T2WeblogicPolicy",
           ])
         })
+        instance = merge(local.weblogic_ec2.instance, {
+        })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
             branch = "main"
@@ -336,8 +340,6 @@ locals {
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2T3WeblogicPolicy",
           ])
-        })
-        instance = merge(local.weblogic_ec2.instance, {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
