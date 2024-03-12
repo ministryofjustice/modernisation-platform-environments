@@ -65,7 +65,7 @@ locals {
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBERDPhblaiNoqjmERYqaDeAPN5yPhWdq58My149qBVorbemHwd/1KYaby6C3Wjsllsvo6mfTUdpe4aaCZfx9GV7ZICX3bILlHYBYQPUmL9gJ69PiqsbuK3PTZB7yotcsUA==",
   ]
   civica_cidr_ipv4s = [
-    "20.0.26.153/32",
+    "172.167.3.97/32",
   ]
   civica_cidr_ipv6s = []
 
