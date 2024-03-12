@@ -206,7 +206,7 @@ module "glue_hive_table_creation_job" {
   aws_kms_key                  = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.025X"
+  worker_type                 = "G.1X"
   number_of_workers           = 2
   max_concurrent              = 64
   region                      = local.account_region
@@ -271,7 +271,7 @@ module "glue_s3_file_transfer_job" {
   aws_kms_key                  = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.025X"
+  worker_type                 = "G.1X"
   number_of_workers           = 2
   max_concurrent              = 64
   region                      = local.account_region
@@ -337,7 +337,7 @@ module "glue_switch_prisons_hive_data_location_job" {
   aws_kms_key                  = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.025X"
+  worker_type                 = "G.1X"
   number_of_workers           = 2
   max_concurrent              = 64
   region                      = local.account_region
@@ -396,7 +396,7 @@ module "glue_s3_data_deletion_job" {
   aws_kms_key                  = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.025X"
+  worker_type                 = "G.1X"
   number_of_workers           = 2
   max_concurrent              = 64
   region                      = local.account_region
@@ -449,7 +449,7 @@ module "glue_stop_glue_instance_job" {
   aws_kms_key                  = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.025X"
+  worker_type                 = "G.1X"
   number_of_workers           = 2
   max_concurrent              = 64
   region                      = local.account_region
