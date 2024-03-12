@@ -129,7 +129,7 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 # Create the Launch Template and assign the instance profile
 resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix   = "tribunals-all"
-  image_id      = "ami-073e5090717e28896"
+  image_id      = "ami-00668e7b96c46e503"
   instance_type = "m5.xlarge"
   update_default_version = true
 
