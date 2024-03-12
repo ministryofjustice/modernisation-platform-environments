@@ -393,7 +393,7 @@ locals {
 
   bip_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                  = "oasys_bip_release_*"
+      ami_name                  = "oasys_bip_release_2023-12-02*"
       iam_resource_names_prefix = "ec2"
       availability_zone         = "${local.region}a"
     })
