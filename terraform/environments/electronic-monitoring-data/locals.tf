@@ -12,7 +12,7 @@ locals {
   capita_cidr_ipv6s = []
 
   ddc_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBFc140uxPfjq1ilaOxcLYbnyIau2vURzKWFHLsxra+5Vf1nSZypOZ/g9eavBxcf2tkxBjgTx06BeRh3j+QhA8rnV9vKtyh9ZXIe5SNcrGlsGLKMyn+eB05Dt2m58oyMwWA==",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBFc140uxPfjq1ilaOxcLYbnyIau2vURzKWFHLsxra+5Vf1nSZypOZ/g9eavBxcf2tkxBjgTx06BeRh3j+QhA8rnV9vKtyh9ZXIe5SNcrGlsGLKMyn+eB05Dt2m58oyMwWB==",
   ]
   ddc_cidr_ipv4s = [
     "82.203.33.112/28",
