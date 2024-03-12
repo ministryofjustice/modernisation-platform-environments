@@ -99,13 +99,47 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
       "${module.s3_bucket_oracle_statistics.bucket.arn}/*"
     ]
   }
+
+}
+
+
+data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
+
+  statement {
+    sid     = "allowAccessToListOracleStatistics${title(local.oracle_statistics_delius_source_environment)}Bucket"
+    effect  = "Allow"
+    actions = [
+      "s3:ListBucket"
+    ]
+    resources = ["arn:aws:s3:::${local.oracle_statistics_delius_source_environment}-oracle-statistics-backup-data"]
+  }
+
+  statement {
+    sid     = "allowAccessToOracleStatistics${title(local.oracle_statistics_delius_source_environment)}BucketObjects"
+    effect  = "Allow"
+    actions = [
+      "s3:PutObjectAcl",
+      "s3:PutObject",
+      "s3:GetObjectTagging",
+      "s3:GetObject"
+    ]
+    resources = ["arn:aws:s3:::${local.oracle_statistics_delius_source_environment}-oracle-statistics-backup-data/*"]
+  }
+}
+
+data "aws_iam_policy_document" "combined" {
+  source_policy_documents = compact([
+                              data.aws_iam_policy_document.oracledb_backup_bucket_access.json,
+                              local.oracle_statistics_delius_source_environment != "" ? data.aws_iam_policy_document.oracle_remote_statistics_bucket_access.json : null
+                            ])
 }
 
 resource "aws_iam_policy" "oracledb_backup_bucket_access" {
   name        = "${var.env_name}-oracledb-backup-bucket-access"
   description = "Allow access to Oracle DB Backup Bucket"
-  policy      = data.aws_iam_policy_document.oracledb_backup_bucket_access.json
+  policy      = data.aws_iam_policy_document.combined.json
 }
+
 
 #resource "aws_iam_role_policy" "oracledb_backup_bucket_access_policy" {
 #  name   = "${var.env_name}-oracledb-backup-bucket-access-policy"
@@ -178,7 +212,8 @@ resource "aws_s3_bucket_inventory" "oracledb_backuppieces" {
   }
 }
 
-# Buckets for storing Oracle Statistics Backup Dump Files
+# Bucket for storing Oracle Statistics Backup Dump Files
+
 module "s3_bucket_oracle_statistics" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
   bucket_name         = "${var.env_name}-oracle-statistics-backup-data"
@@ -186,7 +221,12 @@ module "s3_bucket_oracle_statistics" {
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
   custom_kms_key      = var.account_config.kms_keys.general_shared
-
+  bucket_policy       = compact([ local.oracle_statistics_delius_target_environment != "" ? templatefile("${path.module}/policies/oracle_statistics_backup_data.json", 
+                                                            { 
+                                                              s3bucket_arn = module.s3_bucket_oracle_statistics.bucket.arn,
+                                                              oracle_statistics_delius_target_account_id = local.oracle_statistics_delius_target_account_id,
+                                                              oracle_statistics_delius_target_environment = local.oracle_statistics_delius_target_environment
+                                                            }) : null])
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
