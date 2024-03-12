@@ -97,18 +97,18 @@ resource "aws_route53_record" "external_validation_prod" {
 }
 
 // Route53 DNS record for directing traffic to the service
-resource "aws_route53_record" "external_prod" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
+// resource "aws_route53_record" "external_prod" {
+//   count    = local.is-production ? 1 : 0
+//   provider = aws.core-network-services
 
-  zone_id = data.aws_route53_zone.application_zone.zone_id
-  name    = "integratedfraudsystem.justice.gov.uk"
-  type    = "A"
+//   zone_id = data.aws_route53_zone.application_zone.zone_id
+//   name    = "integratedfraudsystem.justice.gov.uk"
+//   type    = "A"
 
-  alias {
-    name                   = aws_lb.ifs_lb.dns_name
-    zone_id                = aws_lb.ifs_lb.zone_id
-    evaluate_target_health = true
-  }
-}
+//   alias {
+//     name                   = aws_lb.ifs_lb.dns_name
+//     zone_id                = aws_lb.ifs_lb.zone_id
+//     evaluate_target_health = true
+//   }
+// }
 
