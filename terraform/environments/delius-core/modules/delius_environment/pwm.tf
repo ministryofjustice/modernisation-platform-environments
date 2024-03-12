@@ -156,6 +156,15 @@ resource "aws_route53_record" "pwm_amazonses_dkim_record" {
   records  = ["${aws_ses_domain_dkim.pwm.dkim_tokens[count.index]}.dkim.amazonses.com"]
 }
 
+resource "aws_route53_record" "pwm_amazonses_dmarc_record" {
+  provider = aws.core-vpc
+  zone_id  = var.account_config.route53_external_zone.zone_id
+  name     = "_dmarc.pwm.${var.env_name}.${var.account_config.dns_suffix}"
+  type     = "TXT"
+  ttl      = "600"
+  records  = ["v=DMARC1; p=none;"]
+}
+
 #####################
 # SES SMTP User
 #####################
