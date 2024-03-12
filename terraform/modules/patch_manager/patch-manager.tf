@@ -36,6 +36,8 @@ resource "aws_cloudwatch_log_group" "this" {
 resource "aws_ssm_maintenance_window_task" "this" {
   description     = "Maintenance window task for ${var.application}-${var.environment}"
   task_type       = "RUN_COMMAND"
+  # Only development uses AWS-RunPatchBaselineWithHooks to trigger post patching jobs and you can't use this task
+  # when specifying exact patches so the environments will run the standard AWS-RunPatchBaseline task
   task_arn        = var.environment == "development" ? "AWS-RunPatchBaselineWithHooks" : "AWS-RunPatchBaseline"
   priority        = 1
   max_concurrency = "1" # Patch one instance at a time
