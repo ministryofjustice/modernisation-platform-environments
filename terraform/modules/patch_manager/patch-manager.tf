@@ -1,22 +1,12 @@
-# Set a predefined baseline if specified, otherwise set a custom baseline
-resource "aws_ssm_default_patch_baseline" "this" {
-  baseline_id      = var.use_predefined_baseline == true ? data.aws_ssm_patch_baseline.predefined[0].id : aws_ssm_patch_baseline.baseline-custom[0].id
-  operating_system = "WINDOWS"
-}
-
 data "aws_ssm_patch_baseline" "predefined" {
-  count            = var.use_predefined_baseline == true ? 1 : 0
   owner            = "AWS"
   name_prefix      = var.predefined_baseline
-  operating_system = "WINDOWS"
+  operating_system = var.operating_system
 }
 
-resource "aws_ssm_patch_baseline" "baseline-custom" {
-  count            = var.use_predefined_baseline == false ? 1 : 0
-  name             = "MOJ-CustomBaseline-${var.application}-${var.environment}"
-  description      = "Custom Patch Baseline for ${var.application}-${var.environment}"
-  operating_system = "WINDOWS"
-  approved_patches = var.approved_patches
+resource "aws_ssm_default_patch_baseline" "this" {
+  baseline_id      = data.aws_ssm_patch_baseline.predefined.id
+  operating_system = var.operating_system
 }
 
 resource "aws_ssm_maintenance_window" "this" {
@@ -33,8 +23,8 @@ resource "aws_ssm_maintenance_window_target" "this" {
   description   = "${var.application}-${var.environment} target"
 
   targets {
-    key    = "tag:environment-name"
-    values = ["${var.application}-${var.environment}"]
+    key    = "tag:${keys(var.target_tag)[0]}"
+    values = [values(var.target_tag)[0]]
   }
 }
 
@@ -46,7 +36,9 @@ resource "aws_cloudwatch_log_group" "this" {
 resource "aws_ssm_maintenance_window_task" "this" {
   description     = "Maintenance window task for ${var.application}-${var.environment}"
   task_type       = "RUN_COMMAND"
-  task_arn        = "AWS-RunPatchBaseline"
+  # Only development uses AWS-RunPatchBaselineWithHooks to trigger post patching jobs and you can't use this task
+  # when specifying exact patches so the environments will run the standard AWS-RunPatchBaseline task
+  task_arn        = var.environment == "development" ? "AWS-RunPatchBaselineWithHooks" : "AWS-RunPatchBaseline"
   priority        = 1
   max_concurrency = "1" # Patch one instance at a time
   max_errors      = "0" # Stop after the first error result
@@ -61,19 +53,41 @@ resource "aws_ssm_maintenance_window_task" "this" {
 
   task_invocation_parameters {
     run_command_parameters {
-      comment              = "Windows Patch Baseline Install"
+      comment              = "Patch Baseline Install"
       document_version     = "$LATEST"
       timeout_seconds      = 3600
       output_s3_bucket     = aws_s3_bucket.this.id
       output_s3_key_prefix = "patch-logs"
-
       cloudwatch_config {
-        cloudwatch_log_group_name = aws_cloudwatch_log_group.this.id
+        cloudwatch_log_group_name = aws_cloudwatch_log_group.this.name
         cloudwatch_output_enabled = true
       }
       parameter {
         name   = "Operation"
         values = ["Install"]
+      }
+
+      parameter {
+        name   = "RebootOption"
+        values = ["RebootIfNeeded"]
+      }
+
+      dynamic "parameter" {
+        for_each = var.environment == "development" ? [1] : []
+        content {
+          # Extract successful patches after development gets patched
+          name   = "PostInstallHookDocName"
+          values = [aws_ssm_document.extract-upload-patches[0].arn]
+        }
+      }
+
+      dynamic "parameter" {
+        for_each = var.environment != "development" ? [1] : []
+        content {
+          # All non-development environments pull patch list from development
+          name   = "InstallOverrideList"
+          values = ["s3://${var.application}-development-patch-logs/windows/WindowsServer2022DatacenterPatches.yaml"]
+        }
       }
     }
   }

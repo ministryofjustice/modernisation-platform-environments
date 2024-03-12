@@ -166,10 +166,10 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PTC/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PTC*/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*TRN/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/TRN*/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PR/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PR*/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*TR/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/TR*/*",
             ]
           },
         ]
@@ -243,7 +243,7 @@ locals {
         }
         ebs_volume_config = {
           data = {
-            iops       = 1500
+            iops       = 500
             type       = "gp3"
             throughput = 125
             total_size = 200
