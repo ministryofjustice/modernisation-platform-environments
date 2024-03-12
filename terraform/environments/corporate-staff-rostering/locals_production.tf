@@ -64,8 +64,6 @@ locals {
             "Ec2ProdDatabasePolicy",
           ])
         })
-        # IMPORTANT: remove this line when the DB is live in Production
-        cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.database_awaiting_deployment
         instance = merge(local.defaults_database_ec2.instance, {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
@@ -160,11 +158,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          pre-migration     = "PDCAW00007"
-          description       = "Application Server Region 1"
-          os-type           = "Windows"
-          ami               = "pd-csr-a-7-a"
-          component         = "app"
+          pre-migration = "PDCAW00007"
+          description   = "Application Server Region 1"
+          os-type       = "Windows"
+          ami           = "pd-csr-a-7-a"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -187,11 +185,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          pre-migration     = "PDCAW00008"
-          description       = "Application Server Region 2"
-          os-type           = "Windows"
-          ami               = "pd-csr-a-8-b"
-          component         = "app"
+          pre-migration = "PDCAW00008"
+          description   = "Application Server Region 2"
+          os-type       = "Windows"
+          ami           = "pd-csr-a-8-b"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -214,11 +212,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          pre-migration     = "PDCAW00009"
-          description       = "Application Server Region 3"
-          os-type           = "Windows"
-          ami               = "pd-csr-a-9-a"
-          component         = "app"
+          pre-migration = "PDCAW00009"
+          description   = "Application Server Region 3"
+          os-type       = "Windows"
+          ami           = "pd-csr-a-9-a"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -241,11 +239,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          pre-migration     = "PDCAW00010"
-          description       = "Application Server Region 4"
-          os-type           = "Windows"
-          ami               = "pd-csr-a-10-b"
-          component         = "app"
+          pre-migration = "PDCAW00010"
+          description   = "Application Server Region 4"
+          os-type       = "Windows"
+          ami           = "pd-csr-a-10-b"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -268,11 +266,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          pre-migration     = "PDCAW00011"
-          description       = "Application Server Region 5"
-          os-type           = "Windows"
-          ami               = "pd-csr-a-11-a"
-          component         = "app"
+          pre-migration = "PDCAW00011"
+          description   = "Application Server Region 5"
+          os-type       = "Windows"
+          ami           = "pd-csr-a-11-a"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -294,11 +292,11 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 112 }
         }
         tags = {
-          pre-migration     = "PDCAW00012"
-          description       = "Application Server Region 6"
-          os-type           = "Windows"
-          ami               = "pd-csr-a-12-b"
-          component         = "app"
+          pre-migration = "PDCAW00012"
+          description   = "Application Server Region 6"
+          os-type       = "Windows"
+          ami           = "pd-csr-a-12-b"
+          component     = "app"
         }
         route53_records = {
           create_internal_record = true
@@ -321,11 +319,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          pre-migration     = "PDCWW00001"
-          description       = "Web Server Region 1 and 2"
-          os-type           = "Windows"
-          ami               = "pd-csr-w-1-a"
-          component         = "web"
+          pre-migration = "PDCWW00001"
+          description   = "Web Server Region 1 and 2"
+          os-type       = "Windows"
+          ami           = "pd-csr-w-1-a"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -348,11 +346,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          pre-migration     = "PDCWW00002"
-          description       = "Web Server Region 1 and 2"
-          os-type           = "Windows"
-          ami               = "pd-csr-w-2-b"
-          component         = "web"
+          pre-migration = "PDCWW00002"
+          description   = "Web Server Region 1 and 2"
+          os-type       = "Windows"
+          ami           = "pd-csr-w-2-b"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -375,11 +373,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          pre-migration     = "PDCWW00003"
-          description       = "Web Server Region 3 and 4"
-          os-type           = "Windows"
-          ami               = "pd-csr-w-3-a"
-          component         = "web"
+          pre-migration = "PDCWW00003"
+          description   = "Web Server Region 3 and 4"
+          os-type       = "Windows"
+          ami           = "pd-csr-w-3-a"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -402,11 +400,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          pre-migration     = "PDCWW00004"
-          description       = "Web Server Region 3 and 4"
-          os-type           = "Windows"
-          ami               = "pd-csr-w-4-b"
-          component         = "web"
+          pre-migration = "PDCWW00004"
+          description   = "Web Server Region 3 and 4"
+          os-type       = "Windows"
+          ami           = "pd-csr-w-4-b"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -429,11 +427,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         tags = {
-          pre-migration     = "PDCWW00005"
-          description       = "Web Server Region 5 and 6"
-          os-type           = "Windows"
-          ami               = "pd-csr-w-5-a"
-          component         = "web"
+          pre-migration = "PDCWW00005"
+          description   = "Web Server Region 5 and 6"
+          os-type       = "Windows"
+          ami           = "pd-csr-w-5-a"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true
@@ -456,11 +454,11 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         tags = {
-          pre-migration     = "PDCWW00006"
-          description       = "Web Server Region 5 and 6"
-          os-type           = "Windows"
-          ami               = "pd-csr-w-6-b"
-          component         = "web"
+          pre-migration = "PDCWW00006"
+          description   = "Web Server Region 5 and 6"
+          os-type       = "Windows"
+          ami           = "pd-csr-w-6-b"
+          component     = "web"
         }
         route53_records = {
           create_internal_record = true

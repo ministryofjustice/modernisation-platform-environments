@@ -5,8 +5,11 @@ locals {
     enduserclient = [
       "10.0.0.0/8"
     ]
-    domain_controllers = module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers
-    jumpservers        = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
+    domain_controllers = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers,
+      module.ip_addresses.mp_cidrs.ad_fixngo_azure_domain_controllers,
+    ])
+    jumpservers = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
     remotedesktop_gateways = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers,
       module.ip_addresses.mp_cidr[module.environment.vpc_name]
@@ -19,8 +22,11 @@ locals {
     enduserclient = [
       "10.0.0.0/8"
     ]
-    domain_controllers = module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers
-    jumpservers        = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
+    domain_controllers = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers,
+      # module.ip_addresses.mp_cidrs.ad_fixngo_hmpp_domain_controllers, # hits rule limit, remove azure DCs first
+    ])
+    jumpservers = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
     remotedesktop_gateways = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
       module.ip_addresses.mp_cidr[module.environment.vpc_name]

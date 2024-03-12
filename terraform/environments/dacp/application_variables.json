@@ -17,8 +17,7 @@
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
-      "domain_name": "modernisation-platform.service.justice.gov.uk",
-      "tactical_products_db_secrets_arn": "5fWKaj"
+      "domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "preproduction": {
       "db_name": "dacp_db_pre_prod",
@@ -37,8 +36,7 @@
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
-      "domain_name": "modernisation-platform.service.justice.gov.uk",
-      "tactical_products_db_secrets_arn": "AHK8Tj"
+      "domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "production": {
       "db_name": "dacp_db_prod",
@@ -57,8 +55,7 @@
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
-      "domain_name": "divorce-section-search.service.justice.gov.uk",
-      "tactical_products_db_secrets_arn": "VQasvo"
+      "domain_name": "divorce-section-search.service.justice.gov.uk"
     }
   }
 }

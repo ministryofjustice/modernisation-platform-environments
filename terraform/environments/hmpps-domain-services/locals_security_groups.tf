@@ -1,16 +1,22 @@
 locals {
 
   security_group_cidrs_devtest = {
-    azure_vnets        = module.ip_addresses.azure_fixngo_cidrs.devtest
-    domain_controllers = module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers
+    azure_vnets = module.ip_addresses.azure_fixngo_cidrs.devtest
+    domain_controllers = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers,
+      module.ip_addresses.mp_cidrs.ad_fixngo_azure_domain_controllers,
+    ])
     rd_session_hosts = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.devtest,
     ])
   }
   security_group_cidrs_preprod_prod = {
-    azure_vnets        = module.ip_addresses.azure_fixngo_cidrs.prod
-    domain_controllers = module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers
+    azure_vnets = module.ip_addresses.azure_fixngo_cidrs.prod
+    domain_controllers = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers,
+      module.ip_addresses.mp_cidrs.ad_fixngo_hmpp_domain_controllers,
+    ])
     rd_session_hosts = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.prod,

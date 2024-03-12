@@ -50,9 +50,9 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration     = "PPFAW0010"
-          description       = "RDS Session Host and CAFM App Server/PFME Licence Server"
-          ami               = "pp-cafm-a-10-b"
+          pre-migration = "PPFAW0010"
+          description   = "RDS Session Host and CAFM App Server/PFME Licence Server"
+          ami           = "pp-cafm-a-10-b"
         })
       })
 
@@ -72,9 +72,9 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration     = "PPFAW011"
-          description       = "RDS session host and app server"
-          ami               = "pp-cafm-a-11-a"
+          pre-migration = "PPFAW011"
+          description   = "RDS session host and app server"
+          ami           = "pp-cafm-a-11-a"
         })
       })
 
@@ -95,9 +95,9 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration     = "PPFWW0004"
-          description       = "Web Portal Server"
-          ami               = "pp-cafm-w-4-b"
+          pre-migration = "PPFWW0004"
+          description   = "Web Portal Server"
+          ami           = "pp-cafm-w-4-b"
         })
       })
 
@@ -117,9 +117,9 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration     = "PPFWW0005"
-          description       = "Migrated server PPFWW0005 Web Portal Server"
-          ami               = "pp-cafm-w-5-a"
+          pre-migration = "PPFWW0005"
+          description   = "Migrated server PPFWW0005 Web Portal Server"
+          ami           = "pp-cafm-w-5-a"
         })
       })
     }

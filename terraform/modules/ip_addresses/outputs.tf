@@ -13,6 +13,11 @@ output "mp_ip" {
   description = "Modernisation Platform ips: map(string)"
 }
 
+output "mp_ips" {
+  value       = local.mp_ips
+  description = "Modernisation Platform ips: map(list(string))"
+}
+
 output "mp_cidr" {
   value       = local.mp_cidr
   description = "Modernisation Platform cidrs: map(string)"

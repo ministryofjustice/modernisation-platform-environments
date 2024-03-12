@@ -86,7 +86,7 @@ module "pwm" {
   ]
 
   ignore_changes_task_definition = false
-  force_new_deployment           = true
+  force_new_deployment           = false
 
   providers = {
     aws          = aws
@@ -138,44 +138,44 @@ resource "aws_route53_record" "pwm_amazonses_dkim_record" {
   records  = ["${aws_ses_domain_dkim.pwm.dkim_tokens[count.index]}.dkim.amazonses.com"]
 }
 
-######################
+#####################
 # SES SMTP User
-######################
+#####################
 
-# resource "aws_iam_user" "pwm_ses_smtp_user" {
-#   name = "pwm-smtp-user"
-# }
-#
-# resource "aws_iam_access_key" "pwm_ses_smtp_user" {
-#   user = aws_iam_user.pwm_ses_smtp_user.name
-# }
-#
-# resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
-#   name = "pwm-ses-smtp-user-policy"
-#   user = aws_iam_user.pwm_ses_smtp_user.name
-#
-#   policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       {
-#         Effect = "Allow",
-#         Action = [
-#           "ses:SendRawEmail",
-#           "ses:SendEmail"
-#         ],
-#         Resource = "*"
-#       }
-#     ]
-#   })
-# }
+resource "aws_iam_user" "pwm_ses_smtp_user" {
+  name = "${var.env_name}-pwm-smtp-user"
+}
 
-# resource "aws_ssm_parameter" "pwm_ses_smtp_user" {
-#   name = "/pwm/ses_smtp"
-#   type = "SecureString"
-#   value = jsonencode({
-#     user              = aws_iam_user.pwm_ses_smtp_user.name,
-#     key               = aws_iam_access_key.pwm_ses_smtp_user.id,
-#     secret            = aws_iam_access_key.pwm_ses_smtp_user.secret
-#     ses_smtp_password = aws_iam_access_key.pwm_ses_smtp_user.ses_smtp_password_v4
-#   })
-# }
+resource "aws_iam_access_key" "pwm_ses_smtp_user" {
+  user = aws_iam_user.pwm_ses_smtp_user.name
+}
+
+resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
+  name = "${var.env_name}-pwm-ses-smtp-user-policy"
+  user = aws_iam_user.pwm_ses_smtp_user.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ses:SendRawEmail",
+          "ses:SendEmail"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_ssm_parameter" "pwm_ses_smtp_user" {
+  name = "/${var.env_name}/pwm/ses_smtp"
+  type = "SecureString"
+  value = jsonencode({
+    user              = aws_iam_user.pwm_ses_smtp_user.name,
+    key               = aws_iam_access_key.pwm_ses_smtp_user.id,
+    secret            = aws_iam_access_key.pwm_ses_smtp_user.secret
+    ses_smtp_password = aws_iam_access_key.pwm_ses_smtp_user.ses_smtp_password_v4
+  })
+}
