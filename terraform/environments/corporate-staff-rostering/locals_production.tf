@@ -20,7 +20,7 @@ locals {
           passwords = { description = "database passwords" }
         }
       }
-      "/oracle/database/DRIWFM" = {
+      "/oracle/database/DIWFM" = {
         secrets = {
           passwords = { description = "database passwords" }
         }
