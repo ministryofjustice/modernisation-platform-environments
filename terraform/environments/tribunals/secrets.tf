@@ -9,7 +9,7 @@ resource "random_password" "password" {
 }
 
 resource "aws_secretsmanager_secret" "resource_rds_secret" {
-  name                    = "${local.application_data.accounts[local.environment].db_identifier}-Credentials"
+  name                    = "${local.application_data.accounts[local.environment].db_identifier}_credentials"
   recovery_window_in_days = 0
 }
 
@@ -40,7 +40,7 @@ data "aws_secretsmanager_secret_version" "data_rds_secret_current" {
 
 //source db secret definition, will be filled manually
 resource "aws_secretsmanager_secret" "resource_source_db_secret" {
-  name                    = "tribunals-source-database-credentials"
+  name                    = "tribunals-source-credentials-db"
   recovery_window_in_days = 0
 }
 

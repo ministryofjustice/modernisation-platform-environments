@@ -98,7 +98,7 @@ resource "null_resource" "app_setup_db" {
 }
 
 resource "aws_secretsmanager_secret" "app_db_credentials" {
-  name                    = "${local.app}-database-credentials-2"
+  name                    = "${local.app}-credentials-db-2"
   recovery_window_in_days = 0
 }
 
