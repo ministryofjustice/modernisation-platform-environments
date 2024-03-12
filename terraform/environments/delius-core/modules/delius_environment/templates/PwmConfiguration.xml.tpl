@@ -181,7 +181,7 @@
     </setting>
     <setting key="email.smtp.username" syntax="SELECT">
       <label>SMTP Server User Name</label>
-      <value>$${SES_USERNAME}></value>
+      <value>$${SES_USERNAME}</value>
     </setting>
     <setting key="email.smtp.userpassword" syntax="SELECT">
       <label>SMTP Server Password</label>
