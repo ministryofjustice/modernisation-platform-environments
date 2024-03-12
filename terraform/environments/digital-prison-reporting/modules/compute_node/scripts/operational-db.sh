@@ -22,7 +22,7 @@ echo -e "host    all          all            0.0.0.0/0  md5" >> /var/lib/pgsql/d
 
 # Create our new PostgreSQL authentication config file
 #cat <<'EOF' > /var/lib/pgsql/data/pg_hba.conf
-#${pg_hba_file}
+#<<pg_hba_file>>
 #EOF
 
 # Update the IPs of the address to listen from PostgreSQL config
