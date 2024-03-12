@@ -185,7 +185,7 @@
     </setting>
     <setting key="email.smtp.userpassword" syntax="STRING">
       <label>SMTP Server Password</label>
-      <value><![CDATA[$${SES_PASSWORD}]]></value>
+      <value plaintext="true"><![CDATA[$${SES_PASSWORD}]]></value>
     </setting>
     <setting key="email.smtp.port" syntax="NUMERIC">
       <label>SMTP Server Port</label>
