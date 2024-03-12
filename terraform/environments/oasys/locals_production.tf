@@ -286,7 +286,7 @@ locals {
       #     ])
       #   })
       #   instance = merge(local.bip_a.instance, {
-      #     instance_type = "t3.medium"
+      #     instance_type = "t3.xlarge"
       #   })
       #   tags = merge(local.bip_a.tags, {
       #     bip-db-name       = "TRBIPINF"
