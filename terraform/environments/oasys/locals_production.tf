@@ -302,7 +302,7 @@ locals {
       # })
 
       "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
+        config = merge(local.webserver_a.config, {
           ssm_parameters_prefix     = "ec2-web-ptc/"
           iam_resource_names_prefix = "ec2-web-ptc"
           instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
@@ -318,7 +318,7 @@ locals {
       })
 
       "trn-${local.application_name}-web-a" = merge(local.webserver_a, {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
+        config = merge(local.webserver_a.config, {
           ssm_parameters_prefix     = "ec2-web-trn/"
           iam_resource_names_prefix = "ec2-web-trn"
           instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
