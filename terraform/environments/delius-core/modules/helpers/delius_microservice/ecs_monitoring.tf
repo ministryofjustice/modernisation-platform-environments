@@ -77,6 +77,12 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
 }
 
 
+
+
+
+
+
+
 // log metric filter for error logs in container that contain the phrase "Error in Helpdesk"
 resource "aws_cloudwatch_log_metric_filter" "error" {
   name           = "${var.name}-${var.env_name}-application-error"
@@ -165,8 +171,8 @@ resource "aws_cloudwatch_metric_alarm" "healthy_hosts_fatal_alarm" {
   alarm_actions       = [var.notification_arn]
   ok_actions          = [var.notification_arn]
   dimensions = {
-    LoadBalancer = data.aws_lb.lb.0.arn_suffix
-    TargetGroup  = aws_lb_target_group.target_group.0.arn_suffix
+    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+    TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
 
@@ -185,8 +191,8 @@ resource "aws_cloudwatch_metric_alarm" "response_time_critical_alarm" {
   alarm_actions       = [var.notification_arn]
   ok_actions          = [var.notification_arn]
   dimensions = {
-    LoadBalancer = data.aws_lb.lb.0.arn_suffix
-    TargetGroup  = aws_lb_target_group.target_group.0.arn_suffix
+    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+    TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
 
@@ -205,8 +211,8 @@ resource "aws_cloudwatch_metric_alarm" "response_code_5xx_warning_alarm" {
   alarm_actions       = [var.notification_arn]
   ok_actions          = [var.notification_arn]
   dimensions = {
-    LoadBalancer = data.aws_lb.lb.0.arn_suffix
-    TargetGroup  = aws_lb_target_group.target_group.0.arn_suffix
+    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+    TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
 
@@ -224,7 +230,7 @@ resource "aws_cloudwatch_metric_alarm" "response_code_5xx_critical_alarm" {
   alarm_actions       = [var.notification_arn]
   ok_actions          = [var.notification_arn]
   dimensions = {
-    LoadBalancer = data.aws_lb.lb.0.arn_suffix
-    TargetGroup  = aws_lb_target_group.target_group.0.arn_suffix
+    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+    TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
