@@ -103,7 +103,7 @@ module "pwm" {
     }
   ]
 
-  ignore_changes_task_definition = false
+  ignore_changes_task_definition = true
   force_new_deployment           = false
 
   providers = {
