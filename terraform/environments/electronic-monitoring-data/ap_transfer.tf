@@ -104,7 +104,7 @@ resource "aws_iam_role" "ap_transfer_lambda" {
 }
 
 
-resource "aws_iam_role_policy_document" "lambda_vpc_doc" {
+resource "aws_iam_policy_document" "lambda_vpc_doc" {
     sid    = "VPC Config"
     effect = "Allow"
     actions = [
