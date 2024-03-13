@@ -147,3 +147,11 @@ resource "aws_iam_role" "ap_transfer_lambda" {
   assume_role_policy  = data.aws_iam_policy_document.lambda_vpc_doc.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
+
+resource "aws_lambda_permission" "ap_transfer_lambda" {
+  statement_id  = "AllowPArquetToAP"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.ap_transfer_lambda.arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.test_dump.arn
+}
