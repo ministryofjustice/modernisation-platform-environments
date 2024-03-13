@@ -135,10 +135,9 @@ data "aws_iam_policy_document" "ap_transfer_lambda" {
 
     actions = [
     "rds:Connect",
-    # "rds:Query",
+    "rds:Query",
     "rds:DescribeDBInstances"
     ]
-    resources = [aws_db_instance.database_2022.arn]
     }
     statement {
       sid    = "secrets access"
