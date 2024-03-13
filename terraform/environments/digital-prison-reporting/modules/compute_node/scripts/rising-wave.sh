@@ -347,12 +347,13 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF`
 
+  echo "$meta_node_service_file_contents" | sudo tee /lib/systemd/system/risingwave-meta.service > /dev/null
+
   sudo systemctl daemon-reload
   sudo systemctl enable risingwave-meta
   sudo systemctl start risingwave-meta.service
   sudo systemctl status -l risingwave-meta.service
 
-  echo "$meta_node_service_file_contents" | sudo tee /lib/systemd/system/risingwave-meta.service > /dev/null
   echo "$HOST_NAME" >risingwave_meta.txt
   aws s3 cp ./risingwave_meta.txt s3://dpr-working-development/rising-wave/hosts/risingwave_meta.txt
   echo "Wrote meta node host file to s3 at $(date)"

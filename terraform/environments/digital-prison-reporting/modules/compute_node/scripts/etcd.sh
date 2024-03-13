@@ -104,4 +104,4 @@ sudo systemctl status -l etcd.service
 hostname -s >risingwave_etcd.txt
 aws s3 cp ./risingwave_etcd.txt s3://dpr-working-development/rising-wave/hosts/risingwave_etcd.txt
 echo "Wrote etcd host file to s3 at $(date)"
-rf -f ./risingwave_etcd.txt
+rm -f ./risingwave_etcd.txt
