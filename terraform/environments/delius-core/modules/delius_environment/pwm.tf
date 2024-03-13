@@ -96,13 +96,12 @@ module "pwm" {
         email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
         email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
         rendered_email_challenge_token = templatefile("${path.module}/templates/email.html.tpl", {
-          email_subject      = "Forgotten Password Verification"
           email_preview_text = "Forgotten Password Verification"
           email_header       = <<EOT
                                 EmailItem default:
                                   To:@User:Email@
                                 From:Forgotten Password <@DefaultEmailFromAddress@>
-                                Subj:${email_subject}
+                                Subj:Forgotten Password Verification
                                 Body:Thank you for requesting your account activation. To continue with your account activation, please copy and paste the following code onto the activation form:
 
                                 %TOKEN%
@@ -123,7 +122,6 @@ module "pwm" {
                                 EOT
         })
         rendered_email_pwd_changed = templatefile("${path.module}/templates/email.html.tpl", {
-          email_subject      = "Password Changed"
           email_preview_text = "Password Changed"
           email_header       = <<EOT
                                 EmailItem default:
