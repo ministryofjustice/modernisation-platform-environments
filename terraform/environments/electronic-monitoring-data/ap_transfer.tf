@@ -105,7 +105,7 @@ resource "aws_lambda_function" "ap_transfer_lambda" {
   timeout       = 900
 
   vpc_config {
-    subnet_ids         = [aws_db_subnet_group.db.id]
+    subnet_ids         = aws_db_subnet_group.db.id
     security_group_ids = [aws_security_group.db.id]
   }
   environment {
@@ -119,7 +119,7 @@ resource "aws_lambda_function" "ap_transfer_lambda" {
 
 data "aws_iam_policy_document" "lambda_vpc_doc" {
     statement {
-      sid    = "VPC Config"
+      sid    = "VPCConfig"
       effect = "Allow"
       actions = [
         "ec2:CreateNetworkInterface",
