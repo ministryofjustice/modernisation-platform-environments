@@ -124,12 +124,13 @@ data "aws_iam_policy_document" "lambda_vpc_doc" {
       sid    = "VPC Config"
       effect = "Allow"
       actions = [
-        "ec2:CreateNetworkInterface",
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:DescribeSubnets",
-        "ec2:DeleteNetworkInterface",
-        "ec2:AssignPrivateIpAddresses",
-        "ec2:UnassignPrivateIpAddresses"
+        "logs:CreateLogStream",
+        # "ec2:CreateNetworkInterface",
+        # "ec2:DescribeNetworkInterfaces",
+        # "ec2:DescribeSubnets",
+        # "ec2:DeleteNetworkInterface",
+        # "ec2:AssignPrivateIpAddresses",
+        # "ec2:UnassignPrivateIpAddresses"
       ]
       resources = ["*"]
   }
