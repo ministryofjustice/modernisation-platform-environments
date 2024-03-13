@@ -60,6 +60,15 @@ locals {
 
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
 
+    cloudwatch_metric_alarms = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+    )
+
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name  = "hmpps_ol_8_5_oracledb_19c_release_2023-08-07T16-14-04.275Z"
       ami_owner = "self"
