@@ -301,21 +301,21 @@ locals {
       #   })
       # })
 
-      # "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
-      #   config = merge(local.webserver_a.config, {
-      #     ssm_parameters_prefix     = "ec2-web-ptc/"
-      #     iam_resource_names_prefix = "ec2-web-ptc"
-      #     instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
-      #       "Ec2PtcWebPolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.webserver_a.tags, {
-      #     description                             = "${local.environment} practice ${local.application_name} web"
-      #     "${local.application_name}-environment" = "ptc"
-      #     oracle-db-sid                           = "PROASYS"
-      #     oracle-db-hostname                      = "db.ptc.oasys.hmpps-production.modernisation-platform.internal"
-      #   })
-      # })
+      "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
+        config = merge(local.webserver_a.config, {
+          ssm_parameters_prefix     = "ec2-web-ptc/"
+          iam_resource_names_prefix = "ec2-web-ptc"
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2PtcWebPolicy",
+          ])
+        })
+        tags = merge(local.webserver_a.tags, {
+          description                             = "${local.environment} practice ${local.application_name} web"
+          "${local.application_name}-environment" = "ptc"
+          oracle-db-sid                           = "PROASYS"
+          oracle-db-hostname                      = "db.ptc.oasys.hmpps-production.modernisation-platform.internal"
+        })
+      })
 
       "trn-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(local.webserver_a.config, {
