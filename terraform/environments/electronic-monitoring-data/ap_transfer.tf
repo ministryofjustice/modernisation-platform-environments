@@ -99,13 +99,23 @@ data "archive_file" "ap_transfer_lambda" {
 
 resource "aws_iam_role" "ap_transfer_lambda" {
   name                = "ap-transfer-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.ap_transfer_lambda.json
+  assume_role_policy  = data.aws_iam_policy_document.lambda_vpc_doc.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_vpc_policy" {
-  role       = aws_iam_role.ap_transfer_lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+
+resource "aws_iam_role_policy_document" "lambda_vpc_doc" {
+    sid    = "VPC Config"
+    effect = "Allow"
+    actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DescribeSubnets",
+      "ec2:DeleteNetworkInterface",
+      "ec2:AssignPrivateIpAddresses",
+      "ec2:UnassignPrivateIpAddresses"
+    ]
+    resources = ["*"]
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_policy" {
@@ -113,7 +123,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_lambda_function" "example_lambda" {
+resource "aws_lambda_function" "ap_transfer_lambda" {
   filename      = "ap_transfer_lambda.zip"
   function_name = "ap-transfer-lambda"
   role          = aws_iam_role.ap_transfer_lambda.arn
