@@ -193,15 +193,11 @@
     </setting>
     <setting key="email.challenge.token" syntax="EMAIL">
       <label>Forgotten Password Verification Email</label>
-      <value><![CDATA[
-       ${rendered_email_challenge_token}
-      ]]></value>
+      <value>${rendered_email_challenge_token}</value>
     </setting>
     <setting key="email.changePassword" syntax="EMAIL">
       <label>Change Password Email</label>
-      <value><![CDATA[
-       ${rendered_email_pwd_changed}
-      ]]></value>
+      <value>${rendered_email_pwd_changed}</value>
     </setting>
   </settings>
 </PwmConfiguration>

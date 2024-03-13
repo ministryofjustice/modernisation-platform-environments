@@ -95,7 +95,7 @@ module "pwm" {
         # email_from_address = "noreply-ndelius-pwm-${var.env_name}@digital.justice.gov.uk"
         email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
         email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
-        rendered_email_challenge_token = templatefile("${path.module}/templates/email.html.tpl", {
+        rendered_email_challenge_token = templatefile("${path.module}/templates/email_encoded.tpl", {
           email_preview_text = "Forgotten Password Verification"
           email_header       = <<EOT
                                 EmailItem default:
@@ -121,7 +121,7 @@ module "pwm" {
                                 <b>If you do not wish to change your password at this time, you do not need to take any action.</b>
                                 EOT
         })
-        rendered_email_pwd_changed = templatefile("${path.module}/templates/email.html.tpl", {
+        rendered_email_pwd_changed = templatefile("${path.module}/templates/email_encoded.tpl", {
           email_preview_text = "Password Changed"
           email_header       = <<EOT
                                 EmailItem default:
