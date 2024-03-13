@@ -3,15 +3,6 @@
 # Output all log
 exec > >(tee /tmp/userdata.log|logger -t user-data-extra -s 2>/dev/console) 2>&1
 
-echo "assumeyes=1" >> /etc/yum.conf
-
-# Update all packages
-sudo yum -y update
-
-# Setup YUM install Utils
-#sudo yum -y install curl wget unzip jq
-
-
 # Install AWS CLI Libs
 echo "Seup AWSCLI V2....."
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -23,12 +14,18 @@ RISING_WAVE_NODE_TYPE=${RISING_WAVE_NODE_TYPE}
 echo "RISING_WAVE_NODE_TYPE: $RISING_WAVE_NODE_TYPE"
 echo
 
-# Part of temporary noddy service discovery
+# Part of temporary service discovery
 if [ "$RISING_WAVE_NODE_TYPE" = "meta" ]; then
   aws s3 rm s3://dpr-working-development/rising-wave/hosts/risingwave_meta.txt
-  # Sleep gives us a bit of time for the meta node and etcd hosts files to be gone by the time we start setup
-  sleep 60
 fi
+
+# Sleep gives us a bit of extra time for the meta node and etcd hosts files to be gone by the time we start setup
+sleep 60
+
+echo "assumeyes=1" >> /etc/yum.conf
+
+# Update all packages
+sudo yum -y update
 
 if grep ssm-user /etc/passwd &> /dev/null;
 then
@@ -291,7 +288,7 @@ HOST_NAME=$(hostname -s)
 if [ "$RISING_WAVE_NODE_TYPE" = "meta" ]; then
     echo "Configuring Meta Node"
     echo "Started reading etcd host file from s3 at $(date)"
-    # Temporary noddy service discovery for etcd
+    # Temporary service discovery for etcd
     timeout=300
     start_time=$(date +%s)
     set +x
@@ -362,7 +359,7 @@ EOF`
   rm -f ./risingwave_meta.txt
 
 else
-  # Temporary noddy service discovery for meta node
+  # Temporary service discovery for meta node
   # Write a file to S3 for now and rely on timings
   echo "Started reading meta node host file from s3 at $(date)"
   timeout=600

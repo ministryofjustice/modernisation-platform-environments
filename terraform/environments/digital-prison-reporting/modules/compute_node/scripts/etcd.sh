@@ -3,23 +3,19 @@
 # Ouput all log
 exec > >(tee /tmp/userdata.log|logger -t user-data-extra -s 2>/dev/console) 2>&1
 
-echo "assumeyes=1" >> /etc/yum.conf
-
-# Update all packages
-sudo yum -y update
-
-# Setup YUM install Utils
-#sudo yum -y install curl wget unzip jq
-
-
 # Install AWS CLI Libs
 echo "Seup AWSCLI V2....."
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
 
-# Part of temporary noddy service discovery
+# Part of temporary service discovery
 aws s3 rm s3://dpr-working-development/rising-wave/hosts/risingwave_etcd.txt
+
+echo "assumeyes=1" >> /etc/yum.conf
+
+# Update all packages
+sudo yum -y update
 
 if grep ssm-user /etc/passwd &> /dev/null;
 then
@@ -99,7 +95,7 @@ sudo systemctl status -l etcd.service
 
 #this_instance_id=$(cat /var/lib/cloud/data/instance-id)
 
-# Part of temporary noddy service discovery
+# Part of temporary service discovery
 # Write a file to S3 for now and rely on timings
 hostname -s >risingwave_etcd.txt
 aws s3 cp ./risingwave_etcd.txt s3://dpr-working-development/rising-wave/hosts/risingwave_etcd.txt
