@@ -483,3 +483,9 @@ variable "ecs_service_egress_security_group_ids" {
   }))
   default = []
 }
+
+variable "log_error_pattern" {
+  description = "Used by metric filter for error count"
+  type        = string
+}
+

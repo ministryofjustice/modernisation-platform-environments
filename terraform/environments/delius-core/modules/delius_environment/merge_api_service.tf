@@ -135,4 +135,6 @@ module "merge_api_service" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
+
+  log_error_pattern = "ERROR"
 }

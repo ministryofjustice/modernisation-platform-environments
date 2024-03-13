@@ -65,5 +65,6 @@ module "weblogic" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
+
   bastion_sg_id = module.bastion_linux.bastion_security_group
 }

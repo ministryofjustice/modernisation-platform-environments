@@ -115,24 +115,26 @@ resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
 
 
 
-/*
+
 
 
 resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
-  count          = var.log_error_pattern != "" && local.create_log_group ? 1 : 0
-  log_group_name = aws_cloudwatch_log_group.log_group.0.name
-  name           = "${var.environment_name}-${var.service_name}-logged-errors"
+  count          = var.log_error_pattern != ""
+  log_group_name = aws_cloudwatch_log_group.ecs.name
+  name           = "${var.name}-${var.env_name}-logged-errors"
   pattern        = var.log_error_pattern
   metric_transformation {
     name          = "LoggedErrors"
-    namespace     = "${var.environment_name}/${var.service_name}"
+    namespace     = "${var.env_name}/${var.name}"
     value         = 1
     default_value = 0
   }
 }
 
+/*
+
 resource "aws_cloudwatch_metric_alarm" "log_error_warning_alarm" {
-  count               = var.log_error_pattern != "" && local.create_log_group && var.notification_arn != "" ? 1 : 0
+  count               = var.log_error_pattern != ""
   alarm_name          = "${var.environment_name}-${var.service_name}-logged-errors-cwa--warning"
   alarm_description   = "Error messages were detected in the `${var.service_name}` logs."
   comparison_operator = "GreaterThanUpperThreshold"

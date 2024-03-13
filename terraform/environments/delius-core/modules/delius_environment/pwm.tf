@@ -110,6 +110,8 @@ module "pwm" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
+
+  log_error_pattern = "FATAL"
 }
 
 
