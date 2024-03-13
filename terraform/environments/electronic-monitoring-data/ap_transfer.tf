@@ -117,6 +117,12 @@ resource "aws_lambda_function" "ap_transfer_lambda" {
   }
 }
 
+resource "aws_iam_role" "ap_transfer_lambda" {
+  name                = "ap-transfer-iam-role"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
 data "aws_iam_policy_document" "lambda_vpc_doc" {
     statement {
       sid    = "VPCConfig"
@@ -129,19 +135,14 @@ data "aws_iam_policy_document" "lambda_vpc_doc" {
         "ec2:AssignPrivateIpAddresses",
         "ec2:UnassignPrivateIpAddresses"
       ]
+      resources = ["*"]
   }
 }
 
 resource "aws_iam_role_policy" "ap_transfer_lambda" {
-    name = "ap_transfer_lambda"
+    name = "ap-transfer-iam-policy"
     role = aws_iam_role.ap_transfer_lambda.id
     policy = data.aws_iam_policy_document.lambda_vpc_doc.json
-}
-
-resource "aws_iam_role" "ap_transfer_lambda" {
-  name                = "ap-transfer-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
 
 resource "aws_lambda_permission" "ap_transfer_lambda" {
