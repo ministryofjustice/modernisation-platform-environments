@@ -56,6 +56,19 @@ locals {
     }
   }
 
+  oem_ec2_cloudwatch_metric_alarms = {
+    standard = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+    )
+    backup = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+    )
+  }
+
   oem_ec2_default = {
 
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
