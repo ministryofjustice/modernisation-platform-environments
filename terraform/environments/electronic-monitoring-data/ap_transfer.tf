@@ -103,6 +103,7 @@ resource "aws_lambda_function" "ap_transfer_lambda" {
   runtime       = "python3.12"
   memory_size   = 4096
   timeout       = 900
+  layers = [aws_lambda_layer_version.ap_transfer_lambda_layer.arn]
 
   vpc_config {
     subnet_ids         = aws_db_subnet_group.db.subnet_ids
