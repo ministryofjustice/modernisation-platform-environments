@@ -30,7 +30,7 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=710e3d9978564b75aeeee2ee3ad4218a5573267d"
+  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=35dcaa1d280564c4b1973183dd9f789ee02834de"
   container_definitions = module.container_definition.json_map_encoded_list
   cluster_arn           = var.ecs_cluster_arn
   name                  = var.name
