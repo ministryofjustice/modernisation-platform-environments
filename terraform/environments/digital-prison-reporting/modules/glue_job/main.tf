@@ -6,8 +6,7 @@ locals {
     "--checkpoint.location"              = var.checkpoint_dir
     "--spark-event-logs-path"            = var.spark_event_logs
     "--continuous-log-logGroup"          = try(aws_cloudwatch_log_group.job[0].name, "null")
-    "--enable-continuous-cloudwatch-log" = "true"
-    "--enable-continuous-log-filter"     = "true"
+    "--enable-continuous-cloudwatch-log" = "false"
     "--enable-glue-datacatalog"          = "true"
     "--enable-job-insights"              = "true"
     "--continuous-log-logStreamPrefix"   = var.continuous_log_stream_prefix
