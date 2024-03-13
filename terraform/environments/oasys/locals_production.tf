@@ -259,13 +259,13 @@ locals {
         }
         ebs_volume_config = {
           data = {
-            iops       = 500
+            iops       = 3000 # min 3000
             type       = "gp3"
             throughput = 125
             total_size = 200
           }
           flash = {
-            iops       = 500
+            iops       = 3000 # min 3000
             type       = "gp3"
             throughput = 125
             total_size = 50
@@ -279,19 +279,19 @@ locals {
         })
       })
 
-      # "trn-${local.application_name}-bip-a" = merge(local.bip_a, {
-      #   config = merge(local.bip_a.config, {
-      #     instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
-      #       "Ec2TrnBipPolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.bip_a.tags, {
-      #     bip-db-name       = "TRBIPINF"
-      #     bip-db-hostname   = "ptctrn-oasys-db-a"
-      #     oasys-db-name     = "TROASYS"
-      #     oasys-db-hostname = "ptctrn-oasys-db-a"
-      #   })
-      # })
+      "trn-${local.application_name}-bip-a" = merge(local.bip_a, {
+        config = merge(local.bip_a.config, {
+          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+            "Ec2TrnBipPolicy",
+          ])
+        })
+        tags = merge(local.bip_a.tags, {
+          bip-db-name       = "TRBIPINF"
+          bip-db-hostname   = "ptctrn-oasys-db-a"
+          oasys-db-name     = "TROASYS"
+          oasys-db-hostname = "ptctrn-oasys-db-a"
+        })
+      })
     }
 
     baseline_ec2_autoscaling_groups = {
