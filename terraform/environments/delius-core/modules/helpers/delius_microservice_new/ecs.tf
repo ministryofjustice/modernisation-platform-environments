@@ -1,5 +1,5 @@
 module "container_definition" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=20cda601f8008ce207bfbd5f36069db18249d8db"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=45dd510c4f6a8e500f3e7c2ef7b7e9c30450d76a"
   name                     = var.name
   image                    = var.container_image
   memory                   = var.container_memory
@@ -30,7 +30,7 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=20cda601f8008ce207bfbd5f36069db18249d8db"
+  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=45dd510c4f6a8e500f3e7c2ef7b7e9c30450d76a"
   container_definitions = module.container_definition.json_encoded
   cluster_arn           = var.ecs_cluster_arn
   name                  = var.name
