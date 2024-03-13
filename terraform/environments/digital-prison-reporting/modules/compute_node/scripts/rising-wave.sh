@@ -290,7 +290,7 @@ if [ "$RISING_WAVE_NODE_TYPE" = "meta" ]; then
     # Temporary service discovery for etcd
     timeout=300
     start_time=$(date +%s)
-    set +x
+    set +e
     while true; do
       aws s3 cp s3://dpr-working-development/rising-wave/hosts/risingwave_etcd.txt ./risingwave_etcd.txt
       if [ $? -eq 0 ]; then
@@ -313,7 +313,7 @@ if [ "$RISING_WAVE_NODE_TYPE" = "meta" ]; then
       fi
       sleep 10
     done
-    set -x
+    set -e
     service_file_contents=`cat << EOF
 [Unit]
 Description=rising wave meta service
@@ -356,7 +356,7 @@ else
   echo "Started reading meta node host file from s3 at $(date)"
   timeout=600
   start_time=$(date +%s)
-  set +x
+  set +e
   while true; do
     aws s3 cp s3://dpr-working-development/rising-wave/hosts/risingwave_meta.txt ./risingwave_meta.txt
     if [ $? -eq 0 ]; then
@@ -379,7 +379,7 @@ else
     fi
     sleep 30
   done
-  set -x
+  set -e
 
   if [ "$RISING_WAVE_NODE_TYPE" = "compute" ]; then
     echo "Configuring Compute Node"
