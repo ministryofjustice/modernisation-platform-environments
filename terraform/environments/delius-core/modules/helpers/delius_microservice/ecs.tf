@@ -1,9 +1,9 @@
 module "container_definition" {
-  source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.61.1"
-  container_name           = var.name
-  container_image          = var.container_image
-  container_memory         = var.container_memory
-  container_cpu            = var.container_cpu
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=a91014d6c57dad8fd1de5e20096472397afc42e8"
+  name                     = var.name
+  image                    = var.container_image
+  memory                   = var.container_memory
+  cpu                      = var.container_cpu
   essential                = true
   readonly_root_filesystem = false
 
@@ -30,8 +30,8 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=127962ef327feee9977bd93ff3d83e68abf44700"
-  container_definitions = module.container_definition.json_map_encoded_list
+  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=a91014d6c57dad8fd1de5e20096472397afc42e8"
+  container_definitions = module.container_definition.json_encoded_list
   cluster_arn           = var.ecs_cluster_arn
   name                  = var.name
 
@@ -63,7 +63,7 @@ module "ecs_service" {
 
   enable_execute_command = true
 
-  ignore_changes = false
+  ignore_changes = var.ignore_changes_task_definition
 
   tags = var.tags
 }
