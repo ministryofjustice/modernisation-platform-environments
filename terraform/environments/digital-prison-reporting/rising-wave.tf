@@ -295,3 +295,13 @@ module "rising_wave_frontend_node" {
   ]
 
 }
+
+resource "aws_iam_user" "rising_wave_s3_connector_user" {
+  name = "rising_wave_s3_connector_user"
+  path = "/drp/risingwave/"
+
+  tags = {
+    Resource_Group = "rising-wave"
+    Jira           = "DPR2-463"
+  }
+}
