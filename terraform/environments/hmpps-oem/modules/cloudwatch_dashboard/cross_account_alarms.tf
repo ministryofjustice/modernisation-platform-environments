@@ -1,5 +1,5 @@
-resource "aws_cloudwatch_metric_alarm" "oasys-cpu-util" {
-    alarm_name = "oasys-cpu-util"
+resource "aws_cloudwatch_metric_alarm" "nomis-cpu-util" {
+    alarm_name = "nomis-cpu-util"
     comparison_operator = "GreaterThanOrEqualToThreshold"
     evaluation_periods  = "15"
     datapoints_to_alarm = "15"
@@ -15,6 +15,9 @@ resource "aws_cloudwatch_metric_alarm" "oasys-cpu-util" {
             namespace = "AWS/EC2"
             period = "60"
             stat = "Maximum"
+            dimensions = {
+                InstanceId = "*"
+            }
         }
     }
 }
