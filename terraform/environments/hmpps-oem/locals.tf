@@ -29,7 +29,7 @@ locals {
     enable_ec2_oracle_enterprise_managed_server  = true # the oem manager manages itself, so it needs all of these permissions too
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = true # adds db backup buckets
-    cloudwatch_metric_alarms_default_actions     = ["dba_pagerduty"]
+    cloudwatch_metric_alarms_default_actions     = null # don't alarm by default as we use this account to aggregate alarms
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }
