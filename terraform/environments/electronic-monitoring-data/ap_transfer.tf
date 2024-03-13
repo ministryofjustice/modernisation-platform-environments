@@ -185,7 +185,7 @@ resource "null_resource" "lambda_layer" {
 
 # create lambda layer from s3 object
 resource "aws_lambda_layer_version" "ap_transfer_lambda_layer" {
-  filename   = "ap_transfer_lambda_layer.zip"
+  filename   = "${local.layer_path}/${local.layer_zip_name}"
   layer_name          = local.layer_path
   compatible_runtimes = ["python3.11"]
   skip_destroy        = true
