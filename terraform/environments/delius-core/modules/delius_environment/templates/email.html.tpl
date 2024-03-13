@@ -26,8 +26,6 @@ Html:<!DOCTYPE html>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta content="telephone=no" name="format-detection"> <!-- need to add formatting for real phone numbers -->
   <meta name="viewport" content="width=device-width">
-  <title>${email_subject}</title>
-
   <style>
     @media only screen and (min-device-width: 581px) {
       .content {
