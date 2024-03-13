@@ -1,0 +1,16 @@
+# This is an EC2Launch V2 type user-data script
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
+# See C:\ProgramData\Amazon\EC2Launch\log for logs
+version: 1.0 # version 1.0 is required as this executes AFTER the SSM Agent is running
+tasks:
+  - task: executeScript
+    inputs:
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          Set-Location -Path ([System.IO.Path]::GetTempPath())
+          $GitBranch = "DSO/DSOS-2627/pwsh-ad-module"
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
+          Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
+          . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch

@@ -73,7 +73,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2024-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/user-data.yaml"))
+          user_data_raw                 = base64encode(file("./templates/user-data-pwsh-test-branch.yaml"))
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["CSRWebServerPolicy"])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
