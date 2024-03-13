@@ -113,6 +113,11 @@ resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
   comparison_operator = "GreaterThanThreshold"
 }
 
+
+
+/*
+
+
 resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
   count          = var.log_error_pattern != "" && local.create_log_group ? 1 : 0
   log_group_name = aws_cloudwatch_log_group.log_group.0.name
@@ -234,3 +239,6 @@ resource "aws_cloudwatch_metric_alarm" "response_code_5xx_critical_alarm" {
     TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
+
+
+*/
