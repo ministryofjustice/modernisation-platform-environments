@@ -42,6 +42,10 @@ locals {
 
     baseline_ec2_instances = {
       test-oem-a = merge(local.oem_ec2_default, {
+        cloudwatch_metric_alarms = merge(
+          local.oem_ec2_cloudwatch_metric_alarms.standard,
+          local.oem_ec2_cloudwatch_metric_alarms.backup,
+        )
         config = merge(local.oem_ec2_default.config, {
           availability_zone = "eu-west-2a"
         })
