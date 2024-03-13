@@ -6,6 +6,49 @@ locals {
         iam_policies   = module.baseline_presets.s3_iam_policies
       }
     }
+    baseline_iam_policies = {
+      Ec2DevDatabasePolicy = {
+        description = "Permissions required for DEV Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*DEV/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/DEV*/*",
+            ]
+          }
+        ]
+      }
+      Ec2DevReportingPolicy = {
+        description = "Permissions required for DEV reporting EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip-cms/dev/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-tomcat-admin/dev/*",
+            ]
+          }
+        ]
+      }
+    }
     baseline_ec2_instances = {
       dv-ncr-db-1-a = merge(local.database_ec2_default, {
         cloudwatch_metric_alarms = merge(
