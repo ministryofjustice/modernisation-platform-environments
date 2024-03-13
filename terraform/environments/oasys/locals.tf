@@ -226,13 +226,13 @@ locals {
     }
     ebs_volume_config = {
       data = {
-        iops       = 10000
+        iops       = 10000 # min 3000
         type       = "gp3"
         throughput = 125
         total_size = 200
       }
       flash = {
-        iops       = 3000
+        iops       = 3000 # min 3000
         type       = "gp3"
         throughput = 125
         total_size = 50
