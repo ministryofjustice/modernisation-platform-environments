@@ -152,3 +152,42 @@ resource "aws_lambda_permission" "ap_transfer_lambda" {
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.test_dump.arn
 }
+
+#-----------------------------------------------------------------------------
+# Lambda layer for the above lambda
+#------------------------------------------------------------------------------
+
+
+#define variables
+locals {
+  layer_path        = "ap_transfer_lambda_layer"
+  layer_zip_name    = "${locals.layer_path}.zip"
+  requirements_name = "requirements.txt"
+  requirements_path = "${path.module}/${local.layer_path}/${local.requirements_name}"
+}
+
+# create zip file from requirements.txt. Triggers only when the file is updated
+resource "null_resource" "lambda_layer" {
+  triggers = {
+    requirements = filesha1(local.requirements_path)
+  }
+  # the command to install python and dependencies to the machine and zips
+  provisioner "local-exec" {
+    command = <<EOT
+      cd ${local.layer_path}
+      rm -rf python
+      mkdir python
+      pip3 install -r ${local.requirements_name} -t python/
+      zip -r ${local.layer_zip_name} python/
+    EOT
+  }
+}
+
+# create lambda layer from s3 object
+resource "aws_lambda_layer_version" "ap_transfer_lambda_layer" {
+  filename   = "ap_transfer_lambda_layer.zip"
+  layer_name          = local.layer_path
+  compatible_runtimes = ["python3.11"]
+  skip_destroy        = true
+  depends_on          = [local.layer_zip_name]
+}
