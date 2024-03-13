@@ -125,7 +125,7 @@ locals {
           nomis-combined-reporting-environment = "t1"
         })
       })
-      t1-ncr-cms-a = merge(local.bip_cms_ec2_default, {
+      t1-ncr-cms = merge(local.bip_cms_ec2_default, {
         cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
         config = merge(local.bip_cms_ec2_default.config, {
           instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
@@ -150,7 +150,7 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          t1-ncr-cms-a = {
+          t1-ncr-cms = {
             port     = 7777
             protocol = "HTTP"
             health_check = {
@@ -168,7 +168,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "t1-ncr-cms-a" },
+              { ec2_instance_name = "t1-ncr-cms" },
             ]
           }
         }
@@ -185,16 +185,16 @@ locals {
               }
             }
             rules = {
-              t1-ncr-cms-a = {
+              t1-ncr-cms = {
                 priority = 4000
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-cms-a"
+                  target_group_name = "t1-ncr-cms"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-cms-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                      "t1-ncr-cms.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -215,16 +215,16 @@ locals {
               }
             }
             rules = {
-              t1-ncr-cms-a = {
+              t1-ncr-cms = {
                 priority = 4580
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-cms-a"
+                  target_group_name = "t1-ncr-cms"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-cms-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                      "t1-ncr-cms.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -243,7 +243,7 @@ locals {
         ]
         lb_alias_records = [
           # T1
-          { name = "t1-ncr-cms-a", type = "A", lbs_map_key = "private" },
+          { name = "t1-ncr-cms", type = "A", lbs_map_key = "private" },
           { name = "t1-ncr-web", type = "A", lbs_map_key = "private" },
         ]
       }

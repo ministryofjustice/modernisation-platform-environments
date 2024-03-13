@@ -88,6 +88,27 @@ locals {
           protocol    = -1
           self        = true
         }
+        http6411 = {
+          description     = "Allow http6411 ingress"
+          from_port       = 6411
+          to_port         = 6411
+          protocol        = "tcp"
+          security_groups = ["public"]
+        }
+        http6400 = {
+          description     = "Allow http6400 ingress"
+          from_port       = 6400
+          to_port         = 6400
+          protocol        = "tcp"
+          security_groups = ["public"]
+        }
+        http6455 = {
+          description     = "Allow http6455 ingress"
+          from_port       = 6455
+          to_port         = 6455
+          protocol        = "tcp"
+          security_groups = ["public"]
+        }
         http7777 = {
           description     = "Allow http7777 ingress"
           from_port       = 7777
