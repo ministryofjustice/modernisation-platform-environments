@@ -190,22 +190,22 @@ locals {
           }
         ]
       }
-      Ec2ProdBipPolicy = {
-        description = "Permissions required for prod Bip EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/bip-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/bip-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/bip/production/*",
-            ]
-          }
-        ]
-      }
+      # Ec2ProdBipPolicy = {
+      #   description = "Permissions required for prod Bip EC2s"
+      #   statements = [
+      #     {
+      #       effect = "Allow"
+      #       actions = [
+      #         "secretsmanager:GetSecretValue",
+      #       ]
+      #       resources = [
+      #         "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/bip-*",
+      #         "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/bip-*",
+      #         "arn:aws:secretsmanager:*:*:secret:/oracle/bip/production/*",
+      #       ]
+      #     }
+      #   ]
+      # }
     }
 
     baseline_ec2_instances = {
@@ -279,19 +279,19 @@ locals {
         })
       })
 
-      "trn-${local.application_name}-bip-a" = merge(local.bip_a, {
-        config = merge(local.bip_a.config, {
-          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
-            "Ec2TrnBipPolicy",
-          ])
-        })
-        tags = merge(local.bip_a.tags, {
-          bip-db-name       = "TRBIPINF"
-          bip-db-hostname   = "ptctrn-oasys-db-a"
-          oasys-db-name     = "TROASYS"
-          oasys-db-hostname = "ptctrn-oasys-db-a"
-        })
-      })
+      # "trn-${local.application_name}-bip-a" = merge(local.bip_a, {
+      #   config = merge(local.bip_a.config, {
+      #     instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+      #       "Ec2TrnBipPolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.bip_a.tags, {
+      #     bip-db-name       = "TRBIPINF"
+      #     bip-db-hostname   = "ptctrn-oasys-db-a"
+      #     oasys-db-name     = "TROASYS"
+      #     oasys-db-hostname = "ptctrn-oasys-db-a"
+      #   })
+      # })
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -301,21 +301,21 @@ locals {
       #   })
       # })
 
-      "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
-        config = merge(local.webserver_a.config, {
-          ssm_parameters_prefix     = "ec2-web-ptc/"
-          iam_resource_names_prefix = "ec2-web-ptc"
-          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
-            "Ec2PtcWebPolicy",
-          ])
-        })
-        tags = merge(local.webserver_a.tags, {
-          description                             = "${local.environment} practice ${local.application_name} web"
-          "${local.application_name}-environment" = "ptc"
-          oracle-db-sid                           = "PROASYS"
-          oracle-db-hostname                      = "db.ptc.oasys.hmpps-production.modernisation-platform.internal"
-        })
-      })
+      # "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
+      #   config = merge(local.webserver_a.config, {
+      #     ssm_parameters_prefix     = "ec2-web-ptc/"
+      #     iam_resource_names_prefix = "ec2-web-ptc"
+      #     instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+      #       "Ec2PtcWebPolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.webserver_a.tags, {
+      #     description                             = "${local.environment} practice ${local.application_name} web"
+      #     "${local.application_name}-environment" = "ptc"
+      #     oracle-db-sid                           = "PROASYS"
+      #     oracle-db-hostname                      = "db.ptc.oasys.hmpps-production.modernisation-platform.internal"
+      #   })
+      # })
 
       "trn-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(local.webserver_a.config, {
