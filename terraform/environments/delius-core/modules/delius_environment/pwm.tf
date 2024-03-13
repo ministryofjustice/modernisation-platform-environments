@@ -95,6 +95,48 @@ module "pwm" {
         # email_from_address = "noreply-ndelius-pwm-${var.env_name}@digital.justice.gov.uk"
         email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
         email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
+        rendered_email_challenge_token = templatefile("${path.module}/templates/email.html.tpl", {
+          email_subject      = "Forgotten Password Verification"
+          email_preview_text = "Forgotten Password Verification"
+          email_header       = <<EOT
+                                EmailItem default:
+                                  To:@User:Email@
+                                From:Forgotten Password <@DefaultEmailFromAddress@>
+                                Subj:${email_subject}
+                                Body:Thank you for requesting your account activation. To continue with your account activation, please copy and paste the following code onto the activation form:
+
+                                %TOKEN%
+
+                                If you did not request to create a new account, you do not need to take any action.
+                                EOT
+          email_body         = <<EOT
+                                <b>If you do not wish to change your password at this time, you do not need to take any action.</b>
+                                Html:Thank you for requesting a password reset.
+                                <a style="word-wrap: break-word; color: #1D70B8;" href="https://pwm.${var.env_name}.${var.account_config.dns_suffix}/public/forgottenpassword/%TOKEN%" target="_blank">Click here to reset</a>.
+
+                                If for some reason this link doesn't work, you can copy and paste the following code onto the password reset form:
+                                <blockquote style="Margin: 0 0 20px 0; border-left: 10px solid #B1B4B6;padding: 15px 0 0.1px 15px; font-size: 19px; line-height: 25px;"><p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">
+                                  <span class="placeholder">%TOKEN%</span></p>
+                                </blockquote>
+
+                                <b>If you do not wish to change your password at this time, you do not need to take any action.</b>
+                                EOT
+        })
+        rendered_email_pwd_changed = templatefile("${path.module}/templates/email.html.tpl", {
+          email_subject      = "Password Changed"
+          email_preview_text = "Password Changed"
+          email_header       = <<EOT
+                                EmailItem default:
+                                  To:@User:Email@
+                                From:Change Password Notice <@DefaultEmailFromAddress@>
+                                Subj:Password Change Notification
+                                Body:You have changed your password. If you did not initiate a password change please contact your help desk immediately.
+                                EOT
+          email_body         = <<EOT
+                                <b>You have changed your password.</b> If you have changed your password, then no action is required. If you did not initiate a password change please contact your help desk.
+                                EOT
+        })
+
       }))
     },
     {
