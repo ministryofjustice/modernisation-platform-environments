@@ -103,7 +103,7 @@ module "pwm" {
     }
   ]
 
-  ignore_changes_task_definition = false
+  ignore_changes_task_definition = true
   force_new_deployment           = false
 
   providers = {
@@ -150,10 +150,19 @@ resource "aws_route53_record" "pwm_amazonses_dkim_record" {
   provider = aws.core-vpc
   count    = 3
   zone_id  = var.account_config.route53_external_zone.zone_id
-  name     = "${aws_ses_domain_dkim.pwm.dkim_tokens[count.index]}._domainkey"
+  name     = "${aws_ses_domain_dkim.pwm.dkim_tokens[count.index]}._domainkey.pwm.${var.env_name}.${var.account_info.application_name}"
   type     = "CNAME"
   ttl      = "600"
   records  = ["${aws_ses_domain_dkim.pwm.dkim_tokens[count.index]}.dkim.amazonses.com"]
+}
+
+resource "aws_route53_record" "pwm_amazonses_dmarc_record" {
+  provider = aws.core-vpc
+  zone_id  = var.account_config.route53_external_zone.zone_id
+  name     = "_dmarc.pwm.${var.env_name}.${var.account_config.dns_suffix}"
+  type     = "TXT"
+  ttl      = "600"
+  records  = ["v=DMARC1; p=none;"]
 }
 
 #####################

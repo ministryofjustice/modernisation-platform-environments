@@ -1,3 +1,17 @@
+### DMS replication instance log group
+resource "aws_cloudwatch_log_group" "dms-instance-log-group" {
+  count = var.setup_dms_instance ? 1 : 0
+  name  = "dms-tasks-${var.name}-instance-${var.env}"
+
+  retention_in_days = var.dms_log_retention_in_days
+
+  tags = merge(
+    var.tags,
+    {
+      name = "${var.name}-instance-log-group-${var.env}"
+    })
+}
+
 ### DMS replication instance
 resource "aws_dms_replication_instance" "dms-s3-target-instance" {
   count = var.setup_dms_instance ? 1 : 0
@@ -30,7 +44,8 @@ resource "aws_dms_replication_instance" "dms-s3-target-instance" {
 
   depends_on = [
     aws_dms_replication_subnet_group.dms-s3-target-subnet-group,
-    aws_security_group.dms_s3_target_sec_group
+    aws_security_group.dms_s3_target_sec_group,
+    aws_cloudwatch_log_group.dms-instance-log-group
   ]
 }
 

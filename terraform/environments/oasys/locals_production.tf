@@ -190,22 +190,22 @@ locals {
           }
         ]
       }
-      Ec2ProdBipPolicy = {
-        description = "Permissions required for prod Bip EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/bip-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/bip-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/bip/production/*",
-            ]
-          }
-        ]
-      }
+      # Ec2ProdBipPolicy = {
+      #   description = "Permissions required for prod Bip EC2s"
+      #   statements = [
+      #     {
+      #       effect = "Allow"
+      #       actions = [
+      #         "secretsmanager:GetSecretValue",
+      #       ]
+      #       resources = [
+      #         "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/bip-*",
+      #         "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/bip-*",
+      #         "arn:aws:secretsmanager:*:*:secret:/oracle/bip/production/*",
+      #       ]
+      #     }
+      #   ]
+      # }
     }
 
     baseline_ec2_instances = {
@@ -259,13 +259,13 @@ locals {
         }
         ebs_volume_config = {
           data = {
-            iops       = 500
+            iops       = 3000 # min 3000
             type       = "gp3"
             throughput = 125
             total_size = 200
           }
           flash = {
-            iops       = 500
+            iops       = 3000 # min 3000
             type       = "gp3"
             throughput = 125
             total_size = 50

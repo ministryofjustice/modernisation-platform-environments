@@ -69,7 +69,7 @@ locals {
           ami_name                      = "hmpps_windows_server_2022_release_2024-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
-          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy"])
+          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
           user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {

@@ -169,6 +169,12 @@ variable "allow_major_version_upgrade" {
   default     = false
 }
 
+variable "dms_log_retention_in_days" {
+  type        = number
+  default     = 14
+  description = "(Optional) The default number of days log events retained in the DMS task log group."
+}
+
 #--------------------------------------------------------------
 # DMS general config
 #--------------------------------------------------------------

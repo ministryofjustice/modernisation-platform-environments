@@ -1,7 +1,9 @@
-import boto3 
-cloudwatch = boto3.client('cloudwatch')
-     
-def lambda_handler(event, context):
-         response = cloudwatch.enable_alarm_actions(
-            AlarmNames=['CPU-High-i-029d2b17679dab982','CPU-High-i-00cbccc46d25e77c6'] 
-    )
+import boto3
+
+client = boto3.client('cloudwatch')
+
+file1 = open("alarms.txt", "r")
+enable_alarm = file1.readlines()
+enable_alarm = [line.rstrip() for line in enable_alarm]
+print(enable_alarm)
+response = client.enable_alarm_actions(AlarmNames=enable_alarm)

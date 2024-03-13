@@ -51,6 +51,7 @@ module "glue_compact_raw_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -95,6 +96,7 @@ module "glue_compact_structured_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -139,6 +141,7 @@ module "glue_compact_curated_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -183,6 +186,7 @@ module "glue_compact_domain_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -228,6 +232,7 @@ module "glue_retention_raw_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -272,6 +277,7 @@ module "glue_retention_structured_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -316,6 +322,7 @@ module "glue_retention_curated_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -360,6 +367,7 @@ module "glue_retention_domain_job" {
   max_concurrent               = 1
   region                       = local.account_region
   account                      = local.account_id
+  log_group_retention_in_days  = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
