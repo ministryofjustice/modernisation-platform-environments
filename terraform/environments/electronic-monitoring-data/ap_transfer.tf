@@ -141,13 +141,3 @@ resource "aws_iam_role_policy" "ap_transfer_lambda" {
     role = aws_iam_role.ap_transfer_lambda.id
     policy = data.aws_iam_policy_document.ap_transfer_lambda.json
 }
-
-resource "aws_iam_role_policy_attachment" "lambda_vpc_policy" {
-  role       = aws_iam_role.lambda_exec_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_basic_policy" {
-  role       = aws_iam_role.lambda_exec_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
