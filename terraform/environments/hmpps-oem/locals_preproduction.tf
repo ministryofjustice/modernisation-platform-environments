@@ -7,7 +7,13 @@ locals {
   }
 
   # baseline presets config
-  preproduction_baseline_presets_options = {}
+  preproduction_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dba_pagerduty = "hmpps_shef_dba_low_priority"
+      }
+    }
+  }
 
   # baseline config
   preproduction_config = {

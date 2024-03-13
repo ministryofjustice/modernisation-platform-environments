@@ -7,7 +7,13 @@ locals {
   }
 
   # baseline presets config
-  test_baseline_presets_options = {}
+  test_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dba_pagerduty = "hmpps_shef_dba_non_prod"
+      }
+    }
+  }
 
   # baseline config
   test_config = {
