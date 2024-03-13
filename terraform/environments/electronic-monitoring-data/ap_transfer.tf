@@ -140,7 +140,7 @@ resource "aws_iam_role_policy" "ap_transfer_lambda" {
 
 resource "aws_iam_role" "ap_transfer_lambda" {
   name                = "ap-transfer-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.lambda_vpc_doc.json
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
 
