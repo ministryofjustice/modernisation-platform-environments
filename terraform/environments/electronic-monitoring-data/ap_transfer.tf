@@ -161,7 +161,7 @@ resource "aws_lambda_permission" "ap_transfer_lambda" {
 #define variables
 locals {
   layer_path        = "ap_transfer_lambda_layer"
-  layer_zip_name    = "${locals.layer_path}.zip"
+  layer_zip_name    = "${local.layer_path}.zip"
   requirements_name = "requirements.txt"
   requirements_path = "${path.module}/${local.layer_path}/${local.requirements_name}"
 }
