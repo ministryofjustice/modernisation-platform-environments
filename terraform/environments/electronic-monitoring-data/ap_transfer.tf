@@ -87,14 +87,13 @@ module "ap_transfer_log_bucket" {
 
 
 #------------------------------------------------------------------------------
-# S3 lambda function and IAM role definition
+# Lambda function and IAM role definition
 #------------------------------------------------------------------------------
 data "archive_file" "ap_transfer_lambda" {
   type        = "zip"
   source_file = "ap_transfer_lambda.py"
   output_path = "ap_transfer_lambda.zip"
 }
-
 
 resource "aws_lambda_function" "ap_transfer_lambda" {
   filename      = "ap_transfer_lambda.zip"
@@ -112,7 +111,6 @@ resource "aws_lambda_function" "ap_transfer_lambda" {
   environment {
     variables = {
       DB_HOST     = aws_db_instance.database_2022.address
-      # DB_NAME     = aws_db_instance.database_2022.name
       DB_USERNAME = aws_db_instance.database_2022.username
       DB_PASSWORD = aws_secretsmanager_secret_version.db_password.secret_string
     }
@@ -124,15 +122,13 @@ data "aws_iam_policy_document" "lambda_vpc_doc" {
       sid    = "VPC Config"
       effect = "Allow"
       actions = [
-        "logs:CreateLogStream",
-        # "ec2:CreateNetworkInterface",
-        # "ec2:DescribeNetworkInterfaces",
-        # "ec2:DescribeSubnets",
-        # "ec2:DeleteNetworkInterface",
-        # "ec2:AssignPrivateIpAddresses",
-        # "ec2:UnassignPrivateIpAddresses"
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeSubnets",
+        "ec2:DeleteNetworkInterface",
+        "ec2:AssignPrivateIpAddresses",
+        "ec2:UnassignPrivateIpAddresses"
       ]
-      resources = ["*"]
   }
 }
 
@@ -149,7 +145,7 @@ resource "aws_iam_role" "ap_transfer_lambda" {
 }
 
 resource "aws_lambda_permission" "ap_transfer_lambda" {
-  statement_id  = "AllowPArquetToAP"
+  statement_id  = "AllowParquetToAP"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ap_transfer_lambda.arn
   principal     = "s3.amazonaws.com"
