@@ -96,7 +96,24 @@ data "archive_file" "ap_transfer_lambda" {
 }
 
 
-resource "aws_lambda_function" "ap_transfer_lambda" {
+
+resource "aws_iam_role" "ap_transfer_lambda" {
+  name                = "ap-transfer-iam-role"
+  assume_role_policy  = data.aws_iam_policy_document.ap_transfer_lambda.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_vpc_policy" {
+  role       = aws_iam_role.ap_transfer_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_policy" {
+  role       = aws_iam_role.ap_transfer_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_lambda_function" "example_lambda" {
   filename      = "ap_transfer_lambda.zip"
   function_name = "ap-transfer-lambda"
   role          = aws_iam_role.ap_transfer_lambda.arn
@@ -105,21 +122,19 @@ resource "aws_lambda_function" "ap_transfer_lambda" {
   memory_size   = 4096
   timeout       = 900
 
-  tags = local.tags
-
   vpc_config {
-    // Assuming the subnets are associated with the RDS and appropriate for the Lambda as well
-    subnet_ids         = data.aws_subnets.shared-public.ids
+    subnet_ids         = [aws_db_subnet_group.db.id]
     security_group_ids = [aws_security_group.db.id]
   }
+  environment {
+    variables = {
+      DB_HOST     = aws_db_instance.database_2022.address
+      DB_NAME     = aws_db_instance.database_2022.name
+      DB_USERNAME = aws_db_instance.database_2022.username
+      DB_PASSWORD = aws_secretsmanager_secret_version.db_password.secret_string
+    }
+  }
 }
-
-resource "aws_iam_role" "ap_transfer_lambda" {
-  name                = "ap-transfer-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.ap_transfer_lambda.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
-}
-
 
 resource "aws_iam_role_policy" "ap_transfer_lambda" {
     name = "ap_transfer_lambda"
@@ -127,25 +142,12 @@ resource "aws_iam_role_policy" "ap_transfer_lambda" {
     policy = data.aws_iam_policy_document.ap_transfer_lambda.json
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_vpc_policy" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
 
-data "aws_iam_policy_document" "ap_transfer_lambda" {
-  statement {
-    sid    = "RDS access"
-    effect = "Allow"
-
-    actions = [
-      "rds-data:ExecuteSql",
-      "rds-data:ExecuteStatement",
-      "rds-data:BatchExecuteStatement",
-      "rds-data:BeginTransaction",
-      "rds-data:CommitTransaction",
-      "rds-data:RollbackTransaction",
-    ]
-    }
-    statement {
-      sid    = "secrets access"
-      effect = "Allow"
-      actions = ["secretsmanager:GetSecretValue"]
-      resources = [aws_secretsmanager_secret.db_password.arn]
-    }
+resource "aws_iam_role_policy_attachment" "lambda_basic_policy" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
