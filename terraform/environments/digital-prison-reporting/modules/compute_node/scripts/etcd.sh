@@ -10,6 +10,7 @@ unzip awscliv2.zip
 ./aws/install
 
 # Part of temporary service discovery
+# Remove the etcd host file so risingwave nodes won't use the old file on a redeploy
 aws s3 rm s3://dpr-working-development/rising-wave/hosts/risingwave_etcd.txt
 
 echo "assumeyes=1" >> /etc/yum.conf
@@ -92,8 +93,6 @@ sudo systemctl daemon-reload
 sudo systemctl enable etcd
 sudo systemctl start etcd.service
 sudo systemctl status -l etcd.service
-
-#this_instance_id=$(cat /var/lib/cloud/data/instance-id)
 
 # Part of temporary service discovery
 # Write a file to S3 for now and rely on timings

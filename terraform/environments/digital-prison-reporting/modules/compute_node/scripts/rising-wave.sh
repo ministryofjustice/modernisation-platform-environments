@@ -15,6 +15,7 @@ echo "RISING_WAVE_NODE_TYPE: $RISING_WAVE_NODE_TYPE"
 echo
 
 # Part of temporary service discovery
+# Remove the risingwave meta node host file so other node types won't use the old file on a redeploy
 if [ "$RISING_WAVE_NODE_TYPE" = "meta" ]; then
   aws s3 rm s3://dpr-working-development/rising-wave/hosts/risingwave_meta.txt
 fi
@@ -277,11 +278,9 @@ EOF`
 
 echo "$config_file_contents" | sudo tee "$RISING_WAVE_HOME/risingwave.toml" > /dev/null
 
-
 sudo groupadd -f risingwave
 sudo useradd -d /opt/risingwave -s /bin/false -g risingwave risingwave
 sudo chown -R risingwave:risingwave /opt/risingwave
-
 
 HOST_NAME=$(hostname -s)
 
@@ -315,7 +314,7 @@ if [ "$RISING_WAVE_NODE_TYPE" = "meta" ]; then
       sleep 10
     done
     set -x
-    meta_node_service_file_contents=`cat << EOF
+    service_file_contents=`cat << EOF
 [Unit]
 Description=rising wave meta service
 
@@ -346,21 +345,14 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF`
 
-  echo "$meta_node_service_file_contents" | sudo tee /lib/systemd/system/risingwave-meta.service > /dev/null
-
-  sudo systemctl daemon-reload
-  sudo systemctl enable risingwave-meta
-  sudo systemctl start risingwave-meta.service
-  sudo systemctl status -l risingwave-meta.service
-
   echo "$HOST_NAME" >risingwave_meta.txt
   aws s3 cp ./risingwave_meta.txt s3://dpr-working-development/rising-wave/hosts/risingwave_meta.txt
   echo "Wrote meta node host file to s3 at $(date)"
   rm -f ./risingwave_meta.txt
 
 else
-  # Temporary service discovery for meta node
-  # Write a file to S3 for now and rely on timings
+  # Temporary service discovery for meta node hostname
+  # We write a file to S3 for now and rely on timings when reading it back
   echo "Started reading meta node host file from s3 at $(date)"
   timeout=600
   start_time=$(date +%s)
@@ -391,7 +383,7 @@ else
 
   if [ "$RISING_WAVE_NODE_TYPE" = "compute" ]; then
     echo "Configuring Compute Node"
-    compute_node_service_file_contents=`cat << EOF
+    service_file_contents=`cat << EOF
 [Unit]
 Description=rising wave compute service
 
@@ -418,16 +410,9 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF`
 
-  echo "$compute_node_service_file_contents" | sudo tee /lib/systemd/system/risingwave-compute.service > /dev/null
-
-  sudo systemctl daemon-reload
-  sudo systemctl enable risingwave-compute
-  sudo systemctl start risingwave-compute.service
-  sudo systemctl status -l risingwave-compute.service
-
   elif [ "$RISING_WAVE_NODE_TYPE" = "compactor" ]; then
     echo "Configuring Compactor Node"
-    compactor_node_service_file_contents=`cat << EOF
+    service_file_contents=`cat << EOF
 [Unit]
 Description=rising wave compactor service
 
@@ -452,18 +437,9 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF`
 
-    echo "$compactor_node_service_file_contents" | sudo tee /lib/systemd/system/risingwave-compactor.service > /dev/null
-
-    sudo systemctl daemon-reload
-    sudo systemctl enable risingwave-compactor
-    sudo systemctl start risingwave-compactor.service
-    sudo systemctl status -l risingwave-compactor.service
-
   elif [ "$RISING_WAVE_NODE_TYPE" = "frontend" ]; then
-
-  # Frontend node
     echo "Configuring Frontend Node"
-    frontend_node_service_file_contents=`cat << EOF
+    service_file_contents=`cat << EOF
 [Unit]
 Description=rising wave frontend service
 
@@ -488,17 +464,22 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF`
 
-    echo "$frontend_node_service_file_contents" | sudo tee /lib/systemd/system/risingwave-frontend.service > /dev/null
-
-    sudo systemctl daemon-reload
-    sudo systemctl enable risingwave-frontend
-    sudo systemctl start risingwave-frontend.service
-    sudo systemctl status -l risingwave-frontend.service
-
   else
-    echo "$RISING_WAVE_NODE_TYPE is not a valid rising wave node type"
+    echo "ERROR: $RISING_WAVE_NODE_TYPE is not a valid rising wave node type"
     exit 1
   fi
 fi
+
+# Write the service file and start the service
+service_name="risingwave-$RISING_WAVE_NODE_TYPE"
+service_file_location="/lib/systemd/system/$service_name.service"
+echo "$service_file_contents" | sudo tee "$service_file_location" > /dev/null
+
+echo "Starting service"
+echo
+sudo systemctl daemon-reload
+sudo systemctl enable "$service_name"
+sudo systemctl start "$service_name.service"
+sudo systemctl status -l "$service_name.service"
 
 echo "Finished setup"
