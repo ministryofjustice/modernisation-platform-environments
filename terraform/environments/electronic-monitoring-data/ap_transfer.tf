@@ -103,6 +103,7 @@ resource "aws_lambda_function" "ap_transfer_lambda" {
   runtime       = "python3.12"
   memory_size   = 4096
   timeout       = 900
+  # architectures = ["arm64"]
   layers = [aws_lambda_layer_version.ap_transfer_lambda_layer.arn]
 
   vpc_config {
@@ -188,7 +189,7 @@ resource "null_resource" "lambda_layer" {
 resource "aws_lambda_layer_version" "ap_transfer_lambda_layer" {
   filename   = "${local.layer_path}/${local.layer_zip_name}"
   layer_name          = local.layer_path
-  compatible_runtimes = ["python3.11"]
+  compatible_runtimes = ["python3.12"]
   skip_destroy        = true
   depends_on          = [local.layer_zip_name]
 }
