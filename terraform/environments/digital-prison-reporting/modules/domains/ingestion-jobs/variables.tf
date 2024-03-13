@@ -42,13 +42,6 @@ variable "glue_batch_create_sec_conf" {
   description = "(Optional) Create AWS Glue Security Configuration associated with the job."
 }
 
-variable "glue_batch_log_group_retention_in_days" {
-  type        = number
-  default     = 1
-  description = "(Optional) The default number of days log events retained in the glue job log group."
-}
-
-
 variable "glue_batch_language" {
   type        = string
   default     = "python"
@@ -86,7 +79,7 @@ variable "glue_batch_script_location" {
 
 variable "glue_batch_enable_cont_log_filter" {
   type        = bool
-  default     = true
+  default     = false
   description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 
@@ -167,9 +160,9 @@ variable "glue_cdc_create_sec_conf" {
   description = "(Optional) Create AWS Glue Security Configuration associated with the job."
 }
 
-variable "glue_cdc_log_group_retention_in_days" {
+variable "glue_log_group_retention_in_days" {
   type        = number
-  default     = 1
+  default     = 7
   description = "(Optional) The default number of days log events retained in the glue job log group."
 }
 
@@ -211,7 +204,7 @@ variable "glue_cdc_script_location" {
 
 variable "glue_cdc_enable_cont_log_filter" {
   type        = bool
-  default     = true
+  default     = false
   description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 

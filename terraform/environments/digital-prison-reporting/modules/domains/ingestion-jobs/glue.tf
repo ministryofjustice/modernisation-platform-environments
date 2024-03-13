@@ -23,7 +23,7 @@ module "glue_reporting_hub_cdc_job" {
   max_concurrent                = var.glue_cdc_max_concurrent
   region                        = var.account_region
   account                       = var.account_id
-  log_group_retention_in_days   = var.glue_cdc_log_group_retention_in_days
+  log_group_retention_in_days   = var.glue_log_group_retention_in_days
 
   arguments = var.glue_cdc_arguments
 
@@ -60,7 +60,7 @@ module "glue_reporting_hub_batch_job" {
   max_concurrent                = var.glue_batch_max_concurrent #64
   region                        = var.account_region
   account                       = var.account_id
-  log_group_retention_in_days   = var.glue_batch_log_group_retention_in_days
+  log_group_retention_in_days   = var.glue_log_group_retention_in_days
 
   arguments = var.glue_batch_arguments
 
