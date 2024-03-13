@@ -134,9 +134,12 @@ data "aws_iam_policy_document" "ap_transfer_lambda" {
     effect = "Allow"
 
     actions = [
-    "rds:Connect",
-    "rds:Query",
-    "rds:DescribeDBInstances"
+      "rds-data:ExecuteSql",
+      "rds-data:ExecuteStatement",
+      "rds-data:BatchExecuteStatement",
+      "rds-data:BeginTransaction",
+      "rds-data:CommitTransaction",
+      "rds-data:RollbackTransaction",
     ]
     }
     statement {
