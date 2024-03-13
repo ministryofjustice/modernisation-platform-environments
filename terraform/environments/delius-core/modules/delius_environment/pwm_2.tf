@@ -64,7 +64,7 @@ module "mod_test" {
   microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
 
 
-  alb_listener_rule_host_header = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
+  alb_listener_rule_host_header = "pwm2.${var.env_name}.${var.account_config.dns_suffix}"
 
   platform_vars = var.platform_vars
 
@@ -88,7 +88,7 @@ module "mod_test" {
       value = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
         ldap_host_url = "ldap://${module.ldap.nlb_dns_name}:${var.ldap_config.port}"
         ldap_user     = module.ldap.delius_core_ldap_principal_arn
-        pwm_url       = "https://pwm.${var.env_name}.${var.account_config.dns_suffix}"
+        pwm_url       = "https://pwm2.${var.env_name}.${var.account_config.dns_suffix}"
         # email_smtp_address = "smtp.${data.terraform_remote_state.vpc.outputs.private_zone_name}"
         #         email_smtp_address = "production-smtp-relay-70e032e2738d0a27.elb.eu-west-2.amazonaws.com"
         # email_from_address = "no-reply@${data.terraform_remote_state.vpc.outputs.public_zone_name}"
