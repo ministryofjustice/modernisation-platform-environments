@@ -87,6 +87,15 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
   cidr_ipv4 = "152.37.111.98/32"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
+  security_group_id = aws_security_group.db.id
+  description       = "LB ip"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+
+  cidr_ipv4 = "209.35.83.77/32"
+}
 resource "aws_db_subnet_group" "db" {
   name       = "db-subnet-group"
   subnet_ids = data.aws_subnets.shared-public.ids
