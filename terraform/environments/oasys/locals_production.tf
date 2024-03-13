@@ -409,7 +409,7 @@ locals {
               #   ]
               # }
               ptc-web-http-8080 = {
-                priority = 100
+                priority = 200
                 actions = [{
                   type              = "forward"
                   target_group_name = "ptc-${local.application_name}-web-a-pb-http-8080"
@@ -427,7 +427,7 @@ locals {
                 ]
               }
               trn-web-http-8080 = {
-                priority = 100
+                priority = 300
                 actions = [{
                   type              = "forward"
                   target_group_name = "trn-${local.application_name}-web-a-pb-http-8080"
@@ -530,7 +530,7 @@ locals {
               #   ]
               # }
               ptc-web-http-8080 = {
-                priority = 100
+                priority = 200
                 actions = [{
                   type              = "forward"
                   target_group_name = "ptc-${local.application_name}-web-a-pv-http-8080"
@@ -548,7 +548,7 @@ locals {
                 ]
               }
               trn-web-http-8080 = {
-                priority = 100
+                priority = 300
                 actions = [{
                   type              = "forward"
                   target_group_name = "ptc-${local.application_name}-web-a-pv-http-8080"
