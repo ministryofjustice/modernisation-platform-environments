@@ -91,6 +91,8 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_start" {
   source_arn    = aws_cloudwatch_event_rule.start_instance[0].arn
 }
 
+/*
+
 #####################################
 # Create a ZIP of Python Application
 #####################################
@@ -190,3 +192,4 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   runtime       = "python3.12"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_to_lambda_role]
 }
+*/
