@@ -40,7 +40,7 @@ resource "aws_ssm_maintenance_window_task" "this" {
   # when specifying exact patches so the environments will run the standard AWS-RunPatchBaseline task
   task_arn        = var.environment == "development" ? "AWS-RunPatchBaselineWithHooks" : "AWS-RunPatchBaseline"
   priority        = 1
-  max_concurrency = "2 " # Temp values for debugging
+  max_concurrency = "2" # Temp values for debugging
   max_errors      = "2" # Temp values for debugging
 
   cutoff_behavior = "CONTINUE_TASK"
