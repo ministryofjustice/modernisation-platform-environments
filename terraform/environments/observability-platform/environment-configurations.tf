@@ -12,7 +12,17 @@ locals {
               xray_enabled            = true
             }
           }
-        }
+        },
+        "analytical-platform" = {
+          identity_centre_team = "9c6710dd7f-e2cdaf44-0510-48cd-8bb1-4b21552ae0f1"
+          aws_accounts = {
+            "analytical-platform-ingestion-development" = {
+              cloudwatch_enabled      = true
+              prometheus_push_enabled = false
+              xray_enabled            = true
+            }
+          }
+        },
         "data-platform" = {
           "identity_centre_team" = "a68242b4-b0a1-7085-25f4-dc60e4c122c0"
           "aws_accounts" = {
@@ -66,7 +76,17 @@ locals {
               xray_enabled            = true
             }
           }
-        }
+        },
+        "analytical-platform" = {
+          identity_centre_team = "9c6710dd7f-e2cdaf44-0510-48cd-8bb1-4b21552ae0f1"
+          aws_accounts = {
+            "analytical-platform-ingestion-production" = {
+              cloudwatch_enabled      = true
+              prometheus_push_enabled = false
+              xray_enabled            = true
+            }
+          }
+        },
         "data-platform" = {
           "identity_centre_team" = "a68242b4-b0a1-7085-25f4-dc60e4c122c0"
           "aws_accounts" = {
