@@ -9,7 +9,7 @@ module "development" {
   }
 }
 
-# Test overridden baseline
+# Test overridden baseline from same account
 module "devtest" {
   count       = local.is-development == true ? 1 : 0
   source      = "../../modules/patch_manager"
@@ -32,7 +32,7 @@ module "test" {
   }
 }
 
-# Test predefined baseline
+# Test predefined baseline from across account
 module "test-predefinedbaseline" {
   count       = local.is-test == true ? 1 : 0
   source      = "../../modules/patch_manager"
