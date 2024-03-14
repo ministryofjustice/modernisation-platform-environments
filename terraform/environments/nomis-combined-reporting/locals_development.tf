@@ -6,6 +6,13 @@ locals {
         iam_policies   = module.baseline_presets.s3_iam_policies
       }
     }
+    baseline_secretsmanager_secrets = {
+      "/ec2/ncr-bip-cms/dev"      = local.bip_cms_secretsmanager_secrets
+      "/ec2/ncr-tomcat-admin/dev" = local.tomcat_admin_secretsmanager_secrets
+
+      "/oracle/database/DEVBIPSYS" = local.database_secretsmanager_secrets
+      "/oracle/database/DEVBIPAUD" = local.database_secretsmanager_secrets
+    }
     baseline_iam_policies = {
       Ec2DevDatabasePolicy = {
         description = "Permissions required for DEV Database EC2s"
