@@ -179,7 +179,13 @@ resource "null_resource" "lambda_layer" {
       cd ${local.layer_path}
       rm -rf python
       mkdir python
-      pip3 install -r ${local.requirements_name} -t python/
+      pip install \
+      --platform manylinux2014_x86_64 \
+      --target=python \
+      --implementation cp \
+      --python-version 3.12 \
+      --only-binary=:all: --upgrade \
+      -r ${local.requirements_name}
       zip -r ${local.layer_zip_name} python/
     EOT
   }
@@ -193,3 +199,4 @@ resource "aws_lambda_layer_version" "ap_transfer_lambda_layer" {
   skip_destroy        = true
   depends_on          = [local.layer_zip_name]
 }
+
