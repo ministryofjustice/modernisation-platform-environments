@@ -30,7 +30,7 @@ locals {
 
   ndh_ems_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
+      ami_name = "nomis_data_hub_rhel_7_9_ems_release_2023-05-02T00-00-34.669Z"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.xlarge"

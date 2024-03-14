@@ -60,6 +60,7 @@ locals {
 
       t1-ndh-ems-a = merge(local.ndh_ems_a, {
         config = merge(local.ndh_ems_a.config, {
+          ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
           instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
             "Ec2t1Policy",
           ])
@@ -84,6 +85,7 @@ locals {
 
       t2-ndh-ems-a = merge(local.ndh_ems_a, {
         config = merge(local.ndh_ems_a.config, {
+          ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
           instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
             "Ec2t2Policy",
           ])
