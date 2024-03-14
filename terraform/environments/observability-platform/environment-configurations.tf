@@ -4,7 +4,7 @@ locals {
     development = {
       tenant_configuration = {
         "observability-platform" = {
-          identity_centre_team = "16a2d234-1031-70b5-2657-7f744c55e48f"
+          identity_centre_team = "observability-platform"
           aws_accounts = {
             "observability-platform-development" = {
               cloudwatch_enabled      = true
@@ -14,7 +14,7 @@ locals {
           }
         },
         "analytical-platform" = {
-          identity_centre_team = "9c6710dd7f-e2cdaf44-0510-48cd-8bb1-4b21552ae0f1"
+          identity_centre_team = "analytical-platform"
           aws_accounts = {
             "analytical-platform-ingestion-development" = {
               cloudwatch_enabled      = true
@@ -24,7 +24,7 @@ locals {
           }
         },
         "data-platform" = {
-          "identity_centre_team" = "a68242b4-b0a1-7085-25f4-dc60e4c122c0"
+          "identity_centre_team" = "data-platform"
           "aws_accounts" = {
             "data-platform-development" = {
               cloudwatch_enabled      = true
@@ -49,7 +49,7 @@ locals {
           }
         }
         "digital-studio-operations" = {
-          "identity_centre_team" = "9c6710dd7f-120a1f73-34c1-447a-b34c-6cdc2cd64b5e"
+          "identity_centre_team" = "studio-webops"
           "aws_accounts" = {
             "nomis-test" = {
               cloudwatch_enabled      = true
@@ -68,7 +68,7 @@ locals {
     production = {
       tenant_configuration = {
         "observability-platform" = {
-          identity_centre_team = "16a2d234-1031-70b5-2657-7f744c55e48f"
+          identity_centre_team = "observability-platform"
           aws_accounts = {
             "observability-platform-production" = {
               cloudwatch_enabled      = true
@@ -78,7 +78,7 @@ locals {
           }
         },
         "analytical-platform" = {
-          identity_centre_team = "9c6710dd7f-e2cdaf44-0510-48cd-8bb1-4b21552ae0f1"
+          identity_centre_team = "analytical-platform"
           aws_accounts = {
             "analytical-platform-ingestion-production" = {
               cloudwatch_enabled      = true
@@ -88,7 +88,7 @@ locals {
           }
         },
         "data-platform" = {
-          "identity_centre_team" = "a68242b4-b0a1-7085-25f4-dc60e4c122c0"
+          "identity_centre_team" = "data-platform"
           "aws_accounts" = {
             "data-platform-production" = {
               cloudwatch_enabled      = true
