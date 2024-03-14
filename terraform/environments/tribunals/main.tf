@@ -39,6 +39,7 @@ module "transport" {
   vpc_shared_id                     = data.aws_vpc.shared.id 
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  ecs_security_group_id             = aws_security_group.ecs_service.id
 }
 
 module "appeals" {
