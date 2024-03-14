@@ -78,6 +78,7 @@ module "rising_wave_meta_node" {
   policies                    = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.access_instance_metadata_policy}",
   ]
   region                      = local.account_region
   account                     = local.account_id
@@ -93,6 +94,11 @@ module "rising_wave_meta_node" {
     "RISINGWAVE_DASHBOARD" = {
       "from_port" = 5691,
       "to_port"   = 5691,
+      "protocol"  = "TCP"
+    }
+    "INSTANCE_METADATA" = {
+      "from_port" = 80,
+      "to_port"   = 80,
       "protocol"  = "TCP"
     }
   }
@@ -115,6 +121,7 @@ module "rising_wave_meta_node" {
   depends_on = [
     aws_iam_policy.kms_read_access_policy,
     aws_iam_policy.s3_all_object_actions_policy,
+    aws_iam_policy.access_instance_metadata_policy,
   ]
 
 }
@@ -294,4 +301,22 @@ module "rising_wave_frontend_node" {
     aws_iam_policy.s3_all_object_actions_policy,
   ]
 
+}
+
+locals {
+  access_instance_metadata_policy = "${local.project}_access_instance_metadata_policy"
+}
+resource "aws_iam_policy" "access_instance_metadata_policy" {
+  name = local.access_instance_metadata_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "AllowAccessInstanceMetadata",
+        "Action" : ["ec2:DescribeInstances"],
+        "Effect" : "Allow",
+        "Resource" : ["*"]
+      }
+    ]
+  })
 }
