@@ -89,3 +89,6 @@ variable "aws_acm_certificate_external" {
 
 variable "vpc_shared_id" {  
 }
+
+variable "ecs_security_group_id" {  
+}

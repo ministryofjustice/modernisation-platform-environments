@@ -139,6 +139,8 @@ module "app_ecs_task" {
   lb_listener               = module.ecs_loadbalancer.tribunals_lb_listener
   cluster_id                = var.cluster_id
   cluster_name              = var.cluster_name
+  ecs_security_group_id     = var.ecs_security_group_id
+  subnets_shared_public_ids = var.subnets_shared_public_ids
 }
 
 ####################### Load Balancer #########################################

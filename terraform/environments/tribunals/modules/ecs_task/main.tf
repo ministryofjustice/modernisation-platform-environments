@@ -139,8 +139,8 @@ resource "aws_ecs_service" "ecs_service" {
   health_check_grace_period_seconds = 300
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
-    security_groups  = [aws_security_group.ecs_service.id]
+    subnets          = var.subnets_shared_public_ids
+    security_groups  = [var.ecs_security_group_id]
     assign_public_ip = true
   }
 
