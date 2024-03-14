@@ -7,6 +7,8 @@ data "aws_ssoadmin_instances" "main" {
 }
 
 data "aws_identitystore_group" "this" {
+  provider = aws.sso-readonly
+
   identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
 
   alternate_identifier {
