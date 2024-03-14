@@ -95,7 +95,6 @@ resource "aws_dms_endpoint" "source" {
 }
 
 # Uncomment modernisation_dms_access for first time creation of the Security Group in AWS DSD Account
-/*
 resource "aws_security_group" "modernisation_dms_access" {
    provider    = aws.mojdsd
    name        = "modernisation_dms_access"
@@ -116,11 +115,10 @@ resource "aws_security_group" "modernisation_dms_access" {
      cidr_blocks = ["0.0.0.0/0"]
    }
 }
-*/
 
 // Uncomment setup_target_rds_security_group for first time setup of DMS
 // executes a local script to set up the security group for the target RDS instance in the source db aws account
-/*
+
 resource "null_resource" "setup_target_rds_security_group" {
   depends_on = [aws_dms_replication_instance.tribunals_replication_instance]
 
@@ -141,4 +139,3 @@ resource "null_resource" "setup_target_rds_security_group" {
     always_run = "${timestamp()}"
   }
 }
-*/
