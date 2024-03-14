@@ -48,6 +48,10 @@ module "merge_api_service" {
   rds_allocated_storage = var.delius_microservice_configs.merge_api.rds_allocated_storage
   rds_username          = var.delius_microservice_configs.merge_api.rds_username
   rds_license_model     = var.delius_microservice_configs.merge_api.rds_license_model
+  rds_deletion_protection = var.delius_microservice_configs.merge_api.rds_deletion_protection
+  snapshot_identifier     = var.delius_microservice_configs.merge_api.snapshot_identifier
+  rds_skip_final_snapshot = var.delius_microservice_configs.merge_api.rds_skip_final_snapshot
+  
   container_environment_vars = [
     {
       name  = "SERVER_SERVLET_CONTEXT_PATH"
