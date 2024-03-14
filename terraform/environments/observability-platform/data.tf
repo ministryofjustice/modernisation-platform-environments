@@ -63,5 +63,5 @@ data "aws_identitystore_group" "dso" {
 }
 
 output "dso_display_name" {
-  value = data.aws_identitystore_group.data_platform.display_name
+  value = data.aws_identitystore_group.dso.display_name
 }
