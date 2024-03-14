@@ -82,7 +82,7 @@ resource "aws_ssm_maintenance_window_task" "this" {
       }
 
       dynamic "parameter" {
-        for_each = (var.environment != "development" || var.application != "hmpps-domain-services-test-predefined" ) ? [1] : []
+        for_each = (var.environment != "development" && var.application != "hmpps-domain-services-test-predefined" ) ? [1] : []
         content {
           # All non-development environments pull patch list from development
           name   = "InstallOverrideList"
