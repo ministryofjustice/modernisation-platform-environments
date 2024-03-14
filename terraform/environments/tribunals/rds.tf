@@ -83,7 +83,7 @@ resource "aws_security_group" "sqlserver_db_sc" {
     to_port         = 1433
     protocol        = "tcp"
     description     = "Allows Administrative Appeals ECS service to access RDS"
-    security_groups = [module.appeals-ecs.cluster_ec2_security_group_id]
+    security_groups = [module.appeals.cluster_ec2_security_group_id]
   }
   # ingress {
   #   from_port       = 1433
