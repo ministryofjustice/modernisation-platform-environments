@@ -11,11 +11,19 @@ data "aws_identitystore_group" "this" {
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
 
-  alternate_identifier {
-    unique_attribute {
-      attribute_path  = "DisplayName"
-      attribute_value = "analytical-platform"
-    }
+  # This fails with the following error:
+  #   Error: reading AWS SSO Identity Store Group Data Source (d-XXXXXX): operation error identitystore: GetGroupId, https response error StatusCode: 400, RequestID: 059df12d-84ce-4803-9a6b-0d41624d749f, ResourceNotFoundException: Group not found
+  # alternate_identifier {
+  #   unique_attribute {
+  #     attribute_path  = "DisplayName"
+  #     attribute_value = "analytical-platform"
+  #   }
+  # }
+
+  # This is deprecated, but @dms1981 said it works...
+  filter {
+    attribute_path  = "DisplayName"
+    attribute_value = "analytical-platform"
   }
 }
 
