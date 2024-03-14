@@ -192,7 +192,7 @@ resource "null_resource" "lambda_layer" {
 }
 
 # create lambda layer from s3 object
-resource "ap_transfer_lambda_layer" "lambda_layer" {
+resource "aws_lambda_layer_version" "ap_transfer_lambda_layer" {
   s3_bucket           = aws_s3_bucket.lambda_layer.id
   s3_key              = aws_s3_object.lambda_layer_zip.key
   layer_name          = local.layer_path
