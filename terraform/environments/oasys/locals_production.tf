@@ -286,10 +286,11 @@ locals {
           ])
         })
         tags = merge(local.bip_a.tags, {
-          bip-db-name       = "TRBIPINF"
-          bip-db-hostname   = "ptctrn-oasys-db-a"
-          oasys-db-name     = "TROASYS"
-          oasys-db-hostname = "ptctrn-oasys-db-a"
+          bip-db-name                             = "TRBIPINF"
+          bip-db-hostname                         = "ptctrn-oasys-db-a"
+          oasys-db-name                           = "TROASYS"
+          oasys-db-hostname                       = "ptctrn-oasys-db-a"
+          "${local.application_name}-environment" = "trn"
         })
       })
     }
