@@ -57,7 +57,7 @@ locals {
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
+      "10.0.0.0/8",
     ])
   }
   security_group_cidrs_prod = {
@@ -89,7 +89,7 @@ locals {
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
+      "10.0.0.0/8",
     ])
   }
   security_group_cidrs_by_environment = {
