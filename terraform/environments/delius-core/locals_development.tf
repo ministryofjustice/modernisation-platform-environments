@@ -89,7 +89,7 @@ locals {
       rds_engine            = "postgres"
       rds_engine_version    = "15"
       rds_instance_class    = "db.t3.small"
-      rds_allocated_storage = 20
+      rds_allocated_storage = 30
       rds_username          = "dbadmin"
       rds_port              = 5432
       rds_license_model     = "postgresql-license"
