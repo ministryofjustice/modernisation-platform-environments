@@ -138,6 +138,12 @@ resource "aws_ecs_service" "ecs_service" {
 
   health_check_grace_period_seconds = 300
 
+  network_configuration {
+    subnets          = data.aws_subnets.shared-public.ids
+    security_groups  = [aws_security_group.ecs_service.id]
+    assign_public_ip = true
+  }
+
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
