@@ -32,7 +32,7 @@ locals {
       pp-ndh-app-a = merge(local.ndh_app_a, {
         config = merge(local.ndh_app_a.config, {
           instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
-            "Ec2t1Policy",
+            "Ec2ppPolicy",
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
@@ -44,7 +44,7 @@ locals {
       pp-ndh-ems-a = merge(local.ndh_ems_a, {
         config = merge(local.ndh_ems_a.config, {
           instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
-            "Ec2t1Policy",
+            "Ec2ppPolicy",
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
