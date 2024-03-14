@@ -192,11 +192,26 @@ resource "null_resource" "lambda_layer" {
 }
 
 # create lambda layer from s3 object
-resource "aws_lambda_layer_version" "ap_transfer_lambda_layer" {
-  filename   = "${local.layer_path}/${local.layer_zip_name}"
+resource "aws_lambda_layer_version" "lambda_layer" {
+  s3_bucket           = aws_s3_bucket.lambda_layer.id
+  s3_key              = aws_s3_object.lambda_layer_zip.key
   layer_name          = local.layer_path
-  compatible_runtimes = ["python3.12"]
+  compatible_runtimes = ["python3.11"]
   skip_destroy        = true
-  depends_on          = [local.layer_zip_name]
+  depends_on          = [aws_s3_object.lambda_layer_zip] # triggered only if the zip file is uploaded to the bucket
 }
 
+
+# define existing bucket for storing lambda layers
+resource "aws_s3_bucket" "lambda_layer" {
+  bucket_prefix = "lambda-layers"
+}
+
+
+# upload zip file to s3
+resource "aws_s3_object" "lambda_layer_zip" {
+  bucket     = aws_s3_bucket.lambda_layer.id
+  key        = "lambda_layers/${local.layer_path}/${local.layer_zip_name}"
+  source     = "${local.layer_path}/${local.layer_zip_name}"
+  depends_on = [null_resource.lambda_layer] # triggered only if the zip file is created
+}
