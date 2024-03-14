@@ -99,6 +99,9 @@ locals {
       rds_username          = "dbadmin"
       rds_port              = 5432
       rds_license_model     = "postgresql-license"
+      rds_deletion_protection = false
+      rds_skip_final_snapshot = true
+      snapshot_identifier = null
     }
 
     weblogic = {
