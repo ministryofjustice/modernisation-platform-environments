@@ -34,6 +34,7 @@ locals {
       pp-rdgw-1-a = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
           availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
         })
         tags = merge(local.rds_ec2_instance.tags, {
           description = "Remote Desktop Gateway for azure.hmpp.root domain"
