@@ -1,6 +1,5 @@
 resource "aws_ecs_task_definition" "ecs_task_definition" {
   family             = "${var.app_name}Family"
-  network_mode       = "awsvpc"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn      = aws_iam_role.ecs_task_execution_role.arn
   requires_compatibilities = [
@@ -138,12 +137,6 @@ resource "aws_ecs_service" "ecs_service" {
   launch_type     = "EC2"
 
   health_check_grace_period_seconds = 300
-
-  network_configuration {
-    subnets          = var.subnets_shared_public_ids
-    security_groups  = [var.ecs_security_group_id]
-    assign_public_ip = true
-  }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"

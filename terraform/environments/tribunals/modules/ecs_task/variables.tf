@@ -63,9 +63,3 @@ variable "cluster_id" {
 
 variable "cluster_name" {  
 }
-
-variable "subnets_shared_public_ids" {  
-}
-
-variable "ecs_security_group_id" {  
-}
