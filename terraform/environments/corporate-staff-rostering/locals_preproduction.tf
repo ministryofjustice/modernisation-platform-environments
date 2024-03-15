@@ -68,6 +68,7 @@ locals {
             "Ec2PreprodDatabasePolicy",
           ])
         })
+        cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.database # inc. ec2_instance_cwagent_collectd_oracle_db_backup alarms
         instance = merge(local.defaults_database_ec2.instance, {
           instance_type                = "r6i.xlarge"
           metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
