@@ -30,7 +30,7 @@ resource "aws_glue_catalog_database" "rds_to_parquet" {
 
 resource "aws_iam_role" "rds_to_parquet" {
     name = "rds-to-parquet-glue"
-    assume_role_policy = data.glue_assume_role.glue_ser.json
+    assume_role_policy = data.glue_assume_role.glue_assume_role.json
     managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
 }
 
