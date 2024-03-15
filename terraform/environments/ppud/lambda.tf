@@ -98,15 +98,15 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_start" {
 data "archive_file" "zip_the_disable_alarm_code" {
   count       = local.is-production == true ? 1 : 0
   type        = "zip"
-  source_dir  = "${path.module}/disable_cpu_alarm/"
-  output_path = "${path.module}/disable_cpu_alarm/disable_cpu_alarm.zip"
+  source_dir  = "${path.module}/disable-alarm/"
+  output_path = "${path.module}/disable-alarm/disable_cpu_alarm.zip"
 }
 
 data "archive_file" "zip_the_enable_alarm_code" {
   count       = local.is-production == true ? 1 : 0
   type        = "zip"
-  source_dir  = "${path.module}/enable_cpu_alarm/"
-  output_path = "${path.module}/enable_cpu_alarm/enable_cpu_alarm.zip"
+  source_dir  = "${path.module}/enable-alarm/"
+  output_path = "${path.module}/enable-alarm/enable_cpu_alarm.zip"
 }
 
 ########################################
@@ -119,7 +119,7 @@ resource "aws_cloudwatch_event_rule" "disable_cpu_alarm" {
   count               = local.is-production == true ? 1 : 0
   name                = "disable_cpu_alarm"
   description         = "Runs Weekly every Saturday at 00:00am GMT"
-  schedule_expression = "cron(00 14 ? * FRI *)" # Time Zone is in UTC
+  schedule_expression = "cron(00 00 ? * SAT *)" # Time Zone is in UTC
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_disable_cpu_alarm" {
@@ -144,7 +144,7 @@ resource "aws_cloudwatch_event_rule" "enable_cpu_alarm" {
   count               = local.is-production == true ? 1 : 0
   name                = "enable_cpu_alarm"
   description         = "Runs Weekly every Sunday at 08:00pm GMT"
-  schedule_expression = "cron(00 15 ? * FRI *)" # Time Zone is in UTC
+  schedule_expression = "cron(00 20 ? * SUN *)" # Time Zone is in UTC
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_enable_cpu_alarm" {
@@ -171,7 +171,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_enable_cpu_alarm" {
 
 resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
   count         = local.is-production == true ? 1 : 0
-  filename      = "${path.module}/disable_cpu_alarm/disable_cpu_alarm.zip"
+  filename      = "${path.module}/disable-alarm/disable_cpu_alarm.zip"
   function_name = "disable_cpu_alarm"
   role          = aws_iam_role.lambda_role_alarm_suppression[0].arn
   handler       = "disable_cpu_alarm.lambda_handler"
@@ -183,7 +183,7 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
 
 resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   count         = local.is-production == true ? 1 : 0
-  filename      = "${path.module}/enable_cpu_alarm/enable_cpu_alarm.zip"
+  filename      = "${path.module}/enable-alarm/enable_cpu_alarm.zip"
   function_name = "enable_cpu_alarm"
   role          = aws_iam_role.lambda_role_alarm_suppression[0].arn
   handler       = "enable_cpu_alarm.lambda_handler"
