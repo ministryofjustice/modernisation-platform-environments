@@ -23,3 +23,30 @@ resource "aws_glue_connection" "rds_to_parquet" {
     subnet_id              = tolist(data.aws_subnets.shared-public.ids)[0]
   }
 }
+
+resource "aws_glue_catalog_database" "rds_to_parquet" {
+  name = "rds_to_parquet"
+}
+
+resource "aws_iam_role" "rds_to_parquet" {
+    name = "rds-to-parquet-glue"
+    assume_role_policy = aws_iam_policy_document.rds_to_parquet.json
+    managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
+}
+
+resource "aws_iam_rol_policy_document" "rds_to_parquet" {
+    statement {
+        sid = "EC2RDSPermissions"
+        effect = "allow"
+        actions = ["rds:Describe*",
+        "rds:ListTagsForResource",
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeVpcs"]
+        resources = ["*"]
+    }
+}
