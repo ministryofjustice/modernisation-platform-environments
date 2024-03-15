@@ -54,16 +54,18 @@ resource "aws_route53_record" "external_validation" {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
-      provider = dvo.domain_name == "modernisation-platform.service.justice.gov.uk" ? aws.core-network-services : aws.core-vpc
+      provider = dvo.domain_name == "modernisation-platform.service.justice.gov.uk" ? aws.core-network-services : null
     }
   }
+  
+  provider = aws.core-vpc
+
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
   zone_id         = local.cert_zone_id
-  provider        = each.value.provider 
 }
 
 resource "aws_acm_certificate_validation" "external" {
