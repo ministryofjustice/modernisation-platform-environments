@@ -11,7 +11,7 @@ resource "aws_glue_crawler" "rds_to_parquet" {
 
 resource "aws_glue_connection" "rds_to_parquet" {
   connection_properties = {
-    JDBC_CONNECTION_URL = "jdbc:sqlserver:// ${aws_db_instance.database_2022.address}:${aws_db_instance.db.endpoint};database=${aws_db_instance.database_2022.db_name}"
+    JDBC_CONNECTION_URL = "jdbc:sqlserver:// ${aws_db_instance.database_2022.address}:${aws_db_instance.database_2022.endpoint};database=${aws_db_instance.database_2022.db_name}"
     PASSWORD            = "examplepassword"
     USERNAME            = "exampleusername"
   }
