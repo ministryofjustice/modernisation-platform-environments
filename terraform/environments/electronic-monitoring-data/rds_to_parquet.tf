@@ -47,6 +47,5 @@ data "aws_iam_policy_document" "rds_to_parquet" {
         "ec2:DescribeSubnets",
         "ec2:DescribeVpcAttribute",
         "ec2:DescribeVpcs"]
-        resources = ["*"]
     }
 }
