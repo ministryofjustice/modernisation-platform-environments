@@ -63,6 +63,7 @@ resource "aws_route53_record" "external_validation" {
   ttl             = 60
   type            = each.value.type
   zone_id         = local.cert_zone_id
+  provider        = each.value.provider 
 }
 
 resource "aws_acm_certificate_validation" "external" {
