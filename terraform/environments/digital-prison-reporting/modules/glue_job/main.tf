@@ -192,6 +192,8 @@ resource "aws_iam_role_policy_attachment" "glue_policies" {
 resource "aws_cloudwatch_log_group" "job" {
   count = var.create_job ? 1 : 0
 
+  skip_destroy = false
+
   name              = "/aws-glue/jobs/${var.name}"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
@@ -199,6 +201,8 @@ resource "aws_cloudwatch_log_group" "job" {
 
 resource "aws_cloudwatch_log_group" "sec_config" {
   count = var.create_job ? 1 : 0
+
+  skip_destroy = false
 
   name              = "/aws-glue/jobs/${var.short_name}-sec-config"
   retention_in_days = var.log_group_retention_in_days
@@ -208,6 +212,8 @@ resource "aws_cloudwatch_log_group" "sec_config" {
 resource "aws_cloudwatch_log_group" "sec_config_error" {
   count = var.create_job ? 1 : 0
 
+  skip_destroy = false
+
   name              = "/aws-glue/jobs/${var.short_name}-sec-config-role/${var.name}-glue-role/error"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
@@ -215,6 +221,8 @@ resource "aws_cloudwatch_log_group" "sec_config_error" {
 
 resource "aws_cloudwatch_log_group" "sec_config_output" {
   count = var.create_job ? 1 : 0
+
+  skip_destroy = false
 
   name              = "/aws-glue/jobs/${var.short_name}-sec-config-role/${var.name}-glue-role/output"
   retention_in_days = var.log_group_retention_in_days
@@ -224,6 +232,8 @@ resource "aws_cloudwatch_log_group" "sec_config_output" {
 
 resource "aws_cloudwatch_log_group" "continuous_log" {
   count = var.create_job ? 1 : 0
+
+  skip_destroy = false
 
   name              = "/aws-glue/jobs/${var.name}-${var.short_name}-sec-config"
   retention_in_days = var.log_group_retention_in_days
