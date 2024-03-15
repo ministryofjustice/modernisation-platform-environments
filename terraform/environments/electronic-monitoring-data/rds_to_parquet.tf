@@ -38,14 +38,20 @@ data "aws_iam_policy_document" "rds_to_parquet" {
     statement {
         sid = "EC2RDSPermissions"
         effect = "Allow"
-        actions = ["rds:Describe*",
-        "rds:ListTagsForResource",
-        "ec2:DescribeAccountAttributes",
-        "ec2:DescribeAvailabilityZones",
-        "ec2:DescribeInternetGateways",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeVpcAttribute",
-        "ec2:DescribeVpcs"]
+        actions = [
+            "rds:Describe*",
+            "rds:ListTagsForResource",
+            "ec2:DescribeAccountAttributes",
+            "ec2:DescribeAvailabilityZones",
+            "ec2:DescribeInternetGateways",
+            "ec2:DescribeSecurityGroups",
+            "ec2:DescribeSubnets",
+            "ec2:DescribeVpcAttribute",
+            "ec2:DescribeVpcs"
+            ]
+        principals {
+          type = "Service"
+          identifiers = ["rds.amazonaws.com"]
+        }
     }
 }
