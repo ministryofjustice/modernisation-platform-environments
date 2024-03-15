@@ -34,7 +34,7 @@ resource "aws_iam_role" "rds_to_parquet" {
     managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
 }
 
-resource "aws_iam_rol_policy_document" "rds_to_parquet" {
+resource "aws_iam_role_policy_document" "rds_to_parquet" {
     statement {
         sid = "EC2RDSPermissions"
         effect = "allow"
