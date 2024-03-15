@@ -78,15 +78,15 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4" {
 }
 
 
-resource "aws_vpc_security_group_ingress_rule" "db_ipv4_10sc" {
-  security_group_id = aws_security_group.db.id
-  description       = "10SC ip"
-  ip_protocol       = "tcp"
-  from_port         = 1433
-  to_port           = 1433
+# resource "aws_vpc_security_group_ingress_rule" "db_ipv4_10sc" {
+#   security_group_id = aws_security_group.db.id
+#   description       = "10SC ip"
+#   ip_protocol       = "tcp"
+#   from_port         = 1433
+#   to_port           = 1433
 
-  cidr_ipv4 = "51.149.2.8/32"
-}
+#   cidr_ipv4 = "51.149.2.8/32"
+# }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
   security_group_id = aws_security_group.db.id
