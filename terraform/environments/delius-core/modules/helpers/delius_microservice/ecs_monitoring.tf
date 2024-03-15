@@ -152,10 +152,9 @@ resource "aws_cloudwatch_metric_alarm" "log_error_warning_alarm" {
   }
 }
 
-/*
+
 
 resource "aws_cloudwatch_metric_alarm" "healthy_hosts_fatal_alarm" {
-  count               = var.create_lb_alarms && var.enable_healthy_host_alarms ? 1 : 0
   alarm_name          = "${var.name}-${var.env_name}-healthy-hosts-cwa--fatal"
   alarm_description   = "All `${var.name}` instances stopped responding."
   namespace           = "AWS/ApplicationELB"
@@ -168,14 +167,13 @@ resource "aws_cloudwatch_metric_alarm" "healthy_hosts_fatal_alarm" {
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   dimensions = {
-    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+    LoadBalancer = var.frontend_lb_arn_suffix
     TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
 
 # Response time alarms
 resource "aws_cloudwatch_metric_alarm" "response_time_critical_alarm" {
-  count               = var.create_lb_alarms && var.enable_response_time_alarms ? 1 : 0
   alarm_name          = "${var.name}-${var.env_name}-response-time-cwa--critical"
   alarm_description   = "Average response time for the `${var.name}` service exceeded 5 seconds."
   namespace           = "AWS/ApplicationELB"
@@ -188,14 +186,13 @@ resource "aws_cloudwatch_metric_alarm" "response_time_critical_alarm" {
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   dimensions = {
-    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+    LoadBalancer = var.frontend_lb_arn_suffix
     TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
 
 # Response code alarms
 resource "aws_cloudwatch_metric_alarm" "response_code_5xx_warning_alarm" {
-  count               = var.create_lb_alarms && var.enable_response_code_alarms ? 1 : 0
   alarm_name          = "${var.name}-${var.env_name}-5xx-response-cwa--warning"
   alarm_description   = "The `${var.name}` service responded with 5xx errors."
   namespace           = "AWS/ApplicationELB"
@@ -208,13 +205,12 @@ resource "aws_cloudwatch_metric_alarm" "response_code_5xx_warning_alarm" {
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   dimensions = {
-    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+    LoadBalancer = var.frontend_lb_arn_suffix
     TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "response_code_5xx_critical_alarm" {
-  count               = var.create_lb_alarms && var.enable_response_code_alarms ? 1 : 0
   alarm_name          = "${var.name}-${var.env_name}-5xx-response-cwa--critical"
   alarm_description   = "The `${var.name}` service responded with 5xx errors at an elevated rate (over 10/minute)."
   namespace           = "AWS/ApplicationELB"
@@ -227,10 +223,8 @@ resource "aws_cloudwatch_metric_alarm" "response_code_5xx_critical_alarm" {
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   dimensions = {
-    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+    LoadBalancer = var.frontend_lb_arn_suffix
     TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
 
-
-*/

@@ -493,3 +493,8 @@ variable "sns_topic_arn" {
   description = "Used by alarms"
   type        = string
 }
+
+variable "frontend_lb_arn_suffix" {
+  description = "Used by alarms"
+  type        = string
+}
