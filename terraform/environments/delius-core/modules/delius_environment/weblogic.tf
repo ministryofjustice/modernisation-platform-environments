@@ -65,6 +65,9 @@ module "weblogic" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
+  
+  log_error_pattern = "FATAL"
+  sns_topic_arn     = aws_sns_topic.delius_core_alarms.arn
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 }

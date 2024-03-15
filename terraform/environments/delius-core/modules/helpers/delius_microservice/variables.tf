@@ -489,3 +489,7 @@ variable "log_error_pattern" {
   type        = string
 }
 
+variable "sns_topic_arn" {
+  description = "Used by alarms"
+  type        = string
+}

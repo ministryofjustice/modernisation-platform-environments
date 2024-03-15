@@ -33,4 +33,7 @@ module "gdpr_ui_service" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
+  
+  log_error_pattern = ""
+  sns_topic_arn     = aws_sns_topic.delius_core_alarms.arn
 }

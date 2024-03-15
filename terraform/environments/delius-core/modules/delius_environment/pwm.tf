@@ -112,6 +112,7 @@ module "pwm" {
   }
 
   log_error_pattern = "FATAL"
+  sns_topic_arn     = aws_sns_topic.delius_core_alarms.arn
 }
 
 
