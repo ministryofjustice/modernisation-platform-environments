@@ -77,6 +77,17 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4" {
   cidr_ipv4 = "46.69.144.146/32"
 }
 
+
+resource "aws_vpc_security_group_ingress_rule" "db_ipv4_10sc" {
+  security_group_id = aws_security_group.db.id
+  description       = "10SC ip"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+
+  cidr_ipv4 = "152.37.111.98/32"
+}
+
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
   security_group_id = aws_security_group.db.id
   description       = "MH ip"
@@ -84,7 +95,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
   from_port         = 1433
   to_port           = 1433
 
-  cidr_ipv4 = "152.37.111.98/32"
+  cidr_ipv4 = "51.149.2.8/32"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
@@ -98,6 +109,16 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_glue" {
+  security_group_id = aws_security_group.db.id
+  description       = "glue"
+  ip_protocol       = "tcp"
+  from_port         = 0
+  to_port           = 65535
+
+  cidr_ipv4 = "152.37.111.98/32"
+}
+
+resource "aws_vpc_security_group_egress_rule" "db_glue" {
   security_group_id = aws_security_group.db.id
   description       = "glue"
   ip_protocol       = "tcp"
