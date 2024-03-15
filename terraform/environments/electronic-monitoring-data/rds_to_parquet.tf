@@ -1,3 +1,4 @@
+
 resource "aws_glue_crawler" "rds_to_parquet" {
   database_name = aws_glue_catalog_database.rds_to_parquet.name
   name          = "rds_to_parquet"
@@ -20,8 +21,8 @@ resource "aws_glue_connection" "rds_to_parquet" {
 
   physical_connection_requirements {
     security_group_id_list = [aws_security_group.db.id]
-    subnet_id              = tolist(data.aws_subnets.shared-public.ids)[0]
-    availability_zone      = ""
+    subnet_id              = data.aws_subnet.private_subnets_a.id
+    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
   }
 }
 
