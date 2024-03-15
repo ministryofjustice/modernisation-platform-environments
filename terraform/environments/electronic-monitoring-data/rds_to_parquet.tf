@@ -12,8 +12,8 @@ resource "aws_glue_crawler" "rds_to_parquet" {
 resource "aws_glue_connection" "rds_to_parquet" {
   connection_properties = {
     JDBC_CONNECTION_URL = "jdbc:sqlserver:// ${aws_db_instance.database_2022.address}:${aws_db_instance.database_2022.endpoint};database=${aws_db_instance.database_2022.db_name}"
-    PASSWORD            = "examplepassword"
-    USERNAME            = "exampleusername"
+    PASSWORD            = aws_secretsmanager_secret.db_password
+    USERNAME            = "admin"
   }
 
   name = "rds_to_parquet"
@@ -30,7 +30,7 @@ resource "aws_glue_catalog_database" "rds_to_parquet" {
 
 resource "aws_iam_role" "rds_to_parquet" {
     name = "rds-to-parquet-glue"
-    assume_role_policy = data.aws_iam_policy_document.rds_to_parquet.json
+    assume_role_policy = data.glue_assume_role.glue_ser.json
     managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
 }
 
@@ -39,7 +39,9 @@ data "aws_iam_policy_document" "rds_to_parquet" {
         sid = "EC2RDSPermissions"
         effect = "Allow"
         actions = [
-            "rds:Describe*",
+            "rds:DescribeDBInstances",
+            "rds:DescribeDBClusters",
+            "rds:DescribeDBSnapshots",
             "rds:ListTagsForResource",
             "ec2:DescribeAccountAttributes",
             "ec2:DescribeAvailabilityZones",
