@@ -64,6 +64,13 @@ resource "aws_security_group" "sqlserver_db_sc" {
       module.bastion_linux.bastion_security_group
     ]
   }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows ECS cluster to access RDS"
+    security_groups = [aws_security_group.cluster_ec2.id]
+  }
   # ingress {
   #   from_port       = 1433
   #   to_port         = 1433
@@ -78,13 +85,13 @@ resource "aws_security_group" "sqlserver_db_sc" {
   #   description     = "Allows Lands Chamber ECS service to access RDS"
   #   security_groups = [module.lands-ecs.cluster_ec2_security_group_id]
   # }
-  # ingress {
-  #   from_port       = 1433
-  #   to_port         = 1433
-  #   protocol        = "tcp"
-  #   description     = "Allows Administrative Appeals ECS service to access RDS"
-  #   security_groups = [module.appeals.cluster_ec2_security_group_id]
-  # }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Administrative Appeals ECS service to access RDS"
+    security_groups = [module.appeals.cluster_ec2_security_group_id]
+  }
   # ingress {
   #   from_port       = 1433
   #   to_port         = 1433
