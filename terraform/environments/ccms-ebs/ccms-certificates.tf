@@ -57,7 +57,7 @@ resource "aws_route53_record" "external_validation" {
     }
   }
   
-  provider = aws.core-vpc
+  provider = local.cert_opts[0].domain_name == "modernisation-platform.service.justice.gov.uk" ? aws.core-network-services : aws.core-vpc
 
   allow_overwrite = true
   name            = each.value.name
