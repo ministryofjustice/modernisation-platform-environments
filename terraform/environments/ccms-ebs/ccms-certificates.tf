@@ -41,7 +41,6 @@ resource "aws_acm_certificate" "external-service" {
 }
 
 ## Validation 
-
 resource "aws_route53_record" "external_validation" {
   depends_on = [
     aws_instance.ec2_oracle_ebs,
@@ -50,13 +49,12 @@ resource "aws_route53_record" "external_validation" {
     aws_instance.ec2_accessgate
   ]
 
-  provider = aws.core-vpc
-
   for_each = {
     for dvo in local.cert_opts : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
+      provider = dvo.domain_name == "modernisation-platform.service.justice.gov.uk" ? aws.core-network-services : aws.core-vpc
     }
   }
   allow_overwrite = true
