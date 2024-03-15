@@ -94,7 +94,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_start" {
 #####################################
 # Create a ZIP of Python Application
 #####################################
-/*
+
 data "archive_file" "zip_the_disable_alarm_code" {
   count       = local.is-production == true ? 1 : 0
   type        = "zip"
@@ -108,7 +108,7 @@ data "archive_file" "zip_the_enable_alarm_code" {
   source_dir  = "${path.module}/enable_cpu_alarm/"
   output_path = "${path.module}/enable_cpu_alarm/enable_cpu_alarm.zip"
 }
-*/
+
 ########################################
 # EventBridge rules to Lambda functions
 ########################################
