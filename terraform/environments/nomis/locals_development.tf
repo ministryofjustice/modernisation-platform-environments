@@ -275,6 +275,11 @@ locals {
       #  config = merge(local.database_ec2.config, {
       #    ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
       #    availability_zone = "${local.region}a"
+      #     instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+      #       "Ec2DevWeblogicPolicy",
+      #       "Ec2Qa11GWeblogicPolicy",
+      #       "Ec2Qa11RWeblogicPolicy",
+      #     ])
       #  })
       #  ebs_volumes = merge(local.database_ec2.ebs_volumes, {
       #    "/dev/sdb" = { label = "app", size = 100 }
@@ -295,6 +300,7 @@ locals {
       #   cloudwatch_metric_alarms = {}
       #   config = merge(local.weblogic_ec2.config, {
       #     ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
+      #     availability_zone = "${local.region}a"
       #     instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
       #       "Ec2DevWeblogicPolicy",
       #     ])
@@ -319,6 +325,7 @@ locals {
       #   cloudwatch_metric_alarms = {}
       #   config = merge(local.weblogic_ec2.config, {
       #     ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
+      #     availability_zone = "${local.region}b"
       #     instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
       #       "Ec2Qa11GWeblogicPolicy",
       #     ])
@@ -339,29 +346,30 @@ locals {
       #   })
       # })
 
-      # qa11r-nomis-web-c = merge(local.weblogic_ec2, {
-      #   cloudwatch_metric_alarms = {}
-      #   config = merge(local.weblogic_ec2.config, {
-      #     ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
-      #     instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-      #       "Ec2Qa11RWeblogicPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.weblogic_ec2.instance, {
-      #     instance_type = "t2.large"
-      #   })
-      #   user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
-      #     args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-      #       branch = "main"
-      #     })
-      #   })
-      #   tags = merge(local.weblogic_ec2.tags, {
-      #     nomis-environment    = "qa11r"
-      #     oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
-      #     oracle-db-hostname-b = "none"
-      #     oracle-db-name       = "qa11r"
-      #   })
-      # })
+      qa11r-nomis-web-a = merge(local.weblogic_ec2, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2Qa11RWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.large"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "qa11r"
+          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "qa11r"
+         })
+       })
     }
 
     baseline_lbs = {
