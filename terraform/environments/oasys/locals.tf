@@ -48,6 +48,7 @@ locals {
     enable_ec2_self_provision                    = true
     enable_ec2_user_keypair                      = true
     enable_ec2_oracle_enterprise_managed_server  = true
+    enable_azure_sas_token                       = true
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = true # adds db backup buckets
     iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
