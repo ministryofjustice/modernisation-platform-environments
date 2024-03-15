@@ -85,16 +85,6 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_10sc" {
   from_port         = 1433
   to_port           = 1433
 
-  cidr_ipv4 = "152.37.111.98/32"
-}
-
-resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
-  security_group_id = aws_security_group.db.id
-  description       = "MH ip"
-  ip_protocol       = "tcp"
-  from_port         = 1433
-  to_port           = 1433
-
   cidr_ipv4 = "51.149.2.8/32"
 }
 
