@@ -295,6 +295,7 @@ locals {
       })
     }
 
+
     baseline_ec2_autoscaling_groups = {
       # "pd-${local.application_name}-web-a" = merge(local.webserver_a, {
       #   tags = merge(local.webserver_a.tags, {
