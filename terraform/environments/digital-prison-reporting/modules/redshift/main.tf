@@ -41,6 +41,7 @@ resource "aws_redshift_cluster" "this" {
       log_destination_type = try(logging.value.log_destination_type, null)
       log_exports          = try(logging.value.log_exports, null)
       s3_key_prefix        = try(logging.value.s3_key_prefix, null)
+      retention_period     = try(logging.value.retention_period, null)
     }
   }
 
