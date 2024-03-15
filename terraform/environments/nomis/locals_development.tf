@@ -349,7 +349,6 @@ locals {
       qa11r-nomis-web-a = merge(local.weblogic_ec2, {
         cloudwatch_metric_alarms = {}
         config = merge(local.weblogic_ec2.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2Qa11RWeblogicPolicy",
