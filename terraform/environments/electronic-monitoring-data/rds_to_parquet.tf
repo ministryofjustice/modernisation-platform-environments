@@ -30,14 +30,14 @@ resource "aws_glue_catalog_database" "rds_to_parquet" {
 
 resource "aws_iam_role" "rds_to_parquet" {
     name = "rds-to-parquet-glue"
-    assume_role_policy = aws_iam_policy_document.rds_to_parquet.json
+    assume_role_policy = data.aws_iam_policy_document.rds_to_parquet.json
     managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
 }
 
 data "aws_iam_policy_document" "rds_to_parquet" {
     statement {
         sid = "EC2RDSPermissions"
-        effect = "allow"
+        effect = "Allow"
         actions = ["rds:Describe*",
         "rds:ListTagsForResource",
         "ec2:DescribeAccountAttributes",
