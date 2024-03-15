@@ -201,6 +201,7 @@ locals {
       })
     }
 
+
     baseline_ec2_instances = {
       preprod-nomis-db-1-a = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
