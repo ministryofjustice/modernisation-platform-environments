@@ -57,7 +57,7 @@ locals {
         config = merge(local.rds_ec2_instance.config, {
           availability_zone         = "eu-west-2a"
           user_data_raw             = base64encode(file("./templates/user-data-domain-join.yaml"))
-          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy"])
+          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies,["SSMPolicy", "PatchBucketAccessPolicy"])
         })
         instance = merge(local.rds_ec2_instance.instance, {
           instance_type = "t3.large"

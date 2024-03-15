@@ -38,7 +38,7 @@ resource "aws_ssm_maintenance_window_task" "this" {
   task_type       = "RUN_COMMAND"
   # Only development uses AWS-RunPatchBaselineWithHooks to trigger post patching jobs and you can't use this task
   # when specifying exact patches so the environments will run the standard AWS-RunPatchBaseline task
-  task_arn        = (var.environment == "development" && var.application != "hmpps-domain-services-test-predefined") ? "AWS-RunPatchBaselineWithHooks" : "AWS-RunPatchBaseline"
+  task_arn        = var.environment == "development" ? "AWS-RunPatchBaselineWithHooks" : "AWS-RunPatchBaseline"
   priority        = 1
   max_concurrency = "2" # Temp values for debugging
   max_errors      = "2" # Temp values for debugging
@@ -73,7 +73,7 @@ resource "aws_ssm_maintenance_window_task" "this" {
       }
 
       dynamic "parameter" {
-        for_each = (  var.environment == "development" && var.application != "hmpps-domain-services-test-predefined" )? [1] : []
+        for_each = var.environment == "development" ? [1] : []
         content {
           # Extract successful patches after development gets patched
           name   = "PostInstallHookDocName"
@@ -82,7 +82,7 @@ resource "aws_ssm_maintenance_window_task" "this" {
       }
 
       dynamic "parameter" {
-        for_each = (var.environment != "development" && var.application != "hmpps-domain-services-test-predefined" ) ? [1] : []
+        for_each = var.environment != "development" ? [1] : []
         content {
           # All non-development environments pull patch list from development
           name   = "InstallOverrideList"
