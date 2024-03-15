@@ -34,7 +34,7 @@ locals {
     ]
     principals = {
       type        = "AWS"
-      identifiers = local.oem_share_secret_principal_ids
+      identifiers = concat(local.oem_share_secret_principal_ids,["arn:aws:iam::326912278139:role/modernisation-platform-oidc-cicd"])
     }
     resources = ["*"]
   }
