@@ -270,7 +270,7 @@ locals {
       # SDPWL0001 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL6) [t2.large  2/8]
       # SDPWL0002 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL6) [t2.large]
       # SDPWL0003 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL6) [t2.large]
-      # SDPNL0001 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL7) [t3.medium]
+      # SDPNL0001 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL7) [t3.medium]
 
       dev-nomis-db-1-a = merge(local.database_ec2, {
         config = merge(local.database_ec2.config, {
@@ -384,47 +384,44 @@ locals {
         subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private-lb"]
 
+        instance_target_groups = {
+          dev-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
+            attachments = [
+              { ec2_instance_name = "dev-nomis-web-a" },
+            ]
+          })
+          qa11g-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
+            attachments = [
+              { ec2_instance_name = "qa11g-nomis-web-a" },
+            ]
+          })
+          qa11r-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
+            attachments = [
+              { ec2_instance_name = "qa11r-nomis-web-a" },
+            ]
+          })
+        }
+
         listeners = {
           http = local.weblogic_lb_listeners.http
 
-          http7777 = merge(local.weblogic_lb_listeners.http7777, {
-            rules = {
-              # qa11r-nomis-web-a = {
-              #   priority = 300
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "qa11r-nomis-web-a-http-7777"
-              #   }]
-              #   conditions = [{
-              #     host_header = {
-              #       values = [
-              #         "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
-              #         "c-qa11r.development.nomis.service.justice.gov.uk",
-              #       ]
-              #     }
-              #   }]
-              # }
-            }
-          })
-
           https = merge(local.weblogic_lb_listeners.https, {
             rules = {
-              # qa11r-nomis-web-a-http-7777 = {
-              #   priority = 300
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "qa11r-nomis-web-a-http-7777"
-              #   }]
-              #   conditions = [{
-              #     host_header = {
-              #       values = [
-              #         "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
-              #         "c-qa11r.development.nomis.service.justice.gov.uk",
-              #       ]
-              #     }
-              #   }]
-              # }
-              # }
+              qa11r-nomis-web-a-http-7777 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "qa11r-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
+                      "c-qa11r.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }
