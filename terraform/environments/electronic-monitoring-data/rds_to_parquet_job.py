@@ -16,7 +16,6 @@ source_table = args["table_name"]
 s3_output_path = (
     f"s3://rds-to-parquet-20240318105226406200000002/{source_database}/{source_table}/"
 )
-
 # Read data from the table
 dynamic_frame = glueContext.create_dynamic_frame.from_catalog(
     database=source_database, table_name=source_table
