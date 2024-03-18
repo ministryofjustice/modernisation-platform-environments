@@ -6,7 +6,7 @@ resource "aws_s3_bucket" "glue_jobs" {
 resource "aws_glue_crawler" "rds_to_parquet" {
   database_name = aws_glue_catalog_database.rds_to_parquet.name
   name          = "rds_to_parquet"
-  role          = aws_iam_role.rds_to_parquet.arn
+  role          = aws_iam_role.rds_to_parquet_crawler.arn
 
   jdbc_target {
     connection_name = aws_glue_connection.rds_to_parquet.name
@@ -34,13 +34,13 @@ resource "aws_glue_catalog_database" "rds_to_parquet" {
   name = "rds_to_parquet"
 }
 
-resource "aws_iam_role" "rds_to_parquet" {
+resource "aws_iam_role" "rds_to_parquet_crawler" {
     name = "rds-to-parquet-glue"
     assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
     managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
 }
 
-data "aws_iam_policy_document" "rds_to_parquet" {
+data "aws_iam_policy_document" "rds_to_parquet_job" {
     statement {
         sid = "EC2RDSPermissions"
         effect = "Allow"
@@ -103,10 +103,10 @@ resource "aws_s3_bucket_versioning" "rds_to_parquet" {
 
 resource "aws_s3_bucket_policy" "rds_to_parquet" {
   bucket = aws_s3_bucket.rds_to_parquet.id
-  policy = data.aws_iam_policy_document.rds_to_parquet.json
+  policy = data.aws_iam_policy_document.rds_to_parquet_bucket.json
 }
 
-data "aws_iam_policy_document" "rds_to_parquet" {
+data "aws_iam_policy_document" "rds_to_parquet_bucket" {
   statement {
     sid = "EnforceTLSv12orHigher"
     principals {
@@ -159,3 +159,5 @@ resource "aws_s3_object" "rds_to_parquet_glue_job" {
   source     = local.layer_python_name
   depends_on = [local.layer_python_name]
 }
+
+
