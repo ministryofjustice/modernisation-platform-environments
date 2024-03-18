@@ -40,29 +40,29 @@ resource "aws_iam_role" "rds_to_parquet_crawler" {
     managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
 }
 
-data "aws_iam_policy_document" "rds_to_parquet_job" {
-    statement {
-        sid = "EC2RDSPermissions"
-        effect = "Allow"
-        actions = [
-            "rds:DescribeDBInstances",
-            "rds:DescribeDBClusters",
-            "rds:DescribeDBSnapshots",
-            "rds:ListTagsForResource",
-            "ec2:DescribeAccountAttributes",
-            "ec2:DescribeAvailabilityZones",
-            "ec2:DescribeInternetGateways",
-            "ec2:DescribeSecurityGroups",
-            "ec2:DescribeSubnets",
-            "ec2:DescribeVpcAttribute",
-            "ec2:DescribeVpcs"
-            ]
-        principals {
-          type = "Service"
-          identifiers = ["rds.amazonaws.com"]
-        }
-    }
-}
+# data "aws_iam_policy_document" "rds_to_parquet_job" {
+#     statement {
+#         sid = "EC2RDSPermissions"
+#         effect = "Allow"
+#         actions = [
+#             "rds:DescribeDBInstances",
+#             "rds:DescribeDBClusters",
+#             "rds:DescribeDBSnapshots",
+#             "rds:ListTagsForResource",
+#             "ec2:DescribeAccountAttributes",
+#             "ec2:DescribeAvailabilityZones",
+#             "ec2:DescribeInternetGateways",
+#             "ec2:DescribeSecurityGroups",
+#             "ec2:DescribeSubnets",
+#             "ec2:DescribeVpcAttribute",
+#             "ec2:DescribeVpcs"
+#             ]
+#         principals {
+#           type = "Service"
+#           identifiers = ["rds.amazonaws.com"]
+#         }
+#     }
+# }
 
 
 #------------------------------------------------------------------------------
@@ -187,10 +187,10 @@ data "aws_iam_policy_document" "rds_to_parquet_glue_job" {
             "ec2:DescribeVpcAttribute",
             "ec2:DescribeVpcs"
             ]
-        principals {
-          type = "Service"
-          identifiers = ["rds.amazonaws.com"]
-        }
+        # principals {
+        #   type = "Service"
+        #   identifiers = ["rds.amazonaws.com"]
+        # }
     }
   statement {
     sid = "AllowPutS3"
