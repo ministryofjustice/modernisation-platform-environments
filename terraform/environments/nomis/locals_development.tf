@@ -276,11 +276,11 @@ locals {
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           availability_zone = "${local.region}a"
-           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-             "Ec2DevWeblogicPolicy",
-             "Ec2Qa11GWeblogicPolicy",
-             "Ec2Qa11RWeblogicPolicy",
-           ])
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2DevWeblogicPolicy",
+            "Ec2Qa11GWeblogicPolicy",
+            "Ec2Qa11RWeblogicPolicy",
+          ])
         })
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
@@ -293,6 +293,7 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "dev"
           description         = "syscon nomis dev and qa databases"
+          instance-scheduling = "skip-scheduling"
           oracle-sids         = ""
         })
       })
@@ -314,6 +315,7 @@ locals {
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
+          instance-scheduling  = "skip-scheduling"
           nomis-environment    = "dev"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
@@ -338,6 +340,7 @@ locals {
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
+          instance-scheduling  = "skip-scheduling"
           nomis-environment    = "qa11g"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
@@ -362,6 +365,7 @@ locals {
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
+          instance-scheduling  = "skip-scheduling"
           nomis-environment    = "qa11r"
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
