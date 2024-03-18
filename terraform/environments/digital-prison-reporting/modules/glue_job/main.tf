@@ -121,6 +121,10 @@ data "aws_iam_policy_document" "extra-policy-document" {
     actions = [
       "kinesis:DescribeLimits",
       "kinesis:DescribeStream",
+      "kinesis:DescribeStreamSummary",
+      "kinesis:DescribeStreamConsumer",
+      "kinesis:PutRecord",
+      "kinesis:PutRecords",
       "kinesis:GetRecords",
       "kinesis:GetShardIterator",
       "kinesis:SubscribeToShard",
