@@ -392,7 +392,7 @@ locals {
           })
           qa11g-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
             attachments = [
-              # { ec2_instance_name = "qa11g-nomis-web-a" },
+              { ec2_instance_name = "qa11g-nomis-web-a" },
             ]
           })
           qa11r-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
