@@ -10,16 +10,16 @@ data "archive_file" "get_table_names" {
 resource "aws_lambda_function" "get_table_names" {
   filename      = "get_table_names.zip"
   function_name = "get-all-table-names"
-  role          = aws_iam_role.lambda_execution.arn
+  role          = aws_iam_role.get_table_names_lambda.arn
   handler       = "get_table_names.handler"
   runtime       = "python3.12"
   memory_size   = 4096
   timeout       = 900
-  layers = [aws_lambda_layer_version.get_table_names.arn]
+  layers = [aws_lambda_layer_version.get_table_names_lambda_layer.arn]
 }
 
-resource "aws_iam_role" "lambda_execution" {
-  name                = "ap-transfer-iam-role"
+resource "aws_iam_role" "get_table_names_lambda" {
+  name                = "get-table-names-iam"
   assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
@@ -36,8 +36,8 @@ data "aws_iam_policy_document" "get_glue_table_names_policy" {
 }
 
 resource "aws_iam_role_policy" "get_table_names_lambda" {
-    name = "ap-transfer-iam-policy"
-    role = aws_iam_role.get_glue_table_names_policy.id
+    name = "get-table-names-iam-policy"
+    role = aws_iam_role.get_table_names_lambda.id
     policy = data.aws_iam_policy_document.get_glue_table_names_policy.json
 }
 
@@ -88,7 +88,7 @@ resource "null_resource" "get_table_names_lambda_layer" {
 # create lambda layer from s3 object
 resource "aws_lambda_layer_version" "get_table_names_lambda_layer" {
   s3_bucket           = aws_s3_bucket.rds_to_parquet.id
-  s3_key              = aws_s3_object.rds_to_parquet.key
+  s3_key              = aws_s3_object.lambda_layer_zip.key
   layer_name          = local.table_names_layer_path
   compatible_runtimes = ["python3.12"]
   skip_destroy        = true
