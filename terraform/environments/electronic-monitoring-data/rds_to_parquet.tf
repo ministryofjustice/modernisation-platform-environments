@@ -154,7 +154,12 @@ locals {
 
 resource "null_resource" "change_job" {
   triggers = {
-    requirements = filesha1(local.layer_python_name)
+    test = filesha1(local.layer_python_name)
+  }
+  provisioner "local-exec" {
+    command= <<EOT
+    cd .
+    EOT
   }
 }
 
@@ -170,7 +175,6 @@ resource "aws_glue_job" "rds_to_parquet_glue_job" {
   name     = "rds-to-parquet"
   glue_version = "4.0"
   role_arn = aws_iam_role.rds_to_parquet_job.arn
-  depends_on = [null_resource.change_job]
 
   command {
     script_location = "s3://${aws_s3_object.rds_to_parquet_glue_job.bucket}/${aws_s3_object.rds_to_parquet_glue_job.key}"
