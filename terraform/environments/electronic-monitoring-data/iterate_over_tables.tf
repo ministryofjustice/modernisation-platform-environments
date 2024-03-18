@@ -11,7 +11,7 @@ resource "aws_lambda_function" "get_table_names" {
   filename      = "get_table_names.zip"
   function_name = "get-all-table-names"
   role          = aws_iam_role.get_table_names_lambda.arn
-  handler       = "get_table_names.handler"
+  handler       = "get_table_names.lambda_handler"
   runtime       = "python3.12"
   memory_size   = 4096
   timeout       = 900
@@ -56,7 +56,7 @@ resource "aws_lambda_permission" "get_table_names_lambda" {
 
 #define variables
 locals {
-  table_names_layer_path        = "get_table_names_lambda_layer"
+  table_names_layer_path = "get_table_names_lambda_layer"
   layer_zip_name    = "${local.table_names_layer_path}.zip"
   requirements_name = "requirements.txt"
   requirements_path = "${path.module}/${local.table_names_layer_path}/${local.requirements_name}"
