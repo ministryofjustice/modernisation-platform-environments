@@ -13,9 +13,13 @@ locals {
 
   # EC2OracleEnterpriseManagementSecretsRole is used to allow access to OEM secrets from EC2 instances
   # modernisation-platform-oidc-cicd is used to allow access to OEM secrets from Ansible controller 
+  #  (modernisation-platform-oidc-cicd only currently required in Delius dev & test environments)
   oem_share_secret_principal_ids = flatten([
     for key, value in module.environment.account_ids :
-      contains(local.oem_managed_applications, key) ? ["arn:aws:iam::${value}:role/EC2OracleEnterpriseManagementSecretsRole","arn:aws:iam::${value}:role/modernisation-platform-oidc-cicd"] : []
+      concat (
+         contains(local.oem_managed_applications, key) ? ["arn:aws:iam::${value}:role/EC2OracleEnterpriseManagementSecretsRole"] : [],
+         contains(["development", "test"], local.environment) && contains(["delius-core-${local.environment}"], key) ? ["arn:aws:iam::${value}:role/modernisation-platform-oidc-cicd"] : []
+     )
   ])
 
   oem_secret_policy_write = {
