@@ -130,7 +130,7 @@ data "aws_iam_policy_document" "rds_to_parquet_bucket" {
 resource "aws_s3_bucket_logging" "rds_to_parquet" {
   bucket = aws_s3_bucket.rds_to_parquet.id
 
-  target_bucket = module.rds_to_parquet.bucket_id
+  target_bucket = aws_s3_bucket.rds_to_parquet.id
   target_prefix = "log/"
 
   target_object_key_format {
