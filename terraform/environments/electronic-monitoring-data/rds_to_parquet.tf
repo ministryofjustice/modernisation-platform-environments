@@ -165,6 +165,7 @@ resource "aws_glue_job" "rds_to_parquet_glue_job" {
   role_arn = aws_iam_role.rds_to_parquet_job.arn
 
   command {
+    python_version  = "3.11"
     script_location = "s3://${aws_s3_object.rds_to_parquet_glue_job.bucket}/${aws_s3_object.rds_to_parquet_glue_job.key}"
   }
 }
