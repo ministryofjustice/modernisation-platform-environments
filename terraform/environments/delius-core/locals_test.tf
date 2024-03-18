@@ -89,19 +89,19 @@ locals {
     }
 
     merge_api = {
-      image_tag             = "REPLACE"
-      container_port        = 8080
-      create_rds            = true
-      rds_engine            = "postgres"
-      rds_engine_version    = "15"
-      rds_instance_class    = "db.t3.small"
-      rds_allocated_storage = 20
-      rds_username          = "dbadmin"
-      rds_port              = 5432
-      rds_license_model     = "postgresql-license"
+      image_tag               = "REPLACE"
+      container_port          = 8080
+      create_rds              = true
+      rds_engine              = "postgres"
+      rds_engine_version      = "15"
+      rds_instance_class      = "db.t3.small"
+      rds_allocated_storage   = 20
+      rds_username            = "dbadmin"
+      rds_port                = 5432
+      rds_license_model       = "postgresql-license"
       rds_deletion_protection = false
       rds_skip_final_snapshot = true
-      snapshot_identifier = null
+      snapshot_identifier     = null
     }
 
     weblogic = {

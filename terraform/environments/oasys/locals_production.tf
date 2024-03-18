@@ -275,7 +275,7 @@ locals {
           description                             = "practice and training ${local.application_name} database"
           "${local.application_name}-environment" = "ptctrn"
           bip-db-name                             = "TRBIPINF"
-          oracle-sids = "PROASYS TROASYS TRBIPINF"
+          oracle-sids                             = "PROASYS TROASYS TRBIPINF"
         })
       })
 

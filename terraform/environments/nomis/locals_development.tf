@@ -368,8 +368,8 @@ locals {
           oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "qa11r"
-         })
-       })
+        })
+      })
     }
 
     baseline_lbs = {
