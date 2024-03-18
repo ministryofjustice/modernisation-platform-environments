@@ -145,7 +145,7 @@ resource "aws_s3_bucket_logging" "rds_to_parquet" {
 #------------------------------------------------------------------------------
 
 
-#define variables
+# define variables
 locals {
   layer_path        = "rds_to_parquet_job"
   layer_python_name    = "${local.layer_path}.py"
