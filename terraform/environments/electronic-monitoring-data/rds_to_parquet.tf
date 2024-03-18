@@ -152,23 +152,11 @@ locals {
 }
 
 
-resource "null_resource" "change_job" {
-  triggers = {
-    test = filesha1(local.layer_python_name)
-  }
-  provisioner "local-exec" {
-    command= <<EOT
-    cd .
-    EOT
-  }
-}
-
-# upload zip file to s3
 resource "aws_s3_object" "rds_to_parquet_glue_job" {
   bucket     = aws_s3_bucket.rds_to_parquet.id
   key        = "glue-job/${local.layer_python_name}"
   source     = local.layer_python_name
-  depends_on = [null_resource.change_job]
+  source_hash = filemd5(local.layer_python_name)
 }
 
 resource "aws_glue_job" "rds_to_parquet_glue_job" {
