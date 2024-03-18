@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
     #   }
     # }
 
-    volume {
+  volume {
     name = "tribunals"
     host_path = "D:/storage/tribunals"
   }
