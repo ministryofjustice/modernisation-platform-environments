@@ -160,4 +160,65 @@ resource "aws_s3_object" "rds_to_parquet_glue_job" {
   depends_on = [local.layer_python_name]
 }
 
+resource "aws_glue_job" "rds_to_parquet_glue_job" {
+  name     = "rds-to-parquet"
+  role_arn = aws_iam_role.rds_to_parquet_job.arn
 
+  command {
+    script_location = "s3://${aws_s3_object.rds_to_parquet_glue_job.bucket}/${aws_s3_object.rds_to_parquet_glue_job.key}"
+  }
+}
+
+
+data "aws_iam_policy_document" "rds_to_parquet_glue_job" {
+    statement {
+        sid = "EC2RDSPermissions"
+        effect = "Allow"
+        actions = [
+            "rds:DescribeDBInstances",
+            "rds:DescribeDBClusters",
+            "rds:DescribeDBSnapshots",
+            "rds:ListTagsForResource",
+            "ec2:DescribeAccountAttributes",
+            "ec2:DescribeAvailabilityZones",
+            "ec2:DescribeInternetGateways",
+            "ec2:DescribeSecurityGroups",
+            "ec2:DescribeSubnets",
+            "ec2:DescribeVpcAttribute",
+            "ec2:DescribeVpcs"
+            ]
+        principals {
+          type = "Service"
+          identifiers = ["rds.amazonaws.com"]
+        }
+    }
+  statement {
+    sid = "AllowPutS3"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+      "s3:PutObjectAcl",
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:GetObjectTagging",
+      "s3:GetObjectAcl",
+      "s3:GetObjectAttributes",
+      "s3:GetObjectVersionAttributes",
+      "s3:ListBucket"
+    ]
+    resources = ["${aws_s3_bucket.rds_to_parquet.arn}/*"]
+  }
+}
+
+resource "aws_iam_role" "rds_to_parquet_job" {
+    name = "rds-to-parquet-glue"
+    assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
+    managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
+}
+
+resource "aws_iam_role_policy" "rds_to_parquet_job" {
+  name   = "rds-to-parquet-job"
+  role   = aws_iam_role.rds_to_parquet_job.id
+  policy = data.aws_iam_policy_document.rds_to_parquet_glue_job.json
+}

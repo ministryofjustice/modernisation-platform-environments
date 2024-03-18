@@ -13,7 +13,7 @@ def get_table_and_database_names():
         database_name = database_dict["Name"]
         names[database_name] = []
 
-        response_get_tables = client.get_tables(databaseName=database_name)
+        response_get_tables = client.get_tables(DatabaseName=database_name)
         table_list = response_get_tables["TableList"]
 
         for table_dict in table_list:

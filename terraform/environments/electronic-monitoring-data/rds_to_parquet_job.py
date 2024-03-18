@@ -14,7 +14,9 @@ spark = glueContext.spark_session
 # Define source and target paths
 source_database = args["database_name"]
 source_table = args["table_name"]
-s3_output_path = f"s3://rds_to_parquet-xzytxuzytuzyt/{source_database}/{source_table}/"
+s3_output_path = (
+    f"s3://rds-to-parquet-20240318105226406200000002/{source_database}/{source_table}/"
+)
 
 
 # Read data from the table
