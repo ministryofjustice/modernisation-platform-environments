@@ -151,9 +151,11 @@ locals {
   layer_python_name    = "${local.layer_path}.py"
 }
 
-# create zip file from requirements.txt. Triggers only when the file is updated
-resource "null_resource" "rds_to_parquet_job" {
-  triggers = {
-    requirements = filesha1(local.layer_python_name)
-  }
+
+# upload zip file to s3
+resource "aws_s3_object" "rds_to_parquet_glue_job" {
+  bucket     = aws_s3_bucket.rds_to_parquet.id
+  key        = "glue-job/${local.layer_python_name}"
+  source     = local.layer_python_name
+  depends_on = [local.layer_python_name]
 }
