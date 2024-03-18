@@ -29,7 +29,8 @@ data "aws_iam_policy_document" "get_glue_table_names_policy" {
       sid    = "VPCConfig"
       effect = "Allow"
       actions = [
-        "glue:GetTables"
+        "glue:GetTables",
+        "glue:GetDatabases"
       ]
       resources = ["*"]
   }
