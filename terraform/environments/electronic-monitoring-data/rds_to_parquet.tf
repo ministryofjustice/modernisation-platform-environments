@@ -163,7 +163,7 @@ resource "aws_glue_job" "rds_to_parquet_glue_job" {
   name     = "rds-to-parquet"
   glue_version = "4.0"
   role_arn = aws_iam_role.rds_to_parquet_job.arn
-
+  connections = [aws_glue_connection.rds_to_parquet.name]
   command {
     python_version  = "3"
     script_location = "s3://${aws_s3_object.rds_to_parquet_glue_job.bucket}/${aws_s3_object.rds_to_parquet_glue_job.key}"
@@ -205,7 +205,7 @@ data "aws_iam_policy_document" "rds_to_parquet_glue_job" {
       "s3:GetObjectVersionAttributes",
       "s3:ListBucket"
     ]
-    resources = ["${aws_s3_bucket.rds_to_parquet.arn}/*"]
+    resources = ["${aws_s3_bucket.rds_to_parquet.arn}", "${aws_s3_bucket.rds_to_parquet.arn}/*"]
   }
 }
 

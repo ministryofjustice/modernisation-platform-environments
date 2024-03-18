@@ -106,9 +106,6 @@ resource "aws_s3_object" "lambda_layer_zip" {
 }
 
 
-
-
-
 # resource "aws_sfn_state_machine" "sfn_state_machine" {
 #   name     = "my-state-machine"
 #   role_arn = aws_iam_role.iam_for_sfn.arn
@@ -116,53 +113,52 @@ resource "aws_s3_object" "lambda_layer_zip" {
 #   type     = "EXPRESS"
 #   definition = <<EOF
 # {
-#   "Comment": "Orchestration to run Glue job on all tables in a Glue schema",
-#   "StartAt": "StartCrawler",
+#   "Comment": "Get all tables into parquet via glue job",
+#   "StartAt": "Get Table Names",
 #   "States": {
-#     "StartCrawler": {
+#     "Get Tables": {
 #       "Type": "Task",
-#       "Next": "ListTables",
+#       "Resource": "arn:aws:states:::lambda:invoke",
+#       "OutputPath": "$.arguments",
 #       "Parameters": {
-#         "Name": "MyData"
+#         "Payload.$": "$"
+#         "FunctionName": "arn:aws:lambda:eu-west-2:800964199911:function:get-all-table-names:$LATEST"
 #       },
-#       "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler"
-#     },
-#     "ListTables": {
-#       "Type": "Task",
-#       "Resource": "arn:aws:lambda:REGION:ACCOUNT_ID:function:ListTablesLambdaFunction",
-#       "Next": "TriggerGlueJobs",
-#       "Catch": [
+#       "Retry": [
 #         {
 #           "ErrorEquals": [
-#             "States.ALL"
+#             "Lambda.ServiceException",
+#             "Lambda.AWSLambdaException",
+#             "Lambda.SdkClientException",
+#             "Lambda.TooManyRequestsException"
 #           ],
-#           "Next": "ErrorState"
+#           "IntervalSeconds": 1,
+#           "MaxAttempts": 3,
+#           "BackoffRate": 2
 #         }
-#       ]
+#       ],
+#       "Next": "Map"
 #     },
-#     "TriggerGlueJobs": {
+#     "Map": {
 #       "Type": "Map",
-#       "ItemsPath": "$.tableNames",
-#       "Iterator": {
-#         "StartAt": "Glue StartJobRun",
+#       "ItemProcessor": {
+#         "ProcessorConfig": {
+#           "Mode": "INLINE"
+#         },
+#         "StartAt": "Run Glue Job on Table",
 #         "States": {
-#           "Glue StartJobRun": {
+#           "Run Glue Job on Table": {
 #             "Type": "Task",
-#             "Resource": "arn:aws:states:::glue:startJobRun.sync",
+#             "Resource": "arn:aws:states:::glue:startJobRun",
 #             "Parameters": {
-#               "JobName": "myJobName"
+#               "JobName": "rds_to_parquet_job"
 #             },
-#             "End": true
+#             "End": true,
+#             "InputPath": "$.arguments"
 #           }
 #         }
 #       },
-#       "Next": "Finish"
-#     },
-#     "Finish": {
-#       "Type": "Succeed"
-#     },
-#     "ErrorState": {
-#       "Type": "Fail"
+#       "End": true
 #     }
 #   }
 # }
