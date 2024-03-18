@@ -3,7 +3,7 @@ from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
-from pyspark.sql.function import unix_timestamp
+from pyspark.sql.functions import unix_timestamp
 
 # Get Glue context
 args = getResolvedOptions(sys.argv, ["JOB_NAME", "database_name", "table_name"])
