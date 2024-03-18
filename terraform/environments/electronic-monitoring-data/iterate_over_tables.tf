@@ -56,10 +56,10 @@ resource "aws_lambda_permission" "get_table_names_lambda" {
 
 #define variables
 locals {
-  layer_path        = "get_table_names_lambda_layer"
-  layer_zip_name    = "${local.layer_path}.zip"
+  table_names_layer_path        = "get_table_names_lambda_layer"
+  layer_zip_name    = "${local.table_names_layer_path}.zip"
   requirements_name = "requirements.txt"
-  requirements_path = "${path.module}/${local.layer_path}/${local.requirements_name}"
+  requirements_path = "${path.module}/${local.table_names_layer_path}/${local.requirements_name}"
 }
 
 # create zip file from requirements.txt. Triggers only when the file is updated
@@ -70,7 +70,7 @@ resource "null_resource" "get_table_names_lambda_layer" {
   # the command to install python and dependencies to the machine and zips
   provisioner "local-exec" {
     command = <<EOT
-      cd ${local.layer_path}
+      cd ${local.table_names_layer_path}
       rm -rf python
       mkdir python
       pip install \
@@ -89,7 +89,7 @@ resource "null_resource" "get_table_names_lambda_layer" {
 resource "aws_lambda_layer_version" "get_table_names_lambda_layer" {
   s3_bucket           = aws_s3_bucket.rds_to_parquet.id
   s3_key              = aws_s3_object.rds_to_parquet.key
-  layer_name          = local.layer_path
+  layer_name          = local.table_names_layer_path
   compatible_runtimes = ["python3.12"]
   skip_destroy        = true
   depends_on          = [aws_s3_object.lambda_layer_zip] # triggered only if the zip file is uploaded to the bucket
@@ -99,8 +99,8 @@ resource "aws_lambda_layer_version" "get_table_names_lambda_layer" {
 # upload zip file to s3
 resource "aws_s3_object" "lambda_layer_zip" {
   bucket     = aws_s3_bucket.rds_to_parquet.id
-  key        = "lambda_layers/${local.layer_path}/${local.layer_zip_name}"
-  source     = "${local.layer_path}/${local.layer_zip_name}"
+  key        = "lambda_layers/${local.table_names_layer_path}/${local.layer_zip_name}"
+  source     = "${local.table_names_layer_path}/${local.layer_zip_name}"
   depends_on = [null_resource.get_table_names_lambda_layer] # triggered only if the zip file is created
 }
 
