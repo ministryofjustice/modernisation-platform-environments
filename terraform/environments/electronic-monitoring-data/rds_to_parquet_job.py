@@ -6,11 +6,10 @@ from awsglue.context import GlueContext
 from pyspark.sql.function import unix_timestamp
 
 # Get Glue context
-args = getResolvedOptions(sys.argv, ["JOB_NAME"])
+args = getResolvedOptions(sys.argv, ["JOB_NAME", "database_name", "table_name"])
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
-args = getResolvedOptions(sys.argv, ["JOB_NAME", "database_name", "table_name"])
 # Define source and target paths
 source_database = args["database_name"]
 source_table = args["table_name"]
